@@ -18048,7 +18048,16 @@ var EngCalcs = EngCalcs || {};
 	paneTables().forEach(function (spec) {
 		paneTabs.push({
 			id: spec.id, panel: spec.panel, label: spec.label, tip: 'lpn_pane_tab_tip',
-			show: function () { paneTableReset(spec); renderPaneTable(spec); },
+			// **SHOWING A TABLE RE-SORTS IT AND REFILLS IT; IT DOES NOT REBUILD IT** (Tom,
+			// 2026-09-21, R-111: *"Switching to Junctions the first time and some subsequent times
+			// delayed about 3 seconds or more. This is the worst issue I found."*). show() used to
+			// clear the signature as well as the order, so EVERY tab click threw away a table of
+			// ~1,300 live cells and built it again from nothing -- and a hidden panel keeps its
+			// DOM, so there was nothing to rebuild. Forgetting the order alone keeps "a sort is
+			// re-applied when you come back" exactly as it was: if the fresh order differs, the
+			// signature differs and renderPaneTable() rebuilds by itself; if it does not, the
+			// cells are refilled in place. See paneTableSignature() for what else forces one.
+			show: function () { spec.orderIds = null; renderPaneTable(spec); },
 			refresh: function () { renderPaneTable(spec); }
 		});
 	});
@@ -18244,6 +18253,12 @@ var EngCalcs = EngCalcs || {};
 		paneState.tab = now.id;
 		applyPaneLayout();
 		if (paneState.open && now.show) { now.show(); }
+		// **AND THE KEYBOARD LANDS IN THE TABLE, NOT ON THE TAB** (Tom, 2026-09-21, R-113:
+		// *"Switching tables (tabs) leaves the tab selected instead of the currently highlighted
+		// cell."*). A click on a tab focuses the tab button, and the table's own key handler never
+		// hears an arrow pressed there. Only here, on the tab strip's own gesture: a table shown by a
+		// solve, a project arriving or a menu row must not steal the caret from whatever has it.
+		if (paneState.open && paneTableById(now.id)) { paneFocusActiveCell(paneTableById(now.id)); }
 		savePaneState();
 	}
 	// **OPEN, NOT TOGGLE**, exactly like the Find box: a menu row that names a tab shows that tab.
@@ -20529,6 +20544,9 @@ var EngCalcs = EngCalcs || {};
 			if (!Object.prototype.hasOwnProperty.call(spec.cells, id)) { continue; }
 			if (spec.cells[id][key] && spec.cells[id][key].style) {
 				spec.cells[id][key].style.setProperty('--lpn-pane-col-w', em + 'em');
+				if (spec.cells[id][key].tagName === 'SELECT' && spec.cells[id][key].classList) {
+					spec.cells[id][key].classList.add('lpn-pane-dragged');
+				}
 			}
 		}
 	}
@@ -20544,6 +20562,24 @@ var EngCalcs = EngCalcs || {};
 	// the pointer has crossed into another heading, for the same reason -- one heading doing two
 	// jobs has to be able to tell them apart. Two pixels, because a hand is not quite still.
 	var PANE_COL_DRAG_SLOP = 2;
+	// **A DRAG STARTS FROM THE WIDTH ON SCREEN, NOT FROM A NUMBER THE COLUMN MAY NOT HAVE** (Tom,
+	// 2026-09-21, R-110: *"Sometimes the column widths are unreasonable. For example,
+	// Pumps.Date installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?);
+	// Pump.Price pattern, width = 3em (due to selector?)"*). The blind spot was exactly the columns
+	// he named: a pull-down and a custom property DECLARE NO WIDTH -- the browser sizes them from
+	// their widest option or their heading -- and the drag took the 7em fallback as where it was
+	// starting from. So the first pixel of any drag on one of them snapped it to 7em plus the
+	// travel, whatever it had been drawn at; and a column that declares an em its heading has
+	// outgrown (a 3.5em figure under a three-word heading) snapped NARROWER than it stood, by the
+	// difference, before the hand had moved. A few drags of that and a column is a character wide,
+	// stored per browser for good. The heading's own rendered width is the one number that is
+	// always what the reader sees; the declared width stays the answer where nothing is laid out.
+	function paneColDrawnEm(spec, c, unit) {
+		var th = spec.headCells && spec.headCells[c.key], w = 0;
+		try { w = (th && th.getBoundingClientRect) ? th.getBoundingClientRect().width : 0; } catch (e) { w = 0; }
+		if (w > 0 && unit > 0) { return Math.round((w / unit) * 100) / 100; }
+		return paneColWidthEm(spec.id, c) || 7;
+	}
 	function paneStartColResize(spec, key, ev) {
 		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
 			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startEm;
@@ -20553,7 +20589,7 @@ var EngCalcs = EngCalcs || {};
 		if (ev && ev.preventDefault) { ev.preventDefault(); }
 		table = spec.colGroup && spec.colGroup.parentNode;
 		unit = paneEmPx(table);
-		startEm = paneColWidthEm(spec.id, cols[i]) || 7;
+		startEm = paneColDrawnEm(spec, cols[i], unit);
 		function dxOf(e2) {
 			return ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX;
 		}
@@ -20617,6 +20653,11 @@ var EngCalcs = EngCalcs || {};
 	function paneApplyColWidth(input, c, spec) {
 		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
 		if (em) { input.style.setProperty('--lpn-pane-col-w', em + 'em'); }
+		// A pull-down gives up its natural width only in a column the reader has dragged (R-110;
+		// the rule and its reason are in css/engcalcs.css beside `select.lpn-pane-dragged`).
+		if (spec && input.classList && input.tagName === 'SELECT' && paneColUserWidth(spec.id, c)) {
+			input.classList.add('lpn-pane-dragged');
+		}
 	}
 	// The placeholder and its explanation for a column that offers a suggestion, and nothing at all
 	// for one that does not. The tip goes on `title` rather than beside the cell: a table of forty
@@ -20648,10 +20689,23 @@ var EngCalcs = EngCalcs || {};
 	// "showing 12 of 40", and adding a junction that the filter turns away changes the 40 while
 	// leaving every row in place -- so a signature made of the rows alone would leave a stale count
 	// on screen for as long as nothing else moved.
+	//
+	// **AND WHAT KIND OF CELL EACH ONE IS** (R-111). A cell is built as a box, a pull-down or plain
+	// text, and refillPaneTable() can only write a value into the kind it finds -- so a row whose
+	// `plainFor` answer changed (a demand that became a list of categories, a pipe type that now
+	// owns its diameter), or a pull-down whose list of choices changed (a curve added in the
+	// Library), has to be rebuilt. That was always true of a live refill and was covered, on a tab
+	// switch, only by rebuilding everything; now that a switch refills, it is stated here.
 	function paneTableSignature(spec, rows) {
+		var cols = paneCols(spec);
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
-			paneCols(spec).map(paneHeadingText).join('|') + '||' +
-			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length;
+			cols.map(paneHeadingText).join('|') + '||' +
+			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
+			cols.map(function (c) {
+				if (c.result || !c.set) { return ''; }
+				return (c.choices && !c.bool ? c.choices().map(function (o) { return o[0]; }).join(',') : '') +
+					(c.plainFor ? ':' + rows.map(function (el) { return c.plainFor(el) ? 1 : 0; }).join('') : '');
+			}).join('|');
 	}
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
 	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
@@ -20936,7 +20990,7 @@ var EngCalcs = EngCalcs || {};
 				btn = document.createElement('button');
 				btn.type = 'button';
 				btn.className = 'lpn-pane-goto ec-help';
-				btn.title = pc.lpn_pane_goto_tip || 'Show this on the map.';
+				btn.title = pc.lpn_pane_goto_tip || 'Zoom & select';
 				btn.setAttribute('aria-label', btn.title + ' ' + el.id);
 				if (EngCalcs.iconEl) { btn.appendChild(EngCalcs.iconEl('pin')); }
 				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
@@ -20970,13 +21024,18 @@ var EngCalcs = EngCalcs || {};
 			var cells = spec.cells[el.id];
 			if (!cells) { return; }
 			paneCols(spec).forEach(function (c) {
-				var target = cells[c.key];
+				var target = cells[c.key], text;
 				if (!target) { return; }
 				if (target._lpnCell) { target._lpnCell.el = el; }
+				// **A CELL IS WRITTEN ONLY WHEN WHAT IT SAYS HAS CHANGED** (R-111). Assigning
+				// `textContent` replaces the text node even when the words are identical, and that
+				// alone marks the cell for layout -- so a refill of a table in which nothing had
+				// moved re-laid-out all ~1,300 cells, on every solve and now on every tab switch.
 				if (paneCellIsPlain(c, el)) {
-					target.textContent = paneCellText(c, el);
+					text = paneCellText(c, el);
+					if (target.textContent !== text) { target.textContent = text; }
 				} else if (c.bool && target.type === 'checkbox') {
-					target.checked = !!c.get(el);
+					if (target.checked !== !!c.get(el)) { target.checked = !!c.get(el); }
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
 					// The suggestion follows the drawing: move the meter and the pipe it would be
 					// served from changes, so a placeholder written once at build time would be
@@ -20986,7 +21045,8 @@ var EngCalcs = EngCalcs || {};
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
 					// refused to refresh it would leave one stale number in a live table.
-					target.value = paneCellText(c, el);
+					text = paneCellText(c, el);
+					if (target.value !== text) { target.value = text; }
 					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
 			});
@@ -21250,6 +21310,22 @@ var EngCalcs = EngCalcs || {};
 			if (r) { rowTops.push((r.top - hostRect.top) + cur); }
 		}
 		host.scrollTop = paneScrollTopFor(cur, viewH, headH, top, bottom, rowTops);
+	}
+	// The table's current cell, focused -- the anchor of its selection, which is the cell wearing the
+	// border (see paneSelPaint()), so a Shift-extended range survives the trip untouched. A table
+	// nobody has touched yet gets its first cell, as a spreadsheet opens on A1.
+	function paneFocusActiveCell(spec) {
+		var rows, cols, box;
+		if (!spec || !spec.tds) { return false; }
+		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+		if (!rows.length || !cols.length) { return false; }
+		box = paneSelBox(spec, rows, cols);
+		if (!box) {
+			paneSelSet(spec, rows, cols, 0, 0, false);
+			paneSelPaint(spec, rows, cols);
+			box = paneSelBox(spec, rows, cols);
+		}
+		return box ? paneFocusCell(spec, rows[box.ar].id, cols[box.ac].key) : false;
 	}
 	function paneFocusCell(spec, id, key) {
 		var active = activeElementSafe(), target, cellTd;
@@ -22010,8 +22086,11 @@ var EngCalcs = EngCalcs || {};
 	 * **EVERY WORD ON THE MENU IS BORROWED, NOT COINED.** Copy and Paste are
 	 * `points_data_copy`/`points_data_paste` -- the row-table point grid's own labels, already
 	 * shipping on four calculator pages, and CLAUDE.md's concept-level reuse rule gives the key
-	 * used by materially more pages the win. **Select in map is `lpn_pane_goto_tip`**, the pin's
-	 * own tip: the pin already IS this command (findGoTo() selects the element and pans to it), so
+	 * used by materially more pages the win. **Zoom & select is `lpn_pane_goto_tip`**, the pin's
+	 * own tip: the pin already IS this command (findGoTo() selects the element and ZOOMS to it --
+	 * Tom, 2026-09-21, R-115: *"If right-click 'Show on map' is 'Select on map' instead of just
+	 * 'Go to' or 'Zoom to' (which is what I expected), then we should label it 'Zoom & select'."*
+	 * It does both, so the words are his), so
 	 * a second string for the identical action would be the "Source trace"/"Source share"
 	 * collision this project has already paid for once. Delete is `lpn_tool_delete`'s bare word,
 	 * reused for the imperative alone and not its sentence, because the map tool and this command
@@ -22095,7 +22174,7 @@ var EngCalcs = EngCalcs || {};
 			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
 		});
 		aim = paneCtxTarget(spec, td, rows, box);
-		mk(pc.lpn_pane_goto_tip || 'Show this on the map.', function () {
+		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
 			findGoTo(aim.group, aim.id);
 		});
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
@@ -22388,6 +22467,18 @@ var EngCalcs = EngCalcs || {};
 	// The pane follows the document without a listener of its own: every solve ends in a call to
 	// this, and every edit schedules a solve. A tab that is not on screen is not refreshed, and
 	// picks up whatever changed when it is next shown.
+	// **THE TABLE ON SHOW IS DRAWN FROM THE DOCUMENT, NOT BY THE SOLVE** (Tom, 2026-09-21, R-109:
+	// *"The page loads with the current table blank. I have to switch away and back to see that
+	// table."*). The pane was only ever refreshed at the END of a solve, and a document can arrive
+	// with no solve behind it at all -- Recalculate off, or an answer already kept for that tab --
+	// so the table wirePane() built at boot, before any project had been read, stayed on screen
+	// saying "This network has none of these yet" over a network of 92 junctions. Called wherever a
+	// document ARRIVES (the boot path and refreshAllFromDocument()), never on an edit. Every table's
+	// remembered row order belongs to the outgoing document, so all seven forget it.
+	function paneDocumentArrived() {
+		paneTables().forEach(paneTableReset);
+		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
+	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
 		if (!paneIsOpen() || !t || !t.refresh) { return; }
@@ -26409,6 +26500,7 @@ var EngCalcs = EngCalcs || {};
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
 			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
 		});
+		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
@@ -32669,6 +32761,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (opening) {
 			applySaved(opening);
 			buildDom();
+			paneDocumentArrived();   // R-109: wirePane() above drew the table before this document existed
 			// The boot path does not go through refreshAllFromDocument(), so it marks the arrival
 			// itself: a project reopened with a duration is presented over it, exactly as one
 			// opened from the tab strip is.

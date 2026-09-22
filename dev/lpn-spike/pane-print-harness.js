@@ -267,8 +267,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 	});
 	// One seam decides what a cell says. Two would be two roundings of one number.
 	report(src.split('function paneCellText(').length === 2, 'one function decides a cell’s text');
-	report(/target\.textContent = paneCellText\(c, el\);/.test(src) &&
-		/target\.value = paneCellText\(c, el\);/.test(src),
+	// (R-111: the refill now writes a cell only when its text changed, so the value arrives through
+	// a local -- still paneCellText()'s, and still the only thing either write is handed.)
+	report(/text = paneCellText\(c, el\);\s*if \(target\.textContent !== text\) \{ target\.textContent = text; \}/.test(src) &&
+		/text = paneCellText\(c, el\);\s*if \(target\.value !== text\) \{ target\.value = text; \}/.test(src),
 		'...and the live table fills its cells through it too');
 }
 

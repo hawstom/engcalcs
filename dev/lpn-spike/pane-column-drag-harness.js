@@ -72,7 +72,24 @@ function docFire(type, ev) {
 	((global.document._listeners && global.document._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
 }
 // The grip and the heading button, as the browser hands them over.
-function gripOf(key) { return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0]; }
+// **A HEADING IS DRAWN AT ITS COLUMN'S WIDTH**, which is the one physical relationship a drag now
+// reads (R-110: the drag starts from the width on screen). The stub's default rect is 1000 px wide
+// for everything, which would make every column start a drag 62 em wide. `drawn` overrides the
+// modelled width for one heading, to stand for a browser that laid it out wider or narrower than
+// the column declares -- which is exactly the case the blind spot was about.
+const drawn = {};
+function modelHeadingWidths() {
+	ths().forEach((th) => {
+		th.getBoundingClientRect = () => {
+			const em = drawn[th._lpnColKey] || L.widthEm('junctions', th._lpnColKey) || 7;
+			return { left: 0, top: 0, right: em * 16, bottom: 20, width: em * 16, height: 20 };
+		};
+	});
+}
+function gripOf(key) {
+	modelHeadingWidths();
+	return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0];
+}
 function sortBtnOf(key) { return thFor(key).children.filter((c) => String(c.className || '').indexOf('lpn-pane-sort') === 0)[0]; }
 
 console.log('\n--- the heading carries both handles ---');
@@ -181,6 +198,45 @@ console.log('\n--- double-clicking the divider gives the column its default back
 		'...and its heading stops breaking mid-word');
 	L.renderTable('junctions');
 	report(L.userWidth('junctions', 'elev') === 0, '...and it stays forgotten across a rebuild');
+}
+
+// **THE BLIND SPOT, AND IT WAS THE COLUMNS HE NAMED** (Tom, 2026-09-21, R-110: *"Pumps.Date
+// installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
+// pattern, width = 3em (due to selector?)"*). A pull-down and a custom property declare no width,
+// so the drag assumed 7em; a column whose heading has outgrown its declared em was assumed to be
+// the declared em. Either way the first pixel of travel snapped the column to a width the reader
+// had never seen. It must start from what is drawn.
+console.log('\n--- R-110: a drag starts from the width on screen ---');
+{
+	L.resetWidth('junctions', 'elev');
+	L.renderTable('junctions');
+	const declared = L.widthEm('junctions', 'elev');
+	drawn.elev = declared + 1.5;   // the heading holds the column open 1.5 em past what it declares
+	fire(gripOf('elev'), 'mousedown', { clientX: 100, stopPropagation: function () {}, preventDefault: function () {} });
+	docFire('mousemove', { clientX: 116 });
+	docFire('mouseup', { clientX: 116 });
+	report(Math.abs(L.widthEm('junctions', 'elev') - (declared + 2.5)) < 0.01,
+		'a column drawn wider than it declares widens from where it is drawn, not from its declaration',
+		declared + ' declared, ' + drawn.elev + ' drawn, +1 em -> ' + L.widthEm('junctions', 'elev'));
+	delete drawn.elev;
+	L.resetWidth('junctions', 'elev');
+	L.renderTable('junctions');
+	// A column declaring NO width -- the pull-down and custom-property case -- was assumed to be
+	// 7em. Drawn at 5.9em (a pattern pull-down, measured in Chromium), a one-em narrowing is 4.9.
+	const noEm = L.colKeys('junctions').filter((k) => !L.widthEm('junctions', k))[0];
+	report(!!noEm, 'the junction table has a column that declares no width to test with', noEm);
+	if (noEm) {
+		drawn[noEm] = 5.9;
+		fire(gripOf(noEm), 'mousedown', { clientX: 100, stopPropagation: function () {}, preventDefault: function () {} });
+		docFire('mousemove', { clientX: 84 });
+		docFire('mouseup', { clientX: 84 });
+		report(Math.abs(L.widthEm('junctions', noEm) - 4.9) < 0.01,
+			'a column that declares no width narrows from its drawn 5.9 em, not from a 7 em guess',
+			'-1 em -> ' + L.widthEm('junctions', noEm));
+		delete drawn[noEm];
+		L.resetWidth('junctions', noEm);
+		L.renderTable('junctions');
+	}
 }
 
 console.log('\n--- (e) dragging a heading moves the column ---');

@@ -1359,7 +1359,7 @@ $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
-$ec_lang['lpn_pane_goto_tip']='Show this on the map.';
+$ec_lang['lpn_pane_goto_tip']='Zoom & select';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 

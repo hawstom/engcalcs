@@ -2165,6 +2165,24 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    rule comes later in this file. */
 .lpn-pane-panel.lpn-pane-scroll { overflow: auto; }
 .lpn-pane-panel.lpn-pane-scroll.on { display: block; }
+/* **A TABLE THAT IS NOT ON SHOW KEEPS ITS LAYOUT** (Tom, 2026-09-21, R-111: *"Switching to
+   Junctions the first time and some subsequent times delayed about 3 seconds or more. This is the
+   worst issue I found."*). `display: none` throws a panel's style and layout away, so every tab
+   click re-derived both for ~1,300 form controls from nothing -- measured as the larger part of a
+   switch once the table itself stopped being rebuilt. `content-visibility: hidden` is the property
+   made for exactly this: the subtree is skipped for style, layout, paint and hit-testing while
+   hidden, and its last rendering is KEPT, so showing it again costs only what changed. The panels
+   are stacked in one box so a hidden one takes no room, and a hidden one sits BENEATH everything
+   else in the pane with a z-index -- not `pointer-events` or `visibility`, which are inherited and
+   would restyle every cell on every switch, undoing the point. `isolation` makes the pane body its
+   own stacking context so "beneath" means beneath the Profile and Time series panels, which stay
+   in normal flow, and never beneath the page. (Without it an empty positioned box lay over the
+   Profile panel and ate its clicks.) Its scroll position survives the round trip too. */
+.lpn-pane-body { position: relative; isolation: isolate; }
+.lpn-pane-panel.lpn-pane-scroll {
+	display: block; position: absolute; inset: 0; z-index: -1; content-visibility: hidden;
+}
+.lpn-pane-panel.lpn-pane-scroll.on { z-index: 1; content-visibility: visible; }
 /* **NO TOP PADDING ON A SCROLLING PANEL, AND THAT IS THE WHOLE OF THE SLIVER FIX** (Tom,
    2026-08-23: "when you scroll a table, a tiny sliver of the data is visible scrolling above the
    headings. It's a little bit cool and a little bit embarrassing"). A sticky `top: 0` sticks to
@@ -2373,10 +2391,21 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
 	   width it has always been. Only a column that names an em -- or that the reader has
 	   dragged -- pulls its pull-down in with it. */
-	width: var(--lpn-pane-col-w); max-width: 100%; min-width: 0;
+	width: var(--lpn-pane-col-w); max-width: 100%; min-width: max-content;
 	border: 0; background: transparent; padding: 1px 2px; margin: 0; font: inherit;
 	text-align: inherit;
 }
+/* **AND A PULL-DOWN NOBODY HAS DRAGGED HOLDS ITS COLUMN OPEN TO ITS OWN WIDEST CHOICE** (Tom,
+   2026-09-21, R-110: *"Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
+   pattern, width = 3em (due to selector?)"*). He was right that it was the selector. The trial
+   above made `min-width: 0` unconditional, and a control with a percentage `max-width` and no
+   minimum contributes NOTHING to an automatic table column's width -- so an untouched pull-down
+   column was as wide as its heading's longest word and no wider, and clipped "No fittings list
+   selected" to "No fittings" on first sight, before anybody had asked for a narrow column at all.
+   Measured on Net3: four pull-down columns clipped their own shown choice. `max-content` gives
+   it back its natural width; the truncation his trial asked for is kept for exactly the case he
+   described -- a column he has DRAGGED, which js/looped-network.js marks on the control. */
+.lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
@@ -2387,6 +2416,23 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
    native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
 .lpn-pane-table tbody td input[readonly] { user-select: none; }
+/* **EVERY ROW IS A WHOLE NUMBER OF PIXELS TALL, SO A SCROLL CAN LAND EXACTLY ON ONE** (Tom,
+   2026-09-21, R-112: *"There is a slight calculation error that makes the top border of the top
+   cell row not quite coincide with the bottom border of the headings, and vary in that from about
+   0px to 3px (maybe 2px), as I arrow up or down."*). There was no calculation error to find:
+   paneScrollTopFor() asks for exactly the row boundary, and the browser rounds `scrollTop` to a
+   whole pixel. A row was 26.609 px tall at the default text size, so the boundary it asked for
+   was a different fraction of a pixel on every row -- measured in Chromium as a gap cycling
+   between -0.47 and +0.48 px while arrowing, which is the difference between the row's top rule
+   hiding under the heading's bottom rule and standing a pixel clear of it. A row's height is its
+   line height plus whole-pixel paddings and borders, so rounding the LINE HEIGHT up to a whole
+   pixel makes every row, of one line or two, a whole number of pixels -- and the note above the
+   table gets the same treatment, because the table's own top offset is part of every boundary.
+   1.35em is chosen to sit between the two system fonts' own "normal" -- about 1.5 on Linux and 1.33
+   with Segoe UI -- so a row moves by a pixel or so either way and not by a line. `round()` is
+   ignored by a browser too old to know it, which then behaves exactly as before. */
+.lpn-pane-table tbody td, .lpn-pane-table tbody td input, .lpn-pane-table tbody td select,
+.lpn-pane-panel.lpn-pane-scroll .lpn-lib-note { line-height: round(up, 1.35em, 1px); }
 /* **NEITHER OF THESE IS A HYPERLINK, AND THEY BOTH LOOKED LIKE ONE** (Tom, 2026-09-19: *"we have
    blue text links"* on the sort headings, and the *"strange highlighting around the ID"*).
    The MARKUP was never wrong -- a sortable heading here is already a real `<button>` carrying
