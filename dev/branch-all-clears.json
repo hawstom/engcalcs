@@ -75,6 +75,13 @@
             "words": "feat/lock-initials-later: Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task?",
             "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/xy-world-map and feat/engine-fetch-wait. His R-004 answer had already ruled the design: 'A name given once for one purpose becomes a standing per-browser label: Confirmed. And we are adding \"Not you? Change this\" opportunities.' The one thing he names as NOT done is the messaging system, which is Task 704 on its own branch.",
             "pin_note": "HE CLEARED IT AT 37f05c7e AND THE PIN IS ONE COMMIT LATER, STATED RATHER THAN GLOSSED. The extra commit is 1c9aba51 and it changes a CODE COMMENT and nothing else: the comment claimed the initials are 'SENT, never stored', which was a misreading of his own 2026-09-18 ruling that the objection was always to the PROMPT and never to the storage. No shipped behaviour and no string moved. If extending the pin for a comment was the wrong call, this line is where to catch it."
+        },
+        "feat/zoom-symbol-size": {
+            "head": "5c7bbcaf28df2cdabe2712d5e0a013eb4c66bc51",
+            "date": "2026-09-22",
+            "words": "I think this feature works for now and can be closed, merged, and the branch deleted. Good work.",
+            "context": "Said after testing port 8100, in the same message as his peripheral question (now Task 708): \"Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?\"",
+            "pin_note": "HE TESTED THE LIVE PREVIEW WHILE THE BUILD AGENT WAS STILL FINISHING, so the exact commit he saw is not knowable: the preview serves the worktree as it stands. The pin is the agent's final head, whose only additions after his pass are the harness, the Settings-row wording and the merge of master. Extended by a judgement, not by him; if that judgement was wrong, this line is where to catch it."
         }
     }
 }
