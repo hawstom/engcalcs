@@ -214,3 +214,106 @@ label ever falls nearby. This may be exactly what Tom's own design asked for ("r
 or not one is actually there"), so it is reported as a question rather than a defect — but it was
 never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
 explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
+
+---
+
+## 2026-09-22 — seventh outing: the table has no scenario-switch guard the popup already had
+
+OBSERVED, checked 2026-09-22, `feat/tables-spreadsheet` `47306e11`.
+
+**The tables spec the build agent left behind (`dev/browser-pass/specs/tables.js`) is real and I
+ran it myself rather than trusting its own green.** `flock ... node run.js tables`: 17/17, against
+the live tree, covering R-109 (blank-on-load reload with Recalculate off), R-110 (column floors on
+three real examples, plus the three-piece heading-break rule replayed against OLD stored 1em
+widths), R-111/R-113/R-115 (refill-not-rebuild, focus-follows-tab, the right-click label), and R-112
+(heading/row seam at three device scale factors). All passed against the actual DOM, not a stub.
+
+**The one MISS, and it is the shape this seat exists to catch: a scenario switch does not refresh
+the visible table when Recalculate is off, and the popup's own equivalent code already knows to
+guard against exactly this.** `applyScenarioChange()` (js/looped-network.js ~4520) calls
+`closePopup()`, `buildDom()`, `refreshSymbolSizes()`, `refreshValueColors()` and
+`refreshScenarioStatus()` unconditionally, then `scheduleSolve()` — and `scheduleSolve()` with
+`settings.autoRun === false` (Recalculate off) runs `afterManualEdit()`, which only saves and stands
+down time; it never calls `refreshPaneIfOpen()`. The table pane has no listener of its own — its own
+comment says so ("The pane follows the document without a listener of its own... A tab that is not
+on screen is not refreshed"). So with Recalculate off, switching FROM a scenario back to Base, while
+staying on the SAME table tab the whole time, leaves the input cell showing the OTHER scenario's
+number.
+
+**Measured with real interaction, not synthetic events**: opened `lpn_ex_net3_title`, Recalculate
+off (patched into the stored project, matching R-109's own harness technique), opened Junctions,
+created a scenario via the real menu (`.lpn-menu-row` "New scenario…", answered through
+`Session.answerPromptWith`), double-clicked junction 10's Demand cell, typed `999999`, pressed
+Enter — a real edit through the real commit path (`change` event → `paneCommitCell`), confirmed by
+the scenario menu's own override count going `(0)` → `(1)`, so the write correctly became a
+scenario override rather than a Base mutation. Then opened the scenario menu again and clicked
+`Base`. **The table still read 999999.** A second run in the same session: clicking away to Pipes
+and back to Junctions heals it immediately (reads `0`, correct) — `renderPaneTable()` is called
+fresh on tab `show()` and picks up the live document — and a parallel run with Recalculate ON shows
+the correct `0` immediately after the scenario switch (the debounced solve calls
+`refreshPaneIfOpen()` on the way through). So the gap is narrow and specific: **Recalculate off,
+scenario switch, no intervening tab click** — but it is a real one, and it is not hypothetical: it
+produces a number on screen that is not the number the document holds, in the exact "does the table
+match Properties" shape this round was asked to check first. The popup sidesteps the whole question
+by closing itself on a scenario switch (`closePopup()`, unconditional, at the top of
+`applyScenarioChange()`); the table has no equivalent and just sits there wrong. Two script paths,
+both reproduced with a real click/type/Enter sequence and read back from the live DOM:
+`/tmp/claude-1000/.../scratchpad/staleness-probe.js` and `staleness-probe2.js` (not committed;
+paths are this machine's temp dir and will not survive the session — the finding is what to keep,
+not the file).
+
+**CONFIRMED clean, measured rather than assumed: a hidden, stacked table panel cannot intercept a
+click or a Tab stop.** Opened all seven table tabs once each (so each is a real built, hidden
+`content-visibility: hidden` panel stacked at `z-index: -1` under Profile), landed on Profile, and
+(a) `elementFromPoint()` at four points across the pane body resolved inside Profile's own subtree
+every time, never inside a hidden table; (b) a real dispatched click landed on the SVG polygon
+Profile drew, not on anything hidden; (c) walked Tab fifteen times from the Profile tab strip and
+never once landed inside a `.lpn-pane-panel.lpn-pane-scroll:not(.on)`. The CSS comment's own account
+of the earlier bug and its fix (`isolation: isolate` on `.lpn-pane-body`, because "an empty
+positioned box lay over the Profile panel and ate its clicks") checks out against real interaction,
+not just against the stylesheet's own prose.
+
+**Re-measured the tab-switch timing myself rather than trusting the probe's committed numbers**,
+three runs, `lpn_ex_net3_title --solve`: a first switch to Pipes (fresh build, 117 rows x 17 cols)
+cost 480-611 ms; every REPEAT switch back to Junctions after that cost 17-177 ms — matching the
+build agent's own AFTER figures (17-97 ms) closely enough, and nowhere near Tom's "3 seconds" or "8
+seconds" at normal speed. **Under a 4x CPU throttle** (`--throttle=4`, simulating a busier or older
+machine, which Tom's own machine may be relative to this one), the same repeat switches ran
+400-428 ms and the first Pipes build ran 2.4 s with a 2.2 s worst single frame — genuinely in
+multi-second territory. So the fix is real and large for a REPEAT switch, but a first switch to a
+given tab in a session is still a genuine rebuild, and on a slower machine that alone could still
+read as "delayed several seconds" — worth Tom noting, next time it happens, whether it was the
+FIRST time he opened that tab in the session or a repeat.
+
+**CONFIRMED the two new `table_column_parity_check.php` exemptions are truthful, traced to the
+actual gate rather than taken on the comment's word.** `pump/lpn_result_reaction_rate` and
+`valve/lpn_result_reaction_rate` claim the row never renders on those types. `linkReactionRate(l)`
+(js/looped-network.js:7083) reads `lastSolveResult.linkRates[l.id]`, and `linkRates` is populated
+only by `fillReactionRates()` in js/lpn-epanet.js (~1900), which explicitly skips every link whose
+EPANET type is not Pipe — the engine's own `reactpipes()` gate, copied rather than re-decided. A
+pump or valve id is never written into `linkRates` at all, so `linkReactionRate()` returns
+`undefined` for one and the popup row is skipped by the same `if (rateVal !== undefined)` every
+other result row uses. True as stated.
+
+**CONFIRMED print widths clamp to the sheet, by measurement rather than by reading the CSS.**
+Forced all 17 Pipes columns to a stored 30em (510em total, an extreme a real drag would be unlikely
+to reach but exactly the "wider than the page" case asked for), reloaded, opened Print, emulated
+print media and read the DOM: `table.style.width` was the full `510em`, but `max-width: 100%` under
+`table-layout: fixed` clamped the rendered box to the print area's own width exactly
+(`tableWidth === areaWidth`), with every column still at its proportional 5.88% share. **Caveat, an
+honest one**: Playwright's `emulateMedia('print')` renders print CSS but does not paginate to a real
+sheet size the way `page.pdf()` or an actual print dialog would, so this proves the table cannot run
+wider than ITS OWN CONTAINER, not that the container itself is bounded to a US Letter or A4 printable
+width in every browser's print dialog — that last step needs a person to press Ctrl+P and look, which
+is the one thing this instrument cannot do. Also confirmed by reading the live file (not the diff):
+`lpn_pane_paste_note` and its "rows that already exist" text are gone from `lib/lang.ec.en.php`
+entirely (R-140), and `lpn_pane_tab_tip` now reads *"This tab shows the assets of this kind as a
+spreadsheet-like table. Result columns cannot be edited."* (R-141), matching Tom's own quoted wording.
+
+**Not reached this round, for the record rather than by silence**: whether an EPS time-step change
+(scrubbing the run transport) has the same Recalculate-off gap the scenario switch does — `lpn-time.js`
+carries no reference to `refreshPaneIfOpen` or `lastSolveResult` at all, so the wiring is somewhere
+in the `EngCalcs.lpnTime*` bridge functions inside `looped-network.js` and tracing it was not
+finished in this pass; and whether a UNITS change or an UNDO while a scenario other than the one the
+snapshot was taken in is active shows the same class of gap (undo calls `refreshPaneIfOpen()`
+directly and unconditionally, so it is very likely fine, but not independently re-measured here).
