@@ -540,7 +540,7 @@ $ec_lang['contact_main_menu']='Contact';
 $ec_lang['about_main_title']='About HawsEDC Engineering Calculators';
 $ec_lang['about_main_desc']='Mission, Libre Software, and Contributing';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>This is an invitation, not a price. There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes yours. The full version you see today is free for everyone now and forever to use and to modify. That is a promise about the software, which the licence puts beyond anybody’s power to take back, including ours. The website that serves it is offered freely today; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators have been online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>This is an invitation, not a price. There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes yours. The full version you see today is free for everyone now and forever to use and to modify. That is a promise about the software, which the licence puts beyond anybody’s power to take back, including ours. The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';
 $ec_lang['contactYourEmail']='Your e-mail address:';
@@ -1392,6 +1392,13 @@ $ec_lang['lpn_run_menu_tip']='Recalculate this network now. The Calculate button
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_auto_run_tip']='Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow.';
+// **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
+// values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
+// stood here for part of one day and is DELETED, English-only, never translated: it announced a
+// clearing that no longer happens. With the box unticked an edit leaves the last answers exactly
+// where they are and says nothing about them, because whether they are still worth reading is
+// the user's judgement and not this page's. Do not write a replacement -- a grey-out or a
+// "stale" marker is the same decision in quieter clothes.
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
@@ -2926,20 +2933,14 @@ $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-// **IT STATED A CAUSE IT NEVER MEASURED, AND TOM HAD TO SAY SO TWICE** (2026-09-05: *"Message is
-// wrong, I think. Automatic recalculation is turned off by the user. When else would this shown?
-// This is the second time I mentioned this."*). It read "This network takes so long to calculate
-// over its whole time period that ..." -- but `EC.lpnTimeStatusNote()` consults no timing at all.
-// Its whole gate is `!autoRunAllowed()`, which asks ONE question: did the user turn the checkbox
-// off. So a small fast network whose owner unchecked that box was told its network was slow.
-//
-// The page does measure speed elsewhere and says so honestly: `adviseIfSlow()` writes
-// `lpn_time_run_slow` when a completed run passes `LPN_TIME_SLOW_MS`. That is ADVICE about a
-// measurement. This note is a statement about a SETTING, and it now says which setting, because
-// that is both the true cause and the one the reader can act on.
-// Full record, including why the row could not be closed as a wording question:
-// `dev/eps-terminology-audit.md` section 5.
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
+// **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
+// `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
+// LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
+// but the later time steps, and Tom read it as the defect it was: *"when Recalculate is off, the
+// first time step is still calculated. This is bad. Off means off."* Off now means off -- an edit
+// with the box unticked solves nothing at all -- so there is no such state left to describe, and
+// nothing replaced it: the last answers simply stay on screen until the reader presses Calculate.
+// The measurement and the new gate: scheduleSolve() in js/looped-network.js.
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
@@ -3610,9 +3611,12 @@ $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. The results below are the ones already finished.';
 $ec_lang['lpn_ff_cost']='This run solved the whole network {solves} times.';
-// The results are about the network as it stood when the run finished, so an edit clears them
-// rather than leaving a picture of a system that no longer exists.
+// The results are about the network as it stood when the run finished. Opening a different network
+// still clears them; an edit to THIS one no longer does (Tom, 2026-09-21) -- the user decides when
+// to look at fresh rings, with the Clear button below for whenever they want to do it themselves.
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
+// Clears the rings on purpose -- the reader's own decision, not news the page has to break to them.
+$ec_lang['lpn_ff_clear']='Clear rings';
 // **COUNTED THE SAME WAY THE ROWS ARE READ, or the summary contradicts the table above it.** The
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than

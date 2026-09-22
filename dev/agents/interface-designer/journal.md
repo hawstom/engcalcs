@@ -2093,3 +2093,433 @@ used for the frame (`:12200` etc.) — recommendation 2 above assumes it might a
 before building, not asserted as already true.
 
 No shipped file touched; the worktree was read only, per the brief.
+## 2026-09-18 — Escape and non-modal boxes; and a second opinion on remembered initials
+
+Checked master at `fb9bdc24` and branch `feat/lock-initials-later` at `37f05c7e`, both 2026-09-18.
+
+### Question 1 — Escape closing Properties/Settings when they are not in focus
+
+**What is actually shipped, and why Tom's complaint is correct as stated.** OBSERVED
+`js/looped-network.js:25258-25305` (checked 2026-09-18): one `document`-level `keydown` listener,
+not scoped to focus at all, runs `closeMenu(); closeViewPopovers(); closePopup(); closeSettingsBox();
+closeLibraryBox();` on every Escape press anywhere on the page, THEN falls through to "leave the
+armed tool" and "clear the selection" if nothing was open. So today a Properties or Settings box
+open in the corner of the screen, that the reader has not touched in the current gesture, is closed
+by an Escape meant for something else entirely — exactly the shape of his complaint. This is a
+FOCUS bug, not a "should Escape ever close these" bug: the handler doesn't ask `document.activeElement`
+anything.
+
+**The real close routes are ordinary buttons, not Escape-only.** OBSERVED `Looped-Network.php:664`
+(`#lpn_popup`, the Properties box), `:682` (`<button type="button" id="lpn_popup_close" ... aria-label="Close">×</button>`),
+`:743` (`#lpn_setbox_close`, same shape for Settings), `:997` (`#lpn_libbox_close`, Libraries). All
+three are real `<button>` elements with `aria-label`/`title` = "Close" (`lpn_close`), so they are
+in the normal Tab order and fire on Enter or Space like any button. **A keyboard-only visitor with
+no pointer at all is NOT stranded if Escape stops closing these boxes** — Tab to the × and press
+Enter still works, it is just more keystrokes than one Escape. That directly answers the brief's
+accessibility question: Escape is not the only keyboard route here, unlike the zoom control I found
+had no keyboard route at all (Task 682, journal 2026-09-17) — this is a different, milder case.
+
+**Convention.** CITED (Sarah Higley, "Escaping 101," sarahmhigley.com, fetched 2026-09-18): real
+platforms disagree on Escape's exact scope and the article's own conclusion is that there is no
+universal rule — but the piece's organizing distinction is FOCUS: "combobox menus and tooltips
+never take focus, so no active focus handling needs to occur when they are dismissed," while a
+component that DOES take focus (a dialog, a slide-pane, certain menus) should hand focus back to
+whoever opened it when Escape closes it. That is a convention that Escape is legitimate wherever
+the thing being dismissed currently HOLDS the interaction — never that it reaches into a panel
+sitting unfocused in the background. CITED (WAI-ARIA Authoring Practices Guide, w3.org, general
+knowledge of the disclosure/dialog patterns, cross-checked via search 2026-09-18): Escape is
+documented per-widget, on the widget that has focus, not as a page-wide "close everything open" key.
+SPECULATION, from ordinary use of desktop tools rather than a citation I can point at: docked
+panels in image/CAD editors (a Photoshop-style Layers palette, an Illustrator-style Properties
+panel) are not closed by Escape at all — Escape in those tools cancels the current operation or
+deselects, and a panel is closed by its own control. That is the same shape Tom is naming with
+"non-hog boxes," and it lines up with his Vision 1 rather than contradicting it. I could not verify
+this against a written spec in the time budgeted; treat it as informed guesswork, not a citation.
+
+**Which rule I would ship.** Not his blunt version and not a no-op — a **focus-scoped** version:
+Escape closes Properties/Settings/Libraries only when the keypress lands while focus is *inside*
+that box (`document.activeElement` under `#lpn_popup` / `#lpn_setbox` / `#lpn_libbox`); an Escape
+pressed anywhere else on the page — the canvas, the toolbar, a field, empty space — leaves an
+unfocused box exactly where it was and falls through to the tool/selection behavior it already has.
+This is the smaller change the brief asked me to weigh against the blunt one, and I think it is
+also the *better* one on the merits, not merely the cheaper one: it keeps a genuine keyboard exit
+for the one visitor who tabbed INTO the box and wants out without walking back to the × — a real
+person, not a hypothetical, since the box's own fields are all reachable by Tab and a reader
+already inside a Settings box that wants to leave it is the case Higley's rule protects. Tom's
+blunter Vision 1 (Escape can NEVER close these, click only) is defensible and is not an
+accessibility regression either, given the real × buttons — but it throws away a working keyboard
+exit for no reader-visible benefit over the focus-scoped fix, which already stops the exact
+complaint he filed (a box he was not touching disappearing). I would ship focus-scoped first,
+and treat "never" as the fallback if testing shows even the scoped version still feels wrong in
+practice — that is a testable difference, not a hunch either way needs to resolve on paper.
+
+One implementation note for whoever builds this, not a design opinion: `closeMenu()` and
+`closeViewPopovers()` (menu pull-downs and view popovers) are a DIFFERENT class of thing from
+these two boxes — a pull-down is the disclosure-menu pattern Tom's own 2026-08-13 ruling already
+names ("these are menus, not boxes") and Higley's non-focus-taking case applies to it cleanly.
+Nothing above touches that part of the handler; only the `closePopup()` / `closeSettingsBox()` /
+`closeLibraryBox()` three lines want the focus guard.
+
+### Question 2 — remembering initials across roles: is it good thinking, mostly, with one flag
+
+**This proposal collides with a decision made on `feat/lock-initials-later`, not yet on master,
+and the code comment calls it "the whole point."** OBSERVED `feat/lock-initials-later`
+`js/looped-network.js:23261-23291` (checked 2026-09-18, branch head `37f05c7e`): identity is now
+minted SILENTLY with an empty name (`identity = { holder: randomToken(24), name: '', trained: false };`)
+— nobody is asked anything to acquire a lock — and the name a colleague types into the new "Ask"
+dialog is, in the comment's own words, **"SENT, never stored — that is the whole point of Task
+667(b)."** That is the design ROADMAP Task 667(b) (`dev/ROADMAP.md:569-588`) already shipped on
+this branch, and it is a closer read of what Tom rejected than "asking is startling": he rejected
+asking AND he rejected the software remembering a name outside the one moment it is volunteered
+for one purpose (telling the current holder who wants in). Tom's new proposal is a second, explicit
+reversal of the "never stored" half, on the same day the branch that just built it is sitting
+unmerged.
+
+**Is it good thinking anyway? Mostly yes, on the part that matters, but say so as a reversal, not
+a refinement.** The two halves are not equally strong:
+- **"Ask once per browser"** is close to free and does not reopen the registration worry: it is
+  the SAME event (pressing Ask) that already gets a name today, just remembered so the SAME person
+  is not asked a second time in a later session. Nothing about the trigger changes — nobody is
+  solicited for a name at Save, ever, on this design. I see no real cost here.
+- **"Use it to name the holder in role A"** is the part that reopens the reversed decision. It
+  means: once a browser has ever answered an Ask, every lock THAT browser holds from then on is
+  labeled with that name automatically, with no fresh prompt — so a name given once for one purpose
+  (telling a specific colleague who wants a specific file) becomes a standing label the software
+  attaches to that browser everywhere, indefinitely. That is a small, real account, acquired by
+  accident of having once pressed Ask rather than by anyone choosing to register one. It is milder
+  than what Tom rejected (nobody is asked up front, ever), but it is the same shape at a smaller
+  scale, and it is worth him hearing that framing before it ships, given how recently and how
+  deliberately the "never stored" line was drawn.
+
+**Storage: I read this as passing the existing exemption test, by the same reasoning already
+applied to the identity token, not by a new argument.** OBSERVED `CLAUDE.md`, "What may be stored
+on a visitor's device": the test is "strictly necessary for a service the visitor explicitly
+requested." The per-browser identity holder token is already stored today, unconsented, on master
+AND on the branch (`LPN_IDENTITY_KEY`/`lpn_identity` in `localStorage`, both versions) — that
+storage already shipped under the user-input-storage exemption Tom's own file names: he typed it
+into a box to use a feature (locking on master; Ask on the branch). Remembering the NAME half
+alongside the token it is already stored beside is the same category of thing, not a new one — I
+would not gate it behind a new consent question, and I think doing so would be over-cautious given
+the precedent already standing in this file. I did not find a rule in `dev/cookie-storage-inventory.md`
+that treats a name differently from an opaque token for this purpose; if Tom or a later reader
+disagrees with that reading, that is the file to correct it in, not a new banner.
+
+**What happens when the name is wrong — real, but not a NEW risk, an existing one this proposal
+widens.** A stale or borrowed name on a shared machine is already possible today: master's own
+shipped identity (`js/looped-network.js:24222-24227`, OBSERVED, checked 2026-09-18) asks ONE person
+for initials at first save and reuses them forever after for every lock that browser takes, with no
+per-session re-check — so "confidently wrong on a data-loss-adjacent dialog" is a live property of
+the CURRENT shipped design, not something this proposal introduces. What it does is widen the
+window: today the name is set at the first deliberate save (a moment the person is paying
+attention), Tom's proposal sets it via Ask, which can be answered quickly and less carefully by
+someone reaching for a dialog that showed up unexpectedly, on someone else's project. I would not
+block the idea on this, but I would want an easy, visible way to correct a wrong stored name — a
+"not you?" affordance beside wherever the initials are used to label a lock — since the cost of a
+confidently wrong name on a break-lock decision is exactly the shape CLAUDE.md worries about
+elsewhere (a share card reading "undefined" is a defect only strangers see; a wrong name on a
+lock is a defect only the person NOT holding the lock ever notices).
+
+### Where I did not look
+I did not render either box in a real browser this session — everything above is read from
+`js/looped-network.js` and `Looped-Network.php` source, not measured on screen or in a headless
+harness. I did not check `dev/lpn-spike/` or `dev/browser-pass/` for an existing Escape or identity
+test that a focus-scoped fix would need to keep passing. I did not read `lpn-lock.php` (the
+server side of the lock broker) at all — everything about "name" above is the client's own storage
+and transmission of it, not how the server persists or exposes it. I did not check whether the
+branch's Ask dialog has its own separate close-on-Escape wiring beyond the shared handler discussed
+above; the "Escaping 101" citation is general convention, not a reading of that dialog's code.
+
+No shipped file touched.
+
+## 2026-09-19 — Sort-heading affordance: blue links, and the ID column's stray highlight
+
+Tom's question, reviewing `feat/tables-spreadsheet`: *"Ask Ida how most apps do clicking on
+headings to change sorting; we have blue text links."* Checked worktree
+`feat-tables-spreadsheet` at `f688970a` (checked 2026-09-19).
+
+### The convention, with sources
+
+**A sortable heading is a real, focusable control — most commonly a `<button>` wrapping the
+label text — carrying `aria-sort` on the `<th>` itself, never styled as a hyperlink.** CITED
+(WAI-ARIA Authoring Practices Guide, "Table Pattern," w3.org, fetched 2026-09-19): "the header
+text of sortable columns is wrapped in a button element," and `aria-sort` (`ascending` /
+`descending`) is set on the currently-sorted header only — removed entirely from an unsorted one,
+never left at a default `none`. CITED (MDN, "aria-sort," developer.mozilla.org, fetched
+2026-09-19): same reading, one `aria-sort` live at a time. CITED (Adrian Roselli, "Sortable Table
+Columns," adrianroselli.com, 2021, fetched 2026-09-19): his worked example uses native `<button>`s
+throughout; the direction indicator is a small chevron placed to the right of the label, drawn
+**always** (not hover-only), and the sorted state is shown by a SHAPE change (hollow chevron →
+filled) rather than by color, explicitly to avoid relying on color alone (WCAG 1.4.1, "Use of
+Color").
+
+**Desktop precedent agrees on the shape even where I could not pin a single citable source for
+each product's own style guide.** SPECULATION, from ordinary use and general knowledge rather
+than a spec I can cite: Excel's own column headers (not the AutoFilter dropdown, which is a
+separate, later-added control) and Google Sheets' plain grid headers are neutral gray/black text
+with no underline and no color change; macOS Finder's List View and Windows Explorer's Details
+view both put a small triangle at the trailing edge of the ACTIVE sort column only, in the
+header's own ink color, with every other heading left as plain unmarked label text. None of these
+color the heading text itself, and none underline it. The pattern is consistent enough across
+every example I could find, cited or not, that I am confident in it as the convention: **a
+sortable heading looks like a heading that also happens to be clickable — bold or plain text plus
+a small directional glyph on the active column — never like a hyperlink to another page.**
+
+**Why "never a link" is more than a style preference: the semantics are wrong.** A `<a href>`
+promises navigation — leaving the current view for a different resource, with the back button as
+the undo. Clicking a sort heading does the opposite: it stays on the same view and reorders what
+is already there in place. Blue-and-underlined is the one visual vocabulary the web has spent
+thirty years training every reader to read as "this leaves." Borrowing it for an action that does
+not leave is a false promise, independent of whether it also happens to look nice.
+
+### Our own table, read before recommending
+
+OBSERVED `js/looped-network.js:18538-18576` (checked 2026-09-19): **the sort control is already
+the right ELEMENT** — a real `<button type="button" class="lpn-pane-sort">` wrapping the heading
+text, with `aria-sort` set correctly on the `<th>` only for the sorted column (`:18575`), and the
+direction glyph (`▲`/`▼`) appended to the button's own text content on the active column only
+(`:18548-18549`) — trailing edge, always visible when sorted, exactly the convention above. This
+part needs no design correction; it is worth telling Tom so nothing here gets un-fixed by accident
+while the real problem is chased.
+
+**The "blue text links" he is seeing is styling laid on top of that correct element, not the
+element itself.** OBSERVED `css/engcalcs.css:2371-2377` (checked 2026-09-19):
+
+```
+.lpn-pane-sort, .lpn-pane-goto {
+	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
+	text-align: inherit;
+}
+.lpn-pane-sort { font-weight: bold; }
+.lpn-pane-goto { text-decoration: underline; }
+.lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+```
+
+At REST the sort button is `color: inherit` (correctly neutral) and bold — fine, matches
+convention. But **on hover it turns `#0645ad`**, which is not an arbitrary blue: it is the
+long-standing browser default color for a *visited* hyperlink, the single most recognized "this is
+a link" signal on the web after the default unvisited blue. And `.lpn-pane-goto` — the button in
+the ID cell, `:18617-18626`, which selects the part on the map and pans to it — is underlined **at
+rest, permanently**, and shares the identical hover blue. Underline-at-rest plus link-blue-on-hover
+is not a heading that happens to be clickable; it is, pixel for pixel, an ordinary inline hyperlink.
+That is almost certainly what Tom is naming, even though no `<a>` tag is anywhere in this code —
+the classic case of markup being correct and paint being wrong, which this suite's own automated
+checks (`link_title_check.php` et al.) cannot see, because there is no `<a>` to inspect.
+
+**What that costs at a row of ten headings, which is the question only this seat can answer.** A
+reader scans a heading row once, fast, to answer "what can I do here and what am I looking at."
+Blue-and-underlined text is a category the eye has a single, automatic reading for, learned from
+every other page on the web: *leaving*. A row of ten such headings does not read as "ten sortable
+columns" — it reads as ten hyperlinks sitting where a table normally has none, which is a
+genuinely startling first impression on a page whose whole point is that you stay and work in
+place. Worse, it COMPETES with the one control in this same table that legitimately IS a
+navigation-flavored action: `.lpn-pane-goto` really does move the reader's attention to a different
+place (the map), the nearest thing this table has to "leaving." Giving the sort headings the exact
+same visual language as that button erases the one distinction a reader could have used to tell
+"this reorders what I'm already looking at" from "this takes me somewhere else" — the two
+controls currently look alike because they share a stylesheet rule, not because they mean the same
+thing.
+
+**Recommendation, ranked:**
+1. **Drop `.lpn-pane-sort:hover { color: #0645ad }` and give it a neutral hover treatment instead**
+   — a background tint or a slightly heavier weight, not a color already carrying a specific,
+   different meaning elsewhere on this exact page (see below). Cheapest fix, one line, zero new
+   strings, zero translation cost.
+2. **Drop the permanent underline on `.lpn-pane-goto`.** If the ID cell should still read as
+   "special," a hover-only background tint or a small icon (a pin/crosshair reading "go to this on
+   the map") does the job without borrowing hyperlink vocabulary for an in-page action. This one
+   costs slightly more (an icon decision), so it is second.
+3. **Reserve `#0645ad` for exactly one meaning in this table, and it already has one:** OBSERVED
+   `css/engcalcs.css:2229-2246` (checked 2026-09-19) — that same blue is the "current cell" outline
+   and its autofill-dot, freshly designed and named by Tom himself on 2026-09-19 in the same
+   session ("a blue border highlight... should indicate the current cell"). Two unrelated meanings
+   sharing one color in one table is a hierarchy collision on its own, independent of the
+   link-reading problem above — a reader who has learned "blue means current cell" then sees the
+   identical blue flash under their pointer while merely hovering a heading, for a reason that has
+   nothing to do with the cursor's position.
+
+### A second, separate finding: the "strange highlighting around the ID" is likely this same seam
+
+Tom's other, separate report — *"at column A there is a strange highlighting around the ID"* — is
+very likely produced by the collision named in point 3 above, not a new bug needing new code.
+OBSERVED `css/engcalcs.css:2229-2233` (checked 2026-09-19):
+
+```
+.lpn-pane-table tbody td.lpn-pane-cur,
+.lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
+	outline: 2px solid #0645ad; outline-offset: -2px;
+}
+```
+
+`:focus-within` fires on the `<td>` the moment its child `.lpn-pane-goto` button receives focus —
+which happens on every ordinary click, since a `<button>` takes focus on click in most browsers.
+Nothing in `paneTableRow()` needs to mark that cell "current" for this rule to paint the identical
+2px inset blue box `js/looped-network.js` was just given as the deliberate, meaningful signal for
+"this is the current cell in Entry/Navigate mode" (`:18617-18626` builds the button; the outline
+rule is generic to any focused `<td>`, not gated on the spreadsheet-mode logic that owns
+`.lpn-pane-cur`). So clicking an ID to jump to the map leaves that cell wearing the SAME visual
+mark the new spreadsheet-mode design just invented for a different, specific idea — and it will
+sit there, focus rarely being cleared automatically, until something else steals focus. **This
+reads as the same root cause as the "blue text links" question: one color pressed into two jobs.**
+Whoever fixes the sort-heading colors should check this outline rule at the same time — either
+exclude `.lpn-pane-goto`'s own focus from painting the cell (`:focus-within:not(:has(.lpn-pane-goto:focus))`,
+or simpler, give the goto button its own `:focus` ring instead of relying on the generic
+`td:focus-within` rule) — rather than treating it as a second, unrelated defect.
+
+### Where I did not look
+
+I did not render the table in a real browser this session (no `dev/browser-pass` screenshot) —
+everything above is read from source, not measured on screen. I could not find a single citable
+style-guide document for Excel's or Google Sheets' or Finder's or Explorer's own header
+conventions (all four are proprietary, undocumented visual conventions); that part of the finding
+is SPECULATION from ordinary use, flagged as such above, not a citation I can point at. I did not
+check whether `#0645ad` appears anywhere else on this page outside the bottom pane (e.g., the
+map's own selection highlight) — if it does, the collision named above is wider than this one
+table.
+
+No shipped file touched.
+
+## 2026-09-21 — Notice and error messaging: QGIS, the count, and what to build first (Task 704)
+
+Tom, on `lpn_`: *"The banner message about 'We asked your colleague to close the file' disappeared
+too fast and unrecoverable. 'Help! What did I miss!' We need a better messaging system. We talked
+about the QGIS system."* Ranking it: *"my only remaining issue was the peripheral and pervasive
+banner persistence issue... But we need Ida's input."* Diagnosis only; nothing built.
+
+### QGIS, since he named it (checked 2026-09-21)
+
+**QGIS runs two mechanisms, not one, and the second is the part that answers his complaint.**
+CITED (QGIS pyqgis cookbook, "Communicating with the user,"
+docs.qgis.org/3.44/en/docs/pyqgis_developer_cookbook/communicating.html, fetched 2026-09-21):
+`QgsMessageBar` is a transient bar with four severity colors (Info, Warning, Critical, Success),
+optionally timed, and **it STACKS** — a second message while one is showing does not overwrite the
+first, it queues behind it, and the user dismisses one at a time to reveal the next. Nothing here
+loses a message to a faster second one.
+
+**The part he actually asked for is `QgsMessageLog`, a separate, persistent store the bar merely
+mirrors.** CITED (same source): "You can see the output of the `QgsMessageLog` in the Log Messages
+Panel." CITED (QGIS user manual, "General Tools,"
+docs.qgis.org/3.44/en/docs/user_manual/introduction/general_tools.html, fetched 2026-09-21): the
+Log Messages Panel is **opened from one icon at the right end of the bottom status bar**, grouped
+into tabs (General plus one per plugin), and holds everything that has ever been logged for the
+session — including whatever scrolled off the bar before anyone read it. It costs no permanent
+screen space: closed by default, one click to open, one click to close.
+
+**A second desktop family agrees on the same two-part shape.** CITED (Autodesk AutoCAD Help, "About
+Navigating and Editing in the Command Window" / F2 Text Screen,
+help.autodesk.com, fetched 2026-09-21): the command LINE shows only the current exchange; **F2**
+opens the Text Screen, "a complete history of the prompts and responses in the current work
+session," independently scrollable and copyable, default buffer 400 lines. Same division: a
+one-line-or-two transient readout for the moment, and a keystroke away from everything that has
+ever been said.
+
+**The web convention does NOT simply agree with "always keep a log," and that matters because it is
+the honest caution on the other side.** CITED (Material Design 3, "Snackbar," Guidelines,
+m3.material.io/components/snackbar/guidelines, fetched 2026-09-21): a snackbar is for messages that
+are "minimally interruptive and don't require user action," and Google's own accessibility note is
+blunt — an auto-dismissing snackbar is **inaccessible to a visitor with low vision or who needs more
+time to read it**, and the fix Google names is not "log it," it is "communicate the same information
+another way, inline, near the thing that triggered it." **That is a real vote against treating a log
+as the whole answer**: a log fixes "I can look it up later," not "I could not read it fast enough the
+first time," and this page's own `setNotice()` (8 seconds, single line, no severity color) already
+has exactly the second problem, independent of whether a log gets built.
+
+**So the QGIS answer is not "add a log" on its own — it is "keep the transient bar honest about being
+transient, and put a genuine record behind one click, because the two failure modes are different and
+a single fix cannot cover both."**
+
+### What this page actually has, counted rather than guessed at
+
+Read `js/looped-network.js` end to end for every distinct way it tells a person something, checked
+2026-09-21:
+
+| Mechanism | Door(s) | Call sites | Lifetime | Severity shown |
+|---|---|---|---|---|
+| `setNotice()` / `showNotice()` | 1 (`:42199`, `:42231`) | **66** | 8 s, `STATUS_NOTICE_MS`; a second call silently replaces the first, no queue | none — one plain sentence |
+| `setStatus()` (diagnostic, `#lpn_status`) | 1 (`:42251`) | 19 | standing, until the model changes or `expireStatus()` is called | amber box (implied, not colour-coded per severity) |
+| `setEngineNotes()` (`#lpn_status_notes`) | 1 (`:42326`) | few, all engine-difference notes | 2 min, then an 800 ms fade | none |
+| `renderBanner()` (`bannerWarn`/`bannerRO`, `#lpn_lock_banner`) | 1 render door (`:25892`), several setters (`setLockUnavailable`, `setFileMissing`, `syncReadOnlyToOpenProject`, the `changed`-kind assignment) | 5 distinct kinds (`changed`, `reopen`, `lock`, `missing`, read-only) | standing, dismissable per kind via `lockWarnDismissed`; **a dismissal cannot be un-dismissed** — nothing shows what was hidden | amber `#a80` vs red `#a00`, two colours, real and consistently applied (`:25903-25904`) |
+| `paneFilterBanner()` | 1 (`:17990`) | 3 | standing while a filter is active | none |
+| `openDialog()` custom modals | 1 door, but each call writes its own body | 14 | until the user answers; **content is never retained anywhere once closed** | none |
+| `window.alert()` | none — each call writes its own string directly | 39 | until dismissed, blocking | none (native) |
+| `window.confirm()` | none — same | 18 | until answered, blocking | none (native) |
+
+**Six-plus genuinely different idioms, and the worst of them has no shared door at all.**
+`setNotice`, `setStatus`, `setEngineNotes` and `renderBanner` each have exactly one function that
+owns their element, which is the same discipline `dev/scenario-seam-repair.md` asks for elsewhere —
+a real seam, just four different ones that do not know about each other. **`alert()`/`confirm()` at
+57 call sites are the opposite: every one writes its own text directly into a browser-native dialog,
+with nothing between the call site and the screen.** That is worse than Task 701's finding, not the
+same shape by luck — 701 found forty places writing a raw `'block'`/`'flex'`/`'none'` around ONE
+guard that could see plain calls but not the ternary form; here there was never a guard to be blind
+to. **And it is these two — `openDialog()` and `alert()`/`confirm()` — that a "what did I miss"
+complaint is most likely to be about**, because they are the only two classes that vanish completely:
+`setNotice()`'s 66 sites at least sit in one function that COULD be taught to remember; a modal's
+text exists nowhere once the user clicks a button. The stale-claim dialog at `:25658-25681`
+(`presentOpenChoice()`) — three choices, the first reading *"Cancel and ask them to... close it
+properly"* — is exactly the shape of text Tom is very likely remembering as "the banner," because
+its Cancel branch (`:25670`) does nothing at all afterward: no notice, no residue, nothing to reopen.
+Whether that is literally the site or not, it is the class of site the complaint names.
+
+### The three questions, ranked
+
+**1. What must be recoverable, and what is fine to lose — the sharpest single question, because it
+splits the 66 `setNotice()` sites cleanly in two.** A notice confirming an action the canvas or the
+document already shows the result of (`Saved {file}`, `Renamed {n} assets`, `Pasted {n} cells`) is
+fine to lose: the evidence survives in the model whether or not the sentence does, so a missed
+"Saved" costs nothing a glance at the title bar / dirty flag would not already answer. **A notice
+that is the ONLY record of a decision point or a standing risk is not** — `lpn_lock_unavailable` and
+its siblings, the read-only banner's naming of who holds the file, and above all the stale-claim
+dialog's three choices, because nothing else on the page states them. The diagnostic box
+(`setStatus`) already gets this mostly right by construction — it does not expire on its own — which
+is why it should be the MODEL for the rest, not a fourth thing needing its own fix.
+
+**2. Where a persistent message can live without being a fifth line of chrome.** Not a bar that is
+always drawn — that is a fifth line of the four he has already named (HawsEDC, menus, toolbar,
+tabs), and it is the mistake QGIS itself does not make: the Log Messages Panel is CLOSED by default
+and opened from one icon. **The right home here is the same shape: one small control — a
+history/clock icon, sitting in the existing `#lpn_status` corner rather than a new location — that
+carries a count when something unread is waiting, and opens a short, read-only, newest-first list on
+click.** Closed, it costs nothing; open, it is a control like any popup this page already has, not a
+new standing bar. This is a LOG BEHIND A CONTROL, not a bar, and it is the distinction Tom's own
+four-lines-of-chrome framing already gives the reason for.
+
+**3. What severity buys.** QGIS earns four levels because a GIS genuinely produces four kinds of
+event at volume — routine info, a recoverable warning, a hard failure, a confirmed success — across
+dozens of plugins nobody wrote in concert. **This page already has, and only has, two:** amber
+(`#a80`, "a warning you may work through") and red (`#a00`, "a state that has taken editing away"),
+and `renderBanner()` already draws that distinction correctly and consistently. Adding Info/Success
+as separate colours on top of that would be inventing categories the page's own 84 message sites
+don't actually sort into — `setNotice()`'s confirmations are all one flavor ("this finished"), the
+diagnostics are all one flavor ("this is still true"), and only the banner class ever needed two.
+**Two is honest here; four would be decoration.**
+
+### Cheapest useful step, ranked above the rebuild
+
+Because `setNotice()` is ALREADY one function serving 66 call sites — unlike the alert/confirm
+sprawl, which has none — **the cheapest fix that answers "Help! What did I miss!" is to teach that
+one function to remember, and add one small disclosure control to read the memory back.** Concretely
+(reported as a shape, not built): `setNotice()` pushes `{text, time}` onto a capped in-memory array
+(session-only, no storage question — this is a JS variable, not `localStorage`, so it does not touch
+`dev/cookie-storage-inventory.md` at all) alongside what it already does; one small icon near
+`#lpn_status` opens a plain list of the last handful, newest first. No new severities, no new
+chrome, and it directly answers the complaint as stated — a message that scrolled past becomes
+something you can go back and read, the way the Text Screen and the Log Messages Panel both do.
+
+**Ranked above that:** nothing — this is the first move, and it is cheap because the seam already
+exists. **Ranked below it, in order:**
+2. Fold `setStatus()` and `renderBanner()` into the SAME small log, since those are the ones
+   carrying actual decisions (a dismissed lock warning currently has no way back at all — only the
+   NEXT distinct fault brings the banner back, per `lockWarnDismissed`).
+3. Audit the 57 raw `alert()`/`confirm()` sites and decide, case by case, which genuinely need to
+   block (an irreversible action — breaking a lock, discarding unsaved work) versus which are really
+   just information that belongs in the same notice/log door as everything else. This is
+   real feature-branch work — a design pass over ~57 sites, each a judgement call about whether it
+   blocks or merely informs — and is the piece that actually matches the size of what Tom floated
+   ("open a feature branch"). It is real work and belongs later, not first.
+4. Do NOT add QGIS's stacking behavior to `setNotice()` itself (message N+1 waiting behind message N
+   rather than overwriting it) as a first move — it is a reasonable idea but it fixes a narrower
+   problem (two notices arriving close together) than the log does, and building the log first makes
+   stacking optional rather than necessary: once anything can be read back, losing 8 seconds of
+   overlap matters much less.
+
+No shipped file touched.

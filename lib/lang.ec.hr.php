@@ -1135,7 +1135,6 @@ $ec_lang['lpn_time_tank']='Spremnik';
 $ec_lang['lpn_time_level']='Razina vode';
 $ec_lang['lpn_time_run']='Pokreni';
 $ec_lang['lpn_time_run_tip']='Riješi ovu mrežu u svakom hidrauličkom vremenskom koraku, od početka pokretanja do njegovog kraja.';
-$ec_lang['lpn_time_run_note']='Vidite mrežu u prvom trenutku izvještavanja. Postavka Izračunavaj automatski je isključena, pa se rezultati za kasnija vremena ne ažuriraju dok radite. Pritisnite gumb Pokreni da ih ažurirate.';
 $ec_lang['lpn_time_speed']='Brzina';
 $ec_lang['lpn_time_speed_tip']='Koliko brzo se reproducira simulacija.';
 $ec_lang['lpn_settings_search']='Pretraži postavke';

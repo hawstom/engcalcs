@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**105 still to read on master**, of 168 untranslated keys, of 2036 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**106 still to read on master**, of 169 untranslated keys, of 2036 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (168, 105 to read @@ NEEDS RULING)
+## lpn_  (169, 106 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -54,6 +54,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
+- **`lpn_ff_clear`**
+  > Clear rings
+  @@ NEEDS RULING
 - **`lpn_field_account`**
   > Account number
   _Ruled OK 2026-09-17._
@@ -536,7 +539,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**28 still to read**, of 40 new keys across 9 unmerged branch(es).
+**40 still to read**, of 52 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -547,15 +550,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-1 (`9eb1b163`) — adds no English strings
-
-### feat/customer-find-labels (`18ef2788`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/customer-find-labels (`a84da469`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
   @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
-  > Customer labels show the node values chosen above, at the customer.
+  > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
   @@ NEEDS RULING
 - **`lpn_labels_customer_width`**
   > Widest view that attempts to display customer labels
@@ -566,11 +567,29 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_meter_pattern_unknown`**
   > No pattern in this project is named {id}, so the customer was left as it was.
   @@ NEEDS RULING
-- **`lpn_settings_customer_labels`**
-  > Customer labels
+- **`lpn_settings_label_use_view`**
+  > Use current view
+  @@ NEEDS RULING
+- **`lpn_settings_sec_symbology`**
+  > Symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sym_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_settings_sym_customer`**
+  > Customer
+  @@ NEEDS RULING
+- **`lpn_settings_sym_link`**
+  > Link
+  @@ NEEDS RULING
+- **`lpn_settings_sym_node`**
+  > Node
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`3df1129e`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/engine-fetch-wait (`e9319a0a`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_engine_bar_label`**
   > Solver loading progress
@@ -584,8 +603,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_engine_wait_pct`**
   > Solver {percent}% loaded.
   @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
 
-### feat/label-gang-search (`4d763c56`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/label-gang-search (`344c0cc4`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -614,8 +636,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_use_view`**
   > Use current view
   @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 16 new, 4 to read @@ NEEDS RULING
+### feat/lock-initials-later (`1c9aba51`) — 17 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -665,22 +690,29 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_terrain_none_needed`**
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`f688970a`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`cfa207d7`) — 3 new, 3 to read @@ NEEDS RULING
 
+- **`lpn_pane_goto_tip`**
+  > Show this on the map.
+  @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-
-### feat/xy-world-map (`48ac9490`) — adds no English strings
-
-### fix/esc-focus-and-recalc (`d9b2be9d`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_manual_results_cleared`**
-  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### tables-interface (`e34970bc`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/xy-world-map (`731ab367`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
+
+### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -690,4 +722,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_terrain_none_needed`**
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING

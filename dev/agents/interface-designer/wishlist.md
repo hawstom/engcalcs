@@ -379,3 +379,56 @@ is answered for the three that remain after the divorce; see item 5 series above
     restyled control, and his proposed narrow range (1 in the middle, ~0.75-1.5) is sound and
     already has a working "pick it up again" door (`mapgeoAdjust`, wired as Map > World map >
     Move / Scale by picking) if it is ever built. See journal, 2026-09-18.
+38. **Scope the Properties/Settings/Libraries Escape-close to focus, not to a page-wide keydown.**
+   `js/looped-network.js:25258-25305` closes `#lpn_popup`/`#lpn_setbox`/`#lpn_libbox` on ANY Escape
+   anywhere on the page, whether or not the reader's focus is inside the box — the exact shape of
+   Tom's 2026-09-18 complaint. Guard the three close calls on `document.activeElement` being inside
+   the relevant box; leave the menu/popover half of the same handler untouched (a different pattern,
+   already correctly page-wide per the 2026-08-13 "these are menus, not boxes" ruling). Cheaper than
+   his own blunter "never closable by Escape" proposal and keeps a real keyboard exit for the one
+   reader who tabbed INTO the box — the × buttons are ordinary focusable `<button>`s either way, so
+   neither version strands a keyboard-only visitor, but the focus-scoped version costs nothing a
+   reader can feel and the blunt version removes a working shortcut for no visible gain. See
+   journal, 2026-09-18.
+
+39. **Before `feat/lock-initials-later` merges, get Tom's explicit yes on storing the Ask-typed
+   name, since his 2026-09-18 proposal reverses a line the branch draws on purpose.**
+   `js/looped-network.js:23289-23291` on that branch (checked 2026-09-18) calls the name being
+   sent-never-stored "the whole point of Task 667(b)." His new want — remember it once per browser,
+   reuse it to label who holds a lock — is good thinking on the "ask once" half and is a real,
+   if milder, repeat of the thing he rejected on the "reuse everywhere afterward" half: a name
+   given once for one purpose becomes a standing per-browser label. Not a reason to drop the idea —
+   I read it as passing the existing storage exemption test the identity token already relies on —
+   but it is a reversal of a decision made days ago on the same branch, and the person who should
+   say so out loud is Tom, not whoever implements it next. Pair it with a visible "not you?" way to
+   correct a stale or borrowed name, since a wrong name on a break-lock decision is the kind of
+   defect only the person NOT holding the lock ever notices. See journal, 2026-09-18.
+
+40. **Stop styling sortable-table headings and the ID/goto cell as hyperlinks.** The `<button>`
+    markup and `aria-sort` wiring in `js/looped-network.js:18538-18576` already match the WAI-ARIA
+    APG's own sortable-table pattern exactly and need no change. The paint does not:
+    `css/engcalcs.css:2371-2377` turns the sort button link-blue (`#0645ad`, the default visited-
+    link color) on hover and underlines the ID button permanently, so both read as ordinary
+    hyperlinks to a reader scanning the row — a false "this leaves the page" signal on controls
+    that both stay in place. Fix: drop the link-blue hover and the permanent underline; reserve
+    `#0645ad` for the one meaning this same table just gave it on 2026-09-19, the current-cell
+    outline, rather than splitting it across three unrelated signals. One-line CSS change, no new
+    strings. See journal, 2026-09-19.
+41. **The "strange highlighting around the ID" is very likely the same seam as #40, not a separate
+    bug.** `css/engcalcs.css:2229-2233` paints the current-cell outline on ANY focused `<td>`
+    (`:focus-within`), and the ID cell's goto-button takes focus on an ordinary click — so jumping
+    to the map leaves that cell wearing the exact mark the new spreadsheet-mode design just
+    invented to mean "current cell," with nothing to do with cursor position. Fix alongside #40:
+    give `.lpn-pane-goto` its own focus ring instead of relying on the generic `td:focus-within`
+    rule. See journal, 2026-09-19.
+
+42. **Give `setNotice()` a memory and one small disclosure control — the cheapest fix for "Help!
+    What did I miss."** It is already the ONE function behind 66 call sites (`js/looped-network.js
+    :42199,42231`), unlike the 57 raw `alert()`/`confirm()` sites that have no shared door at all —
+    so teaching it to keep the last handful of messages in memory and adding one icon near
+    `#lpn_status` to read them back costs a small build, not a redesign, and directly answers Task
+    704. No new storage (session-only JS array), no new severities, no new chrome bar — a log
+    behind a control, the same shape QGIS's Log Messages Panel and AutoCAD's F2 Text Screen both
+    use. Rank first, ahead of folding the lock/file banner into the same log (second) and auditing
+    the 57 `alert()`/`confirm()` sites for which genuinely need to block (third, and the only piece
+    big enough to be the "feature branch" Tom floated). See journal, 2026-09-21.

@@ -10,10 +10,12 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
 - **`feature_freeze.active` in `dev/branch-policy.json` is the second lock.** Tom's all-clear in
   `dev/branch-all-clears.json` (pin field is **`head`**, not `commit`) does not merge a `protected`
   branch while the freeze stands. Only Tom lifts it. It is currently OFF.
-- **`master` is `0d2256fd`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
+- **`master` is `b680e213`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
 - **Production is whatever Tom last pulled, and it is not master.** Never say "it is live."
-- **`feat/tables-spreadsheet` is built, green on the merge result, and AWAITING HIS TEST** on port
-  8096. Nothing else is waiting on an all-clear. See STATE.
+- **FIVE FEATURE BRANCHES ARE BUILT AND EVERY ONE AWAITS HIS BROWSER PASS. NONE MAY MERGE.** All
+  five are in `protected`. The list, the ports, and the nine decisions that are his rather than
+  anybody's to infer, are in STATE below. **A session that merges one of these on its own green
+  build is the 2026-09-13 failure repeating.**
 
 
 ---
@@ -95,6 +97,21 @@ of them does the thing the standing ruling says we never do.
 
 ## RULINGS -- permanent
 
+- **THE MAPBOX TOKEN IS URL-RESTRICTED, AND THAT IS WHY SATELLITE NEVER WORKED LOCALLY** (measured
+  2026-09-19, and Tom fixed it the same night by adding the local origins to the token's allowed URL
+  list: *"URL list fixed it."*). **The lesson outlives the fix: a token being PRESENT is not a token
+  being ACCEPTED.** Two rounds were spent saying "the token is present, so that is ruled out" while
+  checking only that the string existed. The measurement that settled it was fetching a real tile
+  with the real token and varying nothing but the `Referer`: `https://hawsedc.com/` 200,
+  `https://librewaternet.org/` 200, and **403 from `hawsedc.local`, `localhost:8094` and
+  `localhost:8096` alike** -- satellite AND Terrain-RGB. Street map is unaffected because
+  OpenStreetMap tiles need no token, which is exactly why the symptom read as "map but not
+  satellite". **CORRECTED BY TOM, 2026-09-19: A NEW PREVIEW PORT NEEDS NOTHING.** He was told each new
+  port needs its own entry; his answer: *"No. The list simply contains localhost and
+  hawsedc.local."* An allowed-URL entry is a HOST, and every preview port lives on one of those two
+  hosts already. **A new HOSTNAME would need an entry; a new port never does.** The 403s measured
+  above were from before he fixed the list, not evidence about ports.
+
 - **"Production is not master. Say it again and again."** (2026-09-12)
 - **A branch names its capability, in the singular.** (2026-09-12)
 - **Tom's all-clear is required to merge a `protected` branch. Green is not done.** (2026-09-13)
@@ -170,106 +187,131 @@ of them does the thing the standing ruling says we never do.
 
 ---
 
-## STATE -- 2026-09-18 night, perishable
+## STATE -- 2026-09-21, perishable
 
-### What landed on master this session (`b7cb5e23` -> `5a9c7fae`, pushed)
+### HIS REVIEW COMMENTS LIVE IN A FILE AND HE USES IT
 
-- **`isGeoProject` -> `isLatLonProject()`**, 20 files. See RULINGS.
-- **The gravity note is gone.** Tom: *"We can't keep showing the gravity message
-  `lpn_engine_minor_loss_note` forever. It's just noise. If anything, put it in settings in the tip
-  for the choice of whether to use the built-in solver when possible."* Done exactly there.
-  **KEY DELETED FROM ALL 27 FILES: `lpn_engine_minor_loss_note`.** The warning CODE
-  `minor-loss-gravity-differs` is still raised in `js/lpn-epanet.js` and two harnesses still assert
-  it; only the sentence is gone. `engine-note-once-harness.js` was re-pointed at the MANNING note,
-  which is the same shape of thing and is still shown -- he did not ask for that one to go.
-- **`feat/customer-demands` merged on his all-clear** (*"Nice. Let's call it done, merge it, and
-  delete it."*), pinned to `0476f882`; branch, worktree and port 8088 all retired. It carries
-  **Offset beside Station in the popup and in the table**, which he had asked for twice: positive is
-  to the RIGHT of the pipe looking from its first node toward its second. Keys added:
-  `lpn_field_meter_offset`, `lpn_field_meter_offset_tip`.
-- **Tasks 692, 686, 626 and 611 closed** -- merged work still sitting open. **689 closed** on the
-  tables branch.
+`dev/tom-review-queue.md`, guarded by `review_queue_check.php`. **Every `check_all.sh` run prints
+the outstanding rows under a NOTE** -- the advisory leg exits non-zero while anything is open on
+purpose. He has now PRUNED it himself, deleting cleared rows and REOPENING several with dated notes
+underneath, which is the file working exactly as intended. **Commit his edits verbatim, under his
+own authorship, before touching anything else.**
 
-### Branches alive
+### PERRY IS THE PRE-REVIEWER AND HE NAMED IT
 
-| Branch | Port | State |
-|---|---|---|
-| `feat/tables-spreadsheet` | 8096 | **BUILT, green on the merge result, AWAITING HIS TEST** |
-| `feat/xy-world-map` | 8094 | **caught up with master; the dial clamp and the satellite ruling built.** See the two-step-twos block |
-| `feat/label-gang-search` | 8090 | **the classification measurement is built and committed.** No placement change; the choice is his |
-| `feat/customer-find-labels` | new | agent running: his customer items, spec REVISED twice -- see below |
-| `feat/engine-fetch-wait` | new | agent running: Task 608, the authorized half only |
-| `feat/lock-initials-later` | 8095 | needs Task 698; **170 behind master**, and it is what dev.hawsedc.com was sitting on |
-| `ida/esc-and-lock-identity` | -- | 1 ahead, untouched this session |
-| `tables-interface` | -- | stale, nobody has claimed it |
+`.claude/agents/pre-reviewer.md`. It reviews work it did not write, on every branch, BEFORE Tom is
+told a branch is ready, and it **reports rather than fixes**. Five outings so far, and it has earned
+the seat every time:
 
-**`feat/tables-spreadsheet` IS NOT IN `protected` AND SHOULD BE** -- it is a feature umbrella
-(spreadsheet editing), and the policy's own rule is that a feature branch joins that list when it is
-MADE, not when somebody remembers.
+- **Its standing check -- "construct the case the author did not" -- has now paid off four times**,
+  and always on the SAMPLE rather than on the numbers. A harness concluding a link label never
+  blocks, from customers placed at round numbers on a main whose label repeats elsewhere. Four
+  monotonic zoom gestures concluding "the wheel is not the cause". A drop rate reported as
+  0.8%/0.8% that was the harness's own hardcoded seed 12345 and the best of ten (true spread 0.0% to
+  2.4%). **When a report gives one percentage from a harness, ask what seed it is and re-run it.**
+- **Its second standing check:** a commit that fixes a VISIBLE thing gets checked by eye and not by
+  the machinery beside it. **For any commit touching an `$ec_lang` value, grep for the same string
+  as a `pc.x || '...'` fallback in `js/looped-network.js`.** It has caught that twice.
+- **And the lesson worth carrying furthest, from a crash it found on 2026-09-21: THE SAME FUNCTION
+  IS NOT THE SAME DOOR.** A table and a popup both called one rename function and only one of the
+  two callers finished the job. Distrust "it goes through the same door as X" unless somebody has
+  driven both callers with real events.
 
-### What is waiting on Tom
+### On master and pushed: `2964ce32`
 
-- **`feat/tables-spreadsheet`, port 8096.** Ctrl+Z inside a table: **native text undo while a cell
-  editor is open (F2, double-click, or a printable character), project undo when it is not**;
-  checkboxes and selects always take the project undo. Undo now refreshes the pane, for Task 611's
-  reason. **A shipped defect was found while building it**: `var paneTablesCache = null;` sat BELOW
-  the block that filled it, so hoisting re-ran it at load and the page held **two sets of six table
-  specs** -- the tab strip sorted and displayed one, everything reaching a table by id got the
-  other, whose sort was permanently the default, and the Print button reads the second. **Printed
-  tables came out in id order however he had sorted the screen.** Fixed here.
-- **Task 690's parity check reports 28 gaps, ADVISORY.** One flag makes it a ratchet the day the
-  count reaches zero. **Whether the PUMP rows should be columns at all is his call and not a
-  defect**: that table's own comment says a pump is a reading rather than an editor, and yet a speed
-  and an energy price are scalars. Nothing mechanical can settle it.
-- **Task 247 is NOT closed, deliberately.** He cleared the BRANCH, not the task. Its block says
-  slices 1-3 are in and *"what is left is his call"*: the label density rule, a customer in Find,
-  Slice 4.
-- **`feat/xy-world-map` -- the dial defect is FIXED and it was real.** The dial is a 306 px control
-  centred on the canvas, and **with the bottom pane open the canvas is not tall enough**: at
-  1366x768 with a 300 px pane it slid under the form; at 1280x700 with a 340 px pane the TURN KNOB
-  sat behind the toolbar and could not be pressed. **That is the same defect the rectangle's rotate
-  handle already had -- the defect the dial was built to escape.** `mapgeoPlaceDial()` now fits
-  itself to the canvas rect and shrinks the bar to a 56 px floor rather than sliding out, re-placed
-  from `applyMapHeight()`. `dev/lpn-spike/mapgeo-browser-drive.js` drives real Chrome across five
-  layouts and fails before the fix.
-  - **THE SATELLITE RULING, recorded in the source:** a georeferenced XY project IS locatable **for
-    the basemap rows only** (street, satellite, corner teaser, via `basemapChoosable()`); **Go to,
-    place-name search and Read DEM stay on the narrow `isLatLonProject()` question**, because each
-    needs more than a transform and a row that does nothing is the defect Task 692 closed.
-  - **Two judgements, neither acted on:** the dial lands on the right edge overlapping the labels
-    legend and is the only wizard control not in the step bar where the reader's eyes already are;
-    and **the rectangle's rotate handle is UNREACHABLE at a fitted zoom** (measured twice --
-    `elementFromPoint` returns the step bar), so a dead handle is probably worse than none.
-- **His three original reports on `feat/xy-world-map`**, for the record: no slider/dial, step 2 still rotates the
-  project, satellite refused. **The satellite one is traced**: that branch is 47 commits behind
-  master and contains NEITHER half of the Task 692 fix (`ca25f1da`, `19ab3155`). The Mapbox token is
-  present, 89 chars, so an absent token is ruled out. **And the branch creates a FOURTH case of Task
-  692** -- a plain XY project WITH a world map attached is not lat/lon and is nevertheless locatable
-  -- which master's fix cannot know about, because that project kind did not exist when it was
-  written.
-- **His two new customer items, 2026-09-18: (1) "Add Customer to Find."** and **(2)** labels, *if* we
-  label at all -- two fixed positions aligned with the service line, one justified against the link
-  and one against the customer dot and beyond it from the link's perspective, **both failing a
-  conflict check means the label is dropped**, styled as a link flow label, and *"maybe we have a
-  setting for the widest view that attempts to display it."* Revised minutes later: ***"I guess
-  **if** we label, we should allow more than just Q."*** The **if** is his own emphasis and is
-  load-bearing -- he has not decided that customers should be labelled at all, so the first
-  deliverable is what customer labelling IS today and whether anybody ever decided it, and the
-  "never" setting must stay one line away.
-- **Ida owes an answer**: where does **Revert** live by interface convention? He pushed back twice on
-  the position it was given and asked for the convention, not an opinion.
-- **Task 698** -- keep initials per browser, name the holder, and say *"We have you listed as ABC.
-  If that's wrong, you can change it."*
+- **His own edits**, committed under his authorship.
+- **His roadmap ruling applied:** eleven closed or deleted (608, 646, 698, 665, 687, 632, 641, 700,
+  635, 689, 283), twenty moved, his notes written into 696, 653 and the water-tower trio 645/648/679.
+  **Three new: 703 satellite tiles, 704 messaging, 705 zoom rules.** Plus 701 (the panel guard's
+  forty invisible sites), 702 (a view window spanning the antipode), 706 (every cell commit saves
+  the whole project).
+- **ABOUT: "online since 2010", in his words, both edits.** That is a PUBLIC CLAIM, evidenced by his
+  own Wayback finding. It changes a string translated into 26 languages, so it is in drift now.
+- **`fix/stale-is-a-snapshot`, a defect track, merged on the ordinary rules and NOT yet browser-tested.**
+  His principle, in his own words and now in `CLAUDE.md`: ***"Off means Off, but it doesn't mean Hide
+  or Delete. It means Snapshot in time."*** An edit now rewrites only its OWN label and moves only
+  that one label, instead of recomputing every label on the map and re-running collision avoidance
+  -- which was the slowdown he had been complaining about all week. Editing a junction's elevation
+  or demand did not update its map label AT ALL before. The Tables pane now hears Properties, a
+  direction that was simply missing. Fire flow rings survive an edit and gained a Clear rings button
+  (`lpn_ff_clear`, the only new key). **And the audit found a crash nobody had hit**: a junction
+  with no demand stated returned `undefined` into `.toFixed()`.
 
-### One loose end
+### THE LABEL ANSWER: HE WAS RIGHT, AND THE NUMBER IS 36 OF 97
 
-`git stash list` holds **`stash@{0}` -- "prev run: station column + general table audit + parity
-check"**, made on the now-deleted `feat/customer-demands`. Station was rewritten fresh and nothing
-else from it landed; the twenty-one-column sweep inside it is the same ground Task 690's derived
-check now covers. **It is not needed, but it is the only copy of that attempt outside a perishable
-scratchpad.** Drop it deliberately or keep it deliberately -- do not leave it by accident.
+**`feat/label-gang-search` `4d763c56`+. NOTHING ABOUT THE DRAWING CHANGES -- the shipped default is
+byte-identical to what he tested, and the fix is behind `?debug=labels`.** Say that first; he once
+spent a browser pass on this branch when every candidate had been abandoned and nobody told him.
 
----
+His claim was *"adding 12345678 however causes no conflicts with anything all the way to Japan"*.
+Replayed on his own Novato drawing, 97 of 97 reproduced:
+
+- **36 of 97 labels vanish and NOT ONE was boxed in.** A node label's whole search is at most 28
+  spots, all inside the SINGLE widest gap between that node's own pipes, none more than three
+  label-widths out. When those 28 are taken the code writes "nowhere to put it". **"Nowhere in the
+  28 places I looked" is not "nowhere."** Re-searched: 18 had room just past the reach, 11 inside
+  the window it never sampled finely enough, 7 in a direction it never looks at all. **Genuinely
+  enclosed: zero.** That is the blatant bug, and his description of it was exact.
+- **60 of 97 move, and only 19 are real collisions** with a node symbol past the edge they grew
+  toward. **The other 41 move only because a neighbour moved first** -- placed one at a time in
+  importance order, each treating its predecessors as obstacles, nothing ever going back.
+  **Nineteen real collisions shove fifty-one labels.**
+- **Built and switched off, honestly:** a label whose ordinary spots are taken is set aside and
+  rescued afterwards -- widening rings, all the way round, nearest first, hunting the node's gaps
+  widest-first -- running LAST so it can shove nobody. **29 rescued, 0 labels that already had a
+  place moved. Hiding goes 36 to 0 on his prefix; 79 to 35 across five examples.**
+- **WHY IT IS OFF, and this is the decision now with him:** with EVERY label field on it stops being
+  a win. A label rescued onto a long leader is then hidden by the CROSSING-LEADER rule instead --
+  **14 to 59 hidden over four views for only 7 more drawn** -- and the drawing rearranges. That is
+  trading a hide for a hide one rung down. **The rescue and the crossing-leader rule now decide the
+  same thing twice in opposite directions, and only the rescue knows the plane is empty.**
+- **AND THE DAMPING HE MARKED *Recommended* CANNOT BE BUILT AS WRITTEN.** "Keep the place it had"
+  means the PREVIOUS PASS's place, and where a label sits is required to be a pure function of the
+  drawing rather than of history.
+
+Also measured for him: the all-round ring costs **about 16% more, roughly 13 ms a view** (1,663 ms
+against 1,928 ms over five examples, four views each), and its advantage has shrunk now the search
+can widen -- 18 hidden against 10. **The four corners are the CHEAPEST set measured (1,247 ms), but
+his caching idea is not sound and he was told so**: whether a corner is free depends on the VIEW and
+not the network, because link labels shed values as you zoom, so there is no "zoom at which the
+corners stop working" to record. **`spot route` WAS wired all along** and only acts where a gang of
+crossing leaders exists; **what was NOT wired to anything he could see is the four number boxes,
+which steer the LINK label pass and cannot touch a node label at all** -- an instrument defect in
+what he was given, now labelled in two halves. **The ranked gap list is BUILT**: the node's table of
+every gap between its pipes was already computed and already survives a zoom, and the code then
+threw all but the biggest away.
+
+### FOUR FEATURE BRANCHES AWAIT HIS BROWSER PASS. NONE MAY MERGE.
+
+| Branch | Head | Port | What he must judge |
+|---|---|---|---|
+| `feat/tables-spreadsheet` | see worktree | 8096 | four modes, the right-click menu, and the two crashes Perry found now fixed |
+| `feat/xy-world-map` | `731ab367` | 8094 | **Task 703: he still sees white squares after FOUR measured-and-fixed causes** |
+| `feat/customer-find-labels` | see worktree | 8098 | his two label positions, the Symbology header, the service line |
+| `feat/label-gang-search` | see worktree | 8090 | **nothing to look at. A measurement and a switchboard** |
+
+`feat/engine-fetch-wait` MERGED (Task 608 closed on his word). `feat/lock-initials-later` needs
+nothing now -- Task 698 is closed.
+
+### WHAT IS OUTSTANDING WITH HIM
+
+1. **The label rescue: adopt it, and what to do about the crossing-leader rule** now that two rules
+   decide the same thing in opposite directions.
+2. **Task 703, the satellite tiles.** Four causes found and fixed and he still sees white squares.
+   **The next move is not a fifth cause, it is an instrument HE can run** -- a readout saying, for
+   the current view: wanted, requested, arrived, drawn, failed, retried, cached.
+3. **Task 705, the zoom rules** -- he asked to DISCUSS, not to be handed a build.
+4. **Task 704's cheapest step** (Ida): give `setNotice()` a history and one icon to read it back.
+5. **The 1 px heading misalignment:** what browser and zoom level, and was the scrollbar showing?
+6. **`sh dev/host/install.sh`** -- one command, fixes the spurious 2:22 AM page-check mail.
+
+### A TRAP MEASURED AGAIN, WORSE THAN EVER
+
+**ELEVEN concurrent `check_all.sh` runs**, against a cap of about three, with several killed at exit
+144 -- green-looking output, failing exit code. **And three agents sat in UNBOUNDED WAIT LOOPS with
+their work UNCOMMITTED**, watching for a completion marker a killed job would never write. Both are
+named defects here (`.claude/hooks/guard-wait-loops.php`, `dev/scripts/wait_for.sh`). **Tell every
+agent: commit first, run the suite at most once, and never watch for a marker.**
 
 ## What to hand Tom in the same breath as any panel change
 
