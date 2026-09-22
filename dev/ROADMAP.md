@@ -1904,6 +1904,13 @@ the block.
     has already passed in the browser. The limitation is now written at the top of the harness so it
     no longer implies coverage it does not have.
 
+- 75|708| **Every property in every venue: an audit, then a check.**
+  Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
+  multi-properties. Should we do an audit to ensure that all properties are represented in all
+  venues?"* Yes. Venues: the Properties box (single and multi-select), the Tables pane, Find and
+  replace, Settings symbology, labels, `.inp` export. Produce the element-by-venue matrix first, then
+  hold it with a check so a new property cannot ship in one venue only. Task 690 already asks the
+  popup-vs-table half.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
