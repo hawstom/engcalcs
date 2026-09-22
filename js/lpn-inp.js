@@ -281,8 +281,8 @@
 	 * ---- CUSTOMERS: METERED DEMANDS, LUMPED AT THE NEAREST NODE (ROADMAP Task 247) -------------
 	 *
 	 * **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED, AND NOT A SECOND STRUCTURE.** It
-	 * carries an account number, a count of identical services, a place on the map and an
-	 * attachment to a pipe; everything else about it is a demand row. Which is why these three
+	 * carries the description and tag every other element carries, a count of identical services, a
+	 * place on the map and an attachment to a pipe; everything else about it is a demand row. Which is why these three
 	 * functions live HERE, beside EngCalcs.lpnDemandRows(): the editor's own totals and the `.inp`
 	 * writer both have to answer "how much does this junction draw" the same way, and two
 	 * implementations of that is how a demand goes missing on export.
@@ -300,8 +300,8 @@
 	 */
 	// The flow a meter represents: what one service draws, times how many of them this symbol
 	// stands for. **THE COUNT IS WHY A ROW OF FORTY-TWO HOUSES IS ONE SYMBOL** (Tom, 2026-08-24:
-	// *"should we make meter only a Type and Count object?"*), and it defaults to 1 so a customer
-	// with an account number is the count-of-one case rather than a different kind of thing.
+	// *"should we make meter only a Type and Count object?"*), and it defaults to 1 so a single
+	// service is the count-of-one case rather than a different kind of thing.
 	EngCalcs.lpnCustomerFlow = function (c) {
 		var d = (c && typeof c.demand === 'number' && isFinite(c.demand)) ? c.demand : 0,
 			n = (c && typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1;
@@ -331,12 +331,16 @@
 	 * and EngCalcs.lpnNumText() composes it. A customer never came out of an `.inp` in the first
 	 * place; no `.inp` has customers.
 	 *
-	 * **THE CATEGORY IS THE ACCOUNT NUMBER, and that is the only slot EPANET has for a name.** Task
-	 * 468 occupies the category with *who* the demand is, and an account number is exactly that
-	 * kind of name -- so a customer's row says its account in the one field of a `[DEMANDS]` row
-	 * that can hold a name, and the export report says what the file could not hold beside it.
-	 * Blank where the meter has no account number, which leaves a nameless row rather than a
-	 * fabricated name.
+	 * **THE CATEGORY IS THE TAG, and that is the only slot EPANET has for a name** (Tom, 2026-09-19,
+	 * retiring the owned account number: *"Since Customer is a pseudo-node, what if we provide
+	 * existing properties like Description and Tag instead of Account number?"*). Task 468 occupies
+	 * the category with *who* the demand is, and a tag is exactly that kind of name -- it is what
+	 * somebody else's records call this service, which is the join key EPANET's own `[TAGS]` holds
+	 * for every node and link. **The DESCRIPTION is deliberately NOT written here**: it is a
+	 * sentence about where the service is, the category slot is one token EPANET reads back as a
+	 * name, and a sentence in it would round-trip as its first word.
+	 *
+	 * Blank where the meter has no tag, which leaves a nameless row rather than a fabricated name.
 	 */
 	EngCalcs.lpnCustomerRowsByNode = function (docLike) {
 		var out = {}, byId = {}, list = (docLike && docLike.customers) || [];
@@ -349,7 +353,7 @@
 			out[nid].push({
 				base: EngCalcs.lpnCustomerFlow(c),
 				pattern: c.pattern || null,
-				category: c.account ? String(c.account) : null,
+				category: c.tag ? String(c.tag) : null,
 				rec: null, key: 'base', customer: c
 			});
 		});
@@ -1998,7 +2002,7 @@
 	// the cheapest of the four and it is also why it earns its place -- **a tag is the join key to
 	// whatever system the utility already keeps its assets in**, which is the whole of what makes a
 	// model of somebody's real network somebody's real network. It is also the natural home for
-	// Task 247's customer and account work.
+	// Task 247's customer work.
 	//
 	// **EPANET'S TAG IS ONE WORD AND OURS HAS TO BE TOO.** `[TAGS]` is `NODE|LINK  id  tag` and the
 	// reader stops at whitespace, so a tag containing a space would come back as a truncated one and
@@ -3216,8 +3220,8 @@
 		}
 		if (fittedPipes.length) { diff('fittings-flattened', fittedPipes, null); }
 		// **WHAT AN .inp CANNOT HOLD ABOUT A CUSTOMER** (Task 247). Its demand went out, on the
-		// junction it lumps at; its account number went out too, in the one field of a [DEMANDS]
-		// row that can hold a name. What has nowhere to go is the METER: where it sits, which pipe
+		// junction it lumps at; its tag went out too, in the one field of a [DEMANDS] row that can
+		// hold a name. What has nowhere to go is the METER: where it sits, which pipe
 		// serves it, where along that pipe the service connects, and how many identical services
 		// one symbol stands for. `detail` is the number of meters, so the sentence can say it.
 		//

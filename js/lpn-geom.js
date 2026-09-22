@@ -335,6 +335,72 @@ EngCalcs.lpnGeom = (function () {
 	//
 	// Returns the same {x, y, w, h} shape the collision boxes use (x/y = top-left), so the caller
 	// can hand it straight to lpn-collide with `movable: false`.
+	/**
+	 * **THE TWO PLACES A CUSTOMER LABEL MAY GO, AND THERE IS NO THIRD** (ROADMAP Task 247; Tom,
+	 * 2026-09-18: *"If we label them, the labels should be at one of two fixed locations, both
+	 * aligned with the service line, one justified against the link and the other one justified
+	 * against the Customer dot and beyond it from the perspective of the link. If both of those
+	 * fail a conflict check, the label is dropped. This much simpler than general node label
+	 * placement."*).
+	 *
+	 * **THAT LAST SENTENCE IS THE SPECIFICATION AND NOT A REMARK.** A node label has a ring of
+	 * candidate angles, a first-fit search, a joint gang repair, a shed cascade and a leader. This
+	 * has two positions and a drop. Anything added here is the simplification being spent.
+	 *
+	 * **BOTH ARE ROTATED TO THE SERVICE LINE, which is what "aligned" means** -- not horizontal.
+	 * `alignedLabelAnchor()` does the one hard part, which is that text must never render upside
+	 * down: the angle is normalised into a readable window FIRST, and the flip that normalisation
+	 * may apply is what decides the justification. That is why `hAlign` comes OUT of this function
+	 * rather than being a constant at the call site -- on a service running right to left,
+	 * "justified against the link" is `end` and not `start`, and getting it wrong puts both labels
+	 * on the far side of the thing they are justified against.
+	 *
+	 * `linkPad` is the air between the main and the first letter; `dotPad` is measured from the
+	 * meter POINT, so a caller passes the dot's own radius plus its air.
+	 *
+	 * Returns [] for a customer attached to nothing: there is no service line, so there is nothing
+	 * to align with. A refusal, never a fallback to horizontal -- that would be the third candidate
+	 * the rule says there is not.
+	 */
+	function serviceLabelSpots(ax, ay, px, py, opts) {
+		opts = opts || {};
+		var w = opts.w || 0, h = opts.h || 0, fs = opts.fontSize || 0,
+			gap = opts.gap || 0, linkPad = opts.linkPad || 0, dotPad = opts.dotPad || 0,
+			bias = (typeof opts.bias === 'number' && isFinite(opts.bias)) ? opts.bias : 90,
+			dx = px - ax, dy = py - ay, len = Math.hypot(dx, dy),
+			out = [], fracs, gaps, i, a, hAlign;
+		if (!(len > 0) || !isFinite(len)) { return out; }
+		// **ORDER IS PART OF THE SPECIFICATION**: the link end is tried first.
+		fracs = [linkPad / len, (len + dotPad) / len];
+		// **AND THE TWO SPOTS SIT ACROSS THE LINE DIFFERENTLY, WHICH IS TOM'S OWN RULING**
+		// (2026-09-19: *"When a label is beyond the meter, make it middle justified with the meter
+		// instead of bottom."*).
+		//
+		//   * The spot BETWEEN the main and the customer lies alongside a service line that is
+		//     really there, so it is offset clear of it -- `gap` above the line, exactly as an
+		//     aligned pipe label is.
+		//   * The spot BEYOND the customer has no service line under it to avoid: the line stops
+		//     at the dot. So it is centred ON the service line's own axis, which puts the lettering
+		//     level with the customer symbol instead of perched above the axis it is extending.
+		//
+		// The centred offset is derived rather than chosen. `alignedLabelAnchor` returns a
+		// BASELINE, and a one-line box reaches 0.85 x fontSize above it and `h` tall in all; so
+		// the block's middle lands on the axis when the baseline sits `h / 2 - 0.85 x fontSize`
+		// above it -- a NEGATIVE offset for an ordinary line height, i.e. the baseline drops below
+		// the axis, which is what centring means.
+		gaps = [gap, h / 2 - fs * 0.85 - (Math.max(1, opts.nLines || 1) - 1) * fs];
+		for (i = 0; i < 2; i++) {
+			a = alignedLabelAnchor(ax, ay, px, py,
+				{ frac: fracs[i], gap: gaps[i], fontSize: fs, nLines: opts.nLines || 1, side: 1, bias: bias });
+			hAlign = a.flipped ? 'end' : 'start';
+			out.push({
+				ax: a.x, ay: a.y, angle: a.angle, hAlign: hAlign, flipped: a.flipped,
+				atLink: i === 0,
+				box: orientedLabelBox(a.x, a.y, w, h, hAlign, 'baseline', a.angle, fs)
+			});
+		}
+		return out;
+	}
 	function rotatedLabelBox(ax, ay, w, h, angleDeg, fontSize) {
 		var b = orientedLabelBox(ax, ay, w, h, 'middle', 'top', angleDeg, fontSize),
 			rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
@@ -778,6 +844,7 @@ EngCalcs.lpnGeom = (function () {
 		labelBoxAt: labelBoxAt,
 		segmentRectRange: segmentRectRange,
 		alignedLabelAnchor: alignedLabelAnchor,
+		serviceLabelSpots: serviceLabelSpots,
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,

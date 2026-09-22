@@ -1140,19 +1140,19 @@ $ec_lang['lpn_settings_search_tip']='Yalnızca bahsi geçen ayarları görmek i�
 $ec_lang['lpn_settings_no_match']='Hiçbir ayar bu sözcükten bahsetmiyor.';
 $ec_lang['lpn_rpane_empty']='Burada henüz bir şey yerleştirilmedi. Tüm projeye ait olan her şey Ayarlar\'da.';
 $ec_lang['lpn_time_settings_open']='Zaman ayarları';
-$ec_lang['lpn_settings_sec_visualization']='Görselleştirme';
+$ec_lang['lpn_settings_sec_symbology']='Görselleştirme';
 $ec_lang['lpn_settings_sec_map']='Harita ve sayfa';
 $ec_lang['lpn_settings_sec_assets']='Yeni öğeler için varsayılanlar';
 $ec_lang['lpn_settings_sec_calculation']='Hesaplama';
-$ec_lang['lpn_settings_node_symbology']='Düğüm gösterimi';
-$ec_lang['lpn_settings_link_symbology']='Hat gösterimi';
+$ec_lang['lpn_settings_sym_node']='Düğüm gösterimi';
+$ec_lang['lpn_settings_sym_link']='Hat gösterimi';
 $ec_lang['lpn_settings_page']='Sayfa';
 $ec_lang['lpn_settings_page_note']='Projede değil, bu hesaplayıcıda kaydedilir.';
 $ec_lang['lpn_settings_hydraulics']='Hidrolik';
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
 $ec_lang['lpn_labels_col_rank']='Sıra';
 $ec_lang['lpn_labels_col_drop']='Bırakma';
-$ec_lang['lpn_settings_node_link']='Düğüm ve hat';
+$ec_lang['lpn_settings_sym_all']='Düğüm ve hat';
 
 // Sprint 459 batch 1 (keys 1-50)
 $ec_lang['calc_set_units_tip']='Her alanın birimini bir kerede ayarlar. Yıkıcı değildir: yazdığınız sayılar tam olarak kaldığı gibi kalır, yalnızca artık yeni birimde okunur. 6, 6 olarak kalır, ama artık 6 milimetre yerine 6 inç anlamına gelir.';

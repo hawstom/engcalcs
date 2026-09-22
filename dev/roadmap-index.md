@@ -32,7 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
 - Task 703 — The satellite tiles: still blank patches after everything measured so far.
 - ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
-- ! Task 705 — New zoom rules: a symbol may not grow past a size the network itself sets.
+- Task 705 — Limit zoom symbol mapwise size growth.
 
 ## 75 — Soon (16)
 
@@ -123,5 +123,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-85 of 95 titles are within 4–12 words. `!` marks the rest;
+86 of 95 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
