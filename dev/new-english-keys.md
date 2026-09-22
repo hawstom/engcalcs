@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**119 still to read on master**, of 191 untranslated keys, of 2049 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**124 still to read on master**, of 196 untranslated keys, of 2054 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (191, 119 to read @@ NEEDS RULING)
+## lpn_  (196, 124 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -126,6 +126,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_meter_total_tip`**
   > The demand per service times the number of services. This is the number added to the junction named below.
   _Ruled OK 2026-09-17._
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
+  @@ NEEDS RULING
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   @@ NEEDS RULING
@@ -348,6 +354,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_settings_label_always`**
+  > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width`**
+  > Show labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
+  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
   @@ NEEDS RULING
@@ -605,7 +620,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**28 still to read**, of 34 new keys across 3 unmerged branch(es).
+**13 still to read**, of 13 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -616,56 +631,27 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`ae48c735`) — 13 new, 11 to read @@ NEEDS RULING
+### chore/tom-0922 (`b2485826`) — adds no English strings
+
+### feat/label-gang-search (`2b528452`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   @@ NEEDS RULING
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
 - **`lpn_labels_restore`**
   > Restore label defaults
   @@ NEEDS RULING
 - **`lpn_labels_restore_tip`**
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   @@ NEEDS RULING
-- **`lpn_settings_label_always`**
-  > Always show labels
-  @@ NEEDS RULING
 - **`lpn_settings_label_auto`**
   > Automatic: {width}
   @@ NEEDS RULING
-- **`lpn_settings_label_max_width`**
-  > Widest view that shows labels (map units)
-  @@ NEEDS RULING
-- **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
-  @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
 
-### feat/notice-log (`5191e8d3`) — 13 new, 11 to read @@ NEEDS RULING
+### feat/map-menu (`574f4dd3`) — adds no English strings
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
+### feat/notice-log (`1e48999b`) — 7 new, 7 to read @@ NEEDS RULING
+
 - **`lpn_lock_open_cancelled`**
   > That file was not opened, and nothing here changed. Somebody else still has it open.
   @@ NEEDS RULING
@@ -687,42 +673,18 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_tip`**
   > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`64b1a0e0`) — 8 new, 6 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`a04de77f`) — 2 new, 2 to read @@ NEEDS RULING
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
 - **`lpn_pane_goto_tip`**
-  > Show this on the map.
+  > Zoom & select
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
+
+### feat/zoom-symbol-size (`e1c025ca`) — adds no English strings
+
+### fix/daily-report-headings (`f3edca07`) — adds no English strings
+
+### fix/example-open (`e3ff6a6e`) — adds no English strings
