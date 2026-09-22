@@ -220,19 +220,20 @@ function replay(Collide, cap) {
 		// **ROOM TO GROW, REPLAYED** (2026-09-22): a label narrower than its `grow` first stands at
 		// the first side whose room is clear, and reserves the room. Asked through the pass's own
 		// two functions, so the replay cannot hold a second opinion about it.
-		if (lbl.grow > lbl.w && !lbl.dragged) {
+		const tiers = lbl.dragged ? [] : Collide.growTiers(lbl);
+		for (let t = 0; t < tiers.length && pick < 0; t++) {
 			for (let i = 0; i < all.length; i++) {
-				const room = Collide.growBoxAt(lbl, all[i]);
+				const room = Collide.growBoxAt(lbl, all[i], tiers[t]);
 				if (!Collide.roomClearOf(room, obs, pad, lbl.id)) { continue; }
 				pick = i; pickBox = Collide.labelLineBoxes(lbl, all[i]);
 				obs.boxes.push(room);
 				break;
 			}
-			if (pick >= 0) {
-				chosen[lbl.id] = pick; candidates[lbl.id] = all;
-				pickBox.forEach(function (cb) { obs.boxes.push(cb); });
-				return;
-			}
+		}
+		if (pick >= 0) {
+			chosen[lbl.id] = pick; candidates[lbl.id] = all;
+			pickBox.forEach(function (cb) { obs.boxes.push(cb); });
+			return;
 		}
 		for (let i = 0; i < all.length; i++) {
 			const b = Collide.labelLineBoxes(lbl, all[i]);

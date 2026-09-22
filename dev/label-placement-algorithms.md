@@ -1888,7 +1888,53 @@ labels at Net3-World's fit view with the short prefix.
 rather than a ceiling. What is left is the fit and 2x views, where the plane itself is crowded: the
 floor there is 29 and 17 on Net3-World, so most of what still moves genuinely has to.
 
-### 20d. What is not done
+### 20d. Why adding text still makes ANY difference at the fit view (Tom's second question)
+
+*"I still want to push on why additional string length makes any difference at all... with 1
+character added, there is no significant additional vertical spacing in the gang. But when I add a
+second character, a noticeable amount of additional gaps appear... the top label of this descending
+gang is eventually gratuitously 20 text heights away from its node."*
+
+**Measured, and it is one number: how many labels found their room.** Room to grow makes a label's
+choice independent of its text ONLY for the labels that find six row heights of clear room. At 4x
+on Net3-World all 97 do, which is why nothing moves there. At the fit view in the southwestern
+cluster 34 of 97 do not, and those 34 fall back to the old exact-width search, which is width-
+sensitive by definition: one more character re-decides 23 first-fit placements and drops 10 more
+labels. **The gang is then built from a different set of members, and a gang column could only
+hang from a spot one of its members already held** -- so its top jumped to wherever that member
+happened to land: 2.0, 2.0, 5.7, 5.7, 3.5 text heights for 0 to 4 characters in the harness's sweep.
+That is the oscillation. It is quantisation, but not of a lattice step: of WHICH first-fit spot the
+column is allowed to hang from.
+
+- **Fixed in the same mechanism**: a column may now also be slid, rows locked together, in
+  half-row steps toward its own nodes (`repairCrossingGangs()` (b')), and the shortest admissible
+  one wins. The worst top-of-column leader over 0 to 10 characters fell from 5.7 to 3.7 text
+  heights.
+- **Not fixed, and it is the real answer to "why at all"**: at the fit view the cluster genuinely
+  has no room for longer text -- the floor says 32 labels had to move for eight extra digits -- so
+  the hidden count still climbs with length (13 at 0 characters to 43 at 10). A graded reserve
+  (try 6, then 4, 3, 2 row heights before the exact width) was measured and barely moved it,
+  because the labels that find no room at all are still the ones that move.
+
+`label-prefix-acceptance-harness.js` prints the sweep: per length, moved, hidden, the longest
+column, its top label's leader, its longest leader and the mean leader, now and with room to grow
+off. The curve is flatter; it is not flat, and at the fit view it cannot be.
+
+### 20e. Slide toward the node (Tom's third point)
+
+*"A human would have slid the two labels at A toward B, shortening the leaders without any bad
+effects."* `Collide.slideTowardAnchors()`, after the gang repair and before the crossing shed: each
+drawn label with a leader steps along its own leader toward its node, a quarter text height at a
+time, and stops at the first step that would touch a label, a symbol, a pipe label or another
+leader. A leader that only gets shorter cannot cross anything new, so only the box is asked.
+Shortest leader first, measured against longest-first (29 labels slide against 23). A label that
+claimed room to grow slides with its room, or the slide itself would make a prefix move labels
+again (measured: 2 at 4x). On his northwest case, ID plus three properties at 3x: node 120's leader
+3.9 -> 3.2 text heights, node 257's 2.5 -> 1.8, no new contacts, no label lost
+(`label-slide-harness.js`). It costs a few moves at 1x and 2x in the R-075 count (30 -> 38 on
+Net3-World) and none at 4x or 8x.
+
+### 20f. What is not done
 
 - **A label wider than the reserve is placed exactly as before.** Six row heights is sized to his
   test (a Net3 ID plus eight digits is 5.45 row heights, median of 97); multi-row labels with every

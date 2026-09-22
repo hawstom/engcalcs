@@ -624,6 +624,10 @@ EngCalcs.lpnCollide = (function () {
 	// always, plus `sector` when the caller asked for a raster. Every existing harness is the check
 	// on that, and none of them moved.
 	var SIDE_STRATEGIES = ['corners', 'sector', 'ring'];
+	// How many half-row steps a gang column may be slid toward its nodes (repairCrossingGangs() (b')).
+	// Measured on Net3-World with the ID prefix swept 0 to 10 characters: the worst top-of-column
+	// leader fell from 5.7 to 3.5 text heights at 16 steps, and 40 bought nothing more.
+	var COLUMN_SLIDE_STEPS = 16;
 	function cardinalSides(anchor, offset, arcs, opts) {
 		opts = opts || {};
 		var dx = Math.abs((offset && offset.x) || 0), dy = Math.abs((offset && offset.y) || 0),
@@ -1292,14 +1296,124 @@ EngCalcs.lpnCollide = (function () {
 	// **The caller keeps ownership of both**, because deciding which side is open needs the network's
 	// topology and deciding which label matters needs to know what a demand is, and this file is not
 	// allowed to know either. It is the same purity line placeLabels() draws.
+	// ---- SLIDE TOWARD THE NODE (Task 539, Tom 2026-09-22) ------------------------------------------
+	//
+	// **Tom, on two labels parked well out from their nodes with empty ground between:** *"A human
+	// would have slid the two labels at A toward B, shortening the leaders without any bad effects.
+	// Could our algorithm be smart enough not to be gratuitously distant like this?"* Every pass
+	// before this one chooses among a fixed list of spots; none of them ever asks whether the spot it
+	// chose could be nearer. This does, and nothing else: each drawn label with a leader steps along
+	// its OWN leader toward its node, a fraction of a text height at a time, and stops at the first
+	// step that would touch anything. Keeping the leader's direction is what makes it safe -- a
+	// leader that only gets shorter cannot cross anything it did not already cross, so the only new
+	// question per step is whether the BOX is clear.
+	//
+	// Clear means clear of every obstacle's box, the yielding pipe labels included (sliding must not
+	// start covering a label that was readable), of every other drawn label's boxes as they stand
+	// now, and of every other label's leader. Pipes stay soft, exactly as for every other placement.
+	// It is a pure function of its inputs, so the layout stays a pure function of the drawing
+	// (dev/lpn-spike/node-yield-harness.js), and it is local: nothing but the label itself moves.
+	//
+	//   labels   the first-fit specs (anchor, w, h, yOff, lines, home, dragged)
+	//   placed   the results after every placement pass; a COPY comes back with slid entries
+	//   opts     { pad, leaderMin, step }  -- `step` in world units, default a quarter text height
+	function slideTowardAnchors(labels, placed, obstacles, opts) {
+		opts = opts || {};
+		var pad = opts.pad > 0 ? opts.pad : 0, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
+			specs = {}, out = (placed || []).map(function (r) {
+				var c = {}, k;
+				for (k in r) { if (Object.prototype.hasOwnProperty.call(r, k)) { c[k] = r[k]; } }
+				return c;
+			}),
+			hard = (obstacles && obstacles.boxes) || [], live = [], slid = 0, saved = 0;
+		(labels || []).forEach(function (l) { specs[l.id] = l; });
+		// **A LABEL THAT CLAIMED ROOM TO GROW SLIDES WITH ITS ROOM, not with its text** (see
+		// placeLabelsFirstFit()). Sliding the bare text would make where it stops depend on how long
+		// the text is -- measured: it put two moves back at 4x on Net3-World, where room to grow had
+		// made adding a prefix move nothing. So such a label is tested, and seen by the others, as
+		// the room it claimed; the real text lies inside that box by construction.
+		function asSpec(sp, r) {
+			if (!(r.room > sp.w)) { return sp; }
+			return { id: sp.id, anchor: sp.anchor, home: sp.home, w: r.room, h: sp.h, yOff: sp.yOff,
+				lines: null, text: sp };
+		}
+		out.forEach(function (r, i) {
+			var sp0 = specs[r.id], sp;
+			if (r.dropped || !sp0 || sp0.dragged) { return; }
+			sp = asSpec(sp0, r);
+			live.push({ i: i, sp: sp, boxes: labelLineBoxes(sp, { x: r.x, y: r.y }),
+				leader: segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+		});
+		function clearAt(me, bs) {
+			var j, k, m, o, g;
+			for (k = 0; k < bs.length; k++) {
+				g = pad > 0 ? box(bs[k].cx, bs[k].cy, bs[k].w + 2 * pad, bs[k].h + 2 * pad, bs[k].a) : bs[k];
+				for (j = 0; j < hard.length; j++) {
+					o = hard[j];
+					if (o.owner !== undefined && o.owner === me.sp.id) { continue; }
+					if (boxOverlapDepth(g, o) > 0) { return false; }
+				}
+				for (j = 0; j < live.length; j++) {
+					m = live[j];
+					if (m === me) { continue; }
+					for (o = 0; o < m.boxes.length; o++) {
+						if (boxOverlapDepth(g, m.boxes[o]) > 0) { return false; }
+					}
+					if (m.leader && segmentInBoxFraction(m.leader, bs[k]) > 0) { return false; }
+				}
+			}
+			return true;
+		}
+		// SHORTEST leader first, and that was measured against longest-first: the label nearest its
+		// node moves out of the way of the ones behind it, so more of them get to slide (29 labels
+		// against 23 on Net3-World's fit view). The order is fixed by the drawing either way.
+		live.slice().sort(function (a, b) {
+			var la = Math.hypot(out[a.i].x - a.sp.anchor.x, out[a.i].y - a.sp.anchor.y),
+				lb = Math.hypot(out[b.i].x - b.sp.anchor.x, out[b.i].y - b.sp.anchor.y);
+			return la - lb || (a.sp.id < b.sp.id ? -1 : 1);
+		}).forEach(function (me) {
+			var r = out[me.i], ax = me.sp.anchor.x, ay = me.sp.anchor.y,
+				len = Math.hypot(r.x - ax, r.y - ay),
+				step = opts.step > 0 ? opts.step : me.sp.h / 4,
+				// Never nearer than the resting offset: that is where an unmoved label sits, and the
+				// four corners already say it is the nearest place a label belongs.
+				floor = Math.max(leaderMin, me.sp.home ? Math.hypot(me.sp.home.x - ax, me.sp.home.y - ay) : 0),
+				ux, uy, d, c, bs, best = null, bestBoxes = null;
+			if (!(len > floor + step)) { return; }
+			ux = (r.x - ax) / len; uy = (r.y - ay) / len;
+			for (d = len - step; d >= floor; d -= step) {
+				c = { x: ax + ux * d, y: ay + uy * d };
+				bs = labelLineBoxes(me.sp, c);
+				if (!clearAt(me, bs)) { break; }
+				best = c; bestBoxes = bs;
+			}
+			if (!best) { return; }
+			slid++; saved += len - Math.hypot(best.x - ax, best.y - ay);
+			r.dx += best.x - r.x; r.dy += best.y - r.y;
+			r.x = best.x; r.y = best.y;
+			r.box = labelBoxAtEnd(me.sp.text || me.sp, best);
+			r.boxes = me.sp.text ? labelLineBoxes(me.sp.text, best) : bestBoxes;
+			me.boxes = bestBoxes;
+			me.leader = segment(ax, ay, best.x, best.y, 'leader', r.id);
+		});
+		return { results: out, stats: { slid: slid, saved: saved } };
+	}
 	// ROOM TO GROW's two pieces (placeLabelsFirstFit() carries the reasoning), at module level so a
 	// replay of the pass -- label-width-cause-harness.js -- asks the identical question rather than
 	// keeping a second opinion about it. The room is a box `lbl.grow` wide hanging off the endpoint
 	// exactly as the text does, so it lies in the direction the text would grow.
-	function growBoxAt(lbl, c) {
-		var b = labelBoxAtEnd({ anchor: lbl.anchor, w: lbl.grow, h: lbl.h, yOff: lbl.yOff, id: lbl.id }, c);
+	function growBoxAt(lbl, c, w) {
+		var b = labelBoxAtEnd({ anchor: lbl.anchor, w: w > 0 ? w : growTiers(lbl)[0], h: lbl.h,
+			yOff: lbl.yOff, id: lbl.id }, c);
 		b.kind = 'reserve'; b.yields = true;
 		return b;
+	}
+	// `grow` is one width or a DESCENDING list of them; either way this is the list, widest first,
+	// with every width not wider than the label itself left out -- a claim narrower than the text is
+	// not a claim of room, it is the ordinary search.
+	function growTiers(lbl) {
+		var g = lbl.grow, list = Array.isArray(g) ? g : (g > 0 ? [g] : []);
+		return list.filter(function (w) { return w > lbl.w; });
 	}
 	// Clear of every hard obstacle AND of every other label's reserve: two labels may not both claim
 	// the same room. A stationed pipe label still gives way, exactly as it does to the real box.
@@ -1337,7 +1451,7 @@ EngCalcs.lpnCollide = (function () {
 				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
 			}
 			// The ROOM TO GROW is part of what this label may test, so it is part of the reach.
-			l._reach = far + Math.hypot(Math.max(l.w, l.grow > 0 ? l.grow : 0), l.h) + pad;
+			l._reach = far + Math.hypot(Math.max(l.w, growTiers(l)[0] || 0), l.h) + pad;
 			maxReach = Math.max(maxReach, l._reach);
 		});
 		index = grid(maxReach, obs);
@@ -1407,9 +1521,10 @@ EngCalcs.lpnCollide = (function () {
 				chosen = null, chosenBox = null, i, c, b, verdict,
 				fallback = null, fallbackBox = null, room;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
-			if (lbl.grow > lbl.w && !lbl.dragged) {
+			var tiers = lbl.dragged ? [] : growTiers(lbl), t;
+			for (t = 0; t < tiers.length; t++) {
 				for (i = 0; i < sides.length; i++) {
-					room = growBoxAt(lbl, sides[i]);
+					room = growBoxAt(lbl, sides[i], tiers[t]);
 					if (!roomClearOf(room, local, pad, lbl.id)) { continue; }
 					b = labelLineBoxes(lbl, sides[i]);
 					index.addBox(obs.boxes.push(room) - 1);
@@ -1417,7 +1532,7 @@ EngCalcs.lpnCollide = (function () {
 					out.push({ id: lbl.id, x: sides[i].x, y: sides[i].y,
 						dx: sides[i].x - lbl.home.x, dy: sides[i].y - lbl.home.y,
 						dropped: false, side: i, box: labelBoxAtEnd(lbl, sides[i]), boxes: b,
-						leader: null });
+						leader: null, room: tiers[t] });
 					return;
 				}
 			}
@@ -2315,13 +2430,36 @@ EngCalcs.lpnCollide = (function () {
 			// move there is: every position is one the first-fit already found room for.
 			trials.push(assignByAngle(members, members.map(function (m) { return m.at; })));
 			// (b) a fresh column hung at each member's own endpoint, downward and upward.
+			var cy = 0;
+			members.forEach(function (m) { cy += m.spec.anchor.y; });
+			cy /= members.length;
 			members.forEach(function (m) {
 				[1, -1].forEach(function (dir) {
-					var slots = [], k;
+					var slots = [], k, j, shift, top, bottom, toward, span = (members.length - 1) * rowH,
+						steps = COLUMN_SLIDE_STEPS;
 					for (k = 0; k < members.length; k++) {
 						slots.push({ x: m.at.x, y: m.at.y + dir * k * rowH });
 					}
 					trials.push(assignByAngle(members, slots));
+					// **(b') THE SAME COLUMN SLID TOWARD ITS NODES** (Tom, 2026-09-22: the gang's top
+					// label drifted from 8 to 20 text heights from its node as the ID grew). A column
+					// could only ever hang from a spot one member already held, so its height was
+					// whatever the first-fit happened to give that member -- a quantity that moves
+					// with the text. These trials slide the whole column, rows locked together, in
+					// half-row steps toward the middle of the gang's own nodes; the score's last term
+					// is total leader length, so the nearest admissible one wins. A column moved as
+					// one piece keeps its angle order, which a per-label slide cannot.
+					top = Math.min(slots[0].y, slots[slots.length - 1].y);
+					bottom = top + span;
+					toward = (top + bottom) / 2 > cy ? -1 : 1;
+					for (j = 1; j <= steps; j++) {
+						shift = toward * j * rowH / 2;
+						if ((toward < 0 && top + shift + span / 2 < cy - span) ||
+								(toward > 0 && top + shift + span / 2 > cy + span)) { break; }
+						trials.push(assignByAngle(members, slots.map(function (p) {
+							return { x: p.x, y: p.y + shift };
+						})));
+					}
 				});
 			});
 			return trials;
@@ -2694,6 +2832,8 @@ EngCalcs.lpnCollide = (function () {
 		boxesClearOf: boxesClearOf,
 		labelLineBoxes: labelLineBoxes,
 		growBoxAt: growBoxAt,
+		growTiers: growTiers,
+		slideTowardAnchors: slideTowardAnchors,
 		roomClearOf: roomClearOf,
 		RING_ANGLES: RING_ANGLES,
 		RAY_STRETCH: RAY_STRETCH,

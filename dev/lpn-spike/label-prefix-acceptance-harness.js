@@ -40,19 +40,20 @@ const LONG = '12345678';
 const MULTS = [1, 2, 4, 8];
 
 // **THE RATCHET.** Totals over every view of a file, shipped code, empty prefix against LONG. They
-// may FALL and may not RISE. Measured 2026-09-22.
+// may FALL and may not RISE. Measured 2026-09-22, with the leader slide and the column slide in:
+// those two shorten leaders and cost a few moves at 1x and 2x (30 -> 38 on Net3-World), never at 4x.
 const CEILING = {
-	'Net3-Novato-CA-World.lwn': { moved: 30, hidden: 41 },
-	'Net3.lwn': { moved: 19, hidden: 28 }
+	'Net3-Novato-CA-World.lwn': { moved: 38, hidden: 41 },
+	'Net3.lwn': { moved: 26, hidden: 25 }
 };
 
 // THE BEFORE: room to grow switched off through the stub's own source hook, so every label is
 // placed at exactly its text width again -- the pass as it stood before 2026-09-22. A mutation that
 // no longer matches throws rather than passing silently.
 const BEFORE = function (src) {
-	const from = 'grow: dataLabelBoxHeight(1) * LPN_NODE_ROOM_TO_GROW_ROWS,';
+	const from = 'grow: LPN_NODE_ROOM_TO_GROW_ROWS.map(';
 	if (src.indexOf(from) < 0) { throw new Error('label-prefix-acceptance-harness: re-aim BEFORE'); }
-	return src.replace(from, 'grow: 0,');
+	return src.replace(from, 'grow: [].map(');
 };
 
 let checks = 0, failures = 0;
@@ -165,6 +166,7 @@ function runChild(file, before, quick) {
 		ms.sort(function (x, y) { return x - y; });
 		return ms[ms.length >> 1];
 	}
+	if (quick === 'sweep') { return sweepIn(L, Collide, doc, ls, sFit, cx, cy, snap, function () { return lastCall; }, timed); }
 	const views = [];
 	(quick ? [1] : MULTS).forEach(function (mult) {
 		{
@@ -195,9 +197,74 @@ function runChild(file, before, quick) {
 	return views;
 }
 
+
+// ---- THE PREFIX-LENGTH SWEEP (Tom, 2026-09-22) ----------------------------------------------------
+//
+// *"with 1 character added, there is no significant additional vertical spacing in the gang. But
+// when I add a second character, a noticeable amount of additional gaps appear... the top label of
+// this descending gang is eventually gratuitously 20 text heights away from its node."* So: prefixes
+// of 0 to 10 characters, and per length the labels that moved (against length 0), the labels hidden,
+// the longest vertical COLUMN (rows touching, overlapping in x), the leader of that column's TOP
+// row, the longest leader in it, and the mean leader of every drawn label -- all in text heights.
+// If adding text made no difference these would all be flat lines.
+const SWEEP = '1234567890';
+function sweepIn(L, Collide, doc, ls, sFit, cx, cy, snap, lastCall, timed) {
+	const rows = [];
+	[1, 2].forEach(function (mult) {
+		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
+		let base = null;
+		for (let k = 0; k <= SWEEP.length; k++) {
+			ls.prefix.node.id = SWEEP.slice(0, k);
+			const ms = timed(), a = snap(), call = lastCall();
+			const spec = {};
+			call.labels.forEach(function (l) { spec[l.id] = l; });
+			const drawn = [];
+			doc.nodes.forEach(function (n) {
+				const v = a[n.id], sp = spec[L.nodeLabelKey(n.id)];
+				if (!v || !sp) { return; }
+				drawn.push({ id: n.id, v: v, h: sp.h, lead: Math.hypot(v.dx, v.dy) / sp.h,
+					b: Collide.labelBoxAtEnd(sp, { x: v.ex, y: v.ey }) });
+			});
+			if (!base) { base = a; }
+			let moved = 0;
+			Object.keys(a).forEach(function (id) {
+				if (a[id] && base[id] && (Math.abs(a[id].dx - base[id].dx) > 1e-12 || Math.abs(a[id].dy - base[id].dy) > 1e-12)) { moved++; }
+			});
+			// Columns: b directly below a, overlapping it in x by a third of the narrower, with a gap
+			// under one row. The longest chain of those is "the gang" as a reader sees it.
+			const below = {};
+			drawn.forEach(function (p) { below[p.id] = []; });
+			drawn.forEach(function (p) {
+				drawn.forEach(function (q) {
+					if (p === q) { return; }
+					const ov = Math.min(p.b.cx + p.b.w / 2, q.b.cx + q.b.w / 2) - Math.max(p.b.cx - p.b.w / 2, q.b.cx - q.b.w / 2);
+					const gap = (q.b.cy - q.b.h / 2) - (p.b.cy + p.b.h / 2);
+					if (ov > Math.min(p.b.w, q.b.w) / 3 && gap > -0.05 * p.h && gap < p.h) { below[p.id].push(q); }
+				});
+			});
+			const memo = {};
+			const chain = function (p) {
+				if (memo[p.id]) { return memo[p.id]; }
+				memo[p.id] = [p];
+				let best = [p];
+				below[p.id].forEach(function (q) { const c = chain(q); if (c.length + 1 > best.length) { best = [p].concat(c); } });
+				return (memo[p.id] = best);
+			};
+			let col = [];
+			drawn.forEach(function (p) { const c = chain(p); if (c.length > col.length) { col = c; } });
+			rows.push({ mult: mult, k: k, moved: moved, hidden: doc.nodes.length - drawn.length,
+				column: col.length, top: col.length ? col[0].lead : 0,
+				colMax: col.reduce(function (m, p) { return Math.max(m, p.lead); }, 0),
+				mean: drawn.reduce(function (m, p) { return m + p.lead; }, 0) / Math.max(1, drawn.length),
+				ms: ms });
+		}
+	});
+	return rows;
+}
+
 function child(file, before, quick) {
 	const args = [__filename, '--child', file, before ? 'before' : 'shipped'];
-	if (quick) { args.push('--quick'); }
+	if (quick === 'sweep') { args.push('--sweep'); } else if (quick) { args.push('--quick'); }
 	const r = spawnSync(process.execPath, args,
 		{ cwd: __dirname, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 900000 });
 	const m = /@@JSON@@(.*)/.exec(r.stdout || '');
@@ -211,9 +278,32 @@ function median(a) {
 	return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
+// The ratchet on the sweep: the worst top-of-column leader and the worst hidden count over all
+// eleven lengths, fit and 2x. Measured 2026-09-22; may fall, may not rise.
+const SWEEP_CEILING = { top: 3.7, hidden: 43, mean: 3.37 };
+function sweepReport() {
+	const file = FILES[0], got = { now: child(file, false, 'sweep'), before: child(file, true, 'sweep') };
+	if (got.now.error || got.before.error) { report(false, 'prefix sweep', got.now.error || got.before.error); return; }
+	console.log('  prefix length sweep, ' + file + ', node ID alone (leaders in text heights)');
+	console.log('    zoom  len | now: moved hidden column top-lead col-max mean     ms | before: moved hidden column top-lead col-max mean');
+	got.now.forEach(function (r, i) {
+		const b = got.before[i], f = function (v) { return v.toFixed(1).padStart(8); };
+		console.log('    x' + r.mult + '   ' + String(r.k).padStart(4) + ' |' + String(r.moved).padStart(10)
+			+ String(r.hidden).padStart(7) + String(r.column).padStart(7) + f(r.top) + f(r.colMax) + f(r.mean)
+			+ String(Math.round(r.ms)).padStart(7) + ' |' + String(b.moved).padStart(13) + String(b.hidden).padStart(7)
+			+ String(b.column).padStart(7) + f(b.top) + f(b.colMax) + f(b.mean));
+	});
+	const worst = function (rows, k) { return rows.reduce(function (m, r) { return Math.max(m, r[k]); }, 0); };
+	report(worst(got.now, 'top') <= SWEEP_CEILING.top && worst(got.now, 'hidden') <= SWEEP_CEILING.hidden
+			&& worst(got.now, 'mean') <= SWEEP_CEILING.mean,
+		'prefix sweep: worst top-of-column leader, hidden count and mean leader against the ratchet',
+		'top ' + worst(got.now, 'top').toFixed(1) + ' h, hidden ' + worst(got.now, 'hidden') + ', mean '
+			+ worst(got.now, 'mean').toFixed(2) + ' h (ceilings ' + SWEEP_CEILING.top + ', ' + SWEEP_CEILING.hidden + ', ' + SWEEP_CEILING.mean + ')');
+}
+
 function main() {
 	if (process.argv[2] === '--child') {
-		const out = runChild(process.argv[3], process.argv[4] === 'before', process.argv[5] === '--quick');
+		const out = runChild(process.argv[3], process.argv[4] === 'before', process.argv[5] === '--sweep' ? 'sweep' : process.argv[5] === '--quick');
 		process.stdout.write('@@JSON@@' + JSON.stringify(out) + '\n', function () { process.exit(0); });
 		return;
 	}
@@ -261,6 +351,7 @@ function main() {
 			file + ': selftest -- with room to grow switched off, labels move again',
 			'before ' + (sum(B, 'moved') + sum(B, 'hid')) + ' against shipped ' + (sum(S, 'moved') + sum(S, 'hid')));
 	});
+	if (!quick) { sweepReport(); }
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);
 }

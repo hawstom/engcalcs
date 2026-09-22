@@ -888,7 +888,7 @@ var EngCalcs = EngCalcs || {};
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			widen: labelWidenSearch ? { offset: d, arcs: arcs, outer: reach } : null,
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
-			grow: dataLabelBoxHeight(1) * LPN_NODE_ROOM_TO_GROW_ROWS,
+			grow: LPN_NODE_ROOM_TO_GROW_ROWS.map(function (r) { return dataLabelBoxHeight(1) * r; }),
 			lines: labelRowWidths(ne) };
 	}
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
@@ -1572,7 +1572,11 @@ var EngCalcs = EngCalcs || {};
 	// drew: at 4x and 8x NO label moves or hides on Net3 or Net3-World (21 + 6 moved before); over
 	// all four zooms Net3-World goes from 99 moved and 42 hidden to 32 and 41. Four row heights
 	// was measured too and leaves 13 moving at 4x; the reserve has to hold the whole grown label.
-	var LPN_NODE_ROOM_TO_GROW_ROWS = 6;
+	// A LIST, widest first, because a label that cannot find the widest room could try a narrower
+	// one before the exact-width search. Measured with [6, 4, 3, 2]: one more character still moved
+	// 19 first-fit placements at Net3-World's fit view against 23 with [6] alone, because the labels
+	// that find no room at all are still the ones that move. One entry is what ships.
+	var LPN_NODE_ROOM_TO_GROW_ROWS = [6];
 	// **THE NEIGHBOUR CREDIT, `k`.** Goal 11: a candidate is credited for the openness of the
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.
@@ -2832,6 +2836,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.
 	var lastNodeShedRungs = 0;
+	// What the last leader slide did, for a harness to read. Not a decision input.
+	var lastLeaderSlide = null;
 	// **THE LABELS THAT ARE DRAWN AND CANNOT MOVE, as the gang repair needs to see them** (Task
 	// 539). Stationed pipe labels and Text objects reach the drawing as OBSTACLES rather than as
 	// placements, and they are half of most flagged pairs -- 76 label-on-leader against 9
@@ -3122,6 +3128,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		nodePlaced = repaired.results;
 		lastGangRepair = repaired.stats;
+		// **AND EVERY LEADER THEN GETS AS SHORT AS THE GROUND ALLOWS** (Tom, 2026-09-22: *"A human
+		// would have slid the two labels at A toward B"*). Collide.slideTowardAnchors() carries the
+		// reasoning; after the repair so it shortens what the repair chose, before the crossing shed
+		// so the shed judges the drawing the reader will see.
+		var slide = Collide.slideTowardAnchors(nodeLabels, nodePlaced,
+			{ boxes: obs.boxes, segments: obs.segments }, { pad: pad, leaderMin: leaderThreshold() });
+		nodePlaced = slide.results;
+		lastLeaderSlide = slide.stats;
 		if (repairT0) { spotDebugMs = performance.now() - repairT0; }
 		spotDebugTrace = repaired.stats.trace;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
