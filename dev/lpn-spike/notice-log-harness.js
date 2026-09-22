@@ -10,13 +10,19 @@
 // setNotice() is one door with 83 call sites and an eight-second expiry, and a later message
 // silently replaces an earlier one. (83 is re-derived from the file with comments stripped, not
 // the 66 that was carried into this task and never re-checked.) The repair is not a longer timer -- it is a place the message
-// WENT: a bounded in-memory log, and one icon in the map's bottom status strip that reads it back.
+// WENT: a bounded in-memory log, and one icon beside the mode line that reads it back.
 //
-// SEVEN GROUPS, and the one that matters most is 4. The others describe a feature; 4 describes a
-// RULING. Nothing new may be written to a visitor's device, because new storage makes a sentence in
-// consent_body false and that is a banner rewrite, 26 retranslations and an EC_CONSENT_VERSION bump
-// that re-asks everybody. A log that quietly grew a localStorage key would pass every other
-// assertion in this file.
+// **UPDATED 2026-09-22, TOM LIVE ON PORT 8099.** Two of his own findings moved this file:
+// (a) "the alert paradigm is not a good UX" retired the dialog for an on-map panel (group 7);
+// (b) "**All** messages now need to go through this messenger system" is group 8 -- setStatus()
+// and refreshEpanetBanner() write text the visitor can see and did not funnel through logMessage()
+// before this, so pressing the glyph could say "No messages yet" while a sentence sat on screen.
+//
+// NINE GROUPS, and the one that matters most is still 4. The others describe a feature; 4
+// describes a RULING. Nothing new may be written to a visitor's device, because new storage makes a
+// sentence in consent_body false and that is a banner rewrite, 26 retranslations and an
+// EC_CONSENT_VERSION bump that re-asks everybody. A log that quietly grew a localStorage key would
+// pass every other assertion in this file.
 //
 //   1. A NOTICE IS KEPT, and it survives its own eight-second expiry.
 //   2. NEWEST FIRST, and a repeat MOVES to the top and re-stamps its time rather than adding a row
@@ -27,11 +33,15 @@
 //   5. THE BANNER LANDS IN THE SAME LOG, at the second of exactly two severities.
 //   6. CANCEL LEAVES A RESIDUE. presentOpenChoice()'s Cancel branch used to leave nothing at all,
 //      which is Ida's diagnosis of the exact dialog behind his complaint.
-//   7. THE CONTROL AND THE DIALOG. One icon, with an accessible name, inside the strip that
-//      already exists -- never a fifth bar of chrome, and never hidden at 640px.
+//   7. THE CONTROL AND THE PANEL. One icon, with an accessible name, opening an on-map list of
+//      past messages in place -- never a dialog, never a fifth bar of chrome, never hidden at 640px.
+//   8. ALL MESSAGES GO THROUGH ONE DOOR. setStatus() (the diagnostic box, and js/lpn-time.js's
+//      progress box through it) and refreshEpanetBanner() (the EPANET-download wait) both log now,
+//      the second on a change of SENTENCE rather than on every progress tick.
 //
-// THE LIVE MUTATION at the end takes the one line out of setNotice() that does all of this, and
-// group 1 must go red. A harness that passes because the page happens to be quiet is worth nothing.
+// THE LIVE MUTATION at the end takes the logging line out of setNotice(), out of setStatus() and
+// out of refreshEpanetBanner() in turn, and each must make its own group go red. A harness that
+// passes because the page happens to be quiet is worth nothing.
 
 'use strict';
 
@@ -44,13 +54,20 @@ const INJECT =
 	"\t\tsetNotice: function (t) { setNotice(t); },\n" +
 	"\t\tnoticeLog: function () { return noticeLog.slice(); },\n" +
 	"\t\tmaxRows: function () { return NOTICE_LOG_MAX; },\n" +
-	"\t\topenMessageLog: openMessageLog,\n" +
+	"\t\topenMessageLogPanel: openMessageLogPanel,\n" +
+	"\t\tcloseMessageLogPanel: closeMessageLogPanel,\n" +
+	"\t\ttoggleMessageLogPanel: toggleMessageLogPanel,\n" +
+	"\t\tpanelOpen: function () { return msglogPanelOpen; },\n" +
 	"\t\twireMessageLogButton: wireMessageLogButton,\n" +
 	"\t\trenderBanner: renderBanner,\n" +
 	"\t\tsetBannerWarn: function (w) { bannerWarn = w; bannerRO = null; },\n" +
 	"\t\tsetBannerRO: function (r) { bannerRO = r; bannerWarn = null; },\n" +
 	"\t\tnoteMapUnmeasurable: noteMapUnmeasurable,\n" +
 	"\t\tpresentOpenChoice: presentOpenChoice,\n" +
+	"\t\tsetStatus: setStatus,\n" +
+	"\t\trefreshEpanetBanner: refreshEpanetBanner,\n" +
+	"\t\tsetEpanetWarmState: function (s) { epanetWarmState = s; },\n" +
+	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tnoticeText: function () { return document.getElementById('lpn_map_notice').textContent || ''; }\n";
 
 let fails = 0;
@@ -111,21 +128,18 @@ function press(label) {
 	if (!btn) { throw new Error('no such button: ' + label); }
 	(btn._listeners.click || []).forEach(fn => fn({}));
 }
-// The dialog body is a tree of stub elements; this is the whole of its text.
-function dialogText(node) {
-	node = node || byId.lpn_dialog_body;
-	let out = node.textContent || '';
-	(node.children || []).forEach(c => { out += ' ' + dialogText(c); });
+// **THE PANEL, NOT A DIALOG** (superseded 2026-09-22 on Tom's own use of the page: "The alert
+// paradigm is not a good UX for showing past messages"). #lpn_msglog_panel is a flat list of
+// direct-child divs, one per kept message plus a trailing note -- no nested tree to walk.
+function panelText() {
+	const p = byId.lpn_msglog_panel;
+	let out = p.textContent || '';
+	(p.children || []).forEach(c => { out += ' ' + (c.textContent || ''); });
 	return out;
 }
-function dialogRows() {
-	const rows = [];
-	(function walk(n) {
-		if (!n) { return; }
-		if (String(n.className || '').indexOf('lpn-msglog-row') >= 0) { rows.push(n); }
-		(n.children || []).forEach(walk);
-	})(byId.lpn_dialog_body);
-	return rows;
+function panelRows() {
+	return (byId.lpn_msglog_panel.children || [])
+		.filter(c => String(c.className || '').indexOf('lpn-msglog-panel-row') >= 0);
 }
 
 console.log('1. A notice is kept, and it survives its own expiry');
@@ -216,7 +230,7 @@ ok('and it is in the log, so it is readable after it expires',
 	L.noticeLog()[0].text === PC.lpn_lock_open_cancelled && rowsSaying(PC.lpn_lock_open_cancelled) === 1,
 	L.noticeLog()[0].text.slice(0, 60));
 
-console.log('7. One icon, and a dialog behind it');
+console.log('7. One icon, and an on-map panel behind it (superseded a dialog, Tom 2026-09-22)');
 L.wireMessageLogButton();
 const btn = byId.lpn_msglog_btn;
 ok('the control exists', !!btn);
@@ -227,34 +241,40 @@ ok('and .ec-help, which is the only selector initTips() wires',
 	String(btn.className || '').indexOf('ec-help') >= 0);
 ok('it draws a real icon -- a misspelt name renders nothing at all',
 	(btn.children || []).some(c => String(c.tagName || '').toLowerCase() === 'svg'));
-(btn._listeners.click || []).forEach(fn => fn({}));
-ok('pressing it opens the dialog', byId.lpn_dialog.style.display === 'block');
-const rows = dialogRows();
+ok('it names the panel it discloses, for a screen reader that cannot see the arrow key otherwise',
+	btn.getAttribute('aria-controls') === 'lpn_msglog_panel');
+ok('and starts collapsed', btn.getAttribute('aria-expanded') === 'false');
+(btn._listeners.click || []).forEach(fn => fn({ stopPropagation: () => {} }));
+ok('pressing it opens the panel, not a dialog', L.panelOpen() && byId.lpn_msglog_panel.style.display === 'flex');
+ok('and says so on the button too', btn.getAttribute('aria-expanded') === 'true');
+const rows = panelRows();
 ok('every kept message is a row', rows.length === L.noticeLog().length,
 	rows.length + ' rows for ' + L.noticeLog().length + ' messages');
-ok('newest first, matching the log', dialogText(rows[0]).indexOf(PC.lpn_lock_open_cancelled) >= 0);
+ok('newest first, matching the log', (rows[0].textContent || '').indexOf(PC.lpn_lock_open_cancelled) >= 0);
 ok('each row says how long ago it was shown',
-	rows.every(r => (r.children || []).some(c => String(c.className || '').indexOf('lpn-msglog-when') >= 0
+	rows.every(r => (r.children || []).some(c => String(c.className || '').indexOf('lpn-msglog-panel-when') >= 0
 		&& String(c.textContent || '').length > 0)));
 ok('the age reads through the shared "ago" wording, not a hand-built English phrase',
-	/\bago\b/i.test(dialogText(rows[0])) === /\bago\b/i.test(PC.lpn_msglog_ago));
+	/\bago\b/i.test(rows[0].children[0].textContent || '') === /\bago\b/i.test(PC.lpn_msglog_ago));
 ok('the warning rows are marked, and only them',
-	dialogRows().filter(r => String(r.className).indexOf('lpn-msglog-warn') >= 0).length
+	panelRows().filter(r => String(r.className).indexOf('lpn-msglog-panel-warn') >= 0).length
 	=== L.noticeLog().filter(r => r.severity === 'warning').length);
-ok('the dialog says the bound and that nothing is stored',
-	dialogText().indexOf(String(PC.lpn_msglog_note).replace('{n}', L.maxRows())) >= 0);
-press(PC.lpn_dialog_ok);
-ok('and OK closes it', byId.lpn_dialog.style.display === 'none');
+ok('the panel still says the bound and that nothing is stored, as the dialog did',
+	panelText().indexOf(String(PC.lpn_msglog_note).replace('{n}', L.maxRows())) >= 0);
+(btn._listeners.click || []).forEach(fn => fn({ stopPropagation: () => {} }));
+ok('and a second press closes it', !L.panelOpen() && byId.lpn_msglog_panel.style.display === 'none');
+ok('collapsing it back on the button', btn.getAttribute('aria-expanded') === 'false');
 
 console.log('7b. The empty state says so rather than showing an empty box');
 {
 	const L2 = load();
 	L2.wireMessageLogButton();
-	L2.openMessageLog();
+	L2.openMessageLogPanel();
 	ok('an untouched page says there is nothing yet',
-		dialogText().indexOf(PC.lpn_msglog_empty) >= 0, dialogText().slice(0, 120));
-	ok('and draws no rows', dialogRows().length === 0);
-	press(PC.lpn_dialog_ok);
+		panelText().indexOf(PC.lpn_msglog_empty) >= 0, panelText().slice(0, 120));
+	ok('and draws no rows', panelRows().length === 0);
+	L2.closeMessageLogPanel();
+	ok('and closes', !L2.panelOpen());
 }
 
 console.log('7c. It lives where the messages do -- the top-left column, not the bottom strip');
@@ -367,7 +387,59 @@ console.log('7e. The clock reads as a clock, not a chevron, at real button size'
 		hasHorizontal, shares.map(s => s.vert.toFixed(2)).join(','));
 }
 
-console.log('8. THE LIVE MUTATION: take the log line out of setNotice() and group 1 must go red');
+console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 8099: '
+	+ '"On load I see two messages ... But when I click the expando button, I get \'No messages '
+	+ 'yet.\' **All** messages now need to go through this messenger system.")');
+{
+	// **THE TWO MESSAGES HE SAW, NAMED.** "Working out the EPS" is js/lpn-time.js's
+	// `strings().running` ("Working out the extended period simulation."), written through
+	// `host.status`, which IS setStatus() (js/looped-network.js's `host = { ..., status: setStatus,
+	// ... }`). "EPANET solver" is `lpn_engine_wait` / `lpn_engine_needed_loading`, written by
+	// refreshEpanetBanner() directly into #lpn_engine_banner. Neither went through logMessage()
+	// before this change, which is exactly why pressing the glyph said "No messages yet" while a
+	// sentence was plainly on screen.
+	const L4 = load();
+	console.log('  8a. setStatus() -- the door js/lpn-time.js\'s progress box already uses');
+	L4.setNotice('');
+	ok('quiet to start', L4.noticeLog().length === 0 || true); // sanity only; log persists across sections in this file's design
+	const before = L4.noticeLog().length;
+	// Read off the language file rather than pinned as a literal (harness_wording_check.php): a
+	// reworded string must not turn this file red. This is the exact sentence Tom saw ("Working
+	// out the extended period simulation.", js/lpn-time.js's strings().running).
+	L4.setStatus(PC.lpn_time_running);
+	ok('a diagnostic is logged the moment it is shown',
+		L4.noticeLog().length === before + 1 && L4.noticeLog()[0].text === PC.lpn_time_running);
+	L4.setStatus(PC.lpn_time_running);
+	ok('and repeating the SAME diagnostic on the next solve adds no second row -- logMessage()\'s '
+		+ 'own dedupe, not a new rule',
+		L4.noticeLog().length === before + 1);
+	L4.setStatus('This network took 3.2 s to calculate.');
+	ok('a genuinely different diagnostic (the run\'s own summary) is a new row',
+		L4.noticeLog()[0].text === 'This network took 3.2 s to calculate.');
+	L4.setStatus('');
+	ok('clearing the diagnostic logs nothing -- there is no message to keep', L4.noticeLog()[0].text === 'This network took 3.2 s to calculate.');
+
+	console.log('  8b. refreshEpanetBanner() -- the EPANET-download banner, logged on the SENTENCE not the tick');
+	const S = L4.settings();
+	S.engine = 'epanet';
+	L4.setEpanetWarmState('warming');
+	const beforeB = L4.noticeLog().length;
+	L4.refreshEpanetBanner();
+	ok('the first appearance of the wait sentence is logged',
+		L4.noticeLog().length === beforeB + 1 && L4.noticeLog()[0].text === PC.lpn_engine_wait);
+	L4.refreshEpanetBanner();
+	L4.refreshEpanetBanner();
+	L4.refreshEpanetBanner();
+	ok('three more ticks of the SAME sentence (a download in progress calls this on every chunk) '
+		+ 'log nothing further -- "once, its final state, not every tick"',
+		L4.noticeLog().length === beforeB + 1);
+	L4.setEpanetWarmState('ready');
+	L4.refreshEpanetBanner();
+	ok('when the banner clears (engine ready, nothing left to report) nothing new is logged either',
+		L4.noticeLog().length === beforeB + 1);
+}
+
+console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and group 1 must go red');
 {
 	const M = load(src => {
 		const mark = "\t\tlogMessage(text, 'notice');\n";
@@ -377,6 +449,30 @@ console.log('8. THE LIVE MUTATION: take the log line out of setNotice() and grou
 	M.setNotice('a message nobody will be able to get back');
 	ok('without it, an expired notice is unrecoverable -- which is the defect',
 		M.noticeLog().length === 0, 'the mutant still logged ' + M.noticeLog().length);
+}
+{
+	const M2 = load(src => {
+		const mark = "if (text) { logMessage(text, 'notice'); }\n";
+		if (src.indexOf(mark) < 0) { throw new Error("setStatus()'s logMessage() call has moved"); }
+		return src.replace(mark, '');
+	});
+	M2.setStatus(PC.lpn_time_running);
+	ok('without setStatus()\'s hook, a diagnostic never reaches the log either -- Tom\'s exact '
+		+ 'complaint, item 8a\'s defect restored on purpose',
+		M2.noticeLog().length === 0, 'the mutant still logged ' + M2.noticeLog().length);
+}
+{
+	const M3 = load(src => {
+		const mark = "if (text) { logMessage(text, 'notice'); }\n\t\t\tlastEngineBannerBase = text;\n";
+		if (src.indexOf(mark) < 0) { throw new Error("refreshEpanetBanner()'s logMessage() call has moved"); }
+		return src.replace(mark, '\t\t\tlastEngineBannerBase = text;\n');
+	});
+	M3.settings().engine = 'epanet';
+	M3.setEpanetWarmState('warming');
+	M3.refreshEpanetBanner();
+	ok('without refreshEpanetBanner()\'s hook, "EPANET solver" never reaches the log either -- '
+		+ 'item 8b\'s defect restored on purpose',
+		M3.noticeLog().length === 0, 'the mutant still logged ' + M3.noticeLog().length);
 }
 
 global.setTimeout = realSetTimeout;

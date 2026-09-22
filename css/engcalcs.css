@@ -2972,18 +2972,39 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */
-.lpn-msglog-list { margin: 0; padding: 0; list-style: none; max-height: 45vh; overflow-y: auto; }
+/* ---- The on-map message list (superseded the dialog above, Tom 2026-09-22, live on port 8099:
+   "The alert paradigm is not a good UX ... User expects them to descend below the glyph, below
+   the Mode status, in similar appearance that they originally had.") ----
+   #lpn_msglog_panel itself is a plain flex column (`display:flex` is set in JS alongside
+   `display:none`, so there is no rule for the panel itself here); each row is its own translucent
+   pill, the same paint as the mode hint and the notice above it, so the list reads as more lines
+   of the same readout rather than a different kind of box appearing under it. max-height is set
+   in JS (fitMsglogPanelHeight()), never here -- see that function for why a CSS percentage cannot
+   work on this box. */
+.lpn-msglog-panel-row {
+	display: flex; gap: 8px; align-items: baseline;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px;
+}
 /* The age leads the row and is a fixed column, so thirty rows read as a column of times against a
    column of sentences rather than as ragged prose. It is the quieter of the two: the message is
    what the reader came back for. */
-.lpn-msglog-row { display: flex; gap: 8px; padding: 4px 0 4px 6px; border-top: 1px solid #eee; border-left: 3px solid transparent; }
-.lpn-msglog-row:first-child { border-top: 0; }
-.lpn-msglog-when { flex: none; width: 7.5em; color: #666; }
-/* THE SECOND OF EXACTLY TWO LEVELS. Amber is what renderBanner() already paints for a warning, so
-   the log says the same thing the bar said; a marker WORD would be a word to translate and one
-   more thing to get wrong in five right-to-left languages. */
-.lpn-msglog-warn { border-left-color: #a80; background: #fffbe6; }
-.lpn-msglog-note { margin: 8px 0 0; font-size: 0.85em; color: #666; }
+.lpn-msglog-panel-when { flex: none; color: #666; }
+.lpn-msglog-panel-text { flex: 1 1 auto; min-width: 0; }
+/* THE SECOND OF EXACTLY TWO LEVELS, painted the same amber #lpn_map_notice and #lpn_status
+   already use for a warning -- the log says the same thing the map said; a marker WORD would be a
+   word to translate and one more thing to get wrong in five right-to-left languages. */
+.lpn-msglog-panel-warn { background: #fffbe6; border-color: #a80; }
+/* The empty state, deliberately NOT .lpn-msglog-panel-row -- it is not itself a kept message. */
+.lpn-msglog-panel-empty {
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px; color: #666;
+}
+/* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
+   on why. No background of its own: it is a caption under the pills, not one more of them. */
+.lpn-msglog-panel-note { font-size: 0.85em; color: #666; padding: 2px 6px; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;

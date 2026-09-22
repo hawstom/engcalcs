@@ -45020,46 +45020,132 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_msglog_ago || '{x} ago').replace('{x}', agoText(Math.max(1, Date.now() - at)));
 	}
-	// **A DIALOG, NOT A FIFTH BAR OF CHROME** (Ida, 2026-09-21). A persistent panel is what this
-	// page cannot afford -- Tom has said more than once that it carries too many bars -- so the log
-	// borrows the modal that already exists, costs nothing while nobody is reading it, and takes no
-	// room on the map at any window size.
-	function openMessageLog() {
-		var pc = EngCalcs.pageConfig || {};
-		openDialog(function (body) {
-			var head = document.createElement('p');
-			head.style.margin = '0 0 8px';
-			head.style.fontWeight = 'bold';
-			head.textContent = pc.lpn_msglog_heading || 'Recent messages';
-			body.appendChild(head);
-			if (!noticeLog.length) {
-				var none = document.createElement('p');
-				none.style.margin = '0';
-				none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
-				body.appendChild(none);
-				return;
-			}
-			var ul = document.createElement('ul');
-			ul.className = 'lpn-msglog-list';
-			noticeLog.forEach(function (row) {
-				var li = document.createElement('li');
-				li.className = 'lpn-msglog-row' + (row.severity === 'warning' ? ' lpn-msglog-warn' : '');
-				var when = document.createElement('span');
-				when.className = 'lpn-msglog-when';
-				when.textContent = messageAgeText(row.at);
-				li.appendChild(when);
-				var what = document.createElement('span');
-				what.textContent = row.text;
-				li.appendChild(what);
-				ul.appendChild(li);
-			});
-			body.appendChild(ul);
-			var note = document.createElement('p');
-			note.className = 'lpn-msglog-note';
-			note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
-				.replace('{n}', NOTICE_LOG_MAX);
-			body.appendChild(note);
-		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	// **AN ON-MAP LIST, NOT A DIALOG** (ROADMAP Task 704; superseded Ida's 2026-09-21 dialog design
+	// the next day, Tom having actually used it: *"The alert paradigm is not a good UX for showing
+	// past messages. User expects them to descend below the glyph, below the Mode status in
+	// similar appearance that they originally had... fill the map below the Mode status line with
+	// old messages with oldest at the bottom."*). #lpn_msglog_panel is a child of the same
+	// top-left column the mode hint and the notice sit in, directly under that slot, so opening it
+	// reads as the next line down rather than as a separate control landing somewhere else on the
+	// page.
+	var msglogPanelOpen = false;
+	// **THE NOTICE'S HEIGHT IS INVISIBLE TO FLOW, AND USUALLY THAT DOES NOT MATTER.** #lpn_map_notice
+	// is `position:absolute` on purpose ("a transient must not change the fit, or every save would
+	// re-zoom the map") and #lpn_mode_hint beside it is an ordinary flow element, so on a normal
+	// window the panel's own flow position already falls below whichever of the two is showing,
+	// because mode_hint's real height is what flow sees either way.
+	//
+	// **AT 640px AND UNDER, #lpn_mode_hint IS display:none BY DESIGN** ("no mouse verbs on a
+	// phone" -- see the small-screen rule in css/engcalcs.css). With it gone, flow has NOTHING
+	// contributing height to that slot any more, so if the notice happens to be showing at that
+	// moment, the panel's ordinary flow position lands at the very top of the column, squarely on
+	// top of the notice it was supposed to appear below (measured: a browser pass caught the panel
+	// starting 15px above the notice's own bottom edge at 390px). This is a targeted compensation
+	// for exactly that combination, computed fresh each time the panel opens rather than assumed:
+	// zero everywhere the mode hint is doing its ordinary job.
+	function msglogPanelTopCompensation() {
+		var modeHint = document.getElementById('lpn_mode_hint'), notice = document.getElementById('lpn_map_notice');
+		var cs = modeHint && window.getComputedStyle ? window.getComputedStyle(modeHint) : null;
+		var modeHintInFlow = !!(cs && cs.display !== 'none');
+		var noticeShowing = !!(notice && notice.style.display !== 'none');
+		if (noticeShowing && !modeHintInFlow) { return notice.offsetHeight + 4; }
+		return 0;
+	}
+	function fitMsglogPanelHeight(panel) {
+		// **MEASURED AGAINST THE MAP, NEVER A BARE CSS PERCENTAGE.** A percentage `max-height` on
+		// an absolutely positioned ancestor whose own height is auto measures that ancestor's own
+		// content -- which is this panel -- and caps nothing. The map's own canvas is the thing
+		// with a real, laid-out height, so the panel's available room is read from it directly:
+		// however far down the canvas the panel starts, minus a little breathing room above the
+		// canvas's own bottom edge.
+		var canvas = document.getElementById('lpn_canvas'), canvasBox, panelBox, avail;
+		if (!canvas) { return; }
+		canvasBox = canvas.getBoundingClientRect();
+		panelBox = panel.getBoundingClientRect();
+		avail = canvasBox.bottom - panelBox.top - 8;
+		panel.style.maxHeight = Math.max(40, avail) + 'px';
+	}
+	function renderMsglogPanel() {
+		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
+		if (!panel) { return; }
+		panel.innerHTML = '';
+		if (!noticeLog.length) {
+			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
+			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
+			var none = document.createElement('div');
+			none.className = 'lpn-msglog-panel-empty';
+			none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
+			panel.appendChild(none);
+			return;
+		}
+		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
+		// re-sorting at render time, so the panel can never disagree with the log it is reading.
+		noticeLog.forEach(function (row) {
+			var pill = document.createElement('div');
+			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
+			var when = document.createElement('span');
+			when.className = 'lpn-msglog-panel-when';
+			when.textContent = messageAgeText(row.at);
+			pill.appendChild(when);
+			var what = document.createElement('span');
+			what.className = 'lpn-msglog-panel-text';
+			what.textContent = row.text;
+			pill.appendChild(what);
+			panel.appendChild(pill);
+		});
+		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
+		// paragraph of Ida's dialog design; it says something none of the pills above it do --
+		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
+		// as the last row rather than dropped along with the dialog chrome around it.
+		var note = document.createElement('div');
+		note.className = 'lpn-msglog-panel-note';
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+			.replace('{n}', NOTICE_LOG_MAX);
+		panel.appendChild(note);
+	}
+	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
+	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
+	// without hunting for a close button the panel does not have (it is a readout, not a form).
+	function msglogOutsideHandler(e) {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (panel && panel.contains(e.target)) { return; }
+		if (btn && btn.contains(e.target)) { return; }
+		closeMessageLogPanel();
+	}
+	function msglogKeyHandler(e) {
+		if (e.key === 'Escape' || e.key === 'Esc') { closeMessageLogPanel(); }
+	}
+	function openMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!panel) { return; }
+		renderMsglogPanel();
+		panel.style.display = 'flex';
+		panel.style.marginTop = msglogPanelTopCompensation() + 'px';
+		fitMsglogPanelHeight(panel);
+		msglogPanelOpen = true;
+		if (btn) { btn.setAttribute('aria-expanded', 'true'); }
+		// Deferred one tick so the click that opened the panel is not the same click that
+		// immediately closes it again via the outside-click listener.
+		setTimeout(function () {
+			document.addEventListener('click', msglogOutsideHandler, true);
+			document.addEventListener('keydown', msglogKeyHandler, true);
+		}, 0);
+	}
+	function closeMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!msglogPanelOpen) { return; }
+		msglogPanelOpen = false;
+		// **hidePanel(), NOT A HAND-WRITTEN display:'none'** (ROADMAP Task 562;
+		// dev/lpn-spike/panel-touch-harness.js). It also sweeps any `.ec-help` tip this panel
+		// raised -- this panel's rows carry none today, but a per-box checklist for that rule is
+		// exactly what that harness exists to make unnecessary.
+		hidePanel(panel);
+		if (btn) { btn.setAttribute('aria-expanded', 'false'); }
+		document.removeEventListener('click', msglogOutsideHandler, true);
+		document.removeEventListener('keydown', msglogKeyHandler, true);
+	}
+	function toggleMessageLogPanel() {
+		if (msglogPanelOpen) { closeMessageLogPanel(); } else { openMessageLogPanel(); }
 	}
 	// **STANDING RATHER THAN CONDITIONAL, for the reason the grievance button beside it is.** A
 	// control that appears only once there is something to read is one nobody learns, and it would
@@ -45068,14 +45154,19 @@ var EngCalcs = EngCalcs || {};
 	// **HISTORY, NOT INFO** (Ida, 2026-09-21, after Tom: *"The i info glyph doesn't seem quite right
 	// to me."*). 'info' names standing reference facts elsewhere on this page (Welcome, Privacy
 	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
-	// mark cannot hold both jobs. See lib/Icons.lib.php for why a clock face and not the other three
-	// candidates considered.
+	// mark cannot hold both jobs. See lib/Icons.lib.php for the drawing itself and Tom's own
+	// ruling on it, 2026-09-22.
 	function wireMessageLogButton() {
 		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }
 		setIconLabel(btn, 'history', pc.lpn_msglog_name || 'Messages',
 			pc.lpn_msglog_tip || 'Read the recent messages again. They are kept only while this page is open.');
-		btn.addEventListener('click', openMessageLog);
+		btn.setAttribute('aria-expanded', 'false');
+		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleMessageLogPanel();
+		});
 	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
@@ -45165,6 +45256,14 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = text || '';
+		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
+		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
+		// progress box writes through (`host.status`) -- "Working out the extended period
+		// simulation." on the way in, the run summary on the way out -- so hooking it here logs
+		// both without lpn-time.js knowing the log exists. logMessage()'s own dedupe (identical
+		// text+severity moves to the top rather than duplicating) is what stops an unchanged
+		// diagnostic re-logging itself on every ordinary solve.
+		if (text) { logMessage(text, 'notice'); }
 		var next = text ? (code || 'status') : '';
 		// A NEW COMPLAINT IS A NEW THING TO REPORT. The button stays thanked while the same message
 		// stands -- a second press posts nothing -- but a different diagnostic is a different
@@ -46405,6 +46504,7 @@ var EngCalcs = EngCalcs || {};
 	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
 	// choice and a page that reports a wait the reader is already in are different pages. The words
 	// are Tom's own, 2026-09-06.
+	var lastEngineBannerBase = '';
 	function refreshEpanetBanner() {
 		var el = document.getElementById('lpn_engine_banner'),
 			pc = EngCalcs.pageConfig || {},
@@ -46435,6 +46535,18 @@ var EngCalcs = EngCalcs || {};
 				// no reason given.
 				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
+		}
+		// **LOGGED ON THE SENTENCE, NOT ON EVERY TICK** (Task 704, Tom 2026-09-22, live on port
+		// 8099: *"On load I see two messages ... But when I click the expando button, I get
+		// 'No messages yet.' **All** messages now need to go through this messenger system."*).
+		// `text` at this point is the BASE sentence, before the progress percentage is appended
+		// below -- logging here, once per change of base sentence, is what keeps a download that
+		// ticks fifty times from writing fifty rows. `lastEngineBannerBase` remembers what was last
+		// logged so an unchanged sentence on a later call (most calls, while nothing has changed)
+		// logs nothing again.
+		if (text !== lastEngineBannerBase) {
+			if (text) { logMessage(text, 'notice'); }
+			lastEngineBannerBase = text;
 		}
 		if (text && epanetWarmState === 'warming') {
 			var prog = epanetProgressText();

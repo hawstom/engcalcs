@@ -22,6 +22,13 @@
 // `lpn_select_first` ("Nothing is selected..."). Chosen because it needs no file dialog, no
 // network round trip and no example network -- three fewer ways for a probe of LAYOUT to fail for
 // an unrelated reason.
+//
+// **ADDED 2026-09-22, SAME DAY, LIVE ON PORT 8099:** Tom retired the dialog the log opened into --
+// "The alert paradigm is not a good UX for showing past messages ... fill the map below the Mode
+// status line with old messages, oldest at the bottom" -- for an on-map panel. This file also
+// drives it with REAL clicks and a REAL Escape key, which is the only way to prove an
+// outside-click listener actually closes something: a real click(), not a synthetic dispatch, is
+// what document-level capture listeners are written against.
 
 const { Session } = require('../lib/session');
 
@@ -112,7 +119,48 @@ exports.run = async function ({ browser, report }) {
 				if (size.label === '390') {
 					report.ok(!realBox(shown.modeHint), `${label}: the mode hint is hidden at this width, as designed`);
 				}
-				// No cleanup needed: each iteration below opens its own fresh browser context.
+
+				// ---- The panel (Tom, 2026-09-22, live on the same port: "The alert paradigm is
+				// not a good UX ... fill the map below the Mode status line with old messages,
+				// oldest at the bottom") -- a real click, a real Escape, a real click elsewhere. ----
+				await a.page.click('#lpn_msglog_btn');
+				await a.settle(80);
+				const opened = await a.page.evaluate(() => {
+					const p = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+					const r = p.getBoundingClientRect();
+					return {
+						shown: getComputedStyle(p).display !== 'none' && r.width > 0 && r.height > 0,
+						expanded: btn.getAttribute('aria-expanded'),
+						top: r.top, left: r.right, right: r.right, rowCount: p.querySelectorAll('.lpn-msglog-panel-row, .lpn-msglog-panel-empty').length
+					};
+				});
+				report.ok(opened.shown, `${label}: pressing the glyph opens a real on-map panel, not an alert()`, JSON.stringify(opened));
+				report.eq(opened.expanded, 'true', `${label}: the button says it is expanded`);
+				report.ok(opened.rowCount > 0, `${label}: the panel has at least one row (the notice just shown, if nothing else)`);
+
+				const glyphBox = (await boxes(a.page)).glyph;
+				const panelBox = await a.page.evaluate(() => document.getElementById('lpn_msglog_panel').getBoundingClientRect());
+				report.ok(panelBox.top >= glyphBox.bottom - 2,
+					`${label}: the panel sits BELOW the glyph/mode-line row, not overlapping it`,
+					JSON.stringify({ glyphBottom: glyphBox.bottom, panelTop: panelBox.top }));
+
+				await a.page.keyboard.press('Escape');
+				await a.settle(80);
+				const afterEscape = await a.page.evaluate(() => ({
+					shown: getComputedStyle(document.getElementById('lpn_msglog_panel')).display !== 'none',
+					expanded: document.getElementById('lpn_msglog_btn').getAttribute('aria-expanded')
+				}));
+				report.ok(!afterEscape.shown, `${label}: Escape closes the panel`);
+				report.eq(afterEscape.expanded, 'false', `${label}: and un-expands the button`);
+
+				await a.page.click('#lpn_msglog_btn');
+				await a.settle(80);
+				// A real click well away from both the panel and the button -- the canvas itself.
+				await a.page.mouse.click(Math.round(size.viewport.width / 2), Math.round(size.viewport.height / 2));
+				await a.settle(80);
+				const afterOutside = await a.page.evaluate(() =>
+					getComputedStyle(document.getElementById('lpn_msglog_panel')).display !== 'none');
+				report.ok(!afterOutside, `${label}: a click elsewhere on the map closes the panel too`);
 			} finally {
 				await a.context.close();
 			}

@@ -363,6 +363,29 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // right edge under `dir="rtl"`, and `inset-inline-start` follows that automatically
 			      // where a physical `left` would not. ?>
 			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
+			<?php // **THE MESSAGE LOG IS AN ON-MAP LIST NOW, NOT A DIALOG** (ROADMAP Task 704, Tom
+			      // 2026-09-22, live on port 8099: *"The alert paradigm is not a good UX for showing
+			      // past messages. User expects them to descend below the glyph, below the Mode status
+			      // in similar appearance that they originally had... fill the map below the Mode
+			      // status line with old messages with oldest at the bottom."*). This supersedes
+			      // Ida's 2026-09-21 dialog design, which his own use of the page overruled the next
+			      // day -- a live browser pass outranks a design note nobody has used yet.
+			      //
+			      // A CHILD OF THIS COLUMN, directly under the mode-hint/notice slot, so it reads as
+			      // the next line down rather than as a separate control. Newest row FIRST, matching
+			      // `noticeLog`'s own order (newest first), so no re-sorting happens at render time.
+			      // Hidden by default; toggleMessageLogPanel() in js/looped-network.js shows and fills
+			      // it, sets `aria-expanded` on the button, and closes it again on a second press, on
+			      // Escape, or on a click outside either the panel or the button. `max-height` is set
+			      // in JS against the map's own measured height (never a bare CSS percentage, which
+			      // would measure the OVERLAY's own auto height and cap nothing) so a long history
+			      // scrolls inside the map instead of running off the bottom of it.
+			      //
+			      // pointer-events:auto because unlike the readouts above it this one is scrollable
+			      // content, not a passive overlay; role="region" plus an aria-label from the same
+			      // heading key the old dialog used, because a list with no name is unannounced to a
+			      // screen reader even though it is visually obvious to a sighted user. ?>
+			<div id="lpn_msglog_panel" class="lpn-msglog-panel d-print-none" role="region" aria-label="<?=htmlspecialchars($ec_lang['lpn_msglog_heading'])?>" style="display:none;position:relative;pointer-events:auto;overflow-y:auto;width:100%"></div>
 			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
 			      // instructions popup bubble for how to continue and end the current mode."*). A
 			      // box of its own rather than more text in the mode line, because it says
