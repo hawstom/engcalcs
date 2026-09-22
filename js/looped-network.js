@@ -187,6 +187,16 @@ var EngCalcs = EngCalcs || {};
 	// AND IT IS NOT THE SCREEN -- it is the map area, narrower than the window and much shorter, so
 	// any wording shown to a user says map, not screen.
 
+	// Rounded UP to `sig` significant figures. **UP, never to nearest**: this rounds a captured view
+	// width into a threshold that is compared against that same view, and `toPrecision()` rounds
+	// half of all views DOWN -- which hides the very labels the reader was looking at when they
+	// pressed the button that captured it. Measured in a real browser on 2026-09-18, where a capture
+	// read 1110 off a 1114-unit view and the labels went out on the press.
+	function ceilToPrecision(v, sig) {
+		if (!(v > 0) || !isFinite(v)) { return v; }
+		var mag = Math.pow(10, sig - 1 - Math.floor(Math.log(v) / Math.LN10));
+		return Math.ceil(v * mag) / mag;
+	}
 	function mapSpan(which) {
 		var w = visibleMapWidth(), h = visibleMapHeight();
 		if (which === 'w') { return w; }
@@ -5111,6 +5121,17 @@ var EngCalcs = EngCalcs || {};
 			// deliberately decoupled. 2 reads as a pipe rather than a hairline or a road.
 			linkWidth: 2,
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
+			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-21 under Task 705). Generated
+			// labels are drawn only while the visible map is at most this many DISPLAY LENGTH UNITS
+			// wide, and the same number is what stops a map symbol growing on the ground
+			// (symbolCapScale()). null = always draw, which is the right default because no single
+			// number is meaningful across networks 400 ft and 40 miles wide -- the Settings row
+			// captures it from the current view rather than asking anyone to guess one.
+			//
+			// **A TYPED NUMBER IN THE DISPLAY UNIT, NEVER SI, and it is REINTERPRETED rather than
+			// converted when the unit changes** -- the suite's own absolute rule. Converted to
+			// metres only where it is compared, in labelWidthLimitSI().
+			labelMaxWidth: null,
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -6281,7 +6302,90 @@ var EngCalcs = EngCalcs || {};
 	// number to turn. NOT a "relative to text" multiplier -- with both in pixels that costs the user
 	// a mental division every time they want a bigger dot. Link width is its own setting too.
 
+	// ---- THE MAXIMUM MAP SIZE OF A SYMBOL (ROADMAP Task 705) -----------------------------------
+	//
+	// **A SYMBOL IS DRAWN IN SCREEN PIXELS, SO ITS SIZE ON THE GROUND GROWS WITHOUT BOUND AS YOU
+	// ZOOM OUT.** Tom, 2026-09-21: *"a symbol may not grow past a size the network itself sets."*
+	// At a whole-county view a 7 px junction dot is a mile across on the map, and a drawing that is
+	// nothing but overlapping dots says less than one that is mostly pipe.
+	//
+	// **THE RULE IS DERIVED, AND THERE IS NO CONTROL FOR IT.** He offered two shapes -- a second
+	// number under Map and page > Appearance, or "the maximum symbol size is whatever it is at the
+	// maximum label zoom, so that once labels are hidden, symbols start shrinking on screen and stay
+	// constant on the ground as you zoom out". The second ships, and the reason is not only that it
+	// is free. The two rules answer the SAME question -- how far out is too far out to keep drawing
+	// at reading size -- and a second box lets a user set them to disagree, which produces a view
+	// with no lettering and mile-wide dots and no way to tell which of two numbers caused it. One
+	// threshold, one answer, and the tip on that one row says both things it does.
+	//
+	// **WHAT IT IS WHEN NO THRESHOLD IS SET, which is the default:** his own (1), the 10th-percentile
+	// link length as the maximum junction size on the map. It is the honest fallback because it is
+	// the same KIND of statement -- the network's own shortest ordinary pipe is the distance at which
+	// two junctions stop being separable, so a dot wider than that is drawing over the thing it
+	// marks.
+	//
+	// **EXPRESSED AS A FLOOR ON THE SCALE, not as a cap on a size**, because every symbol on this
+	// map is already one number divided by `state.s`. Below this scale the drawing stops growing on
+	// the ground and starts shrinking on the screen, which is exactly his sentence.
+	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
+	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	function invalidateSymbolCap() { symbolCapCache = null; }
+	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
+	// they change only when the drawing does, while the cap also moves with the window and the
+	// settings.
+	function invalidateLinkLengths() { p10LinkLengthCache = null; symbolCapCache = null; }
+	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
+	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
+	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
+	// left out rather than counted: a pump and a valve are zero-length by construction, and a
+	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	function p10LinkLengthWorld() {
+		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
+		var list = doc.links || [], n = list.length, step = Math.max(1, Math.ceil(n / 512)),
+			lens = [], i, l, a, b, d;
+		for (i = 0; i < n; i += step) {
+			l = list[i];
+			a = nodeAt(nodeById(l.from)); b = nodeAt(nodeById(l.to));
+			if (!a || !b || !isFinite(a.x) || !isFinite(b.x) || !isFinite(a.y) || !isFinite(b.y)) { continue; }
+			d = Math.hypot(b.x - a.x, b.y - a.y);
+			if (d > 0) { lens.push(d); }
+		}
+		if (!lens.length) { p10LinkLengthCache = 0; return 0; }
+		lens.sort(function (x, y) { return x - y; });
+		p10LinkLengthCache = lens[Math.floor(0.1 * (lens.length - 1))];
+		return p10LinkLengthCache;
+	}
+	function computeSymbolCapScale() {
+		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
+		if (!(px > 0)) { return 0; }
+		if (limSI > 0) {
+			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
+			v = currentView();
+			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
+			wWorld = (mpu > 0) ? limSI / mpu : 0;
+			if (wWorld > 0 && isFinite(wWorld)) { return px / wWorld; }
+		}
+		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
+		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
+		l10 = p10LinkLengthWorld();
+		return (l10 > 0) ? settings.symbolSize / l10 : 0;
+	}
+	function symbolCapScale() {
+		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
+		return symbolCapCache;
+	}
+	// **THE ONE DOOR, AND IT IS THE CAPPED ONE.** Every symbol this map draws goes through here, so
+	// the cap is the default and an exception has to ask for it by name.
 	function symbolFactor() {
+		var s = state.s || 1, cap = symbolCapScale();
+		return (settings.symbolSize / 2) / JUNCTION_R / ((cap > 0 && cap > s) ? cap : s);
+	}
+	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
+	// the two things a reader is looking FOR on a wide view -- where does the water come from and
+	// where is it stored -- so they keep their size on the screen at every zoom while everything
+	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
+	// already branch on those two types.
+	function symbolFactorFull() {
 		return (settings.symbolSize / 2) / JUNCTION_R / (state.s || 1);
 	}
 	// Pipe stroke width in world units, from `settings.linkWidth` screen pixels. Published to CSS as
@@ -6359,7 +6463,7 @@ var EngCalcs = EngCalcs || {};
 	// The drawn box for a node that has an overlay symbol. Sized per TYPE, not per node -- so the
 	// map reads as a symbol set rather than as a set of scaled circles.
 	function nodeSymbolSize(n) {
-		var k = symbolFactor();
+		var k = symbolFactorFull();   // reservoir and tank only: the declared exceptions (Task 705)
 		if (n && n.type === 'tank') { return { w: 2 * TANK_HALF_W * k, h: 2 * TANK_HALF_H * k }; }
 		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
 	}
@@ -6421,7 +6525,8 @@ var EngCalcs = EngCalcs || {};
 		// Both vessels are 2U wide by Tom's ratio and neither is taller than it is wide, so the
 		// circumscribing radius of what is DRAWN is exactly U for both. One number, and it moves
 		// with the junction unit rather than with the boxes.
-		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactor(); }
+		// The two declared exceptions to the maximum map size (Task 705) -- symbolFactorFull().
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
@@ -33979,6 +34084,42 @@ var EngCalcs = EngCalcs || {};
 	function visibleMapWidth() {
 		return mapBox().w / (state.s || 1);
 	}
+	// **THE SAME WIDTH, ON THE GROUND.** On an XY grid a world unit IS the display length unit, so
+	// this is `visibleMapWidth()` in metres and nothing more. On a geographic project a world unit
+	// is a DEGREE, and a threshold compared against degrees is five orders of magnitude out -- the
+	// defect Tom found on the customer-label control on 2026-09-21. Measured at the view's own
+	// centre, with the same metresPerWorldUnit() that fills every derived length on this map.
+	function visibleMapMetres() {
+		var v = currentView(), w = visibleMapWidth();
+		if (!isFinite(w) || w <= 0) { return 0; }
+		return w * metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
+	}
+	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
+	// project's own length unit, so a project in feet keeps the number its reader typed and
+	// changing the unit REINTERPRETS it, exactly as every other typed number on this page.
+	function labelWidthLimitSI() {
+		var v = settings.labelMaxWidth;
+		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
+		return toSI(v, 'lpn_u_length');
+	}
+	// What the capture button writes: the SAME quantity the gate reads, in the box's own unit,
+	// rounded UP so the view that was captured still qualifies. See ceilToPrecision().
+	function captureLabelViewWidth() {
+		var m = visibleMapMetres();
+		if (!(m > 0)) { return 0; }
+		return ceilToPrecision(toDisplay(m, 'lpn_u_length'), 3);
+	}
+	// Whether generated annotation is past the threshold at the scale being considered. `atScale`
+	// is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in force.
+	function labelsPastThreshold(atScale) {
+		var limSI = labelWidthLimitSI(), v, mpu, px;
+		if (!(limSI > 0)) { return false; }
+		px = mapBox().w;
+		if (!(px > 0)) { return false; }
+		v = currentView();
+		mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
+		return (px / (atScale || 1)) * mpu > limSI;
+	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
 	// it, it exists to be read, and zoomed out it is noise over the network. Each label's leader is
@@ -33988,13 +34129,25 @@ var EngCalcs = EngCalcs || {};
 	// visibility rather than display, so this composes with the leader's own show/hide logic instead
 	// of fighting it. One class on the <svg>, so a zoom step costs nothing per element.
 	//
-	// **NOTHING HERE DEPENDS ON THE ZOOM ANY MORE** (Tom, 2026-08-19: "Always show labels, Zoom
-	// level, Current view, etc.: Remove that entire concept ... now that we have good hiding and
-	// Thematic map"). A map-width threshold hid labels automatically, and the Settings box's
-	// explicit per-field hiding and Thematic mode now do that job deliberately; a second, implicit
-	// mechanism was one more thing to learn and one more thing to be surprised by. Do not
-	// reintroduce it -- and note that it is NOT what keeps map-unit text sizing out (see
-	// effectiveFontSize()): text is in screen pixels because it is furniture of the view.
+	// **THE LABELING THRESHOLD IS BACK, AND THE RULE ABOUT A QUESTION ASKED TWICE IS WHY**
+	// (Task 669, restored 2026-09-21 under Task 705). It shipped, Tom removed it himself on
+	// 2026-08-19 ("Always show labels, Zoom level, Current view, etc.: Remove that entire concept
+	// ... now that we have good hiding and Thematic map"), and he has asked for it back since --
+	// 2026-09-15 (*"I guess it was a bad idea to remove that"*) and again on 2026-09-18 and
+	// 2026-09-21. The comment that stood here said "Do not reintroduce it", and it was wrong.
+	//
+	// **WHAT THE 2026-08-19 ARGUMENT MISSED, IN HIS WORDS:** *"Without this threshold, we have no
+	// limit for outer boxes; we have no upper limit for text size."* Lettering is drawn in SCREEN
+	// pixels, so its width in MAP units grows without bound as the view widens, and the placement
+	// pass is asked to find open ground for a drawing that is nothing but lettering. Per-field
+	// hiding and Thematic mode cannot do that job, because neither of them knows how far out you
+	// are. The same sentence is why the threshold is also what caps a SYMBOL's map size -- see
+	// symbolCapScale().
+	//
+	// It is NOT what keeps map-unit text sizing out (see effectiveFontSize()): text is in screen
+	// pixels because it is furniture of the view. And it is none of the three mechanisms it is
+	// easiest to confuse it with -- the thematic toggle hides labels outright, the SHED drops label
+	// CONTENT when the drawing is crowded, and the gang repair moves labels to open ground.
 	//
 	// **THIS IS THE ONE PLACE ANYTHING HIDES A LABEL.** Task 428: a second path (a `.lpn-thematic`
 	// CSS rule) once hid labels by selector, and a selector cannot tell a generated label from the
@@ -34002,11 +34155,13 @@ var EngCalcs = EngCalcs || {};
 	// a rule of its own. What the OR governs is `.lpn-annotation`, so no suppressor can ever reach
 	// authored content again by construction.
 	//
-	// Two suppressors, and neither of them is about how far out you are:
+	// Three suppressors:
 	//   * generated annotation is off while the project is being placed on the map;
-	//   * thematic mode: colour is the message, so the lettering comes off.
-	// And one per-label rule, which is about the MODEL rather than the view:
-	//   * a Text label switched off in this scenario is not there at all.
+	//   * thematic mode: colour is the message, so the lettering comes off;
+	//   * the view is wider than the labeling threshold.
+	// And two per-label rules:
+	//   * a Text label switched off in this scenario is not there at all (the MODEL, not the view);
+	//   * a Text label whose "Show at all zoom levels" is UNticked goes with the threshold.
 	function applyLabelVisibility() {
 		// Recorded, not just applied. The zoom path needs to KNOW whether generated annotation is on
 		// screen rather than merely being styled by it, so it can skip the whole label pipeline when
@@ -34019,16 +34174,22 @@ var EngCalcs = EngCalcs || {};
 		// the rule for the georef case: "only elements including text". A Text object is a note
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
-		dataLabelsHidden = !!(georefActive() || settings.colorThematic);
+		// **AND THE THIRD SUPPRESSOR IS THE LABELING THRESHOLD** (Tasks 669 and 705).
+		var past = labelsPastThreshold(state.s);
+		dataLabelsHidden = !!(georefActive() || settings.colorThematic || past);
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
 		// labels only, typically a handful, so the loop is cheap.
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
-			// MEMBERSHIP, and nothing else: a label switched OFF in this scenario is not there at
-			// all (Task 407).
-			var gone = !isActive(lb);
+			// MEMBERSHIP FIRST, and it beats everything else here: a label switched OFF in this
+			// scenario is not there at all (Task 407). Then the label's OWN answer to the zoom:
+			// **a Text object is authored content and ships exempt from the threshold** -- the rule
+			// this page has always had, and what makes the shipped Net3 note reading "Zoom in to
+			// see labels" still readable when the labels have gone. `!== false` rather than a
+			// truthiness test, so a note written before this switch existed keeps showing.
+			var gone = !isActive(lb) || (past && lb.allZoom === false);
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
