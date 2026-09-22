@@ -224,3 +224,68 @@ errors in en/ar at 1280 and 390.
 
 **Not checked:** check_all (serialized, per brief); the right-hand overlay with a pane open beyond
 reading that `right:` is unchanged; the harness mutation claim (not re-run).
+
+## 2026-09-22 -- feat/label-gang-search (R-075, R-108, R-135..R-137), HEAD 019a5b0d
+
+CITED: `node dev/lpn-spike/label-prefix-acceptance-harness.js` and
+`node dev/lpn-spike/label-slide-harness.js`, run against this worktree unmodified. Real Chrome
+via `dev/lpn-spike/browser-drive.js` (flocked, `?debug=perf`, `?debug=labels` unused), Net3 and
+Net3-Novato-CA-World, fit/x2/x4 via synthetic wheel events on `#lpn_canvas`, the Settings box's ID
+row `Before` input driven through its real `input` event. Screenshots under
+`/tmp/perry-shots/`.
+
+**R-075 -- OPEN, correctly, and this is the one that matters most.** Tom's own words: "without
+moving or hiding any of the labels shown." Ceiling in the harness itself (not my number, the
+build's own ratchet): Net3-World moved 10 / hidden 29 over the four zooms, Net3 moved 10 / hidden
+22 -- NOT zero. Broken out by zoom, the fit view (what a project opens on) and 2x are where it
+fails: Net3-World fit 5 moved / 18 hidden, x2 5/11; Net3 fit 7/16, x2 3/6. Only x4 and x8 are 0/0.
+The queue entry (R-075's own sub-bullet, 1210139e) states this accurately and leaves it open. **No
+overclaim here** -- flagging it as the top item for Tom because "4x and 8x 0/0" reads better than
+the whole truth, and a build report that leads with that number without the fit-view number beside
+it would be the R-054 shape. This report led with both.
+
+**R-136/R-137 -- MARKED [x] "shipped" in `019a5b0d`, and the number he called out is not fixed.**
+His words: "the top label of this descending gang is eventually gratuitously 20 text heights away
+from its node" (R-136) and, on nodes 120/251/257, "A human would have slid the two labels at A
+toward B" (R-137). Independently re-run `label-slide-harness.js`: at zoom x2 -- the zoom his own
+screenshot was taken at -- node 251's leader is 28.0 -> 19.1 text heights. **19.1 is still
+"gratuitously ~20," which is the exact number he named.** `dev/label-placement-algorithms.md`
+itself says "still long" for this case. The x3 result (23.8 -> 4.8, 251 alone 1.0) is a genuine
+fix, but it is a different zoom from the one he was looking at. Marking R-136/R-137 DONE reads as
+"the thing you pointed at is fixed"; the thing he pointed at, at the zoom he pointed at it, is
+19.1 text heights away, barely below his own complaint threshold. Recommend re-opening or
+re-wording the queue entry to say "fixed at x3, still ~19h at x2" rather than shipped outright.
+
+**Performance -- the slide pass itself costs real time, and nobody has said so where Tom would
+see it.** Same harness, same run, its own printed numbers: adding `slideTowardAnchors()` moved the
+content pass from 1731 ms to 4944 ms at x3 on Net3-World (+186%), and 2961 -> 3037 ms at x2 (+3%).
+Tom asked twice in this round for performance to be the focus (R-076, and "we really should be
+focusing on efficiency and performance," R-136). The prefix-acceptance harness's own layout-time
+column also moves around 2-3x depending on prefix length and zoom, consistent with the "2-2.5x
+master" figure in the build's report, but I could not independently confirm the master-side of that
+ratio from a real browser: loading master (`https://hawsedc.local/engcalcs/Looped-Network.php`) via
+the same localStorage-injection technique that works on the branch (port 8090) produced a blank
+screenshot after fit+zoom, and I did not chase why (different origin/profile, or an ID-row/Settings
+selector difference on master) given time. **UNVERIFIABLE FROM HERE: a human should open
+`https://hawsedc.local/engcalcs/Looped-Network.php` and this branch side-by-side, load
+Net3-Novato-CA-World in both, and time a wheel-zoom sequence with DevTools' Performance panel** --
+that is the comparison the report's "~2-2.5x master" claim needs and I could not complete headless.
+
+**Visual check, real Chrome, Net3-Novato-CA-World, default label fields (ID/Qb/H/P/Z), fit/x2/x4,
+empty and `12345678` node-ID prefix.** No gross defect jumped out at fit or x4 (screenshots
+`branch_novato_*_fit.png`, `*_z4.png`): labels sit beside their nodes, no label drawn on top of a
+pipe symbol in the areas I looked at, no leader visibly crossing another leader at a wide angle.
+One close-up crop of the dense SW cluster (`closeup_empty_z4b.png`, nodes 177/181/179/271/183) shows
+several stacked labels close enough together that I cannot rule out sub-pixel touching from a
+screenshot alone -- **UNVERIFIABLE FROM HERE at this resolution; a human zoomed into that exact
+cluster should look for touching label boxes**, which is the one thing a screenshot at normal zoom
+cannot settle. My own from-scratch overlap counter (`getBoundingClientRect()` on every SVG `<text>`)
+produced too many hits to trust (99-385 pairs on 218-227 elements) to mean anything on a page that
+stacks multi-line labels by design; I do not trust that instrument and did not build one that could
+tell an intentional stack from a real collision in the time available, so I am not citing its
+numbers as a finding.
+
+**Not checked:** `check_all.sh` (told not to run it); the georeference/EPSG examples other than the
+two named; whether `labelMaxWidth` has any merge-duplicate logic -- grepped, found none, single
+declaration and three reads, looks clean; pan-only cost; touch/phone. Master-branch visual diff
+(blank screenshot, see above).
