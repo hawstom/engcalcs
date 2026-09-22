@@ -1,5 +1,25 @@
 # Customers and metered demands (`lpn_`) — design, not a build plan
 
+> **THE ACCOUNT NUMBER WAS REMOVED ON 2026-09-19 AND THIS DOCUMENT STILL ARGUES ABOUT IT
+> THROUGHOUT.** Read every "account number" below as history. Tom, that day: *"Didn't I say to trash
+> Account number since they can just make a Custom property for that or anything else?"* and *"Since
+> Customer is a pseudo-node, what if we provide existing properties like Description and Tag instead
+> of Account number? Then we aren't inventing something, and we incur no language debt."*
+>
+> **A customer now carries `desc` and `tag`** — the same two identity properties every node and link
+> carries, with the same writers, the same conditions in Find, the same one-word rule on the tag and
+> the same no-newline rule on the description. `lpn_field_account` and `lpn_field_account_tip` are
+> deleted. A saved project's `account` is CARRIED into the tag on open (into the description where a
+> tag is already present), because a number that came out of a file is the user's.
+>
+> **The `[DEMANDS]` CATEGORY slot now carries the TAG**, which answers §3's open question from the
+> other side: a tag is EPANET's own join key for a node or a link, so it is a better match for that
+> slot than a field we invented. The DESCRIPTION is deliberately not written there — the slot is one
+> token read back as a name, and a sentence would round-trip as its first word.
+>
+> What is unchanged is §5's ruling, which is why it survives its own subject: **it is a LABEL, never
+> a key**. Nothing is unique, nothing is looked up, nothing reaches a log row.
+
 Scope for ROADMAP Task 247. **Slices 1, 2 and 3 shipped 2026-09-15 together** -- the drawn meter,
 the account number, the count, the derived junction, the draggable attachment, the Customer table and
 the `.inp` answer. Tom asked for something to test, and the field work and the drawing surface touch
@@ -21,7 +41,7 @@ His steer, verbatim:
 
 ## 1. What a Customer is in the document model
 
-**A Customer is a drawn object that carries a demand and an account number, is attached to a PIPE at
+**A Customer is a drawn object that carries a demand, a description and a tag, is attached to a PIPE at
 a position along it, and is NOT a node in the hydraulic model.** It lives in its own document
 collection (`doc.customers`), sits beside `doc.labels` in every respect that matters, and its demand
 is summed into a junction at solve time.
@@ -78,7 +98,7 @@ State it precisely, because the meter attaches to a pipe and not to a node:
 3. A tie is broken deterministically toward `from`. Never randomly, and never by splitting the demand
    between both ends.
 
-**Store the attachment, derive the node.** As built: `customer = {id, account, demand, count, link,
+**Store the attachment, derive the node.** As built: `customer = {id, desc, tag, demand, count, link,
 t, x, y}` — where the assigned junction is computed, not stored, and `x`/`y` is an OFFSET from the
 attachment point while the customer is attached and an absolute position while it is not, which is
 the dual meaning a Text label's own x/y already has (`customerPoint()` is the one door, as
@@ -304,6 +324,113 @@ literal and names no element and no field. `dev/cookie-storage-inventory.md` car
 **Recommended first slice was Slice 1**, on top of Task 468, because it settles the `.inp` answer
 while it is still cheap to change and spends none of the drawing-surface budget. What changed is that
 Tom wanted something to test; the reasoning was right and the recommendation was overtaken.
+
+### Added 2026-09-18 on `feat/customer-find-labels`, from Tom's own list
+
+1. **CUSTOM PROPERTIES ARE RESPECTED**, in the Properties box and in the Customers table, plus Find
+   and Replace. A design whose "Applies to" carries **M** reaches a customer. `customPropTypeKey()`
+   takes an explicit GROUP for this and for nothing else, because `elGroup()` is deliberately never
+   asked about a customer -- a group answer would invite exactly the `setProp()`/`effective()` path
+   §1 rules out. So the read and the write are PLAIN (`customerCustomValue()`,
+   `setCustomerCustomProp()`), there is no override marker, and `prop` is left off the table column
+   that would otherwise carry one.
+2. **CUSTOMER IN FIND.** Its own scope beside the seven, offering id, account number, connected
+   asset, demand per service, count, total and the junction it lumps at. Station and offset are
+   deliberately NOT offered: they are positions on the drawing, and a bulk Replace on one would
+   slide four hundred meters along their mains. Account, demand, count, pattern and the custom
+   properties are replaceable. **The account number replaces with NOTHING enforced**, which is the
+   label-not-a-key ruling arriving where a page would most be tempted to break it. The Customers
+   table's filter, which used to decline, now goes through the one evaluator.
+3. **A CUSTOMER DEMAND FOLLOWS A PATTERN.** The field was already READ -- `pattern` has always been
+   on the customer's demand row -- so this is the control and nothing else: a chooser in the popup,
+   a typed column in the table that refuses a name nothing answers to, and `libRepointPattern()`
+   grown a sixth attachment point so a rename or a delete cannot strand one.
+4. **CUSTOMER LABELS, WHICH HE HAS NOT DECIDED HE WANTS.** *"I wasn't expecting that Customers are
+   labeled, and it could be a huge commitment. I am not sure that we want that."* **The state before
+   this was NO LABEL AT ALL**: the account number drawn beside every symbol on 2026-09-15 was
+   deleted on 2026-09-17, and what makes customers LOOK labelled is the other half -- a meter's
+   demand is a demand row, so its junction's own node label has always included it. Nobody ever
+   decided to label a customer.
+   **CONTENT IS ITS OWN, SINCE 2026-09-19** -- `labelSettings.customer` is a third section in
+   Settings, which OVERRULES his earlier *"Customer labels would follow Node styles"*: a junction's
+   label answers *what is the pressure here* and a service's answers *whose is this and how much
+   does it draw*. **STYLE IS STILL SHARED AND THERE IS NO SEPARATE TEXT SIZE.**
+   **PLACEMENT IS HIS OWN AND IS NOT THE NODE PASS**: two fixed
+   locations along the service line, one justified against the link and one beyond the dot, and a
+   DROP if both fail the conflict check -- *"This much simpler than general node label placement."*
+   No leader, no relaxation, no shed. `Geom.serviceLabelSpots()` is the whole geometry.
+   **`labelSettings.customerMaxWidth` is the widest view that attempts them, and 0 is NEVER**, which
+   keeps his own fallback one number away.
+
+### 6a. His browser pass of 2026-09-19, and the answer to the mystery
+
+**THE SIZE WAS A REAL DEFECT AND A PREVIOUS PASS CLOSED IT BY REASONING.** He was told there was no
+separate text size and that the STACKING made them look taller; both halves of that were true and
+the conclusion was wrong. Measured, in the harness he can be shown
+(`dev/lpn-spike/customer-label-size-harness.js`): at a 4x zoom a node label and a link label were
+each **2.75 px** and a customer label **11 px**. The cause is one missing line rather than a size of
+its own -- a font size on this page is a pixel size divided by the scale, so every zoom invalidates
+every one of them, and `refreshFontSizes()` (the zoom path) rewrote node, link and Text labels and
+not customers. From the first zoom until the next content pass a customer label carried the size of
+the scale it was last composed at. All three now measure equal at every scale.
+
+**AND IT MADE THE DRAWING LOOK MORE CROWDED THAN THE PLACER THOUGHT IT WAS.** The placement reserved
+a box the size of a CORRECT label -- the measured width is banked in pixels and rescaled on read --
+while the ink drawn into it was several times bigger. So some of the overlap in his screenshot was
+the size defect and not the placement at all.
+
+**THE MYSTERY, MEASURED** (`dev/lpn-spike/customer-label-cause-harness.js`, his own picture: a
+reservoir, one horizontal main, eight services). Every customer tries the spot beside its service
+line first and takes the one beyond the customer only when something is already standing there; the
+rejecting obstacle is now recorded on the element by name (`customerSpotBlocker()`), so this is
+evidence rather than a second opinion.
+
+**TOM'S READING WAS RIGHT: A LINK LABEL DOES BLOCK A CUSTOMER LABEL. THE FIRST ANSWER GIVEN HERE
+SAID IT DOES NOT, AND THAT ANSWER IS WITHDRAWN.** It was not a judgement that went the wrong way --
+**the case was never on the drawing.** A long pipe does not label itself once at its midpoint; it
+REPEATS its label along its length (`linkLabelStations()`), and on the 900-unit main in that first
+harness the repeats fall at x = 225 and x = 675 while the eight customers stood at 100, 200 ... 800.
+Not one of them was ever near a link label, and the harness then reported that a link label never
+blocks anything. **A harness that concludes "X never happens" from a drawing that cannot produce X
+is worse than no harness**, because it reads as evidence. The fixture now derives those positions
+from the page and stands a customer on each, and the assertion is permanent.
+
+**WHAT THE FOUR VIEWS SHOW TOGETHER**, which is not what any one of them shows:
+
+| the blocker | when | what happens to the label |
+|---|---|---|
+| the NEIGHBOURING customer's label | wherever services are close together | it steps past the customer and stays readable |
+| the pipe's OWN label | where a service lands near one of the label's repeat positions | **both positions can go at once and the label LEAVES THE DRAWING** |
+
+**THE SILENT DROP IS THE REAL DEFECT AND IT IS TOM'S OWN SPECIFIED BEHAVIOUR**, which is why it
+needs him rather than a fix chosen here: *"If both of those fail a conflict check, the label is
+dropped. This much simpler than general node label placement."* Nobody has ever been told how often
+that happens. Measured on an ordinary street -- a 3,000-unit main, twenty-five services at random
+stations, ten runs each way round: **6 of 250 disappeared (2.4%) on the side the pipe's label lies,
+3 of 250 (1.2%) on the far side.** Roughly one service in sixty, with nothing on screen to say a
+number is missing.
+
+**THE THREE WAYS OUT, none of them taken, because each spends something he chose.** (a) A THIRD
+position -- the other side of the service line -- is a few lines and would clear most of these; it
+is also exactly the simplification he asked for by name. (b) Letting a customer label DISPLACE a
+link label uses machinery that already exists for node labels (`yields`,
+`yieldStationedLabels()`), but the customer pass deliberately runs LAST, on ground everything else
+has left, so this reopens the ordering. (c) Accept the drop and make it VISIBLE. **His call.**
+
+**AND HIS PROPOSAL -- one standard location for all, chosen once to accommodate a link label.**
+Where there is room it is already what happens: all eight take the identical standard position. The
+labels that differ are exactly the ones whose first choice was REFUSED, named one by one in the
+trial record -- so a rule offering only that one position would not have tidied those four, it
+would have dropped them on top of the drops above. That much is measured. What is NOT measured is
+whether some OTHER single standard position would do better, and no claim is made about it.
+
+**Two placement changes shipped from the same pass**, both his own words. The label beyond the
+customer is **centred on the service line's axis** rather than sitting above it (*"middle justified
+with the meter instead of bottom"*); and the label beside the line is **moved off it** rather than
+the halo being thinned, because `.lpn-lbl` is one class and thinning it would thin the halo on every
+node and link label to fix a collision only these have. The gap was 0.30 of a font size and is now
+0.48, stated in the source as the sum it is: a descender (0.21), the halo's outer half (0.10) and
+his one to two pixels of air.
 
 **What is NOT built, in one list:** the `atNode` pin (§2, and the ruling that supersedes it); the
 zoom-dependent density rule (§4); finding a customer by account number, totals by pressure zone and

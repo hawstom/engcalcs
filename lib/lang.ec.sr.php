@@ -1132,12 +1132,12 @@ $ec_lang['lpn_settings_search_tip']='Упишите реч да видите с�
 $ec_lang['lpn_settings_no_match']='Ниједно подешавање не помиње ту реч.';
 $ec_lang['lpn_rpane_empty']='Овде још ништа није прикачено. Све што припада целом пројекту налази се у Подешавањима.';
 $ec_lang['lpn_time_settings_open']='Подешавања времена';
-$ec_lang['lpn_settings_sec_visualization']='Визуелизација';
+$ec_lang['lpn_settings_sec_symbology']='Визуелизација';
 $ec_lang['lpn_settings_sec_map']='Мапа и страница';
 $ec_lang['lpn_settings_sec_assets']='Подразумеване вредности за нове елементе';
 $ec_lang['lpn_settings_sec_calculation']='Прорачун';
-$ec_lang['lpn_settings_node_symbology']='Симболика чворова';
-$ec_lang['lpn_settings_link_symbology']='Симболика веза';
+$ec_lang['lpn_settings_sym_node']='Симболика чворова';
+$ec_lang['lpn_settings_sym_link']='Симболика веза';
 $ec_lang['lpn_settings_page']='Страница';
 $ec_lang['lpn_settings_page_note']='Сачувано у овом калкулатору, не у пројекту.';
 $ec_lang['lpn_settings_hydraulics']='Хидраулика';
@@ -1145,7 +1145,7 @@ $ec_lang['lpn_labels_col_decimals_example']='0,000';
 $ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Изостави';
 
-$ec_lang['lpn_settings_node_link']='Чвор и веза';
+$ec_lang['lpn_settings_sym_all']='Чвор и веза';
 
 $ec_lang['lpn_color_mode_equal']='Једнаки интервали';
 $ec_lang['lpn_color_mode_quantile']='Квантил (једнак број)';
