@@ -74,6 +74,7 @@ const L = loadLoopedNetwork(
 	// `mapSized` is the page's "the canvas has a height now" latch and nothing here can raise it by
 	// laying anything out, so it is set directly; paintBasemapTiles() draws nothing without it.
 	"\t\trefreshBasemap: refreshBasemap, setMapSized: function (on) { mapSized = on !== false; },\n" +
+	"\t\trefreshTeaser: refreshBasemapTeaser,\n" +
 	"\t\ttileEls: function () { return basemapEls; },\n" +
 	"\t\tdialFactor: mapgeoDialFactor, dialTurn: mapgeoDialSetTurn,\n" +
 	"\t\tdialPosFor: mapgeoDialPosFor, dialDrop: mapgeoDialDrop,\n" +
@@ -539,8 +540,13 @@ ok('the placement it keeps is the one on the screen',
 // meant was "can this project be put on the Earth at all". **A georeferenced XY project is the case
 // that could not exist when that audit ran** -- emphatically not lat/lon, and locatable all the
 // same -- so its own basemap rows were gated on the narrow question and the satellite row was
-// simply absent. basemapChoosable() is the wide question, and the STREET and SATELLITE rows and the
-// corner teaser are the three readers of it.
+// simply absent. basemapChoosable() is the wide question, and the CORNER TEASER (street/satellite
+// swap) and the World map row's Attach/Detach are the readers of it now.
+//
+// **THE STREET-MAP AND SATELLITE MENU ROWS ARE RETIRED, 2026-09-22** (Tom: *"I think we can retire
+// the Hide/Show street map and satellite images rows. Detach and attach provide the same
+// functionality."*). What used to be two extra Map-menu rows is now the corner teaser alone, so this
+// section asks the teaser the same question it used to ask the rows.
 //
 // **Go to, the place-name search and the DEM elevations are deliberately NOT here**, and that is the
 // other half of the same ruling: each of those needs more than a transform, and a row that is
@@ -549,8 +555,8 @@ ok('the placement it keeps is the one on the screen',
 {
 	// **A TOKEN IS SUPPLIED HERE, because the question under test is the PREDICATE and not the
 	// account.** satelliteAvailable() reads `pc.lpn_mapbox_token`, which lib/config.inc.php fills on
-	// the served page and which no harness has; without it the satellite row is correctly absent for
-	// a reason that has nothing to do with this branch, and the assertion would pass or fail by
+	// the served page and which no harness has; without it the teaser is correctly absent for a
+	// reason that has nothing to do with this branch, and the assertion would pass or fail by
 	// accident. Put back afterwards, so nothing below inherits it.
 	const PCS = global.EngCalcs.pageConfig || {};
 	const tokenWas = PCS.lpn_mapbox_token;
@@ -558,17 +564,22 @@ ok('the placement it keeps is the one on the screen',
 	const rows = L.mapMenuRows().filter(function (r) { return !r.hidden; })
 		.map(function (r) { return r.label; });
 	ok('a georeferenced XY project can say where on the Earth it is', L.basemapChoosable() === true);
-	ok('...so the STREET MAP row is offered', rows.indexOf(PCS.lpn_basemap_show) >= 0 ||
-		rows.indexOf(PCS.lpn_basemap_hide) >= 0, rows.join(' | '));
-	ok('...AND THE SATELLITE ROW IS OFFERED', rows.indexOf(PCS.lpn_basemap_satellite_show) >= 0 ||
-		rows.indexOf(PCS.lpn_basemap_satellite_hide) >= 0, rows.join(' | '));
+	ok('...so the corner teaser (street/satellite swap) is offered', (function () {
+		byId.lpn_basemap_teaser.style.display = 'none';
+		L.refreshTeaser();
+		return byId.lpn_basemap_teaser.style.display !== 'none';
+	}()));
+	ok('...and the retired street-map and satellite rows are gone from the Map menu',
+		rows.indexOf(PCS.lpn_basemap_show) < 0 && rows.indexOf(PCS.lpn_basemap_satellite_show) < 0,
+		rows.join(' | '));
 	ok('...while Go to stays on the narrow question, being more than a transform',
 		rows.indexOf(PCS.lpn_goto_menu) < 0, rows.join(' | '));
 	if (tokenWas === undefined) { delete PCS.lpn_mapbox_token; } else { PCS.lpn_mapbox_token = tokenWas; }
-	ok('...and with no account there is no satellite row to offer, which is the other half',
-		L.mapMenuRows().filter(function (r) { return !r.hidden; })
-			.every(function (r) { return r.label !== PCS.lpn_basemap_satellite_show &&
-				r.label !== PCS.lpn_basemap_satellite_hide; }));
+	ok('...and with no account the corner teaser is absent, which is the other half', (function () {
+		byId.lpn_basemap_teaser.style.display = '';
+		L.refreshTeaser();
+		return byId.lpn_basemap_teaser.style.display === 'none';
+	}()));
 }
 
 // **(3) THE STATUS BAR SAYS `unnamed`** -- Tom's own third step, and the middle of three values.
@@ -606,6 +617,8 @@ ok('...and the map status goes back to saying it is not georeferenced',
 	ok('the Map menu carries ONE world map row, and it opens a submenu',
 		!!world && typeof world.submenu === 'function' && !world.fn,
 		top.map(function (r) { return r.label; }).join(' | '));
+	ok('...NEVER HIDDEN, and enabled on a plain grid project, which can always attach one',
+		!world.hidden && world.disabled !== true);
 	const image = top.find(function (r) { return r.label === PC0.lpn_backdrop_menu; });
 	ok('...sitting beside the background image row, which is the row it is parallel with',
 		!!image && Math.abs(top.indexOf(world) - top.indexOf(image)) === 1,
