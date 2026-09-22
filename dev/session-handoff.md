@@ -181,8 +181,9 @@ code-review question, answered), R-104 (answered). Put them to him by name for a
   redrawn the hands as an L before his words arrived, and the agent's attempt to restore the V was
   refused by Claude Code's own safety classifier as a relayed instruction. **Not worked around.**
   The branch ships the L. It is a one-line revert of the hands in `lib/Icons.lib.php` `history`,
-  to be made in a session where he says it himself. Round three (flash, engine notes, dismiss
-  click, phone) was in flight when this was written -- read its commits before assuming.
+  to be made in a session where he says it himself. Round three landed at `f02da0be`: the
+  loading banner waits 1 s before showing and then holds 1.5 s, so it never flashes; engine notes
+  are logged; a click that closes the log panel no longer acts on the map.
 - **`feat/map-menu`**: Detach keeps a grid placement; nothing can DISCARD one now. His wording
   needed if he wants a discard row. Re-adjust and Scale greyed on lat/lon as well as EPSG (he said
   EPSG only) -- tell him.
