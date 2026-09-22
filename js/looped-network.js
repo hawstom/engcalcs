@@ -23356,10 +23356,60 @@ var EngCalcs = EngCalcs || {};
 		delete switchKeep[id];
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 	}
+	/**
+	 * ---- THE WHOLE-PROJECT WRITE WAITS FOR A PAUSE (ROADMAP Task 706) --------------------------
+	 *
+	 * Tom, 2026-09-21: *"I am not sure what it means to save the whole project and why we would
+	 * ever do that when we can just save the entry at hand. My intuition is that we would always
+	 * just save the entry at hand and only save the whole project ... when there is a pause. See
+	 * Off Means Off."*
+	 *
+	 * **WHAT `localStorage` CAN AND CANNOT DO, because that decides the shape.** A project is ONE
+	 * key holding ONE JSON document, so there is no such thing as writing one cell of it: the only
+	 * write available is the whole thing. Writing the entry at hand on its own would mean a second
+	 * key -- a per-cell journal -- and nothing new may be stored on a visitor's device (see
+	 * dev/cookie-storage-inventory.md and storage_inventory_check.php). So the entry at hand is
+	 * written where it can be written the instant it is typed -- into `doc`, into the map label and
+	 * into the table -- and the STORAGE write, which is the expensive half and the only half that
+	 * was ever whole-project, is what waits for the pause.
+	 *
+	 * **300 ms, the number this page already means by "a pause".** It is scheduleSolve()'s debounce
+	 * and was afterManualEdit()'s, so one burst of typing is one solve AND one save on the same
+	 * rhythm, and a reader does not have to learn a second idea of when the page thinks you have
+	 * stopped. Longer would buy fewer writes and widen the window a browser crash could lose;
+	 * shorter would put the write back inside the typing.
+	 *
+	 * **NOTHING CAN BE LOST BY THE DEFERRAL, and that is not a hope.** saveToStorage() itself
+	 * cancels any pending timer at its first line, so every deliberate save already standing in
+	 * this file -- switching tab, closing a project, exporting, writing a file -- IS a flush, with
+	 * no call site changed. flushSave() adds the one case no existing call covers: the page going
+	 * away. It is wired to `pagehide`, to `visibilitychange -> hidden` (the one that actually fires
+	 * on a phone) and to `beforeunload` (the desktop net) -- the same three doors, and the same
+	 * reasoning, releaseAllLocks() already uses a few lines below.
+	 */
+	var LPN_SAVE_PAUSE_MS = 300;
+	var saveTimer = null;
+	function scheduleSave() {
+		if (saveTimer) { clearTimeout(saveTimer); }
+		saveTimer = setTimeout(function () { saveTimer = null; saveToStorage(); }, LPN_SAVE_PAUSE_MS);
+	}
+	// Write now whatever is owed. Returns whether anything was: the harness asserts on that, and a
+	// flush of nothing must be free, because two of the three doors above fire on an ordinary tab
+	// switch.
+	function flushSave() {
+		if (!saveTimer) { return false; }
+		saveToStorage();   // cancels the timer at its own first line
+		return true;
+	}
 	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
 	// document write fails on quota, the index still describes the last state that actually made it
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
+		// **EVERY DELIBERATE SAVE IS A FLUSH, and this one line is what makes that true without
+		// touching a hundred call sites.** A pending debounced write is owed to the same document
+		// this call is about to write whole, so it is discharged by this write and must not fire
+		// again afterwards.
+		if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
 		if (!library.openId) { return; }
 		// **NEVER WRITE OVER A DOCUMENT WE COULD NOT READ** (Task 627). This is the write that used
 		// to turn a blank map into a lost project: the tab still named the work, `doc` was empty
@@ -30718,7 +30768,22 @@ var EngCalcs = EngCalcs || {};
 		// browser project is NOT at risk -- it lives in localStorage and survives the browser closing;
 		// only CLOSING ITS TAB ends it, and closeTab() asks that question itself. Prompting on every
 		// page close teaches people to click through the one prompt that matters.
+		// **THE DEFERRED WRITE IS DISCHARGED BEFORE THE PAGE CAN GO** (ROADMAP Task 706). Three
+		// doors, the same three releaseAllLocks() uses and for the same reason: `pagehide` is the
+		// one the standard actually promises, `visibilitychange -> hidden` is the one that fires on
+		// a phone when the app is swiped away, and `beforeunload` is the desktop net. All three are
+		// free when nothing is owed -- flushSave() returns immediately without a timer, so an
+		// ordinary tab switch costs a boolean.
+		//
+		// **UNLIKE THE LOCK, THERE IS NOTHING TO LOSE BY FLUSHING ON A GLANCE.** A lock released on
+		// `hidden` would be taken from a colleague who looked at their email; a document written on
+		// `hidden` is simply the document, written.
+		window.addEventListener('pagehide', flushSave);
+		document.addEventListener('visibilitychange', function () {
+			if (document.hidden) { flushSave(); }
+		});
 		window.addEventListener('beforeunload', function (e) {
+			flushSave();
 			releaseAllLocks();
 			var unsaved = library.projects.some(function (p) { return isFileProject(p) && p.dirty; });
 			if (!unsaved) { return; }
@@ -39560,10 +39625,22 @@ var EngCalcs = EngCalcs || {};
 		// three whether the words changed or the label was switched off (Task 407).
 		else if (group === 'label') { refreshLabelContent(el.id); }
 		else if (nodeEls[el.id]) { updateNode(el.id, true); }
-		refreshScenarioMarks();
+		// **THE ELEMENT JUST EDITED, NOT EVERY ELEMENT ON THE MAP** (ROADMAP Task 706). The amber
+		// override ring and the inactive greying are read PER ELEMENT -- isActive() and
+		// hasDisplayedOverride() ask about one asset and nothing else -- so editing this one cannot
+		// change any other one's marks, and the whole-map scan refreshScenarioMarks() does was pure
+		// repetition here, running on every committed cell even when nothing about scenarios had
+		// changed. It is the tunnel-vision rule the stale-snapshot ruling already states for
+		// labels: an edit refreshes what it touched, and a network-wide pass is what the deferral
+		// exists to avoid. The full scan is still correct and still called where a SCENARIO changes
+		// -- switching, deleting, pushing to base -- which really does move every element's answer.
+		applyScenarioMarks(el);
 		refreshScenarioStatus();
 		scheduleSolve();
-		saveToStorage();
+		// **THE WHOLE-PROJECT WRITE WAITS FOR THE PAUSE** (Task 706). The edit is already in `doc`,
+		// on the map and in the table by the three lines above; what is deferred is only the
+		// serialize-and-store, and nothing can be lost by it -- see scheduleSave().
+		scheduleSave();
 		refreshPaneIfOpen();
 	}
 	function overrideMarker(fields, el, prop, format) {
@@ -44666,19 +44743,31 @@ var EngCalcs = EngCalcs || {};
 			|| 'The amber ring means this asset holds a value that belongs to the scenario {name} alone.')
 			.replace('{name}', scenarioDisplayName(activeScenario()));
 	}
-	function refreshScenarioMarks() {
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id], off = !isActive(n), ov = hasDisplayedOverride(n);
-			if (!ne) { return; }
+	/**
+	 * **ONE ELEMENT'S MARKS, WHICH IS ALL AN EDIT CAN EVER CHANGE** (ROADMAP Task 706). Both
+	 * questions this asks -- is the asset active, does it hold a value belonging to this scenario
+	 * alone -- are read off the element handed in. Nothing here consults another element, which is
+	 * why afterPropertyEdit() may call this instead of walking the whole drawing on every
+	 * committed cell. A Text label has no marks and is not drawn from either question, so it is
+	 * simply not in either map and falls through.
+	 */
+	function applyScenarioMarks(el) {
+		if (!el) { return; }
+		// **`elGroup()`, NOT A SEARCH OF doc.nodes/doc.links.** A junction and a pipe may legally
+		// share an id (see ovKey()), so the element's own shape is what tells the two apart --
+		// and an indexOf() here would put back exactly the whole-drawing walk this replaces.
+		var group = elGroup(el), ne = nodeEls[el.id], le = linkEls[el.id], off, ov;
+		if (group === 'node' && ne) {
+			off = !isActive(el); ov = hasDisplayedOverride(el);
 			ne.circle.classList.toggle('lpn-override', ov);
 			setOverrideTitle(ne.circle, ov);
 			ne.circle.classList.toggle('lpn-inactive', off);
 			if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
 			ne.text.classList.toggle('lpn-inactive', off);
-		});
-		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], off = !isActive(l), ov = hasDisplayedOverride(l);
-			if (!le) { return; }
+			return;
+		}
+		if (group === 'link' && le) {
+			off = !isActive(el); ov = hasDisplayedOverride(el);
 			if (le.halo) {
 				le.halo.classList.toggle('lpn-override', ov);
 				setOverrideTitle(le.halo, ov);
@@ -44686,7 +44775,14 @@ var EngCalcs = EngCalcs || {};
 			le.line.classList.toggle('lpn-inactive', off);
 			le.text.classList.toggle('lpn-inactive', off);
 			if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }
-		});
+		}
+	}
+	// The whole-drawing pass, for the events that genuinely move every element's answer: switching
+	// scenario, deleting one, pushing to base, rebuilding the DOM. An ordinary property edit is not
+	// one of those -- see applyScenarioMarks().
+	function refreshScenarioMarks() {
+		doc.nodes.forEach(function (n) { applyScenarioMarks(n); });
+		doc.links.forEach(function (l) { applyScenarioMarks(l); });
 	}
 	// The layout half of refreshLabelText(), without rebuilding any text. Split out so a DRAG can
 	// call it on every frame: moving one label changes what every other label collides with, but
@@ -46884,7 +46980,6 @@ var EngCalcs = EngCalcs || {};
 	// architecture ported from the spike) -- solving on every one of those would both be wasted
 	// work and would fight the drag for the main thread.
 	var solveTimer = null;
-	var manualSaveTimer = null;
 	function scheduleSolve() {
 		// **THE RINGS STAY, LIKE EVERY OTHER STALE ANSWER, AND THIS REVERSES TASK 530** (Tom, asked
 		// directly whether fire flow rings should keep the same "off means off, not hide or
@@ -46973,11 +47068,10 @@ var EngCalcs = EngCalcs || {};
 	 * debounced write. There is no repaint at all on this path now.
 	 */
 	function afterManualEdit() {
-		if (manualSaveTimer) { clearTimeout(manualSaveTimer); }
-		manualSaveTimer = setTimeout(function () {
-			manualSaveTimer = null;
-			saveToStorage();
-		}, 300);
+		// **ONE DEBOUNCED SAVE DOOR FOR THE WHOLE PAGE** (Task 706). This used to keep a timer of
+		// its own at the same 300 ms; scheduleSave() is that timer, shared now with every ordinary
+		// edit, so a burst that crosses the Recalculate switch still costs exactly one write.
+		scheduleSave();
 		if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
 	}
 
