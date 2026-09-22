@@ -180,3 +180,44 @@ label ever falls nearby. This may be exactly what Tom's own design asked for ("r
 or not one is actually there"), so it is reported as a question rather than a defect — but it was
 never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
 explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
+
+---
+
+## 2026-09-22 -- feat/map-menu, review at `a159c4dd`: NOT READY (one defect on the default path)
+
+OBSERVED, checked 2026-09-22 against the worktree at `a159c4dd`, headless Chromium through Apache
+on :8101 plus a node stub of my own.
+
+**MISSED, and it is on the commonest path there is: Map, World map, Attach on a lat/lon or EPSG
+project that is already showing its map turns the map OFF**, while the notice reads *"The world map
+is behind your drawing now"*. A new lat/lon or EPSG project opens with the map showing, and Attach
+is never greyed, so the first press most people make does the opposite of its label. Cause:
+`worldMapAttach()` calls `setBasemapOn(true)` -> `setBasemapStyle('osm')`, and that setter
+TOGGLES OFF when asked for the style already showing (a rule written for the retired Hide/Show
+rows). Measured in the browser: tiles 16 -> 0, attribution hidden, stored `basemap` = `"off"`,
+Detach then greyed. EPSG:32612 the same (48 tiles -> 0). The branch's own harness missed it
+because it sets the basemap `'off'` before pressing Attach -- **the test built the one state in
+which the bug cannot show.** Same shape as the seed-snapshot entries above: a fixture chosen,
+not sampled.
+
+**MISSED, smaller: Detach then Attach on lat/lon/EPSG always comes back as the STREET map**, even
+if the user was on satellite. `setBasemapOn(true)` hard-codes `'osm'`.
+
+**A QUESTION FOR TOM, not a defect in the build: on a GRID project, retiring Hide street map
+removed the only way to hide the tiles without throwing away the placement.** Detach on a grid
+deletes `project.georef` (no undo, no confirm), and getting the map back means the wizard from
+scratch. His reason for retiring the rows -- *"Detach and attach provide the same functionality"*
+-- is true on lat/lon and EPSG and not on a grid.
+
+**CONFIRMED, independently:** the three rows on every kind (screenshots per kind); Go to/Search
+greyed on a bare grid and live on an attached grid; Go to on an attached grid lands exactly on the
+drawing point, checked with my OWN WGS84 forward formula at rotDeg 27.5 and a 1.37 scale factor,
+and again with a 579,000/1,303,000 local origin; node coordinates and georef byte-identical after
+Go to and a search-with-extent. Mutation-killed: nulling the grid branch fails the harness, and so
+does narrowing placeFindable(). The seven deleted keys are read by no shipped file (comments only).
+
+**Harness debt, not user-facing:** `dev/browser-pass/specs/goto.js` and `search.js` still assert
+the OLD rule (row hidden on XY) and fail on their first check; the browser-pass `newProject()`
+helper checks a radio value `xy` that has been `local` since `ce626311`, so the half of
+`basemap.js` this branch edited for the grid case has never actually run. Pre-existing helper, but
+the edited spec's author claimed coverage it does not have.
