@@ -180,3 +180,47 @@ label ever falls nearby. This may be exactly what Tom's own design asked for ("r
 or not one is actually there"), so it is reported as a question rather than a defect — but it was
 never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
 explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
+
+## 2026-09-22 -- feat/notice-log (R-116..R-119), review at `1e48999b`: NOT READY
+
+Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, preview :8099, real headless
+Chromium (playwright-core), setNotice() reached through a route-injected seam, never an edit.
+Screenshots: `/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/760eead1-0b47-4541-a70a-23bd73a4d678/scratchpad/shots/`.
+
+**MISSED, the headline: the glyph is buried under the very message it is meant to sit beside.**
+OBSERVED: `#lpn_map_notice` is NOT inside the new `#lpn_map_overlay_tl_col`; it is a sibling of the
+whole overlay, `position:absolute;top:4px;left:4px;z-index:5` against the map. The glyph is at the
+same top-left corner. Measured at 1280: glyph (5,144) 26x16; short notice (5,144) 94x23; long
+notice (5,144) 767x39. Same at 390px. The screenshots show a clean clock pill when quiet and NO
+glyph at all while a notice shows -- the blue highlight exists in the DOM and nobody can see it.
+It is still clickable through the notice (pointer-events:none), so it is a live invisible target.
+The code comment asserting the notice "is absolutely positioned at THIS box's top-left" is false;
+this is the R-054 shape exactly -- an explanation believed and never rendered. Harness 7c asserts
+SOURCE ORDER (`indexOf`) and "both states read [glyph] [text]"; the order is true and the reading
+is not, so the harness passes on the defect. Tom's words: "it must appear and possibly highlight
+while a message displays" -- it disappears while a message displays.
+
+**MISSED in RTL (?lang=ar).** OBSERVED at 1280: glyph and mode hint at the RIGHT edge (glyph
+x=1249), notice at the LEFT edge (x=5). The notice/hint split is pre-existing (notice has a
+physical `left:4px`); what is new is that the glyph went with the hint, so in five languages the
+glyph sits the full map width away from where messages appear.
+
+**Also-observed, lower:**
+- The ten-past-ten clock at 1x (11px) reads as a chevron-down in a circle -- the V of the two
+  hands dominates. SPECULATION about how a person reads it; needs Tom's eye (glyph-quiet-x4.png vs
+  en-1280-quiet.png).
+- Phone, welcome state only: `#lpn_examples_pane` covers the glyph, a tap lands on the pane. With a
+  map open it is reachable. Mode hint is display:none at <=640px, so on a phone the glyph stands
+  alone and then vanishes under every notice.
+- The lock banner is logged (as 'warning', amber, even when the banner is the RED read-only state)
+  but does not light the glyph. Whether "a message displays" includes the banner is Tom's call.
+- R-117 and R-118 were marked [x] in the queue by the build agent before review.
+
+**CONFIRMED:** icon is a new `history` clock (not info); removed from bottom strip, one id;
+highlight toggles on/off with notice and expiry (harness 7d, and DOM class in Chrome); hidden in
+print (emulated print: offsetParent null); keyboard: one stop, after the tab strip, focus ring
+visible, accessible name "Messages"; notice-log-harness and small-screen-harness pass; no page
+errors in en/ar at 1280 and 390.
+
+**Not checked:** check_all (serialized, per brief); the right-hand overlay with a pane open beyond
+reading that `right:` is unchanged; the harness mutation claim (not re-run).

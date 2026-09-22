@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-126.
+**An ID is permanent and never reused.** Next free: R-135.
 
 ---
 
@@ -244,3 +244,24 @@ judgement and does not belong to a script.
 
 - [x] R-124 -- | There is a git repository on `~/`. Its git status is dirty. Clean up that one. -- **DONE AND PUSHED**, host commit `9565205`. It is a DIFFERENT repository -- `constructionnotesmanager.com` on Bitbucket, with the home directory as its working tree -- and this session had made it dirty by installing the cron scripts. Committed: the three updated scripts, the two new ones (`check.mustblock`, `daily-report-cron.sh`), and a cPanel reshuffle of `public_html/.htaccess`. Ignored rather than tracked: `tgh*`, which holds the engcalcs mirror clone and the report checkout (separate repositories; tracking one file of them makes two repositories disagree about who owns it) and `daily-report.last`, a runtime marker like `check.last`. The two `.before-install` backups were deleted
 - [x] R-125 -- | dev: I will checkout master and pull that one. Thanks. -- his call, nothing owed
+
+## Round of 2026-09-22 -- the same pass, resent after Claude froze
+
+### Map menu
+
+- [ ] R-126 feat/map-menu | Keep all rows visible always. But disable what's not applicable. (1) Maybe 'World map...' should be enabled for all projects. Even an EPSG project should have the option to detach and reattach the world map, I think. But when they attach, they don't have to do the wizard. And for EPSG projects, Re-adjust and Scale should be disabled unless there's user demand to expose them. (2) I think we can retire the Hide/Show street map and satellite images rows. Detach and attach provide the same functionality. (3) Hide map readouts was a print prep command. But it isn't very useful any more. Let's remove it. -- **SUPERSEDES his R-120 question** about whether a context-sensitive menu is good: his answer is always visible, disabled when not applicable
+- [ ] R-127 feat/map-menu | That got tidy. Only three rows left. Zoom to fit, Background image, and World map.
+- [ ] R-128 feat/map-menu | georeference xy: I don't see this work merged to master. The map menu should have parallel Background image and attach world map rows. But I don't see that. -- **IT DID MERGE** (`feat/xy-world-map`, on his all-clear of 2026-09-21); the World map row was offered only on a plain grid project, so it was not on the map he was looking at. R-126 makes it always visible, which answers this by construction
+
+### Open example
+
+- [ ] R-129 fix/example-open | When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project.
+- [ ] R-130 fix/example-open | The delay in opening the Net3 lat/lon example when Net3 was already open was over 25 seconds. This is a failure for a new shopper. This was on hawsedc.local on the current master branch. That said, I may have been experiencing high CPU load from CC WSL.
+
+### Closed on his word
+
+- [x] R-131 -- | ?debug=tiles: I think we are good now. -- **Task 703 CLOSED**
+- [x] R-132 -- | 705: Title "Limit zoom symbol mapwise size growth" -- retitled in `6ae7f2d4`
+- [x] R-133 feat/customer-find-labels | I think this is done. Merge and delete? -- **MERGED** `7afe1d20` on his all-clear, branch and worktree deleted 2026-09-22
+- [ ] R-134 feat/zoom-symbol-size | New zoom rules: If you have no questions or objections, you can proceed to implement this in a branch for me to test.
+
