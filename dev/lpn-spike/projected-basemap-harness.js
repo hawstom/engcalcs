@@ -593,6 +593,29 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 				.filter((r) => r.label === PC.lpn_map_attach_readjust || r.label === PC.lpn_map_attach_scale_from)
 				.every((r) => r.disabled === true));
 
+		// **FROM THE STATE A NEW PROJECT OPENS IN -- THE MAP ALREADY SHOWING** (Perry's review,
+		// 2026-09-22, point 1). Attach there used to go through a setter that toggled OFF on the
+		// style already showing, so it turned the map off while its notice said it had attached it.
+		// Now Attach is greyed while attached, and does nothing if called anyway.
+		{
+			const sub = () => L.mapRows().find((r) => r.label === PC.lpn_map_attach_menu).submenu();
+			ok('set up: a new lat/lon project opens with the map showing', L.worldMapAttached() === true);
+			ok('...so Attach is GREYED and Detach is live', sub()[0].disabled === true
+				&& sub()[sub().length - 1].disabled !== true);
+			L.worldMapAttach();
+			ok('**Attach on a map already showing LEAVES IT SHOWING**', L.worldMapAttached() === true
+				&& L.basemapOn() === true);
+			L.setBasemapStyle('satellite');
+			L.worldMapDetach();
+			ok('Detach hides it', L.worldMapAttached() === false);
+			ok('...then Attach is live and Detach greyed', sub()[0].disabled !== true
+				&& sub()[sub().length - 1].disabled === true);
+			L.worldMapAttach();
+			ok('...and Attach brings back SATELLITE, the style that was showing', L.basemapOn()
+				&& L.getProject().basemap === 'satellite', L.getProject().basemap);
+			L.setBasemapStyle('osm');
+		}
+
 		L.newProject(null, ZONE12N);
 		L.setCanvas(W, H); L.setMapSized();
 		ok('a projected project can be located at all', L.locatable());
@@ -601,6 +624,11 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			return !!row && row.disabled !== true;
 		}()), labels().join(' | '));
 		ok('...and the corner teaser is not hidden', teaserShown());
+		ok('a new EPSG project opens attached, and Attach there leaves it attached', (function () {
+			const was = L.worldMapAttached();
+			L.worldMapAttach();
+			return was === true && L.worldMapAttached() === true;
+		}()));
 		// The row has to WORK, not merely appear -- section 10b's lesson, where a widened gate met
 		// a second copy of the old question inside the command. Attach on an EPSG project skips the
 		// wizard entirely (Tom: "when they attach, they don't have to do the wizard") -- it is only
@@ -743,6 +771,16 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			ok('...and Go to lands on the drawing point that latitude names',
 				!!v && Math.abs(v.cx - L.inwardX(1000)) < 1e-6 && Math.abs(v.cy - L.inwardY(500)) < 1e-6,
 				v ? v.cx.toFixed(3) + ', ' + v.cy.toFixed(3) : 'no view');
+			// Kept placement, map DETACHED: greyed again (Tom: "disabled when a world map is not
+			// attached").
+			L.getProject().basemap = 'off';
+			const top2 = L.mapRows().filter((r) => r && !r.hidden && !r.separator);
+			ok('...and a grid project with its placement kept but the map DETACHED greys both again',
+				[PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()].every(function (lab) {
+					const row = top2.find((r) => r.label === lab);
+					return !!row && row.disabled === true;
+				}));
+			delete L.getProject().basemap;
 			delete L.getProject().georef;
 		}
 	}

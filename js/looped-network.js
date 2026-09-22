@@ -11126,7 +11126,10 @@ var EngCalcs = EngCalcs || {};
 	// that turns a latitude and longitude into drawing units through the attached map's transform,
 	// so they no longer need anything a georeferenced grid project lacks. Moving the camera changes
 	// nothing in the document, which is why this widening is safe where the DEM's is not.
-	function placeFindable() { return basemapChoosable(); }
+	// On a grid project that means the map is SHOWING, not merely that a placement is kept: a
+	// Detached grid project greys both rows, as Tom's "disabled when a world map is not attached"
+	// says. A geographic or projected project is findable whether its map is showing or not.
+	function placeFindable() { return projectLocatable() || worldMapAttached(); }
 	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
 	// oversight.** It still gates the DEM elevations, which write numbers into the document from a
 	// place on the Earth; attaching a backdrop is meant to change nothing, so an attached world map
@@ -11144,14 +11147,27 @@ var EngCalcs = EngCalcs || {};
 	// defect 692 closed, and widening these three would re-open it from the other side.
 	// dev/lpn-spike/xy-world-map-harness.js asserts both halves.
 	function basemapOn() { return basemapChoosable() && project.basemap !== 'off'; }
-	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
-	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
+	// One setter for both sources, and 'off'. **IT SETS; IT NO LONGER TOGGLES** (2026-09-22). It used
+	// to turn the basemap OFF when asked for the style already showing, which was right for the
+	// retired Hide/Show street map and satellite rows and nothing else: once World map, Attach went
+	// through it, Attach on a map that was already showing turned the map off while its notice said
+	// it had attached it (Perry's review, 2026-09-22). The corner teaser always asks for the OTHER
+	// style, so it never relied on the toggle.
+	//
+	// **THE STYLE IN USE IS REMEMBERED WHEN THE MAP GOES OFF**, so Detach then Attach brings back
+	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
+	// project for the same reason `basemap` is: it is a statement about this document's picture.
 	function setBasemapStyle(style) {
-		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
+		if (style === 'off' && project.basemap && project.basemap !== 'off') {
+			project.basemapLast = project.basemap;
+		}
+		project.basemap = style;
 		refreshBasemap();
 		saveToStorage();
 	}
-	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
+	function setBasemapOn(on) {
+		setBasemapStyle(on ? (project.basemapLast || 'osm') : 'off');
+	}
 	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
 	// a tile can, and the only thing that removes it is turning the basemap off. The two sources
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
@@ -11168,8 +11184,7 @@ var EngCalcs = EngCalcs || {};
 	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
 	// is a third thing to keep in step with openMapMenu(). It carries the SAME two strings as that
 	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
-	// come to mean different things -- including the seam's own rule that asking for the style
-	// already showing turns the basemap off.
+	// come to mean different things.
 	//
 	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
 	// bar to icons, so a phone reader has strictly FEWER routes to this than a desktop one; taking
@@ -11190,12 +11205,10 @@ var EngCalcs = EngCalcs || {};
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');
 		b.title = name;
 	}
-	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF**, and that is the whole
-	// difference between it and the View rows. setBasemapStyle() toggles off when asked for the
-	// style already showing, which is right for a row that reads "Hide satellite images" and wrong
-	// for a corner tile: Tom pressed it twice and lost the basemap entirely -- "I get satellite, but
-	// now I lost map. No more map. Satellite has attribution, Map has nothing." Turning the tiles
-	// off stays in the View menu, where a row says so in words.
+	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF.** Tom pressed an earlier version
+	// twice and lost the basemap entirely -- "I get satellite, but now I lost map. No more map.
+	// Satellite has attribution, Map has nothing." Turning the tiles off is Map, World map, Detach,
+	// where a row says so in words.
 	function toggleBasemapTeaser() {
 		setBasemapStyle(basemapOn() && basemapStyle() === 'satellite' ? 'osm' : 'satellite');
 	}
@@ -14229,17 +14242,6 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
-	// **THE FIVE WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
-	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
-	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
-	// comes and goes teaches nobody what the feature can do.
-	//
-	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
-	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
-	// a corner and turns on the round handle; writing a second gesture for each would be a second
-	// opinion about what moving a map means. What the two rows buy is that a reader looking for
-	// "move it a bit" and a reader looking for "it is the wrong size" each find a row with their own
-	// word on it, and the hint that comes up names the handle they want.
 	/**
 	 * **IS THE WORLD MAP ROW USABLE AT ALL?** True for a plain grid (its own wizard places it), a
 	 * geographic project (its coordinates already are the place) and a projected one whose CRS this
@@ -14253,39 +14255,62 @@ var EngCalcs = EngCalcs || {};
 	// streets with the project, never the project with the streets" -- so there is no placement of
 	// OURS to nudge. Only a grid project's placement is ours to have gotten wrong.
 	function worldMapAdjustable() { return xyMapAttachable(); }
-	// **"ATTACHED", FOR A ROW THAT HAS TO GREY ITSELF CORRECTLY BEFORE ANYTHING HAS BEEN CLICKED.**
-	// A grid project has no georeference until the wizard writes one; a geographic or projected
-	// project is always exactly where its own coordinates put it, so "attached" there just means the
-	// tiles are switched on.
-	function worldMapAttached() {
-		return xyMapAttachable() ? xyGeorefOk() : (projectLocatable() && basemapOn());
-	}
+	// **"ATTACHED" IS ONE RULE FOR EVERY PROJECT KIND: A PLACEMENT EXISTS AND THE MAP IS SHOWING.**
+	// A geographic or projected project always has a placement -- its own coordinates -- and a grid
+	// project has one once the wizard has written `project.georef`. So "attached" is basemapOn(),
+	// which already asks exactly that (basemapChoosable() is "a placement exists"). A grid project
+	// whose placement is KEPT while the map is hidden reads as detached, and that includes an older
+	// file saved with the map hidden (Perry's review, 2026-09-22, point 4).
+	function worldMapAttached() { return basemapOn(); }
+	// A grid project with a placement on file, whether or not the map is showing.
+	function worldMapPlacementKept() { return xyMapAttachable() && xyGeorefOk(); }
 	/**
 	 * **ATTACH, WIDENED PAST THE GRID CASE** (Tom, 2026-09-22, on a project he could not see this row
 	 * on at all: *"georeference xy -- I don't see this work merged... The map menu should have
 	 * parallel Background image and attach world map rows."* And: *"Even an EPSG project should have
 	 * the option to detach and reattach the world map... But when they attach, they don't have to do
-	 * the wizard."*). A geographic or projected project's coordinates already locate it, so Attach
-	 * there is not a placement -- it is only the tile switch the retired Show-street-map row used to
-	 * be, reached through the one door this menu now offers for it.
+	 * the wizard."*).
+	 *
+	 * **THE WIZARD RUNS ONLY WHEN THERE IS NOTHING TO PUT BACK.** A geographic or projected project's
+	 * coordinates already locate it, and a grid project that was Detached kept its placement, so for
+	 * all of those Attach just shows the map again -- in the style it was last shown in. Changing a
+	 * kept placement is Re-adjust's job once it is showing; Attach does not offer to start over,
+	 * because a second question on the one row that used to be a plain switch is the complication
+	 * Tom's "Detach and attach provide the same functionality" was taking away.
+	 *
+	 * Already attached, it does nothing: the row is greyed then, the way Detach is greyed while
+	 * detached, and this guard is for anything that calls it anyway.
 	 */
 	function worldMapAttach() {
 		var pc = EngCalcs.pageConfig || {};
-		if (xyMapAttachable()) { mapgeoStart(); return; }
-		if (!projectLocatable()) { return; }
+		if (worldMapAttached()) { return; }
+		if (xyMapAttachable() && !xyGeorefOk()) { mapgeoStart(); return; }
+		if (!basemapChoosable()) { return; }
+		saveUndoSnapshot();
 		setBasemapOn(true);
 		setNotice(pc.lpn_map_attach_done ||
 			'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
 	}
+	/**
+	 * **DETACH HIDES THE MAP AND KEEPS THE PLACEMENT, ON EVERY PROJECT KIND** (Perry's review,
+	 * 2026-09-22, point 3). On a grid project it used to DELETE the georeference with no confirm and
+	 * no undo, so the job the retired Hide-street-map row did -- hide the tiles, keep the placement --
+	 * became impossible there, which made Tom's reason for retiring that row untrue on a grid. Now it
+	 * is one undo step (the undo snapshot already carries `project.basemap`) and Attach puts the same
+	 * placement straight back. No coordinate in the drawing moves either way.
+	 */
 	function worldMapDetach() {
-		if (xyMapAttachable()) { removeMapAttach(); return; }
-		if (!projectLocatable() || !basemapOn()) { return; }
+		var pc = EngCalcs.pageConfig || {};
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
 		setBasemapOn(false);
+		refreshMapStatus();
+		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 	// **THE FOUR WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
-	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
-	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
-	// comes and goes teaches nobody what the feature can do.
+	// Built fresh on every open so `disabled` is read from the state of the moment. Attach is dead
+	// while the map is attached and every other row is dead while it is not -- greyed and not
+	// hidden, because a row that comes and goes teaches nobody what the feature can do.
 	//
 	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
 	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
@@ -14298,7 +14323,7 @@ var EngCalcs = EngCalcs || {};
 			has = worldMapAdjustable() && worldMapAttached();
 		return [
 			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
-				tip: pc.lpn_map_attach_tip, fn: worldMapAttach },
+				tip: pc.lpn_map_attach_tip, fn: worldMapAttach, disabled: worldMapAttached() },
 			// **ONE ROW, BECAUSE THE TWO OPENED THE IDENTICAL THING** (Tom, 2026-09-19: *"Map
 			// submenus a lie: Yes. I see. Let's replace rows two and three (I like their
 			// behavior; good call) with 'Re-adjust'"*). Move and Scale by picking named two
@@ -14560,15 +14585,6 @@ var EngCalcs = EngCalcs || {};
 		b = mapgeoBarEl('lpn_mapgeo_search');
 		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
 		mapgeoWireDial();
-	}
-	function removeMapAttach() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!xyGeorefOk()) { return; }
-		delete project.georef;
-		markEdited();
-		refreshBasemap();
-		saveToStorage();
-		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 
 	// ---- toolbar mode ----

@@ -42,7 +42,9 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
 	"\t\tserialize: serializeProject,\n" +
-	"\t\tremoveMapAttach: removeMapAttach, crsDisplayName: crsDisplayName,\n" +
+	"\t\tworldMapAttach: worldMapAttach, worldMapDetach: worldMapDetach, crsDisplayName: crsDisplayName,\n" +
+	"\t\tworldMapAttached: worldMapAttached, placeFindable: placeFindable, undo: undo,\n" +
+	"\t\tsetBasemapStyle: setBasemapStyle, recountNextId: recountNextId,\n" +
 	"\t\txyGeoref: xyGeoref, xyGeorefOk: xyGeorefOk, xyMapAttachable: xyMapAttachable,\n" +
 	"\t\tbasemapOn: basemapOn, basemapChoosable: basemapChoosable,\n" +
 	"\t\tmapMenuRows: mapMenuRows,\n" +
@@ -129,6 +131,10 @@ const P2 = L.addLink('pipe', A.id, B.id);
 P2.vs = [{ x: 1600, y: -500.125 }];
 const doc = L.getDoc();
 doc.labels.push({ id: 'T1', x: 900, y: -100, text: 'Elm Street' });
+// Pushed past the id allocator, so the counter is brought level with it the way any real open
+// does; otherwise the first undo below recounts it and the byte comparison sees the fixture's
+// shortcut rather than anything the feature did.
+L.recountNextId();
 
 // **WHAT IS COMPARED: the saved bytes, minus the declaration this feature is allowed to add.**
 // Reading the coordinates out node by node would be a second opinion about which numbers the file
@@ -137,6 +143,8 @@ function snapshot() {
 	const s = JSON.parse(JSON.stringify(L.serialize()));
 	delete s.project.georef;
 	delete s.project.basemap;
+	// The style remembered while the map is off (2026-09-22) is the same kind of declaration.
+	delete s.project.basemapLast;
 	return JSON.stringify(s);
 }
 
@@ -600,13 +608,68 @@ ok('CANCEL PUTS THE EARLIER GEOREFERENCING BACK EXACTLY',
 	JSON.stringify(L.xyGeoref()) === JSON.stringify(placed));
 ok('and it changed not one stored byte either', snapshot() === before);
 
-// ---- and it is reversible ----------------------------------------------------------------------
-L.removeMapAttach();
-ok('the georeferencing is gone', L.xyGeorefOk() === false);
-ok('REMOVING LEAVES THE PROJECT EXACTLY AS IT WAS', snapshot() === before,
+// ---- and it is reversible: DETACH HIDES THE MAP AND KEEPS THE PLACEMENT ------------------------
+//
+// Perry's review, 2026-09-22: Detach used to DELETE the georeference with no confirm and no undo,
+// which made the retired Hide-street-map row's job -- hide the tiles, keep the placement --
+// impossible on a grid, and Tom's reason for retiring that row ("Detach and attach provide the same
+// functionality") untrue there. Now Detach hides, Attach puts the same placement straight back with
+// no wizard, and Detach is one undo step.
+const keptBefore = JSON.stringify(L.xyGeoref());
+ok('set up: the map is attached and showing', L.worldMapAttached() === true);
+L.worldMapDetach();
+ok('Detach hides the map', L.worldMapAttached() === false && L.basemapOn() === false);
+ok('...and KEEPS the placement, byte for byte', JSON.stringify(L.xyGeoref()) === keptBefore,
+	JSON.stringify(L.xyGeoref()));
+ok('DETACHING LEAVES THE DRAWING EXACTLY AS IT WAS', snapshot() === before,
 	snapshot() === before ? '' : 'the saved project differs');
-ok('...and the map status goes back to saying it is not georeferenced',
-	L.crsDisplayName() === PC0.lpn_crs_none, L.crsDisplayName());
+ok('...the status still reads unnamed, because the project is still georeferenced',
+	L.crsDisplayName() === PC0.lpn_crs_unnamed, L.crsDisplayName());
+ok('...and Go to is greyed while the map is detached', L.placeFindable() === false);
+L.undo();
+ok('Detach is ONE undo step: Ctrl+Z shows the map again', L.worldMapAttached() === true);
+L.worldMapDetach();
+L.worldMapAttach();
+ok('Attach on a kept placement puts it back at once, with no wizard',
+	L.worldMapAttached() === true && L.mapgeoActive() === false);
+ok('...on exactly the placement that was kept', JSON.stringify(L.xyGeoref()) === keptBefore);
+ok('...and changes not one stored byte of the drawing', snapshot() === before);
+// Attach while attached does nothing -- the old toggle turned the map OFF here (Perry, point 1).
+L.worldMapAttach();
+ok('ATTACH ON A MAP ALREADY SHOWING LEAVES IT SHOWING', L.worldMapAttached() === true);
+// The last style comes back (point 2).
+{
+	const PCS = global.EngCalcs.pageConfig || {};
+	const tokenWas = PCS.lpn_mapbox_token;
+	PCS.lpn_mapbox_token = 'pk.harness';
+	L.setBasemapStyle('satellite');
+	L.worldMapDetach();
+	L.worldMapAttach();
+	ok('Detach then Attach brings back SATELLITE for somebody who was on satellite',
+		L.getProject().basemap === 'satellite', L.getProject().basemap);
+	L.setBasemapStyle('osm');
+	if (tokenWas === undefined) { delete PCS.lpn_mapbox_token; } else { PCS.lpn_mapbox_token = tokenWas; }
+}
+// An OLDER file: georeferenced, saved with the map hidden (point 4). It must read as detached with
+// the placement kept, and Attach must bring it back.
+L.getProject().basemap = 'off';
+ok('an older file saved with the map hidden reads as DETACHED', L.worldMapAttached() === false);
+{
+	const rows = L.mapMenuRows().find(function (r) { return r.label === PC0.lpn_map_attach_menu; }).submenu();
+	ok('...so its submenu offers Attach and greys the rest',
+		rows[0].disabled !== true && rows.slice(1).every(function (r) { return r.disabled === true; }),
+		rows.map(function (r) { return r.label + '=' + !!r.disabled; }).join(' | '));
+}
+L.worldMapAttach();
+ok('...and Attach brings its kept placement back', L.worldMapAttached() === true &&
+	JSON.stringify(L.xyGeoref()) === keptBefore);
+{
+	const rows = L.mapMenuRows().find(function (r) { return r.label === PC0.lpn_map_attach_menu; }).submenu();
+	ok('while attached, ATTACH IS GREYED and the other three are live -- parallel to Detach greyed while detached',
+		rows[0].disabled === true && rows.slice(1).every(function (r) { return r.disabled !== true; }),
+		rows.map(function (r) { return r.label + '=' + !!r.disabled; }).join(' | '));
+}
+L.worldMapDetach();
 
 // ---- THE MENU, AND IT IS THE BACKGROUND IMAGE SUBMENU'S SHAPE ---------------------------------
 //
@@ -732,9 +795,9 @@ ok('ATTACHING AGAIN CHANGED NOT ONE STORED BYTE', snapshot() === before);
 	ok('...while the same factor the other way puts the size back',
 		Math.abs(L.xyGeoref().metersPerUnit - mpu0) < 1e-9 * mpu0);
 }
-// DETACH is the old Remove row under Tom's word, so the reversibility claim above still holds.
-L.removeMapAttach();
-ok('Detach takes the world map away', L.xyGeorefOk() === false);
+// DETACH hides the map and keeps the placement, so the reversibility claim above still holds.
+L.worldMapDetach();
+ok('Detach takes the world map away', L.worldMapAttached() === false && L.xyGeorefOk() === true);
 ok('DETACHING CHANGED NOT ONE STORED BYTE', snapshot() === before);
 
 if (MUTATE) {
