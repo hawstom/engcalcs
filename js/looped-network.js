@@ -45084,6 +45084,14 @@ var EngCalcs = EngCalcs || {};
 	// written, so it is the one place that can know whether a message is currently on screen --
 	// noteMapUnmeasurable() and setNotice() both funnel through here, and neither needs its own
 	// copy of this rule.
+	//
+	// **THE LOCK BANNER (renderBanner(), #lpn_lock_banner) DOES NOT LIGHT THE GLYPH** (Perry's
+	// review, 2026-09-22, asked to make it do so or say why). It is logged into the same message
+	// log through logMessage() directly, but it is not this column: #lpn_lock_banner is a standing
+	// bar of its own, in normal document flow above the map, not a child of #lpn_map_overlay_tl_col.
+	// Lighting a glyph in the top-left map overlay for a message showing in a completely different
+	// part of the page would point the reader at the wrong spot -- the highlight's whole job is
+	// "the thing beside me is what just changed", and here it would not be.
 	function markMsglogActive(on) {
 		var btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }

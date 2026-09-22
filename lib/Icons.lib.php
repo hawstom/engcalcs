@@ -796,8 +796,16 @@ $ec_icons = array(
 	'mail'       => '<path d="M3 6h18v12H3z"/><path d="M3.6 6.6l8.4 5.9 8.4-5.9"/>',
 	// A PLAIN CLOCK FACE, for the message log (ROADMAP Task 704; Ida, 2026-09-21, after Tom asked
 	// *"The i info glyph doesn't seem quite right to me... How about a + expand glyph or a history
-	// glyph?"*). Circle, a short hour hand to 10 and a longer minute hand to 2 -- the watchmaker's
-	// ten-past-ten pose, which is the most widely recognised drawing of a clock there is.
+	// glyph?"*). Circle, a short hour hand straight up to 12 and a longer minute hand straight
+	// right to 3 -- a right angle between two unequal strokes, not a watchmaker's ten-past-ten pose.
+	//
+	// **CORRECTED 2026-09-22 (Perry's review).** The first drawing put both hands within about 20
+	// degrees of straight up (to roughly 10 and roughly 2), which is the classic clock-icon pose on
+	// paper but at this suite's real button size (14-16px) reads as a chevron or checkmark in a
+	// circle: two strokes that close together fuse into what looks like one bent line rather than
+	// two hands of different lengths. A right angle keeps the two strokes visually separate at that
+	// size in a way the shallow ten-past-ten pose does not; it costs some of that pose's
+	// familiarity and buys the legibility this glyph exists for.
 	//
 	// **THREE OTHER MARKS WERE AVAILABLE AND EACH IS ALREADY SPOKEN FOR ON THIS PAGE**, which is the
 	// whole reason this one is drawn new rather than borrowed:
@@ -813,7 +821,7 @@ $ec_icons = array(
 	//
 	// NO SURROUNDING ARROW: an arrow curling around the face is the standard "revert to this point
 	// in time" glyph, which is the 'restore' confusion again with extra strokes.
-	'history'    => '<circle cx="12" cy="12" r="9"/><path d="M12 12L8.8 10.1"/><path d="M12 12L16.5 9.4"/>',
+	'history'    => '<circle cx="12" cy="12" r="9"/><path d="M12 12V8"/><path d="M12 12H17"/>',
 	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
 	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
 	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a

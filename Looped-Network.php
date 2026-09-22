@@ -295,12 +295,23 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // is a real defect, not a matter of taste, and I should have caught it before you
 			      // did."*
 			      //
-			      // **THE FIXED LEFT EDGE OF THE WHOLE COLUMN, OUTSIDE THE PART THE NOTICE COVERS.**
+			      // **THE FIXED START EDGE OF THE WHOLE COLUMN, OUTSIDE THE PART THE NOTICE COVERS.**
 			      // #lpn_map_notice covers #lpn_mode_hint exactly while it shows, so a control placed
 			      // inside that stack would be underneath a message half the time it was wanted. This
 			      // overlay is therefore a ROW: the button, then everything that comes and goes. It
-			      // reads left to right as [glyph] [whatever the map is currently saying], in both
-			      // states -- mode line showing and notice showing alike.
+			      // reads [glyph] [whatever the map is currently saying] in reading order, in both
+			      // states -- mode line showing and notice showing alike -- and in RTL too, because
+			      // the row is plain `flex-direction:row` with no direction override, so the browser
+			      // itself reverses the visual order under `dir="rtl"` and the glyph still leads.
+			      // **#lpn_map_notice moved INTO #lpn_map_overlay_tl_col in this same change** (Perry's
+			      // review, 2026-09-22): it used to be a sibling of this whole row, absolutely
+			      // positioned at the MAP's own top-left corner with a physical `left:4px` -- which is
+			      // where the glyph now sits, so the notice sat exactly on top of the glyph and its
+			      // highlight for the whole time a message showed, in every language, and doubly so in
+			      // RTL where the glyph is at the physical right and the notice was still nailed to the
+			      // physical left. It is now a child of the column below, positioned with
+			      // `inset-inline-start:0` rather than `left`, so it starts at the column's own start
+			      // edge -- immediately after the glyph -- in either direction.
 			      //
 			      // **AND THE MESSAGE TEXT IS NEVER PUT ON THIS LINE.** Folding the sentence into the
 			      // mode line is the obvious next step and is wrong: the mode hint already wraps to
@@ -328,6 +339,30 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // to be kept in step. ?>
 			<div id="lpn_map_overlay_tl_col" style="position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
+			      // saving a project put a line of text above the canvas and "moves the map down past the
+			      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
+			      // the mode status temporarily"). Same move the mode hint itself made, for the same
+			      // reason: a readout that comes and goes must not be in the page's FLOW, because
+			      // everything below it moves when it arrives.
+			      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
+			      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
+			      // uncovers it. It is not measured by overlayReserve(), which is the point -- a
+			      // transient must not change the fit, or every save would re-zoom the map.
+			      //
+			      // **A CHILD OF THIS COLUMN, NOT A SIBLING OF THE WHOLE ROW** (Perry's review,
+			      // 2026-09-22, catching a defect the glyph move introduced). It used to sit outside
+			      // #lpn_map_overlay_tl entirely, positioned with a physical `left:4px` against the
+			      // MAP's own corner -- which is exactly where the glyph now lives, so the notice sat
+			      // on top of the glyph and its highlight for the whole time a message showed, making
+			      // both invisible and the highlight pointless. `inset-inline-start:0` rather than
+			      // `left:0`, and `top:0` rather than `top:4px`, because this box's own position:relative
+			      // origin -- inherited from the column, whose own top-left corner is already past the
+			      // glyph and the 4px inset -- is the coordinate system now, not the map's. The logical
+			      // property is what keeps this correct in RTL: the column's own start edge is its
+			      // right edge under `dir="rtl"`, and `inset-inline-start` follows that automatically
+			      // where a physical `left` would not. ?>
+			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
 			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
 			      // instructions popup bubble for how to continue and end the current mode."*). A
 			      // box of its own rather than more text in the mode line, because it says
@@ -387,18 +422,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
 			</div>
 		</div>
-		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
-		      // saving a project put a line of text above the canvas and "moves the map down past the
-		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
-		      // the mode status temporarily"). Same move the mode hint itself made, for the same
-		      // reason: a readout that comes and goes must not be in the page's FLOW, because
-		      // everything below it moves when it arrives.
-		      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
-		      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
-		      // uncovers it. Same top-left origin, higher z-index, opaque background. It is not
-		      // measured by overlayReserve(), which is the point -- a transient must not change the
-		      // fit, or every save would re-zoom the map. ?>
-		<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:4px;left:4px;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
 		<?php // THE PLACEMENT BAR (ROADMAP Task 145). Top-CENTRE of the map, not the top-left stack:
 		      // it is a modal-for-the-duration control rather than a readout, and it must not cover
 		      // the mode hint or the solver's diagnostic. pointer-events on -- unlike every other
