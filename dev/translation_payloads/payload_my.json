@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2049,
-        "delta_key_count": 193,
+        "expected_key_count": 2054,
+        "delta_key_count": 198,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -602,6 +602,8 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_field_text_all_zoom": "Show at all zoom levels",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.",
         "lpn_map_attach_menu": "World map…",
         "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
         "lpn_map_attach_add": "Attach",
@@ -632,6 +634,9 @@
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
+        "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
+        "lpn_settings_label_always": "Always show labels",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -797,6 +802,8 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_field_text_all_zoom": "Show at all zoom levels",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.",
         "lpn_map_attach_menu": "World map…",
         "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
         "lpn_map_attach_add": "Attach",
@@ -827,6 +834,9 @@
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
+        "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
+        "lpn_settings_label_always": "Always show labels",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -2117,6 +2127,38 @@
                 }
             }
         },
+        "lpn_field_text_all_zoom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "အရွယ်အစား အဆများကိန်း",
+                    "english": "Size multiplier"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "အညွှန်းများ",
+                    "english": "Labels"
+                }
+            }
+        },
+        "lpn_field_text_all_zoom_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "အရွယ်အစား အဆများကိန်း",
+                    "english": "Size multiplier"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "အညွှန်းများ",
+                    "english": "Labels"
+                }
+            }
+        },
         "lpn_map_attach_menu": {
             "reason": "missing",
             "current_value": null,
@@ -2594,6 +2636,54 @@
                     "key": "lpn_backdrop_scale_prompt1",
                     "value": "အတိုင်းအတာတန်း၏ အစွန်းနှစ်ဖက်ကဲ့သို့သော အမှတ်နှစ်ခုကို နောက်ခံပုံပေါ်တွင် နှိပ်ပါ။ ထို့နောက် ၎င်းတို့အကြား အမှန်တကယ် အကွာအဝေးကို ရိုက်ထည့်ပါ။",
                     "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_settings_label_max_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "အညွှန်းတစ်ခုကို ၎င်းအမည်ပေးထားသော အရာနှင့် ခွာ၍ ဆွဲသောအခါ၊ ၎င်းသို့ ပြန်သွားသော မျဉ်းသည် သင်ဆွဲသည့်နေရာနှင့် နီးစပ်ဆုံး သတ်မှတ်ထားသော ထောင့်ပေါ်သို့ ဆွဲငင်ခံရသည်။ ဆက်ဆွဲနေပါက ကပ်ခြင်း (snap) လွှတ်သွားပြီး မည်သည့် ထောင့်ကိုမဆို ရွေးနိုင်ဆဲ ဖြစ်သည်။ ပိတ်ထားလျှင် အလွတ်ဆွဲနိုင်ပြီး၊ ဤစာမျက်နှာက အစဉ်အမြဲ ပြုလုပ်ခဲ့သည့် နည်းလမ်းပင် ဖြစ်သည်။",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "သင်္ကေတ မြင်နိုင်မှု (0 မှ 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_label_max_width_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "အညွှန်းတစ်ခုကို ၎င်းအမည်ပေးထားသော အရာနှင့် ခွာ၍ ဆွဲသောအခါ၊ ၎င်းသို့ ပြန်သွားသော မျဉ်းသည် သင်ဆွဲသည့်နေရာနှင့် နီးစပ်ဆုံး သတ်မှတ်ထားသော ထောင့်ပေါ်သို့ ဆွဲငင်ခံရသည်။ ဆက်ဆွဲနေပါက ကပ်ခြင်း (snap) လွှတ်သွားပြီး မည်သည့် ထောင့်ကိုမဆို ရွေးနိုင်ဆဲ ဖြစ်သည်။ ပိတ်ထားလျှင် အလွတ်ဆွဲနိုင်ပြီး၊ ဤစာမျက်နှာက အစဉ်အမြဲ ပြုလုပ်ခဲ့သည့် နည်းလမ်းပင် ဖြစ်သည်။",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "သင်္ကေတ မြင်နိုင်မှု (0 မှ 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_label_always": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "အညွှန်းတစ်ခုကို ၎င်းအမည်ပေးထားသော အရာနှင့် ခွာ၍ ဆွဲသောအခါ၊ ၎င်းသို့ ပြန်သွားသော မျဉ်းသည် သင်ဆွဲသည့်နေရာနှင့် နီးစပ်ဆုံး သတ်မှတ်ထားသော ထောင့်ပေါ်သို့ ဆွဲငင်ခံရသည်။ ဆက်ဆွဲနေပါက ကပ်ခြင်း (snap) လွှတ်သွားပြီး မည်သည့် ထောင့်ကိုမဆို ရွေးနိုင်ဆဲ ဖြစ်သည်။ ပိတ်ထားလျှင် အလွတ်ဆွဲနိုင်ပြီး၊ ဤစာမျက်နှာက အစဉ်အမြဲ ပြုလုပ်ခဲ့သည့် နည်းလမ်းပင် ဖြစ်သည်။",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "သင်္ကေတ မြင်နိုင်မှု (0 မှ 1)",
+                    "english": "Symbol opacity (0 to 1)"
                 }
             }
         },

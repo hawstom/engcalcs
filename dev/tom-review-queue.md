@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-126.
+**An ID is permanent and never reused.** Next free: R-153.
 
 ---
 
@@ -237,11 +237,52 @@ judgement and does not belong to a script.
 
 ### The daily mail
 
-- [ ] R-121 -- | The "rank by shopping" table is hard to read. Can you add headings? I don't know what the numbers represent.
-- [ ] R-122 -- | I assume that "PAGE LOADS" includes robots. Maybe clarify that "(includes robots)" if so.
-- [ ] R-123 -- | Is "PEOPLE" non-robot (long-dwell) visits? Maybe clarify that.
+- [x] R-121 -- | The "rank by shopping" table is hard to read. Can you add headings? I don't know what the numbers represent. -- ea551c6c
+- [x] R-122 -- | I assume that "PAGE LOADS" includes robots. Maybe clarify that "(includes robots)" if so. -- ea551c6c. **His guess was wrong**: this table's rows already require 10+ seconds on the page before counting at all, so it already excludes nearly all robots by behaviour; the mail now says so instead of "(includes robots)"
+- [x] R-123 -- | Is "PEOPLE" non-robot (long-dwell) visits? Maybe clarify that. -- ea551c6c. **Also not quite right**: PEOPLE is the consented bucket (accepted the cookie banner, counted once per person per page), unrelated to dwell time; the mail now says that plainly
 
 ### Production
 
 - [x] R-124 -- | There is a git repository on `~/`. Its git status is dirty. Clean up that one. -- **DONE AND PUSHED**, host commit `9565205`. It is a DIFFERENT repository -- `constructionnotesmanager.com` on Bitbucket, with the home directory as its working tree -- and this session had made it dirty by installing the cron scripts. Committed: the three updated scripts, the two new ones (`check.mustblock`, `daily-report-cron.sh`), and a cPanel reshuffle of `public_html/.htaccess`. Ignored rather than tracked: `tgh*`, which holds the engcalcs mirror clone and the report checkout (separate repositories; tracking one file of them makes two repositories disagree about who owns it) and `daily-report.last`, a runtime marker like `check.last`. The two `.before-install` backups were deleted
 - [x] R-125 -- | dev: I will checkout master and pull that one. Thanks. -- his call, nothing owed
+
+## Round of 2026-09-22 -- the same pass, resent after Claude froze
+
+### Map menu
+
+- [ ] R-126 feat/map-menu | Keep all rows visible always. But disable what's not applicable. (1) Maybe 'World map...' should be enabled for all projects. Even an EPSG project should have the option to detach and reattach the world map, I think. But when they attach, they don't have to do the wizard. And for EPSG projects, Re-adjust and Scale should be disabled unless there's user demand to expose them. (2) I think we can retire the Hide/Show street map and satellite images rows. Detach and attach provide the same functionality. (3) Hide map readouts was a print prep command. But it isn't very useful any more. Let's remove it. -- **SUPERSEDES his R-120 question** about whether a context-sensitive menu is good: his answer is always visible, disabled when not applicable
+- [ ] R-127 feat/map-menu | That got tidy. Only three rows left. Zoom to fit, Background image, and World map.
+- [ ] R-128 feat/map-menu | georeference xy: I don't see this work merged to master. The map menu should have parallel Background image and attach world map rows. But I don't see that. -- **IT DID MERGE** (`feat/xy-world-map`, on his all-clear of 2026-09-21); the World map row was offered only on a plain grid project, so it was not on the map he was looking at. R-126 makes it always visible, which answers this by construction
+
+### Open example
+
+- [ ] R-129 fix/example-open | When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project.
+- [ ] R-130 fix/example-open | The delay in opening the Net3 lat/lon example when Net3 was already open was over 25 seconds. This is a failure for a new shopper. This was on hawsedc.local on the current master branch. That said, I may have been experiencing high CPU load from CC WSL.
+
+### Closed on his word
+
+- [x] R-131 -- | ?debug=tiles: I think we are good now. -- **Task 703 CLOSED**
+- [x] R-132 -- | 705: Title "Limit zoom symbol mapwise size growth" -- retitled in `6ae7f2d4`
+- [x] R-133 feat/customer-find-labels | I think this is done. Merge and delete? -- **MERGED** `7afe1d20` on his all-clear, branch and worktree deleted 2026-09-22
+- [ ] R-134 feat/zoom-symbol-size | New zoom rules: If you have no questions or objections, you can proceed to implement this in a branch for me to test.
+
+## Round of 2026-09-22b -- his pass over the six branches
+
+- [ ] R-135 feat/label-gang-search | I am incredulous. You made huge progress. Long strings now barely perturb the endless stacked gang of leaders. Before moving on, I want to pick at this.
+- [ ] R-136 feat/label-gang-search | While the results are very good, I still want to push on why additional string length makes any difference at all. The fact that it does leads me to suspect or at least ask for a good insight into our model since, again, there is free space all the way to Japan and beyond. I notice that with 1 character added, there is no significant additional vertical spacing in the gang. But when I add a second character, a noticeable amount of additional gaps appear in the vertical stack. As I add more characters, results oscillate, but the general trend is that the gang's leader trend longer and longer, meaning that the top label of this descending gang is eventually gratuitously 20 text heights away from its node. While I am tempted to rationalize that this is an artifact of keeping the leaders near parallel, that's wrong because with no characters or 1 character, the top label is only gratuitously about 8 text heights below (south of) its node. That said, to say this is partly to quibble since our placements are quite good now, and we really should be focusing on efficiency and performance.
+- [ ] R-137 feat/label-gang-search | Moving to a different test case than that notorious southwest area, let's look at the northwest area with three properties turned on and we are zoomed in closer. [his screenshot: labels for nodes 120 and 25x at A, well away from their nodes; empty ground at B, nearer them] A human would have slid the two labels at A toward B, shortening the leaders without any bad effects. Could our algorithm be smart enough not to be gratuitously distant like this?
+- [ ] R-138 feat/tables-spreadsheet | Most column widths are nice (maybe I set them), but some of the initial column widths are unreasonable. We talked about limiting words to breaking into three pieces (just an idea), but I see words broken into five pieces of one or two characters each.
+- [ ] R-139 feat/tables-spreadsheet | Switching tables can delay over 8 seconds. -- same defect as R-111, measured worse
+- [ ] R-140 feat/tables-spreadsheet | There is a message about "rows that already exist". When I scroll past the last visible row, that message disappears, and the headings jump upward. This is startling. The message uses precious head room. Maybe we should remove it since we are soon working on Declan's request to allow creation by pasting.
+- [ ] R-141 feat/tables-spreadsheet | With this branch released, the tip for these tables tabs can now say "assets of this kind as a spreadsheet-like table. Result...."
+- [ ] R-142 feat/tables-spreadsheet | I think that "Print table" has not been revisited since we added column resizing. And I think that it's important to use the column widths adjusted by the user. Can we implement that for me to test? By the way, I appreciate that the "Print table" feature was added without my request and that it generally has worked well from the first time I saw it. Good work.
+- [ ] R-143 feat/tables-spreadsheet | Right-click "Show this on the map" was requested to change to "Zoom & select". Please do that. -- repeats R-115
+- [ ] R-144 feat/notice-log | I like the down arrow glyph. -- the clock drawing reads to him as a down arrow / Expand glyph, and he likes it: KEEP IT, do not redraw the hands
+- [ ] R-145 feat/notice-log | The messenger needs to print message 1 over the Mode status so that all is at the top of the map and so that the Expand glyph is in line with messages. The user doesn't intuitively see a difference between the Mode status and other messages, so we can use this naivety to improve the UX by aligning everything at the top.
+- [ ] R-146 feat/notice-log | There is a brief flash of a word behind the glyph. I can't read it, but it's similar to POWER. That needs to stop happening.
+- [ ] R-147 feat/notice-log | On load I see two messages, (a) Working out the EPS and (b) EPANET solver. But when I click the expando button, I get an alert "No messages yet". **All** messages now need to go through this messenger system.
+- [ ] R-148 feat/notice-log | The alert paradigm is not a good UX for showing past messages. User expects them to descend below the glyph, below the Mode status in similar appearance that they originally had. This should not be hard to do, fill the map below the Mode status line with old messages with oldest at the bottom, I assume?
+- [ ] R-149 feat/zoom-symbol-size | Peripheral issue: Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?
+- [ ] R-150 feat/zoom-symbol-size | I think this feature works for now and can be closed, merged, and the branch deleted. Good work. -- HIS ALL-CLEAR for Task 705
+- [ ] R-151 feat/map-menu | The last two menu rows showing for EPSG projects, Goto and Search, were not requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map is not attached (no georeference).
+- [ ] R-152 fix/example-open | I think this is good. Close, merge, and delete the branch. -- HIS ALL-CLEAR

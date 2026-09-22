@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 22 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
+**95 open tasks.** Next (100): 21 · Soon (75): 17 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
 
-## 100 — Next (22)
+## 100 — Next (21)
 
 - Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -30,11 +30,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 693 — Separate Length and Map coordinates units
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
-- Task 703 — The satellite tiles: still blank patches after everything measured so far.
 - ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
 - Task 705 — Limit zoom symbol mapwise size growth.
 
-## 75 — Soon (16)
+## 75 — Soon (17)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -52,6 +51,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
+- Task 708 — Every property in every venue: an audit, then a check.
 
 ## 50 — Someday (27)
 

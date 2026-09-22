@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**126 still to read on master**, of 198 untranslated keys, of 2056 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**127 still to read on master**, of 199 untranslated keys, of 2057 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (198, 126 to read @@ NEEDS RULING)
+## lpn_  (199, 127 to read @@ NEEDS RULING)
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -129,6 +129,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_meter_total_tip`**
   > The demand per service times the number of services. This is the number added to the junction named below.
   _Ruled OK 2026-09-17._
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
+  @@ NEEDS RULING
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   @@ NEEDS RULING
@@ -360,14 +366,11 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_label_always`**
   > Always show labels
   @@ NEEDS RULING
-- **`lpn_settings_label_auto`**
-  > Automatic: {width}
-  @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
-  > Widest view that shows labels (map units)
+  > Show labels when zoomed to this map width or less
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
   @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
@@ -626,7 +629,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**11 still to read**, of 11 new keys across 7 unmerged branch(es).
+**10 still to read**, of 10 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -637,13 +640,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/tom-0922 (`d782f058`) — adds no English strings
+### feat/label-gang-search (`f6d6a820`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/label-gang-search (`2b528452`) — adds no English strings
+- **`lpn_settings_label_auto`**
+  > Automatic: {width}
+  @@ NEEDS RULING
 
-### feat/map-menu (`a159c4dd`) — adds no English strings
+### feat/map-menu (`574a6b2b`) — adds no English strings
 
-### feat/notice-log (`cd98ae4e`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/notice-log (`dfd8d244`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_lock_open_cancelled`**
   > That file was not opened, and nothing here changed. Somebody else still has it open.
@@ -667,7 +672,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`a04de77f`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`9381acaa`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_pane_goto_tip`**
   > Zoom & select
@@ -676,13 +681,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not used
   @@ NEEDS RULING
 
-### feat/zoom-symbol-size (`5c7bbcaf`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_field_text_all_zoom`**
-  > Show at all zoom levels
-  @@ NEEDS RULING
-- **`lpn_field_text_all_zoom_tip`**
-  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
-  @@ NEEDS RULING
-
-### fix/example-open (`e3ff6a6e`) — adds no English strings
+### fix/example-open (`3b1f4e9f`) — adds no English strings

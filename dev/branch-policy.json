@@ -53,6 +53,8 @@
         "feat/lock-initials-later",
         "feat/engine-fetch-wait",
         "feat/notice-log",
+        "feat/zoom-symbol-size",
+        "feat/map-menu",
         "tables-interface"
     ],
     "feature_freeze": {

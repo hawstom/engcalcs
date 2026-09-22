@@ -2396,6 +2396,11 @@ $ec_lang['lpn_field_coord_tip']='Type a coordinate location to place this node e
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
+// **SHOW AT ALL ZOOM LEVELS** (Task 705). A Text object is authored content, so it ships exempt
+// from the labeling threshold and this switch is how a note is made to fade out with the generated
+// labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
+$ec_lang['lpn_field_text_all_zoom']='Show at all zoom levels';
+$ec_lang['lpn_field_text_all_zoom_tip']='Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -2879,16 +2884,13 @@ $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 $ec_lang['lpn_settings_leader_snap']='Snap leader lines to set angles';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label away from its asset.';
-// **THE LABELING THRESHOLD** (Task 669). Restored 2026-09-18 after Tom asked for it back three
-// times. Three strings: the row's name, its tip, and the capture button beside the box. The fourth,
-// the placeholder, is the only place on screen that says what a blank box means.
-$ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.';
+// **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
+// Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
+// row's key, because it is the same button doing the same thing. The placeholder is the only place
+// on screen that says what a blank box means. The length unit is shown beside the box at run time.
+$ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map width or less';
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.';
 $ec_lang['lpn_settings_label_always']='Always show labels';
-// The automatic threshold, printed in the empty box so the number is not a secret. It is the view
-// at which the lettering grows taller than twice the median pipe length, which is an upper limit
-// against a drawing that is nothing but text rather than a working setting.
-$ec_lang['lpn_settings_label_auto']='Automatic: {width}';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
