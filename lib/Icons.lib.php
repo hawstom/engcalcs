@@ -794,6 +794,26 @@ $ec_icons = array(
 	// where position disambiguates them, and the label is right there.
 	'info'       => '<circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4"/><path d="M12 7.6v.4"/>',
 	'mail'       => '<path d="M3 6h18v12H3z"/><path d="M3.6 6.6l8.4 5.9 8.4-5.9"/>',
+	// A PLAIN CLOCK FACE, for the message log (ROADMAP Task 704; Ida, 2026-09-21, after Tom asked
+	// *"The i info glyph doesn't seem quite right to me... How about a + expand glyph or a history
+	// glyph?"*). Circle, a short hour hand to 10 and a longer minute hand to 2 -- the watchmaker's
+	// ten-past-ten pose, which is the most widely recognised drawing of a clock there is.
+	//
+	// **THREE OTHER MARKS WERE AVAILABLE AND EACH IS ALREADY SPOKEN FOR ON THIS PAGE**, which is the
+	// whole reason this one is drawn new rather than borrowed:
+	//   'info'    names Welcome, Privacy notice, Terms of use, About and the Reports menu -- every
+	//             one a standing reference fact about the software. A personal, growing, timestamped
+	//             feed of what just happened is not that, and one mark cannot hold both jobs.
+	//   'restore' / 'revert' (the circular arrow) already means "go back to an earlier saved state"
+	//             here. On a log it would read as an offer to UNDO, which is the opposite of a
+	//             record of states that have already passed.
+	//   a bell    imports an unread-and-urgent category. This page has exactly two severities and a
+	//             third arriving by the back door is how a colour stops meaning anything.
+	//   '+'       means "create" everywhere else in this suite and is close to the new-project mark.
+	//
+	// NO SURROUNDING ARROW: an arrow curling around the face is the standard "revert to this point
+	// in time" glyph, which is the 'restore' confusion again with extra strokes.
+	'history'    => '<circle cx="12" cy="12" r="9"/><path d="M12 12L8.8 10.1"/><path d="M12 12L16.5 9.4"/>',
 	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
 	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
 	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a
