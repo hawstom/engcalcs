@@ -35153,11 +35153,6 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// **THE TRANSITION BACK COSTS A RELAYOUT, and that is why a suppressor calls this rather than
-	// applyLabelVisibility() directly.** While annotation is hidden the zoom path deliberately skips
-	// refreshFontSizes()/relayoutLabels() (see onZoomChanged), so labels that come back after a zoom
-	// are still positioned for the scale they were hidden at. Same revival the zoom path runs, in
-	// one place, so a future suppressor cannot forget it.
 	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
 	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
 	// labels re-decided. Never on the zoom path: a zoom changes neither input.
@@ -35168,6 +35163,11 @@ var EngCalcs = EngCalcs || {};
 		refreshLabelSuppression();
 		if (!dataLabelsHidden) { relayoutLabels(); }
 	}
+	// **THE TRANSITION BACK COSTS A RELAYOUT, and that is why a suppressor calls this rather than
+	// applyLabelVisibility() directly.** While annotation is hidden the zoom path deliberately skips
+	// refreshFontSizes()/relayoutLabels() (see onZoomChanged), so labels that come back after a zoom
+	// are still positioned for the scale they were hidden at. Same revival the zoom path runs, in
+	// one place, so a future suppressor cannot forget it.
 	function refreshLabelSuppression() {
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
