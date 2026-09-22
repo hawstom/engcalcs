@@ -91,6 +91,9 @@ const L = loadLoopedNetwork(
 	// paneCols(), never `spec.cols` -- a column may stand down; see pane-harness.js.
 	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
 	"\t\tpaneCols: paneCols,\n" +
+	"\t\theadCells: function (id) { return paneTableById(id).headCells; },\n" +
+	"\t\tsetUserWidth: function (id, key, em) { paneSetColWidth(paneTableById(id), key, em); },\n" +
+	"\t\tforgetWidths: function (id) { var s = paneTableById(id); paneCols(s).forEach(function (c) { paneResetColWidth(s, c.key); }); },\n" +
 	"\t\tsetProjectName: function (n) { project.name = n; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -403,6 +406,42 @@ console.log('\n--- what the print stylesheet promises ---');
 	report(/\.lpn-print-table thead th \{ position: static/.test(css),
 		'...and is not the screen’s sticky row, which has no meaning on paper');
 	report(/\.lpn-pane-print \{/.test(css), 'the button has a style of its own');
+}
+
+// **THE SHEET USES THE WIDTHS THE READER DRAGGED** (Tom, 2026-09-21: *"I think that 'Print table'
+// has not been revisited since we added column resizing. And I think that it's important to use the
+// column widths adjusted by the user."*).
+console.log('\n--- the sheet uses the column widths the reader dragged ---');
+{
+	const cg = (sheetEl) => {
+		const t = (sheetEl.children || []).filter((c) => c._tag === 'table')[0];
+		return { t, cols: t ? ((t.children || []).filter((c) => c._tag === 'colgroup')[0] || { children: [] }).children : [] };
+	};
+	L.forgetWidths('junctions');
+	L.renderTable('junctions');
+	let got = cg(L.buildPrintable('junctions'));
+	report(got.cols.length === 0 && String(got.t.className).indexOf('lpn-print-fixed') < 0,
+		'a table nobody has resized prints as before, at its content’s width', got.cols.length + ' cols');
+	const keys = L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).map((c) => c.key);
+	L.setUserWidth('junctions', keys[1], 20);
+	L.renderTable('junctions');
+	// The stub draws every box 1000 px wide; a heading is drawn at 5 em here (80 px at the stub's
+	// 16 px em), which is the one relationship an undragged column's printed width reads.
+	const heads = L.headCells('junctions');
+	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 80, bottom: 20, width: 80, height: 20 }); });
+	got = cg(L.buildPrintable('junctions'));
+	const pct = got.cols.map((c) => parseFloat(c.style.width));
+	const total = pct.reduce((a, b) => a + b, 0);
+	report(got.cols.length === keys.length, 'once a column is dragged, every printed column is given a width',
+		got.cols.length + ' / ' + keys.length);
+	report(Math.abs(total - 100) < 0.2, '...as shares of the table, which add up to the whole', total.toFixed(2) + '%');
+	report(Math.abs(pct[1] / pct[0] - 4) < 0.02, '...in the screen’s proportions: the column dragged to 20 em is four times a 5 em one',
+		pct[1] + '% / ' + pct[0] + '%');
+	report(/em$/.test(got.t.style.width) && String(got.t.className).indexOf('lpn-print-fixed') >= 0,
+		'the table is the sum of the widths in em, fixed layout, so the widths are obeyed', got.t.style.width);
+	report(/\.lpn-print-table\.lpn-print-fixed \{ table-layout: fixed; max-width: 100%; \}/.test(css),
+		'...and never wider than the sheet: a wide one is scaled down, every column by the same factor');
+	L.forgetWidths('junctions');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

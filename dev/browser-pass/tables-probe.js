@@ -40,6 +40,8 @@ const SOLVE = process.argv.includes('--solve');
 // --trace records a DevTools timeline around each switch and sums the main thread's time by kind
 // (script, style, layout, paint), which is the split a CPU profile's "(program)" hides.
 const TRACE = process.argv.includes('--trace');
+// --width=N sets the window width, because a narrower window wraps the pane's tab strip.
+const WIDTH = Number((process.argv.find(a => a.startsWith('--width=')) || '=0').split('=')[1]) || 0;
 // --throttle=N slows the CPU N times, to see which costs grow with a slower machine.
 const THROTTLE = Number((process.argv.find(a => a.startsWith('--throttle=')) || '=1').split('=')[1]) || 1;
 const ORDER = ['junctions', 'pipes', 'junctions', 'pumps', 'junctions', 'pipes', 'junctions'];
@@ -80,7 +82,7 @@ const SWITCH = async ([id, QUIET]) => {
 	const server = await env.startServer();
 	const browser = await env.launchBrowser(playwright);
 	try {
-		const s = await Session.open(browser, 'A');
+		const s = await Session.open(browser, 'A', WIDTH ? { viewport: { width: WIDTH, height: 900 } } : undefined);
 		await s.goto('Looped-Network.php');
 		await s.openExampleCard(EXAMPLE);
 		await s.settle(3000);

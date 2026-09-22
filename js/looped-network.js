@@ -20291,7 +20291,39 @@ var EngCalcs = EngCalcs || {};
 	// asks for -- relaxed for the gesture, not for everybody's first look at the table.
 	function paneColUserWidth(specId, c) {
 		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
-		return (typeof w === 'number' && isFinite(w) && w > 0) ? w : 0;
+		return (typeof w === 'number' && isFinite(w) && w > 0) ? Math.max(w, paneColFloorEm(c)) : 0;
+	}
+	// **NO HEADING WORD IS BROKEN INTO MORE THAN THREE PIECES** (Tom, 2026-09-21: *"some of the
+	// initial column widths are unreasonable. We talked about limiting words to breaking into three
+	// pieces (just an idea), but I see words broken into five pieces of one or two characters
+	// each."*). This SUPERSEDES the one-character floor of 2026-09-19. A dragged column breaks its
+	// heading at the character, so a width stored narrow -- by a drag, or by the defects that used
+	// to store one without a drag -- came back on every visit as a stack of one-letter lines. The
+	// floor is a third of the heading's longest word plus the heading's own padding; it is applied
+	// where a stored width is READ, so a width stored before this rule existed obeys it too, and
+	// nothing needs migrating. Measured with the heading's own font where a canvas exists; a
+	// generous per-character estimate otherwise (a floor that is slightly wide is harmless).
+	var paneWordEmCache = {};
+	function paneLongestWordEm(text) {
+		var words = String(text || '').replace(/[\u25b2\u25bc]/g, '').split(/\s+/), best = 0, key, ctx, host, px, cs;
+		key = words.sort(function (a, b) { return b.length - a.length; }).slice(0, 3).join(' ');
+		if (Object.prototype.hasOwnProperty.call(paneWordEmCache, key)) { return paneWordEmCache[key]; }
+		try {
+			ctx = document.createElement('canvas').getContext('2d');
+			host = document.getElementById('lpn_pane_body') || document.body;
+			cs = window.getComputedStyle(host);
+			px = parseFloat(cs.fontSize) * 0.9;
+			if (ctx && px > 0) {
+				ctx.font = 'bold ' + px + 'px ' + cs.fontFamily;
+				words.slice(0, 3).forEach(function (w) { best = Math.max(best, ctx.measureText(w).width / px); });
+			}
+		} catch (e) { best = 0; }
+		if (!(best > 0)) { best = (words[0] || '').length * 0.62; }
+		paneWordEmCache[key] = best;
+		return best;
+	}
+	function paneColFloorEm(c) {
+		return Math.max(1, Math.ceil((paneLongestWordEm(paneHeadingText(c)) / 3 + 0.55) * 100) / 100);
 	}
 	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
 	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
@@ -20300,7 +20332,7 @@ var EngCalcs = EngCalcs || {};
 	function paneSetColWidth(spec, key, em) {
 		var pref = paneColPrefFor(spec.id);
 		if (!pref.w) { pref.w = {}; }
-		pref.w[key] = Math.max(1, Math.round(em * 100) / 100);
+		pref.w[key] = Math.max(paneColFloorEm(paneColByKey(spec, key) || { key: key }), Math.round(em * 100) / 100);
 		savePaneColPrefs();
 		return pref.w[key];
 	}
@@ -20596,7 +20628,7 @@ var EngCalcs = EngCalcs || {};
 		function move(e2) {
 			var dx = dxOf(e2);
 			if (Math.abs(dx) < PANE_COL_DRAG_SLOP) { return; }
-			paneDrawColWidth(spec, key, Math.max(1, startEm + dx / unit));
+			paneDrawColWidth(spec, key, Math.max(paneColFloorEm(cols[i]), startEm + dx / unit));
 		}
 		function up(e2) {
 			var dx = dxOf(e2);
@@ -20749,19 +20781,15 @@ var EngCalcs = EngCalcs || {};
 		// rows with no visible cause is the one way this feature can mislead somebody.
 		filterNote = paneFilterBanner(spec, rows, true);
 		if (filterNote) { host.appendChild(filterNote); }
-		// **SAID ONCE FOR THE TABLE, AS A NOTE ON THE PANEL RATHER THAN A TIP ON THE TAB** (Tom,
-		// 2026-09-08). The Curves library teaches the same workflow the same way (see its
-		// lpn_library_curve_values_tip note): a hover tip on the tab strip is the easiest thing on
-		// this page to miss, and this sentence is the one that tells somebody with a spreadsheet
-		// open what this table is for. It says "rows that already exist" because panePasteAt()
-		// cannot grow the table -- when row creation by paste ships, this is the string to reword.
-		// Shown when the table is empty too, where the limit is exactly what a reader needs to know.
-		note = document.createElement('p');
-		note.className = 'lpn-lib-note';
-		note.textContent = pc.lpn_pane_paste_note || 'This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
-		host.appendChild(note);
+		// **NO STANDING NOTE ABOVE THE TABLE** (Tom, 2026-09-21: *"There is a message about 'rows that
+		// already exist'. When I scroll past the last visible row, that message disappears, and the
+		// headings jump upward. This is startling. The message uses precious head room. Maybe we
+		// should remove it since we are soon working on Declan's request to allow creation by
+		// pasting."*). The paste note went, and its language key with it: a paragraph that
+		// scrolls away above a sticky heading moves that heading the moment it has gone.
 		if (!rows.length) {
 			note = document.createElement('p');
+			note.className = 'lpn-lib-note';
 			// One message for all six: "none of these yet" is true of every tab, and the tab the
 			// reader is standing on already says which these are. **UNDER A FILTER IT WOULD BE
 			// FALSE**, and dangerously so -- the network may be full of pipes and none of them match
@@ -22232,6 +22260,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		table = document.createElement('table');
 		table.className = 'lpn-pane-table lpn-print-table';
+		panePrintWidths(spec, table);
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
 		paneCols(spec).forEach(function (c, i) {
@@ -22256,6 +22285,41 @@ var EngCalcs = EngCalcs || {};
 		table.appendChild(tbody);
 		wrap.appendChild(table);
 		return wrap;
+	}
+	/**
+	 * **THE SHEET USES THE COLUMN WIDTHS THE READER DRAGGED** (Tom, 2026-09-21: *"I think that 'Print
+	 * table' has not been revisited since we added column resizing. And I think that it's important
+	 * to use the column widths adjusted by the user."*). He was right: the printed copy is built from
+	 * the spec, and it knew nothing about the widths the screen had been given.
+	 *
+	 * A table nobody has resized prints exactly as before, at its content's width. Once ANY column
+	 * has been dragged, every column is given the width it has on screen -- the dragged ones their
+	 * stored em, the rest the width they are drawn at -- in `em`, so the proportions to the text
+	 * travel to the paper's own font size. The widths are written as PERCENTAGES of a table whose
+	 * width is their sum with `max-width: 100%`, under `table-layout: fixed`: a table narrower than
+	 * the sheet prints at its screen proportions and no wider, and one wider than the sheet is scaled
+	 * down to fit, every column by the same factor, rather than running off the right-hand edge.
+	 * Returns the em widths it applied, or null when it left the table alone.
+	 */
+	function panePrintWidths(spec, table) {
+		var cols = paneCols(spec), unit, ems, sum = 0, cg;
+		if (!cols.some(function (c) { return paneColUserWidth(spec.id, c) > 0; })) { return null; }
+		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
+		ems = cols.map(function (c) {
+			return paneColUserWidth(spec.id, c) || paneColDrawnEm(spec, c, unit);
+		});
+		ems.forEach(function (e) { sum += e; });
+		if (!(sum > 0)) { return null; }
+		cg = document.createElement('colgroup');
+		ems.forEach(function (e) {
+			var col = document.createElement('col');
+			col.style.width = (Math.round((e / sum) * 10000) / 100) + '%';
+			cg.appendChild(col);
+		});
+		table.appendChild(cg);
+		table.className += ' lpn-print-fixed';
+		table.style.width = (Math.round(sum * 100) / 100) + 'em';
+		return ems;
 	}
 	// Taken down on afterprint where the browser has one, so nothing is removed while the print
 	// engine is still reading the page -- and again at the head of the next print, so a browser

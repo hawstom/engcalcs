@@ -1680,7 +1680,6 @@ $ec_lang['lpn_tool_area_tip']='Fai clic sulla mappa come indicato per selezionar
 $ec_lang['lpn_area_selected']='{n} selezionati.';
 $ec_lang['lpn_area_none']='Nulla trovato in quell\'area.';
 $ec_lang['lpn_georef_tab_locked']='Termina il posizionamento con il pulsante "Mantieni questo posizionamento", oppure premi Annulla, prima di passare a un altro progetto. Il posizionamento appartiene a questo progetto e non può seguirti in un altro.';
-$ec_lang['lpn_pane_paste_note']='Questa tabella serve per inserire valori incollandoli da un foglio di calcolo in righe già esistenti. Se non soddisfa le tue esigenze, usa Guida, Correggi qualcosa per dircelo.';
 $ec_lang['lpn_pane_filter_note']='Filtrato per {q}. Mostrati {n} di {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostra tutto';
 $ec_lang['lpn_pane_filter_none']='Nulla in questa tabella corrisponde al filtro.';

@@ -1683,7 +1683,6 @@ $ec_lang['lpn_tool_area_tip']='Klik pada peta sesuai petunjuk untuk memilih semu
 $ec_lang['lpn_area_selected']='{n} dipilih.';
 $ec_lang['lpn_area_none']='Tidak ada yang ditemukan di area tersebut.';
 $ec_lang['lpn_georef_tab_locked']='Selesaikan penempatan dengan tombol "Simpan penempatan ini", atau tekan Batal, sebelum berpindah proyek. Penempatan ini adalah milik proyek ini dan tidak dapat mengikuti Anda ke proyek lain.';
-$ec_lang['lpn_pane_paste_note']='Tabel ini dimaksudkan untuk memasukkan nilai dengan menempelkan dari spreadsheet ke dalam baris yang sudah ada. Jika ini tidak sesuai dengan kebutuhan Anda, gunakan Bantuan, Perbaiki sesuatu untuk memberi tahu kami.';
 $ec_lang['lpn_pane_filter_note']='Difilter berdasarkan {q}. Menampilkan {n} dari {all}.';
 $ec_lang['lpn_pane_filter_clear']='Tampilkan semua';
 $ec_lang['lpn_pane_filter_none']='Tidak ada yang cocok dengan filter di tabel ini.';

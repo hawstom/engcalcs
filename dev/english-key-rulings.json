@@ -2044,11 +2044,6 @@
             "ruled": "2026-09-07",
             "answer": "OK."
         },
-        "lpn_pane_paste_note": {
-            "on": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.",
-            "ruled": "2026-09-09",
-            "answer": "OK"
-        },
         "lpn_pane_pasted": {
             "on": "Pasted {n} cells. {skipped} were not changed.",
             "ruled": "2026-09-09",

@@ -1792,7 +1792,6 @@ $ec_lang['lpn_area_selected']='{n} seleccionados.';
 $ec_lang['lpn_area_none']='No se encontró nada en esa área.';
 $ec_lang['lpn_georef_tab_locked']='Termine la colocación con el botón "Conservar esta colocación", o presione Cancelar, antes de cambiar de proyecto. La colocación pertenece a este proyecto y no puede seguirlo a otro.';
 $ec_lang['lpn_georef_save_locked']='Termine la colocación con el botón "Conservar esta colocación", o presione Cancelar, antes de guardar. El proyecto todavía se está colocando, así que lo que se ve en la pantalla aún no es lo que se escribiría en el archivo.';
-$ec_lang['lpn_pane_paste_note']='Esta tabla está pensada para ingresar valores pegándolos desde una hoja de cálculo en filas que ya existen. Si esto no cubre sus necesidades, use Ayuda, Arreglar algo para avisarnos.';
 $ec_lang['lpn_pane_filter_note']='Filtrado por {q}. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostrar todo';
 $ec_lang['lpn_pane_filter_none']='Nada en esta tabla coincide con el filtro.';

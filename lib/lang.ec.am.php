@@ -1688,7 +1688,6 @@ $ec_lang['lpn_tool_area_tip']='እንደተነገረው በካርታው ላይ �
 $ec_lang['lpn_area_selected']='{n} ተመርጠዋል።';
 $ec_lang['lpn_area_none']='በዚያ ቦታ ውስጥ ምንም አልተገኘም።';
 $ec_lang['lpn_georef_tab_locked']='ወደ ሌላ ፕሮጀክት ከመቀየርዎ በፊት፣ "ይህን አቀማመጥ ጠብቅ" የሚለውን ቁልፍ በመጫን አቀማመጡን ይጨርሱ፣ ወይም Cancel ይጫኑ። አቀማመጡ የዚህ ፕሮጀክት ነው፣ ወደ ሌላ ፕሮጀክትም ሊከተልዎ አይችልም።';
-$ec_lang['lpn_pane_paste_note']='ይህ ሠንጠረዥ አስቀድመው ካሉ ረድፎች ውስጥ ከሠንጠረዥ ገበታ በመለጠፍ ዋጋዎችን ለማስገባት የተዘጋጀ ነው። ፍላጎትዎን የማያሟላ ከሆነ፣ Help, Fix something ይጠቀሙና ይንገሩን።';
 $ec_lang['lpn_pane_filter_note']='በ{q} ተጣርቷል። {n} ከ{all} ውስጥ እያሳየ ነው።';
 $ec_lang['lpn_pane_filter_clear']='ሁሉንም አሳይ';
 $ec_lang['lpn_pane_filter_none']='በዚህ ሠንጠረዥ ውስጥ ከማጣሪያው ጋር የሚስማማ ምንም ነገር የለም።';

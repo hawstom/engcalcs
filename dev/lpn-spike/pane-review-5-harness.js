@@ -66,6 +66,11 @@ console.log('\n--- R-109: a document arriving redraws the table on show ---');
 		rowsOf('junctions'));
 	L.arrived();
 	report(rowsOf('junctions') === 3, 'the arrival draws all three junctions, with no solve and no tab switch', rowsOf('junctions'));
+	// And nothing stands above it to scroll away and move the heading (Tom, 2026-09-21, on the
+	// retired paste note: *"When I scroll past the last visible row, that message disappears, and
+	// the headings jump upward."*).
+	report(byId.lpn_pane_junctions.children[0] === tableOf('junctions'),
+		'the table is the first thing in its panel, with no note above it', byId.lpn_pane_junctions.children[0]._tag);
 	const src = fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8');
 	report((src.match(/paneDocumentArrived\(\);/g) || []).length >= 2,
 		'...and it is called on BOTH arrival doors, the boot path and refreshAllFromDocument()',

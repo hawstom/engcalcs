@@ -1687,7 +1687,6 @@ $ec_lang['lpn_tool_area_tip']='Clique no mapa conforme indicado para selecionar 
 $ec_lang['lpn_area_selected']='{n} selecionados.';
 $ec_lang['lpn_area_none']='Nada encontrado nessa área.';
 $ec_lang['lpn_georef_tab_locked']='Conclua o posicionamento com o botão "Manter este posicionamento", ou pressione Cancelar, antes de trocar de projeto. O posicionamento pertence a este projeto e não pode acompanhá-lo até outro.';
-$ec_lang['lpn_pane_paste_note']='Esta tabela é destinada a inserir valores colando de uma planilha em linhas que já existem. Se ela não atender às suas necessidades, use Ajuda, Corrigir algo para nos contar.';
 $ec_lang['lpn_pane_filter_note']='Filtrado por {q}. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostrar tudo';
 $ec_lang['lpn_pane_filter_none']='Nada nesta tabela corresponde ao filtro.';

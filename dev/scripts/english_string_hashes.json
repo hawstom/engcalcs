@@ -2852,7 +2852,6 @@
         "lpn_pane_filter_none": "778c378ebb7ab3fcde0dc3a817012bf89ba9d678",
         "lpn_pane_filter_note": "05e2eb74abd40d38d2d0d292c8d3c5d57c84f813",
         "lpn_pane_none": "8a127c3c35dc5bcfd46a44eb69bc59549ad9e105",
-        "lpn_pane_paste_note": "d2362d3a8c1acea6b54502c4f8b6bdece464727b",
         "lpn_pane_pasted": "7afb7b32d87e8799315d1b6ac90f1240623781f2",
         "lpn_pane_print": "46e18fe132733ab1ff768a8aa616d225bae99f3d",
         "lpn_pane_print_tip": "90a936ee08e84cd564a615de8e6bc16ab1347b74",
@@ -7775,10 +7774,6 @@
         },
         "lpn_pane_none": {
             "words": 7,
-            "ends_sentence": true
-        },
-        "lpn_pane_paste_note": {
-            "words": 31,
             "ends_sentence": true
         },
         "lpn_pane_pasted": {

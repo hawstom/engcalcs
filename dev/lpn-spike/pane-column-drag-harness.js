@@ -40,6 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn paneColWidthEm(s.id, paneColByKey(s, key)); },\n" +
 	"\t\tuserWidth: function (id, key) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneColUserWidth(s.id, paneColByKey(s, key)); },\n" +
+	"\t\tfloorEm: function (id, key) { return paneColFloorEm(paneColByKey(paneTableById(id), key)); },\n" +
 	"\t\tresetWidth: function (id, key) { paneResetColOnDouble(paneTableById(id), key, null); },\n" +
 	"\t\tcolGroup: function (id) { return paneTableById(id).colGroup; },\n" +
 	"\t\tcells: function (id) { return paneTableById(id).cells; },\n" +
@@ -126,11 +127,14 @@ console.log('\n--- (d) dragging the divider resizes the column ---');
 	// **THE FLOOR IS ONE EM.** A column dragged to nothing is a column nobody can find again.
 	fire(gripOf('elev'), 'mousedown', { clientX: 100, stopPropagation: function () {}, preventDefault: function () {} });
 	docFire('mouseup', { clientX: -900 });
-	report(L.widthEm('junctions', 'elev') === 1, 'a drag past nothing stops at one em',
+	// **THE FLOOR IS A THIRD OF THE HEADING'S LONGEST WORD** (Tom, 2026-09-21: *"I see words
+	// broken into five pieces of one or two characters each"*), which superseded one em.
+	report(L.widthEm('junctions', 'elev') === L.floorEm('junctions', 'elev') && L.floorEm('junctions', 'elev') > 1,
+		'a drag past nothing stops at the floor that breaks no heading word into more than three pieces',
 		L.widthEm('junctions', 'elev'));
 	// And it survives a rebuild, which is what "remembered" means.
 	L.renderTable('junctions');
-	report(L.widthEm('junctions', 'elev') === 1, '...and the width survives a rebuild of the table');
+	report(L.widthEm('junctions', 'elev') === L.floorEm('junctions', 'elev'), '...and the width survives a rebuild of the table');
 }
 
 // **A PRESS THAT NEVER TRAVELS IS NOT A DRAG**, which is the whole of Tom's *"Some of the columns
@@ -177,7 +181,7 @@ console.log('\n--- A PRESS THAT NEVER TRAVELS IS NOT A DRAG ---');
 	fire(gripOf('elev'), 'mousedown', { clientX: 400, stopPropagation: function () {}, preventDefault: function () {} });
 	docFire('mousemove', { clientX: 300 });
 	docFire('mouseup', { clientX: 300 });
-	report(L.widthEm('junctions', 'elev') === 1, 'a real drag still reaches the narrow extreme',
+	report(L.widthEm('junctions', 'elev') === L.floorEm('junctions', 'elev'), 'a real drag still reaches the narrow extreme',
 		L.widthEm('junctions', 'elev'));
 	report(String(thFor('elev').className).indexOf('lpn-pane-tight') >= 0,
 		'...and THAT column\'s heading breaks at the character, which is what he asked for');
@@ -188,7 +192,7 @@ console.log('\n--- A PRESS THAT NEVER TRAVELS IS NOT A DRAG ---');
 // sitting, as the table's own default.
 console.log('\n--- double-clicking the divider gives the column its default back ---');
 {
-	report(L.userWidth('junctions', 'elev') === 1, 'the column starts at the narrow extreme',
+	report(L.userWidth('junctions', 'elev') === L.floorEm('junctions', 'elev'), 'the column starts at the narrow extreme',
 		L.userWidth('junctions', 'elev'));
 	fire(gripOf('elev'), 'dblclick', { stopPropagation: function () {}, preventDefault: function () {} });
 	report(L.userWidth('junctions', 'elev') === 0, 'a double-click on the divider forgets the stored width');

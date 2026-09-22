@@ -1699,7 +1699,6 @@ $ec_lang['lpn_tool_area_tip']='Şeklin içindeki her şeyi seçmek için haritay
 $ec_lang['lpn_area_selected']='{n} seçildi.';
 $ec_lang['lpn_area_none']='O alanda hiçbir şey bulunamadı.';
 $ec_lang['lpn_georef_tab_locked']='Projeler arasında geçiş yapmadan önce yerleşimi "Bu yerleşimi koru" düğmesiyle bitirin veya İptal\'e basın. Yerleşim bu projeye aittir ve sizinle başka bir projeye geçemez.';
-$ec_lang['lpn_pane_paste_note']='Bu tablo, bir e-tablodan zaten var olan satırlara yapıştırarak değer girmek içindir. İhtiyacınızı karşılamıyorsa, bize bildirmek için Yardım, Bir sorunu düzelt\'i kullanın.';
 $ec_lang['lpn_pane_filter_note']='{q} ile filtrelendi. {all} öğeden {n} tanesi gösteriliyor.';
 $ec_lang['lpn_pane_filter_clear']='Hepsini göster';
 $ec_lang['lpn_pane_filter_none']='Bu tabloda filtreyle eşleşen hiçbir şey yok.';

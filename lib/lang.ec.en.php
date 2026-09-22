@@ -1329,7 +1329,7 @@ $ec_lang['lpn_pane_tab_tanks']='Tanks';
 $ec_lang['lpn_pane_tab_pipes']='Pipes';
 $ec_lang['lpn_pane_tab_pumps']='Pumps';
 $ec_lang['lpn_pane_tab_valves']='Valves';
-$ec_lang['lpn_pane_tab_tip']='This tab shows the assets of this kind as a table you can sort and edit. Result columns cannot be edited.';
+$ec_lang['lpn_pane_tab_tip']='This tab shows the assets of this kind as a spreadsheet-like table. Result columns cannot be edited.';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1346,7 +1346,6 @@ $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // rule.
 $ec_lang['lpn_pane_text_attached']='Attached';
 $ec_lang['lpn_pane_not_used']='Not used';
-$ec_lang['lpn_pane_paste_note']='This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
 // What a filtered table says above its rows, so hidden rows always have a visible cause. {q} is the
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtered by {q}. Showing {n} of {all}.';

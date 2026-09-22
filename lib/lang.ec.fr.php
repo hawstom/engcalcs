@@ -1684,7 +1684,6 @@ $ec_lang['lpn_tool_area_tip']='Cliquez sur la carte comme indiqué pour sélecti
 $ec_lang['lpn_area_selected']='{n} sélectionnés.';
 $ec_lang['lpn_area_none']='Rien trouvé dans cette zone.';
 $ec_lang['lpn_georef_tab_locked']='Terminez le placement avec le bouton « Conserver ce placement », ou appuyez sur Annuler, avant de changer de projet. Le placement appartient à ce projet et ne peut pas vous suivre vers un autre.';
-$ec_lang['lpn_pane_paste_note']='Ce tableau est destiné à la saisie de valeurs en les collant depuis un tableur dans des lignes qui existent déjà. S\'il ne répond pas à vos besoins, utilisez Aide, Signaler un problème pour nous le dire.';
 $ec_lang['lpn_pane_filter_note']='Filtré par {q}. Affichage de {n} sur {all}.';
 $ec_lang['lpn_pane_filter_clear']='Tout afficher';
 $ec_lang['lpn_pane_filter_none']='Rien dans ce tableau ne correspond au filtre.';

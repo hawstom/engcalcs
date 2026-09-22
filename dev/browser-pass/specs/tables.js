@@ -156,6 +156,59 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
+	// ---- R-110 (his second pass): no heading word in more than three pieces --------------------
+	// Tom, 2026-09-21: *"some of the initial column widths are unreasonable. We talked about
+	// limiting words to breaking into three pieces (just an idea), but I see words broken into five
+	// pieces of one or two characters each."* A heading only breaks inside a word in a column with
+	// a STORED width, so every column of two tables is stored at one em -- what a browser still
+	// carrying the old defects' widths holds -- and the page is reloaded to read them back.
+	{
+		const a = await openExample(browser, 'EPANET Net3, lat/lon');
+		await openPane(a);
+		const tabs = ['pipes', 'pumps', 'junctions'];
+		const prefs = {};
+		for (const t of tabs) {
+			await showTab(a, t);
+			prefs[t] = { w: await a.page.evaluate((id) => {
+				const w = {};
+				document.querySelectorAll('#lpn_pane_' + id + ' thead th').forEach((th) => { if (th._lpnColKey) { w[th._lpnColKey] = 1; } });
+				return w;
+			}, t) };
+		}
+		await a.page.evaluate((p) => localStorage.setItem('lpn_panecols', JSON.stringify(p)), prefs);
+		await a.page.reload({ waitUntil: 'load' });
+		await a.settle(2500);
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await openPane(a);
+		const bad = [];
+		let words = 0;
+		for (const t of tabs) {
+			await showTab(a, t);
+			const r = await a.page.evaluate((id) => {
+				const cv = document.createElement('canvas').getContext('2d'), out = [];
+				let n = 0;
+				document.querySelectorAll('#lpn_pane_' + id + ' thead th').forEach((th) => {
+					const b = th.querySelector('button'), cs = getComputedStyle(b);
+					cv.font = cs.font;
+					const inner = b.clientWidth;
+					b.textContent.replace(/[▲▼]/g, '').trim().split(/\s+/).forEach((w) => {
+						n++;
+						const pieces = Math.ceil((cv.measureText(w).width - 0.5) / inner);
+						if (pieces > 3) { out.push(`${id}."${w}" in ${pieces} pieces (${inner.toFixed(0)}px)`); }
+					});
+				});
+				return { out, n };
+			}, t);
+			words += r.n;
+			bad.push(...r.out);
+		}
+		report.ok(words > 0 && bad.length === 0,
+			`R-110: with every column of three tables stored at 1 em, none of ${words} heading words is broken into more than three pieces`,
+			bad.slice(0, 4).join('; '));
+		await a.page.evaluate(() => localStorage.removeItem('lpn_panecols'));
+		await a.close();
+	}
+
 	// ---- R-111, R-113, R-115 on one page ----------------------------------------------------
 	{
 		const a = await openExample(browser, 'EPANET Net3');

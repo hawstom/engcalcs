@@ -2426,13 +2426,12 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    between -0.47 and +0.48 px while arrowing, which is the difference between the row's top rule
    hiding under the heading's bottom rule and standing a pixel clear of it. A row's height is its
    line height plus whole-pixel paddings and borders, so rounding the LINE HEIGHT up to a whole
-   pixel makes every row, of one line or two, a whole number of pixels -- and the note above the
-   table gets the same treatment, because the table's own top offset is part of every boundary.
+   pixel makes every row, of one line or two, a whole number of pixels. The table's own top offset
+   is part of every boundary too, which is one more reason the paste note above it had to go.
    1.35em is chosen to sit between the two system fonts' own "normal" -- about 1.5 on Linux and 1.33
    with Segoe UI -- so a row moves by a pixel or so either way and not by a line. `round()` is
    ignored by a browser too old to know it, which then behaves exactly as before. */
-.lpn-pane-table tbody td, .lpn-pane-table tbody td input, .lpn-pane-table tbody td select,
-.lpn-pane-panel.lpn-pane-scroll .lpn-lib-note { line-height: round(up, 1.35em, 1px); }
+.lpn-pane-table tbody td, .lpn-pane-table tbody td input, .lpn-pane-table tbody td select { line-height: round(up, 1.35em, 1px); }
 /* **NEITHER OF THESE IS A HYPERLINK, AND THEY BOTH LOOKED LIKE ONE** (Tom, 2026-09-19: *"we have
    blue text links"* on the sort headings, and the *"strange highlighting around the ID"*).
    The MARKUP was never wrong -- a sortable heading here is already a real `<button>` carrying
@@ -2574,6 +2573,11 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	.lpn-print-table thead { display: table-header-group; }
 	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
 	.lpn-print-table tr { page-break-inside: avoid; }
+	/* A table printed at the reader's dragged widths (panePrintWidths()): fixed layout so the
+	   widths are obeyed, never wider than the sheet, and a long value wraps inside its column
+	   instead of being cut off -- paper has no box to scroll inside. */
+	.lpn-print-table.lpn-print-fixed { table-layout: fixed; max-width: 100%; }
+	.lpn-print-table.lpn-print-fixed th, .lpn-print-table.lpn-print-fixed td { overflow-wrap: anywhere; }
 }
 
 /* ==== The Settings box (ROADMAP Task 441) ====================================================

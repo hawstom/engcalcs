@@ -377,34 +377,22 @@ console.log('\n--- six tabs, one renderer ---');
 		'the junction-specific tip and empty message are retired, not left beside the generic ones');
 }
 
-// ---- the paste note, said once for the table -------------------------------------------------
-console.log('\n--- the Tables pane says what it is for ---');
+// ---- no standing note above the table ---------------------------------------------------------
+console.log('\n--- no standing note above the table ---');
 {
-	// Tom, 2026-09-08, asked for a note "to the effect that this table is intended to be ready for
-	// asset entry and creation by pasting from a spreadsheet". The shipped sentence says "rows that
-	// already exist", because panePasteAt() cannot grow the table -- his own wording describes the
-	// feature's next phase and would be false today.
-	//
-	// **IT IS A NOTE ON THE PANEL, NOT A TIP ON THE TAB.** The Curves library teaches this exact
-	// workflow the same way, and a hover tip on the tab strip is the easiest thing on the page to
-	// miss. Asserted as PLACEMENT because that is the half a later tidy-up would undo.
-	const noteBody = fnBody('renderPaneTable');
-	report(/pc\.lpn_pane_paste_note/.test(noteBody), 'renderPaneTable() renders the paste note');
-	report(php.indexOf('lpn_pane_paste_note:') > 0, '...and the page supplies the key');
-	// **BEFORE the empty-table early return**, so a reader who opens a blank tab -- which is exactly
-	// when somebody has a spreadsheet open -- is told the rows have to be there first.
-	report(noteBody.indexOf('lpn_pane_paste_note') < noteBody.indexOf('if (!rows.length)'),
-		'...above the empty-table message, so a blank tab carries it too');
-	// And live, on a real render. This section changes no document state: a later section counts
-	// the rows of every table and would fail on anything this one added or removed.
+	// Tom, 2026-09-21: *"There is a message about 'rows that already exist'. When I scroll past the
+	// last visible row, that message disappears, and the headings jump upward. This is startling.
+	// The message uses precious head room."* The note and its key are gone; this holds both.
 	L.renderTable('junctions');
 	const panel = document.getElementById(L.paneTableById('junctions').panel);
-	const shown = (panel.childNodes || []).map((c) => c.textContent || '').join(' ');
-	report(shown.indexOf(PC.lpn_pane_paste_note) >= 0, 'and a rendered table really carries it');
-	// It must not have been folded into lpn_pane_none, which six Library sections share and where
-	// five of the six create rows by an Add button, not by paste.
+	const first = (panel.childNodes || [])[0];
+	report(!/lpn_pane_paste_note/.test(src + php), 'the paste note and its key are retired, not merely hidden');
+	// No junctions exist yet at this point, so the panel holds the empty message -- and ONLY that.
+	const kids = panel.childNodes || [];
+	report(kids.length === 1 && first._tag === 'p' && first.textContent === PC.lpn_pane_none,
+		'an empty table says only that it is empty: no second paragraph above it', kids.map((k) => k._tag).join(','));
 	const langEn = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
-	report(/\$ec_lang\['lpn_pane_none'\]='This network has none of these yet\.';/.test(langEn),
+	report(/\$ec_lang\['lpn_pane_none'\]=/.test(langEn),
 		'lpn_pane_none is untouched -- it is shared with six Library sections that create rows by a button');
 }
 
