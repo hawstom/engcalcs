@@ -17358,6 +17358,20 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day');
 	}
+	// **THE RESULT the two paneColReaction() coefficients above feed** (Task 664): a pipe's own
+	// reaction rate, read the identical way the map label and the Properties popup read it --
+	// linkReactionRate() through colorLinkValue(), so a number in this column can never disagree
+	// with the one on the map or in the popup. No unit FAMILY, exactly as the quality column
+	// declares `unitText` rather than `unit`: reactionRateUnitText() is the document's own
+	// concentration label, converted by nobody. Gated on `reactionFieldsShown` for the same reason
+	// the two coefficient columns beside it are -- the column has nothing to say until a chemical
+	// is being tracked.
+	function paneColLinkReactionRate() {
+		var c = paneColLinkResult('rate', 'lpn_result_reaction_rate', null);
+		c.unitText = reactionRateUnitText;
+		c.when = reactionFieldsShown;
+		return c;
+	}
 	// The valve's type, as the word the popup's own selector shows. READ-ONLY here on purpose:
 	// changing the type re-seeds the setting and drops every scenario's override on it, which is a
 	// decision that belongs where its consequences are spelled out.
@@ -17728,7 +17742,8 @@ var EngCalcs = EngCalcs || {};
 					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkReactionRate()
 				])
 			},
 			{
@@ -40532,6 +40547,17 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump' && linkLengthSI(l)) {
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
+			}
+			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
+			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
+			// valve, or any other analysis, simply has none and the row does not appear. No unit
+			// FAMILY, like a concentration: reactionRateUnitText() is the document's own label,
+			// converted by nobody, same as qualityResultRow()'s concentration row on a node.
+			var rateVal = linkReactionRate(l);
+			if (rateVal !== undefined) {
+				readonlyField(fields,
+					(pc.lpn_result_reaction_rate || 'Reaction rate') + ' (' + reactionRateUnitText() + ')',
+					rateVal);
 			}
 		}
 		importNotesField(fields, l);

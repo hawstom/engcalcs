@@ -61,7 +61,11 @@ const L = loadLoopedNetwork(
 	// second opinion about them.
 	"\t\tlinkReactionRate: linkReactionRate, reactionRateUnitText: reactionRateUnitText,\n" +
 	"\t\tcolorFieldUnit: colorFieldUnit, colorFieldUnitText: colorFieldUnitText,\n" +
-	"\t\tcolorValueOf: colorValueOf, colorFieldLabel: colorFieldLabel,\n" +
+	"\t\tcolorValueOf: colorValueOf, colorFieldLabel: colorFieldLabel, colorLinkValue: colorLinkValue,\n" +
+	// The two surfaces Task 664 found it missing from (Tom, 2026-09-21): the Properties popup and
+	// the Tables pane. renderLinkFields builds the real popup DOM; the Tables pane reads through
+	// colorLinkValue() above, the same accessor paneColLinkResult() calls.
+	"\t\trenderLinkFields: renderLinkFields,\n" +
 	"\t\tcolorFieldOptions: function (g) { return colorFieldOptions(g).map(function (o) { return o[0]; }); },\n" +
 	"\t\tlinkFields: function () { return linkFieldDefs(EngCalcs.pageConfig || {}).map(function (f) { return f[0]; }); },\n" +
 	"\t\tlabelSettings: function () { return labelSettings; }, refreshLabelText: refreshLabelText,\n" +
@@ -82,6 +86,13 @@ function ok(name, cond, extra) {
 	console.log('  FAIL ' + name + (extra === undefined ? '' : '  -- ' + extra));
 }
 function head(t) { console.log('\n' + t); }
+// The stub's querySelectorAll() answers nothing, so the walk is the harness's own -- fittings-
+// harness.js's, reused here to read a disabled control (none here) or, as below, a popup's text.
+function walk(el, out) {
+	out = out || [];
+	(el.children || []).forEach(function (c) { out.push(c); walk(c, out); });
+	return out;
+}
 
 // ---------------------------------------------------------------------------------------------
 // THE REFERENCE RUN: the page's own `.inp`, run again through a SEPARATE Workspace with a
@@ -369,6 +380,22 @@ L.setProp(j2, 'demand', 5);
 	ok('...and stops printing it when the row is turned off',
 		!L.linkLabel(p1.id).some(function (t) { return t.indexOf(shown) >= 0; }),
 		JSON.stringify(L.linkLabel(p1.id)));
+
+	// **AND THE TWO PLACES TOM ACTUALLY LOOKED** (Task 664, 2026-09-21: "Reaction rate does not
+	// appear in Properties or Tables. I see it only in Settings.Symbology.Link."). Both must read
+	// the identical number linkReactionRate() gives -- the map label, the popup and the table are
+	// three separate wirings of one accessor, exactly as section 3 above already argues for the
+	// colour ramp.
+	L.renderLinkFields(p1.id);
+	const fieldsText = walk(document.getElementById('lpn_popup_fields'))
+		.map(function (e) { return e.textContent || ''; }).join(' | ');
+	ok('the Properties popup shows the reaction rate',
+		fieldsText.indexOf(PC.lpn_result_reaction_rate) >= 0 &&
+			fieldsText.indexOf(L.linkReactionRate(p1).toFixed(2)) >= 0,
+		fieldsText);
+	ok('the Tables pane\'s own accessor reads the same number',
+		L.colorLinkValue(p1, 'rate') === L.linkReactionRate(p1),
+		String(L.colorLinkValue(p1, 'rate')));
 
 	// =========================================================================================
 	head('4. AND THE NUMBER MEANS WHAT THE MANUAL SAYS: the published model, recomputed here');
