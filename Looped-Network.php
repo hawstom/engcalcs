@@ -902,19 +902,21 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // A host carrying `lpn-set-part` is TRANSPARENT TO THE SEARCH: the filter recurses
 				      // into it and hides row by row, so two builders can share one sub-heading without a
 				      // search for "opacity" turning up everything either of them wrote. ?>
-				<?php // ---- Section: VISUALIZATION ----
-				      // Tom, 2026-08-19: "Group the three Node and Link headings under a new Visualization
-				      // main heading -- the first main heading ... to be honest, I really like Visualization.
-				      // Leave the sub-heading Node and link as is." He named and rejected his own
-				      // alternatives (Analysis View, Labels and colors, Seeing numbers), and Visualization is
-				      // also the word GIS uses for exactly this -- what is drawn and what is printed beside
-				      // it -- so no better term was found to offer against it.
+				<?php // ---- Section: SYMBOLOGY ----
+				      // Tom, 2026-09-19: "Let's try changing main heading Visualization to Symbology and
+				      // its subheadings to Node, Link, Customer, and All." That SUPERSEDES his own
+				      // 2026-08-19 wording ("I really like Visualization ... leave the sub-heading Node and
+				      // link as is"), and the change is the whole of it: each sub-heading used to repeat
+				      // the main heading's word back at the reader -- Node symbology, Link symbology,
+				      // Customer symbology -- which is four words to say what one says once the heading
+				      // above them is Symbology. "All" replaces "Node and link" because the two controls
+				      // under it are now true of a customer as well.
 				      //
 				      // FIRST, which is a claim about what this page is for: you draw a network and you look
 				      // at it, and the index now opens on the controls that decide what you see. Map and page
 				      // keeps what is true of the whole SHEET rather than of one kind of element. ?>
 				<section id="lpn_set_sec_visual" class="lpn-set-sec" data-set-sec="visual">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_visualization']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_symbology']?></h3>
 					<div class="lpn-set-secbody">
 						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
 						      // what is PRINTED beside it, which is one question and was two panels. Tom:
@@ -926,12 +928,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // now one complete answer to "how is this kind of element drawn", scheme
 						      // included -- which is why the ramp is stored per group; see
 						      // defaultSettings() in js/looped-network.js. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_node_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_node_fields"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_link_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_link_fields"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
@@ -941,7 +943,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // link label alike, so they belong to neither group and were being read as
 						      // part of whichever one they were filed under. rebuildLabelsFields() fills
 						      // this host. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
+						<?php // **CUSTOMER SYMBOLOGY, A SECTION OF ITS OWN** (ROADMAP Task 247, Tom
+						      // 2026-09-19). What a customer label says is chosen HERE and not in
+						      // Node above -- he overruled his earlier ruling, because a junction's
+						      // label answers "what is the pressure here" and a service's answers
+						      // "whose is this and how much does it draw". It also carries the one
+						      // question those rows cannot, namely how close the view has to be
+						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_labels_customer_fields"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
 							<?php // Thematic map (Tom, 2026-08-19: "Move Thematic map to the Node and link
@@ -1475,8 +1488,6 @@ EngCalcs.pageConfig = {
 	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
 	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
 	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
-	lpn_field_account: <?=json_encode($ec_lang['lpn_field_account'])?>,
-	lpn_field_account_tip: <?=json_encode($ec_lang['lpn_field_account_tip'])?>,
 	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
 	lpn_field_meter_demand_tip: <?=json_encode($ec_lang['lpn_field_meter_demand_tip'])?>,
 	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
@@ -1487,6 +1498,8 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
 	lpn_field_meter_pipe_suggest: <?=json_encode($ec_lang['lpn_field_meter_pipe_suggest'])?>,
 	lpn_meter_pipe_unknown: <?=json_encode($ec_lang['lpn_meter_pipe_unknown'])?>,
+	lpn_field_meter_pattern_tip: <?=json_encode($ec_lang['lpn_field_meter_pattern_tip'])?>,
+	lpn_meter_pattern_unknown: <?=json_encode($ec_lang['lpn_meter_pattern_unknown'])?>,
 	lpn_meter_placed: <?=json_encode($ec_lang['lpn_meter_placed'])?>,
 	lpn_field_meter_station: <?=json_encode($ec_lang['lpn_field_meter_station'])?>,
 	lpn_field_meter_station_tip: <?=json_encode($ec_lang['lpn_field_meter_station_tip'])?>,
@@ -1991,6 +2004,10 @@ EngCalcs.pageConfig = {
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
+	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
+	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
+	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
+	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
 	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
 	lpn_labels_mark_extrema_tip: <?=json_encode($ec_lang['lpn_labels_mark_extrema_tip'])?>,

@@ -802,18 +802,28 @@ $ec_lang['lpn_tool_add_meter_tip']='Click where the customer is, then click the 
 $ec_lang['lpn_mode_add_meter']='Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
 $ec_lang['lpn_customer_heading']='Customer {id}';
-$ec_lang['lpn_field_account']='Account number';
-$ec_lang['lpn_field_account_tip']='Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.';
+// ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
+// "Didn't I say to trash Account number since they can just make a Custom property for that or
+// anything else?" and "Since Customer is a pseudo-node, what if we provide existing properties like
+// Description and Tag instead of Account number? Then we aren't inventing something, and we incur no
+// language debt."). A customer now carries lpn_field_desc and lpn_field_tag, the two identity
+// strings every node and link already uses. Do not re-add an account key: a utility that wants a
+// field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Demand per service';
 $ec_lang['lpn_field_meter_demand_tip']='What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.';
-$ec_lang['lpn_field_meter_count']='Services at this customer';
+$ec_lang['lpn_field_meter_count']='Number of services';
 $ec_lang['lpn_field_meter_count_tip']='How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
 $ec_lang['lpn_field_meter_total']='Total demand';
 $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
 $ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
 $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
-$ec_lang['lpn_meter_placed']='Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.';
+// ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
+// heading is the junction's own whole label reused and only the tip is new: what it says that the
+// junction's does not is that the number the pattern multiplies is the TOTAL, count included.
+$ec_lang['lpn_field_meter_pattern_tip']='How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.';
+$ec_lang['lpn_meter_pattern_unknown']='No pattern in this project is named {id}, so the customer was left as it was.';
+$ec_lang['lpn_meter_placed']='Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.';
 $ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.';
 $ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
 $ec_lang['lpn_field_meter_station_tip']='How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
@@ -825,10 +835,10 @@ $ec_lang['lpn_node_customers']='Customer demands';
 $ec_lang['lpn_node_customers_tip']='Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
 $ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
-$ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+$ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
 $ec_lang['lpn_customer_detached_count']='{n} customers are no longer connected to a pipe. Their demand is not in the answers.';
 $ec_lang['lpn_meter_pick_pipe']='Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
-$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.';
+$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.';
 
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Click the opposite corner to finish.';
@@ -2274,6 +2284,10 @@ $ec_lang['lpn_field_tag']='Tag';
 // synonym list.
 // Edited by TGH 2026-09-07
 $ec_lang_syn['lpn_field_tag']='Tag, Custom property, User property, Custom label | EPANET’s own [TAGS] value: one unspaced token of the user’s own meaning, often a pressure zone or a work order.';
+// ROADMAP Task 247. Tom's own words, given verbatim on 2026-09-19 when he shortened the label from
+// "Services at this customer" to "Number of services": the short label loses the "at this customer"
+// that told a translator WHOSE services are being counted, and this is where that goes back.
+$ec_lang_syn['lpn_field_meter_count']='| Number or count of services at this customer point';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tag_tip']='A one-word identifier with any meaning you require, such as a pressure zone or a work order.';
 $ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
@@ -3029,12 +3043,24 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // colour a value is drawn in and the label printed beside it.
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
-$ec_lang['lpn_settings_sec_visualization']='Visualization';
+$ec_lang['lpn_settings_sec_symbology']='Symbology';
 $ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
-$ec_lang['lpn_settings_node_symbology']='Node symbology';
-$ec_lang['lpn_settings_link_symbology']='Link symbology';
+$ec_lang['lpn_settings_sym_node']='Node';
+$ec_lang['lpn_settings_sym_link']='Link';
+// ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
+// would follow Node styles"), so this section has one control and no checkboxes: how close the
+// view has to be before a service is worth lettering.
+$ec_lang['lpn_settings_sym_customer']='Customer';
+$ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
+$ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
+$ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
+// ROADMAP Task 247. The capture button beside the width above (Tom, 2026-09-19: "Widest view: Add a
+// 'Use current view' button like the other one we restored in a different branch."). The SAME key
+// name and the same words as that control, deliberately: it is one idea and a reader who has met it
+// once must not have to learn a second wording for it.
+$ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_page']='Page';
 $ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
@@ -3237,7 +3263,7 @@ $ec_lang['lpn_labels_col_drop']='Drop';
 // A third sub-heading over the two controls that are about a node label and a link label alike.
 // "Node and link" rather than "Both": it names the two things, which survives translation into a
 // language with no single word for the pair.
-$ec_lang['lpn_settings_node_link']='Node and link';
+$ec_lang['lpn_settings_sym_all']='All';
 // THE RANGE ALLOCATION MODES, which decide where one colour stops and the next begins. Named for
 // what they DO to the numbers, in the vocabulary QGIS, ArcGIS and every GIS textbook already use --
 // a translator should reach for their own discipline's standard term rather than a literal

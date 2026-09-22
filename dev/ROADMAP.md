@@ -728,7 +728,7 @@ the block.
   left is his call.**
   - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
     connector, the two-click gesture and its one-click door, the **Count** (so
-    forty-two residential services are one symbol), the derived junction,
+    forty-two residential services are one symbol), the draggable attachment, the derived junction,
     the detached state, a Customers tab, and the `.inp` answer.
     `dev/lpn-spike/customer-harness.js`, 66 assertions.
   - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
@@ -738,11 +738,60 @@ the block.
     meter does rewrites a number the user typed on a junction.**
   - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
     row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
+  - **THE ACCOUNT NUMBER IS GONE, AND A CUSTOMER CARRIES DESCRIPTION AND TAG INSTEAD** (2026-09-19,
+    his own two sentences): *"Didn't I say to trash Account number since they can just make a Custom
+    property for that or anything else?"* and *"Since Customer is a pseudo-node, what if we provide
+    existing properties like Description and Tag instead of Account number? Then we aren't inventing
+    something, and we incur no language debt."* The field, its two language keys and its column are
+    deleted; the popup, the Customers table, Find and Replace all use the two identity properties
+    every node and link already has. **A saved project's account number is CARRIED into the tag**
+    (into the description where a tag is already there), because a number that came out of a file is
+    the user's -- `customer-node-harness.js` §5 asserts all four cases. The `[DEMANDS]` CATEGORY
+    slot now carries the TAG, which is a better map than the old one: it is EPANET's own join key.
+  - **`feat/customer-find-labels` (2026-09-18) adds four things**, all from his message of that
+    day: custom properties respected in a customer's Properties box and Customers table; a Customer
+    scope in Find and replace; a demand PATTERN on a customer, reaching both solvers and the `.inp`;
+    and customer LABELS. Their placement is his own two fixed locations along the service line with
+    a drop if both are taken -- *"This much simpler than general node label placement."*
+  - **HIS BROWSER PASS OF 2026-09-19 REWROTE THE LABEL HALF OF THAT.** A customer label no longer
+    follows the node checkboxes: **Settings > Customer symbology** is a third section of its own
+    (*"since we may want only demand or only demand and description"*), the values are laid out on
+    ONE LINE the way a link label's are (*"Can we make labels one-line concats like link labels?"*),
+    and there is deliberately **no separate text size**. **THE SIZE WAS STILL WRONG AND THE
+    "it was only the stacking" ANSWER IS WITHDRAWN** (his screenshot, 2026-09-19): the zoom path
+    rewrote node, link and Text label sizes and not customers, so a customer label carried the size
+    of whatever scale it was last composed at -- 11 px beside a node label's 2.75 px at 4x.
+    Measured and guarded in `dev/lpn-spike/customer-label-size-harness.js`. The **symbol is 0.25 of
+    a junction and follows Symbol scale**,
+    replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
+    and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
+    rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
+    current view** capture button. **It does NOT match `feat/label-gang-search`'s, and copying that
+    one verbatim was the defect** (his 2026-09-21 pass): that branch's threshold IS `mapSpan('min')`
+    and this one is the view WIDTH in METRES, so the copy captured the height of a landscape window
+    (1,000 ft of a 2,000 ft view) and, on a geographic project, degrees into a box read as feet
+    (0.005 against 2,880). `dev/lpn-spike/customer-view-capture-harness.js`. The service line's
+    1 px floor is in the same harness; the rest of his service-line sentence -- shrinking BELOW a
+    pixel once the drawing stops growing -- is Task 705 and is deliberately not invented here.
+  - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
+    property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
+    selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
+    labelled and neither colourable; the largest is that a custom property can be searched,
+    replaced and typed and cannot be printed on the map or coloured by.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
-    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **THE LABEL PLACEMENT MYSTERY IS MEASURED, AND TOM WAS RIGHT** (2026-09-19,
+    `dev/lpn-spike/customer-label-cause-harness.js`). He guessed a LINK label was the conflict, was
+    first told it is not, and **that answer is withdrawn**: the fixture stood its customers at round
+    numbers on a main whose label repeats somewhere else, so the case was never on the drawing. A
+    neighbouring customer's label is the commonest blocker and that outcome is a shuffle; a link
+    label blocks too, and **that outcome is a SILENT DROP -- 2.4% of services on the pipe label's
+    own side, 1.2% on the far side**, measured on a random street.
+    **AWAITING HIS CALL:** a third position, letting a customer displace a link label, or making
+    the drop visible -- each spends something he chose. `dev/customer-demands.md` §6a.
   - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
-    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
     so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
     here is a pointer gesture no harness can hold.
 
@@ -1953,8 +2002,12 @@ the block.
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
 
-- 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
-  Tom, 2026-09-21, asking for discussion and a plan rather than a build.
+- 100|705| **Limit zoom symbol mapwise size growth.**
+  **HIS OWN TITLE, 2026-09-21**, replacing "New zoom rules: a symbol may not grow past a size the
+  network itself sets." **And he gave the go-ahead the same day:** *"New zoom rules: If you have no
+  questions or objections, you can proceed to implement this in a branch for me to test."* It is
+  building on `feat/zoom-symbol-size`. What follows was his discussion brief and stands as the
+  design.
   - **(1) EVERY SYMBOL BUT A DECLARED EXCEPTION HAS A MAXIMUM MAP SIZE.** His starting proposal,
     offered as a starting point and not a ruling: the junction is the reference, and **the maximum
     junction map size is the 10th-percentile link length**. Reservoir and tank are the exceptions he
