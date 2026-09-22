@@ -51,7 +51,8 @@
         "feat/tables-spreadsheet",
         "feat/customer-find-labels",
         "feat/lock-initials-later",
-        "feat/engine-fetch-wait"
+        "feat/engine-fetch-wait",
+        "feat/notice-log"
     ],
     "feature_freeze": {
         "active": false,
