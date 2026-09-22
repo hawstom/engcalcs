@@ -10880,6 +10880,23 @@ var EngCalcs = EngCalcs || {};
 				if (!tileSeen(t.key).viewSrc) { tileSeen(t.key).viewSrc = 'net'; }
 				return;
 			}
+			// **ALREADY ON SCREEN, CARRIED UNDER THE LAST VIEW.** The third bucket, and the one
+			// the "do we already have this" test never read: a tile that left the want list on
+			// one paint is still hanging in the layer, holding its picture or its request, until
+			// the carry is released. An ordinary overshoot-and-correct -- a gesture that reverses
+			// direction -- brings exactly those keys back, and until now each one was thrown away
+			// and fetched again while a perfectly good copy was on the screen underneath.
+			// **A FAILED CARRIED TILE IS NOT RECLAIMED**, which is R-056's rule: settled without a
+			// picture means ask again, never hand the blank back.
+			if (basemapCarried[t.key]) {
+				var held = basemapCarried[t.key];
+				if (!held._lpnSettled || held._lpnOk) {
+					delete basemapCarried[t.key];
+					basemapEls[t.key] = held;
+					if (!tileSeen(t.key).viewSrc) { tileSeen(t.key).viewSrc = 'net'; }
+					return;
+				}
+			}
 			// **ALREADY FETCHED IN THIS PAGE'S LIFE.** The element is re-attached with the picture
 			// still in it: no request, no wait, nothing new to draw. The key carries the source, so
 			// a street tile can never be handed back while the satellite credit is showing.

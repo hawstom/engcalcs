@@ -213,7 +213,82 @@ ok('switching back re-uses the very same street tiles',
 	Object.keys(L.tileEls()).length + ' tiles, none requested');
 
 // =================================================================================================
-// 5. A FAILED TILE IS ASKED FOR AGAIN
+// 5. A GESTURE THAT REVERSES DIRECTION ASKS FOR NOTHING IT ALREADY HAS ON SCREEN
+// =================================================================================================
+// **THE FOURTH CAUSE, and it is the one that survived three rounds of fixing** (ROADMAP Task 703).
+// A tile has THREE homes, not two: on screen and wanted (basemapEls), retired into the cache
+// (basemapCache), and CARRIED -- still hanging in the layer under the newer view while that view
+// loads. The "do we already have this" test read the first two and never the third, so an ordinary
+// overshoot-and-correct -- pan too far, come back -- threw away a picture that was on the screen at
+// that moment and fetched it again. Every gesture the earlier fixing rounds tested went one way.
+//
+// The reversal is driven here WITHOUT letting the middle view finish, which is the whole case: a
+// finished view has no carried tiles at all, and that is why a one-directional test never saw it.
+// Fresh ground, never visited above: a view whose tiles are already in the cache settles on the
+// spot, and a settled view carries nothing -- which is exactly the state that hid this for so long.
+L.setCacheBound(realBound);
+const VIEW_D = { cx: -118.07, cy: 34.61, s: 2000 };
+const VIEW_E = { cx: -117.07, cy: 35.61, s: 2000 };
+const VIEW_F = { cx: -116.07, cy: 36.61, s: 2000 };
+L.setView(VIEW_D);
+L.refresh();
+const elsHeld = snapshot(L.tileEls());
+const keysHeld = Object.keys(elsHeld);
+fireAll('load', elsHeld);
+
+L.setView(VIEW_E);
+L.refresh();                              // the A tiles are now CARRIED, not wanted; B is in flight
+ok('the view he came from is carried while the new one loads',
+	keysHeld.every(k => !!L.carried()[k]) && keysHeld.every(k => !L.tileEls()[k]),
+	Object.keys(L.carried()).length + ' carried');
+
+L.setView(VIEW_D);
+L.refresh();                              // ...and he changes his mind, before B ever arrives
+const backHeld = L.tileEls();
+ok('coming straight back re-uses the carried elements, so nothing is requested',
+	keysHeld.every(k => backHeld[k] === elsHeld[k]), keysHeld.length + ' of ' + keysHeld.length);
+ok('...and they are no longer carried, so the release cannot take them away',
+	keysHeld.every(k => !L.carried()[k]));
+ok('...and they are still in the layer',
+	keysHeld.every(k => backHeld[k].parentNode === L.layer()));
+
+// **AND THE RECLAIM HAS TO LEAVE THE CARRY, not merely join the want list.** The release runs at
+// the end of every paint that is still waiting on something, and it retires whatever the carry
+// still names -- which would take a picture straight back off the screen it had just been put on.
+// Driven on a view that OVERLAPS the one carried, so the paint is still pending when it releases.
+const VIEW_G = { cx: VIEW_D.cx + 0.25, cy: VIEW_D.cy, s: 2000 };
+L.setView(VIEW_D);
+L.refresh();
+fireAll('load', L.tileEls());
+const elsD2 = snapshot(L.tileEls());
+L.setView(VIEW_E);
+L.refresh();                              // D carried again
+L.setView(VIEW_G);
+L.refresh();                              // overlaps D: some reclaimed, some brand new and pending
+const shared = Object.keys(elsD2).filter(k => !!L.tileEls()[k]);
+ok('an overlapping view reclaims the tiles it shares with the carried one', shared.length > 0,
+	shared.length + ' shared');
+ok('...and the release that follows does not take them off the screen again',
+	shared.every(k => L.tileEls()[k] === elsD2[k] &&
+		L.tileEls()[k].parentNode === L.layer() && !L.cache()[k]),
+	shared.length + ' still drawn');
+fireAll('load', L.tileEls());
+
+// **A CARRIED TILE THAT FAILED IS NOT HANDED BACK**, which is R-056 stated for the third bucket.
+L.setView(VIEW_E);
+L.refresh();
+const elsB2 = snapshot(L.tileEls());
+const badKey = Object.keys(elsB2)[0];
+fire(elsB2[badKey], 'error');
+L.setView(VIEW_F);
+L.refresh();                              // B is carried now, including the one that failed
+L.setView(VIEW_E);
+L.refresh();
+ok('a carried tile that came back blank is asked for again, not re-used',
+	L.tileEls()[badKey] !== elsB2[badKey], badKey);
+
+// =================================================================================================
+// 6. A FAILED TILE IS ASKED FOR AGAIN
 // =================================================================================================
 // The retry is on a timer with jitter, so this part is the one that has to wait. The first gap is
 // 0.8 s plus up to half of that again.
