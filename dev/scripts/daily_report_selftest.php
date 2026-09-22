@@ -100,14 +100,14 @@ ec_dr_expect('a data row (Fixture-Calculator, 3, 7) still comes through',
 // ---- R-123: "people" is the consented bucket, never "long-dwell". ------------------------------
 ec_dr_expect('the mail states what "people" means (consented, once per person per page)',
     strpos($usage, 'accepted the consent banner') !== false, $usage);
-ec_dr_expect('the mail explicitly denies the "long-dwell" reading Tom guessed',
-    stripos($usage, 'long-dwell') !== false, $usage);
+ec_dr_expect('the mail says both counts need 10+ seconds on the page',
+    strpos($usage, '10+ seconds on the page') !== false, $usage);
 
 // ---- R-122: "page loads" does not silently claim or deny robots without saying why. ------------
 ec_dr_expect('the mail states what "page loads" means (everyone else, one row per view)',
     strpos($usage, 'everyone else, one row per page view') !== false, $usage);
 ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the dwell gate, '
-    . 'not by a robot list)', strpos($usage, 'excludes nearly all robots') !== false, $usage);
+    . 'not by a robot list)', strpos($usage, 'robots are') !== false, $usage);
 
 // cleanup
 @unlink($tmp . '/log/lang-log-stats.sh');

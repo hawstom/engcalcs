@@ -337,14 +337,11 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
                     r=1
                     print ""
                     print " rank by shopping (top pages; two counts, never summed):"
-                    print "   people      visitors who accepted the consent banner, counted once"
-                    print "               per person per page. NOT the same as \"long-dwell\" --"
-                    print "               consent, not dwell time, is what puts a row here."
-                    print "   page loads  everyone else, one row per page view, never"
-                    print "               de-duplicated. Both columns already require 10+ seconds"
-                    print "               on the page before a row counts at all, so this table"
-                    print "               already excludes nearly all robots -- it is not a raw"
-                    print "               page-view count."
+                    print "   people      visitors who accepted the consent banner, counted"
+                    print "               once per person per page"
+                    print "   page loads  everyone else, one row per page view"
+                    print "   Both count only after 10+ seconds on the page, so robots are"
+                    print "   nearly all excluded."
                     next
                 }
                 r && /^ *rank[[:space:]]/  {print; next}
