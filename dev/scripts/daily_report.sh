@@ -323,8 +323,28 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             # its header and once beside the consent share. Two identical lines in a report that is
             # meant to be identical in shape every day is a thing a reader stops to check.
             printf '%s\n' "$out" | grep -E '^ +(WINDOW|DURATION|FINGERPRINT) ' | awk '!seen[$0]++'
+            # R-121/122/123: Tom read this table with no headings and could not tell what the
+            # numbers were, then guessed "page loads" includes robots and "people" means
+            # long-dwell. Neither guess is right -- checked against log/lang-log-stats.sh and
+            # lib/UsageReport.lib.php: "people" is the CONSENTED bucket (one row per person per
+            # page, by cookie, nothing to do with dwell time); "page loads" is everybody else, one
+            # row per page view. This table is built from the >=10s-dwell "shopping" beacon for
+            # BOTH columns, so it already excludes nearly all robots by behaviour -- there is no
+            # user-agent or robot list anywhere in this codebase. So the headings say what is true
+            # rather than what he guessed.
             printf '%s\n' "$out" | awk '
-                /RANK BY SHOPPING/         {r=1; print ""; print " rank by shopping:"; next}
+                /RANK BY SHOPPING/ {
+                    r=1
+                    print ""
+                    print " rank by shopping (top pages; two counts, never summed):"
+                    print "   people      visitors who accepted the consent banner, counted"
+                    print "               once per person per page"
+                    print "   page loads  everyone else, one row per page view"
+                    print "   Both count only after 10+ seconds on the page, so robots are"
+                    print "   nearly all excluded."
+                    next
+                }
+                r && /^ *rank[[:space:]]/  {print; next}
                 r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
                 r && k>0 && /^ *$/         {r=0}
                 /reach rows:/              {print}

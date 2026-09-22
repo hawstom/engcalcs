@@ -236,9 +236,9 @@ judgement and does not belong to a script.
 
 ### The daily mail
 
-- [ ] R-121 -- | The "rank by shopping" table is hard to read. Can you add headings? I don't know what the numbers represent.
-- [ ] R-122 -- | I assume that "PAGE LOADS" includes robots. Maybe clarify that "(includes robots)" if so.
-- [ ] R-123 -- | Is "PEOPLE" non-robot (long-dwell) visits? Maybe clarify that.
+- [x] R-121 -- | The "rank by shopping" table is hard to read. Can you add headings? I don't know what the numbers represent. -- ea551c6c
+- [x] R-122 -- | I assume that "PAGE LOADS" includes robots. Maybe clarify that "(includes robots)" if so. -- ea551c6c. **His guess was wrong**: this table's rows already require 10+ seconds on the page before counting at all, so it already excludes nearly all robots by behaviour; the mail now says so instead of "(includes robots)"
+- [x] R-123 -- | Is "PEOPLE" non-robot (long-dwell) visits? Maybe clarify that. -- ea551c6c. **Also not quite right**: PEOPLE is the consented bucket (accepted the cookie banner, counted once per person per page), unrelated to dwell time; the mail now says that plainly
 
 ### Production
 
