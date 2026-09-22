@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-126.
+**An ID is permanent and never reused.** Next free: R-131.
 
 ---
 
@@ -244,3 +244,14 @@ judgement and does not belong to a script.
 
 - [x] R-124 -- | There is a git repository on `~/`. Its git status is dirty. Clean up that one. -- **DONE AND PUSHED**, host commit `9565205`. It is a DIFFERENT repository -- `constructionnotesmanager.com` on Bitbucket, with the home directory as its working tree -- and this session had made it dirty by installing the cron scripts. Committed: the three updated scripts, the two new ones (`check.mustblock`, `daily-report-cron.sh`), and a cPanel reshuffle of `public_html/.htaccess`. Ignored rather than tracked: `tgh*`, which holds the engcalcs mirror clone and the report checkout (separate repositories; tracking one file of them makes two repositories disagree about who owns it) and `daily-report.last`, a runtime marker like `check.last`. The two `.before-install` backups were deleted
 - [x] R-125 -- | dev: I will checkout master and pull that one. Thanks. -- his call, nothing owed
+
+### Examples gallery -- repeat clicks, and a slow lat/lon open
+
+- [x] R-129 fix/example-open | "When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project." -- SHIPPED, `b043a319`. The gallery now closes on the FIRST click (or Enter) on a card, before the fetch even starts, and every activation after it is ignored until that import has landed or failed; a failed open clears the guard and reopens the gallery so a visitor is never left stuck. `dev/lpn-spike/example-open-guard-harness.js` asserts one activation opens exactly one project against five rapid clicks, mutation-tested (both the guard and the "close on activation, not on landing" property)
+- [ ] R-130 fix/example-open | "The delay in opening the Net3 lat/lon example when Net3 was already open was over 25 seconds. This is a failure for a new shopper. This was on hawsedc.local on the current master branch. That said, I may have been experiencing high CPU load from CC WSL." -- MEASURED headless in Chromium (`dev/browser-pass/example-open-timing.js`, `?debug=perf`), with several other agents' own browser passes contending for the same machine's CPU at the time (queued behind this run's own `flock`), which is the condition his own caveat names:
+  - Net3 lat/lon opened with Net3 (grid) already open: **4.1 s, 3.7 s, 2.9 s** across three runs
+  - the grid Net3 opened with Net3 lat/lon already open, for comparison: 1.8 s, 1.7 s, 2.6 s
+  - phase breakdown from the page's own instrument (run 1): fetch 17 ms, parse 1 ms, basemap setup 8 ms, buildDom (nodes+links+texts) 213 ms, libraries 4 ms, label layout (`lblRestore`) 309 ms, tabs 3 ms -- SWITCH total (import through redraw, no tile network) 645-935 ms across runs
+  - the gap between that SWITCH total and the wall clock is real network time to `tile.openstreetmap.org` (measured directly: 84 tile requests, ~1.0-1.6 s from first tile to last) plus a second label re-layout pass the tiles' arrival triggers
+  - no 25-second phase reproduces here. The likeliest account of the 25 s is R-129's own defect, from the same session: repeated clicks during a 3-5 s delay multiply it, and five clicks at that cost is close to 25 s
+  - nothing here is a CONTAINED fix beyond R-129 -- buildDom and label layout are Tasks 653/680/681's own territory (the label pass), and tile loading is real third-party network time this page does not control. Leaving open rather than closing: worth a retest once R-129 has shipped and, if he still sees it, worth asking whether his own machine's tile latency or CPU load differs from this one's
