@@ -69,8 +69,13 @@ const ROOTJS = path.join(ROOT, 'js/lpn-collide.js');
 // as at `1234=`. Section 19bb is why it does not ship that way yet.
 const FIXTURES = [
 	{ tag: 'synthetic crowded', kind: 'synthetic', arg: 100, roomCeiling: { narrow: 0, wide: 0 } },
-	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 12, wide: 32 } },
-	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 5 } }
+	// Raised 2026-09-22 when master's symbol cap (Task 705) landed: smaller symbols at the fit view
+	// mean a smaller candidate lattice, so more labels drop with room. Master alone hides 26 node IDs
+	// at Net3-World's fit view where this branch hid 13 before the merge. The defect this ratchets is
+	// real and is the width-blind lattice section 20b describes; the number moved for a reason
+	// outside this branch, and it is recorded here rather than silently absorbed.
+	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 28, wide: 42 } },
+	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 6 } }
 ];
 // His own test: the same field, with and without four characters of Before text.
 // **THE AFFIX IS OVERRIDABLE FOR EXPLORATION ONLY** -- `LPN_WIDE_AFFIX=12345678 node ...` runs his
@@ -420,6 +425,14 @@ function classify(Collide, runs) {
 		// narrow text chose is still free at the wider text, and with the widening in the pass that
 		// point may have come from an escalation the plain `sides` list does not contain.
 		const sides = N.candidates[id] || (lw && lw.sides && lw.sides.length ? lw.sides : (lw ? [lw.home] : null));
+		// **DRAWN AT THE WIDER TEXT AND NOT AT THE NARROWER ONE** is not a move and not a defect:
+		// the label appeared. Since room to grow (2026-09-22) it happens, because a label wider than
+		// its reserve claims no room, which leaves ground a neighbour could not use before.
+		if (lw && ln && iN < 0 && W.chosen[id] >= 0) {
+			tally.appeared = (tally.appeared || 0) + 1;
+			rows.push([id, 'drawn only at the wider text (the narrower run dropped it)', '']);
+			return;
+		}
 		if (!lw || !ln || iN < 0 || !sides || !sides[iN]) {
 			tally.unclassified++;
 			rows.push([id, 'no comparable candidate at the wider text', '']);

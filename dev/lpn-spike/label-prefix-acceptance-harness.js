@@ -42,9 +42,12 @@ const MULTS = [1, 2, 4, 8];
 // **THE RATCHET.** Totals over every view of a file, shipped code, empty prefix against LONG. They
 // may FALL and may not RISE. Measured 2026-09-22, with the leader slide and the column slide in:
 // those two shorten leaders and cost a few moves at 1x and 2x (30 -> 38 on Net3-World), never at 4x.
+// Re-measured after master's symbol cap (Task 705) landed and the gang repair and the slide began
+// judging a room-claiming label by its room: 102 -> 11 moved over the four zooms on Net3-World. The
+// hidden count rose with the cap itself, which hides more at the fit view on master alone (26).
 const CEILING = {
-	'Net3-Novato-CA-World.lwn': { moved: 38, hidden: 41 },
-	'Net3.lwn': { moved: 26, hidden: 25 }
+	'Net3-Novato-CA-World.lwn': { moved: 11, hidden: 29 },
+	'Net3.lwn': { moved: 9, hidden: 22 }
 };
 
 // THE BEFORE: room to grow switched off through the stub's own source hook, so every label is
@@ -280,7 +283,7 @@ function median(a) {
 
 // The ratchet on the sweep: the worst top-of-column leader and the worst hidden count over all
 // eleven lengths, fit and 2x. Measured 2026-09-22; may fall, may not rise.
-const SWEEP_CEILING = { top: 3.7, hidden: 43, mean: 3.37 };
+const SWEEP_CEILING = { top: 3.5, hidden: 47, mean: 2.1 };
 function sweepReport() {
 	const file = FILES[0], got = { now: child(file, false, 'sweep'), before: child(file, true, 'sweep') };
 	if (got.now.error || got.before.error) { report(false, 'prefix sweep', got.now.error || got.before.error); return; }

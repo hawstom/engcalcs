@@ -1934,6 +1934,17 @@ again (measured: 2 at 4x). On his northwest case, ID plus three properties at 3x
 (`label-slide-harness.js`). It costs a few moves at 1x and 2x in the R-075 count (30 -> 38 on
 Net3-World) and none at 4x or 8x.
 
+### 20e2. After master's symbol cap landed (2026-09-22)
+
+Master's Task 705 caps a symbol's size at the labeling threshold, so at the fit view symbols are
+smaller, the width-blind lattice is smaller, and more labels drop: master ALONE hides 26 node IDs at
+Net3-World's fit view where this branch hid 13 before the merge (the "before" columns agree, so it
+is not room to grow). Separately, the merge exposed that the gang repair judged a room-claiming
+label by its bare text, which put width back into the repair: it now judges such a label by its
+room (`roomSpec()`), as the slide already did. R-075 over the four zooms, empty prefix -> 8 digits,
+labels the short layout drew: Net3-World 102 moved / 41 hidden before room to grow -> **11 / 29**;
+Net3 78 / 26 -> **9 / 22**; zero and zero at 4x and 8x on both.
+
 ### 20f. What is not done
 
 - **A label wider than the reserve is placed exactly as before.** Six row heights is sized to his

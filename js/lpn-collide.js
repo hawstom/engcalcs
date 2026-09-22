@@ -1296,6 +1296,18 @@ EngCalcs.lpnCollide = (function () {
 	// **The caller keeps ownership of both**, because deciding which side is open needs the network's
 	// topology and deciding which label matters needs to know what a demand is, and this file is not
 	// allowed to know either. It is the same purity line placeLabels() draws.
+	// **A LABEL THAT CLAIMED ROOM TO GROW IS, TO EVERY LATER PASS, THE ROOM IT CLAIMED** (see
+	// placeLabelsFirstFit()). The gang repair and the leader slide both judge a label by its box, and
+	// judging it by the bare TEXT would make what they decide depend on how long the text is -- which
+	// is exactly what room to grow exists to stop. Measured after the symbol cap landed: the repair
+	// re-dealt one gang differently with an 8-digit prefix at 4x on Net3-World and the crossing shed
+	// then hid a label. So such a label is presented as a spec whose width IS the room; `text` keeps
+	// the real one, which is what any result handed back to the page is built from.
+	function roomSpec(sp, r) {
+		if (!sp || !r || !(r.room > sp.w)) { return sp; }
+		return { id: sp.id, anchor: sp.anchor, home: sp.home, sides: sp.sides, dragged: sp.dragged,
+			w: r.room, h: sp.h, yOff: sp.yOff, lines: null, text: sp };
+	}
 	// ---- SLIDE TOWARD THE NODE (Task 539, Tom 2026-09-22) ------------------------------------------
 	//
 	// **Tom, on two labels parked well out from their nodes with empty ground between:** *"A human
@@ -1332,11 +1344,7 @@ EngCalcs.lpnCollide = (function () {
 		// the text is -- measured: it put two moves back at 4x on Net3-World, where room to grow had
 		// made adding a prefix move nothing. So such a label is tested, and seen by the others, as
 		// the room it claimed; the real text lies inside that box by construction.
-		function asSpec(sp, r) {
-			if (!(r.room > sp.w)) { return sp; }
-			return { id: sp.id, anchor: sp.anchor, home: sp.home, w: r.room, h: sp.h, yOff: sp.yOff,
-				lines: null, text: sp };
-		}
+		var asSpec = roomSpec;
 		out.forEach(function (r, i) {
 			var sp0 = specs[r.id], sp;
 			if (r.dropped || !sp0 || sp0.dragged) { return; }
@@ -2244,9 +2252,10 @@ EngCalcs.lpnCollide = (function () {
 				? segment(spec.anchor.x, spec.anchor.y, c.x, c.y, 'leader', spec.id) : null;
 		}
 		out.forEach(function (r, i) {
-			var spec = specs[r.id], bs;
+			var spec = roomSpec(specs[r.id], r), bs;
 			if (r.dropped || !spec || spec.dragged) { return; }
-			bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
+			bs = spec.text ? labelLineBoxes(spec, { x: r.x, y: r.y })
+				: ((r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []));
 			if (!bs.length) { return; }
 			slotOf[r.id] = live.length;
 			live.push({ id: r.id, boxes: bs, leader: leaderAt(spec, { x: r.x, y: r.y }),
@@ -2693,8 +2702,9 @@ EngCalcs.lpnCollide = (function () {
 				live[slotOf[m.id]].at = { x: c.x, y: c.y };
 				out[m.out] = { id: r.id, x: c.x, y: c.y,
 					dx: c.x - spec.home.x, dy: c.y - spec.home.y,
-					dropped: false, side: sides.indexOf(c),
-					box: labelBoxAtEnd(spec, c), boxes: bestArr[j].boxes, leader: null };
+					dropped: false, side: sides.indexOf(c), room: r.room,
+					box: labelBoxAtEnd(spec.text || spec, c),
+					boxes: spec.text ? labelLineBoxes(spec.text, c) : bestArr[j].boxes, leader: null };
 			});
 		});
 		// **THE CLOSING COUNT IS A REPORT, NOT A DECISION, so it is asked for rather than always
