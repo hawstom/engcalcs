@@ -1902,6 +1902,12 @@ the block.
     found writers blind to an existing guard, and here there was never a door to be blind to.
   - **THE DIALOG BEHIND HIS COMPLAINT IS PROBABLY `presentOpenChoice()`**, whose Cancel branch
     leaves no residue at all -- nothing to reopen, which is exactly *"Help! What did I miss!"*
+  - **ROWS 1 AND 2 ARE BUILT on `feat/notice-log`**, on Tom's word 2026-09-21: *"Messaging /
+    Messenger: I think I agree with Ida. Proceed."* `setNotice()` keeps the last 30 distinct
+    messages in memory, `renderBanner()` and `presentOpenChoice()`'s Cancel branch land in the same
+    log, and one `info` icon in the map's bottom status strip reads it back. Nothing new is stored
+    on the visitor's device. `dev/lpn-spike/notice-log-harness.js`. **Rows 3 and 4 are NOT built**:
+    the 57 raw dialogs are the feature-branch-sized piece he floated and has not authorized.
   - **HER RANKING, cheapest first, and the first row is the whole of his complaint:** (1) teach
     `setNotice()` -- already one function -- to keep a small in-memory history, and put one modest
     icon near the existing status box to read it back. **A log behind a control, not a fifth bar of
