@@ -43851,8 +43851,11 @@ var EngCalcs = EngCalcs || {};
 	// message about 'We asked your colleague to close the file' disappeared too fast and
 	// unrecoverable. 'Help! What did I miss!' We need a better messaging system."*).
 	//
-	// setNotice() is already ONE DOOR with 66 call sites and an eight-second expiry, and a later
-	// message silently REPLACES an earlier one. That replacement is the whole of the complaint, and
+	// setNotice() is already ONE DOOR with 83 call sites and an eight-second expiry, and a later
+	// message silently REPLACES an earlier one. **THE COUNT IS RE-DERIVED, NOT INHERITED**: the
+	// figure carried into this task was 66, which was an undercount nobody had re-checked. 83 is
+	// this file with comments stripped, on the day the log was built and before the two Cancel
+	// notices below made it 85. Re-derive it rather than quoting this line. That replacement is the whole of the complaint, and
 	// the answer is not a longer timer -- it is a place the message went. QGIS splits exactly here:
 	// QgsMessageBar is transient, QgsMessageLog is the store behind it, reached from one icon at
 	// the end of the status bar. This is that split and nothing more.
@@ -43881,6 +43884,17 @@ var EngCalcs = EngCalcs || {};
 	// setNotice() carries is a completed action. That is two honest kinds of event and this page
 	// does not have four, so QGIS's four severities are deliberately not imported -- a level
 	// nobody can assign consistently is a colour that means nothing by the third week.
+	// **THE LIMITATION, WRITTEN DOWN AT THE PLACE IT WOULD BITE.** Dedupe is an exact match on the
+	// pair (text, severity), which is right for the case that matters -- a message carrying a
+	// changing number ("Saved Net3.lwn", "Saved Net2.lwn") stays distinct, because the numbers and
+	// names are substituted before this sees the string. What it cannot tell apart is TWO DIFFERENT
+	// LANGUAGE KEYS THAT RENDER BYTE-IDENTICAL ENGLISH: they would collapse into one row, and the
+	// reader would be shown one event where two happened. No such collision exists in the current
+	// strings -- checked, not assumed. Comparing the KEY instead would fix it and cost more than it
+	// buys: every caller would have to pass one, and renderBanner() composes its sentence from a
+	// key plus a name, so there is no single key to pass. If a collision ever does ship, the cheap
+	// repair is to reword one of the two strings, which is a translation edit and not a design
+	// change.
 	function logMessage(text, severity) {
 		var t = String(text == null ? '' : text).trim(), kind, i;
 		if (!t) { return; }

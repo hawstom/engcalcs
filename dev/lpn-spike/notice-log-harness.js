@@ -7,8 +7,9 @@
 // miss!' We need a better messaging system."* And again on 2026-09-21: *"peripheral and
 // pervasive."*
 //
-// setNotice() is one door with 66 call sites and an eight-second expiry, and a later message
-// silently replaces an earlier one. The repair is not a longer timer -- it is a place the message
+// setNotice() is one door with 83 call sites and an eight-second expiry, and a later message
+// silently replaces an earlier one. (83 is re-derived from the file with comments stripped, not
+// the 66 that was carried into this task and never re-checked.) The repair is not a longer timer -- it is a place the message
 // WENT: a bounded in-memory log, and one icon in the map's bottom status strip that reads it back.
 //
 // SEVEN GROUPS, and the one that matters most is 4. The others describe a feature; 4 describes a
