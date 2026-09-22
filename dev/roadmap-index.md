@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 23 · Soon (75): 16 · Someday (50): 26 · Maybe (25): 12 · Parked (5): 18
+**95 open tasks.** Next (100): 22 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
 
-## 100 — Next (23)
+## 100 — Next (22)
 
 - Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -33,7 +33,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 703 — The satellite tiles: still blank patches after everything measured so far.
 - ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
 - ! Task 705 — New zoom rules: a symbol may not grow past a size the network itself sets.
-- Task 706 — Every committed cell saves the WHOLE project, and nothing holds it back.
 
 ## 75 — Soon (16)
 
@@ -54,7 +53,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 
-## 50 — Someday (26)
+## 50 — Someday (27)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -82,6 +81,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 694 — Export a map animation as an animated picture.
 - Task 695 — The daily status mail has columns with no headings.
 - ! Task 702 — A view window cannot describe a span across the far side of the world.
+- Task 707 — Five minutes of a real browser on the Task 706 repair.
 
 ## 25 — Maybe (12)
 

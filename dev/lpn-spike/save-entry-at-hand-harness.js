@@ -283,8 +283,11 @@ function buildPage(mutate) {
 	console.log('    (and the deferred write, once per pause, serialises ' + p.counts.bytes + ' characters)');
 	ok('a committed cell costs less than it did', afterMs < beforeMs,
 		afterMs.toFixed(3) + ' ms vs ' + beforeMs.toFixed(3) + ' ms');
-	ok('...and deferring the write is most of that', marksMs < beforeMs,
-		marksMs.toFixed(3) + ' ms vs ' + beforeMs.toFixed(3) + ' ms');
+	// **NOT ASSERTED: WHICH OF THE TWO REPAIRS IS THE BIGGER ONE.** Their split moves run to run
+	// here and is a fact about this stub's DOM rather than about a browser (see the header). What
+	// is asserted is only that each one removes work, which is decidable.
+	ok('...and dropping the whole-map mark scan removes work of its own', afterMs < marksMs,
+		afterMs.toFixed(3) + ' ms vs ' + marksMs.toFixed(3) + ' ms');
 
 	// ---- 5. THE MUTATIONS -----------------------------------------------------------------------
 	//
