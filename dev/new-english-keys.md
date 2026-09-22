@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**111 still to read on master**, of 186 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**118 still to read on master**, of 193 untranslated keys, of 2051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (186, 111 to read @@ NEEDS RULING)
+## lpn_  (193, 118 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -213,6 +213,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
   _Ruled OK 2026-09-17._
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  @@ NEEDS RULING
 - **`lpn_lock_open_care`**
   > To avoid data loss, choose carefully from the options below.
   _Ruled OK 2026-09-17._
@@ -326,6 +329,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.
+  @@ NEEDS RULING
+- **`lpn_msglog_ago`**
+  > {x} ago
+  @@ NEEDS RULING
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  @@ NEEDS RULING
+- **`lpn_msglog_heading`**
+  > Recent messages
+  @@ NEEDS RULING
+- **`lpn_msglog_name`**
+  > Messages
+  @@ NEEDS RULING
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
+  @@ NEEDS RULING
+- **`lpn_msglog_tip`**
+  > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
 - **`lpn_node_customers`**
   > Customer demands
@@ -590,7 +611,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**63 still to read**, of 63 new keys across 4 unmerged branch(es).
+**63 still to read**, of 63 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -724,7 +745,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`4cfbd343`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/notice-log (`778d4c95`) — adds no English strings
+
+### feat/tables-spreadsheet (`d8ee55a0`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_training_3`**
   > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
@@ -759,6 +782,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
+
+### fix/save-entry-at-hand (`e8e39758`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 13 new, 13 to read @@ NEEDS RULING
 
