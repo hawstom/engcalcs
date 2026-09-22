@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2012,
-        "delta_key_count": 157,
+        "expected_key_count": 2044,
+        "delta_key_count": 189,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -558,6 +558,7 @@
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_copy_of": "Copy of {name}",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -576,6 +577,7 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unnamed": "unnamed",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -599,6 +601,36 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "World map…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_add": "Attach",
+        "lpn_map_attach_readjust": "Re-adjust",
+        "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
+        "lpn_map_attach_scale_from": "Scale from the current size…",
+        "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
+        "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
+        "lpn_map_attach_remove": "Detach",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
+        "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
+        "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
+        "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
+        "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
+        "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
+        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn_read": "{d} degrees",
+        "lpn_mapgeo_dial_size": "Map size",
+        "lpn_mapgeo_dial_size_read": "{f} times",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_place": "Place approximately",
+        "lpn_mapgeo_finish": "Georeference here",
+        "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
+        "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_cp_key": "Key",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -717,6 +749,7 @@
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_copy_of": "Copy of {name}",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -735,6 +768,7 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unnamed": "unnamed",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -758,6 +792,36 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "World map…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_add": "Attach",
+        "lpn_map_attach_readjust": "Re-adjust",
+        "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
+        "lpn_map_attach_scale_from": "Scale from the current size…",
+        "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
+        "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
+        "lpn_map_attach_remove": "Detach",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
+        "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
+        "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
+        "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
+        "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
+        "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
+        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn_read": "{d} degrees",
+        "lpn_mapgeo_dial_size": "Map size",
+        "lpn_mapgeo_dial_size_read": "{f} times",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_place": "Place approximately",
+        "lpn_mapgeo_finish": "Georeference here",
+        "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
+        "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_cp_key": "Key",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -1356,6 +1420,22 @@
                 }
             }
         },
+        "lpn_copy_of": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo",
+                    "value": "একটি xy ফাইল মানচিত্রে খুলুন…",
+                    "english": "Convert coordinates as…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "এই পৃষ্ঠায় একটি নতুন প্রকল্প ট্যাবে, রাস্তার মানচিত্রে একটি প্রকল্প ফাইল বা একটি EPANET ফাইল খোলে। আপনি হাতে অঙ্কনটি পৃথিবীতে বসান: সাইটে প্যান ও জুম করুন, তারপর মাপ ও দিক ঠিক করে বসিয়ে দিন। যদি ফাইলের x ও y ইতিমধ্যে একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হয়, তাহলে এগুলো ইতিমধ্যে lat\/lon বোতাম চাপুন এবং নেটওয়ার্কটি সরাসরি তার প্রকৃত জায়গায় চলে যাবে। আপনার লেখা প্রতিটি সংখ্যা যেমন আছে তেমনই থাকে।",
+                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                }
+            }
+        },
         "lpn_ts_menu": {
             "reason": "missing",
             "current_value": null,
@@ -1629,6 +1709,22 @@
             }
         },
         "lpn_crs_unplaceable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "জিওরেফারেন্সড নয়",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_crs_unnamed": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2009,6 +2105,486 @@
                     "key": "lpn_field_text_size",
                     "value": "আকার গুণক",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_map_attach_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_readjust": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_readjust_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_bad": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_step1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_step2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_hint1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_hint2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_gestures": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_turn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_turn_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_size_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_help": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_finish": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "পটভূমি চিত্রটি সরিয়ে ফেলবেন?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
                 }
             }
         },
