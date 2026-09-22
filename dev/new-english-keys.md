@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**119 still to read on master**, of 191 untranslated keys, of 2049 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**119 still to read on master**, of 191 untranslated keys, of 2042 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -605,7 +605,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**28 still to read**, of 34 new keys across 3 unmerged branch(es).
+**70 still to read**, of 70 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -616,17 +616,56 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`ae48c735`) — 13 new, 11 to read @@ NEEDS RULING
+### chore/tom-0922 (`b2485826`) — 7 new, 7 to read @@ NEEDS RULING
 
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`2b528452`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   @@ NEEDS RULING
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
 - **`lpn_labels_restore`**
   > Restore label defaults
   @@ NEEDS RULING
@@ -645,27 +684,32 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_max_width_tip`**
   > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
 
-### feat/notice-log (`5191e8d3`) — 13 new, 11 to read @@ NEEDS RULING
+### feat/map-menu (`89bbbcdc`) — adds no English strings
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
+### feat/notice-log (`1e48999b`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
 - **`lpn_lock_open_cancelled`**
   > That file was not opened, and nothing here changed. Somebody else still has it open.
   @@ NEEDS RULING
@@ -687,42 +731,120 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_tip`**
   > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`64b1a0e0`) — 8 new, 6 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`47c8f84a`) — 9 new, 9 to read @@ NEEDS RULING
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
 - **`lpn_pane_goto_tip`**
   > Show this on the map.
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
+
+### feat/zoom-symbol-size (`e1c025ca`) — 12 new, 12 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
   @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
   @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
   @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
+  @@ NEEDS RULING
+- **`lpn_settings_label_always`**
+  > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width`**
+  > Show labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
+  @@ NEEDS RULING
+
+### fix/daily-report-headings (`f3edca07`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
+
+### fix/example-open (`e3ff6a6e`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
   @@ NEEDS RULING
