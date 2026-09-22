@@ -124,6 +124,11 @@ const EC_TABLE_PARITY_EXEMPT = [
     'valve/lpn_field_valve_setting_flow' => 'b. see lpn_field_valve_setting_drop',
     'valve/lpn_field_valve_setting_loss' => 'b. see lpn_field_valve_setting_drop',
     'valve/lpn_field_valve_setting_pressure' => 'b. see lpn_field_valve_setting_drop',
+    // (e) renderLinkFields() is shared by every link type, so the scan credits its pipe-only reaction
+    // rate row to pumps and valves too. linkReactionRate() answers undefined for anything but a pipe,
+    // so the row never appears on either; the Pipes table carries the column.
+    'pump/lpn_result_reaction_rate' => 'e. a pipe-only row in the shared link popup; never shown on a pump',
+    'valve/lpn_result_reaction_rate' => 'e. a pipe-only row in the shared link popup; never shown on a valve',
     'text/lpn_field_text_attached' => 'b. an attached Text takes its alignment from its leader; the '
         . 'align and valign columns state that rule in the cell through plainWord/plainTip',
     // (e) not this element's property at all. A junction's Customers line is a ROLL-UP of other

@@ -24,10 +24,11 @@ exports.title = '46. Bottom pane tables: blank on load, widths, switch cost, hea
 
 const TABLES = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'customers'];
 
-async function openExample(browser, title, extra) {
+// An example is named by its card's language KEY, never its English (harness_wording_check.php).
+async function openExample(browser, titleKey, extra) {
 	const a = await Session.open(browser, 'A', extra);
 	await a.goto('Looped-Network.php');
-	await a.openExampleCard(title);
+	await a.openExampleCard(await a.lang(titleKey));
 	await a.settle(1500);
 	// The consent banner lies across the bottom of the window, which is where the pane is.
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -95,7 +96,7 @@ const COLUMN_FLOORS = (id) => {
 exports.run = async function ({ browser, report }) {
 	// ---- R-109: blank on load --------------------------------------------------------------
 	{
-		const a = await openExample(browser, 'EPANET Net3');
+		const a = await openExample(browser, 'lpn_ex_net3_title');
 		await openPane(a);
 		await showTab(a, 'junctions');
 		// Recalculate OFF, written into the stored project the way the Settings box writes it, so
@@ -129,7 +130,7 @@ exports.run = async function ({ browser, report }) {
 	}
 
 	// ---- R-110: every column of every table meets its floor ----------------------------------
-	for (const ex of ['EPANET Net3, lat/lon', 'EPANET Net3', 'Elm Street Center']) {
+	for (const ex of ['lpn_ex_net3_world_title', 'lpn_ex_net3_title', 'lpn_ex_elm_street_title']) {
 		const a = await openExample(browser, ex);
 		await openPane(a);
 		const bad = [], seen = [];
@@ -163,7 +164,7 @@ exports.run = async function ({ browser, report }) {
 	// a STORED width, so every column of two tables is stored at one em -- what a browser still
 	// carrying the old defects' widths holds -- and the page is reloaded to read them back.
 	{
-		const a = await openExample(browser, 'EPANET Net3, lat/lon');
+		const a = await openExample(browser, 'lpn_ex_net3_world_title');
 		await openPane(a);
 		const tabs = ['pipes', 'pumps', 'junctions'];
 		const prefs = {};
@@ -211,7 +212,7 @@ exports.run = async function ({ browser, report }) {
 
 	// ---- R-111, R-113, R-115 on one page ----------------------------------------------------
 	{
-		const a = await openExample(browser, 'EPANET Net3');
+		const a = await openExample(browser, 'lpn_ex_net3_title');
 		await openPane(a);
 		await showTab(a, 'junctions');
 		await showTab(a, 'pipes');
@@ -274,7 +275,7 @@ exports.run = async function ({ browser, report }) {
 
 	// ---- R-112: the heading and the top row share one edge, at three scale factors ------------
 	for (const dsf of [1, 1.25, 1.5]) {
-		const a = await openExample(browser, 'EPANET Net3', { deviceScaleFactor: dsf });
+		const a = await openExample(browser, 'lpn_ex_net3_title', { deviceScaleFactor: dsf });
 		await openPane(a);
 		await showTab(a, 'junctions');
 		await a.page.evaluate(() => {

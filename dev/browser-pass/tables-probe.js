@@ -1,6 +1,6 @@
 // HOW LONG DOES A TABLE TAB TAKE TO APPEAR, IN A REAL CHROME? (Task 690, R-111)
 //
-//   flock /tmp/engcalcs-browser.lock node dev/browser-pass/tables-probe.js ["EPANET Net3"] [--profile]
+//   flock /tmp/engcalcs-browser.lock node dev/browser-pass/tables-probe.js [lpn_ex_net3_title] [--solve] [--profile]
 //
 // Tom, 2026-09-21: *"Switching to Junctions the first time and some subsequent times delayed about
 // 3 seconds or more. This is the worst issue I found."*
@@ -17,7 +17,7 @@
 //
 // Absolute milliseconds are this machine's, not Tom's. The SHAPE and the before/after ratio travel.
 //
-// WHAT IT FOUND, 2026-09-22, "EPANET Net3" with --solve, three runs each, on a shared 4-core box:
+// WHAT IT FOUND, 2026-09-22, lpn_ex_net3_title (the XY Net3) with --solve, three runs each, on a shared 4-core box:
 //   * BEFORE: a switch back to Junctions (92 rows x 14 columns) took 279-560 ms, median ~360.
 //     Every show() threw the table away and built it again, then the browser re-derived style and
 //     layout for ~1,300 controls because `display: none` had discarded both. The trace split was
@@ -33,7 +33,8 @@ const path = require('path');
 const env = require('./lib/env.js');
 const { Session } = require('./lib/session.js');
 
-const EXAMPLE = process.argv.slice(2).find(a => !a.startsWith('--')) || 'EPANET Net3, lat/lon';
+// The example's card title, or its language key (lpn_ex_*_title), which is the default's form.
+const EXAMPLE = process.argv.slice(2).find(a => !a.startsWith('--')) || 'lpn_ex_net3_world_title';
 const PROFILE = process.argv.includes('--profile');
 // --solve presses Calculate first, so the tables carry their RESULT columns as Tom's do.
 const SOLVE = process.argv.includes('--solve');
@@ -84,7 +85,7 @@ const SWITCH = async ([id, QUIET]) => {
 	try {
 		const s = await Session.open(browser, 'A', WIDTH ? { viewport: { width: WIDTH, height: 900 } } : undefined);
 		await s.goto('Looped-Network.php');
-		await s.openExampleCard(EXAMPLE);
+		await s.openExampleCard(/^lpn_ex_/.test(EXAMPLE) ? await s.lang(EXAMPLE) : EXAMPLE);
 		await s.settle(3000);
 		const nodes = await s.nodeCount();
 		console.log(`${EXAMPLE}: ${nodes} nodes drawn; status: ${(await s.status() || '').slice(0, 120)}`);
