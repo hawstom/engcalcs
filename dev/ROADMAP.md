@@ -255,9 +255,25 @@ the block.
     undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
     hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
     whatever `tables-interface` already holds.
-  - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
-    tables is the defect inside that programme. Read it before opening anything new.
-  - At 50 because he named it as long-term, not next. Promoting it is his call.
+  - **`tables-interface` IS RETIRED, 2026-09-21, AND EVERYTHING IT HELD IS THE FOUR BULLETS BELOW.**
+    It was one commit off master, made 2026-09-14, holding nothing but a roadmap block -- and that
+    block numbered itself **666**, which was closed the same day for an unrelated lock defect, so
+    the branch could not have passed `roadmap_id_check.php` and could never have merged. It sat for
+    a week. The work itself is live on `feat/tables-spreadsheet`; only the reasoning was stranded,
+    and it is salvaged here rather than deleted with the branch.
+    - Tom, 2026-09-14: *"Tables spreadsheet editing: Copy/paste doesn't work right. We need a
+      tables-interface branch that may be a long-term tweaking project to include column-widths,
+      copy/paste, etc."*
+    - **COPY AND PASTE IS THE DEFECT; THE REST IS THE PROGRAMME.** Fix it first rather than let it
+      wait on the long work -- a broken paste is the `data-entry-clerk`'s whole day. Also named the
+      same day: user-resizable columns, headings that do not wrap, columns too wide.
+    - **THE TABLE IS AN EDITOR OF THE DOCUMENT, NOT A GRID**, and that shapes all of it. Cells write
+      through `setProp()` (`scenario_seam_check.php`), a blank is a STATE not a zero where a column
+      declares `blank`, and `multiGroups()` builds the multi-properties box from these same specs.
+      **So a paste is a batch of validated property writes under one undo snapshot; getting that
+      wrong is silent inside a scenario.**
+    - **Shares the bottom pane's tab strip** with anything else that writes it, so name that seam in
+      any brief or sequence the tracks.
 
 - 100|691| **Create a better error and notice messaging system.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
