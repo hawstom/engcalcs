@@ -1819,64 +1819,81 @@ node ID alone 1,415 -> 1,390 ms (nothing, inside the noise of a shared machine);
 
 ---
 
-## 20. HOW THE ENDLESS STACK IS POSSIBLE, MEASURED -- and it is a bug, not a constraint (2026-09-21)
+## 20. HOW THE ENDLESS STACK IS POSSIBLE, AND ROOM TO GROW (2026-09-21, built 2026-09-22)
 
-**Tom, 2026-09-21, on being handed section 19's mechanism as though it were a defence:** *"Clearly
-this is a bug. But you say it without batting an eyelash. If you don't understand why it's a bug, ask
-me. If you do, fix it. I'm just grateful that magically this endless stack happened so that I know
-it's possible; We just have to find out how it's possible and empower that."*
+**Tom, on being handed the mechanism as though it were a defence** (*"the spots don't move; the
+boxes grow into each other"*): *"Clearly this is a bug. But you say it without batting an eyelash.
+If you don't understand why it's a bug, ask me. If you do, fix it. I'm just grateful that magically
+this endless stack happened so that I know it's possible; We just have to find out how it's
+possible and empower that."* His acceptance test is R-075 unchanged: add `12345678` to the node ID
+prefix without moving or hiding any of the labels shown.
 
-**He is right, and the three sentences he was answering were an explanation offered as an excuse.**
-A placement lattice whose spacing is fixed by symbol geometry and blind to the size of the thing
-being placed is a defect. **The narrow case working is the EXISTENCE PROOF that a correct layout is
-available on that drawing; the wide case failing is the algorithm declining to find it.**
+### 20a. How the stack is possible, measured
 
-### 20a. The measurement, on his own drawing
+**The stack is not made by the first-fit at all. It is `repairCrossingGangs()`'s column** (§9a step
+4, route (b)): rows one box height plus the pad apart, hung from ONE shared edge, all hanging the
+same way. Width never enters between two rows of a column; a row's width meets only what lies past
+the column's open side. **A column is width-immune by construction**, and that is the whole trick.
+Node ID alone, Net3-World at the fit view: the first-fit's own output has no vertical chain longer
+than 2; after the repair there is a column of 10 (267, 187, 189, 169, 181, 185, 183, 179, 199, 273,
+left of the southern cluster). With the 8-digit prefix the longest column was 4, because 37 of 97
+labels had already been dropped by the first-fit and a dropped label never reaches the repair.
 
-`node dev/lpn-spike/label-lattice-harness.js` -- and `LPN_WIDE_AFFIX=12345678` for his own test.
-Net3-Novato-CA-World, node ID alone, the fit view and 2x, the real first-fit's own captured inputs.
-**Every length is in LABEL HEIGHTS**, because the drawing is geographic and a world unit is a degree.
+**What the first-fit got wrong is the other half of the same fact.** It placed every label with its
+box exactly as wide as its text, so a narrow label was free to stop a hair short of a neighbour or a
+symbol, and then any growth ran into it. Measured as a floor (`label-prefix-acceptance-harness.js`,
+"had to move"): leave every label of the short layout where it was, give it the long width, and
+count the ones that land on something. Before the fix that was 17 of 97 at 4x and 6 at 8x on
+Net3-World, and the real pass moved 21 and 6 -- **the moves at working zooms were genuine, made
+inevitable by where the SHORT layout had put its labels.** So "no conflicts all the way to Japan"
+was true of the plane and false of the layout: the plane had room; the pass had parked labels in
+each other's growth paths.
 
-| per node label, median of 97 | ID alone | ID + `12345678` |
+### 20b. The first guess, built and measured, and not shipped: scale the lattice with the box
+
+The lattice of spots IS blind to the box (12 label-heights across whatever the width), and the first
+fix floored its reach at 4 box widths with rings added to keep the step (`label-lattice-harness.js`
+still prints the geometry). **It did empower the stack**: with the prefix, 11 dropped instead of 37,
+and the repair built a column of 44. **And it made every other number worse**: node labels moved
+53/43/23 at 1x/2x/4x on Net3-World against 36/36/21 before; with every field on,
+`label-spot-harness.js` hid 64 labels against a ceiling of 14 and `label-gang-harness.js`'s worst
+view hid 29 against 12; the 44-row column hung off leaders running half the drawing; and the fit
+view cost about four times as long. A self-similar variant (spot spacing 0.6 of the box's own
+extent, the ratio the narrow case happens to have) hid fewer still and moved more. **So a lattice
+that reads the box is not what makes a stack**, and nothing that moves every spot when the text
+grows can satisfy a test whose whole point is that nothing moves.
+
+### 20c. The fix: a label first claims room to grow (`Collide.placeLabelsFirstFit()`)
+
+Every row of a stack has open ground in the direction its text runs. So a node label narrower than
+`LPN_NODE_ROOM_TO_GROW_ROWS` (6) row heights first looks for a side where a box that wide, hanging
+the way its text hangs, is clear -- and if it finds one it stands there and RESERVES that room, so
+nobody placed after it parks in its growth path. If it finds none, the ordinary search runs exactly
+as before. **The claim does not depend on the text**, so a label that finds room makes the same
+choice whatever its text is up to that width. The reserve is SOFT: it blocks another label's
+room-to-grow claim, but the ordinary search sees it as yielding, like a stationed pipe label, so a
+label with nowhere else to stand may still take it. A hard reserve was measured first and hid 9 more
+labels at Net3-World's fit view with the short prefix.
+
+| node ID alone, empty prefix -> `12345678`, labels the short layout drew | before | room to grow |
 |---|---|---|
-| width of the box being placed | 1.49 | **5.45** |
-| diameter of the whole cloud of spots it is offered | 11.95 | **11.95** |
-| distance between two neighbouring spots | 0.90 | **0.90** |
-| **cloud diameter / box width -- how much room it has to hunt in** | **8.04** | **2.19** |
-| spots offered | 26 | 26 |
-| **spots that are genuinely DIFFERENT places for a box that size** | **17** | **12** |
-| spots one committed box poisons | 2.5 | 4.4 |
-| labels hidden at the fit view | 12 of 97 | 36 of 97 |
+| Net3-World, moved / hidden, 1x | 36 / 30 | **18 / 27** |
+| Net3-World, 2x | 36 / 12 | **12 / 14** |
+| Net3-World, 4x and 8x | 21 / 0 and 6 / 0 | **0 / 0 and 0 / 0** |
+| Net3 (XY), 1x / 2x | 30 / 18 and 29 / 8 | **12 / 21 and 7 / 7** |
+| Net3 (XY), 4x and 8x | 11 / 0 and 4 / 0 | **0 / 0 and 0 / 0** |
+| labels drawn with the short prefix, 1x (World / Net3) | 82 / 87 | 81 / 90 |
 
-### 20b. The mechanism, in one paragraph
+**At 4x and 8x his sentence now holds exactly on both drawings**, and the harness asserts zero there
+rather than a ceiling. What is left is the fit and 2x views, where the plane itself is crowded: the
+floor there is 29 and 17 on Net3-World, so most of what still moves genuinely has to.
 
-**The lattice is finer than a narrow box and coarser than a wide one, and it never changes.** The
-spots sit in a cloud about twelve label-heights across with neighbours nine-tenths of a label-height
-apart -- `nodeFirstFitSpec()` builds both from `defaultLabelOffset()`, which scales with the SYMBOL,
-and from a fixed 15 degree angle step. A narrow box is one and a half label-heights wide, which is
-under two spot-spacings, so a label can step ONE RUNG along the lattice and sit shoulder to shoulder
-with its neighbour; 26 spots give it 17 real choices inside eight box-widths of open ground. **That
-rung-by-rung stepping IS the endless stack, and it is not a talent of narrow labels -- it is the
-lattice being finer than the thing being placed.** A wide box is five and a half label-heights, six
-spot-spacings, so one box lies across six rungs: the 26 spots collapse to 12 real choices, a
-committed box poisons four of its own neighbours instead of two, and the whole search area is two
-box-widths across instead of eight. **The wide label is not short of plane. It is short of LATTICE.**
+### 20d. What is not done
 
-### 20c. What that says to build, and it is the consumption again
-
-The offered cloud is IDENTICAL at both widths -- asserted, not argued, and the harness's first
-mutation is a reach that reads the box width, which must make it differ. So the fix is not a new
-model: **the lattice has to be a function of the box being placed.** Two numbers, both already
-computed one step away:
-
-- **REACH.** `outer` is `max(3 x resting offset, 1.5 text heights)`, a symbol quantity. Floored on
-  the BOX instead, a wide label is offered the same eight box-widths of hunting ground a narrow one
-  gets, and the stack is as endless as it ever was; it simply takes more room, and there is room.
-- **ANGULAR STEP.** Fixed at 15 degrees, so at the inner ring the spots are far finer than any box
-  and 14 of the 26 are spellings of one place, while at the outer ring of a wide label they are
-  coarser than the box and a gap is stepped straight over. Stepped so the TANGENTIAL spacing is a
-  fixed fraction of the box width, both ends are right and the count does not rise.
-
-**This is his R-079 in a second place.** The ranked arc table stopped being thrown away at
-`rankedArcs()`; here the box stops being thrown away at the lattice. Both are changes where a
-quantity is CONSUMED, not new models.
+- **A label wider than the reserve is placed exactly as before.** Six row heights is sized to his
+  test (a Net3 ID plus eight digits is 5.45 row heights, median of 97); multi-row labels with every
+  field on are usually wider and are untouched, which is also why none of the all-fields ratchets
+  moved. Whether the reserve should scale with the field set is a question, not a default.
+- **The fit-view cascade is still greedy.** A label that genuinely has to move takes ground a later
+  one wanted. A tiered pass (every label tries its four corners before any label tries the raster)
+  was measured at 279 -> 228 moves over the old nine-view sample and is not built.

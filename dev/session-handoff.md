@@ -36,11 +36,12 @@ suspect. This is that trap, resolved rather than survived. **The full answers ar
 
 The three things worth carrying:
 
-- **THE SPOTS DO NOT MOVE; THE BOXES GROW INTO EACH OTHER.** The candidate set is identical at
-  both widths on all 97 labels, so where a label may be OFFERED a place never reads its text. The
-  spots sit at a fixed geometric spacing around the node. Two labels at neighbouring spots collide
-  exactly when their half-widths together exceed that spacing -- so a narrow label stacks endlessly
-  because the spacing wins, and a wide one **occupies spots it is not standing on**.
+- **THE SPOTS DO NOT MOVE; THE BOXES GROW INTO EACH OTHER -- AND HE RULED THAT A BUG (R-108).**
+  Measured 2026-09-22: the endless stack is `repairCrossingGangs()`'s COLUMN (rows one box height
+  apart, one shared edge, width-immune), not anything the first-fit does; and the moves at working
+  zooms were genuine, because the first-fit parked labels in each other's growth paths. Scaling
+  the spot lattice with the box was built and REJECTED on its numbers. What shipped on the branch
+  is ROOM TO GROW: `dev/label-placement-algorithms.md` §20.
 - **NINETEEN IS THE COUNT THAT TOUCHED SOMETHING. ZERO IS THE COUNT THAT HAD TO MOVE, AND HIS IS
   THE ONE THAT DECIDES WHAT GETS BUILT.** 36 of 97 labels vanish and not one was boxed in: the
   search gives up after 28 spots inside one gap while there was room just outside it.
@@ -52,9 +53,10 @@ The three things worth carrying:
   all but the biggest away (his R-079).
 
 **AND SAY "NOTHING SHIPPED" OUT LOUD THE MOMENT IT IS TRUE.** He once spent a browser pass on
-`feat/label-gang-search` when every candidate had been abandoned and nobody told him. The shipped
-default on that branch is still byte-identical to what he tested; the rescue is behind
-`?debug=labels`. Lead with that sentence, every time.
+`feat/label-gang-search` when every candidate had been abandoned and nobody told him. **The shipped
+default on that branch CHANGED on 2026-09-22 (room to grow, R-108), on his instruction to fix it:**
+at 4x and 8x his `12345678` test now moves and hides nothing on Net3 and Net3-World; the fit view
+still moves some. The widening rescue is still behind `?debug=labels`.
 
 ---
 

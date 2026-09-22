@@ -1292,6 +1292,32 @@ EngCalcs.lpnCollide = (function () {
 	// **The caller keeps ownership of both**, because deciding which side is open needs the network's
 	// topology and deciding which label matters needs to know what a demand is, and this file is not
 	// allowed to know either. It is the same purity line placeLabels() draws.
+	// ROOM TO GROW's two pieces (placeLabelsFirstFit() carries the reasoning), at module level so a
+	// replay of the pass -- label-width-cause-harness.js -- asks the identical question rather than
+	// keeping a second opinion about it. The room is a box `lbl.grow` wide hanging off the endpoint
+	// exactly as the text does, so it lies in the direction the text would grow.
+	function growBoxAt(lbl, c) {
+		var b = labelBoxAtEnd({ anchor: lbl.anchor, w: lbl.grow, h: lbl.h, yOff: lbl.yOff, id: lbl.id }, c);
+		b.kind = 'reserve'; b.yields = true;
+		return b;
+	}
+	// Clear of every hard obstacle AND of every other label's reserve: two labels may not both claim
+	// the same room. A stationed pipe label still gives way, exactly as it does to the real box.
+	function roomClearOf(b, obs, pad, ownerId) {
+		var grown = pad > 0 ? box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a) : b, i, o;
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			if ((!o.yields || o.kind === 'reserve') && boxOverlapDepth(grown, o) > 0) { return false; }
+		}
+		for (i = 0; i < obs.segments.length; i++) {
+			o = obs.segments[i];
+			if (o.kind !== 'leader') { continue; }
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			if (segmentInBoxFraction(o, grown) > 0) { return false; }
+		}
+		return true;
+	}
 	function placeLabelsFirstFit(labels, obstacles, opts) {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0,
@@ -1310,7 +1336,8 @@ EngCalcs.lpnCollide = (function () {
 			for (i = 0; i < s.length; i++) {
 				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
 			}
-			l._reach = far + Math.hypot(l.w, l.h) + pad;
+			// The ROOM TO GROW is part of what this label may test, so it is part of the reach.
+			l._reach = far + Math.hypot(Math.max(l.w, l.grow > 0 ? l.grow : 0), l.h) + pad;
 			maxReach = Math.max(maxReach, l._reach);
 		});
 		index = grid(maxReach, obs);
@@ -1348,11 +1375,52 @@ EngCalcs.lpnCollide = (function () {
 			}
 			return out;
 		}
+		// ---- ROOM TO GROW (Task 539, 2026-09-22) --------------------------------------------------
+		//
+		// **HOW THE ENDLESS STACK IS POSSIBLE, AND IT IS NOT A TALENT OF NARROW LABELS.** The stack
+		// Tom saw -- ten node IDs in one column beside Net3-World's southern cluster -- is built by
+		// repairCrossingGangs(): its rows are one box height apart and hang from ONE shared edge, all
+		// the same way. So width never enters between two rows; a row's width only ever meets what
+		// lies past the column's open side, and there is open ground there "all the way to Japan".
+		// **A column is width-immune by construction.** Every other label was placed by this pass
+		// with its box EXACTLY as wide as its text, so a narrow label was free to stop a hair short
+		// of a neighbour or a symbol -- and then any growth at all ran into it. That is the bug
+		// behind "the spots don't move; the boxes grow into each other": the pass chose spots whose
+		// growth direction was already spent.
+		//
+		// **SO A LABEL FIRST CLAIMS ITS ROOM TO GROW, the thing every row of a stack has.** `grow`
+		// is a width in world units the caller sets; a label narrower than it first looks for a side
+		// where a box that wide, hanging the way its text hangs, is clear. Found: it stands there
+		// and RESERVES that room, so nobody placed after it parks in its growth path. Not found: the
+		// ordinary search below runs exactly as before, at the label's real width. Because the claim
+		// does not depend on the text, a label that finds room makes the SAME choice whatever its
+		// text is up to that width -- which is Tom's R-075, *"add 12345678 to the node ID prefix
+		// without moving or hiding any of the labels shown"*, as a property of the pass.
+		//
+		// **THE RESERVE IS SOFT.** It blocks another label's room-to-grow test, which is what makes
+		// the room real, but the ordinary search sees it as YIELDING -- the same answer a stationed
+		// pipe label gives -- so a label with nowhere else to stand may still take it rather than
+		// vanish. Measured in dev/lpn-spike/label-prefix-acceptance-harness.js: a hard reserve hid 9
+		// more labels at the fit view of Net3-World with the SHORT prefix; the soft one hides none.
 		order.forEach(function (lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
 				chosen = null, chosenBox = null, i, c, b, verdict,
-				fallback = null, fallbackBox = null;
+				fallback = null, fallbackBox = null, room;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			if (lbl.grow > lbl.w && !lbl.dragged) {
+				for (i = 0; i < sides.length; i++) {
+					room = growBoxAt(lbl, sides[i]);
+					if (!roomClearOf(room, local, pad, lbl.id)) { continue; }
+					b = labelLineBoxes(lbl, sides[i]);
+					index.addBox(obs.boxes.push(room) - 1);
+					b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+					out.push({ id: lbl.id, x: sides[i].x, y: sides[i].y,
+						dx: sides[i].x - lbl.home.x, dy: sides[i].y - lbl.home.y,
+						dropped: false, side: i, box: labelBoxAtEnd(lbl, sides[i]), boxes: b,
+						leader: null });
+					return;
+				}
+			}
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
@@ -2625,6 +2693,8 @@ EngCalcs.lpnCollide = (function () {
 		boxClearOf: boxClearOf,
 		boxesClearOf: boxesClearOf,
 		labelLineBoxes: labelLineBoxes,
+		growBoxAt: growBoxAt,
+		roomClearOf: roomClearOf,
 		RING_ANGLES: RING_ANGLES,
 		RAY_STRETCH: RAY_STRETCH,
 		box: box,

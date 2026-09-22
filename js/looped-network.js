@@ -871,21 +871,10 @@ var EngCalcs = EngCalcs || {};
 	// shedding a value is a design change nobody asked for.
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
-			home = Math.hypot(d.x, d.y) || 1,
-			// **THE LATTICE IS A FUNCTION OF THE BOX BEING PLACED**, which is the whole of Task
-			// 539's 2026-09-21 fix; LPN_NODE_REACH_BOX_WIDTHS carries the reasoning and the
-			// measurement. The symbol floor is unchanged and still decides every ordinary label.
-			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS,
-				labelBoxWidth(ne) * LPN_NODE_REACH_BOX_WIDTHS),
-			// Rings enough to hold the step between them where the symbol-sized reach puts it, so a
-			// stretched reach samples the NEAR ground exactly as finely as it did before and simply
-			// reaches further as well. 3 whenever the box floor is inactive, so nothing moves there.
-			rings = Math.max(3, Math.min(LPN_NODE_MAX_RINGS,
-				1 + Math.ceil(Math.log(reach / home) / Math.log(LPN_NODE_RING_STEP)))),
+			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]),
-				{ raster: true, outer: reach, rings: rings, max: 8 * rings,
-					strategies: labelSideStrategies });
+				{ raster: true, outer: reach, strategies: labelSideStrategies });
 		// **AND WHEN THOSE COME UP EMPTY THE SEARCH WIDENS RATHER THAN DROPPING THE LABEL** (Tom,
 		// 2026-09-19: *"there is infinite space available. Moving is fine, but dropping is not."*).
 		// `sides` above is at most 28 points inside one wedge within three resting offsets, and the
@@ -899,6 +888,7 @@ var EngCalcs = EngCalcs || {};
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			widen: labelWidenSearch ? { offset: d, arcs: arcs, outer: reach } : null,
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
+			grow: dataLabelBoxHeight(1) * LPN_NODE_ROOM_TO_GROW_ROWS,
 			lines: labelRowWidths(ne) };
 	}
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
@@ -1574,36 +1564,15 @@ var EngCalcs = EngCalcs || {};
 	// half of one for air; it is inactive above symbolSize = 0.32 x textSize, so it changes nothing
 	// at any ordinary setting.
 	var LPN_NODE_MIN_REACH_TEXT_HEIGHTS = 1.5;
-	// **AND A FLOOR IN BOX WIDTHS, WHICH IS THE ONE THAT MAKES A WIDE LABEL STACK (Task 539,
-	// 2026-09-21).** Tom, on being told the spots do not move while the boxes grow into each other:
-	// *"Clearly this is a bug... I'm just grateful that magically this endless stack happened so
-	// that I know it's possible; We just have to find out how it's possible and empower that."*
-	//
-	// **HOW IT IS POSSIBLE, MEASURED** (`label-lattice-harness.js`, section 20): the lattice of
-	// spots is about twelve label-heights across with its rungs nine-tenths of a label-height apart,
-	// and BOTH numbers come from the SYMBOL. A narrow box is 1.5 label-heights -- under two rungs --
-	// so a label steps one rung and sits shoulder to shoulder with its neighbour, and 26 spots are
-	// 17 real choices inside eight box-widths of hunting ground. That rung-by-rung stepping IS the
-	// endless stack. A box eight characters wider is 5.5 label-heights -- six rungs -- so one box
-	// lies across six of them: 26 spots collapse to 12 real choices, each committed box poisons 4.4
-	// of its own neighbours instead of 2.5, and the whole search is two box-widths across instead of
-	// eight. **The wide label is not short of plane; it is short of LATTICE.**
-	//
-	// So the reach is floored on the BOX as well as on the symbol, and 4 is not a taste: it is the
-	// ratio the narrow case already has (5.97 label-heights of reach against a 1.49 label-height
-	// box, measured), so a wide label is offered geometrically the SAME search its narrow twin gets
-	// and stacks the same way. **It is therefore INACTIVE at his own tested settings** -- a one-row
-	// node ID is already at the ratio -- which is why the shipped drawing is what he tested.
-	var LPN_NODE_REACH_BOX_WIDTHS = 4;
-	// The ring spacing that floor must preserve. polarCandidates() lays its rings geometrically from
-	// the resting offset out to the reach, so stretching the reach without adding rings would leave
-	// the near ground sampled coarsely -- the far rungs would grow and the near ones would vanish,
-	// which is the opposite of the fix. Rings are added to hold the STEP between them at what the
-	// symbol-sized reach already produces, sqrt(3), and the candidate cap rises with them for the
-	// reason cardinalSides() already raises it for `ring`: a cap that binds spends the whole budget
-	// on the nearest ring and the outer ones are never reached.
-	var LPN_NODE_RING_STEP = Math.sqrt(3);
-	var LPN_NODE_MAX_RINGS = 8;
+	// **ROOM TO GROW, IN ROW HEIGHTS (Task 539, 2026-09-22; Collide.placeLabelsFirstFit() carries
+	// the mechanism).** A node label first looks for a side with this much room in the direction its
+	// text runs, and reserves it. Six row heights holds a typical Net3 ID with Tom's own eight-digit
+	// test prefix (5.45 row heights, median of 97), so up to that width adding text moves nothing.
+	// Measured with label-prefix-acceptance-harness.js, node ID alone, every label the short layout
+	// drew: at 4x and 8x NO label moves or hides on Net3 or Net3-World (21 + 6 moved before); over
+	// all four zooms Net3-World goes from 99 moved and 42 hidden to 32 and 41. Four row heights
+	// was measured too and leaves 13 moving at 4x; the reserve has to hold the whole grown label.
+	var LPN_NODE_ROOM_TO_GROW_ROWS = 6;
 	// **THE NEIGHBOUR CREDIT, `k`.** Goal 11: a candidate is credited for the openness of the
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.

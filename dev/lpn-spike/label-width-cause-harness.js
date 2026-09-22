@@ -217,6 +217,23 @@ function replay(Collide, cap) {
 		// be re-tested against the finished drawing, which is not what the pass saw.
 		snapshots[lbl.id] = { boxes: obs.boxes.slice(), segments: obs.segments.slice() };
 		let pick = -1, pickBox = null, fb = -1, fbBox = null, all = sides;
+		// **ROOM TO GROW, REPLAYED** (2026-09-22): a label narrower than its `grow` first stands at
+		// the first side whose room is clear, and reserves the room. Asked through the pass's own
+		// two functions, so the replay cannot hold a second opinion about it.
+		if (lbl.grow > lbl.w && !lbl.dragged) {
+			for (let i = 0; i < all.length; i++) {
+				const room = Collide.growBoxAt(lbl, all[i]);
+				if (!Collide.roomClearOf(room, obs, pad, lbl.id)) { continue; }
+				pick = i; pickBox = Collide.labelLineBoxes(lbl, all[i]);
+				obs.boxes.push(room);
+				break;
+			}
+			if (pick >= 0) {
+				chosen[lbl.id] = pick; candidates[lbl.id] = all;
+				pickBox.forEach(function (cb) { obs.boxes.push(cb); });
+				return;
+			}
+		}
 		for (let i = 0; i < all.length; i++) {
 			const b = Collide.labelLineBoxes(lbl, all[i]);
 			const v = lbl.dragged ? 'clear' : Collide.boxesClearOf(b, obs, pad, lbl.id);

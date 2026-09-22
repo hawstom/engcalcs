@@ -835,6 +835,9 @@ the block.
     changes nothing by itself.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
     may not hide a hand-placed label.** They are named by id in the harness and that is correct.
+  - **R-108, 2026-09-22: ROOM TO GROW is the branch's default now.** A node label first claims six
+    row heights of room in the direction its text runs; his `12345678` test moves and hides nothing
+    at 4x and 8x. Scaling the spot lattice with the box was built and rejected. §20.
   - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
     don't understand why we are spending effort on the rings model instead of giving the spot-prime
     box model a good college try."* **The honest answer is that of his four steps only step 4 was
