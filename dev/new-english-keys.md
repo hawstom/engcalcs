@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**79 still to read on master**, of 139 untranslated keys, of 2006 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**113 still to read on master**, of 188 untranslated keys, of 2046 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,11 +25,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (139, 79 to read @@ NEEDS RULING)
+## lpn_  (188, 113 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
+- **`lpn_copy_of`**
+  > Copy of {name}
+  @@ NEEDS RULING
+- **`lpn_crs_unnamed`**
+  > unnamed
+  @@ NEEDS RULING
 - **`lpn_crs_unplaceable`**
   > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
   @@ NEEDS RULING
@@ -48,6 +54,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
+- **`lpn_engine_bar_label`**
+  > Solver loading progress
+  @@ NEEDS RULING
+- **`lpn_engine_wait`**
+  > Loading solver. Results delayed momentarily. Continue working.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_bytes`**
+  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_pct`**
+  > Solver {percent}% loaded.
+  @@ NEEDS RULING
 - **`lpn_ff_clear`**
   > Clear rings
   @@ NEEDS RULING
@@ -167,6 +185,135 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_library_import_units_line`**
   > {name}: this project shows {mine}, the file shows {theirs}.
+  @@ NEEDS RULING
+- **`lpn_lock_age_edited`**
+  > It was last edited {x} ago.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_inuse`**
+  > It has been in use for {x}.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_never_saved`**
+  > Nothing has been saved to this file yet.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_saved`**
+  > It was last saved {x} ago.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_unknown`**
+  > There is no record of how long it has been in use, or when it was last saved or edited.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask`**
+  > Ask
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask_failed`**
+  > Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask_prompt`**
+  > Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.
+  _Ruled 2026-09-17: Edited. Please review._
+- **`lpn_lock_ask_sent`**
+  > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_open_care`**
+  > To avoid data loss, choose carefully from the options below.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_open_choices_ask`**
+  > "Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_inuse`**
+  > This file appears to be in use.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_requested`**
+  > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
+  _Ruled OK 2026-09-17._
+- **`lpn_map_attach_add`**
+  > Attach
+  @@ NEEDS RULING
+- **`lpn_map_attach_done`**
+  > The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.
+  @@ NEEDS RULING
+- **`lpn_map_attach_menu`**
+  > World map…
+  @@ NEEDS RULING
+- **`lpn_map_attach_none`**
+  > There is no world map attached to this project yet. Use Map, World map, Attach first.
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust`**
+  > Re-adjust
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust_tip`**
+  > Return to Step 2 of the map attachment process.
+  @@ NEEDS RULING
+- **`lpn_map_attach_remove`**
+  > Detach
+  @@ NEEDS RULING
+- **`lpn_map_attach_remove_tip`**
+  > Take the world map away. The drawing and its coordinates are untouched either way.
+  _Ruled OK 2026-09-17._
+- **`lpn_map_attach_removed`**
+  > The world map is gone, and the drawing is exactly as it was.
+  _Ruled OK 2026-09-17._
+- **`lpn_map_attach_scale_from`**
+  > Scale from the current size…
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_bad`**
+  > Type one number greater than zero.
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_done`**
+  > The map is resized, and your drawing and every coordinate in it are exactly as they were.
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_prompt`**
+  > Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.
+  @@ NEEDS RULING
+- **`lpn_map_attach_tip`**
+  > Attach the world map to this project without changing it any other way.
+  _Ruled OK 2026-09-17._
+- **`lpn_mapgeo_cancelled`**
+  > The world map is back where it was, and your drawing never moved.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_help`**
+  > Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size`**
+  > Map size
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size_read`**
+  > {f} times
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn`**
+  > Turn the map
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn_read`**
+  > {d} degrees
+  @@ NEEDS RULING
+- **`lpn_mapgeo_finish`**
+  > Georeference here
+  @@ NEEDS RULING
+- **`lpn_mapgeo_gestures`**
+  > Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint1`**
+  > Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint2`**
+  > Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_intro`**
+  > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_locked`**
+  > Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_place`**
+  > Place approximately
+  @@ NEEDS RULING
+- **`lpn_mapgeo_replace`**
+  > This project already has the world map attached. Replace that georeferencing?
+  @@ NEEDS RULING
+- **`lpn_mapgeo_step1`**
+  > Step 1 of 2: find your place in the world
+  @@ NEEDS RULING
+- **`lpn_mapgeo_step2`**
+  > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
 - **`lpn_meter_pick_pipe`**
   > Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.
@@ -449,7 +596,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**65 still to read**, of 80 new keys across 7 unmerged branch(es).
+**44 still to read**, of 44 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -460,10 +607,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-find-labels (`a84da469`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/customer-find-labels (`8ef7868a`) — 20 new, 20 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
+  @@ NEEDS RULING
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
   @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
@@ -473,6 +626,27 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_labels_customer_width_tip`**
   > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_meter_pattern_unknown`**
   > No pattern in this project is named {id}, so the customer was left as it was.
@@ -495,35 +669,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_sym_node`**
   > Node
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`e9319a0a`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_engine_bar_label`**
-  > Solver loading progress
-  @@ NEEDS RULING
-- **`lpn_engine_wait`**
-  > Loading solver. Results delayed momentarily. Continue working.
-  @@ NEEDS RULING
-- **`lpn_engine_wait_bytes`**
-  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
-  @@ NEEDS RULING
-- **`lpn_engine_wait_pct`**
-  > Solver {percent}% loaded.
-  @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
-
-### feat/label-gang-search (`344c0cc4`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/label-gang-search (`ae48c735`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  @@ NEEDS RULING
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
 - **`lpn_labels_restore`**
   > Restore label defaults
@@ -546,176 +696,57 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_use_view`**
   > Use current view
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+
+### feat/notice-log (`5191e8d3`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  @@ NEEDS RULING
+- **`lpn_msglog_ago`**
+  > {x} ago
+  @@ NEEDS RULING
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  @@ NEEDS RULING
+- **`lpn_msglog_heading`**
+  > Recent messages
+  @@ NEEDS RULING
+- **`lpn_msglog_name`**
+  > Messages
+  @@ NEEDS RULING
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
+  @@ NEEDS RULING
+- **`lpn_msglog_tip`**
+  > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
 
-### feat/lock-initials-later (`1c9aba51`) — 17 new, 5 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`0635b5c0`) — 9 new, 9 to read @@ NEEDS RULING
 
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
-- **`lpn_lock_age_edited`**
-  > It was last edited {x} ago.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_inuse`**
-  > It has been in use for {x}.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_never_saved`**
-  > Nothing has been saved to this file yet.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_saved`**
-  > It was last saved {x} ago.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_unknown`**
-  > There is no record of how long it has been in use, or when it was last saved or edited.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask`**
-  > Ask
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask_failed`**
-  > Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask_prompt`**
-  > Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.
-  _Ruled 2026-09-17: Edited. Please review._
-- **`lpn_lock_ask_sent`**
-  > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_open_care`**
-  > To avoid data loss, choose carefully from the options below.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_open_choices_ask`**
-  > "Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.
+- **`lpn_file_training_name`**
+  > Your initials
   @@ NEEDS RULING
-- **`lpn_lock_open_inuse`**
-  > This file appears to be in use.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_requested`**
-  > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
-  _Ruled OK 2026-09-17._
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
   @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+- **`lpn_lock_open_copy`**
+  > Create a copy
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
   @@ NEEDS RULING
-
-### feat/tables-spreadsheet (`7023acf4`) — adds no English strings
-
-### feat/xy-world-map (`3efd322c`) — 32 new, 29 to read @@ NEEDS RULING
-
-- **`lpn_copy_of`**
-  > Copy of {name}
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
   @@ NEEDS RULING
-- **`lpn_crs_unnamed`**
-  > unnamed
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
   @@ NEEDS RULING
-- **`lpn_map_attach_add`**
-  > Attach
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
   @@ NEEDS RULING
-- **`lpn_map_attach_done`**
-  > The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.
-  @@ NEEDS RULING
-- **`lpn_map_attach_menu`**
-  > World map…
-  @@ NEEDS RULING
-- **`lpn_map_attach_none`**
-  > There is no world map attached to this project yet. Use Map, World map, Attach first.
-  @@ NEEDS RULING
-- **`lpn_map_attach_readjust`**
-  > Re-adjust
-  @@ NEEDS RULING
-- **`lpn_map_attach_readjust_tip`**
-  > Return to Step 2 of the map attachment process.
-  @@ NEEDS RULING
-- **`lpn_map_attach_remove`**
-  > Detach
-  @@ NEEDS RULING
-- **`lpn_map_attach_remove_tip`**
-  > Take the world map away. The drawing and its coordinates are untouched either way.
-  _Ruled OK 2026-09-17._
-- **`lpn_map_attach_removed`**
-  > The world map is gone, and the drawing is exactly as it was.
-  _Ruled OK 2026-09-17._
-- **`lpn_map_attach_scale_from`**
-  > Scale from the current size…
-  @@ NEEDS RULING
-- **`lpn_map_attach_scale_from_bad`**
-  > Type one number greater than zero.
-  @@ NEEDS RULING
-- **`lpn_map_attach_scale_from_done`**
-  > The map is resized, and your drawing and every coordinate in it are exactly as they were.
-  @@ NEEDS RULING
-- **`lpn_map_attach_scale_from_prompt`**
-  > Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.
-  @@ NEEDS RULING
-- **`lpn_map_attach_tip`**
-  > Attach the world map to this project without changing it any other way.
-  _Ruled OK 2026-09-17._
-- **`lpn_mapgeo_cancelled`**
-  > The world map is back where it was, and your drawing never moved.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_help`**
-  > Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_size`**
-  > Map size
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_size_read`**
-  > {f} times
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_turn`**
-  > Turn the map
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_turn_read`**
-  > {d} degrees
-  @@ NEEDS RULING
-- **`lpn_mapgeo_finish`**
-  > Georeference here
-  @@ NEEDS RULING
-- **`lpn_mapgeo_gestures`**
-  > Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint1`**
-  > Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint2`**
-  > Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_intro`**
-  > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_locked`**
-  > Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_place`**
-  > Place approximately
-  @@ NEEDS RULING
-- **`lpn_mapgeo_replace`**
-  > This project already has the world map attached. Replace that georeferencing?
-  @@ NEEDS RULING
-- **`lpn_mapgeo_step1`**
-  > Step 1 of 2: find your place in the world
-  @@ NEEDS RULING
-- **`lpn_mapgeo_step2`**
-  > Step 2 of 2: fit the map behind your drawing
-  @@ NEEDS RULING
-
-### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
-  @@ NEEDS RULING
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING

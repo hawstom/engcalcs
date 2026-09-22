@@ -173,6 +173,10 @@ automated can test it)*
       [TGH: It worked right this time.]
 
 **H5. The words, which only a person can judge**
+*(SUPERSEDED 2026-09-17 by Task 667(b): the first line now states three ages rather than one, and
+names nobody unless an older record happens to carry a name. The question this box asks — is it the
+sentence you would want to read before deciding whether to interrupt somebody? — is still the right
+one, and is worth asking again of the new words.)*
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
       the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after
       the last save", or "…and their work is saved to the file", or "…their browser last checked in
@@ -245,7 +249,33 @@ automated can test it)*
 
 ---
 
+> **BUTTON ORDER CHANGED 2026-09-17.** Every box below that names the open-time dialog's
+> answers was written against **Ask / Break lock / Open read-only / Cancel**. It is now
+> **Ask / Open read-only / Cancel / (gap) / ⚠ Break lock**, which Tom agreed: the first button takes
+> keyboard focus, so a stray Enter must land on the answer that changes nothing; the two
+> look-but-do-not-touch answers sit together; and Cancel goes before Break lock rather than one seat
+> from it. The glyph is prepended by the renderer and is not in the language file. `dev/browser-pass/
+> specs/locking.js` asserts the whole row, so no box below needs re-running for it.
+
 ## 1. First run and the training panel
+
+> **CORRECTED 2026-09-17 (Task 667(b)).** **THE PANEL NO LONGER ASKS FOR INITIALS**, so every box
+> below that types them is history. Tom: *"asking user A for their initials the first time they save
+> a file is a bit startling, not to mention easily confused with a login or account registration."*
+> The lock is now taken anonymously; the question moved to the SECOND user, onto the **Ask** button
+> of the dialog they get when the file is already in use, and what they type is sent to the broker
+> rather than stored. The panel itself stays, and stays for the reason below: it is what makes the
+> native file dialog open from a real user gesture. Reading it and pressing **Continue** is the whole
+> of it now. `dev/lpn-spike/lock-initials-harness.js`.
+>
+> **AND IT IS ONE PARAGRAPH, NOT THREE, SINCE THE SAME DAY.** Tom first said to drop the panel
+> entirely and then took half of that back: *"I waffle on 'drop the pre-Open message entirely'. The
+> browser message about saving could be alarming without an introduction (the last paragraph I
+> mentioned keeping)."* What survives is the paragraph about the BROWSER's own permission prompt,
+> which is the one thing on that panel a person cannot predict. The two that went said a file is
+> saved when you ask, and that two people editing one file is watched for. Asserted as an exact
+> list in the harness and as a paragraph count in `dev/browser-pass/specs/files.js`, because
+> "the panel is short" is the finding and three presence tests could never catch a fourth.
 
 The panel is what makes the native file dialog open from a real user gesture. It is the riskiest
 single guess in the build.
@@ -478,6 +508,43 @@ single guess in the build.
       nothing".)*
       [TGH: I did not test due to previous.]
 - [x] With the broker blocked (see §9), Save as… still works. A lock outage must not disable saving.
+
+> **THE "ASK" ROUND TRIP, MEASURED 2026-09-18 AFTER TOM FOUND IT DEAD.** He tested it with a
+> colleague: *"B asked, but A didn't see anything."* The mechanism was sound and three things around
+> it were not, each silent. (1) **A reloading destroyed the note**: a page unloading releases its
+> lock, so a note left in that one-second gap was wiped by the release and thrown away by the
+> re-acquire, while B had been told they would be heard. (2) **A standing warning stamped on it**:
+> the note is raised once and marked read in the same breath, so the reconnect banner overwriting it
+> lost it for good. (3) **There is no push**, so nothing happens for up to a minute and two people
+> watching one screen conclude it is broken. Fixed, except that the minute is real. Coming back to
+> the tab now checks straight away, which also closes the case of a holder whose tab is in the
+> background and whose timers the browser has slowed.
+>
+> `dev/lpn-spike/lock-ask-both-sides-harness.js` runs both users as two processes against the real
+> broker, which is what none of the earlier tests did -- each half was tested against a fake of the
+> other half, and the carriage between them is where it broke. It blocks, and every one of the four
+> fixes has been removed one at a time to watch it go red.
+>
+> **AND IT WAS FOUND BY DRIVING, NOT BY READING.** `dev/lpn-spike/lock-ask-browser-drive.js` runs
+> the two people as two isolated contexts of one real Chrome against a real server, clicking the
+> real menus. On the code as Tom tested it, it reproduces his sentence exactly: the note reaches
+> A's browser, is cleared from the record as delivered, and is painted over by the reconnect
+> banner, so nothing whatever appears. With the fixes it shows the bar at boot after a reload, and
+> with `SLOW=1` -- nobody touching A's tab -- it showed it after 48 seconds of real waiting.
+
+- [ ] **Two profiles.** A holds the file. B opens it, presses **Ask**, types initials.
+      B is told the note was sent. **A sees a yellow bar naming those initials within one minute**,
+      and once only. Waiting the full minute is part of the test.
+- [ ] **A reloads between the two.** Same result: A is told at boot, not a minute later, and the
+      note is not lost.
+- [ ] **A's tab is in the background when B asks.** Clicking back onto A's tab shows the bar at
+      once rather than after another minute.
+- [ ] **What it still cannot do, and this is by design:** B is never told whether A saw it, the note
+      reaches nobody whose page is shut (it waits on the record for when they next open the file),
+      and nothing takes the file away from A. Ask is a message, not a command. There is also room
+      for ONE note at a time: a second colleague asking before the holder's next check-in replaces
+      the first, so the holder is told who wants it most recently rather than given a queue. A
+      queue was declined because what the holder has to do about it is the same either way.
 
 ---
 

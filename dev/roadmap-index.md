@@ -7,13 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 21 · Soon (75): 17 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
+**95 open tasks.** Next (100): 22 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
 
-## 100 — Next (21)
+## 100 — Next (22)
 
 - Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 - Task 669 — Show labels at this zoom or closer.
@@ -33,7 +34,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
 - ! Task 705 — New zoom rules: a symbol may not grow past a size the network itself sets.
 
-## 75 — Soon (17)
+## 75 — Soon (16)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -51,7 +52,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
-- Task 706 — Every committed cell saves the WHOLE project, and nothing holds it back.
 
 ## 50 — Someday (27)
 
@@ -64,7 +64,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 285 — We do not know what devices anybody uses this on.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
-- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
@@ -82,6 +81,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 694 — Export a map animation as an animated picture.
 - Task 695 — The daily status mail has columns with no headings.
 - ! Task 702 — A view window cannot describe a span across the far side of the world.
+- Task 707 — Five minutes of a real browser on the Task 706 repair.
 
 ## 25 — Maybe (12)
 

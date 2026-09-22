@@ -267,12 +267,6 @@ the block.
   - **THE PARITY CHECK IS A RATCHET AT ZERO.** All 28 gaps closed on his *"Fix all that was
     found"*, the pumps table included -- *"I see nothing special there, and I don't know why you
     asked"* -- so its own comment claiming a pump has no editable scalar is struck.
-  - **`tables-interface` IS MERGED INTO `feat/tables-spreadsheet` ON HIS WORD** (*"Can you try to
-    merge it?"*). It held no code: one ROADMAP block and a `branch-policy.json` entry, and the block
-    took ID 666, which a gallery task had closed under the same number the same day. Its content is
-    folded here rather than re-numbered -- copy and paste was the defect inside the programme,
-    resizable columns and headings that do not wrap were the programme, and the bottom pane's tab
-    strip is a SEAM shared with `custom-property` and `graph`, which also add columns.
   - **A `position: sticky` TABLE CELL LOSES ITS OWN LAST PIXEL COLUMN, and that was his *"strange
     missing heading border"*.** Chromium composites each sticky cell in a layer snapped to whole
     device pixels; where the cell's sub-pixel trailing edge rounds inward, whatever is drawn there
@@ -286,6 +280,25 @@ the block.
     the divider forgets the width.
   - Still open under the umbrella: paste that CREATES rows (610, gated on Declan's spec), column
     hide, fill-down.
+  - **`tables-interface` IS RETIRED, 2026-09-21, AND EVERYTHING IT HELD IS THE FOUR BULLETS BELOW.**
+    It was one commit off master, made 2026-09-14, holding nothing but a roadmap block -- and that
+    block numbered itself **666**, which was closed the same day for an unrelated lock defect, so
+    the branch could not have passed `roadmap_id_check.php` and could never have merged. It sat for
+    a week. The work itself is live on `feat/tables-spreadsheet`; only the reasoning was stranded,
+    and it is salvaged here rather than deleted with the branch.
+    - Tom, 2026-09-14: *"Tables spreadsheet editing: Copy/paste doesn't work right. We need a
+      tables-interface branch that may be a long-term tweaking project to include column-widths,
+      copy/paste, etc."*
+    - **COPY AND PASTE IS THE DEFECT; THE REST IS THE PROGRAMME.** Fix it first rather than let it
+      wait on the long work -- a broken paste is the `data-entry-clerk`'s whole day. Also named the
+      same day: user-resizable columns, headings that do not wrap, columns too wide.
+    - **THE TABLE IS AN EDITOR OF THE DOCUMENT, NOT A GRID**, and that shapes all of it. Cells write
+      through `setProp()` (`scenario_seam_check.php`), a blank is a STATE not a zero where a column
+      declares `blank`, and `multiGroups()` builds the multi-properties box from these same specs.
+      **So a paste is a batch of validated property writes under one undo snapshot; getting that
+      wrong is silent inside a scenario.**
+    - **Shares the bottom pane's tab strip** with anything else that writes it, so name that seam in
+      any brief or sequence the tracks.
 
 - 100|691| **Create a better error and notice messaging system.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
@@ -794,6 +807,22 @@ the block.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
     may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
     in the harness.
+  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
+    don't understand why we are spending effort on the rings model instead of giving the spot-prime
+    box model a good college try."* **The honest answer is that of his four steps only step 4 was
+    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
+    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
+    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
+    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
+    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+    The rings work got the effort because it was reachable. That is a reason about us, not about
+    the two models.
+  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
+    gap between its pipes is already computed and already survives a zoom, and the code then throws
+    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
+    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
+    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
+    found, which is the thing he asked to be told.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
@@ -1233,7 +1262,10 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+- 100|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+  **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
+  performance win read as the bigger story: it is his top item *"because the network has to exist
+  first."*
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
   having read the clerk's wish list, *"I am sympathetic."* His conditions, which are the whole
@@ -1874,15 +1906,25 @@ the block.
     whole picture and threw away everything in flight. (3) **A tile whose request FAILED was never
     asked for again** -- 33 knocked out of 105 stayed white after 30 seconds. Each was measured, each
     was real, and none of them was the whole of it.
-  - **AND PERRY FOUND A FOURTH THAT IS STILL OPEN**: a direction-REVERSED gesture -- an ordinary
-    overshoot-and-correct -- discards a tile that had already loaded and re-fetches it, because the
-    "do we already have this" test reads two buckets and never the third one a tile sits in while a
-    view is still loading. Every gesture the fixing agent tested was one-directional.
-  - **THE NEXT MOVE IS NOT ANOTHER CAUSE, IT IS AN INSTRUMENT HE CAN RUN.** Four rounds of
-    measure-and-fix have each ended with him still seeing white squares, so the measurement is not
-    reaching the state his machine is in. What is missing is a readout, on his own screen, saying
-    for the current view: wanted, requested, arrived, drawn, failed, retried, cached. Then the next
-    report is his, not ours.
+  - **PERRY'S FOURTH IS NOW FIXED TOO, and it is the fifth cause rather than the last one**: a
+    direction-REVERSED gesture -- an ordinary overshoot-and-correct -- discarded a tile that had
+    already loaded and re-fetched it, because the "do we already have this" test read two buckets
+    and never the third one a tile sits in while a view is still loading. Every gesture the
+    earlier fixing rounds tested was one-directional. `basemap-cache-harness.js` section 5 is the
+    guard, mutation-tested, and it includes the half that bites: a reclaimed tile must LEAVE the
+    carry, or the release at the end of a still-pending paint takes it straight back off screen.
+  - **THE INSTRUMENT IS BUILT AND IT IS `?debug=tiles`** (feat/xy-world-map). Add `?debug=tiles`
+    to the page URL and a panel sits in the lower right saying, for the CURRENT view: wanted, from
+    cache, requested, arrived, drawn, failed, retried, still outstanding -- plus the source, the
+    zoom and whether a token is present -- and it names every failed tile with the reason the
+    network gave. It updates on every arrival and on a one-second tick, so a number that STAYS put
+    is the reading. `dev/lpn-spike/basemap-debug-readout-harness.js` grades the counts against
+    hand-worked outcomes and is mutation-tested. **The next report is his, not ours.**
+  - **A REASON NEEDS A SECOND REQUEST AND THAT IS WHY THE SWITCH EXISTS.** An SVG `<image>` error
+    event is one bit -- no status, no headers, no body -- so under the switch a failed tile's URL
+    is fetched once more and the answer is printed as given. **THE BYTE COUNT IS PART OF THE
+    ANSWER**: a URL-restricted token can refuse in 23 bytes, which looks like a delivered tile to
+    anything counting only success.
   - Remember the token is URL-restricted: a satellite tile fetched from anywhere but hawsedc.com or
     librewaternet.org is a 23-byte Forbidden reply that **looks like a delivered tile to anything
     counting bytes**, and that has already cost one agent a whole wrong measurement.
@@ -1908,8 +1950,11 @@ the block.
     AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
     own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
     look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
-  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (66 sites, one door,
-    8-second expiry, **a later message silently replaces an earlier one**), `setStatus()` (19
+  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (one door, 8-second
+    expiry, **a later message silently replaces an earlier one**, **83 sites** -- the 66 first
+    written here was an undercount Perry re-derived on 2026-09-21, which changes nothing about the
+    fix, since one door is one door, but a number restated as fact that nobody re-checked is
+    exactly the shape that seat watches for), `setStatus()` (19
     sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
     `renderBanner()` (one render door, five kinds, dismissable and not restorable),
     `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
@@ -1926,22 +1971,12 @@ the block.
     feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
     already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
 
-- 75|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
-  Found by Declan 2026-09-21, answering Tom's *"is it fast enough for Declan?"* -- his answer was
-  **yes**, and this is the thing he found while proving it.
-  - **The recalculation waits until you pause. The save does not.** Every cell commit serialises
-    and stores the entire project, not the one thing that changed, on every keystroke-equivalent,
-    uncapped.
-  - **He would not claim a number he could not honestly measure**, and that restraint is the point:
-    with no real browser he built a stand-in on a document shaped like Tom's and got **about 2.6 ms
-    per save at 400 elements -- a FLOOR, not a ceiling**, because it skips the browser's actual
-    write. Small enough not to change his verdict today, and it grows with the network.
-  - **A third thing of the same shape is NAMED and deliberately not sized:** a scan across every
-    element on the map on every commit, running even when nothing about scenarios has changed
-    (`refreshScenarioMarks()`).
-  - **THE CHEAP WAY TO SETTLE IT IS FIVE MINUTES OF A REAL BROWSER** -- the Performance tab open,
-    ten cells typed down a column of the biggest real project. That replaces a stand-in number with
-    a real one, and it is the one thing that could overturn his yes.
+- 50|707| **Five minutes of a real browser on the Task 706 repair.** The Performance tab open, ten
+  cells typed down a column of the biggest real project. The repair shipped on Tom's ruling without
+  waiting for a measurement; every number behind it is a stand-in
+  (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
+  browser's own write, and the real cost of a style invalidation). This is what replaces the floor
+  with a number.
 
 - 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
   Tom, 2026-09-21, asking for discussion and a plan rather than a build.

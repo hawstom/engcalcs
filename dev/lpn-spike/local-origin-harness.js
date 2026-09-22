@@ -326,6 +326,13 @@ console.log('\n--- one home for the concept ---');
 	// so the shift and the flip apply exactly once to each and cancel in the difference. Two points
 	// is why it is +2 and not +1: converting the vector directly is the mistake this task exists to
 	// catch, and it would have been +1.
+	// **AND ONE MORE ON EACH CONVERTER FOR THE WORLD MAP BEHIND AN XY DRAWING** (Task 646). The
+	// attachment places tiles THROUGH a stored transform instead of rewriting the drawing, so
+	// paintBasemapTiles() asks which patch of Earth is on screen by reading the two screen corners
+	// OUTWARD (one call per axis, both corners in one expression) and places each tile by turning
+	// its own longitude and latitude INWARD (one call per axis). Same boundary as every other one
+	// here: a grid model on State Plane coordinates would otherwise draw its map half a million
+	// units away from its own pipes.
 	// **AND ONE MORE ON EACH FOR THE METER'S REAL-WORLD SIZE** (Task 247). A meter is drawn about
 	// 2 m across while the site is small enough for that to be legible, and how many metres one
 	// drawing unit is depends on WHERE you are once the drawing unit is a degree -- so
@@ -356,6 +363,12 @@ console.log('\n--- one home for the concept ---');
 	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
 	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
 	// three.
+	// **THE CUSTOM GEOREFERENCE WIZARD ADDED ONE SITE TO EACH PAIR, AND THEY ARE ONE ROUND TRIP.**
+	// mapgeoPointerSrc() reads where the pointer is in the drawing's own outward terms, because a
+	// gesture there is measured against the ground rather than against the screen; mapgeoInward()
+	// puts the rectangle back into the drawing frame to be drawn. The wizard writes no coordinate
+	// at all -- it edits the transform -- so these two are the whole of its boundary, and having
+	// them here is what stops a third one reaching for cartesianY() on its own.
 	// **AND ONE MORE EACH FOR viewLonLat()** (Task 692), which is where on the Earth the middle of
 	// the camera is. It is nodeLonLat() asked of the view rather than of an element, and it crosses
 	// the boundary the same way: outwardX/outwardY on the view centre, then the projection's own
@@ -373,8 +386,8 @@ console.log('\n--- one home for the concept ---');
 	// **THE INWARD PAIR GAINS NOTHING**, and that asymmetry is the design rather than an oversight:
 	// a typed offset is converted to drawing units by DIVIDING by that same measured scale, so it
 	// never states a longitude or a latitude of its own for anything to convert.
-	ok('outwardX has one definition and thirty-two call sites', count(/outwardX\(/g) === 33, count(/outwardX\(/g));
-	ok('outwardY has one definition and thirty-two call sites', count(/outwardY\(/g) === 33, count(/outwardY\(/g));
+	ok('outwardX has one definition and 34 call sites', count(/outwardX\(/g) === 35, count(/outwardX\(/g));
+	ok('outwardY has one definition and 34 call sites', count(/outwardY\(/g) === 35, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -433,8 +446,13 @@ console.log('\n--- one home for the concept ---');
 	// surveyed file arrives as a pair of numbers out of somebody's file, which is the definition of
 	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
 	// own value rides beside the drawn one so the save hands it back unchanged.
-	ok('inwardX has one definition and twenty-nine call sites', count(/inwardX\(/g) === 30, count(/inwardX\(/g));
-	ok('inwardY has one definition and thirty call sites', count(/inwardY\(/g) === 31, count(/inwardY\(/g));
+	// **AND ONE SITE EACH CAME OFF WHEN THE WORLD-MAP WIZARD'S RECTANGLE WAS DELETED** (2026-09-19,
+	// Tom: *"The rectangle control is gone."*). mapgeoInward() was its own one-line crossing, used
+	// only to draw that overlay; the two sliders that replace it edit the transform and draw
+	// nothing in the drawing frame at all, so the boundary got SMALLER. Worth saying out loud
+	// because every other movement of these numbers in this file has been upward.
+	ok('inwardX has one definition and 30 call sites', count(/inwardX\(/g) === 31, count(/inwardX\(/g));
+	ok('inwardY has one definition and 31 call sites', count(/inwardY\(/g) === 32, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

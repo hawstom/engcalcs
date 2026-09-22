@@ -52,7 +52,7 @@
 
 // Measured 2026-09-09: 199 when this check was written, 52 the same day once the sweep below the
 // three heaviest files had been done. It may fall; it may not rise.
-const EC_HARNESS_WORDING_BASELINE = 51;
+const EC_HARNESS_WORDING_BASELINE = 49;   // 51 -> 49 on 2026-09-17: the two initials-box pins went with the box (Task 667(b)).
 
 /**
  * THE DECLARED EXCEPTIONS, keyed on the file and the EXACT literal, with the reason each one is

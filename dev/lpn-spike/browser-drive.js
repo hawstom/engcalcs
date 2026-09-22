@@ -28,7 +28,10 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 
-const PORT = 9333;
+// The debugging port is settable so two probes can run at once on one machine -- other agents
+// share this box, and a second Chrome launched on a port already in use silently attaches to
+// the first one's page instead of failing.
+const PORT = Number(process.env.CDP_PORT) || 9333;
 const URL_ = process.env.PAGE || 'http://hawsedc.local/engcalcs/Looped-Network.php?debug=perf';
 const PROFILE = process.env.PROFILE || '/tmp/claude-1000/cdp-profile';
 

@@ -4085,3 +4085,50 @@ tr.lpn-ff-error { background: #f2f2f2; }
    this drawing a visitor selects as text in any mode. */
 #lpn_canvas { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 
+
+/* **THE ENGINE-WAIT PROGRESS BAR** (ROADMAP Task 608; Tom, 2026-09-19: "We must include the
+   unknown in the progress bar. The progress bar can stall at the end if necessary. But it can't
+   disappear prematurely."). Sits directly under #lpn_engine_banner and is written only by
+   refreshEpanetBanner() in js/looped-network.js.
+
+   TWO STATES, and the second one is the whole reason this is a bar and not a number. Where the
+   transfer states a size, the fill is a width in percent. Where it states NONE -- a gzipped reply,
+   or no content-length -- .lpn-engine-bar-unknown runs a slab back and forth, so the unknown is IN
+   the bar rather than a bar that is missing. Neither state ever reaches the end on its own: the
+   last tenth is reserved for the unmeasured tail after the bytes land. */
+.lpn-engine-bar {
+	max-width: 60%;
+	height: 6px;
+	margin: 0;
+	background: rgba(255, 255, 255, .9);
+	border: 1px solid #05a;
+	border-top: 0;
+	overflow: hidden;
+}
+.lpn-engine-bar-fill {
+	height: 100%;
+	width: 0;
+	background: #05a;
+	transition: width .2s linear;
+}
+.lpn-engine-bar-unknown .lpn-engine-bar-fill {
+	width: 30%;
+	transition: none;
+	animation: lpn-engine-bar-sweep 1.4s ease-in-out infinite;
+}
+@keyframes lpn-engine-bar-sweep {
+	0%   { margin-left: 0; }
+	50%  { margin-left: 70%; }
+	100% { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	/* A bar that cannot sweep still has to SAY it is working, so it pulses in place rather than
+	   standing still, which would read as a stalled download instead of an unknown size. */
+	.lpn-engine-bar-unknown .lpn-engine-bar-fill {
+		animation: lpn-engine-bar-pulse 2s ease-in-out infinite;
+	}
+	@keyframes lpn-engine-bar-pulse {
+		0%, 100% { opacity: 1; }
+		50%      { opacity: .35; }
+	}
+}

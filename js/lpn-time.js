@@ -1523,8 +1523,28 @@
 	var ui = null;
 
 	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
-	function stepText(t) {
-		return EC.lpnTimeElapsedText(t) + '  ·  ' + EC.lpnTimeClockText(docTimes(), t);
+	// **THE LABEL IS THE STEP'S RUN-TIME RANGE, NEVER THE WALL CLOCK.** `next` is the following
+	// reporting time, so a step reads `24:00 - 25:00` and keeps climbing past a day -- it must
+	// never fall back to `EC.lpnTimeClockText()`, whose whole job is to WRAP at 24:00 for a
+	// CLOCKTIME control, and which read as `24:00 - 0:00` here before this was written. The last
+	// step has no following stop, so it shows one bare elapsed time.
+	function stepText(t, next) {
+		var start = EC.lpnTimeElapsedText(t);
+		return (next === undefined || next === null) ? start
+			: start + ' - ' + EC.lpnTimeElapsedText(next);
+	}
+	// **THE CLOCK READING DID NOT GO AWAY; IT MOVED INTO THE ROW'S TIP.** The label used to be
+	// `elapsed  ·  clock` -- two readings of ONE instant side by side -- and Tom read it as a
+	// range and was right to: two times separated by a mark is a range to everybody. His
+	// instruction, 2026-09-21: *"Fix it to say 24:00 - 25:00, and fix all subsequent steps."*
+	// So the LABEL is now a genuine run-time range and cannot wrap. The clock is still the thing
+	// a pattern is keyed on, so it is kept where it costs no width, and it is the reason the
+	// signature below still has to notice a project that states the SAME grid from a different
+	// hour -- every row would otherwise keep the clock of the project before it.
+	function stepClockText(t, next) {
+		var times = docTimes(), start = EC.lpnTimeClockText(times, t);
+		return (next === undefined || next === null) ? start
+			: start + ' - ' + EC.lpnTimeClockText(times, next);
 	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
@@ -1589,8 +1609,8 @@
 		// is no visible label beside it on an icon-only strip.
 		//
 		// **BOTH ARE WIDTH-CAPPED.** The one wide control this strip ever had was a field-name
-		// dropdown, and it was removed for being wide (Task 427). A step reads as two clock times at
-		// its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
+		// dropdown, and it was removed for being wide (Task 427). A step reads as two elapsed times
+		// at its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
 		// spare -- and a max-width means a long translation shrinks the control rather than the map.
 		function picker(id, label, tip, w) {
 			var sel = document.createElement('select');
@@ -1643,22 +1663,25 @@
 	};
 
 	function renderTransport() {
-		var stops, labels, sig, i;
+		var stops, labels, clocks, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
-		labels = stops.map(stepText);
+		labels = stops.map(function (t, i) { return stepText(t, stops[i + 1]); });
+		clocks = stops.map(function (t, i) { return stepClockText(t, stops[i + 1]); });
 		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
 		// the rows themselves changed -- an edit to the duration, to the report step, or to the
 		// clock time at the start; rebuilding on every solve would close the list under a user who
 		// had it open. It was `stops.join(',')` until 2026-09-09, and that misses a project that
 		// states the SAME reporting grid from a different hour: every row keeps the clock time of
-		// the project before it, which is a wrong number rather than a missing one.
-		sig = labels.join('|');
+		// the project before it, which is a wrong number rather than a missing one. **THE CLOCKS
+		// ARE IN THE KEY EVEN THOUGH THEY ARE NO LONGER IN THE LABEL** -- they are in the tip, and
+		// a stale tip is the same defect one surface further in.
+		sig = labels.join('|') + '\u0001' + clocks.join('|');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
 			labels.forEach(function (text, k) {
-				ui.step.appendChild(el('option', { value: String(k) }, text));
+				ui.step.appendChild(el('option', { value: String(k), title: clocks[k] }, text));
 			});
 		}
 		i = stops.indexOf(state.t);

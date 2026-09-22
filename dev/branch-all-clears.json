@@ -47,6 +47,27 @@
             "date": "2026-09-18",
             "words": "The task is complete. Merge, delete, and close.",
             "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
+        },
+        "feat/xy-world-map": {
+            "head": "765ac3bc21cecec85175e15628746c9dc465ff22",
+            "date": "2026-09-21",
+            "words": "feat/xy-world-map: Why is this branch still present? The task has been closed. Merge, delete, and update?",
+            "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/lock-initials-later and feat/engine-fetch-wait. What he cleared is the map-attach wizard and the georeferencing work. WHAT HE HAS NOT CLEARED, AND MUST NOT BE READ AS CLEARED, IS TASK 703: he still sees white squares after four measured-and-fixed causes, and that task stays OPEN on master after this merge, as do queue rows R-019 and R-056.",
+            "pin_note": "HE CLEARED IT AT 731ab367 AND THE PIN IS FOUR COMMITS LATER, WHICH IS STATED RATHER THAN GLOSSED, because those four are work he has not seen. They are: 5f2b49ab and 2b12b16d, the `?debug=tiles` readout -- an instrument built so HE can diagnose Task 703 himself, invisible to anyone who does not type the switch; 69d9c8ee, a fifth measured cause closed (a tile still hanging on screen under the new view was thrown away and re-fetched on an overshoot-and-correct gesture, with a harness and two killed mutations); and 5ade3041 and 765ac3bc, edits to dev/tom-review-queue.md, one of them deleting R-066 on his own written instruction (*\"If it has been fixed, please delete this.\"*). The judgement made here was that an instrument switched off by default plus one measured defect fix is not a feature he needs to re-clear, and that leaving the branch alive for an open task is the stale-ref problem. If that judgement was wrong, this line is where to catch it."
+        },
+        "feat/engine-fetch-wait": {
+            "head": "e9319a0ad8af40c6f86f2cee2204e80c95afbf96",
+            "date": "2026-09-21",
+            "words": "feat/engine-fetch-wait: Why is this branch still present? Is there something to do? Or merge, delete, and update?",
+            "context": "HIS WORDS ARE A QUESTION WITH TWO BRANCHES AND THE ANSWER TO THE FIRST IS NO, which is why this is recorded as an all-clear rather than glossed as one. He had already closed Task 608 outright on 2026-09-21 -- 'Done, right? Or is there more?' -- after testing the branch himself in a private window throttled to Slow 3G: 'Worked for me. No problems or alerts.' He also ruled all three halves on 2026-09-19: 'Continue working: Worked great. Banner can show always' and 'We must include the unknown in the progress bar. The progress bar can stall at the end if necessary. But it can't disappear prematurely.' Nothing was added to the branch after that ruling. dev/session-handoff.md said this branch had already MERGED and it had not, which is why he found it still on the preview panel.",
+            "pin_note": "PINNED TO THE BRANCH HEAD AS IT STANDS, e9319a0a, which is the commit he tested and ruled on. The merge into master resolved two conflicts, both of them bookkeeping and neither of them code: dev/ROADMAP.md, where master had already DELETED the closed Task 608 block and the branch still carried it (master's deletion kept), and dev/new-english-keys.md, which is a GENERATED file and was regenerated after the merge."
+        },
+        "feat/lock-initials-later": {
+            "head": "1c9aba51aba4f9c31b203dfadb5b671f9c364517",
+            "date": "2026-09-21",
+            "words": "feat/lock-initials-later: Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task?",
+            "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/xy-world-map and feat/engine-fetch-wait. His R-004 answer had already ruled the design: 'A name given once for one purpose becomes a standing per-browser label: Confirmed. And we are adding \"Not you? Change this\" opportunities.' The one thing he names as NOT done is the messaging system, which is Task 704 on its own branch.",
+            "pin_note": "HE CLEARED IT AT 37f05c7e AND THE PIN IS ONE COMMIT LATER, STATED RATHER THAN GLOSSED. The extra commit is 1c9aba51 and it changes a CODE COMMENT and nothing else: the comment claimed the initials are 'SENT, never stored', which was a misreading of his own 2026-09-18 ruling that the objection was always to the PROMPT and never to the storage. No shipped behaviour and no string moved. If extending the pin for a comment was the wrong call, this line is where to catch it."
         }
     }
 }

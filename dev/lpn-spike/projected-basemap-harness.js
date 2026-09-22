@@ -63,7 +63,13 @@ const L = loadLoopedNetwork(
 	"\t\tisGeo: isLatLonProject, isProjected: isProjectedProject,\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapStyle: setBasemapStyle,\n" +
 	"\t\trefreshBasemap: refreshBasemap,\n" +
-	"\t\ttiles: function () { return Array.prototype.slice.call(basemapLayer.children || []); },\n" +
+	// **THE WANTED SET, NOT THE LAYER'S CHILDREN, SINCE 2026-09-19.** The layer now also holds the
+	// PREVIOUS view's tiles while the new ones load, so that a zoom does not blank the map (Tom's
+	// R-019). Two zoom levels in the layer at once is that fix working; the questions this file
+	// asks -- which level was chosen, in which units, and whether it changes with the camera --
+	// are about the set the page WANTS, which is basemapEls.
+	"\t\ttiles: function () { var o = [], k; for (k in basemapEls) {\n" +
+	"\t\t\tif (basemapEls.hasOwnProperty(k)) { o.push(basemapEls[k]); } } return o; },\n" +
 	"\t\tinwardX: inwardX, inwardY: inwardY, outwardX: outwardX, outwardY: outwardY,\n" +
 	// The DEM controls' own gate, and the two functions that turn nodes into places for it.
 	"\t\tlocatable: projectLocatable, nodeLonLat: nodeLonLat,\n" +

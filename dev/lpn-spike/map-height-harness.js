@@ -159,7 +159,7 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			// The canvas box as of the previous call. Seeded to the starting box, which is what the
 			// page's own boot does: the first applyMapHeight() records it and re-centres nothing.
 			lastMapBox = env.lastBox === undefined ? { w: 1400, h: env.h0 } : env.lastBox;
-		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized', 'placeLegends', 'noteMapUnmeasurable',
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized', 'placeLegends', 'noteMapUnmeasurable', 'mapgeoPlaceDial',
 			extract('viewportHeight') + '\n' +
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			extract('applyMapHeight') +
@@ -177,7 +177,13 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			// something to be, exactly like placeLegends above. The message itself is asserted in
 			// dev/lpn-spike/scale-publish-harness.js, which drives the whole module rather than a
 			// slice of it.
-			function () { /* noteMapUnmeasurable */ });
+			function () { /* noteMapUnmeasurable */ },
+			// **THE WORLD-MAP WIZARD'S DIAL IS RE-PLACED ON EVERY RESIZE**, because it is centred on
+			// the canvas box and the bottom pane cuts that box at will. No wizard is open in here;
+			// the stub exists so the call has something to be, exactly like placeLegends above. What
+			// it does is asserted in dev/lpn-spike/mapgeo-browser-drive.js, which needs a real
+			// browser -- the defect is a control that is display:block and still not on the screen.
+			function () { /* mapgeoPlaceDial */ });
 		return { h: svg._h, state: state, transforms: transforms };
 	}
 	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at
