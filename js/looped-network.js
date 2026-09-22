@@ -23071,6 +23071,14 @@ var EngCalcs = EngCalcs || {};
 	// the same pair the upload path uses: a second import path would drift from the first, which is
 	// the one carrying the version migration, the structural repair and the quota handling.
 	var examplesManifest = null, examplesState = 'idle';
+	// **ONE ACTIVATION OPENS ONE PROJECT.** Tom, on the gallery (queue R-129): "there was a delay
+	// during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new
+	// projects." The fetch-then-import round trip is the delay; a second click (or a repeat
+	// keyboard Enter, which fires the same 'click' event on a <button>) before the first one lands
+	// used to start a second import. `exampleOpenInFlight` blocks every activation but the first
+	// until that one has either landed or failed, and the gallery closes on the FIRST activation
+	// (below) rather than waiting for the import to finish, which is the delay itself.
+	var exampleOpenInFlight = false;
 	function examplesPane() { return document.getElementById('lpn_examples_pane'); }
 	// Cards are built from the manifest, which is FETCHED -- so this cannot be rendered by PHP, and
 	// a PHP copy of the list would be a second index to keep in step with the generated one.
@@ -23212,12 +23220,34 @@ var EngCalcs = EngCalcs || {};
 			.catch(function () { examplesState = 'failed'; renderExamplesGallery(); });
 	}
 	function openExample(ex) {
+		// **IGNORE EVERY ACTIVATION BUT THE FIRST WHILE ONE IS IN FLIGHT.** Five rapid clicks (or a
+		// held Enter key, which repeats the same button 'click') must open exactly one project, not
+		// queue five.
+		if (exampleOpenInFlight) { return; }
+		exampleOpenInFlight = true;
+		// **CLOSE THE GALLERY NOW, not when the import lands.** The wait Tom hit was the fetch and
+		// import running; waiting for that to finish before closing is exactly the delay that
+		// invited the repeat clicks. hideExamplesGallery() also answers the wall for good (Task
+		// 431's rule: opening an example is one of the three ways of answering it), which is correct
+		// here too -- an attempted open is a real answer, not a glance.
+		hideExamplesGallery();
 		var pc = EngCalcs.pageConfig || {};
 		logLpnFirstAction('example');
+		// **?debug=perf COVERS OPENING AN EXAMPLE TOO** (queue R-130: "The delay in opening the
+		// Net3 lat/lon example when Net3 was already open was over 25 seconds"). fetch and JSON.parse
+		// are the two phases importProject()'s own instrument (refreshAllFromDocument, "SWITCH") does
+		// not see, so they are pushed onto the same perfDebugRows the SWITCH report already flushes --
+		// one console line per open, fetch and parse and buildDom and the rest together, at the cost
+		// of one regex when the flag is off (perfDebugOn()).
+		var perfFetch0 = perfDebugOn() && typeof performance !== 'undefined' ? performance.now() : 0;
 		fetch('/engcalcs/examples/' + ex.file, { cache: 'no-cache' })
 			.then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.text(); })
 			.then(function (text) {
+				if (perfFetch0) { perfDebugRows.push('fetch ' + (performance.now() - perfFetch0).toFixed(1) + 'ms'); }
+				exampleOpenInFlight = false;
+				var perfParse0 = perfFetch0 && performance.now();
 				var saved = acceptImportedText(text);
+				if (perfFetch0) { perfDebugRows.push('parse ' + (performance.now() - perfParse0).toFixed(1) + 'ms'); }
 				if (!saved) { return; }
 				var id = importProject(saved);
 				if (!id) { return; }
@@ -23243,8 +23273,15 @@ var EngCalcs = EngCalcs || {};
 					.replace('{name}', projectDisplayName(project)));
 			})
 			.catch(function () {
+				// **A FAILED OPEN RE-ENABLES THINGS.** The in-flight guard lifts so the next
+				// activation is not silently swallowed, and the gallery reopens (forced, since the
+				// canvas is still empty and the wall was already permanently dismissed above) so a
+				// visitor whose fetch failed sees why and can try again rather than staring at a
+				// blank canvas with no gallery and no explanation.
+				exampleOpenInFlight = false;
 				examplesState = 'failed';
-				renderExamplesGallery();
+				galleryForced = true;
+				updateEmptyHint();
 			});
 	}
 	// A tiny HTML-element helper. el() above builds SVG elements in the SVG namespace, which is
@@ -25100,7 +25137,7 @@ var EngCalcs = EngCalcs || {};
 		// different project's colour field, label set and unit-bearing labels all come from.
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
-		refreshBasemap();
+		perfDebugTime('basemap', function () { refreshBasemap(); });
 		// **THE SOLVE SURVIVES A SWITCH IF THE DOCUMENT DID** (Task 680). Restored HERE, before
 		// buildDom(), because the labels compose their values out of it: set after the build, every
 		// label would be drawn empty and drawn again when the values arrived.
