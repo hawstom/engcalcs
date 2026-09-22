@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-084.
+**An ID is permanent and never reused.** Next free: R-108.
 
 ---
 
@@ -72,7 +72,7 @@ judgement and does not belong to a script.
 
 ### On master -- the recalculate-off fix overreached
 
-- [ ] R-046 fix/recalc-trust-user | Recalc off Old values: Leave in place stale. Don't clear. Trust the user. -- fix/recalc-trust-user 313a8656 -- stale numbers stay exactly where they are, and the page says nothing about them. Key `lpn_manual_results_cleared` DELETED
+- [x] R-046 fix/recalc-trust-user | **ALL THREE OF HIS NOTES ARE SHIPPED, on master at `2d718fd4` (`fix/stale-is-a-snapshot`), and he has not pulled it yet.** An edit now rewrites only its OWN label and moves only that one label; Tables hears Properties, a direction that was simply missing; every stale result stays put in Tables, Properties, the status bar and the run report; and the fire flow rings survive an edit and gained the Clear button he asked for (`lpn_ff_clear`). Recalc off Old values: Leave in place stale. Don't clear. Trust the user. -- fix/recalc-trust-user 313a8656 -- stale numbers stay exactly where they are, and the page says nothing about them. Key `lpn_manual_results_cleared` DELETED
   - Any input we edit must be reflected wherever it shows, Table, Properties, and map labels. We can make an exception to label placement passes for this label update, and we can have tunnel vision on only the label we change.
   - Tables and Properties—*everything*—should show the stale results while user continues to work. Keep on showing and let user decide when to recalculate. Off means Off, but it doesn't mean Hide or Delete. It means Snapshot in time.
   - CC asked TGH: "Fire flow rings still clear themselves on edit and still say so. That predates today and has its own sentence in 27 languages. It left it alone rather than quietly extend your ruling. Want it to follow "leave it stale" too?" TGH: Yes. The reason I am saying Yes to everything is that if we clear these things prematurely, it robs the user of an important point of reference. It's important to leave some value in the model when we have it. That said, for fire flow rings, we could provide a button in that box to clear the rings.
@@ -129,3 +129,59 @@ judgement and does not belong to a script.
 - [x] R-081 -- | WaterModels.jl: what is it and what can we do with it? -- **MARY'S ANSWER IS "NOTHING", CLEANLY.** It is **not a file format**: it is a Julia package from Los Alamos, DOE-funded, doing OPTIMIZATION on water networks (best pump schedule, best pipe design under a budget) rather than simulation. It READS EPANET `.inp`, which we already read and write byte-identically, so it unlocks nothing there; its own JSON is a private wire format for a math solver and **nothing outside its own sibling packages reads it**. Modified BSD, LANL-ANSI, 77 stars, last push April 2025, research-paced. **No utility adoption found anywhere** -- every result naming it was itself a national-lab paper. Not an importer, not a dependency, not a citation on `dev/positioning.md`, which is for tools our users actually choose between. The one idea she kept, as speculation only, is its named *candidate, not-yet-built pipe* state, which `lpn_` has no equivalent of
 - [ ] R-082 feat/tables-spreadsheet | **PERRY FOUND A CRASH, not Tom.** Open a node's Properties, then rename that same node in the table below it: the page throws. The table's rename calls the same FUNCTION as Properties but not the same DOOR -- Properties updates the popup's own id before refreshing, the table does not, so the popup re-renders by an id that no longer exists. Back with the build agent
 - [ ] R-083 feat/tables-spreadsheet | **PERRY FOUND A SECOND ONE.** Delete on a selection that includes the ID column fires one blocking dialog PER ROW -- three rows, three dialogs; dozens of rows, dozens of dialogs before the page is usable. No data is lost. Back with the build agent
+
+## Round of 2026-09-21b -- his list after the branch previews
+
+### Production and the host
+
+- [x] R-084 -- | "Note that the command you gave me is invalid. Please ssh into production, clean up (git status is dirty), and do what you need to do for this `cd ~/webdev/hawsedc.com/engcalcs && sh dev/host/install.sh`" -- **HE WAS RIGHT AND THE COMMAND COULD NOT HAVE WORKED.** `~/webdev/...` is a path on HIS machine and does not exist on the server; and `install.sh` did not copy `check.mustblock` at all, which is the file the R-070 fix lives in. Both fixed: the installer now installs it, and it was run on the host out of `~/tgh/engcalcs-report` (the report checkout, which is the one allowed to pull -- production may never fetch). `~/check.exclude` and `~/check.mustblock` were both stale and are now current; `sh ~/check.sh` exits 0 and silent. **Neither production checkout was dirty:** `~/addon_html/hawsedc.com/engcalcs` is clean on master at 2751faba and `~/dev_html/hawsedc.com/engcalcs` is clean on feat/lock-initials-later at 37f05c7e
+
+### feat/tables-spreadsheet -- his fourth round
+
+- [ ] R-085 feat/tables-spreadsheet | Left and right arrows get stuck at selectors **unless** I first skip over them with Ctrl; interesting.
+- [ ] R-086 feat/tables-spreadsheet | (a) We have a gratuitous space waster at ID where the goto map icon (nice unsolicited touch!) is a line break below the ID number. Put on same line, and possibly in a separate column (exreme left or transcendent left of the table) to keep the paradigm pure. (b) But I should point out that the right-click menu may upstage this feature, and also (c) an interesting possibility that when we right-click on a support column (like From and To) that contains an asset, we can Show on map that asset instead of the row's asset.
+- [ ] R-087 feat/tables-spreadsheet | When I right-click on a cell near the bottom of the screen, the right-click menu goes off the bottom of the screen. Oops. Fix that.
+- [ ] R-088 feat/tables-spreadsheet | Whole-cell near vs left/top. Spreadsheet software chooses a paradigm for where—near or left/top—to maintain exactly a whole cell when arrowing past the edge of the screen. (a) What we have seems to be a split opinion, with sometimes whole cell at the top and sometimes at the bottom when I am arrowing down; we need to choose and do what we do well; and my vote is whole cell at top. (b) When I arrow down to the bottom of the screen and past the bottom whole visible cell, the next down movement brings exactly a whole cell to the bottom, then the next down movement jumps my cursor to the top of the view, which is disorienting and needs to be fixed. The cursor (active cell) needs to stay near the direction I am moving. This bug doesn't happen when moving up, and it seems that we are closer to the whole-cell-at-top paradigm, for what it's worth.
+- [ ] R-089 feat/tables-spreadsheet | It might be nice to develop the tab paradigm of the tables list across the top of the bottom pane. Currently, all the non-active tables are undecorated plain text, which doesn't really say "I'm an inactive tab."
+
+### feat/customer-find-labels
+
+- [ ] R-090 feat/customer-find-labels | "Use current view" button of "Widest view that attempts to display customer labels" uses height (I think), not width. Then it's applied as advertised, to width. So it appears not to work.
+
+### The branches he asked about
+
+- [ ] R-091 feat/xy-world-map | Why is this branch still present? The task has been closed. Merge, delete, and update?
+- [ ] R-092 feat/lock-initials-later | Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task?
+- [ ] R-093 feat/engine-fetch-wait | Why is this branch still present? Is there something to do? Or merge, delete, and update?
+
+### About
+
+- [x] R-094 -- | About, Mission paragraph 1 sentence 1: Revise to "...offered freely online since 2010." -- it now reads *"HawsEDC Engineering Calculators have been offered freely online since 2010."* **A PUBLIC CLAIM, and the string is in drift in 26 languages**
+- [x] R-095 -- | About, License paragraph 2: Remove everything but the last sentence. -- the paragraph is now the single sentence *"The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run."* Four sentences deleted, including *"There is no paid tier"* and the promise-about-the-software sentence
+
+### Roadmap
+
+- [x] R-096 -- | 610: Promote to 100. -- done, with his reason recorded on the task
+- [x] R-097 -- | 706: "I think this would be cheap enough to fix that we should fix it without waiting for measurement... My intuition is that we would always just save the entry at hand and only save the whole project... when there is a pause. See Off Means Off." -- promoted to 100 and his intuition written in as the design. The browser measurement is no longer a gate
+
+### Research
+
+- [x] R-098 -- | Messaging / Messenger: I think I agree with Ida. Proceed. -- Task 704 is being built
+- [x] R-099 -- | WaterModels.jl: Mary's report accepted.
+- [x] R-100 -- | Perry's crashes: Grateful. Nice.
+
+### Placement -- his three questions, which are questions and not builds
+
+- [?] R-101 feat/label-gang-search | Given your explanation, how do all those labels get stacked when narrow? What is it about being single and narrow that uniquely makes/lets them stack neatly and endlessly?
+- [?] R-102 feat/label-gang-search | "Nineteen real collisions shove fifty-one labels": You say nineteen real collisions. But if there were dozens neatly stacked while short-stringed (ID alone), then there are zero real collisions. This is the mystery I will not let rest. You say nineteen while I say zero.
+- [?] R-103 feat/label-gang-search | The fix is built: OK. But I don't understand why we are spending effort on the rings model instead of giving the spot-prime box model a good college try.
+
+### Off means Off
+
+- [?] R-104 -- | If Off means Snapshot, does this help Declan's speed? Is "Save whole project" related to Automatic Recalculate?
+
+### Misc, from his own browser passes
+
+- [ ] R-105 -- | The time step selector on the toolbar (need the transport) lists time ranges. Starting at 24:00, the step end time is normalized back to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say 24:00 - 25:00, and fix all subsequent steps.
+- [ ] R-106 -- | Initial values: Settings.Symbology.Node.Source share.After = '%' and Decimal = 0; Water age.After = ' hr'; Initial quality.After = ' mg/L'; Concentration.After = ' mg/L'; Average source share.After = '%' and Decimal = 0; Link.Average water age.After = ' hr'; Node.Average concentration.After = ' mg/L'
+- [ ] R-107 -- | Reaction rate does not appear in Properties or Tables. I see it only in Settings.Symbology.Link.
