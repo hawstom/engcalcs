@@ -49628,6 +49628,15 @@ var EngCalcs = EngCalcs || {};
 		// edit, so a burst that crosses the Recalculate switch still costs exactly one write.
 		scheduleSave();
 		if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
+		// **AND THE TABLE ON SHOW FOLLOWS THE DOCUMENT, WHETHER OR NOT ANYTHING IS SOLVED** (Perry's
+		// pre-review of Tom's fifth pass, 2026-09-22). With the switch ON the pane is refreshed when
+		// the solve lands; with it OFF this is the only door, and it used to refresh nothing -- so a
+		// scenario switch left the Junctions table showing the scenario just left (a 999999 override
+		// still on screen over a Base value of 0). This is "an edit still has to show up everywhere
+		// the input is shown", reaching the table. It is a REFILL of the one table on show, writing
+		// only the cells that changed, never a map-wide pass; and the result columns read the kept
+		// lastSolveResult, so the snapshot rule stands -- stale answers stay, nothing is cleared.
+		refreshPaneIfOpen();
 	}
 
 	// calcAndSave() calls this unconditionally, from the units strip's own selects and from
