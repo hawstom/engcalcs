@@ -16,12 +16,13 @@ exports.title = '6 & 7. Locking, read-only, and the freshness guarantee, across 
 const FILE = 'Shared-lpn.json';
 
 // Get a session to the point of having FILE saved and its identity established.
-async function saveNewFile(s, initials) {
+// The initials argument is gone with Task 667(b): a lock is taken anonymously now.
+async function saveNewFile(s) {
 	await s.goto();
 	await s.makeEdit();
 	await s.queuePick(FILE);
 	await s.menuClick('Save');
-	await s.answerTrainingPanel(initials);
+	await s.answerTrainingPanel();
 	await s.settle(500);
 }
 
@@ -30,7 +31,7 @@ exports.run = async function ({ browser, report }) {
 	const b = await Session.open(browser, 'B');
 	const share = new Share();
 	try {
-		await saveNewFile(a, 'AAA');
+		await saveNewFile(a);
 		report.ok(!!(await a.readFile(FILE)), 'A has the file');
 		report.ok(await a.banner() === null, 'A is editable, with no banner');
 
@@ -38,7 +39,7 @@ exports.run = async function ({ browser, report }) {
 		await b.goto();
 		await b.queuePick('B-scratch-lpn.json');
 		await b.menuClick('Save');
-		await b.answerTrainingPanel('BBB');
+		await b.answerTrainingPanel();
 		await b.settle(400);
 
 		// --- B opens A's file ------------------------------------------------
@@ -47,18 +48,28 @@ exports.run = async function ({ browser, report }) {
 		await b.menuClick('Open…');
 		const dlg = await b.waitDialog();
 		report.ok(!!dlg, 'B is asked before the project lands, not told afterwards');
-		report.has(dlg && dlg.text, 'AAA', 'the dialog names who has it');
-		report.has(dlg && dlg.text, 'has this file open', 'in the words of the punch list');
-		report.ok(/seconds|minutes|hours|days|unknown/.test(dlg.text), 'and carries a NUMBER, not just a name',
-			(dlg.text || '').slice(0, 120));
-		report.eq(JSON.stringify(dlg.buttons), JSON.stringify(['Cancel', 'Open read-only', 'Break their lock']),
-			'three choices, in the order a decent colleague tries them, and no AUTOMATIC take-over');
+		// **NOBODY IS NAMED, BECAUSE NOBODY WAS ASKED** (Task 667(b)). The dialog describes the FILE
+		// and its ages instead, which is what Tom asked for on 2026-09-17: how long it has been in
+		// use, when it was last saved, when it was last edited.
+		report.has(dlg && dlg.text, 'appears to be in use', 'the dialog describes the file, not a person');
+		report.has(dlg && dlg.text, 'in use for', '...and says how long it has been in use');
+		report.ok(/seconds|minutes|hours|days/.test(dlg.text), 'and carries a NUMBER',
+			(dlg.text || '').slice(0, 200));
+		// **REORDERED 2026-09-17, and the order is the assertion.** Ask leads because the
+		// first button takes keyboard focus, so a stray Enter must land on the answer that changes
+		// nothing; the two look-but-do-not-touch answers sit together; and Cancel goes BEFORE Break
+		// lock, because in the shipped order the destructive answer sat one seat from Cancel. The
+		// caution glyph is prepended by the renderer, so it is in the rendered label and not in the
+		// language file.
+		report.eq(JSON.stringify(dlg.buttons),
+			JSON.stringify(['Ask', 'Open read-only', 'Cancel', '\u26a0 Break lock']),
+			'four choices, in the order Tom agreed, and still no AUTOMATIC take-over');
 
 		// --- read-only means read-only, and nothing else ----------------------
 		await b.dialogClick('Open read-only');
 		const roBanner = await b.waitBanner();
 		report.ok(!!roBanner, 'B gets a banner');
-		report.has(roBanner && roBanner.text, 'AAA', 'naming A');
+		report.has(roBanner && roBanner.text, 'Somebody else', 'naming the holder as well as it can');
 		report.has(roBanner && roBanner.text, 'Read-only', 'and saying read-only');
 		report.ok((roBanner.buttons || []).includes('Save as…'), 'with Save as offered');
 
@@ -115,7 +126,7 @@ exports.run = async function ({ browser, report }) {
 		await b.menuClick('Open…');
 		const dlg2 = await b.waitDialog();
 		report.ok(!!dlg2, 'B is asked again on a second open');
-		await b.dialogClick('Break their lock');
+		await b.dialogClick('\u26a0 Break lock');
 		report.ok(await b.banner() === null, 'after breaking the lock B is editable');
 
 		await b.makeEdit();

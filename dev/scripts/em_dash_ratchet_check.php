@@ -40,10 +40,13 @@ require_once __DIR__ . '/lang_parse.inc.php';
  * The measured count on 2026-09-01, the day the advisory was restored. LOWER THIS when strings are
  * fixed; never raise it. Raising it is the one edit that makes this script pointless.
  */
-const EC_EM_DASH_BASELINE = 56;   // 59 -> 57 on 2026-09-10: the two false Notes were rewritten (Task 625).
+const EC_EM_DASH_BASELINE = 55;   // 59 -> 57 on 2026-09-10: the two false Notes were rewritten (Task 625).
                                   // 57 -> 56 on 2026-09-17: lpn_terrain_none_needed carried one and
                                   // went with EC.lpnTerrainFill(), the entry point no door had called
                                   // since Task 542 removed the Map-menu row.
+                                  // 56 -> 55 on 2026-09-21: lpn_lock_not_asked was reworded for Task
+                                  // 667(b), on a branch cut before the terrain one. Two independent
+                                  // drops of one, merged; the number is the merged tree's, measured.
 
 const EC_EM_DASH = "\u{2014}";
 

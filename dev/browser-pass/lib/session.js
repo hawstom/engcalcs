@@ -249,10 +249,13 @@ class Session {
 	// The first-run training panel, which stands between a fresh profile and any file operation. Not
 	// skipped or stubbed: it is a real step of the real flow, and answering it is how a session earns
 	// the identity every lock is keyed on.
-	async answerTrainingPanel(initials) {
+	//
+	// **IT TAKES NO ARGUMENT SINCE TASK 667(b)**: the panel no longer has an initials box, because
+	// nobody is asked to identify themselves in order to take a lock. It explains, and you press
+	// Continue. Callers that still pass initials are harmless and are simply ignored.
+	async answerTrainingPanel() {
 		const d = await this.dialog();
 		if (!d) { return false; }
-		await this.page.fill('#lpn_dialog_body input[type=text]', initials);
 		await this.dialogClick('Continue');
 		return true;
 	}

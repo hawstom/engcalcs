@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**77 still to read on master**, of 137 untranslated keys, of 2004 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**82 still to read on master**, of 154 untranslated keys, of 2012 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (137, 77 to read @@ NEEDS RULING)
+## lpn_  (154, 82 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -48,6 +48,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
+- **`lpn_engine_bar_label`**
+  > Solver loading progress
+  @@ NEEDS RULING
+- **`lpn_engine_wait`**
+  > Loading solver. Results delayed momentarily. Continue working.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_bytes`**
+  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_pct`**
+  > Solver {percent}% loaded.
+  @@ NEEDS RULING
 - **`lpn_ff_clear`**
   > Clear rings
   @@ NEEDS RULING
@@ -168,6 +180,45 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_library_import_units_line`**
   > {name}: this project shows {mine}, the file shows {theirs}.
   @@ NEEDS RULING
+- **`lpn_lock_age_edited`**
+  > It was last edited {x} ago.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_inuse`**
+  > It has been in use for {x}.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_never_saved`**
+  > Nothing has been saved to this file yet.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_saved`**
+  > It was last saved {x} ago.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_age_unknown`**
+  > There is no record of how long it has been in use, or when it was last saved or edited.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask`**
+  > Ask
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask_failed`**
+  > Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_ask_prompt`**
+  > Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.
+  _Ruled 2026-09-17: Edited. Please review._
+- **`lpn_lock_ask_sent`**
+  > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_open_care`**
+  > To avoid data loss, choose carefully from the options below.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_open_choices_ask`**
+  > "Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_inuse`**
+  > This file appears to be in use.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_requested`**
+  > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
+  _Ruled OK 2026-09-17._
 - **`lpn_meter_pick_pipe`**
   > Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.
   @@ NEEDS RULING
@@ -443,7 +494,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**69 still to read**, of 84 new keys across 9 unmerged branch(es).
+**105 still to read**, of 108 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -454,12 +505,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-4 (`2d718fd4`) — adds no English strings
-
-### feat/customer-find-labels (`a84da469`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/customer-find-labels (`324a8e1c`) — 20 new, 20 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
+  @@ NEEDS RULING
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
   @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
@@ -469,6 +524,27 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_labels_customer_width_tip`**
   > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_meter_pattern_unknown`**
   > No pattern in this project is named {id}, so the customer was left as it was.
@@ -491,29 +567,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_sym_node`**
   > Node
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`e9319a0a`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_engine_bar_label`**
-  > Solver loading progress
-  @@ NEEDS RULING
-- **`lpn_engine_wait`**
-  > Loading solver. Results delayed momentarily. Continue working.
-  @@ NEEDS RULING
-- **`lpn_engine_wait_bytes`**
-  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
-  @@ NEEDS RULING
-- **`lpn_engine_wait_pct`**
-  > Solver {percent}% loaded.
-  @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
-
-### feat/label-gang-search (`344c0cc4`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/label-gang-search (`344c0cc4`) — 19 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -521,11 +576,38 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
+  @@ NEEDS RULING
 - **`lpn_labels_restore`**
   > Restore label defaults
   @@ NEEDS RULING
 - **`lpn_labels_restore_tip`**
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_settings_label_always`**
   > Always show labels
@@ -546,50 +628,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 17 new, 5 to read @@ NEEDS RULING
+### feat/lock-initials-later (`1c9aba51`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
-- **`lpn_lock_age_edited`**
-  > It was last edited {x} ago.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_inuse`**
-  > It has been in use for {x}.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_never_saved`**
-  > Nothing has been saved to this file yet.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_saved`**
-  > It was last saved {x} ago.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_age_unknown`**
-  > There is no record of how long it has been in use, or when it was last saved or edited.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask`**
-  > Ask
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask_failed`**
-  > Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_ask_prompt`**
-  > Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.
-  _Ruled 2026-09-17: Edited. Please review._
-- **`lpn_lock_ask_sent`**
-  > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_open_care`**
-  > To avoid data loss, choose carefully from the options below.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_open_choices_ask`**
-  > "Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.
-  @@ NEEDS RULING
-- **`lpn_lock_open_inuse`**
-  > This file appears to be in use.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_requested`**
-  > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
-  _Ruled OK 2026-09-17._
 - **`lpn_terrain_no_nodes`**
   > There are no nodes to fill in yet.
   @@ NEEDS RULING
@@ -600,25 +643,76 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`cfa207d7`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`7023acf4`) — 11 new, 11 to read @@ NEEDS RULING
 
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
 - **`lpn_pane_goto_tip`**
   > Show this on the map.
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
 
-### feat/xy-world-map (`731ab367`) — 33 new, 30 to read @@ NEEDS RULING
+### feat/xy-world-map (`3efd322c`) — 41 new, 38 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
   @@ NEEDS RULING
 - **`lpn_crs_unnamed`**
   > unnamed
+  @@ NEEDS RULING
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_map_attach_add`**
   > Attach
@@ -710,16 +804,38 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
 
-### fix/stale-is-a-snapshot (`ba310f96`) — adds no English strings
-
-### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
+### tables-interface (`e34970bc`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
+- **`lpn_file_training_3`**
+  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+  @@ NEEDS RULING
+- **`lpn_file_training_name`**
+  > Your initials
+  @@ NEEDS RULING
+- **`lpn_lock_open_choices`**
+  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
+  @@ NEEDS RULING
+- **`lpn_lock_open_copy`**
+  > Create a copy
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_saved`**
+  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_seen`**
+  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_times`**
+  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
+  @@ NEEDS RULING
+- **`lpn_lock_open_heading_unsaved`**
+  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
+  @@ NEEDS RULING
+- **`lpn_lock_prompt_name`**
+  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_terrain_no_nodes`**
   > There are no nodes to fill in yet.

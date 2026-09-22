@@ -28,19 +28,26 @@ exports.run = async function ({ browser, report }) {
 		const panel = await a.dialog();
 		report.ok(!!panel, 'File → Save on a fresh profile shows the training panel first');
 		report.eq((await a.pickerCalls()).length, 0, 'and NO file dialog until Continue is pressed');
-		report.has(panel && panel.text, 'initials', 'the panel asks for initials colleagues will know');
+		// **AND ASKS FOR NOTHING** (Task 667(b), Tom 2026-09-17). The panel used to end in an initials
+		// box, on a site with no login and no account, which is exactly what made it read as a
+		// registration. The assertion is now the ABSENCE: no text field, and no request for a name.
+		report.eq(await a.page.locator('#lpn_dialog_body input[type=text]').count(), 0,
+			'the panel asks for NO initials -- that question moved to the colleague who wants the file');
+		report.ok(!/initials/i.test((panel && panel.text) || ''), '...and does not mention them either');
 		report.ok((panel.buttons || []).includes('Continue'), 'and offers Continue');
+		// **AND IT IS ONE PARAGRAPH** (Tom, 2026-09-17: *"I waffle on 'drop the pre-Open message
+		// entirely'. The browser message about saving could be alarming without an introduction (the
+		// last paragraph I mentioned keeping)."*). The two that went recited expectations a person
+		// already brings; the one that stayed is about a prompt that comes from the BROWSER.
+		report.eq(await a.page.locator('#lpn_dialog_body p').count(), 1,
+			'the panel is one paragraph, not three');
 
-		// **ENTER IN THE INITIALS BOX IS CONTINUE** (Tom, 2026-08-19: "After entering initials, can
-		// the [Enter] key close the box?"). Answered with the KEY rather than the button, so the
-		// whole save that follows is proof the key reaches the same handler -- a check that only
-		// asserted the panel closed would pass on a key that closed it and did nothing else.
+		// Continue is a fresh click with a user activation of its own, which is the whole reason this is
+		// a panel and not a confirm(): the save that follows is the proof it reached the picker.
 		await a.queuePick(FILE1);
-		await a.page.focus('#lpn_dialog input[type="text"]');
-		await a.page.keyboard.type('TGH');
-		await a.page.keyboard.press('Enter');
+		await a.dialogClick('Continue');
 		await a.settle(400);
-		report.ok(!(await a.dialog()), 'Enter in the initials box is Continue — the panel closes');
+		report.ok(!(await a.dialog()), 'Continue closes the panel');
 		report.ok((await a.pickerCalls()).length > 0, '...and goes on to the picker, not just away');
 		await a.settle(500);
 

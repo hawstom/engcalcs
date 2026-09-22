@@ -85,7 +85,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_index` | `js/looped-network.js` | The project list: id, name, last-updated, file link state |
 | `lpn_project_<id>` | same | One whole project — the network the user drew, its settings, and any backdrop image as a data URI. **Since Task 247 it also holds CUSTOMER ACCOUNT NUMBERS**, which is the first personal-adjacent data this suite stores anywhere: an account number beside a map position says where a named service is. **Exempt on the same terms as every other input on this page — it is what the visitor typed, kept so it can be given back — and it is subject to one extra rule that is not about storage at all: it must never reach a log row, a usage statistic or an error report.** Nothing writes it outside this key; `log_bucket_check.php`'s six appending writers name no element and no field, and the placement gesture's one logging call records the literal `element`. A shared project file carries it, which is a fact about sharing a file rather than about this browser |
 | `lpn_document` | same | Legacy single-document key, migrated on read |
-| `lpn_identity` | same | The initials and the opaque token this browser sends to the file-lock broker |
+| `lpn_identity` | same | The opaque token this browser sends to the file-lock broker, and a flag saying the file-and-lock panel has been read. **No name since Task 667(b)** (Tom, 2026-09-17): nobody is asked for initials in order to take a lock, and the initials a colleague types into *Ask* are SENT to the broker and never written here |
 | `lpn_pane` | same | Whether the bottom pane is open, how tall it is, and which tab (Task 434) |
 | `lpn_rpane` | same | Whether the right panel is open and how wide it is (Task 441) |
 | `lpn_setbox` | same | Where the Settings box was left, how big it was made, where its two panes are split, and whether it was open (Tasks 441, 576; openness Tom, 2026-09-04) |
@@ -104,15 +104,17 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
 them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for
-a service the visitor explicitly requested (you cannot take a lock on a shared file without saying
-who is holding it), and the last four are preferences the visitor set deliberately — three panel
+a service the visitor explicitly requested (you cannot take a lock on a shared file without a token
+that says which browser is holding it), and the last four are preferences the visitor set deliberately — three panel
 layouts and a page-title toggle. **A panel layout is the same purpose at a finer grain, so it rides
 this declaration rather than earning a new one: no new sentence in `consent_body`, no
 `EC_CONSENT_VERSION` bump, nothing re-asked.** `bpn_sketch_toggles` is the same kind of thing one
 page over: five checkboxes the visitor ticked, remembered because they sit outside the form the
 input cookie captures. **None of the nine is analytics, and none carries an identifier of a
-person** — `lpn_identity`'s token is opaque and its initials are typed by the user, for other humans
-to read in the lock notice.
+person** — `lpn_identity`'s token is opaque, and since Task 667(b) it carries no name at all. The
+one place a name is still typed is *Ask*, on the dialog a colleague gets when the file is already in
+use; those initials go straight to the lock broker for the holder to read and are **deliberately not
+stored on the device**, which is why that change cost no new row here and no consent-version bump.
 
 **All eight `lpn_` keys are removed by Settings > Erase everything** (`wipeAllStorage()`), which is
 what makes that button's own sentence — "every project, every background image, all settings, and

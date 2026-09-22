@@ -1927,7 +1927,6 @@ $ec_lang['lpn_file_changed_elsewhere']='Somebody else has saved to this file sin
 // rather than a name makes the safe answer the obvious one.
 // Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
 // name is never written into the project file, so "anyone you send the file to" was false here too.
-$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
 // The stand-in when someone locked a project before giving a name. Reads in place of {name}
 // everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Somebody else';
@@ -1939,14 +1938,42 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
-$ec_lang['lpn_lock_open_copy']='Create a copy';
-$ec_lang['lpn_lock_break']='Break their lock';
+$ec_lang['lpn_lock_break']='Break lock';
 $ec_lang_syn['lpn_lock_break']='Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button';
-$ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
-$ec_lang['lpn_lock_open_heading_unsaved']='{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.';
-$ec_lang['lpn_lock_open_heading_saved']='{name} has this file open; the last edit was {x} ago, and their work is saved to the file.';
-$ec_lang['lpn_lock_open_heading_seen']='{name} has this file open but has not edited it. Their browser last checked in {x} ago.';
-$ec_lang['lpn_lock_open_choices']='Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.';
+// **TASK 667(b): NOBODY IS ASKED FOR A NAME UNTIL A COLLEAGUE ACTUALLY WANTS THE FILE** (Tom,
+// 2026-09-17). The page used to ask the FIRST user for initials the first time they saved, for a
+// name nobody would ever read unless a colleague happened to collide with them -- and on a site
+// with no login and no account, that reads as a registration. So the lock is taken anonymously and
+// the four sentences below are what a second user gets instead: the ages, then the answers.
+// **He conceded the trade rather than denying it** -- *"Of course saving initials with the lock is
+// better. But asking user A for their initials the first time they save a file is a bit startling,
+// not to mention easily confused with a login or account registration."* Asking up front is the
+// REJECTED ALTERNATIVE, not an improvement waiting to be proposed.
+$ec_lang['lpn_lock_open_inuse']='This file appears to be in use.';
+$ec_lang['lpn_lock_open_care']='To avoid data loss, choose carefully from the options below.';
+// THREE AGES, EACH ITS OWN SENTENCE, AND EACH SAID ONLY WHERE IT IS KNOWN. A dialog that decides
+// whether somebody interrupts a colleague must never carry a number it had to invent: an age the
+// server has no record of is simply not stated. `lpn_lock_age_inuse` is the server's own clock;
+// the other two are the holder's, reported with every heartbeat.
+$ec_lang['lpn_lock_age_inuse']='It has been in use for {x}.';
+$ec_lang['lpn_lock_age_edited']='It was last edited {x} ago.';
+$ec_lang['lpn_lock_age_saved']='It was last saved {x} ago.';
+$ec_lang['lpn_lock_age_never_saved']='Nothing has been saved to this file yet.';
+$ec_lang['lpn_lock_age_unknown']='There is no record of how long it has been in use, or when it was last saved or edited.';
+// Four answers now, in Tom's own order, so the prose and the button row read the same way.
+// **IN THE BUTTON ROW'S OWN ORDER** (2026-09-17): Ask, Open read-only, Break lock. The prose and
+// the row have to read the same way down the page, or the sentence a person is reading is about
+// a different button from the one their eye has landed on. Cancel is not described, because a
+// Cancel that needed a sentence would not be a Cancel.
+$ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.';
+$ec_lang['lpn_lock_ask']='Ask';
+// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
+// this computer for it, which is the whole point of moving the question here.
+$ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
+$ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
+$ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
+// The other end of the back channel, shown to the holder.
+$ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
 $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
@@ -1964,7 +1991,7 @@ $ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You 
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
 $ec_lang['lpn_lock_storage_error']='Beware: this site cannot save lock records, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here — the lock folder is not writable by the web server.';
 $ec_lang['lpn_lock_full_error']='Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.';
-$ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.';
+$ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This project has no identifier yet, and saving it to a file gives it one.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this file is now yours to save to.';
 $ec_lang['lpn_lock_dismiss']='Hide this message';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
@@ -1982,8 +2009,6 @@ $ec_lang['lpn_file_training_permission']='The first time you save, your browser 
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_3']='Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
-$ec_lang['lpn_file_training_name']='Your initials';
 $ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.

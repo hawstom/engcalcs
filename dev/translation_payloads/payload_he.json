@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 2004,
-        "delta_key_count": 137,
+        "expected_key_count": 2012,
+        "delta_key_count": 154,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -569,6 +569,23 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Open read-only\" lets you look at it and change anything you like, without being able to save here. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_engine_bar_label": "Solver loading progress",
+        "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
+        "lpn_engine_wait_pct": "Solver {percent}% loaded.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
@@ -708,6 +725,23 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Open read-only\" lets you look at it and change anything you like, without being able to save here. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_engine_bar_label": "Solver loading progress",
+        "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
+        "lpn_engine_wait_pct": "Solver {percent}% loaded.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
@@ -1594,6 +1628,278 @@
                     "key": "lpn_crs_none",
                     "value": "ללא הפניה גאוגרפית",
                     "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_lock_open_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_care": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_edited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_never_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_choices_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_sent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_requested": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "שבור את הנעילה שלו",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} שניות",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_engine_bar_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "טעינת פותר EPANET מתבצעת בזמן שאתם בונים. התוצאות יהיו זמינות לאחר הטעינה המלאה.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "טעינת פותר EPANET מתבצעת בזמן שאתם בונים. התוצאות יהיו זמינות לאחר הטעינה המלאה.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait_pct": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "טעינת פותר EPANET מתבצעת בזמן שאתם בונים. התוצאות יהיו זמינות לאחר הטעינה המלאה.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait_bytes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "טעינת פותר EPANET מתבצעת בזמן שאתם בונים. התוצאות יהיו זמינות לאחר הטעינה המלאה.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
                 }
             }
         },
