@@ -2002,8 +2002,12 @@ the block.
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
 
-- 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
-  Tom, 2026-09-21, asking for discussion and a plan rather than a build.
+- 100|705| **Limit zoom symbol mapwise size growth.**
+  **HIS OWN TITLE, 2026-09-21**, replacing "New zoom rules: a symbol may not grow past a size the
+  network itself sets." **And he gave the go-ahead the same day:** *"New zoom rules: If you have no
+  questions or objections, you can proceed to implement this in a branch for me to test."* It is
+  building on `feat/zoom-symbol-size`. What follows was his discussion brief and stands as the
+  design.
   - **(1) EVERY SYMBOL BUT A DECLARED EXCEPTION HAS A MAXIMUM MAP SIZE.** His starting proposal,
     offered as a starting point and not a ruling: the junction is the reference, and **the maximum
     junction map size is the 10th-percentile link length**. Reservoir and tank are the exceptions he
