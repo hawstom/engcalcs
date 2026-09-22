@@ -2949,9 +2949,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
 /* ---- The message log button and list (ROADMAP Task 704) ----
-   The button is a cell of #lpn_map_footer, so it needs the strip's own translucent readout paint
-   rather than the grievance link's transparent one: it sits over the drawing and an icon with no
-   ground behind it disappears over a dark tile. pointer-events:auto because the strip is inert. */
+   Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
+   button/glyph must be where the messages appear"). It carries the same translucent pill paint as
+   the mode text next to it, so the row reads as one readout and not as a control parked beside
+   one. pointer-events:auto because the row it sits in is otherwise inert like every map overlay. */
 .lpn-msglog-btn {
 	pointer-events: auto;
 	display: inline-flex; align-items: center;
@@ -2961,6 +2962,13 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	color: #555; cursor: pointer;
 }
 .lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: #222; border-color: #888; }
+/* HIGHLIGHTED WHILE A MESSAGE IS ON SCREEN (Tom: "it must appear and possibly highlight while a
+   message displays"), toggled by markMsglogActive() in js/looped-network.js. Blue rather than
+   amber or red -- both of those already mean "something is wrong" on this page (the diagnostic
+   box, the warning banner), and this says only "something is being shown," which is also true of
+   an ordinary save confirmation. */
+.lpn-msglog-btn.lpn-msglog-active { background: #05a; border-color: #05a; color: #fff; }
+.lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: #fff; border-color: #037; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */

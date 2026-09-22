@@ -257,40 +257,57 @@ console.log('7b. The empty state says so rather than showing an empty box');
 	press(PC.lpn_dialog_ok);
 }
 
-console.log('7c. It is a cell of the strip that already exists, not a fifth bar of chrome');
+console.log('7c. It lives where the messages do -- the top-left column, not the bottom strip');
 // Rendered through dev/scripts/render_page.php, which is the only correct way to render a page
 // outside a web request -- an include from inside a function loses the bootstrap globals.
 {
 	const html = execFileSync('php', [path.join(ROOT, 'dev/scripts/render_page.php'), 'Looped-Network.php'],
 		{ encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-	const atFooter = html.indexOf('id="lpn_map_footer"');
+	const atOverlay = html.indexOf('id="lpn_map_overlay_tl"');
 	const atBtn = html.indexOf('id="lpn_msglog_btn"');
+	const atModeHint = html.indexOf('id="lpn_mode_hint"');
+	const atNotice = html.indexOf('id="lpn_map_notice"');
+	const atFooter = html.indexOf('id="lpn_map_footer"');
 	const atWrong = html.indexOf('id="lpn_wrong_btn"');
-	const atCredit = html.indexOf('id="lpn_basemap_credit"');
 	ok('the page renders the control', atBtn > 0);
-	ok('inside the bottom status strip', atFooter > 0 && atBtn > atFooter && atBtn < atCredit);
-	ok('before the grievance link, which is declared last in that strip', atBtn < atWrong);
-	ok('and it is the ONLY new element -- no new bar, panel or row anywhere on the page',
-		(html.match(/id="lpn_msglog/g) || []).length === 1);
+	ok('inside the top-left overlay column, ahead of the mode hint it sits beside',
+		atOverlay > 0 && atBtn > atOverlay && atBtn < atModeHint);
+	ok('and ahead of the notice that covers the mode hint, so both states read [glyph] [text]',
+		atBtn < atNotice);
+	ok('it is no longer a cell of the bottom status strip',
+		atFooter < 0 || atBtn < atFooter || atBtn > html.indexOf('</div>', atFooter));
+	ok('the grievance link is still there, on its own, with no message-log button beside it',
+		atWrong > 0 && html.slice(Math.max(0, atFooter), atFooter < 0 ? 0 : atWrong).indexOf('lpn_msglog') < 0);
+	ok('and it is the ONLY element with this id -- no duplicate left behind by the move',
+		(html.match(/id="lpn_msglog_btn"/g) || []).length === 1);
 	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
-	// The 640px blocks, taken by BRACE MATCHING rather than by splitting on the at-rule -- a split
-	// hands back the whole rest of the stylesheet and would fail on any rule that happens to sit
-	// below the last media query.
-	let small = '';
-	for (let at = css.indexOf('@media (max-width: 640px)'); at >= 0;
-		at = css.indexOf('@media (max-width: 640px)', at + 1)) {
-		let i = css.indexOf('{', at), depth = 0, end = i;
-		for (; end < css.length; end++) {
-			if (css[end] === '{') { depth++; }
-			else if (css[end] === '}') { depth--; if (depth === 0) { end++; break; } }
-		}
-		small += css.slice(at, end) + '\n';
-	}
-	ok('the 640px block is found at all', small.length > 200, 'len=' + small.length);
-	ok('the 640px rules neither hide the strip nor touch this control',
-		small.indexOf('lpn_map_footer') < 0 && small.indexOf('lpn-msglog') < 0);
 	ok('and the control is styled, so it is not an unstyled default button on the map',
 		css.indexOf('.lpn-msglog-btn') >= 0);
+	ok('with a highlight rule for while a message is showing',
+		css.indexOf('lpn-msglog-active') >= 0);
+}
+
+console.log('7d. Highlighted while a message shows, cleared the moment it is not');
+{
+	const L3 = load();
+	function active() { return String(byId.lpn_msglog_btn.className || '').indexOf('lpn-msglog-active') >= 0; }
+	// The DOM stub's elements are a single module-level set reused across every load() in this
+	// file (dev/lpn-spike/lpn-dom-stub.js), so a class left on from an earlier section's notice
+	// survives into this one. Establish a known baseline rather than assuming a fresh page.
+	L3.setNotice('');
+	ok('quiet once nothing is showing', !active());
+	L3.setNotice('Saved fixture-two.lwn.');
+	ok('lit while the notice is on screen', active());
+	expireNotices();
+	ok('and cleared once the eight-second timer takes it away', !active());
+	L3.setNotice('Saved fixture-two.lwn.');
+	ok('lit again for a second notice', active());
+	L3.setNotice('');
+	ok('and an explicit clear turns it off immediately, with no timer to wait for', !active());
+	L3.noteMapUnmeasurable(true);
+	ok('the standing map-unmeasurable warning lights it too -- same slot, same rule', active());
+	L3.noteMapUnmeasurable(false);
+	ok('and clears when that warning resolves', !active());
 }
 
 console.log('8. THE LIVE MUTATION: take the log line out of setNotice() and group 1 must go red');

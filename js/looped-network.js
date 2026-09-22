@@ -45065,20 +45065,36 @@ var EngCalcs = EngCalcs || {};
 	// control that appears only once there is something to read is one nobody learns, and it would
 	// reflow the strip under the hand every time a notice landed. It is one icon in a strip that
 	// already exists, already wraps, and is already reserved against by zoomExtent().
+	// **HISTORY, NOT INFO** (Ida, 2026-09-21, after Tom: *"The i info glyph doesn't seem quite right
+	// to me."*). 'info' names standing reference facts elsewhere on this page (Welcome, Privacy
+	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
+	// mark cannot hold both jobs. See lib/Icons.lib.php for why a clock face and not the other three
+	// candidates considered.
 	function wireMessageLogButton() {
 		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }
-		setIconLabel(btn, 'info', pc.lpn_msglog_name || 'Messages',
+		setIconLabel(btn, 'history', pc.lpn_msglog_name || 'Messages',
 			pc.lpn_msglog_tip || 'Read the recent messages again. They are kept only while this page is open.');
 		btn.addEventListener('click', openMessageLog);
 	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
+	// **HIGHLIGHTED WHILE IT SHOWS, NEVER OTHERWISE** (ROADMAP Task 704; Tom: "it must appear and
+	// possibly highlight while a message displays"). This is the ONE place #lpn_map_notice's text is
+	// written, so it is the one place that can know whether a message is currently on screen --
+	// noteMapUnmeasurable() and setNotice() both funnel through here, and neither needs its own
+	// copy of this rule.
+	function markMsglogActive(on) {
+		var btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		btn.classList[on ? 'add' : 'remove']('lpn-msglog-active');
+	}
 	function showNotice(text) {
 		var el = document.getElementById('lpn_map_notice');
 		if (!el) { return; }
 		el.textContent = text || '';
 		el.style.display = text ? 'block' : 'none';
+		markMsglogActive(!!text);
 	}
 	// **WHEN THIS PAGE CANNOT MEASURE ITSELF, IT SAYS SO** (MJH, 2026-09-09). A map that is silently
 	// unusable cost one user a whole session: the drawing was intact, the menus worked, and nothing

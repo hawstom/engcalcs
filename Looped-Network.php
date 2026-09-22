@@ -309,7 +309,17 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // stay stacked, one covering the other, exactly as they were.
 			      //
 			      // Same size, font-size and translucent pill as the mode text beside it, so the row
-			      // reads as one readout rather than as a control parked next to one. ?>
+			      // reads as one readout rather than as a control parked next to one.
+			      //
+			      // **HIGHLIGHTED WHILE A MESSAGE SHOWS** (Ida's ruling, and Tom's own words above:
+			      // "possibly highlight while a message displays"). showNotice() in
+			      // js/looped-network.js is the one door every notice and the standing
+			      // map-unmeasurable warning already go through, so it is the one place that adds
+			      // and removes .lpn-msglog-active -- on while #lpn_map_notice is showing text, off
+			      // the moment it is cleared, whether by the eight-second timer or by a later
+			      // message replacing it. pointer-events:auto on the button alone, because the row
+			      // it sits in is otherwise inert like every overlay here, and it is one keyboard
+			      // stop like every other icon button on this page. ?>
 			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
 			<?php // Everything that comes and goes, in the stack it has always been in. `position:
 			      // relative` is load-bearing: #lpn_map_notice is absolutely positioned at THIS box's
@@ -375,6 +385,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // states no size the bar runs INDETERMINATE -- it still exists and still moves, because
 			      // his ruling is that the unknown belongs in the bar rather than out of it. ?>
 			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
+			</div>
+		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the
 		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
@@ -618,23 +630,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      //
 			      // LAST IN THE STRIP so it never pushes a live readout, and quiet by design -- it must
 			      // not compete with the drawing. ?>
-			<?php // **THE MESSAGE LOG (ROADMAP Task 704, row 1 of Ida's ranking).** A notice is on
-			      // screen for eight seconds and a later one replaces it, which is the whole of
-			      // Tom's complaint (2026-09-18: *"The banner message ... disappeared too fast and
-			      // unrecoverable. 'Help! What did I miss!'"*). This is the icon the log is behind.
-			      //
-			      // A CELL OF THIS STRIP, for the same three reasons the satellite teaser and the
-			      // grievance link are cells of it: the strip is already the bottom-left band,
-			      // already reserved against by zoomExtent(), already wraps on a narrow window and
-			      // is already d-print-none. **It is deliberately NOT a fifth bar of chrome** --
-			      // the log itself is the page's existing modal, so nothing standing is added to
-			      // the map at any window size, and one icon is what it costs at 640px too.
-			      //
-			      // ICON ONLY, filled by wireMessageLogButton() in js/looped-network.js through
-			      // setIconLabel(), which is the one door that also writes the aria-label and the
-			      // tip -- a button whose only content is an aria-hidden <svg> has no accessible
-			      // name at all. The name lives in PHP because the strings do. ?>
-			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
+			<?php // THE MESSAGE LOG BUTTON MOVED (ROADMAP Task 704, Tom 2026-09-21) to
+			      // #lpn_map_overlay_tl, beside the mode hint and the notice it recalls -- see the
+			      // comment there. It is not a cell of this strip any more. ?>
 			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
