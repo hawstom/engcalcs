@@ -1816,3 +1816,67 @@ node ID alone 1,415 -> 1,390 ms (nothing, inside the noise of a shared machine);
 - ASME Y14.2, *Line Conventions and Lettering* — leader clause. ISO 128-22:1999, leader and reference
   lines. AutoCAD MLEADERSTYLE Content tab.
 - Penn State GEOG 486, *Label Placement* (restates Imhof's line rules).
+
+---
+
+## 20. HOW THE ENDLESS STACK IS POSSIBLE, MEASURED -- and it is a bug, not a constraint (2026-09-21)
+
+**Tom, 2026-09-21, on being handed section 19's mechanism as though it were a defence:** *"Clearly
+this is a bug. But you say it without batting an eyelash. If you don't understand why it's a bug, ask
+me. If you do, fix it. I'm just grateful that magically this endless stack happened so that I know
+it's possible; We just have to find out how it's possible and empower that."*
+
+**He is right, and the three sentences he was answering were an explanation offered as an excuse.**
+A placement lattice whose spacing is fixed by symbol geometry and blind to the size of the thing
+being placed is a defect. **The narrow case working is the EXISTENCE PROOF that a correct layout is
+available on that drawing; the wide case failing is the algorithm declining to find it.**
+
+### 20a. The measurement, on his own drawing
+
+`node dev/lpn-spike/label-lattice-harness.js` -- and `LPN_WIDE_AFFIX=12345678` for his own test.
+Net3-Novato-CA-World, node ID alone, the fit view and 2x, the real first-fit's own captured inputs.
+**Every length is in LABEL HEIGHTS**, because the drawing is geographic and a world unit is a degree.
+
+| per node label, median of 97 | ID alone | ID + `12345678` |
+|---|---|---|
+| width of the box being placed | 1.49 | **5.45** |
+| diameter of the whole cloud of spots it is offered | 11.95 | **11.95** |
+| distance between two neighbouring spots | 0.90 | **0.90** |
+| **cloud diameter / box width -- how much room it has to hunt in** | **8.04** | **2.19** |
+| spots offered | 26 | 26 |
+| **spots that are genuinely DIFFERENT places for a box that size** | **17** | **12** |
+| spots one committed box poisons | 2.5 | 4.4 |
+| labels hidden at the fit view | 12 of 97 | 36 of 97 |
+
+### 20b. The mechanism, in one paragraph
+
+**The lattice is finer than a narrow box and coarser than a wide one, and it never changes.** The
+spots sit in a cloud about twelve label-heights across with neighbours nine-tenths of a label-height
+apart -- `nodeFirstFitSpec()` builds both from `defaultLabelOffset()`, which scales with the SYMBOL,
+and from a fixed 15 degree angle step. A narrow box is one and a half label-heights wide, which is
+under two spot-spacings, so a label can step ONE RUNG along the lattice and sit shoulder to shoulder
+with its neighbour; 26 spots give it 17 real choices inside eight box-widths of open ground. **That
+rung-by-rung stepping IS the endless stack, and it is not a talent of narrow labels -- it is the
+lattice being finer than the thing being placed.** A wide box is five and a half label-heights, six
+spot-spacings, so one box lies across six rungs: the 26 spots collapse to 12 real choices, a
+committed box poisons four of its own neighbours instead of two, and the whole search area is two
+box-widths across instead of eight. **The wide label is not short of plane. It is short of LATTICE.**
+
+### 20c. What that says to build, and it is the consumption again
+
+The offered cloud is IDENTICAL at both widths -- asserted, not argued, and the harness's first
+mutation is a reach that reads the box width, which must make it differ. So the fix is not a new
+model: **the lattice has to be a function of the box being placed.** Two numbers, both already
+computed one step away:
+
+- **REACH.** `outer` is `max(3 x resting offset, 1.5 text heights)`, a symbol quantity. Floored on
+  the BOX instead, a wide label is offered the same eight box-widths of hunting ground a narrow one
+  gets, and the stack is as endless as it ever was; it simply takes more room, and there is room.
+- **ANGULAR STEP.** Fixed at 15 degrees, so at the inner ring the spots are far finer than any box
+  and 14 of the 26 are spellings of one place, while at the outer ring of a wide label they are
+  coarser than the box and a gap is stepped straight over. Stepped so the TANGENTIAL spacing is a
+  fixed fraction of the box width, both ends are right and the count does not rise.
+
+**This is his R-079 in a second place.** The ranked arc table stopped being thrown away at
+`rankedArcs()`; here the box stops being thrown away at the lattice. Both are changes where a
+quantity is CONSUMED, not new models.
