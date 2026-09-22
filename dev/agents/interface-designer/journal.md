@@ -2523,3 +2523,37 @@ exists. **Ranked below it, in order:**
    overlap matters much less.
 
 No shipped file touched.
+
+## 2026-09-21 (later) — Task 704, rows 1–2 built: the glyph, and where messages actually land
+
+Read only, worktree `feat/notice-log` at `5191e8d3`. Tom tested the build and asked four things,
+one by name. Full text of my answer is in my report to the orchestrator; this entry records the
+provenance and the part worth keeping for next time.
+
+**The glyph was not mine.** My own diagnosis (2026-09-21, above) said "a history/clock icon" in
+prose and never named or specified a mark. The build agent chose `'info'` — OBSERVED
+`lib/Icons.lib.php:795`, an i-in-a-circle — which is a real choice with a real cost I had not
+weighed: OBSERVED `js/looped-network.js:29625,29655,29656,29661,30000` — that exact icon already
+names five Help-menu / Reports rows (Welcome page, Privacy notice, Terms of use, About, EPANET
+run, Reports menu), every one of them a single reference fact about the software, none of them a
+feed of what just happened to *you*. Putting the same glyph on a personal, timestamped, growing
+list is the same class of collision I flagged in the sort-heading/`#0645ad` finding above: one
+mark, two unrelated jobs, on the same page. **Own this: I should have named a mark or flagged that
+`'info'` already carries a meaning, and did not.**
+
+**The geometric mismatch is real and I did not catch it either.** OBSERVED
+`Looped-Network.php:289-360`: the mode hint (`#lpn_mode_hint`) and the one-shot notice
+(`#lpn_map_notice`) both sit top-left, `#lpn_map_notice` literally covering the mode hint when a
+notice is showing. OBSERVED `Looped-Network.php:526-608`: the message-log button
+(`#lpn_msglog_btn`) sits in the *bottom-left* footer strip, in a wrapping flex row shared with the
+scenario button, coordinates and CRS readout. Tom's screenshot shows him imagining the glyph beside
+the top-left mode line — he is not asking for a new idea, he is reporting that the built layout put
+the control somewhere other than where the thing it recalls appears, which is exactly the kind of
+defect this seat exists to catch and I did not check the render before he did.
+
+**`'restore'`/`'revert'` are already the vocabulary's "go back to an earlier state" shape** —
+OBSERVED `lib/Icons.lib.php:775,152`, both a near-360° arrow. A clock-face WITHOUT an arrow (an
+unclaimed shape in the current 61-name table) is the correct new mark for "a list in time order,"
+precisely because it does not borrow either taken shape.
+
+No shipped file touched; nothing in the worktree touched either.
