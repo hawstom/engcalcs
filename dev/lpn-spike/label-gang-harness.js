@@ -366,7 +366,12 @@ async function main() {
 	// THERE, the strategy is wrong and this harness says so rather than averaging it away.
 	if (head) {
 		const off = head.off.rows[0].counts.pairs, both = head.both.rows[0].counts.pairs;
-		report(both < off, HEADLINE + ' at the fit zoom: the repair alone LOWERS the count',
+		// **UNLESS THERE IS NOTHING LEFT TO LOWER.** Task 705's symbol cap takes the junctions at
+		// this fit down to about 70% of their screen size (the fit is further out than the
+		// 10th-percentile rule), and that alone took the unrepaired count from 10 pairs to 1. A
+		// repair cannot beat one pair by more than to zero, so at one pair it must not RAISE it.
+		report(both < off || (off <= 1 && both <= off),
+			HEADLINE + ' at the fit zoom: the repair alone LOWERS the count, or it was already one pair',
 			off + ' -> ' + both + ' pairs');
 		// **AND THE SHIPPED CONFIGURATION REACHES HIS NUMBER.** Net3-World has no hand-placed label
 		// on it, so there is no residual class here and the target is flat zero over all four views.

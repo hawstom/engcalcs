@@ -58,7 +58,7 @@ const L = stub.loadLoopedNetwork(
 	"\t\tisLatLonProject: isLatLonProject, docOrigin: docOrigin,\n" +
 	"\t\tmapSpan: mapSpan, visibleMapWidth: visibleMapWidth,\n" +
 	"\t\tvisibleMapHeight: visibleMapHeight, visibleMapMetres: visibleMapMetres,\n" +
-	"\t\tcaptureCustomerViewWidth: captureCustomerViewWidth,\n" +
+	"\t\tcaptureCustomerViewWidth: captureViewWidth,\n" +
 	"\t\tcustomerLabelsAttempted: customerLabelsAttempted,\n" +
 	"\t\tserviceStrokeWorld: serviceStrokeWorld,\n" +
 	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
