@@ -168,3 +168,49 @@ text cell) rather than by asking what OTHER state the same code path now runs in
 adding to the standing list: **a "we exempted X and Y" repair is exactly the moment to ask
 what THIRD state shares the same code path** -- here, editing is not select or checkbox, but
 it is not Ready either, and nothing asked about it.
+
+---
+
+## 2026-09-21 — sixth outing: the review ledger itself can fork, and a flagged number stayed put
+
+OBSERVED, checked 2026-09-21, `feat/customer-find-labels` `bd620e4f`.
+
+**R-011 and R-013 CONFIRMED, both re-derived independently rather than trusting the build agent's
+own harness alone.** R-011: grepped `js/looped-network.js` for the fallback literal beside
+`pc.lpn_customer_fixed_head` and it carries the caution glyph, matching `lib/lang.ec.en.php`
+exactly — the defect shape logged above at 2026-09-19 (glyph in the language file, missing from the
+JS fallback) was not repeated. R-013: read `mapSpan`, `visibleMapWidth`, `visibleMapMetres`,
+`metresPerWorldUnit` and the new `captureCustomerViewWidth()` directly, then separately computed
+`Geom.geodesicMeters()` at four latitudes (0°, 38.1°, 60°, 80°) against `cos(lat) x 111,320 m` to
+confirm the degrees-to-metres correction generalises rather than being tuned to the one latitude the
+build agent's own harness happened to use — it does.
+
+**But the review queue itself forked, which is the finding that would actually cost Tom time.**
+Master gained a new row, R-090, quoting his second complaint about this same button (`418d548f`,
+committed after this branch's last merge from master at `324a8e1c`). This branch's copy of the
+ledger therefore never had R-090 at all; its own fix (`bd620e4f`) instead appended a DONE note onto
+the pre-existing R-011/R-013 rows and never mentions R-090 by number. **The same fix is now recorded
+under two different IDs on two different lines of history.** Confirmed by `git log -S "R-090"`
+(introduced once, on master, after this branch's merge point) and
+`git merge-base --is-ancestor 418d548f bd620e4f` (false). Whoever merges this branch needs to open
+R-090 by hand and mark it DONE against `bd620e4f`, or Tom will find it still open on master
+describing a bug already fixed here — the exact shape R-048 exists to prevent.
+
+**And the seed-sample finding logged above on 2026-09-21 recurred on the same branch, uncorrected.**
+That entry already named this harness's `12345` as "the single most favourable of ten tried."
+Re-running it today: the harness now draws 250 samples per side from one continuing stream instead
+of one (a real improvement), but the seed is still the literal `12345`, and sweeping ten different
+starting seeds through the same 250-draw method gives 0.4%-2.4% per side against the `0.8%/0.8%`
+the queue quotes. The number that was already flagged is still the one written down as the result,
+with no caveat about its range.
+
+**A cost nobody had measured: reserving a link label's room in advance is not free.**
+`linkLabelReachWorld()` is applied to EVERY customer on a labelled, aligned pipe, not only the ones
+near an actual repeat station — `layoutCustomerLabels()` takes
+`Math.max(ordinaryPad, linkLabelReachWorld(link))` per customer regardless of that customer's own
+position. Measured directly: the ordinary pad is 4.4 world units; `linkLabelReachWorld()` is
+22.45 — **5.1x**, paid by every service on a labelled pipe, everywhere on it, whether or not a link
+label ever falls nearby. This may be exactly what Tom's own design asked for ("reserve room whether
+or not one is actually there"), so it is reported as a question rather than a defect — but it was
+never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
+explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
