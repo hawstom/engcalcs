@@ -8488,6 +8488,16 @@ var EngCalcs = EngCalcs || {};
 	// clause -- shrinking BELOW a pixel once the whole drawing stops growing -- depends on a zoom
 	// rule that does not exist yet (ROADMAP Task 705) and is deliberately not invented here.
 	var LPN_SERVICE_MIN_PX = 1;
+	// **AND THE FLOOR IS CAPPED BY THE PIPE ITSELF, BECAUSE A FLOOR ALONE CAN OVERTAKE IT.**
+	// "A lesser multiple of the link width" is a claim about every link width, not about the
+	// comfortable ones: at a 1 px pipe -- the value the Settings box itself declares as its
+	// minimum -- a 1 px floor draws the service EXACTLY as thick as the main it hangs off, and
+	// below that it draws it THICKER. The service would then read as the more important line,
+	// which is the opposite of what a connector is. So the floor is "1 px, or three quarters of
+	// the pipe, whichever is less": the pixel floor governs wherever the main is thick enough to
+	// allow it, and the main governs where it is not. Found by review, from this check's own
+	// printed output -- `link width 0.2 px -> service 1.000 px` was on the screen and unasserted.
+	var LPN_SERVICE_MAX_FRAC = 0.75;   // of settings.linkWidth -- never as heavy as the main
 
 	// How many metres one world unit is, HERE. In a grid project a world unit IS the display length
 	// unit, so this is one conversion. In a geographic project a world unit is a DEGREE, and how
@@ -8524,8 +8534,9 @@ var EngCalcs = EngCalcs || {};
 	// `x`/`y` are kept in the signature though unused now -- every call site already names the
 	// point for meterHalfWorld() beside it, and a screen-constant width genuinely needs no location.
 	function serviceStrokeWorld(x, y) {
-		var s = state.s || 1;
-		return Math.max(LPN_SERVICE_STROKE_FRAC * settings.linkWidth, LPN_SERVICE_MIN_PX) / s;
+		var s = state.s || 1, lw = settings.linkWidth;
+		return Math.min(LPN_SERVICE_MAX_FRAC * lw,
+			Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / s;
 	}
 
 	function customerById(id) {
@@ -9094,6 +9105,17 @@ var EngCalcs = EngCalcs || {};
 				// **ADVANCE, NOT REACTIVE**: never less than the ordinary pad, and never less than
 				// what this customer's own pipe needs to clear its own label, whether or not that
 				// label actually falls at this station.
+				// **AND THE COST IS PAID EVERYWHERE ON THE PIPE, ALL THE TIME -- MEASURED AT 5.1x.**
+				// On the ordinary-street fixture the ordinary pad is 4.4 world units and
+				// linkLabelReachWorld() is 22.45, so every customer on a labelled, aligned pipe is
+				// held five times further from it than it would otherwise be, including the great
+				// majority nowhere near a repeat station. **That is the design and not an
+				// oversight** -- Tom asked for the room to be reserved whether or not a label is
+				// there, precisely so that whether one falls here stops being a coincidence of the
+				// drawing. What it buys is that no customer label ever dodges a link label; what
+				// it costs is that more of them start further out, which is the likeliest reason
+				// the "stepped beyond the meter" count did not fall alongside the drop rate.
+				// Making it conditional on a nearby station would put the coincidence back.
 				linkPad: Math.max(fs * LPN_CUST_LABEL_LINKPAD_FRAC, linkLabelReachWorld(customerLink(c))),
 				dotPad: meterHalfWorld(pt.x, pt.y) + fs * LPN_CUST_LABEL_DOTPAD_FRAC,
 				bias: labelReadabilityBias()
@@ -34107,8 +34129,14 @@ var EngCalcs = EngCalcs || {};
 		var lwInput = document.createElement('input');
 		lwInput.type = 'number'; lwInput.className = 'ec-spin';
 		lwInput.step = '1'; lwInput.min = '1'; lwInput.value = settings.linkWidth;
+		// **THE HANDLER HONOURS THE MIN THE MARKUP DECLARES.** `min="1"` is advice a browser gives
+		// the spinner and nothing at all to a typed entry, so `> 0` accepted 0.5 through the
+		// ordinary dialog -- a pipe thinner than the services hanging off it. A refused entry puts
+		// the old number back rather than standing, which is this page's rule everywhere: a box
+		// showing a value the document does not hold is the one state a reader cannot tell from a
+		// setting that took.
 		lwInput.addEventListener('change', function () {
-			if (+lwInput.value > 0) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
+			if (+lwInput.value >= 1) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
 		row(mapBody, pc.lpn_settings_link_width || 'Link line thickness (pixels)', lwInput);

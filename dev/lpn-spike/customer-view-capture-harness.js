@@ -61,6 +61,7 @@ const L = stub.loadLoopedNetwork(
 	"\t\tcaptureCustomerViewWidth: captureCustomerViewWidth,\n" +
 	"\t\tcustomerLabelsAttempted: customerLabelsAttempted,\n" +
 	"\t\tserviceStrokeWorld: serviceStrokeWorld,\n" +
+	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tgetSettings: function () { return settings; },\n" +
 	"\t\tgetState: function () { return state; },\n" +
@@ -80,6 +81,9 @@ function oldCapture() {
 	const w = L.mapSpan('min');
 	return w > 0 ? ceil3(w) : 0;
 }
+// The stub records listeners on an element rather than implementing dispatchEvent, which is what
+// every other harness here drives a control through.
+function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({}); }); }
 function ceil3(v) {
 	if (!(v > 0) || !isFinite(v)) { return v; }
 	const mag = Math.pow(10, 3 - 1 - Math.floor(Math.log(v) / Math.LN10));
@@ -197,12 +201,18 @@ console.log('--- 3. a geographic project: world units are DEGREES and the gate r
 // Tom, same message: *"The service line is fixed map width. It should be a lesser multiple of the
 // link width or always just 1 px..."* A stroke in WORLD units renders at `world x scale` pixels, so
 // "screen-constant" is the claim to test and the only way to test it is to vary the scale.
-console.log('--- 4. the service line is screen-constant and never thinner than a pixel ---');
+console.log('--- 4. the service line is screen-constant, and always lighter than its own main ---');
 {
 	const st = L.getSettings();
-	const widths = [0.2, 1, 4];
-	const scales = [0.05, 1, 7.5, 300];
-	let worstDrift = 0, thinnest = Infinity;
+	// **EVERY LINK WIDTH THAT IS REACHABLE, NOT THE COMFORTABLE ONES.** 1 is what the Settings box
+	// declares as its minimum, and 0.5 is what a stored project or an older file can still carry.
+	// The first version of this section PRINTED `link width 0.2 -> service 1.000` and asserted the
+	// "lesser multiple" claim against 4 alone, so its own output showed the defect and walked past
+	// it. The sweep and the assertion now cover the same list.
+	const widths = [0.5, 1, 2, 4, 12];
+	// Both ends of anything a wheel can reach, because "screen-constant" is a claim about scale.
+	const scales = [1e-6, 0.05, 1, 7.5, 300, 1e8];
+	let worstDrift = 0, thinnest = Infinity, worstRatio = 0;
 	widths.forEach(function (lw) {
 		st.linkWidth = lw;
 		const px = scales.map(function (s) {
@@ -213,17 +223,66 @@ console.log('--- 4. the service line is screen-constant and never thinner than a
 			worstDrift = Math.max(worstDrift, Math.abs(p - px[0]));
 			thinnest = Math.min(thinnest, p);
 		});
-		console.log('       link width ' + lw + ' px  ->  service ' + px[0].toFixed(3) + ' px at every zoom');
+		worstRatio = Math.max(worstRatio, px[0] / lw);
+		console.log('       link width ' + lw + ' px  ->  service ' + px[0].toFixed(3) +
+			' px at every zoom  (' + (100 * px[0] / lw).toFixed(0) + '% of the main)');
 	});
 	check(worstDrift < 1e-9, '4.1 the service stroke is the same on SCREEN at every zoom',
-		worstDrift.toExponential(2) + ' px of drift');
-	check(thinnest >= 1 - 1e-9, '4.2 ...and never thinner than the 1 px floor he named',
-		thinnest.toFixed(3) + ' px');
+		worstDrift.toExponential(2) + ' px of drift, from 1e-6 to 1e8');
+	// **THE ASSERTION THAT WAS MISSING**, and it is the one his sentence actually makes. A floor
+	// alone overtakes the pipe below 2 px: at a 1 px main a 1 px floor draws the service exactly as
+	// heavy as the main, and below that heavier, so the connector reads as the more important line.
+	check(worstRatio < 1 - 1e-9,
+		'4.2 the service is a LESSER multiple of the main at EVERY reachable link width',
+		'worst ' + (100 * worstRatio).toFixed(0) + '% of the main');
+	// The pixel floor still governs wherever the main is thick enough to allow it -- which is every
+	// width from 2 px up, the whole of the range the Settings spinner walks through.
+	st.linkWidth = 2;
+	L.getState().s = 1;
+	check(Math.abs(L.serviceStrokeWorld(0, 0) - 1) < 1e-9,
+		'4.3 ...and his 1 px floor still governs wherever the main can afford it',
+		L.serviceStrokeWorld(0, 0).toFixed(3) + ' px at a 2 px main');
+	check(thinnest > 0, '4.4 ...and it is never drawn away to nothing', thinnest.toFixed(3) + ' px');
 	st.linkWidth = 4;
 	L.getState().s = 1;
-	check(L.serviceStrokeWorld(0, 0) * 1 < 4,
-		'4.3 ...and is a LESSER multiple of the link width, never equal to it',
-		L.serviceStrokeWorld(0, 0).toFixed(3) + ' against 4');
+}
+
+// ================================================================================================
+// 5. THE SETTINGS BOX REFUSES A LINK WIDTH ITS OWN MARKUP FORBIDS
+// ================================================================================================
+//
+// `min="1"` is advice to a spinner and nothing at all to a typed entry. The handler checked `> 0`,
+// so 0.5 went in through the ordinary dialog -- which is the only door by which section 4's
+// sub-1 widths are reachable at all. Driven through the REAL control, because the defect is the
+// disagreement between the markup and the handler and neither half carries both facts.
+console.log('--- 5. the link width box honours the minimum it declares ---');
+{
+	const st = L.getSettings();
+	st.linkWidth = 3;
+	L.rebuildSettings();
+	const els = [];
+	(function walk(e) {
+		if (!e) { return; }
+		els.push(e);
+		(e.children || []).forEach(walk);
+	})(document.getElementById('lpn_set_map_fields'));
+	const lw = els.filter(function (e) {
+		return String(e.nodeName || '').toLowerCase() === 'input' && e.type === 'number' &&
+			e.min === '1' && e.step === '1' && String(e.value) === '3';
+	})[0];
+	check(!!lw, '5.1 the link width box is on the Settings dialog and declares min 1');
+	if (lw) {
+		lw.value = '0.5';
+		fire(lw, 'change');
+		check(st.linkWidth === 3, '5.2 a typed 0.5 is REFUSED rather than taken',
+			String(st.linkWidth));
+		check(String(lw.value) === '3',
+			'5.3 ...and the box is put back to the value the document holds', String(lw.value));
+		lw.value = '5';
+		fire(lw, 'change');
+		check(st.linkWidth === 5, '5.4 a legal entry still takes', String(st.linkWidth));
+	}
+	st.linkWidth = 4;
 }
 
 console.log(failures === 0

@@ -229,32 +229,54 @@ console.log('       dropped outright across all four views: ' +
 //
 // **PRINTED, NEVER ASSERTED.** A rate is a fact about these fixtures; asserting one would pin a
 // number nobody can act on. What it is for is the size of the decision in front of Tom.
+//
+// **AND IT IS REPORTED AS A RANGE, BECAUSE ONE SEED IS NOT AN ANSWER.** This section already drew
+// ten streets rather than one, which was itself a repair -- but all ten came off ONE seed, and the
+// single number that produced got quoted to Tom as though it were the rate. Swept across ten
+// independent seeds it moves by a factor of six, so the one-seed figure was the favourable end of
+// a real spread and nothing said so. He acts on these numbers; a number with no spread beside it
+// invites a decision the measurement does not support. The pooled rate over every draw is printed
+// too, and it is the only one of the three worth comparing between runs.
 console.log('--- how often a customer label disappears on an ordinary street ---');
 {
-	const LEN = 3000;
+	const LEN = 3000, SEEDS = 10, STREETS = 10, PER_STREET = 25;
 	const a2 = L.addNode('reservoir', 0, 900), b2 = L.addNode('junction', LEN, 900);
 	const street = L.addLink('pipe', a2.id, b2.id);
-	let seed = 12345;
+	let seed = 0;
 	function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
 	[-1, 1].forEach(function (side) {
-		let dropped = 0, total = 0, beyond = 0;
-		for (let trial = 0; trial < 10; trial++) {
-			(L.getDoc().customers || []).slice().forEach(function (c) { L.deleteCustomer(c.id); });
-			const xs = [];
-			for (let i = 0; i < 25; i++) { xs.push(rnd() * LEN); }
-			xs.sort(function (p, q) { return p - q; });
-			const cs = xs.map(function (x) { return L.addCustomer(x, 900 + 70 * side, { link: street.id }); });
-			L.refreshLabelText();
-			L.relayoutLabels();
-			cs.forEach(function (c) {
-				const ce = L.custLblEls()[c.id];
-				total++;
-				if (!ce.spot) { dropped++; } else if (!ce.spot.atLink) { beyond++; }
-			});
+		const rates = [], beyondRates = [];
+		let pooledDropped = 0, pooledTotal = 0, pooledBeyond = 0;
+		// A DECLARED seed per sample, never Math.random(): a sweep that cannot be re-run is an
+		// anecdote, and a red build nobody can reproduce is worse than no measurement.
+		for (let si = 0; si < SEEDS; si++) {
+			seed = 12345 + si * 7919;
+			let dropped = 0, total = 0, beyond = 0;
+			for (let trial = 0; trial < STREETS; trial++) {
+				(L.getDoc().customers || []).slice().forEach(function (c) { L.deleteCustomer(c.id); });
+				const xs = [];
+				for (let i = 0; i < PER_STREET; i++) { xs.push(rnd() * LEN); }
+				xs.sort(function (p, q) { return p - q; });
+				const cs = xs.map(function (x) { return L.addCustomer(x, 900 + 70 * side, { link: street.id }); });
+				L.refreshLabelText();
+				L.relayoutLabels();
+				cs.forEach(function (c) {
+					const ce = L.custLblEls()[c.id];
+					total++;
+					if (!ce.spot) { dropped++; } else if (!ce.spot.atLink) { beyond++; }
+				});
+			}
+			rates.push(100 * dropped / total);
+			beyondRates.push(100 * beyond / total);
+			pooledDropped += dropped; pooledTotal += total; pooledBeyond += beyond;
 		}
+		rates.sort(function (p, q) { return p - q; });
 		console.log('       services ' + (side < 0 ? 'on the pipe label\'s own side' : 'on the far side      ') +
-			': ' + dropped + ' of ' + total + ' disappeared (' + (100 * dropped / total).toFixed(1) +
-			'%), ' + beyond + ' stepped beyond');
+			': ' + rates[0].toFixed(1) + '% to ' + rates[rates.length - 1].toFixed(1) +
+			'% disappeared across ' + SEEDS + ' seeds (median ' +
+			rates[Math.floor(SEEDS / 2)].toFixed(1) + '%, pooled ' +
+			(100 * pooledDropped / pooledTotal).toFixed(1) + '% of ' + pooledTotal +
+			'), ' + (100 * pooledBeyond / pooledTotal).toFixed(1) + '% stepped beyond');
 	});
 }
 
