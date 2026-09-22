@@ -23287,8 +23287,19 @@ var EngCalcs = EngCalcs || {};
 	// 500'd, and the page said only "could not reach the server".
 	//
 	// `opts` carries the two things that are not facts about this browser: `name`, the initials the
-	// user typed into Ask at the moment they asked (SENT, never stored -- that is the whole point of
-	// Task 667(b)), and `ack`, the timestamp of a request the holder has now been shown.
+	// user typed into Ask, and `ack`, the timestamp of a request the holder has now been shown.
+	//
+	// **THIS COMMENT USED TO SAY THE INITIALS ARE "SENT, never stored -- that is the whole point of
+	// Task 667(b)", AND THAT WAS A MISREADING OF TOM'S DECISION, CORRECTED BY HIM ON 2026-09-18.**
+	// His words: *"What was always undesirable was (1) being asked to provide your initials the
+	// first time you save, because that could be confused for a registration request and (2) being
+	// asked to provide your initials every time because that's rude. It was never desirable to avoid
+	// saving the initials or to keep prompting... Removing the prompt avoids it."*
+	//
+	// So the objection was always to the PROMPT and never to the STORAGE, and not storing them meant
+	// prompting again every time -- which is the second thing he called undesirable. **Ask once per
+	// browser, keep the answer, and reuse it when this browser is the one HOLDING a file**, so the
+	// colleague who finds it locked is told who has it rather than "somebody". Task 698.
 	async function postLock(action, docId, opts) {
 		var idn = loadIdentity();
 		// **"We never asked" is not "the server is down."** Returning the same null for both let the
