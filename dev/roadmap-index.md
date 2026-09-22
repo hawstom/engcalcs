@@ -7,61 +7,63 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**97 open tasks.** Next (100): 10 · Soon (75): 19 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
+**95 open tasks.** Next (100): 21 · Soon (75): 17 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
 
-## 100 — Next (10)
+## 100 — Next (21)
 
-- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
+- Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 608 — Fetch the engine before somebody's first solve needs it.
-- Task 646 — Attach the world map to an XY project without changing the project.
-- Task 669 — Show labels at this zoom or closer.
-- Task 676 — Watch the sites, and send a derived weekly report.
-- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
-- Task 696 — File, Convert coordinates as: a working menu item, as a new project.
-- Task 698 — Ask for initials once per browser, keep them, and name the holder.
-
-## 75 — Soon (19)
-
-- Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
-- Task 617 — More map view options, the opacity one having shipped.
-- Task 623 — File loss judged only by people whose files are throwaway.
-- Task 635 — A Zoom to button on the Properties box.
-- Task 637 — A Graph button on the Properties box.
-- Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
-- Task 665 — Make draggable and resizable the standard for a standing box.
+- Task 669 — Show labels at this zoom or closer.
+- Task 676 — Watch the sites, and send a derived weekly report.
 - Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 - Task 685 — Name every unit dropdown for a screen reader.
-- Task 687 — The lock dialog's destructive button sits beside Cancel.
 - Task 688 — File, Convert units as: US to work in, SI to hand over.
-- Task 691 — Banner messages are annoying, and one of them is a trap.
-- Task 693 — "Length and map coordinates" is a lie on an EPSG project.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
+- Task 691 — Create a better error and notice messaging system.
+- Task 693 — Separate Length and Map coordinates units
+- Task 696 — File, Convert coordinates as: a working menu item, as a new project.
+- Task 697 — EPANET++ as a competing front door, on its own two domains.
+- Task 703 — The satellite tiles: still blank patches after everything measured so far.
+- ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
+- ! Task 705 — New zoom rules: a symbol may not grow past a size the network itself sets.
 
-## 50 — Someday (39)
+## 75 — Soon (17)
+
+- Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
+- Task 282 — Offer to attach the backdrop an imported `.inp` names.
+- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
+- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
+- Task 601 — Calibration files: measured field data, against the model that predicts it.
+- Task 604 — Read an EPANET `.PRO` profile file.
+- Task 617 — More map view options, the opacity one having shipped.
+- Task 623 — File loss judged only by people whose files are throwaway.
+- Task 637 — A Graph button on the Properties box.
+- Task 639 — Layers: the first heading under Map and page.
+- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
+- Task 645 — The app icon's legs are leggier than the favicon's.
+- Task 648 — The About icon's outlines are too heavy for its scale.
+- Task 699 — Audit the language keys for lazy duplications.
+- ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
+- Task 706 — Every committed cell saves the WHOLE project, and nothing holds it back.
+
+## 50 — Someday (27)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
-- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 234 — Canal Seepage must prove its worth or go.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
-- Task 282 — Offer to attach the backdrop an imported `.inp` names.
-- Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 285 — We do not know what devices anybody uses this on.
-- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
-- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
-- Task 601 — Calibration files: measured field data, against the model that predicts it.
-- Task 604 — Read an EPANET `.PRO` profile file.
 - Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
@@ -69,14 +71,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 625 — The app page divorce: what is left is one unanswered question.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
-- Task 632 — Animation speed control for the transport.
 - Task 633 — The project tab strip, and whether it could collapse into the toolbar.
 - Task 636 — A custom properties UI, designed in a table.
-- Task 639 — Layers: the first heading under Map and page.
-- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
-- Task 641 — Choose a real EPSG projection in the new project box.
-- Task 645 — The app icon's legs are leggier than the favicon's.
-- Task 648 — The About icon's outlines are too heavy for its scale.
+- Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
@@ -84,11 +81,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 683 — The wheel zoom increment, snapping having been ruled out.
 - Task 694 — Export a map animation as an animated picture.
 - Task 695 — The daily status mail has columns with no headings.
-- Task 697 — EPANET++ as a competing front door, on its own two domains.
+- ! Task 702 — A view window cannot describe a span across the far side of the world.
 
-## 25 — Maybe (11)
+## 25 — Maybe (12)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
+- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
@@ -125,5 +123,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-91 of 97 titles are within 4–12 words. `!` marks the rest;
+85 of 95 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

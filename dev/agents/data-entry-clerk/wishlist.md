@@ -406,3 +406,44 @@ and fails silently on the plan set you didn't.
 **Ranking: this is a correctness condition on the CSV-import branch, not a new priority of my own —
 I would not delay that branch to build it elaborately, but I would treat skipping the coordinate-
 order question as a defect, not a simplification, given how silent the failure is.**
+
+## UPDATE 2026-09-19 to item 1: Task 186 is CLOSED (2026-09-08), the create-rows gap now has its own number, Task 610, and I re-verified it carries exactly the gap this row named
+
+**Re-checked against the current tree, not just trusted from memory, per the rule that an
+OBSERVED finding decays.** Task 186 (the tables interface generally) closed 2026-09-08 with the
+two unbuilt halves — paste that CREATES rows, and this item's own original complaint — split into
+Task 610, still open at priority 50, its text naming the gap this row raised word-for-word: an ID
+that can create, and From/To/X/Y becoming typeable. **This item's original ask is therefore no
+longer an unrecognized gap in a closed task; it is Task 610's actual scope, on the roadmap, in
+Tom's own words, with him "sympathetic."** Nothing further for me to flag here — I would delete
+this pointer as satisfied except that the roster's own provenance rule wants the correction on
+record with a date CHECKED, not just a date found: **checked 2026-09-19.**
+
+One condition of Task 610 (§2.1 of `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md`,
+the Junction table's own X/Y/lat/lon columns) has separately shipped under Task 674 — confirmed
+this session by reading `paneColCoord()`, `js/looped-network.js:17097`. What remains open in 610
+is the vertex-cell format itself (delivered, journal twelfth invocation adds a sourced ranking of
+five candidates against Tom's own list) and the paste-that-creates mechanism (still unbuilt,
+confirmed this session — no `paneColVerts` anywhere, `panePasteAt()`'s own comment still says it
+cannot grow the table).
+
+**Ranking unchanged**: still the top of this list by my own arithmetic (a per-row round trip
+removed 400 times), still behind nothing else here.
+
+## UPDATE 2026-09-21 to item 1/Task 610: measured entry speed against Tom's direct question; ranking unchanged
+
+Tom asked by name whether the spreadsheet work on `feat/tables-spreadsheet` is fast enough for a
+volume clerk. **OBSERVED/SPECULATION, this session (see journal, thirteenth invocation, for the full
+citations and the numbers)**: a committed cell costs roughly 6 ms of layout (Task 690's own fix,
+measured on a 92-junction Net3 in a real browser, already merged at the top of that branch) plus an
+estimated 2.6 ms+ of full-document save that fires on every commit and is not debounced (my own
+synthetic Node.js benchmark, not a real-browser number — flagged as the weaker of the two). Against
+a clerk's own achievable typing cadence that is single-digit-percent overhead, not the "unbelievable"
+delay Tom had been describing before this round of fixes landed. **Yes, fast enough, on a ~400-element
+network, on the evidence I could gather without a browser this session.**
+
+**This does not move Task 610 off the top of my list.** Entry speed answers "how fast can I type
+into a network that already exists"; Task 610 answers "how do I get 400 junctions to exist at all
+without a canvas click each" — the larger of the two numbers by a wide margin, and untouched by this
+round of fixes. Said to Tom directly, in those words, so the honest ranking does not read as
+downplaying real work he just shipped.

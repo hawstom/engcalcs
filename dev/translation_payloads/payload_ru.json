@@ -2,7 +2,7 @@
     "meta": {
         "language": "ru",
         "expected_key_count": 2004,
-        "delta_key_count": 136,
+        "delta_key_count": 137,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -431,14 +431,14 @@
             {
                 "term": "run (a simulation)",
                 "symbol": "",
-                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip, lpn_time_run_note and lpn_time_duration.",
-                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and lpn_time_run_note quotes the button label inside a sentence -- so the word chosen for the button must be the word that appears in that sentence, or the instruction points at a button that is not there.",
+                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip and lpn_time_duration.",
+                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19, as was lpn_manual_results_cleared; lpn_run_menu_tip still does it.)",
                 "preferred_translation": ""
             },
             {
                 "term": "work out (compute)",
                 "symbol": "",
-                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
+                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
                 "translation_notes": "[2026-08-19, sprint 438 Wave 0] Raised because the phrasal verb is opaque word by word: a reader who parses \"work\" plus \"out\" gets exercise, not arithmetic. One rendering should serve all four strings.",
                 "preferred_translation": ""
             },
@@ -588,6 +588,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -726,6 +727,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -1956,6 +1958,22 @@
                     "key": "lpn_terrain_done",
                     "value": "Заполнено {n} отметок.",
                     "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_ff_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_stale",
+                    "value": "Чертёж изменился, поэтому результаты противопожарного расчёта были очищены. Запустите его снова.",
+                    "english": "The drawing changed, so the fire flow results were cleared. Run it again."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_summary",
+                    "value": "{clean} узлов не имеют проблем. {fire} узлов не прошли проверку противопожарного расхода. {design} узлов повлияли на остальную систему.",
+                    "english": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system."
                 }
             }
         },

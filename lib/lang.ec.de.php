@@ -1135,7 +1135,6 @@ $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Wasserspiegel';
 $ec_lang['lpn_time_run']='Berechnen';
 $ec_lang['lpn_time_run_tip']='Löst dieses Netz zu jedem hydraulischen Zeitschritt, vom Anfang des Laufs bis zu seinem Ende.';
-$ec_lang['lpn_time_run_note']='Sie sehen das Netz zum ersten Berichtszeitpunkt. Die Einstellung Automatisch neu berechnen ist ausgeschaltet, daher werden die Ergebnisse für die späteren Zeitpunkte während der Bearbeitung nicht aktuell gehalten. Drücken Sie auf die Schaltfläche Berechnen, um sie zu aktualisieren.';
 $ec_lang['lpn_time_speed']='Wiedergabegeschwindigkeit';
 $ec_lang['lpn_time_speed_tip']='Wie schnell der Ablauf abgespielt wird.';
 $ec_lang['lpn_settings_search']='Einstellungen durchsuchen';

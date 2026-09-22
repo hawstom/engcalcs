@@ -1129,7 +1129,6 @@ $ec_lang['lpn_time_tank']='Depósito';
 $ec_lang['lpn_time_level']='Nivel de agua';
 $ec_lang['lpn_time_run']='Calcular';
 $ec_lang['lpn_time_run_tip']='Calcula esta red en cada paso de tiempo hidráulico, desde el inicio de la simulación hasta el final.';
-$ec_lang['lpn_time_run_note']='Está viendo la red en la primera hora de informe. El ajuste Recalcular automáticamente está desactivado, así que los resultados de las horas posteriores no se mantienen actualizados mientras trabaja. Presione el botón Calcular para actualizarlos.';
 $ec_lang['lpn_time_speed']='Velocidad';
 $ec_lang['lpn_time_speed_tip']='Qué tan rápido se reproduce la simulación.';
 $ec_lang['lpn_settings_search']='Buscar en la configuración';

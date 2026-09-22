@@ -3800,8 +3800,8 @@
                 "the sense of MANAGING something (running a company, running a system).",
                 "a run of a machine in the sense of a production batch."
             ],
-            "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip, lpn_time_run_note and lpn_time_duration.",
-            "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and lpn_time_run_note quotes the button label inside a sentence -- so the word chosen for the button must be the word that appears in that sentence, or the instruction points at a button that is not there.",
+            "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip and lpn_time_duration.",
+            "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19, as was lpn_manual_results_cleared; lpn_run_menu_tip still does it.)",
             "translations": [],
             "source": "sprint 438-wave0, 2026-08-19"
         },
@@ -3814,7 +3814,7 @@
                 "the sense of NEGOTIATING or resolving a disagreement.",
                 "a word implying guessing or estimating. This is exact computation by a solver."
             ],
-            "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
+            "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
             "translation_notes": "[2026-08-19, sprint 438 Wave 0] Raised because the phrasal verb is opaque word by word: a reader who parses \"work\" plus \"out\" gets exercise, not arithmetic. One rendering should serve all four strings.",
             "translations": [],
             "source": "sprint 438-wave0, 2026-08-19"

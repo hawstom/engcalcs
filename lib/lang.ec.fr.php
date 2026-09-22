@@ -1064,7 +1064,6 @@ $ec_lang['lpn_time_tank']='Bâche';
 $ec_lang['lpn_time_level']='Niveau d\'eau';
 $ec_lang['lpn_time_run']='Calculer';
 $ec_lang['lpn_time_run_tip']='Résout ce réseau à chaque pas de temps hydraulique, du début du calcul jusqu\'à sa fin.';
-$ec_lang['lpn_time_run_note']='Vous voyez le réseau au premier instant du rapport. Le réglage Recalculer automatiquement est désactivé, donc les résultats des instants ultérieurs ne sont pas tenus à jour pendant que vous travaillez. Appuyez sur le bouton Calculer pour les mettre à jour.';
 $ec_lang['lpn_time_speed']='Vitesse';
 $ec_lang['lpn_time_speed_tip']='La vitesse de lecture de la simulation.';
 $ec_lang['lpn_settings_search']='Rechercher des paramètres';

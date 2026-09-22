@@ -10,7 +10,7 @@ MIRROR=$HOME/tgh/engcalcs-mirror.git
 WORK=$HOME/tgh/engcalcs-report
 ORIGIN=$(git -C "$SRC/../.." remote get-url origin 2>/dev/null)
 
-for f in check.sh check.exclude cronmail.sh daily-report-cron.sh; do
+for f in check.sh check.exclude check.mustblock cronmail.sh daily-report-cron.sh; do
     if [ -f "$HOME/$f" ] && cmp -s "$SRC/$f" "$HOME/$f"; then
         echo "same      ~/$f"
     else

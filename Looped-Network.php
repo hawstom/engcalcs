@@ -1651,7 +1651,6 @@ EngCalcs.pageConfig = {
 	lpn_time_level: <?=json_encode($ec_lang['lpn_time_level'])?>,
 	lpn_time_run: <?=json_encode($ec_lang['lpn_time_run'])?>,
 	lpn_time_run_tip: <?=json_encode($ec_lang['lpn_time_run_tip'])?>,
-	lpn_time_run_note: <?=json_encode($ec_lang['lpn_time_run_note'])?>,
 <?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
@@ -2289,6 +2288,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_run_title: <?=json_encode($ec_lang['lpn_ff_run_title'])?>,
 	lpn_ff_calculate: <?=json_encode($ec_lang['lpn_ff_calculate'])?>,
 	lpn_ff_stop: <?=json_encode($ec_lang['lpn_ff_stop'])?>,
+	lpn_ff_clear: <?=json_encode($ec_lang['lpn_ff_clear'])?>,
 	lpn_ff_working: <?=json_encode($ec_lang['lpn_ff_working'])?>,
 	lpn_ff_stopped: <?=json_encode($ec_lang['lpn_ff_stopped'])?>,
 	lpn_ff_cost: <?=json_encode($ec_lang['lpn_ff_cost'])?>,

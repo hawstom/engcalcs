@@ -408,6 +408,12 @@ run_check "examples library fresh"       blocking php dev/scripts/generate_examp
 # reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
 # parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
 run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
+# TOM'S BROWSER-PASS COMMENTS, HELD BETWEEN SESSIONS. Blocking on the FORM of the ledger only --
+# a malformed row is the one failure a machine can decide, and it is exactly the failure that makes
+# one of his comments invisible to the next reader. Whether an item is addressed is judgement and
+# stays with people.
+run_check "review queue parses"          blocking php dev/scripts/review_queue_check.php --format
+run_check "review queue selftest"        blocking php dev/scripts/review_queue_selftest.php
 # Task 322 rows 5 and 24. check_all.sh is what RUNS; CLAUDE.md's table is what everybody READS,
 # and nothing tied them together -- eight checks ran unlisted. Matched on script filename, so the
 # two files stay free to word a check differently. And every path CLAUDE.md cites exists: scoped
@@ -475,6 +481,11 @@ run_check "screenshot publication"       advisory php dev/scripts/screenshot_pub
 # keeps it short. Advisory by construction -- citing a closed task as a RECORD is legitimate, so
 # only a human can tell a stale claim from a correct citation.
 run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
+# AND THE OUTSTANDING ROWS THEMSELVES. It exits non-zero while anything is open PRECISELY so this
+# line prints them, on every run, under a NOTE. The printing is the feature: his review costs him
+# time and focus, and the way that cost was being wasted is that the remainder of a message lived
+# only in the context of the session that read it.
+run_check "Tom's review queue"          advisory php dev/scripts/review_queue_check.php --open
 run_check "git hooks installed"          blocking php dev/scripts/hook_install_check.php
 run_check "branch policy selftest"       blocking php dev/scripts/branch_policy_selftest.php
 # A BACKGROUND WAIT LOOP THAT CANNOT FINISH. Eight of them were left sleeping on 2026-09-13 and

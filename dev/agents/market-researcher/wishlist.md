@@ -354,3 +354,17 @@ settle, it needs either a screenshot from someone with a WaterGEMS licence or a 
 search than this session had time for. Zero cost either way; recorded so a future invocation does
 not re-search the same dead ends (bentley.com, virtuosity.com product pages carry no UI
 screenshots reachable without a trial signup).
+
+## 0k. WaterModels.jl (LANL) — not a file format, not for us, do not build anything
+
+2026-09-21, answering Tom's direct find (`lanl-ansi.github.io/WaterModels.jl`): it is a Julia
+optimization package (pump scheduling / network design MINLP research), from a DOE-funded national-lab
+group, aimed at operations-research academics — not a file-format standard, and not used by any
+population this seat has found resembling our users (searched directly for utility/municipal adoption,
+found none; CITED in the journal). It reads EPANET `.inp`, which we already read byte-identically, and
+its own JSON wire format has no outside adoption to interoperate with. **Recommendation: nothing —
+no importer, no dependency, no positioning-page citation.** The one loosely interesting idea it
+surfaced — a "candidate/not-yet-built pipe" concept (`des_pipe`) that `lpn_` has no name for today — is
+recorded as SPECULATION only, not a task, because nobody has asked for it. Full citations, licence
+(modified BSD), and activity numbers (77 stars, last push 2025-04-11): journal, 2026-09-21 entry.
+Ranked at the bottom on purpose: this is a complete, useful "no," not a lead to chase further.

@@ -278,15 +278,19 @@ async function runSection() {
 	await wait(160);
 	eq(engineCalls, 0, 'with the setting off, an edit provokes NOTHING, however long the user waits');
 	eq(EngCalcs.lpnTimeCurrentFrame(), null, 'nothing stale is left behind to draw');
-	check(EngCalcs.lpnTimeStatusNote().length > 0,
-		'and the page SAYS the later times are not being kept up to date');
+	// **AND NOTHING IS SAID, BECAUSE THERE IS NOTHING HALF-FRESH TO SAY** (2026-09-19). Until then
+	// EC.lpnTimeStatusNote() wrote "you are seeing the first reporting time, the later times are
+	// not being kept up to date" -- true while the switch suppressed only the later steps, and the
+	// defect Tom named: *"off means off."* An edit now solves nothing at all, so the host clears
+	// the results and says so itself. The note and its key are gone.
+	check(!EngCalcs.lpnTimeStatusNote,
+		'and the half-fresh banner is gone, because there is no half-fresh state left');
 
 	// ---- ...but Run still runs it ----
 	EngCalcs.lpnTimeRunNow();
 	await wait(160);
 	eq(engineCalls, 1, 'Run works the whole period out');
 	eq(EngCalcs.lpnTimeRunState().frames, 25, 'and the frames are back');
-	eq(EngCalcs.lpnTimeStatusNote(), '', 'and the page stops saying they are out of date');
 	autoRun = true;
 
 	// ---- a duration of 0 is not a run at all ----
