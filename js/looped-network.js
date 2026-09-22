@@ -43321,6 +43321,115 @@ var EngCalcs = EngCalcs || {};
 	// Waiting for the debounced solve to trigger the load is not enough: the gap between choosing a
 	// valve type and the solve firing is exactly where a phone drops its connection.
 	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
+	// **HOW FAR THE 664 KB HAS GOT** (Task 608, the percent-done half; Tom, 2026-09-08: *"I am also
+	// open to putting up a banner 'Loading solver. Results delayed momentarily. Continue working.'"*).
+	// Nielsen's response-time doctrine is that past ten seconds a wait needs a progress indicator or
+	// the reader leaves, and this file floors at roughly 7 s on 3G and 21 s on 2G before handshake.
+	//
+	// `epanetWarmTotal` is 0 when the transfer did not state a size, and the banner then says how
+	// many kilobytes have arrived instead of inventing a fraction of a number nobody has. See
+	// watchFetch() in js/lpn-epanet.js for why a total can be missing.
+	//
+	// `epanetWarmPct` is the last WHOLE percent put on screen, and it exists only so that a hundred
+	// chunks do not each repaint the banner. -1 means nothing has been drawn for this fetch yet.
+	var epanetWarmLoaded = 0, epanetWarmTotal = 0, epanetWarmPct = -1;
+	// **THE SHARE OF THE BAR THE TRANSFER MAY HAVE, AND WHY IT IS NOT ALL OF IT** (Tom, 2026-09-19:
+	// *"We must include the unknown in the progress bar. The progress bar can stall at the end if
+	// necessary. But it can't disappear prematurely."*).
+	//
+	// The bytes are not the whole wait. After the last one there is still the dynamic import, the
+	// WASM instantiation and the first open of a project, and NONE of that reports progress -- so a
+	// bar driven by the transfer alone reaches its end while the page still cannot solve, which is
+	// the one outcome he ruled out. The last tenth is therefore reserved for that tail, and the bar
+	// is closed by the engine becoming USABLE rather than by the download finishing.
+	//
+	// **WHY A TENTH.** The two costs are measured and they are wildly different in ratio depending
+	// on the connection: 664 KB floors at about 7 s on 3G against ~33 ms to import and instantiate,
+	// so on the slow connection this feature exists for the transfer really is ~99% of the wait and
+	// a tenth is generous. On a fast link the tail dominates instead, and there the bar is on screen
+	// for so little time that where it stalls does not matter. A tenth is small enough to keep the
+	// number honest on the connection that counts and large enough to be visibly unfinished.
+	var EPANET_BAR_TRANSFER_SHARE = 0.9;
+	function onEpanetProgress(p) {
+		var pct;
+		epanetWarmLoaded = (p && p.loaded) || 0;
+		epanetWarmTotal = (p && p.total) || 0;
+		// Clamped, because a wrongly stated length must not print 140%. A total that cannot be
+		// trusted is still better read as "nearly there" than as arithmetic nobody believes.
+		pct = epanetWarmTotal > 0 ? Math.min(100, Math.floor(epanetWarmLoaded * 100 / epanetWarmTotal)) : -1;
+		if (epanetWarmTotal > 0 && pct === epanetWarmPct) { return; }
+		epanetWarmPct = pct;
+		refreshEpanetBanner();
+	}
+	// The one sentence the banner adds to say HOW FAR ALONG the wait is, or '' when there is nothing
+	// honest to say yet. Two whole sentences, never a fragment assembled at render time: a language
+	// that puts the number elsewhere in the clause can do so.
+	function epanetProgressText() {
+		var pc = EngCalcs.pageConfig || {};
+		if (epanetWarmState !== 'warming') { return ''; }
+		if (epanetWarmTotal > 0) {
+			// THE SAME NUMBER THE BAR IS DRAWING, never the raw transfer percent. A sentence
+			// reading 100% beside a bar held short of its end is two instruments disagreeing, and
+			// the one that would be believed is the one that is wrong.
+			return (pc.lpn_engine_wait_pct || 'Solver {percent}% loaded.')
+				.replace('{percent}', String(Math.round(epanetBarFraction() * 100)));
+		}
+		if (epanetWarmLoaded > 0) {
+			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.')
+				.replace('{kb}', String(Math.round(epanetWarmLoaded / 1024)));
+		}
+		return '';
+	}
+	/**
+	 * **HOW FULL THE BAR IS, 0 TO 1, AND IT CANNOT REACH 1 WHILE ANYBODY IS STILL WAITING.**
+	 *
+	 * Capped at EPANET_BAR_TRANSFER_SHARE for as long as the state is 'warming', WHATEVER the
+	 * transfer says -- a download that has delivered its last byte is at 0.9 here, and the only
+	 * thing that moves it past that is the engine becoming usable, at which point the bar is being
+	 * taken off screen anyway. That is Tom's ruling expressed as arithmetic rather than as care:
+	 * there is no path through this function that returns 1 during a wait.
+	 *
+	 * Returns -1 when the size is unknown, which is the INDETERMINATE bar rather than a hidden one.
+	 */
+	function epanetBarFraction() {
+		if (epanetWarmState !== 'warming') { return 1; }
+		if (!(epanetWarmTotal > 0)) { return -1; }
+		return Math.min(1, Math.max(0, epanetWarmLoaded / epanetWarmTotal)) * EPANET_BAR_TRANSFER_SHARE;
+	}
+	// The bar itself. Shown exactly when the banner is showing a WAIT, because a bar under a failure
+	// message would be a download that is not happening.
+	//
+	// **IT SHOWS AND HIDES ITS OWN TRACK AND NOTHING ELSE.** It is not mounted in the bottom pane,
+	// it does not open one, and no panel anywhere learns that a download is happening -- the whole
+	// coupling is this function and the six-pixel div it was given. `engineBar` rather than `bar`
+	// because THREE different elements in this file are called `bar` in their own functions (the
+	// toolbar, the georeference bar and this one), and the declared exception in
+	// dev/lpn-spike/panel-touch-harness.js is keyed on the variable name: a row reading `bar` would
+	// quietly excuse the other two as well.
+	function refreshEpanetBar(showing) {
+		var engineBar = document.getElementById('lpn_engine_bar'),
+			fill = document.getElementById('lpn_engine_bar_fill'),
+			frac;
+		if (!engineBar || !fill) { return; }
+		if (!showing || epanetWarmState !== 'warming') {
+			engineBar.style.display = 'none';
+			return;
+		}
+		frac = epanetBarFraction();
+		engineBar.style.display = 'block';
+		if (frac < 0) {
+			// UNKNOWN SIZE. The bar stays, and it moves; what it does not do is claim a position.
+			// aria-valuenow is REMOVED rather than set to something, which is how a progressbar
+			// says indeterminate to a screen reader.
+			engineBar.classList.add('lpn-engine-bar-unknown');
+			engineBar.removeAttribute('aria-valuenow');
+			fill.style.width = '';
+		} else {
+			engineBar.classList.remove('lpn-engine-bar-unknown');
+			engineBar.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+			fill.style.width = (frac * 100) + '%';
+		}
+	}
 	// `why` is 'valve', 'engine' or 'background'. THE SAME FETCH HAS THREE REASONS and one message
 	// cannot be true of all of them: Tom turned the solver on and was told about valves he had not
 	// created (2026-08-14).
@@ -43342,9 +43451,12 @@ var EngCalcs = EngCalcs || {};
 		// see maybeWarmEpanetInBackground(), which refuses to start from any state but 'cold'.
 		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
 		epanetWarmState = 'warming';
+		epanetWarmLoaded = 0;
+		epanetWarmTotal = 0;
+		epanetWarmPct = -1;
 		if (!quiet) { setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.'); }
 		refreshEpanetBanner();
-		EngCalcs.lpnEpanetLoad().then(function () {
+		EngCalcs.lpnEpanetLoad(null, onEpanetProgress).then(function () {
 			epanetWarmState = 'ready';
 			if (!quiet) { setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.'); }
 			refreshEpanetBanner();
@@ -43413,6 +43525,22 @@ var EngCalcs = EngCalcs || {};
 			pc = EngCalcs.pageConfig || {},
 			text = '';
 		if (!el) { return; }
+		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
+		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
+		// plain pipes and junctions now waits for 664 KB at their first solve. The test is not
+		// "did a fetch start" -- section 2 of dev/lpn-spike/engine-prefetch-harness.js is right
+		// that a background fetch nobody is waiting on says nothing -- it is **whether results are
+		// actually delayed**, which is true exactly when the engine the network will be solved BY
+		// is the one still arriving. With the built-in solver chosen, answers are already on
+		// screen and there is nothing to report.
+		//
+		// "Continue working" is the load-bearing half of his sentence: it says the page is not
+		// frozen, which is the thing a bare spinner cannot say. Keeping that true is the whole
+		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
+		// anything modal.
+		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
+			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
 				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
@@ -43423,8 +43551,13 @@ var EngCalcs = EngCalcs || {};
 				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
+		if (text && epanetWarmState === 'warming') {
+			var prog = epanetProgressText();
+			if (prog) { text += ' ' + prog; }
+		}
 		el.textContent = text;
 		el.style.display = text ? 'block' : 'none';
+		refreshEpanetBar(!!text);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:

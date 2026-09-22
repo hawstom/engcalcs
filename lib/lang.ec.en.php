@@ -2111,6 +2111,16 @@ $ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve 
 $ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
 $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
+// **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
+// own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
+// The other two are the progress readout, which is a whole sentence of its own so a language can
+// put the number where it belongs. There is no invented percentage: where the transfer does not
+// state a total, the kilobytes are reported instead and the reader is told why.
+// The bar under that sentence is named for a screen reader, which cannot see it fill.
+$ec_lang['lpn_engine_bar_label']='Solver loading progress';
+$ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
+$ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
+$ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';

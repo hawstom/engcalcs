@@ -50,7 +50,8 @@
         "feat/xy-world-map",
         "feat/tables-spreadsheet",
         "feat/customer-find-labels",
-        "feat/lock-initials-later"
+        "feat/lock-initials-later",
+        "feat/engine-fetch-wait"
     ],
     "feature_freeze": {
         "active": false,
