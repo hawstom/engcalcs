@@ -180,3 +180,82 @@ label ever falls nearby. This may be exactly what Tom's own design asked for ("r
 or not one is actually there"), so it is reported as a question rather than a defect — but it was
 never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
 explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
+
+## 2026-09-22 -- feat/notice-log, second review at `dfd8d244`: NOT READY
+
+Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, preview :8099, real headless
+Chromium (playwright-core, launched directly against the running preview server since this pass
+was scoped to that server rather than to `dev/browser-pass`'s own PHP spawn). This commit fixes the
+buried-glyph defect from the first review (`#lpn_map_notice` is now a child of
+`#lpn_map_overlay_tl_col`, confirmed by a real screenshot: the notice pill sits beside the glyph
+and the panel opens directly under it, oldest lower, matching Tom's description) and answers his
+(2) and part of his (4). Two of his five points are not done, and one further defect appears in the
+same commit.
+
+**MISSED -- (3), the flash, is not gone; only NAMED.** OBSERVED, live: opening the "Basic network,
+gpm (US)" example produces `#lpn_engine_banner` = "Loading solver. Results delayed momentarily.
+Continue working." at t=1028ms and clears it at t=1335ms -- on screen for roughly 300ms, in the
+exact top-left column Tom is looking at. "SOLVER" and "POWER" share four of six letters in the same
+positions (_O__ER vs _O_ER, both round-vowel-then-W/V-then-E-R), so this is a good match for "a
+word... similar to POWER" that he could not read. `git show dfd8d244` and `git log -S"POWER"
+--all` turn up nothing: no debounce, no minimum-display time, no delay-before-show was added
+anywhere in this branch's history. The build agent's claim in this round's brief --
+"the 'POWER' flash was 'Loading solver...' from refreshEpanetBanner()" -- correctly names the
+string and does nothing to it. Tom's instruction was "That needs to stop happening"; it still
+happens, unchanged, and identifying the culprit is not the same act as fixing it. This is the
+R-054 shape in a new place: a plausible, checkable explanation stood in for a fix, and nobody
+reran the browser to see whether the thing complained of was still there.
+
+**MISSED -- (4), "All messages," is not all of them.** `setStatus()` and `refreshEpanetBanner()`
+were taught to call `logMessage()` this commit, which covers the two examples Tom named live
+("Working out the extended period simulation." and the EPANET-loading banner) -- confirmed, both
+appear in the panel after a load that shows them. But `setEngineNotes()` (`js/looped-network.js`,
+~line 45334), the ~2-minute-fading note in `#lpn_status_notes` beside the diagnostic -- "Note: with
+Manning roughness, EPANET rounds the constant in the Manning equation..." is the one example in the
+current source -- has no `logMessage()` call anywhere in it or in its one caller. It is a real,
+on-map, worded message with its own timer, in the same top-left column as everything else this
+branch moved, and it will fade off screen unread exactly the way the lock banner did before this
+whole task existed, with no trace in the log Tom just asked to be complete. Grep is decisive here:
+`grep -n "logMessage" js/looped-network.js` never mentions `setEngineNotes`.
+
+**MISSED (not one of Tom's five, but inside the checklist this review was asked to run) --
+dismissing the panel by clicking the map also does whatever that click would otherwise have done.**
+`msglogOutsideHandler()` (the capture-phase `click` listener that closes the panel on an outside
+click) calls neither `stopPropagation()` nor `preventDefault()`. The canvas's own interaction
+handling is wired on `pointerdown`/`pointerup` (`svg.addEventListener('pointerdown', ...)`,
+`js/looped-network.js` ~32112+), which fires and completes BEFORE the `click` event the dismiss
+handler is listening for. Verified live: instrumenting `document`-level capture listeners for both
+`pointerdown` and `click` and comparing an ordinary canvas click against a "dismiss the panel"
+click at the same map point shows both events reaching the document identically in both cases --
+nothing intercepts or discards the pointerdown on the dismiss path. So a user who presses the map
+just to put the message panel away will, in the same gesture, do to the network whatever a plain
+click there does: select an element, deselect the current one, or begin whatever the active tool
+starts on pointerdown. Not measured against every tool (would need one live repro per mode), but
+the timing argument -- pointerdown-before-click, no propagation stop -- holds for all of them by
+construction.
+
+**CONFIRMED.** (2): a real screenshot with the legend showing (top-right) and the message column
+open (top-left, "Opened Net3-Novato-CA-World...") shows no overlap with the legend -- both the
+top-left row and the footer already reserve `calc(4px + var(--lpn-overlay-right, 0px))`, the same
+custom property a right-side legend sets, so the structural fix predates this branch and nothing in
+it broke that. Dedupe: repeating the identical "Nothing is selected" notice three times over
+produced exactly one row in the panel, moved to the top, not three -- no flood on the case that
+matters most (an unchanged diagnostic re-showing on every ordinary solve). Keyboard: Tab reaches
+`#lpn_msglog_btn`, Enter opens the panel, Escape closes it, live and unscripted. No page errors in
+either probe.
+
+**STILL PRESENT, same defect as the first review, unaddressed by this commit: the phone welcome
+state.** At 390px on a fresh project, `#lpn_examples_pane` still intercepts every click meant for
+`#lpn_msglog_btn` (Playwright's own retry log names the exact intercepting element). Filed once
+already; filing it again because a second commit went by without touching it.
+
+**Not independently re-shot this session, because of a shared `/tmp/engcalcs-browser.lock` held by
+another concurrent session for an extended stretch:** the RTL layout at 1280/390. The fix itself
+(`inset-inline-start` in place of `left`, read directly from `Looped-Network.php`) is a correct,
+logical-property answer to the exact defect the first review measured (glyph and notice a map-width
+apart in Arabic), and `dev/browser-pass/specs/msglogpos.js` is written to catch a regression of
+precisely that shape -- but I did not re-render it myself this round and say so rather than
+inheriting the first review's now-decayed OBSERVED finding as if it still described this build.
+
+**Verdict: NOT READY.** The flash he explicitly asked to stop still happens; "all messages" still
+excludes one; and the outside-click dismissal has a real, unflagged side effect on the drawing.
