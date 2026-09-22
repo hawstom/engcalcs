@@ -264,7 +264,7 @@ judgement and does not belong to a script.
 - [x] R-131 -- | ?debug=tiles: I think we are good now. -- **Task 703 CLOSED**
 - [x] R-132 -- | 705: Title "Limit zoom symbol mapwise size growth" -- retitled in `6ae7f2d4`
 - [x] R-133 feat/customer-find-labels | I think this is done. Merge and delete? -- **MERGED** `7afe1d20` on his all-clear, branch and worktree deleted 2026-09-22
-- [ ] R-134 feat/zoom-symbol-size | New zoom rules: If you have no questions or objections, you can proceed to implement this in a branch for me to test.
+- [x] R-134 feat/zoom-symbol-size | New zoom rules: If you have no questions or objections, you can proceed to implement this in a branch for me to test. -- **MERGED** to master (`1bb9ac8b`) on his all-clear R-149; branch deleted
 
 ## Round of 2026-09-22b -- his pass over the six branches
 
@@ -282,7 +282,7 @@ judgement and does not belong to a script.
 - [ ] R-146 feat/notice-log | There is a brief flash of a word behind the glyph. I can't read it, but it's similar to POWER. That needs to stop happening.
 - [ ] R-147 feat/notice-log | On load I see two messages, (a) Working out the EPS and (b) EPANET solver. But when I click the expando button, I get an alert "No messages yet". **All** messages now need to go through this messenger system.
 - [ ] R-148 feat/notice-log | The alert paradigm is not a good UX for showing past messages. User expects them to descend below the glyph, below the Mode status in similar appearance that they originally had. This should not be hard to do, fill the map below the Mode status line with old messages with oldest at the bottom, I assume?
-- [ ] R-149 feat/zoom-symbol-size | Peripheral issue: Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?
+- [x] R-149 feat/zoom-symbol-size | Peripheral issue: Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues? -- **MERGED** `1bb9ac8b`, branch and worktree deleted 2026-09-22. His peripheral question is Task 708
 - [ ] R-150 feat/zoom-symbol-size | I think this feature works for now and can be closed, merged, and the branch deleted. Good work. -- HIS ALL-CLEAR for Task 705
 - [ ] R-151 feat/map-menu | The last two menu rows showing for EPSG projects, Goto and Search, were not requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map is not attached (no georeference).
-- [ ] R-152 fix/example-open | I think this is good. Close, merge, and delete the branch. -- HIS ALL-CLEAR
+- [x] R-152 fix/example-open | I think this is good. Close, merge, and delete the branch. -- HIS ALL-CLEAR -- **MERGED** `dff93649`, branch and worktree deleted 2026-09-22
