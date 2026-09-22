@@ -904,12 +904,6 @@ the block.
     not labels. §18c answers his zoom-independence point: the stable model is ANGULAR, already built
     and already cached in `nodeContext`, and all but one number of it is thrown away by
     `widestArc()`; occupancy and the candidate radii are per-view and cannot be precomputed.
-- 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
-  Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
-  file, then import anything that is not a name conflict, that probably would be all that's needed."*
-  No export function: a project file already is the export. A name conflict is reported and skipped,
-  never renamed silently.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with

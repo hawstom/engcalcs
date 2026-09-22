@@ -2884,7 +2884,6 @@ $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label 
 // the placeholder, is the only place on screen that says what a blank box means.
 $ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
 $ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.';
-$ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // The automatic threshold, printed in the empty box so the number is not a secret. It is the view
 // at which the lettering grows taller than twice the median pipe length, which is an upper limit
