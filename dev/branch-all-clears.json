@@ -48,6 +48,13 @@
             "words": "The task is complete. Merge, delete, and close.",
             "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
         },
+        "feat/customer-find-labels": {
+            "head": "8ef7868a5cba567f0a758ce40e32d5e49355f481",
+            "date": "2026-09-21",
+            "words": "feat/customer-find-labels: (1)I think this is done. Merge and delete?",
+            "context": "Said after his own browser pass on port 8098, in the same message as six fresh findings on the tables branch and four on the notice-log branch -- so he was reading closely and this branch is the one he passed. It closes a round in which he had reopened four rows: R-011 (restore the caution glyph), R-013 and R-090 (the Use current view button, which he could not find because pressing it hid the labels), R-051 (the service line), and R-053 (reserve a link label's room so nothing has to dodge one). All five are built. Task 247 -- customers, metered demands lumped to the nearest node -- stays open: the label density rule and Slice 4 are still his call.",
+            "pin_note": "PINNED TO 8ef7868a, WHICH IS ONE COMMIT PAST WHAT HE SAW: the last commit is Perry the pre-reviewer's own journal entry and touches nothing the page renders. The two commits BEFORE it are Perry's findings acted on -- the service line was as heavy as the main at a 1 px link width and heavier below it (the Settings box's min=\"1\" is advice to a spinner and nothing at all to a typed entry, so 0.5 went in), and a drop rate that had been reported as a single favourable seed is now reported as a range over ten. Both landed before his pass, not after."
+        },
         "feat/xy-world-map": {
             "head": "765ac3bc21cecec85175e15628746c9dc465ff22",
             "date": "2026-09-21",
