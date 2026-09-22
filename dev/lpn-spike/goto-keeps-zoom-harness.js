@@ -95,10 +95,15 @@ console.log('\n--- one door, no leftovers ---');
 	const js = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
 	ok('GOTO_SPAN_DEG is gone -- a constant nothing reads is a rule waiting to be re-applied',
 		js.indexOf('GOTO_SPAN_DEG') < 0);
+	// Since 2026-09-22 a grid project with the world map attached shares this tail: its size comes
+	// from `sFit`, which is set ONLY inside `if (inwardBox(extent))`, so a bare coordinate still
+	// falls through to state.s. The pins follow the rule, not the old spelling of it.
 	ok('goToPoint() hands applyView() the scale it already had unless it holds an extent',
-		/var box = extent \? inwardBox\(extent\) : null;/.test(js) &&
+		/var box = \(extent && !xg\) \? inwardBox\(extent\) : null;/.test(js) &&
 		/var fit = box \? fitScaleForBox\(box\) : 0;/.test(js) &&
-		/s: fit > 0 \? fit : state\.s/.test(js));
+		/var xg = xyGeoref\(\), at = \{ x: ll\.lon, y: ll\.lat \}, sFit = 0;/.test(js) &&
+		/if \(inwardBox\(extent\)\) \{/.test(js) &&
+		/s: fit > 0 \? fit : \(sFit \|\| state\.s\)/.test(js));
 	// The typed-coordinate row and the place-name search both arrive here, and nothing else does.
 	const callers = (js.match(/goToPoint\(/g) || []).length;
 	ok('goToPoint is called from the typed row and defined once, with no rival traveller',

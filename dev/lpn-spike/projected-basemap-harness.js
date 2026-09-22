@@ -31,6 +31,11 @@ const { ROOT, byId, ensure, loadLoopedNetwork, setUnitSet } = require('./lpn-dom
 // at all -- a harness passing while the page it is testing is dead. Same note as terrain-harness.
 global.window.EngCalcs = global.EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-crs.js'));
+// The place-name search module, so section 13b can hold its Map-menu row to the same rule as Go to
+// (Tom, 2026-09-22). It registers through the page's lpnSearchInit() seam; nothing here sends.
+require(path.join(ROOT, 'js', 'lpn-search.js'));
+// And the attached-map arithmetic, which Go to on a georeferenced grid project travels through.
+require(path.join(ROOT, 'js', 'lpn-georef.js'));
 
 // **THE REAL proj4 AND THE REAL DEFINITIONS.** The point of this harness is the arithmetic that
 // puts a square on a plane, so stubbing the transform would remove the only thing being tested --
@@ -655,7 +660,12 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			const row = rowsFor().find((r) => r.label === PC.lpn_map_attach_menu);
 			return !!row && row.disabled !== true;
 		}()));
-		ok('...no Go to row', !has('lpn_goto_menu'));
+		// Since 2026-09-22 the Go to row is SHOWN here and greyed, not hidden (Tom: "can show for
+		// unnamed CRS projects, but disabled when a world map is not attached").
+		ok('...the Go to row is present but disabled', (function () {
+			const row = rowsFor().find((r) => r.label === PC.lpn_goto_menu);
+			return !!row && row.disabled === true;
+		}()));
 		byId.lpn_basemap_teaser.style.display = '';
 		L.refreshTeaser();
 		ok('...and no corner teaser', byId.lpn_basemap_teaser.style.display === 'none');
@@ -666,11 +676,16 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 
 	head('13b. EXACTLY THREE TOP ROWS, ON EVERY PROJECT KIND -- Tom, 2026-09-22');
 	// *"Keep all rows visible always. But disable what's not applicable... That got tidy. Only three
-	// rows left. Zoom to fit, Background image, and World map."* Read together with the separate
-	// Go to / place-name search rows (unaffected by this change, and gated on projectLocatable() as
-	// before), this is the assertion that the CORE three are always there, never hidden, on a grid,
-	// a lat/lon and a projected project alike -- and that the four retired rows (Hide/Show street
-	// map, Hide/Show satellite images, Hide map readouts) are gone from all three.
+	// rows left. Zoom to fit, Background image, and World map."* This is the assertion that the CORE
+	// three are always there, never hidden, on a grid, a lat/lon and a projected project alike --
+	// and that the four retired rows (Hide/Show street map, Hide/Show satellite images, Hide map
+	// readouts) are gone from all three.
+	//
+	// **AND GO TO AND SEARCH, ON TOM'S LATER WORD THE SAME DAY:** *"The last two menu rows showing
+	// for EPSG projects, Goto and Search, were not requested, but are nice, and can show for unnamed
+	// CRS projects, but disabled when a world map is not attached (no georeference)."* So both are
+	// present on all three kinds, enabled on lat/lon and EPSG, disabled on a bare grid -- and
+	// enabled again on that grid once its world map is attached.
 	{
 		const PC = global.EngCalcs.pageConfig;
 		// **THE FOUR RETIRED KEYS ARE DELETED, so this checks the actual English words rather than a
@@ -696,7 +711,40 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			}()), labels.join(' | '));
 			ok('...and none of the four retired rows', RETIRED.every((r) => labels.indexOf(r) < 0),
 				labels.join(' | '));
+			const wantOn = c[0] !== 'grid';
+			const findRows = [PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()];
+			findRows.forEach(function (lab, i) {
+				const row = top.find((r) => r.label === lab);
+				ok('...' + (i ? 'Search' : 'Go to') + ' is present and ' + (wantOn ? 'enabled' : 'disabled'),
+					!!row && (row.disabled === true) === !wantOn,
+					row ? lab + ' disabled=' + !!row.disabled : 'missing: ' + lab);
+			});
 		});
+		// The grid case the other way: attach a world map and both come alive, because goToPoint()
+		// now travels through the attached map's transform.
+		L.newProject(null, '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.getProject().georef = { anchor: { x: 0, y: 0 }, origin: { lon: PHOENIX.lon, lat: PHOENIX.lat },
+			metersPerUnit: 0.3048, rotDeg: 0 };
+		{
+			const top = L.mapRows().filter((r) => r && !r.hidden && !r.separator);
+			[PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()].forEach(function (lab, i) {
+				const row = top.find((r) => r.label === lab);
+				ok('a grid project WITH the world map attached enables ' + (i ? 'Search' : 'Go to'),
+					!!row && row.disabled !== true, row ? String(row.disabled) : 'missing');
+			});
+			// And Go to must LAND on the right drawing coordinate, not treat x/y as degrees. 1000 ft
+			// east and 500 ft north of the anchor, through the map's own arithmetic.
+			const mpd = global.EngCalcs.lpnGeorefMetersPerDegree(PHOENIX.lat);
+			const target = { lat: PHOENIX.lat + 500 * 0.3048 / mpd.lat, lon: PHOENIX.lon + 1000 * 0.3048 / mpd.lon };
+			global.window.prompt = global.prompt = function () { return target.lat + ',' + target.lon; };
+			L.goToLatLon();
+			const v = L.currentView();
+			ok('...and Go to lands on the drawing point that latitude names',
+				!!v && Math.abs(v.cx - L.inwardX(1000)) < 1e-6 && Math.abs(v.cy - L.inwardY(500)) < 1e-6,
+				v ? v.cx.toFixed(3) + ', ' + v.cy.toFixed(3) : 'no view');
+			delete L.getProject().georef;
+		}
 	}
 
 	head('14. The last reader the audit turned up -- where the New project box opens');

@@ -572,8 +572,12 @@ ok('the placement it keeps is the one on the screen',
 	ok('...and the retired street-map and satellite rows are gone from the Map menu',
 		rows.indexOf(PCS.lpn_basemap_show) < 0 && rows.indexOf(PCS.lpn_basemap_satellite_show) < 0,
 		rows.join(' | '));
-	ok('...while Go to stays on the narrow question, being more than a transform',
-		rows.indexOf(PCS.lpn_goto_menu) < 0, rows.join(' | '));
+	// **REVERSED 2026-09-22** (Tom: Go to and Search "can show for unnamed CRS projects, but
+	// disabled when a world map is not attached"). goToPoint() now travels through the attached
+	// map's transform, so once attached the row is live; the DEM elevations still are not.
+	ok('...and Go to is offered and enabled, now that it can travel through the attached map',
+		L.mapMenuRows().some(function (r) { return r.label === PCS.lpn_goto_menu && r.disabled !== true; }),
+		rows.join(' | '));
 	if (tokenWas === undefined) { delete PCS.lpn_mapbox_token; } else { PCS.lpn_mapbox_token = tokenWas; }
 	ok('...and with no account the corner teaser is absent, which is the other half', (function () {
 		byId.lpn_basemap_teaser.style.display = '';

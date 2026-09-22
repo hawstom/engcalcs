@@ -11119,12 +11119,18 @@ var EngCalcs = EngCalcs || {};
 	// tile offering a basemap the menu no longer agreed about -- the drift refreshBasemapTeaser()'s
 	// own comment warns against.
 	function basemapChoosable() { return projectLocatable() || xyGeorefOk(); }
+	// **GO TO AND THE PLACE-NAME SEARCH ASK THE WIDE QUESTION TOO, SINCE 2026-09-22** (Tom, on
+	// feat/map-menu: *"The last two menu rows showing for EPSG projects, Goto and Search, were not
+	// requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map
+	// is not attached (no georeference)."*). Both travel through goToPoint(), which gained a branch
+	// that turns a latitude and longitude into drawing units through the attached map's transform,
+	// so they no longer need anything a georeferenced grid project lacks. Moving the camera changes
+	// nothing in the document, which is why this widening is safe where the DEM's is not.
+	function placeFindable() { return basemapChoosable(); }
 	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
-	// oversight.** It gates the place-name search and the DEM elevations as well as the tiles, and
-	// both of those want more than a transform: Go to points a camera whose units are DEGREES in a
-	// lat/lon project, and the DEM writes numbers into the document. Attaching a backdrop is meant
-	// to change nothing, so it unlocks the tiles and stops there; the other two rows are Tom's to
-	// ask for.
+	// oversight.** It still gates the DEM elevations, which write numbers into the document from a
+	// place on the Earth; attaching a backdrop is meant to change nothing, so an attached world map
+	// unlocks the tiles, Go to and the search (placeFindable() above), and stops there.
 	//
 	// **AND THIS IS TASK 692's QUESTION ASKED A FOURTH TIME.** That audit found four capabilities
 	// gated on "are these coordinates a latitude and a longitude" where what they meant was "can
@@ -12952,7 +12958,7 @@ var EngCalcs = EngCalcs || {};
 		// was offered and the press did nothing at all. goToPoint() below travels through the
 		// transform, so there is nothing here a projected project cannot do. The wizard's own live
 		// transform is the one addition: while it is open, the drawing can say where it is.
-		if (!projectLocatable() && !mapgeoActive()) { return; }
+		if (!placeFindable() && !mapgeoActive()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -13020,10 +13026,39 @@ var EngCalcs = EngCalcs || {};
 			georefDetachTick();
 			return;
 		}
-		var box = extent ? inwardBox(extent) : null;
+		// **A GRID PROJECT WITH THE WORLD MAP ATTACHED TRAVELS THROUGH ITS OWN TRANSFORM** (Tom,
+		// 2026-09-22 -- see placeFindable()). The drawing frame is the user's x/y, so a latitude is
+		// turned into drawing units by the attached map's similarity and nothing else; the camera
+		// moves, no document number does. An extent is sized from its four corners, because the
+		// map may be turned and a turned box's corners are not its east and west. It shares the ONE
+		// crossing into the drawing frame below rather than writing its own, which is what
+		// dev/lpn-spike/local-origin-harness.js counts.
+		var xg = xyGeoref(), at = { x: ll.lon, y: ll.lat }, sFit = 0;
+		if (xg) {
+			at = EngCalcs.lpnGeorefFromLonLat(xg, ll.lon, ll.lat);
+			if (!isFinite(at.x) || !isFinite(at.y)) { return; }
+			if (inwardBox(extent)) {
+				var cs = [[extent.west, extent.north], [extent.east, extent.north],
+					[extent.west, extent.south], [extent.east, extent.south]].map(function (c) {
+						return EngCalcs.lpnGeorefFromLonLat(xg, c[0], c[1]); });
+				var xs = cs.map(function (c) { return c.x; }), ys = cs.map(function (c) { return c.y; });
+				var dx = Math.max.apply(null, xs) - Math.min.apply(null, xs),
+					dy = Math.max.apply(null, ys) - Math.min.apply(null, ys),
+					w = svg && svg.clientWidth ? svg.clientWidth : 0,
+					h = svg && svg.clientHeight ? svg.clientHeight : 0;
+				if (w && h && dx > 0 && dy > 0) {
+					sFit = Math.min(w / dx, h / dy) * SEARCH_FIT_PAD;
+					sFit = Math.min(sFit, w / (SEARCH_FIT_FLOOR_M / xg.metersPerUnit));
+				}
+			}
+		}
+		// On a geographic project the extent box is its own centre and size; on an attached grid
+		// only the size came from it (sFit), and the centre is the travelled-to point.
+		var box = (extent && !xg) ? inwardBox(extent) : null;
 		var fit = box ? fitScaleForBox(box) : 0;
-		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(ll.lon),
-			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(ll.lat), s: fit > 0 ? fit : state.s });
+		if (!(sFit > 0 && isFinite(sFit))) { sFit = 0; }
+		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(at.x),
+			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(at.y), s: fit > 0 ? fit : (sFit || state.s) });
 		georefDetachTick();
 	}
 	/**
@@ -30704,24 +30739,21 @@ var EngCalcs = EngCalcs || {};
 			// lpn_clean_map_tip, lpn_basemap_hide, lpn_basemap_satellite_hide, lpn_basemap_tip,
 			// lpn_basemap_satellite_tip.
 			//
-			// **HIDDEN WHERE THE PROJECT CANNOT SAY WHERE IT IS, not disabled.** A grid project's
-			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
-			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
-			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
-			// place name. Is this intentional?"* -- it was not; it was `isLatLonProject()` written
-			// before there was a transform, and the answer to a typed latitude is now one forward
-			// projection away). The label states what the row will DO, because this menu has no
-			// checkmark column.
+			// **SHOWN ON EVERY PROJECT, DISABLED WHERE IT CANNOT SAY WHERE IT IS** (Tom, 2026-09-22:
+			// *"Goto and Search ... can show for unnamed CRS projects, but disabled when a world map
+			// is not attached (no georeference)."*). This used to HIDE them on a grid project; it is
+			// now the same rule as the rest of this menu, greyed rather than gone. placeFindable()
+			// is lat/lon, a projected project with a transform, or a grid with the world map
+			// attached. The search row stays hidden only when js/lpn-search.js did not load, since
+			// then there is no label to show at all.
+			{ separator: true },
 			{
-				hidden: !projectLocatable(), separator: true
-			},
-			{
-				hidden: !projectLocatable(), icon: 'globe',
+				disabled: !placeFindable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
-				hidden: !projectLocatable() || !EngCalcs.lpnSearchOpen, icon: 'find',
+				hidden: !EngCalcs.lpnSearchOpen, disabled: !placeFindable(), icon: 'find',
 				label: EngCalcs.lpnSearchMenuLabel && EngCalcs.lpnSearchMenuLabel(),
 				tip: EngCalcs.lpnSearchMenuTip && EngCalcs.lpnSearchMenuTip(),
 				fn: function () { EngCalcs.lpnSearchOpen(); }
@@ -48065,7 +48097,7 @@ var EngCalcs = EngCalcs || {};
 		// **THE WIZARD IS LOCATABLE WHILE IT RUNS**, which is what makes Tom's step 1 offer Search
 		// by name on a project that states no coordinate system at all: the place is what the
 		// wizard is asking for, so refusing to look one up would refuse the question.
-		EngCalcs.lpnSearchInit({ locatable: function () { return projectLocatable() || mapgeoActive(); },
+		EngCalcs.lpnSearchInit({ locatable: function () { return placeFindable() || mapgeoActive(); },
 			goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
