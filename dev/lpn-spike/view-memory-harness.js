@@ -243,10 +243,15 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	// lon/lat" says the coordinates need no placing, and the camera then has to go to where those
 	// numbers put the network -- which by then is nowhere near the whole-Earth view step 1 opens
 	// on. Marked automatic because the user asked to reinterpret coordinates, not to move the view.
-	// **A FIFTH NEEDS THE SAME KIND OF SENTENCE, not a bumped number.**
+	// The cap went 4 -> 5 on 2026-09-18, for mapgeoStart(): the custom georeference wizard opens
+	// with the drawing and the whole world both fitted to the window, which is Tom's own step 1
+	// ("project and map both Zoomed to Fit"). Automatic because the user asked to georeference and
+	// not to move the camera -- and the camera is the one thing that does not move for the rest of
+	// that wizard, so the fit at the start is the only chance to frame it.
+	// **A SIXTH NEEDS THE SAME KIND OF SENTENCE, not a bumped number.**
 	const autos = (code.match(/zoomExtent\(true\)/g) || []).length;
-	ok('...and there are at most four of them left, each one named and argued for',
-		autos <= 4, autos + ' automatic fit(s)');
+	ok('...and there are at most five of them left, each one named and argued for',
+		autos <= 5, autos + ' automatic fit(s)');
 	// **BOOT MUST GO THROUGH restoreViewOrFit(), NOT STRAIGHT TO A FIT**, or a reload ignores the
 	// document's saved view -- the one path where a user most expects to come back to where they
 	// were was the one path that would not. It had its own sequence and never picked up the call

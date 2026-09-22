@@ -58,7 +58,7 @@ const EngCalcs = { pageConfig: {} };
 // returning its argument would remove the shift, which is the one thing section 6 below is about.
 let doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 // Task 145's projection seam: inwardY()/outwardY() now ask whether the project is geographic, and
-// isGeoProject() is EXTRACTED rather than stubbed for the same reason the four converters are --
+// isLatLonProject() is EXTRACTED rather than stubbed for the same reason the four converters are --
 // a stub returning false would hold constant exactly the quantity the seam varies. `project` here
 // is a grid one, which is what a world file is about; Geom carries the Mercator pair.
 const Geom = require('../../js/lpn-geom.js').lpnGeom;
@@ -67,7 +67,7 @@ let project = { name: 'backdrop test' };
 
 eval([
 	'backdropPixelSize', 'setBackdropPixelSize', 'formatPixelSize', 'scaleBackdropAbout',
-	'docOrigin', 'isGeoProject', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
+	'docOrigin', 'isLatLonProject', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
 	'parseWorldFile', 'worldFileRepresentable', 'applyWorldFile', 'applyScaleEntry'
 ].map(extract).join('\n'));
 
@@ -343,17 +343,20 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 		'Position still clears regMode in that handler, before the tool sees the event');
 
 	// The fix: the tap's START is gated, so the click that ends registration can never complete one.
-	// **THE GUARD IS ALLOWED COMPANY.** Task 145's placement tool gates the same seams on the same
-	// principle, so these lines now read `if (regMode || georefActive())`. The property under test is
-	// "the tap's START is gated on regMode", which either spelling states; a regex that insisted on
-	// the exact original characters was testing the punctuation instead.
-	report(/svg\.addEventListener\('pointerdown', function \(e\) \{\s*\n\s*if \(regMode( \|\| georefActive\(\))?\) \{ downPt = null; return; \}/.test(src),
+	// **THE GUARD IS ALLOWED COMPANY, AND THE COMPANY KEEPS ARRIVING.** Task 145's placement tool
+	// gates the same seams on the same principle, and Task 646's custom georeference wizard joined
+	// it on 2026-09-18, so these lines now read `if (regMode || georefActive() || mapgeoActive())`.
+	// The property under test is "the tap's START is gated on regMode", which every one of those
+	// spellings states; a regex that insisted on the exact original characters was testing the
+	// punctuation instead, and then had to be widened by hand each time a third thing was added.
+	// **SO THE COMPANY IS MATCHED AS A GROUP OF ANY LENGTH** -- what must not disappear is regMode.
+	report(/svg\.addEventListener\('pointerdown', function \(e\) \{\s*\n\s*if \(regMode( \|\| \w+\(\))*\) \{ downPt = null; return; \}/.test(src),
 		'a tap cannot BEGIN while a registration is pending');
 
 	// And the three paths that were already right stay right — a tool must not act at any point in
 	// the sequence, not just at its end.
 	const wire = extract('wirePointerEvents');
-	const gates = /if \(regMode( \|\| georefActive\(\))?\)/g;
+	const gates = /if \(regMode( \|\| \w+\(\))*\)/g;
 	report((wire.match(gates) || []).length >= 4,
 		'every pointer path in wirePointerEvents() checks regMode', `${(wire.match(gates) || []).length} gates`);
 	// The delete branch and the select-popup branch both live in that one pointerup, so one gate

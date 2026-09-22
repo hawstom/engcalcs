@@ -38,7 +38,7 @@ const L = loadLoopedNetwork(
 	"\t\tgoToPoint: goToPoint, applyView: applyView, viewNow: currentView,\n" +
 	"\t\tfitScaleForBox: fitScaleForBox, inwardBox: inwardBox,\n" +
 	"\t\tstateNow: function () { return { tx: state.tx, ty: state.ty, s: state.s }; },\n" +
-	"\t\tmaxScale: maxScale, isGeo: isGeoProject,\n" +
+	"\t\tmaxScale: maxScale, isGeo: isLatLonProject,\n" +
 	"\t\tinwardX: inwardX, inwardY: inwardY, outwardX: outwardX, outwardY: outwardY,\n" +
 	"\t\tGEO: LPN_COORDS_GEO,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };\n" +

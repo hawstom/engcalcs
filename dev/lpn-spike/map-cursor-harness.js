@@ -209,8 +209,11 @@ L.setCanvas(svg);
 function classOn() { return svg.classList.contains('lpn-placemode'); }
 
 // CROSSHAIR: a tool whose press means a coordinate.
+// `add-meter` is here for the reason the rest are (Task 247): its first press is a coordinate, and
+// where that press lands on a PIPE it is still a coordinate along that pipe. It is also the ninth
+// tool this file's own note below predicted would fail here on the day it was written, and it did.
 const CROSSHAIR = ['add-junction', 'add-reservoir', 'add-tank', 'add-pipe', 'add-pump',
-	'add-valve', 'add-text', 'select-area'];
+	'add-valve', 'add-meter', 'add-text', 'select-area'];
 // NOT crosshair, each for its own stated reason: `select` acts on the object under the pointer,
 // `delete` does too (so `pointer` is the true thing to say), and `vertices` already states its own
 // rule per element in the stylesheet.

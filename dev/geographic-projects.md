@@ -121,9 +121,39 @@ What follows from that choice, and is enforced in the code:
 - **The offline promise is untouched.** Tiles are not app assets and must never enter
   `sw_manifest_check.php`'s manifest. With no network a geographic project still opens, still draws
   and still solves; the basemap is the only thing missing.
-- **Nothing is cached on the device by us** — no localStorage, no IndexedDB, no Cache API, only the
-  browser's own HTTP cache. Caching tiles is both a tile-policy problem and a storage-consent
-  problem (`dev/cookie-storage-inventory.md`), and declining costs nothing.
+- **Nothing is cached on the DEVICE by us** — no localStorage, no IndexedDB, no Cache API, nothing
+  in the service worker, only the browser's own HTTP cache. Storing tiles on the visitor's device is
+  both a tile-policy problem and a storage-consent problem (`dev/cookie-storage-inventory.md`), and
+  it would make a sentence in `consent_body` false, so it is Tom's decision and nobody else's.
+  `sw_map_host_check.php` holds the service-worker half.
+- **But a tile already fetched is KEPT IN MEMORY for the life of the page** (Tom's R-055,
+  2026-09-19: *"Why do we throw away satellite tiles? We should have a good-sized cache where we
+  throw away only the oldest, right?"*). It is the `<image>` element itself that is kept, detached,
+  with its decoded picture still in it, so a re-use draws instantly and asks the network for
+  nothing. **The bound is 384 tiles — twice the page's own per-refresh ceiling of 192** — so the
+  largest view this page is ever allowed to ask for fits whole, twice over, which is what makes a
+  zoom out and back, or a pan away and back, free. A real satellite tile at zoom 19 over Novato
+  measures 18,385 bytes and a screenful is 72 to 105 tiles on a 2560 × 1400 window, so the bound is
+  about 7 MB of compressed picture. Oldest out first. **A tile that never arrived is never kept** —
+  caching a blank would hand that blank back for the life of the page, which is the next bullet
+  rebuilt on purpose. `dev/lpn-spike/basemap-cache-harness.js`.
+- **A tile whose request FAILED is asked for again, three times with a widening gap** (Tom's R-056,
+  2026-09-19: *"There are still a few blank tiles that never fill in when I stop zooming. It's as
+  if we decided not to draw these tiles."*). We did, and `if (basemapEls[t.key]) { return; }` was
+  where: it read "we made an element for this key" as "this tile is handled", while the `error`
+  listener marked it settled and moved on. **MEASURED before it was fixed**, in real headless
+  Chrome against the real tile servers: with 33 of 105 tile requests failed and then a perfect
+  network restored and the view left alone, all 33 were still blank after 5, 15 and 30 seconds,
+  each still showing exactly ONE request — 18.8% of the canvas white, and the only repair was a
+  gesture that produced different tile keys. After the fix the same run is at 99.6% after five
+  seconds and 100% after fifteen, with no gesture at all. It stops after three attempts, because a
+  tile over the provider's ceiling 404s every time and a retry that never gives up is the bulk
+  download the policy forbids. `dev/lpn-spike/basemap-blank-tile-probe.js` is the instrument.
+- **THE MAPBOX TOKEN IS RESTRICTED TO `hawsedc.com` AND `librewaternet.org`, so every satellite
+  tile fetched from a branch preview port is `HTTP 403 {"message":"Forbidden"}` — 23 bytes.** That
+  is a non-zero body, so anything counting bytes reads it as a delivered tile: the first run of the
+  blank-tile probe reported 100% coverage on a map that was showing nothing at all. A probe on a
+  preview port must use the street map, whose code path is identical.
 - **Policy compliance is a cap and a budget:** zoom 19 maximum (OSM's own), at most 192 tiles per
   refresh with the zoom stepping DOWN rather than the view being clipped, one refresh per gesture
   rather than one per wheel notch, and the browser's real `Referer`.
@@ -317,7 +347,7 @@ holds the user's own eastings and northings and converts nothing. `newBoxAnswers
 those two part, and it is one comparison.
 
 **EPSG:3857 is never stored as `project.crs`.** `assignProjectCrs()` refuses it by name: a document
-stating it as a projected plane would be claiming its longitudes are metres. `isGeoProject()` remains
+stating it as a projected plane would be claiming its longitudes are metres. `isLatLonProject()` remains
 the one thing that answers "is this document lon/lat".
 
 ### The Geographic projection box, and why a spatial filter needed no library

@@ -48,7 +48,12 @@
         "feat/survey-import",
         "feat/library-import",
         "feat/xy-world-map",
-        "feat/lock-initials-later"
+        "feat/tables-spreadsheet",
+        "feat/customer-find-labels",
+        "feat/lock-initials-later",
+        "feat/engine-fetch-wait",
+        "feat/notice-log",
+        "tables-interface"
     ],
     "feature_freeze": {
         "active": false,

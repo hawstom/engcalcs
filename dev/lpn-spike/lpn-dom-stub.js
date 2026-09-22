@@ -372,6 +372,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // from this list, refreshEpanetBanner() returns at its first line and the whole of Part 2 --
   // the sentence Tom wrote and the failure that replaces it -- is invisible to every harness.
   'lpn_engine_banner',
+  // The progress bar under it and the fill inside it (Task 608, Tom's 2026-09-19 ruling that the
+  // bar may stall but may not vanish early). Absent from this list, refreshEpanetBar() returns at
+  // its first line and the one thing he asked to be guaranteed is invisible to every harness.
+  'lpn_engine_bar', 'lpn_engine_bar_fill',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
   // its first line in every harness and the licence credit was the one piece of map chrome no test
   // could see -- which is how it shipped invisible on the boot path (Task 486).
@@ -384,6 +388,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
+  'lpn_pane_customers',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
   // The time-series tab and its three boxes (ROADMAP Task 599), the profile's twin. Absent from
   // this list, rebuildTsForm() and renderTimeSeries() return at their first line and the chart
@@ -717,7 +722,19 @@ global.localStorage = {
 };
 global.window = {
   localStorage: global.localStorage, document: global.document,
-  addEventListener: () => {}, innerWidth: 1200, innerHeight: 900,
+  // **WINDOW LISTENERS ARE RECORDED AND CAN BE DISPATCHED**, for the same reason document's are a
+  // few hundred lines above: this was `() => {}`, so nothing registered on the window could be
+  // tested at all -- and `pagehide`, `beforeunload` and `resize` are all window events that carry
+  // real decisions. ROADMAP Task 706's flush-before-the-page-goes is the first thing that needed
+  // it. Recording a listener changes nothing on its own; only a test that dispatches sees them.
+  _listeners: {},
+  addEventListener(t, f) { (global.window._listeners[t] = global.window._listeners[t] || []).push(f); },
+  removeEventListener() {},
+  dispatchEvent(e) {
+    (global.window._listeners[e && e.type] || []).slice().forEach(function (f) { f(e); });
+    return true;
+  },
+  innerWidth: 1200, innerHeight: 900,
   confirm: () => true, prompt: () => 'X', alert: () => {},
   // **A WIDTH QUERY IS ANSWERED FROM innerWidth, and that is the one physical relationship this
   // stub has to keep** (dev/testing-notes.md: a stub that holds constant what the real thing varies
@@ -998,7 +1015,9 @@ require(ROOT + 'js/lpn-inp.js');
 const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 {
 	const browserLoad = global.EngCalcs.lpnEpanetLoad;
-	global.EngCalcs.lpnEpanetLoad = function (url) { return browserLoad(url || NODE_ENGINE_URL); };
+	// The second argument is the Task 608 progress callback and is forwarded rather than dropped:
+	// a wrapper that swallowed it would make the percent-done indicator untestable through the page.
+	global.EngCalcs.lpnEpanetLoad = function (url, onProgress) { return browserLoad(url || NODE_ENGINE_URL, onProgress); };
 }
 // A COUNTER AND A SETTLE POINT, because the engine is asynchronous and the page is not.
 // runSolveEpanet() hands the result back through a promise the caller cannot see, so a harness

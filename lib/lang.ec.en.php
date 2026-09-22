@@ -540,7 +540,7 @@ $ec_lang['contact_main_menu']='Contact';
 $ec_lang['about_main_title']='About HawsEDC Engineering Calculators';
 $ec_lang['about_main_desc']='Mission, Libre Software, and Contributing';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>This is an invitation, not a price. There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes yours. The full version you see today is free for everyone now and forever to use and to modify. That is a promise about the software, which the licence puts beyond anybody’s power to take back, including ours. The website that serves it is offered freely today; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';
 $ec_lang['contactYourEmail']='Your e-mail address:';
@@ -788,6 +788,48 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_vertices']='Vertices';
+// ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
+// **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
+// *"This feature's name is Customer"*, and *"we are changing 'Meter' to 'Customer' all over in
+// the interface"*). The key names still say meter and that is deliberate: renaming 26 translated
+// files buys nothing a reader can see. A Customer is OURS -- EPANET has no such object, so there
+// is no industry term to defer to. Everything hydraulic in these strings is EPANET's own word all
+// the same -- demand, junction, pipe -- because inventing language an engineer does not recognise
+// has been struck here three times. "Station along the pipe" is the survey word for a distance
+// measured along a route, which is what it is.
+$ec_lang['lpn_tool_add_meter']='Customer';
+$ec_lang['lpn_tool_add_meter_tip']='Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.';
+$ec_lang['lpn_mode_add_meter']='Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.';
+$ec_lang['lpn_pane_tab_customers']='Customers';
+$ec_lang['lpn_customer_heading']='Customer {id}';
+$ec_lang['lpn_field_account']='Account number';
+$ec_lang['lpn_field_account_tip']='Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.';
+$ec_lang['lpn_field_meter_demand']='Demand per service';
+$ec_lang['lpn_field_meter_demand_tip']='What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.';
+$ec_lang['lpn_field_meter_count']='Services at this customer';
+$ec_lang['lpn_field_meter_count_tip']='How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
+$ec_lang['lpn_field_meter_total']='Total demand';
+$ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
+$ec_lang['lpn_field_meter_pipe']='Connected asset';
+$ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
+$ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
+$ec_lang['lpn_meter_placed']='Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.';
+$ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.';
+$ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
+$ec_lang['lpn_field_meter_station_tip']='How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
+$ec_lang['lpn_field_meter_offset']='Offset from the pipe';
+$ec_lang['lpn_field_meter_offset_tip']='How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.';
+$ec_lang['lpn_field_meter_lumped']='Added to node';
+$ec_lang['lpn_field_meter_lumped_tip']='The node that this customer\'s demands are added to through, on top of whatever the junction states itself. It\'s the node closest to this connection.';
+$ec_lang['lpn_node_customers']='Customer demands';
+$ec_lang['lpn_node_customers_tip']='Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
+$ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
+$ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+$ec_lang['lpn_customer_detached_count']='{n} customers are no longer connected to a pipe. Their demand is not in the answers.';
+$ec_lang['lpn_meter_pick_pipe']='Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
+$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.';
+
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Click the opposite corner to finish.';
 $ec_lang['lpn_area_hint_lasso_start']='Click to start the outline.';
@@ -1124,9 +1166,12 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Open xy file on map…';
+$ec_lang['lpn_file_import_geo']='Convert coordinates as…';
+// **HIS OWN NAME FOR THE COPY** (Tom, 2026-09-18): the command belongs to the Save as family,
+// so its result is a second version of this project and is named the way a second version is.
+$ec_lang['lpn_copy_of']='Copy of {name}';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.';
+$ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
@@ -1347,6 +1392,13 @@ $ec_lang['lpn_run_menu_tip']='Recalculate this network now. The Calculate button
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_auto_run_tip']='Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow.';
+// **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
+// values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
+// stood here for part of one day and is DELETED, English-only, never translated: it announced a
+// clearing that no longer happens. With the box unticked an edit leaves the last answers exactly
+// where they are and says nothing about them, because whether they are still worth reading is
+// the user's judgement and not this page's. Do not write a replacement -- a grey-out or a
+// "stale" marker is the same decision in quieter clothes.
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
@@ -1652,7 +1704,7 @@ $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. 
 $ec_lang['lpn_new_coordsys_geo']='Geographic projection';
 $ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
 $ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
-$ec_lang['lpn_new_coordsys_local_tip']='Not georeferenced. Attach your own background image or none.';
+$ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image, or the world map, at any time from the Map menu. Your coordinates never change when you do.';
 // ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -1691,6 +1743,11 @@ $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 $ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
+// **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
+// 2026-09-17). The custom georeference wizard defines a coordinate system of its own -- an anchor
+// point, a scale and a turn -- and no register has a name or a number for it, so the strip says
+// that it has one and that it is nobody's. Lower case: it is not a proper name.
+$ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
@@ -1878,7 +1935,6 @@ $ec_lang['lpn_file_changed_elsewhere']='Somebody else has saved to this file sin
 // rather than a name makes the safe answer the obvious one.
 // Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
 // name is never written into the project file, so "anyone you send the file to" was false here too.
-$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
 // The stand-in when someone locked a project before giving a name. Reads in place of {name}
 // everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Somebody else';
@@ -1890,14 +1946,42 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
-$ec_lang['lpn_lock_open_copy']='Create a copy';
-$ec_lang['lpn_lock_break']='Break their lock';
+$ec_lang['lpn_lock_break']='Break lock';
 $ec_lang_syn['lpn_lock_break']='Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button';
-$ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
-$ec_lang['lpn_lock_open_heading_unsaved']='{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.';
-$ec_lang['lpn_lock_open_heading_saved']='{name} has this file open; the last edit was {x} ago, and their work is saved to the file.';
-$ec_lang['lpn_lock_open_heading_seen']='{name} has this file open but has not edited it. Their browser last checked in {x} ago.';
-$ec_lang['lpn_lock_open_choices']='Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.';
+// **TASK 667(b): NOBODY IS ASKED FOR A NAME UNTIL A COLLEAGUE ACTUALLY WANTS THE FILE** (Tom,
+// 2026-09-17). The page used to ask the FIRST user for initials the first time they saved, for a
+// name nobody would ever read unless a colleague happened to collide with them -- and on a site
+// with no login and no account, that reads as a registration. So the lock is taken anonymously and
+// the four sentences below are what a second user gets instead: the ages, then the answers.
+// **He conceded the trade rather than denying it** -- *"Of course saving initials with the lock is
+// better. But asking user A for their initials the first time they save a file is a bit startling,
+// not to mention easily confused with a login or account registration."* Asking up front is the
+// REJECTED ALTERNATIVE, not an improvement waiting to be proposed.
+$ec_lang['lpn_lock_open_inuse']='This file appears to be in use.';
+$ec_lang['lpn_lock_open_care']='To avoid data loss, choose carefully from the options below.';
+// THREE AGES, EACH ITS OWN SENTENCE, AND EACH SAID ONLY WHERE IT IS KNOWN. A dialog that decides
+// whether somebody interrupts a colleague must never carry a number it had to invent: an age the
+// server has no record of is simply not stated. `lpn_lock_age_inuse` is the server's own clock;
+// the other two are the holder's, reported with every heartbeat.
+$ec_lang['lpn_lock_age_inuse']='It has been in use for {x}.';
+$ec_lang['lpn_lock_age_edited']='It was last edited {x} ago.';
+$ec_lang['lpn_lock_age_saved']='It was last saved {x} ago.';
+$ec_lang['lpn_lock_age_never_saved']='Nothing has been saved to this file yet.';
+$ec_lang['lpn_lock_age_unknown']='There is no record of how long it has been in use, or when it was last saved or edited.';
+// Four answers now, in Tom's own order, so the prose and the button row read the same way.
+// **IN THE BUTTON ROW'S OWN ORDER** (2026-09-17): Ask, Open read-only, Break lock. The prose and
+// the row have to read the same way down the page, or the sentence a person is reading is about
+// a different button from the one their eye has landed on. Cancel is not described, because a
+// Cancel that needed a sentence would not be a Cancel.
+$ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.';
+$ec_lang['lpn_lock_ask']='Ask';
+// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
+// this computer for it, which is the whole point of moving the question here.
+$ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
+$ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
+$ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
+// The other end of the back channel, shown to the holder.
+$ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
 $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
@@ -1915,7 +1999,7 @@ $ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You 
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
 $ec_lang['lpn_lock_storage_error']='Beware: this site cannot save lock records, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here — the lock folder is not writable by the web server.';
 $ec_lang['lpn_lock_full_error']='Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.';
-$ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.';
+$ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This project has no identifier yet, and saving it to a file gives it one.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this file is now yours to save to.';
 $ec_lang['lpn_lock_dismiss']='Hide this message';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
@@ -1933,8 +2017,6 @@ $ec_lang['lpn_file_training_permission']='The first time you save, your browser 
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_3']='Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
-$ec_lang['lpn_file_training_name']='Your initials';
 $ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
@@ -2062,6 +2144,16 @@ $ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve 
 $ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
 $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
+// **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
+// own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
+// The other two are the progress readout, which is a whole sentence of its own so a language can
+// put the number where it belongs. There is no invented percentage: where the transfer does not
+// state a total, the kilobytes are reported instead and the reader is told why.
+// The bar under that sentence is named for a screen reader, which cannot see it fill.
+$ec_lang['lpn_engine_bar_label']='Solver loading progress';
+$ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
+$ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
+$ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
@@ -2388,6 +2480,62 @@ $ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web br
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
+// **THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Tom's own sentence is the tip, because the
+// point of these rows is that the project's own numbers are untouched, which is the whole of what
+// separates this from the placement wizard that converts a project.
+// **ONE ROW WITH A SUBMENU, BUILT TO MATCH Background image** (Tom, 2026-09-18: *"Change Map,
+// Custom georeference to Map, World map... (to be parallel with Background image). And can it have
+// a submenu with Attach (at top), Move, Scale by picking, Scale from the current size..., Detach,
+// similar to the Background map submenu."*). The two rows this replaces named the WIZARD and named
+// the UNDOING of it, which is a pair of commands rather than a thing; a picture behind the drawing
+// and a map behind the drawing are the same kind of thing to a reader, so they read the same way.
+$ec_lang['lpn_map_attach_menu']='World map…';
+$ec_lang['lpn_map_attach_tip']='Attach the world map to this project without changing it any other way.';
+$ec_lang['lpn_map_attach_add']='Attach';
+$ec_lang['lpn_map_attach_readjust']='Re-adjust';
+$ec_lang['lpn_map_attach_readjust_tip']='Return to Step 2 of the map attachment process.';
+$ec_lang['lpn_map_attach_scale_from']='Scale from the current size…';
+$ec_lang['lpn_map_attach_scale_from_prompt']='Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
+$ec_lang['lpn_map_attach_scale_from_bad']='Type one number greater than zero.';
+$ec_lang['lpn_map_attach_scale_from_done']='The map is resized, and your drawing and every coordinate in it are exactly as they were.';
+$ec_lang['lpn_map_attach_none']='There is no world map attached to this project yet. Use Map, World map, Attach first.';
+$ec_lang['lpn_map_attach_remove']='Detach';
+$ec_lang['lpn_map_attach_remove_tip']='Take the world map away. The drawing and its coordinates are untouched either way.';
+$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.';
+$ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is exactly as it was.';
+// **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
+// dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
+// never converting a coordinate, so every sentence below says what stays still as well as what
+// moves: the drawing does not move, the ground does.
+$ec_lang['lpn_mapgeo_replace']='This project already has the world map attached. Replace that georeferencing?';
+$ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.';
+$ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
+$ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
+$ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
+$ec_lang['lpn_mapgeo_hint2']='Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_gestures']='Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.';
+// ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
+//
+// **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
+// objection: *"The map is practically infinite. There is no way to visually enlarge it or reduce
+// it. The rectangle is a poor metaphor (and isn't working anyway). And the scroll wheel is
+// discrete, not continuous."* A corner handle is a grip on a bounded object and the ground has no
+// bounds, so the rectangle was never a picture of the thing it was resizing.
+//
+// **AND THE MIDDLE IS WHERE STEP 1 LEFT IT.** He asked for *"a slider for scale with 1 (from step
+// 1) in the middle"*, so the readout is a factor and not a distance: it says how much bigger or
+// smaller the ground is than the fit already agreed, which is the only quantity a person can judge
+// by looking. The band is narrow on purpose and a wider move is the rectangle's job, or Map, World
+// map, Move, which is the pick-it-up-again door.
+$ec_lang['lpn_mapgeo_dial_turn']='Turn the map';
+$ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
+$ec_lang['lpn_mapgeo_dial_size']='Map size';
+$ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
+$ec_lang['lpn_mapgeo_place']='Place approximately';
+$ec_lang['lpn_mapgeo_finish']='Georeference here';
+$ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
+$ec_lang['lpn_mapgeo_locked']='Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
@@ -2662,7 +2810,7 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
+$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe carries a minor (local) loss, the two solvers disagree in the last digits: EPANET rounds the value it uses for gravity, so its minor losses come out very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
@@ -2693,7 +2841,6 @@ $ec_lang['lpn_control_dangling_note']='These controls refer to an element that i
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
-$ec_lang['lpn_engine_minor_loss_note']='Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
@@ -2840,20 +2987,14 @@ $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-// **IT STATED A CAUSE IT NEVER MEASURED, AND TOM HAD TO SAY SO TWICE** (2026-09-05: *"Message is
-// wrong, I think. Automatic recalculation is turned off by the user. When else would this shown?
-// This is the second time I mentioned this."*). It read "This network takes so long to calculate
-// over its whole time period that ..." -- but `EC.lpnTimeStatusNote()` consults no timing at all.
-// Its whole gate is `!autoRunAllowed()`, which asks ONE question: did the user turn the checkbox
-// off. So a small fast network whose owner unchecked that box was told its network was slow.
-//
-// The page does measure speed elsewhere and says so honestly: `adviseIfSlow()` writes
-// `lpn_time_run_slow` when a completed run passes `LPN_TIME_SLOW_MS`. That is ADVICE about a
-// measurement. This note is a statement about a SETTING, and it now says which setting, because
-// that is both the true cause and the one the reader can act on.
-// Full record, including why the row could not be closed as a wording question:
-// `dev/eps-terminology-audit.md` section 5.
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
+// **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
+// `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
+// LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
+// but the later time steps, and Tom read it as the defect it was: *"when Recalculate is off, the
+// first time step is still calculated. This is bad. Off means off."* Off now means off -- an edit
+// with the box unticked solves nothing at all -- so there is no such state left to describe, and
+// nothing replaced it: the last answers simply stay on screen until the reader presses Calculate.
+// The measurement and the new gate: scheduleSolve() in js/looped-network.js.
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
@@ -3524,9 +3665,12 @@ $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. The results below are the ones already finished.';
 $ec_lang['lpn_ff_cost']='This run solved the whole network {solves} times.';
-// The results are about the network as it stood when the run finished, so an edit clears them
-// rather than leaving a picture of a system that no longer exists.
+// The results are about the network as it stood when the run finished. Opening a different network
+// still clears them; an edit to THIS one no longer does (Tom, 2026-09-21) -- the user decides when
+// to look at fresh rings, with the Clear button below for whenever they want to do it themselves.
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
+// Clears the rings on purpose -- the reader's own decision, not news the page has to break to them.
+$ec_lang['lpn_ff_clear']='Clear rings';
 // **COUNTED THE SAME WAY THE ROWS ARE READ, or the summary contradicts the table above it.** The
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than

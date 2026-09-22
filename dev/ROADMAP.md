@@ -73,7 +73,7 @@ the block.
     SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
-- 75|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
+- 100|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
   **PHASE 1 SHIPPED 2026-09-16: the solve and the label layout are kept, and the switch is 38%
   faster.** Measured in real Chrome on the geographic Net3 at his own zoom: **636 ms to 395 ms
   median**, `lblPlace` 210 ms and `fontSizes` 65 ms gone entirely, **label passes 1 -> 0 and label
@@ -116,7 +116,7 @@ the block.
     changed" already exists for the dirty asterisk. That alone does not fix the delay -- Tom
     measured that turning auto-run off changes nothing -- but it is waste with a cheap remedy.
 
-- 75|681| **Economize the label layout: it is half the cost of a project switch.**
+- 100|681| **Economize the label layout: it is half the cost of a project switch.**
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
     switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
@@ -159,7 +159,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 
-- 75|682| **Zoom on a PC with no wheel, and from the keyboard.**
+- 100|682| **Zoom on a PC with no wheel, and from the keyboard.**
   Tom, 2026-09-17: *"How would a person zoom on a PC without a mouse wheel or, for that matter,
   with a keyboard (if that's not too much to ask). Interesting question, nonetheless."*
   - **THIS IS TASK 674's DEFECT IN ANOTHER CONSTRUCT and that is why it is at 75 rather than 25.**
@@ -231,28 +231,7 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 75|687| **The lock dialog's destructive button sits beside Cancel.**
-  Tom gave the four-button order twice and differently -- 2026-09-14 put **Break lock** second to
-  last, 2026-09-17 put it second -- then handed the question to Ida: *"I am not clear on that point,
-  and I can accept findings from Ida."*
-  - **SHE REJECTED BOTH AND PROPOSED A THIRD: Ask, Open read-only, Cancel, a gap, then a marked
-    Break lock.** Three reasons, and the first is mechanical rather than aesthetic: **the first
-    button takes keyboard focus**, so a bare Enter or a fast double-click hits it -- which is why
-    both of his orders were right to lead with Ask. The two look-but-do-not-touch choices then sit
-    together. **And Cancel belongs BEFORE Break lock**: in the shipped order the destructive answer
-    is one seat from Cancel, where a startled click or Tab-Tab-Enter reaches it.
-  - **A caution glyph on Break lock's label**, the same one the verdict strings already use, so it
-    costs nothing to translate.
-  - **THE "NEVER RESTYLE ONE BUTTON" RULE DOES NOT GOVERN HERE, and she argued it rather than
-    asserting it.** That rule exists because Accept and Reject are two equally legitimate answers, so
-    dressing one up is a dark pattern. Here one of four choices can genuinely force a colleague to
-    redo work by hand: marking it is disclosure, not persuasion. Nothing is hidden and nothing is
-    made harder to choose when it is the right answer, which it sometimes is -- the colleague who
-    has gone home for the weekend.
-  - Built on `feat/lock-initials-later` in the order he gave last; this is the change to make before
-    that branch merges. `dev/agents/interface-designer/journal.md`, 2026-09-17.
-
-- 75|685| **Name every unit dropdown for a screen reader.**
+- 100|685| **Name every unit dropdown for a screen reader.**
   **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
   survey's finding.
   - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
@@ -266,16 +245,6 @@ the block.
     field's own existing label, already written and already translated 26 times. If a design turns
     out to need new words, stop -- that is a different decision and a different price.
 
-- 75|689| **Undo does not work inside a table, only on the map.**
-  Tom, 2026-09-17, testing `674-coordinate-entry`: *"Checking this on the Junctions Table, I can copy
-  and paste from two cells to two cells. But I can't Ctrl+Z within the table. I must move cursor to
-  the map for Ctrl+Z to work."*
-  - **THE UNDO EXISTS AND THE TABLE CANNOT REACH IT**, which is worse than having none: a person who
-    has learned that Ctrl+Z works here presses it after a bad paste and nothing happens. Find where
-    the keydown is bound and why the table pane is outside it; the map's own binding is one of only
-    two this page has outside a text field.
-  - Paste itself works, which is what makes this a sharp edge rather than a gap.
-
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
@@ -286,17 +255,31 @@ the block.
     undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
     hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
     whatever `tables-interface` already holds.
-  - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
-    tables is the defect inside that programme. Read it before opening anything new.
-  - At 50 because he named it as long-term, not next. Promoting it is his call.
+  - **`tables-interface` IS RETIRED, 2026-09-21, AND EVERYTHING IT HELD IS THE FOUR BULLETS BELOW.**
+    It was one commit off master, made 2026-09-14, holding nothing but a roadmap block -- and that
+    block numbered itself **666**, which was closed the same day for an unrelated lock defect, so
+    the branch could not have passed `roadmap_id_check.php` and could never have merged. It sat for
+    a week. The work itself is live on `feat/tables-spreadsheet`; only the reasoning was stranded,
+    and it is salvaged here rather than deleted with the branch.
+    - Tom, 2026-09-14: *"Tables spreadsheet editing: Copy/paste doesn't work right. We need a
+      tables-interface branch that may be a long-term tweaking project to include column-widths,
+      copy/paste, etc."*
+    - **COPY AND PASTE IS THE DEFECT; THE REST IS THE PROGRAMME.** Fix it first rather than let it
+      wait on the long work -- a broken paste is the `data-entry-clerk`'s whole day. Also named the
+      same day: user-resizable columns, headings that do not wrap, columns too wide.
+    - **THE TABLE IS AN EDITOR OF THE DOCUMENT, NOT A GRID**, and that shapes all of it. Cells write
+      through `setProp()` (`scenario_seam_check.php`), a blank is a STATE not a zero where a column
+      declares `blank`, and `multiGroups()` builds the multi-properties box from these same specs.
+      **So a paste is a batch of validated property writes under one undo snapshot; getting that
+      wrong is silent inside a scenario.**
+    - **Shares the bottom pane's tab strip** with anything else that writes it, so name that seam in
+      any brief or sequence the tracks.
 
-- 75|691| **Banner messages are annoying, and one of them is a trap.**
+- 100|691| **Create a better error and notice messaging system.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
   'Something wrong here?' just because I wanted to dismiss a banner. The QGIS paradigm would be
   nice. They show lots of error messages."*
-  - **THE ACCIDENT IS THE FINDING, not the annoyance.** A banner whose only obvious gesture is a
-    LINK that files a report means the cost of dismissing it is sending us something. He did exactly
-    that, at a meeting. **A dismiss must be reachable without passing through an action.**
+  - **USER MUST HAVE CONTROL OVER MESSAGES.** A message that dismisses itself is bound to leave too soon for one user and to late for another.
   - **THE QGIS PARADIGM HE NAMES IS A MESSAGE LOG**, not a banner: messages accumulate in a panel a
     person opens when they want them, with the newest surfaced briefly and then filed rather than
     held on screen awaiting a click. That also answers a second thing this page needs -- a refused
@@ -306,7 +289,7 @@ the block.
     and Task 622. **616 is the same idea arriving from the other direction** and should probably be
     folded in here rather than left parked separately; that is his call, not ours.
 
-- 75|688| **File, Convert units as: US to work in, SI to hand over.**
+- 100|688| **File, Convert units as: US to work in, SI to hand over.**
   Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
   are done, we want to convert to SI for the community."* Put to him that this collides with a rule
   he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
@@ -330,23 +313,9 @@ the block.
     be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
   - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
     original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
+  - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
 
-- 100|692| **Satellite view is refused on a projected project, and it is the DEM bug again.**
-  Tom, 2026-09-18, after making projects in Mesa AZ and Fotobi, Ghana: *"Satellite view is only
-  available for lat/lon CRS."*
-  - **IT IS THE SAME SINGLE WORD THAT BROKE Read DEM, IN THE CONTROL NEXT DOOR.** The satellite row
-    is gated on `isGeoProject()` (`js/looped-network.js:9378` and `:25968`), which means lat/lon and
-    nothing else. The elevation controls asked the same question until 2026-09-14, when `cc894f98`
-    replaced it with **"can this project say where on the Earth a point of it is"** --
-    `projectLocatable()` -- precisely because the row appeared on a projected project and then did
-    nothing. **That fix was applied to its own three entry points and not to its neighbour.**
-  - A project on an EPSG plane knows exactly where it is on the Earth; that is what the plane is for.
-    There is no reason a satellite tile cannot be drawn behind it.
-  - **SO THE REAL TASK IS WIDER THAN THE SYMPTOM: find every OTHER reader of `isGeoProject()` and
-    ask, of each, whether it means "lat/lon" or means "locatable".** Two have now been wrong for the
-    same reason, which is the signature this project keeps finding.
-
-- 75|693| **"Length and map coordinates" is a lie on an EPSG project.**
+- 100|693| **Separate Length and Map coordinates units**
   Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
   Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
   Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
@@ -419,8 +388,24 @@ the block.
     is *"no longer the default way to georeference"* -- the default is the Custom georeference wizard
     that changes no coordinate at all. **This is the dabbler action, offered because we already built
     and debugged the wizard, and not recommended in most situations.**
-
-- 50|697| **EPANET++ as a competing front door, on its own two domains.**
+  - **REOPENED BY TOM 2026-09-21: THE PARADIGM IS OBSOLETE AND THE WORDING IS NOT HIS.** *"Needs
+    some work on a feature branch with Branch review. Its paradigm is obsolete."*
+    - **(1) IT STARTS WITH COORDINATE SYSTEM SELECTION**, not with what it starts with now. And:
+      *"the wording of this is not what I carefully edited. You claimed to have found in transcripts
+      and documented my en edits about Projection and CRS, but I can't find them implemented
+      anywhere."* **GO AND FIND THOSE EDITS AND IMPLEMENT THEM, or say plainly that they cannot be
+      found** -- `dev/tom-coordinate-vocabulary-2026-09-16.md` is where they were recorded, and the
+      standing rulings there are that we no longer expose the word *projection*, and that
+      georeferencing means attaching the world map rather than converting a coordinate system.
+      Claiming to have documented his edits and then not implementing them is the failure to own
+      here.
+    - **(2) A PROJECT THAT ALREADY HAS A WORLD MAP ATTACHED ALREADY KNOWS WHERE IT IS.** His words:
+      *"If a project already has an attached World map (custom or unnamed georeference), the next
+      step (placement step 1) uses our current georeferencing. In fact, we could just convert the
+      project to their selected CRS without further question. But we step them through Steps 1 and 2
+      in case they want to make any changes."* So the steps stay, and they open ALREADY ANSWERED
+      from the existing attachment rather than asking again from nothing.
+- 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
   - **BOTH DOMAINS ALREADY EXIST ON THE ACCOUNT** -- `~/addon_html/epanet-plus-plus.org` and
@@ -441,49 +426,7 @@ the block.
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
 
-- 100|698| **Ask for initials once per browser, keep them, and name the holder.**
-  Tom, 2026-09-18, **correcting a decision this repository had recorded wrong**: *"I guess there was
-  a misunderstanding. What was always undesirable was (1) being asked to provide your initials the
-  first time you save, because that could be confused for a registration request and (2) being asked
-  to provide your initials every time because that's rude. It was never desirable to avoid saving
-  the initials or to keep prompting. In other words, you interpreted and recorded the decision wrong
-  when you wrote 'sent, never stored -- that is the whole point.' That doesn't avoid a login feeling.
-  Removing the prompt avoids it. So I say yes to storing User B initials and using them when they
-  take the role of User A."*
-  - **THE OBJECTION WAS ALWAYS TO THE PROMPT, NEVER TO THE STORAGE**, and the two were conflated in
-    `js/looped-network.js` as a rule. **Not storing them meant prompting every time, which is the
-    second thing he called undesirable** -- so the misrecording did not merely mis-describe the
-    decision, it built the opposite of it.
-  - **SO: ask once per browser, keep the answer, and use it when this browser HOLDS a file** -- the
-    colleague who finds a file locked is told who has it rather than "somebody". That recovers, in
-    his words, *"some (just a little) of our old functionality where we can say A has this file
-    open."*
-  - **THE WRONG-NAME ANSWER IS HIS OWN and it must ship with the storage, not after it:** *"When we
-    stop a user B from opening a file, and when we ask a user A to close a file, we can say, 'We have
-    you listed as ABC. If that's wrong, you can change it.'"* A confidently wrong name on a
-    break-the-lock dialog is worse than an honest "somebody", and Ida noted the live site already has
-    this problem -- it asks once, ever, and reuses the answer with no re-check.
-  - **NO NEW CONSENT QUESTION AND NO BANNER REWRITE** (Ida, 2026-09-18, with the reasoning rather
-    than the assertion): this is user-input storage for a feature the person is actively using, which
-    is the same exemption the suite already applies to a name plus an anonymous token. Read
-    `dev/cookie-storage-inventory.md` before adding a key, and add it there.
-  - Belongs on `feat/lock-initials-later`, whose one-paragraph panel and button order Tom has
-    already approved and which must not change.
-
-- 100|686| **The progress bar finishes before the work does.**
-  Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
-  progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
-  progress bar until all the output is available."*
-  - **THE DEFECT IS THE BAR, NOT THE MILLISECONDS.** Reading the reaction rate out of the engine's
-    binary output costs 234 ms on Net3 over 24 hours -- but it runs on the main thread AFTER the run's
-    own progress bar has already reached the end, so it reads as the page hanging rather than as the
-    run still working. **He was offered "accept it" and "hide the rate on big networks" and rejected
-    both**, which was right: neither addresses a bar that lies, and both get worse as networks grow.
-  - Reserve a share of the bar for the read -- his guess is 10% and a guess is explicitly fine -- and
-    do not complete it until the output is in hand. Then the cost stops mattering at any size.
-
-
-- 75|679| **Narrower strokes on the About mark, and more pixels used.**
+- 100|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
   the outlines."*
@@ -502,8 +445,7 @@ the block.
     "more surfaces" means here:** *"possibly more realistic leg thicknesses and catwalk rendering,
     where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
     elements, not a line -- that is the drawing note, and it is his, not ours.
-
-
+  - **Part of the one water-tower piece of work with Tasks 645 and 648** (Tom, 2026-09-21).
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -661,89 +603,7 @@ the block.
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
 
-- 100|646| **Attach the world map to an XY project without changing the project.**
-  **THE BRANCH ABSORBED `projection` ON 2026-09-18 AND `projection` IS DELETED**, on Tom's own call:
-  *"Maybe we could merge projection into it and then delete projection? The merge may require some
-  manual conflict resolution. But I think it's the right paper trail."* One branch,
-  `feat/xy-world-map`, now holds every piece of the coordinate work, and Task 641 is part of it.
-  - **AND THE BRANCH'S REAL SPECIFICATION IS `dev/tom-coordinate-vocabulary-2026-09-16.md`**, which
-    is his own 17,000-word message recovered from a session transcript on 2026-09-17 after he asked
-    where it had gone. It had never been written to a file. **It is bigger than this task's title**:
-    *"We no longer want to expose the word 'projection'"*, and *"Georeferencing is still
-    georeferencing, but it means to attach the world map, not to convert your coordinate system."*
-  - **HIS WIZARD, IN THREE STEPS, stated twice because the first time was not recorded:** show the
-    world map with the project near 0,0, both zoomed to fit; let the user zoom, pan, search by name
-    or Go to, until they press **Place approximately**; then a drag-scale-rotate rectangle that moves
-    **the map, not their project**, until they press **Georeference here**; then the status bar reads
-    **unnamed**.
-  - **"unnamed" ANSWERS TWO THINGS AT ONCE AND THAT IS DELIBERATE** (Tom, 2026-09-17, correcting a
-    recommendation of ours that it should answer one): the three status values are `{EPSG name}`,
-    **unnamed**, and **not georeferenced** -- where *unnamed* means georeferenced but not to any named
-    CRS, *"probably only an approximate anchor point and convergence angle from our UI."*
-  - **THE 65 STRING EDITS SPLIT THREE WAYS** (measured 2026-09-17, and he approved the split): 17
-    already match master; **13 are pure vocabulary on shipped controls and go to master**, because an
-    EPSG projected CRS genuinely IS a coordinate reference system and renaming it is not a lie; **2
-    would be a lie on master** (`lpn_file_import_geo` and `lpn_new_coordsys_local_tip` describe
-    behaviour master does not have) and wait for this branch; and **33 `lpn_transform_*` are the
-    wizard** and belong here by definition. The 13 include `lpn_geomap` and `lpn_xymap`, which are the
-    canonical mode names `mode_name_check.php` holds every other string to, so they move as one
-    coordinated pass and the check guarantees it cannot be half-done.
-  - Cost of the master half, so it is not a surprise: about 390 retranslations.
-  Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
-  background with a good wizard. Our Map menu can have a new Background map (georeference) 'Attach
-  the world map to this project without changing it any other way.'"* That sentence is the feature
-  and very nearly the tip.
-  - **THE POINT IS THAT THE PROJECT DOES NOT MOVE.** Task 641 makes a coordinate system PERMANENT
-    because converting one is a dabbler action; this is the opposite door and is safe for exactly
-    that reason -- it attaches a backdrop to a drawing whose own numbers are untouched. It is
-    therefore NOT a conversion and must never become one.
-  - The machinery exists: `georefStart()` is the two-point place-on-the-map wizard, and the second
-    radio of Tom's new-project box already promises this in its tip (*"attach your own background
-    image or the world map or adjust the attachment at any time from the Map menu"*), so the promise
-    ships before the menu row does. Close that gap.
-  - Read with Task 497 (basemap tiles, `js/lpn-terrain.js`) and CLAUDE.md's third-party section: a
-    tile request is consented and gated, and attaching a backdrop must not walk past that gate.
-
-- 75|665| **Make draggable and resizable the standard for a standing box.**
-  Tom, 2026-09-13: *"All boxes are better if they are draggable and resizeable. Can we just say that
-  is standard?"* **The interface-designer seat says yes, conditionally, and supplied the condition as
-  a rule that needs no further judgement call** (`dev/agents/interface-designer/journal.md`):
-  - **DECIDE DRAG AND RESIZE TOGETHER, OFF WHETHER THE BOX IS MEANT TO STAY OPEN BESIDE THE MAP FOR
-    MORE THAN A MOMENT.** A standing panel gets both. An `openDialog()` MODAL gets neither: it exists
-    to be answered and dismissed, and its long content already scrolls rather than resizes. That line
-    is one this codebase already draws elsewhere, so the rule describes the tree rather than
-    reforming it.
-  - **The infrastructure is already general**: `makePanelDraggable()` and `addPanelResizeGrip()` are
-    shared by Settings, Libraries and four report boxes, so a new standing box costs about four
-    lines, not a redesign.
-  - **THE SURVEY, measured 2026-09-13: 10 of the page's 14 standing boxes already drag and 7 already
-    resize.** `wireBoxMemory(box, key, layout, save, isOpen)` does the drag, the resize grip, the
-    touch half and the remembered layout together, so the standard mostly describes the tree already.
-    **Four boxes are left**: New project, Geographic projection, About, and Notes. Each costs a
-    `.lpn-setbox`-shaped shell in CSS (`resize: both` needs a non-visible overflow and a
-    `.lpn-popover-body` to scroll), one `wireBoxMemory()` call, one furniture key and one row in
-    `dev/cookie-storage-inventory.md`.
-  - **NOTES IS THE ONLY ONE WITH REAL VALUE IN IT** -- it holds the user's own text and can be long.
-    About is short and the two wizards are answered and gone, so for those three this is consistency
-    rather than need. Do Notes; decide the rest on whether consistency is worth three furniture keys.
-  - **THE MENUS ARE THE DECLARED EXCEPTION and the reason is already written** in `css/engcalcs.css`
-    beside `.lpn-dragpanel`: a menu hangs off a button and is dismissed by clicking away, so dragging
-    one is a gesture with nothing to return it. **That is the same line the interface-designer seat
-    drew from the other side** -- a standing box stays until it is closed -- so two independent
-    readings agree on where the standard stops.
-  - **BUT EVERY NEW DRAGGABLE BOX IS A NEW FURNITURE KEY**, and that is the per-box cost that is not
-    zero: `localStorage` only, never `serializeProject()` (`lpn_furniture_check.php` is blocking,
-    Task 584), and `storage_inventory_check.php` requires it be documented. **It is NOT new consent
-    surface** -- furniture is what the visitor asked for by moving the box -- but it is a line in
-    `dev/cookie-storage-inventory.md` every time.
-  - **A draggable box on a PHONE is a liability**, not a feature: there is nowhere to drag it to, and
-    one dragged half off a small screen is unrecoverable without a reset. The existing phone guards
-    stay, and any new grip inherits them.
-  - **ONE EDGE CASE IS TOM'S:** the custom property design surface is editor-shaped but currently
-    lives in the modal family. If the key-plus-expander lands (Task 636's refinement), the question
-    disappears; if the popup stays, he decides which family it belongs to.
-
-- 75|647| **A project that is whole but entirely off screen should say so.**
+- 100|647| **A project that is whole but entirely off screen should say so.**
   Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
   on the map and alert that project is intact, but entirely outside the current view?"*
   - **THE ARITHMETIC ALREADY EXISTS AND IS NOT WIRED TO A MESSAGE.** `viewShowsModel()`'s third leg
@@ -804,7 +664,7 @@ the block.
     simplifies as a side effect: `worktrees/<branch>` Aliased, with no stand-in parent directory
     whose only job is to make `/engcalcs/...` resolve.
 
-- 50|648| **The About icon's outlines are too heavy for its scale.**
+- 75|648| **The About icon's outlines are too heavy for its scale.**
   Tom, 2026-09-13, closing out the icon work: *"the About icon has outlines unduly heavy for its
   scale, and it can be adjusted to look right (appropriate stroke width) for that scale, which could
   open up additional detail on the roof and belly shading and the legs and catwalk."*
@@ -813,8 +673,8 @@ the block.
   - `dev/icon-preview/gen-about-icon.js` is the generator; the shading rule the whole mark follows
     is in `ship-notes.md` (one light above, three surfaces, and the shading follows the SOLID).
     Do not re-open the geometry: Tom on the favicon, *"my one true love."*
-
-- 50|185| **Match/Copy properties tool (originated during Task 146).**
+  - **Part of the one water-tower piece of work with Tasks 645 and 679** (Tom, 2026-09-21).
+- 25|185| **Match/Copy properties tool (originated during Task 146).**
   **DROPPED TO 50 BY TOM, 2026-09-17** (*"Task 185: Demote to 50"*), which supersedes the
   promotion below rather than cancelling its reasoning: the feature is still wanted, nothing is
   waiting on it.
@@ -861,40 +721,30 @@ the block.
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
-- 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+- 100|247| **Customers: metered demands, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
-  EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
-  - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
-    adding Customer account numbers, and these are meters on the system. Not sure where this is
-    headed, but let's at least think that way. And of course I assume that we lump the Customer
-    demands additively at their nearest (by length) node. Graphically, I think you pick a point, it
-    draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from the meter
-    to the pipe."*
-  - **Task 468 is a PREREQUISITE, not a sibling** — a Customer is one of its demand rows extended,
-    and 247 must not invent a second breakdown structure. Shares the attach-to-a-link-at-a-fraction
-    seam with Task 502.
-  - **Recommended first slice: an account number on a 468 demand row, no geometry** — it settles the
-    `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
-  - **The account number is a label on a demand, never a key into anything**, and it is the first
-    personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
-  - **AND IT IS NOT A CUSTOM PROPERTY, so 636 DOES NOT BLOCK THIS** (Tom, 2026-09-12: *"epanetjs.com
-    doesn't really have 'account number'. They just have the asset id, like any node, so it's not
-    absolutely necessary to have a custom property to get Customer working."*). This corrects a
-    recommendation made the same day that Task 636 land first so an account number could BE a custom
-    property. It can, later, and the gain would be real; what is wrong is treating it as the way in.
-    An asset id already identifies a meter, exactly as it identifies every other element.
-  - **CONCURRENCY: everything here except the shared field seams can run beside 636.** The three
-    places they collide are `pushSpecList()` (one source of truth for writable properties, 8
-    callers), the Properties popup's `BAND_NODE`/`RESULT_NODE`, and the Tables pane's columns. The
-    geometry -- the meter symbol, the perpendicular leader, the `linkAnchor {link, t}` handle, the
-    nearest-node lumping -- touches none of them. **Sequence only the field work; let the drawing
-    surface proceed.** Also shares the coordinate frame with Task 641, so the lumping arithmetic
-    waits on whatever 641 decides about the drawing plane.
-  - **Tom ruled the open questions 2026-08-24 — `dev/customer-demands.md` §7 has all of them.** The
-    two that change the build: a meter carries a **Count** (so *forty-two residential services* is
-    one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
-    `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
-    **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
+  EPANET does not. **Design, his rulings, and what is built against what is not:
+  `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
+  left is his call.**
+  - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
+    connector, the two-click gesture and its one-click door, the **Count** (so
+    forty-two residential services are one symbol), the derived junction,
+    the detached state, a Customers tab, and the `.inp` answer.
+    `dev/lpn-spike/customer-harness.js`, 66 assertions.
+  - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
+    labels, the ramp, the Tables column, the popup's resolved Demand and both solvers pick a meter up
+    without knowing what one is. **The junction is DERIVED** -- the nearest end measured ALONG the
+    pipe, a different end from the nearest in a straight line on a bent one. **Additive: nothing a
+    meter does rewrites a number the user typed on a junction.**
+  - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
+    row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
+  - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
+    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
+    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
+    here is a pointer gesture no harness can hold.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
@@ -936,6 +786,22 @@ the block.
     changes nothing by itself.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
     may not hide a hand-placed label.** They are named by id in the harness and that is correct.
+  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
+    don't understand why we are spending effort on the rings model instead of giving the spot-prime
+    box model a good college try."* **The honest answer is that of his four steps only step 4 was
+    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
+    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
+    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
+    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
+    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+    The rings work got the effort because it was reachable. That is a reason about us, not about
+    the two models.
+  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
+    gap between its pipes is already computed and already survives a zoom, and the code then throws
+    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
+    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
+    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
+    found, which is the thing he asked to be told.
   - **What is deliberately NOT built, each for a stated reason rather than a shrug** (§12b): the
     tile-indexed precomputation of spots, because free space is a per-VIEW quantity and an index of
     the drawing cannot answer it; and `text_size_largest_perfect_fit`, which is an automatic text
@@ -1028,7 +894,7 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
-- 75|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
+- 100|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
   2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
   responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
   BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
@@ -1039,8 +905,21 @@ the block.
   label engine, which is why this is its own task and not a patch. The user-visible half is that
   the box is rebuilt under an open dropdown, so the control reads as broken rather than as slow --
   `refreshLabelText()` has 40 call sites and coalescing it into a frame is the shape of the fix.
-
-- 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
+  - **TOM, 2026-09-21, OFFERING A DIFFERENT SHAPE ENTIRELY:** *"Maybe we could make everything
+    better by making label placement a background service? You get what you get until better is
+    available?"*
+    - **It is a real proposal and it changes the acceptance test rather than the algorithm.** Today
+      a pass must finish before the drawing is right, so every improvement to the search is paid for
+      in waiting. As a background service the drawing is never blocked: labels appear where the last
+      answer put them and improve as a better answer arrives.
+    - **What it buys is the thing three tasks are separately chasing** -- 680's keep, 681's
+      economies, 683's per-zoom bank -- because none of them matters if nobody is waiting.
+    - **What it costs is honesty about motion.** A label that improves after you have started
+      reading is a label that MOVES under your eye, and his own standing worry about banked
+      placements is exactly that: they jump, and the likeliest moment is the half-second before a
+      tap. So the design question is not whether it can run in the background; it is **what is
+      allowed to change once a reader is looking at it.**
+- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
@@ -1059,37 +938,6 @@ the block.
   - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
-
-- 100|608| **Fetch the engine before somebody's first solve needs it.**
-  **RAISED TO 100 AND THE [H] TAG REMOVED BY TOM, 2026-09-18: *"I see no human tasks pending.
-  Reframe this and raise to 100."*** He is right -- the decision this was waiting on is already
-  made in the block below, and what remains is building.
-  Task 605 made EPANET the default, so a first-time visitor now fetches `js/vendor/epanet-js.js`
-  on their FIRST SOLVE rather than on opting in. **A blanket precache is the wrong answer and that
-  half is settled**: it moves the cost to service-worker install, paid by every visitor to all
-  sixteen calculators including people who never open this page.
-  - **RESEARCHED 2026-09-06 by `market-researcher`** (its journal carries the citations, and flags
-    which numbers are secondary-source and must be re-verified before any public claim leans on
-    them). 664 KB floors at roughly **7 s on 3G and 21 s on 2G** before handshake, and in the
-    worst-priced data markets a megabyte is a measurable fraction of daily income. The population
-    this suite is written for is disproportionately there.
-  - **CHEAP AND INDEPENDENT OF THE REST: a percent-done indicator on that first fetch.** Nielsen's
-    response-time doctrine is explicit that past ten seconds a wait needs one or the reader leaves,
-    and this is a DELIBERATE CLICK rather than a page load, which is the more forgiving case
-    provided the wait is legible. Buildable now, needing nobody.
-  - **THE THIRD OPTION THE FRAMING MISSED: a connection-aware idle prefetch, on this page only.**
-    `navigator.connection.effectiveType` and `.saveData` let the page ask the visitor's own browser
-    which cost is smaller, and prefetch after idle unless they are on 2G or have data-saver on.
-    **Chromium-only**, so Safari and Firefox get no signal and must fall back to today's behaviour
-    rather than to an unconditional prefetch.
-  - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
-    optimisation.
-  - **HE ANSWERED 2026-09-08** (numbering it 600, which is the plots task; the words are this one's):
-    *"I am open to your ideas. I am also open to putting up a banner 'Loading solver. Results
-    delayed momentarily. Continue working.'"* So the percent-done bullet above is authorized, and
-    the sentence he wrote is the sentence to use. **"Continue working" is the load-bearing half** --
-    it says the page is not frozen, which is the thing a wait most needs to say and the thing a bare
-    spinner cannot. The `[H]` stands on the connection-aware prefetch, which he has not ruled on.
 
 - 75|617| **More map view options, the opacity one having shipped.**
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
@@ -1186,36 +1034,6 @@ the block.
   - Measurements behind all of it: `dev/chrome-audit.md`,
     `dev/app-chrome-postdivorce-recommendations.md`, `dev/help-menu-mastermind.md`.
 
-- 100|626| **A refused beacon is retried like an offline one, 20 times.**
-  **TOM, 2026-09-18: *"This is all CC. Do something about it or remove it."*** Raised to 100 and it
-  is a defect with a one-line fix, not a question: a 4xx means the server READ the payload and
-  refused it, so re-sending the same bytes 20 times cannot succeed and only the retry count ends it.
-  `EngCalcs._sendOrQueue()` (`js/Calculators.lib.js`) queues on `!resp.ok` as well as on a thrown
-  fetch. A 4xx is not a connectivity failure -- the server read the payload and refused it -- and
-  the flush re-sends `record.params` VERBATIM, so the retry is byte-identical and so is the
-  refusal. One malformed beacon becomes 20 rejections: `flushQueue()` runs on every `online` AND
-  every `DOMContentLoaded`, so it is one per page load until `_QUEUE_MAX_ATTEMPTS` drops it.
-  Original design, shipped with Task 119 (`ce5533df`), never revisited.
-  - **THE SYMPTOM IS A CONSOLE ERROR ON A PAGE THAT DID NOTHING WRONG, DAYS LATER**, which costs
-    out of all proportion to the lost analytics row. Found 2026-09-10 in the console of a
-    work-loss specimen, where the only suite error was a `log-human-view.php` 400 and it took a
-    live fetch of both mounts to prove the page in front of us could not have sent it
-    (`dev/lpn-blank-map-incidents.md`). **A fossil in the log is worse than a silence:** it is the
-    first thing an investigator reaches for.
-  - **The fix is one condition; the judgement is where to cut it.** Retry a throw, a 5xx and a
-    429; drop a 4xx. That loses one event, which is the right price.
-  - Still unanswered: which page ever queued an EMPTY `page`. 400 fires on `$page === ''` alone,
-    and the app page emits `cookieName='Looped-Network'` on both mounts. Task 206 fixed this class
-    once for `contact.php`; any page loading `js/Calculators.lib.js` that calls neither
-    `echoCookieScript()` nor `echoPageNameScript()` still sends an empty name. **That set is
-    enumerable and nothing enumerates it** -- a check is the right shape.
-
-- 75|635| **A Zoom to button on the Properties box.**
-  Tom, 2026-09-12. Zooms the map to this element. **Use the My Location / Use Location icon**
-  (a circle with quadrant ticks pointing mostly inward) -- which `lib/Icons.lib.php` does not have:
-  `position` is a four-way arrow cross and `zoom` is a corner-bracket extents mark, so this needs a
-  new icon definition, not a borrow.
-
 - 75|637| **A Graph button on the Properties box.**
   Tom, 2026-09-12. Graphs the time series of the CURRENTLY FOCUSED property of the current element,
   in a new bottom-pane tab named for what it shows -- his example, `L435 Lake Trace`. The tab
@@ -1224,7 +1042,7 @@ the block.
   (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
   menu this belongs to and Task 599 is the plot itself.
 
-- 75|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
+- 50|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
   Tom, 2026-09-13, answering the projection brief's question about grid versus ground length:
   *"this is straining at a gnat while we are swallowing the camel of slope distance, pipe dips, pipe
   depth, some of which are trivial, but all of which are usually much more of a factor than grid to
@@ -1238,7 +1056,7 @@ the block.
     know."* Ask the `utility-planning-engineer` seat and a real surveyor before choosing between a
     factor and an increment; the difference matters to whoever has to defend a length in a report.
 
-- 50|645| **The app icon's legs are leggier than the favicon's.**
+- 75|645| **The app icon's legs are leggier than the favicon's.**
   Left open when Task 615 closed 2026-09-13, and flagged for Tom rather than decided. The app
   icon's legs are **21.5% longer relative to the tank** than `icons/favicon.svg` draws them.
   - **THE TWO RULES ARE MUTUALLY EXCLUSIVE AND THAT IS WHY IT IS OPEN.** A maskable icon must keep
@@ -1250,7 +1068,19 @@ the block.
     pair alone. `dev/icon-preview/ship-notes.md` has every measured distance.
   - **NOT urgent and possibly not worth doing:** Tom on the favicon, *"Favicon as it stands is my
     one true love."* Only the app icon is in question, and only when installed.
-
+  - **TOM 2026-09-21 TIES 645, 648 AND 679 INTO ONE PIECE OF WORK: the beauty of the LARGER water
+    tower.** *"promote to 75 and cross reference mutually and with 679 as a single task to work on
+    the beauty of the larger versions of the water tower icon. The app has a shortcut icon and a
+    splash screen icon that could be really beautiful, as can the Help, About icon. We want to
+    achieve more beauty and nostalgia for that small-town iconic water tower 'My home town water
+    tower', with realistic legs, catwalk, and maybe even seams and rivets for the installed app
+    splash screen."*
+    - **THE BRIEF IS NOSTALGIA, NOT FIDELITY**, and the phrase to design against is his own: *my
+      home town water tower*. Legs, catwalk, and at the largest size seams and rivets.
+    - **SIZE IS THE WHOLE POINT.** The small icon must stay legible at 16 px and is a different
+      drawing from the splash screen, which can carry detail. Do not let one drawing be scaled to
+      serve both -- that is what makes the big one look empty.
+    - See also Task 648 and Task 679.
 - 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -1348,7 +1178,7 @@ the block.
     **The action is to pick a month and call him**, and the introduction is the larger prize: EWB-USA
     reaches every chapter at once, which is the same leverage a faculty advisor has over a club.
 
-- 50|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
+- 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
   with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
@@ -1359,22 +1189,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-
-- 50|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
-  studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
-  (`alignedLabelAnchor()`) both shipped under Tasks 333 and 329; two pieces are left.
-  - **Auto-hide text that does not fit, as a rule we STATE rather than inherit.** Tom leans to two
-    separate toggles — *"Auto-hide map-sized text"* (or no toggle, and the answer is always no) and
-    *"Auto-hide screen-sized text"* (or no toggle, and the answer is always yes). The asymmetry is
-    the point: map-sized text shrinks with the drawing and its absence would be surprising,
-    screen-sized text stays put and collides. epanet-js hides NODE labels at one zoom threshold, all
-    together and apparently hard-coded — cruder than per-label fit, so beat it rather than copy it.
-    Interacts with Tasks 379, 377 and 399, which are the same question at other granularities.
-  - **Units as an optional suffix**, for anyone who wants epanet-js's behaviour. Not the default —
-    Tom: *"I personally don't see the need for units on a map when they are endlessly redundant. But
-    we could offer that."*
-  - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
-    future tidy-up does not quietly remove them in the name of matching.
 
 - 50|285| **We do not know what devices anybody uses this on.**
   Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
@@ -1434,7 +1248,7 @@ the block.
     questions in Task 530 could be answered by people rather than by search** — the emitter posture,
     and whether anyone models the assembly at all.
 
-- 50|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
+- 75|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
   Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
   frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
   and time series is Task 599, so this row is the remaining three.
@@ -1449,7 +1263,7 @@ the block.
     it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
     definition wrong here is a number a user would believe.
 
-- 50|601| **Calibration files: measured field data, against the model that predicts it.**
+- 75|601| **Calibration files: measured field data, against the model that predicts it.**
   Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
   Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
   - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
@@ -1463,7 +1277,7 @@ the block.
   - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
     computed series belong on one axis, and that axis is the time-series plot.
 
-- 50|604| **Read an EPANET `.PRO` profile file.**
+- 75|604| **Read an EPANET `.PRO` profile file.**
   It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
   Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
   dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
@@ -1479,7 +1293,10 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+- 100|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+  **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
+  performance win read as the bigger story: it is his top item *"because the network has to exist
+  first."*
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
   having read the clerk's wish list, *"I am sympathetic."* His conditions, which are the whole
@@ -1586,11 +1403,6 @@ the block.
   - **COORDINATE READOUT AT EXTREME LATITUDE** is Task 630's, and is noted here only so a reader
     of this block is not left thinking it was forgotten.
 
-- 50|632| **Animation speed control for the transport.**
-  Tom, 2026-09-12: *"Animation speed: We should add a control. Put on roadmap."* The transport
-  plays a run at one fixed rate today. A long period run crawls and a short one is over before it
-  reads.
-
 - 50|633| **The project tab strip, and whether it could collapse into the toolbar.**
   Tom, 2026-09-12, reasoned himself to the status quo in one paragraph and it is recorded so
   nobody reopens it cold: *"Maybe we don't need the Project tabs bar ... it could be a powerful
@@ -1631,7 +1443,7 @@ the block.
   - **AVOID running beside 640.** Graphs must offer a custom property in its selector, so it wants
     this list to exist before it is written rather than to invent a second one.
 
-- 50|639| **Layers: the first heading under Map and page.**
+- 75|639| **Layers: the first heading under Map and page.**
   Tom, 2026-09-12. A Layers sub-heading under `Settings > Map and page`, ABOVE Appearance, with a
   row per layer and the columns On/off, Opacity, Size (default), Color (default), Z.
   - **Phase 1 layers: Text, Symbol, Link, Flow arrow, Background.** Roadmap layers: Contour
@@ -1641,7 +1453,7 @@ the block.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
 
-- 50|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
+- 75|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
   **THE UMBRELLA, ON TOM'S WORD, 2026-09-15** (*"640 would make a nice umbrella"*). He asked whether
   there was an overall graphing project and there was not -- there were four unrelated rows. This is
   now the one place the programme is described, and the menu is where every plot surfaces, which is
@@ -1662,79 +1474,6 @@ the block.
       reached from the element rather than from the menu.
   - This row itself is the MENU, the tab shape and the export set. Full specification:
     `dev/graphs-scope.md`.
-- 50|641| **Choose a real EPSG projection in the new project box.**
-  Tom, 2026-09-12. Beside Unprojected XY and WGS 84 / Pseudo-Mercator lat/lon, the full GIS list.
-  The status bar then shows the projection name (or *not georeferenced*) beside Northing and
-  Easting -- or X and Y, or Lat and Lon -- and the scale.
-  - **A PROJECT CANNOT CHANGE ITS PROJECTION**, deliberately, unless an import conversion wizard is
-    built: *"We don't want this to be a dabbler action."* The one door is `Open an xy file on the
-    map`, which becomes **Open and convert coordinates...**.
-  - **CONCURRENCY: this and Task 636 are the safe pair, and they are running now** (Tom, 2026-09-12:
-    *"Have projection and custom property proceed at full speed."*). No shared seam was found: this
-    branch lives in the coordinate frame, the new-project box and the status bar; 636 lives in the
-    Settings box, the Properties popup, Find and the Tables pane. **Task 247 is the one to keep
-    away from** -- lumping a meter to its nearest node is arithmetic in the plane this task is
-    changing underneath it.
-  - **ALL NINE DESIGN QUESTIONS ARE ANSWERED (Tom, 2026-09-13)**; the rulings and the working are in
-    `dev/map-projection-decision.md`. The four that change the build: **store what the user
-    supplied** and state which (not E/N, not lon/lat -- whichever they typed); **proj4js**; **ground
-    distance, grid / k**, computed but NOT advertised until Task 643 exists; and **draw in the
-    projection, fitting the tiles to it** by the centre's scale factor and convergence angle.
-    Measured against the literature and corrected in one place: pin the transform **per TILE, not
-    per view** -- a single centre pin is off 0.03 m across 1 km and 2,338 m across the 300 km
-    mission scope.
-  - **Task 630 is the defect this feature answers** -- the map draws lat/lon as xy, which is 19.8%
-    at Phoenix and 100% at 60N. Read `dev/map-projection-decision.md` first: it holds Tom's own
-    architecture (store easting/northing in a stated CRS, let the drawing frame BE that plane) and
-    the one question that sizes the work, proj4js or UTM alone.
-  - **PHASE 1 SHIPPED 2026-09-13.** `project.crs` holds an EPSG code, declared at creation and
-    never afterward: `assignProjectCrs()` is the only writer and refuses a project that already
-    states one, a lat/lon project, or one with anything drawn in it; `georefStart()` refuses a
-    projected project by name, which shuts the second door. The list is GENERATED from the EPSG
-    numbering (120 WGS 84 UTM zones, 32601-32660 / 32701-32760), never typed. The status bar names
-    the projection and the readout names its axes per coordinate system, north first.
-    `dev/lpn-spike/projection-harness.js`, 40 assertions.
-  - **NO TRANSFORM EXISTS ON THE PROJECTED PATH, BY CONSTRUCTION.** proj4js was not vendored, so
-    basemap, place-name search and terrain elevations are absent rather than newly gated -- all
-    three already gate on `isGeoProject()`, which a projected project is not. The eastings and
-    northings in the file are the ones the user typed and the round trip is byte-identical.
-    Everything needing the inverse transform is therefore still open: State Plane and the full
-    register, point scale factor, ground length, per-tile reprojection, `;CRS` in the `.inp`, and
-    the **Open and convert coordinates...** rename, which was deliberately NOT made because it
-    would advertise a door that does not exist yet.
-  - **PHASE 3, 2026-09-13: the catalogue is a table of FAMILIES and holds 183 rows.** Tom called the
-    full universe a release blocker; the answer, with the numbers, the licensing and the proj4js
-    memo, is `dev/projection-catalogue.md`. The headline: the whole register is shippable as DATA
-    with no transform at all, because a projected project holds the user's own numbers and a name.
-    Also fixed there: a projected project born from the wizard opened at the plane's origin in the
-    corner, and now says why it cannot travel to the searched place.
-  - **PHASE 4, 2026-09-14: THE FULL UNIVERSE SHIPPED — all 5,346 live projected CRS.**
-    `js/data/epsg-projected.json`, 343 KB raw / 79 KB gzipped, fetched when the chooser first opens
-    and never precached; the 183 built-in rows stay as the offline fallback and
-    `projection_catalogue_check.php` holds all 182 of them against the register's own names, every
-    one of which agreed. Generated from PROJ's build of EPSG v12.029 out of a **PyPI wheel pinned
-    by sha256** — IOGP's REST API was measured and rejected, being ~9,000 requests for a snapshot
-    nothing publishes a hash of. `dev/projection-catalogue.md` §5 has the vendoring argument and
-    the weaker-digest admission. The deploy blocker `utm-only` was CLOSED on his word 2026-09-14.
-  - **PHASE 5, THE TRANSFORM, IS NOW THE WHOLE OF WHAT IS LEFT, AND TOM HAS ASKED FOR IT TWICE IN
-    ONE DAY IN TWO COSTUMES.** (a) *"The projected project needs to open at the place you searched
-    for. We know the lat/lon and zoom level they searched for."* (b) *"The world map is not in the
-    background. It appears that the math to put the world map tiles on the projected map is not
-    implemented or is wrong."* **It is not wrong; it is absent** -- `basemapOn()` is
-    `isGeoProject() && ...`, so a projected project has never drawn a tile.
-    - **THEY ARE ONE MISSING PIECE, WHICH IS THE THING TO SEE.** Both need a forward and inverse
-      transform between lon/lat and the plane: (a) is one point, (b) is four corners per TILE.
-      Everything else phase 4 shipped is data and needed none. Nothing cheaper works for (a)
-      either -- an empty projected project has no coordinates to fit to, so "where is the site in
-      this plane" has no answer but the transform.
-    - **THAT MEANS proj4js, AND THE NUMBERS ARE MEASURED** (`dev/projection-catalogue.md` §6):
-      `proj4` 2.22.0, MIT, 126.7 KB minified / 41.1 KB gzipped, bundling almost no definitions --
-      so per-CRS proj4 strings are a second data problem, and `proj.db` states them as PARAMETERS
-      rather than as strings, which our generator would have to assemble per projection method.
-    - **AND PIN PER TILE, NOT PER VIEW.** Already measured: a single centre pin is 0.03 m out
-      across 1 km and 2,338 m across the 300 km mission scope.
-    - **THE STANDING REFUSAL SURVIVES IT.** A transform makes "convert my network" askable and the
-      answer is still no -- converting rewrites every number the user typed.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
@@ -2138,6 +1877,155 @@ the block.
   - **If it is ever revived, the shape both ranked first** is a read-only, one-way link or export
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
+
+- 75|699| **Audit the language keys for lazy duplications.**
+  Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
+  duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
+  the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
+  owned Account number -- which is the pattern in one instance: a new field invented where an
+  existing one would have done costs 26 translations and a key that must be maintained forever.
+  - **THE AUDIT IS THE CHEAP HALF AND THE REDESIGN IS THE POINT.** A near-duplicate pair is not
+    automatically debt -- `dev/label-normalization-decision.md` already rules that a shared concept
+    lives under ONE owning calculator's key and others borrow it, and that reuse stops at whole
+    labels. What this task adds is looking for the cases where a small INTERFACE change removes the
+    need for a key at all, rather than merging two keys that genuinely say different things.
+  - `key_hygiene_check.php` already names keys nothing renders and names that drifted from their
+    siblings; start from its output rather than from a fresh read of 27 files.
+  - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
+    translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
+
+- 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
+  Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
+  panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have
+  a hole of its own.
+  - **`dev/lpn-spike/panel-touch-harness.js` only recognises a show or a hide written as a plain
+    `'block'`, `'flex'` or `'none'`.** About FORTY places in `js/looped-network.js` write it as a
+    choice instead -- `open ? 'flex' : 'none'` -- and every one is invisible to it.
+  - **The bottom panel is one of them.** Only `applyPaneLayout()` opens and closes it today, **by
+    discipline and not because anything checks**, so a second door added next month would not be
+    noticed. That is precisely the arrangement `dev/scenario-seam-repair.md` exists because of: two
+    tracks wrote element properties, only one went through the single write seam, and five
+    user-reachable defects followed.
+  - **NOT slipped into the branch that found it**, deliberately: it is roughly forty new
+    declarations and several genuine judgement calls about what counts as a panel, on a branch Tom
+    has already passed in the browser. The limitation is now written at the top of the harness so it
+    no longer implies coverage it does not have.
+
+- 50|702| **A view window cannot describe a span across the far side of the world.**
+  Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
+  than as a defect, which is the point of the row.**
+  - The view's longitude window is built from the MIN and MAX of wrapped longitudes, and that pair
+    cannot describe a window spanning the antipode of the transform's origin -- the same branch
+    problem the mirror fix solved one layer down.
+  - **Measured in a probe: a world-wide view after a Go to asked for only 4 of 8 tile columns.**
+  - **It is NOT known what a user actually sees**, because a headless camera is not a real fitted
+    view, and the agent that found it declined to claim a defect it could not measure. That is the
+    correct call and the reason this is its own row: it needs its own measurement, in a real
+    browser, before anybody decides whether there is anything to fix.
+  - The mission scope is a 300 km system span (`dev/geographic-projects.md` §2b), so a drawing that
+    genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
+    world-wide first screen**, which every geographic project passes through.
+
+- 100|703| **The satellite tiles: still blank patches after everything measured so far.**
+  Tom, 2026-09-21, on a screenshot showing six large white rectangles across a satellite mosaic he
+  had left alone: *"Still missing some tiles. Usable, but frustrating. Not good for my reputation."*
+  - **SPLIT OUT OF TASK 646 ON HIS OWN WORDS** -- *"We are just fighting the Satellite tiles now,
+    and that's peripheral to this task."* 646 is closed; this carries the fight.
+  - **THREE CAUSES HAVE ALREADY BEEN FOUND AND FIXED AND THE SYMPTOM SURVIVES ALL THREE**, which is
+    the fact that should shape the next attempt. (1) Tiles were requested west-edge-across, so the
+    middle of the screen sat about 35th in a queue of up to 192. (2) Every wheel nudge deleted the
+    whole picture and threw away everything in flight. (3) **A tile whose request FAILED was never
+    asked for again** -- 33 knocked out of 105 stayed white after 30 seconds. Each was measured, each
+    was real, and none of them was the whole of it.
+  - **PERRY'S FOURTH IS NOW FIXED TOO, and it is the fifth cause rather than the last one**: a
+    direction-REVERSED gesture -- an ordinary overshoot-and-correct -- discarded a tile that had
+    already loaded and re-fetched it, because the "do we already have this" test read two buckets
+    and never the third one a tile sits in while a view is still loading. Every gesture the
+    earlier fixing rounds tested was one-directional. `basemap-cache-harness.js` section 5 is the
+    guard, mutation-tested, and it includes the half that bites: a reclaimed tile must LEAVE the
+    carry, or the release at the end of a still-pending paint takes it straight back off screen.
+  - **THE INSTRUMENT IS BUILT AND IT IS `?debug=tiles`** (feat/xy-world-map). Add `?debug=tiles`
+    to the page URL and a panel sits in the lower right saying, for the CURRENT view: wanted, from
+    cache, requested, arrived, drawn, failed, retried, still outstanding -- plus the source, the
+    zoom and whether a token is present -- and it names every failed tile with the reason the
+    network gave. It updates on every arrival and on a one-second tick, so a number that STAYS put
+    is the reading. `dev/lpn-spike/basemap-debug-readout-harness.js` grades the counts against
+    hand-worked outcomes and is mutation-tested. **The next report is his, not ours.**
+  - **A REASON NEEDS A SECOND REQUEST AND THAT IS WHY THE SWITCH EXISTS.** An SVG `<image>` error
+    event is one bit -- no status, no headers, no body -- so under the switch a failed tile's URL
+    is fetched once more and the answer is printed as given. **THE BYTE COUNT IS PART OF THE
+    ANSWER**: a URL-restricted token can refuse in 23 bytes, which looks like a delivered tile to
+    anything counting only success.
+  - Remember the token is URL-restricted: a satellite tile fetched from anywhere but hawsedc.com or
+    librewaternet.org is a 23-byte Forbidden reply that **looks like a delivered tile to anything
+    counting bytes**, and that has already cost one agent a whole wrong measurement.
+
+- 100|704| **An error and notice messaging system, because a banner that vanishes is a defect.**
+  Tom, 2026-09-18, testing the lock work: *"The banner message about 'We asked your colleague to
+  close the file' disappeared too fast and unrecoverable. 'Help! What did I miss!' We need a better
+  messaging system."* And again on 2026-09-21: *"peripheral and pervasive."*
+  - **HE HAS NAMED THE REFERENCE HIMSELF: QGIS.** Its message bar holds a notice until it is
+    dismissed or superseded, ranks by severity, and keeps a log a reader can open afterwards -- so
+    nothing a person needed to read is destroyed by a timer. **Go and study it rather than
+    designing from our own premises.**
+  - **IT IS IDA'S TO DIAGNOSE FIRST.** His words: *"But we need Ida's input."* The question is not
+    what a banner should look like; it is how many kinds of message this page actually has, which
+    of them a reader must be able to get back, and where a persistent one can live without becoming
+    a fifth line of chrome -- the worry he has stated about this page more than once.
+  - **PERVASIVE is the word that sizes it.** Notices are written in many places today with no shared
+    door, which is the same shape as Task 701's forty invisible show/hide sites. Expect a seam, not
+    a widget.
+  - **IDA ANSWERED IT 2026-09-21, AND THE COUNT IS WORSE THAN TASK 701's.** QGIS runs **two**
+    mechanisms and not one: `QgsMessageBar`, transient and colour-coded, and `QgsMessageLog`, a
+    PERSISTENT store the bar only mirrors, opened from one icon at the end of the status bar.
+    AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
+    own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
+    look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
+  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (one door, 8-second
+    expiry, **a later message silently replaces an earlier one**, **83 sites** -- the 66 first
+    written here was an undercount Perry re-derived on 2026-09-21, which changes nothing about the
+    fix, since one door is one door, but a number restated as fact that nobody re-checked is
+    exactly the shape that seat watches for), `setStatus()` (19
+    sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
+    `renderBanner()` (one render door, five kinds, dismissable and not restorable),
+    `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
+    all**. That last group is WORSE than Task 701's finding rather than merely the same shape: 701
+    found writers blind to an existing guard, and here there was never a door to be blind to.
+  - **THE DIALOG BEHIND HIS COMPLAINT IS PROBABLY `presentOpenChoice()`**, whose Cancel branch
+    leaves no residue at all -- nothing to reopen, which is exactly *"Help! What did I miss!"*
+  - **HER RANKING, cheapest first, and the first row is the whole of his complaint:** (1) teach
+    `setNotice()` -- already one function -- to keep a small in-memory history, and put one modest
+    icon near the existing status box to read it back. **A log behind a control, not a fifth bar of
+    chrome.** No new storage, no new severities. (2) Fold the lock/file banner into the same log,
+    since it carries real decisions and has no way back once dismissed. (3) Audit the 57 raw
+    dialogs for which must genuinely block and which are merely information -- that is the
+    feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
+    already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
+
+- 50|707| **Five minutes of a real browser on the Task 706 repair.** The Performance tab open, ten
+  cells typed down a column of the biggest real project. The repair shipped on Tom's ruling without
+  waiting for a measurement; every number behind it is a stand-in
+  (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
+  browser's own write, and the real cost of a style invalidation). This is what replaces the floor
+  with a number.
+
+- 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
+  Tom, 2026-09-21, asking for discussion and a plan rather than a build.
+  - **(1) EVERY SYMBOL BUT A DECLARED EXCEPTION HAS A MAXIMUM MAP SIZE.** His starting proposal,
+    offered as a starting point and not a ruling: the junction is the reference, and **the maximum
+    junction map size is the 10th-percentile link length**. Reservoir and tank are the exceptions he
+    named.
+  - **(2) WHERE THE CONTROL LIVES, and he offered two shapes.** Either user settings under **Map and
+    page > Appearance**, near the maximum zoom for labels -- *"I love our user settings system"* --
+    or a derived rule with no control at all: the maximum symbol size is whatever it is at the
+    maximum label zoom, **so that once labels are hidden, symbols start shrinking on screen and stay
+    constant on the ground as you zoom out.** The second is the more elegant and costs no setting;
+    weigh it honestly rather than defaulting to a control.
+  - **(3) AND THIS TASK CARRIES THE RESTORATIONS, which must not be lost in the design:** *"Show
+    labels when zoomed to this map width or less"*, **Use current view**, and the Text object's
+    **Show at all zoom levels** toggle.
+  - Read with Tasks 669, 681 and 683. **This is a plan first** -- he asked to discuss.
+
 
 # Reference
 

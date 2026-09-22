@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1973,
-        "delta_key_count": 108,
+        "expected_key_count": 2044,
+        "delta_key_count": 190,
         "exempt_key_count": 39,
         "exempt_keys": [
             "calc_units_us",
@@ -446,14 +446,14 @@
             {
                 "term": "run (a simulation)",
                 "symbol": "",
-                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip, lpn_time_run_note and lpn_time_duration.",
-                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and lpn_time_run_note quotes the button label inside a sentence -- so the word chosen for the button must be the word that appears in that sentence, or the instruction points at a button that is not there.",
+                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip and lpn_time_duration.",
+                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19, as was lpn_manual_results_cleared; lpn_run_menu_tip still does it.)",
                 "preferred_translation": ""
             },
             {
                 "term": "work out (compute)",
                 "symbol": "",
-                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
+                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
                 "translation_notes": "[2026-08-19, sprint 438 Wave 0] Raised because the phrasal verb is opaque word by word: a reader who parses \"work\" plus \"out\" gets exercise, not arithmetic. One rendering should serve all four strings.",
                 "preferred_translation": ""
             },
@@ -530,6 +530,39 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_add_meter": "Customer",
+        "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_pane_tab_customers": "Customers",
+        "lpn_customer_heading": "Customer {id}",
+        "lpn_field_account": "Account number",
+        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
+        "lpn_field_meter_demand": "Demand per service",
+        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
+        "lpn_field_meter_total": "Total demand",
+        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
+        "lpn_field_meter_pipe": "Connected asset",
+        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
+        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_station": "Station along the pipe (%)",
+        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
+        "lpn_field_meter_offset": "Offset from the pipe",
+        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_lumped": "Added to node",
+        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_node_customers": "Customer demands",
+        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
+        "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_copy_of": "Copy of {name}",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_ts_menu": "Time series",
@@ -550,12 +583,60 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unnamed": "unnamed",
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Open read-only\" lets you look at it and change anything you like, without being able to save here. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_engine_bar_label": "Solver loading progress",
+        "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
+        "lpn_engine_wait_pct": "Solver {percent}% loaded.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "World map…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_add": "Attach",
+        "lpn_map_attach_readjust": "Re-adjust",
+        "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
+        "lpn_map_attach_scale_from": "Scale from the current size…",
+        "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
+        "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
+        "lpn_map_attach_remove": "Detach",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
+        "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
+        "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
+        "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
+        "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
+        "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
+        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn_read": "{d} degrees",
+        "lpn_mapgeo_dial_size": "Map size",
+        "lpn_mapgeo_dial_size_read": "{f} times",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_place": "Place approximately",
+        "lpn_mapgeo_finish": "Georeference here",
+        "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
+        "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -575,6 +656,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -640,6 +722,39 @@
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "keys": {
+        "lpn_tool_add_meter": "Customer",
+        "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_pane_tab_customers": "Customers",
+        "lpn_customer_heading": "Customer {id}",
+        "lpn_field_account": "Account number",
+        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
+        "lpn_field_meter_demand": "Demand per service",
+        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
+        "lpn_field_meter_total": "Total demand",
+        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
+        "lpn_field_meter_pipe": "Connected asset",
+        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
+        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_station": "Station along the pipe (%)",
+        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
+        "lpn_field_meter_offset": "Offset from the pipe",
+        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_lumped": "Added to node",
+        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_node_customers": "Customer demands",
+        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
+        "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_copy_of": "Copy of {name}",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_ts_menu": "Time series",
@@ -660,12 +775,60 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unnamed": "unnamed",
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Open read-only\" lets you look at it and change anything you like, without being able to save here. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_engine_bar_label": "Solver loading progress",
+        "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
+        "lpn_engine_wait_pct": "Solver {percent}% loaded.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "World map…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_add": "Attach",
+        "lpn_map_attach_readjust": "Re-adjust",
+        "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
+        "lpn_map_attach_scale_from": "Scale from the current size…",
+        "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
+        "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
+        "lpn_map_attach_remove": "Detach",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
+        "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
+        "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
+        "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
+        "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
+        "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
+        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn_read": "{d} degrees",
+        "lpn_mapgeo_dial_size": "Map size",
+        "lpn_mapgeo_dial_size_read": "{f} times",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_place": "Place approximately",
+        "lpn_mapgeo_finish": "Georeference here",
+        "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
+        "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -685,6 +848,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -750,6 +914,534 @@
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "key_context": {
+        "lpn_tool_add_meter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_tool_add_meter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_mode_add_meter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_pane_tab_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_account": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_account_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_count_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_total": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_total_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe_suggest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_pipe_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_placed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_station": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_station_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_offset": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_offset_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_lumped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_lumped_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers_sum": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_detached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_fixed_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_detached_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_pick_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_inp_export_flat_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Vertici",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Fai clic su un angolo della finestra.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_copy_of": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo",
+                    "value": "Apri un file xy sulla mappa…",
+                    "english": "Convert coordinates as…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "Apre un file di progetto o un file EPANET in una nuova scheda di progetto su questa pagina, sulla mappa stradale. Colloca tu stesso il disegno sul mondo: sposta e ingrandisci fino al sito, poi ridimensiona e ruota per adattarlo. Se la x e la y nel file sono già una longitudine e una latitudine, premi il pulsante Sono già lat\/lon e la rete salta direttamente dove appartiene. Ogni numero che hai digitato resta com'è.",
+                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                }
+            }
+        },
         "lpn_find_q_and": {
             "reason": "equal_to_english",
             "current_value": "AND",
@@ -1070,6 +1762,294 @@
                 }
             }
         },
+        "lpn_crs_unnamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "Un progetto proiettato si apre sul proprio piano, non nel luogo cercato. Collocare quel piano sulla Terra richiede una trasformazione di coordinate, che questa pagina non ha ancora.",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Non georeferenziato",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_lock_open_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_care": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_edited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_never_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_choices_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_sent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_requested": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Forza il blocco",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} secondi",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_engine_bar_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Caricamento del risolutore EPANET in corso mentre costruisci. I risultati saranno disponibili quando il caricamento sarà completo.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "Il risolutore EPANET non è stato ancora caricato, non può essere caricato, e questa rete può essere risolta solo da esso. Verrà caricato quando sei connesso a internet.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Caricamento del risolutore EPANET in corso mentre costruisci. I risultati saranno disponibili quando il caricamento sarà completo.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "Il risolutore EPANET non è stato ancora caricato, non può essere caricato, e questa rete può essere risolta solo da esso. Verrà caricato quando sei connesso a internet.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait_pct": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Caricamento del risolutore EPANET in corso mentre costruisci. I risultati saranno disponibili quando il caricamento sarà completo.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "Il risolutore EPANET non è stato ancora caricato, non può essere caricato, e questa rete può essere risolta solo da esso. Verrà caricato quando sei connesso a internet.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
+        "lpn_engine_wait_bytes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Caricamento del risolutore EPANET in corso mentre costruisci. I risultati saranno disponibili quando il caricamento sarà completo.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "Il risolutore EPANET non è stato ancora caricato, non può essere caricato, e questa rete può essere risolta solo da esso. Verrà caricato quando sei connesso a internet.",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                }
+            }
+        },
         "lpn_field_desc": {
             "reason": "missing",
             "current_value": null,
@@ -1163,6 +2143,486 @@
                     "key": "lpn_field_text_size",
                     "value": "Moltiplicatore di dimensione",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_map_attach_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_readjust": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_readjust_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_bad": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_scale_from_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_step1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_step2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_hint1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_hint2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_gestures": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_turn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_turn_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_size_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_dial_help": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_finish": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
                 }
             }
         },
@@ -1467,6 +2927,22 @@
                     "key": "lpn_terrain_done",
                     "value": "{n} quota\/e compilata\/e.",
                     "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_ff_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_stale",
+                    "value": "Il disegno è cambiato, quindi i risultati della portata antincendio sono stati cancellati. Calcola di nuovo.",
+                    "english": "The drawing changed, so the fire flow results were cleared. Run it again."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_summary",
+                    "value": "{clean} nodi non avevano nulla di sbagliato. {fire} nodi non hanno superato la verifica della portata antincendio. {design} nodi hanno influenzato il resto del sistema.",
+                    "english": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system."
                 }
             }
         },

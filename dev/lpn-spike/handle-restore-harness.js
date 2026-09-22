@@ -300,31 +300,12 @@ async function scenario(label, rows, openProjects, stampsOnRecord = []) {
 		report(!t.stale, 'save as: no baseline → fails open, as an unanswerable question must');
 	}
 
-	// 12. What the lock dialog says. The reader is being asked to judge a claim, and every branch of
-	//     that judgment is about time — so each case says the most it truthfully can.
-	{
-		const now = Date.now();
-		const EngCalcs = { pageConfig: {} };
-		const agoText = eval('(' + extract('agoText') + ')');
-		const lockHeadingText = eval('(' + extract('lockHeadingText') + ')');
-
-		const unsavedWork = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: now - 1800000 });
-		report(/10 minutes ago, 20 minutes after/.test(unsavedWork), 'lock dialog: unsaved work names both numbers',
-			unsavedWork);
-		const neverSaved = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: 0 });
-		report(/10 minutes/.test(neverSaved) && /not been saved|none of it/.test(neverSaved),
-			'lock dialog: edited but never saved says so', neverSaved);
-		const allSaved = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: now - 60000 });
-		report(/10 minutes/.test(allSaved) && langRe('lpn_lock_open_heading_saved').test(allSaved),
-			'lock dialog: everything saved says so — this is the safe one to break', allSaved);
-		const justOpen = lockHeadingText('ABC', { editedAt: 0, savedAt: 0, lastActivity: Math.floor((now - 300000) / 1000) });
-		report(/5 minutes/.test(justOpen), 'lock dialog: nothing edited falls back to when we last heard from them',
-			justOpen);
-		report(!/hours|days/.test(justOpen), 'lock dialog: lastActivity is read as SECONDS, not milliseconds',
-			'mixing the units turns 5 minutes into 7 weeks');
-		report(lockHeadingText('ABC', {}) === 'ABC has this file open.',
-			'lock dialog: with no numbers at all, the bare sentence — and only then');
-	}
+	// 12. MOVED 2026-09-17 (Task 667(b)). What the lock dialog says is now
+	//     dev/lpn-spike/lock-initials-harness.js §2: `lockHeadingText()` is gone, and the one sentence
+	//     it produced has become a lead line plus a readout of THREE ages -- how long the file has
+	//     been in use, when it was last saved, when it was last edited -- each stated only where the
+	//     broker actually has it on record. The seconds-against-milliseconds trap this block guarded
+	//     is asserted there, on the broker's own in-use clock.
 
 	console.log(`\n${checks - failures}/${checks} checks passed.\n`);
 	process.exit(failures ? 1 : 0);

@@ -9,8 +9,11 @@
 //   * the RESULT SET NEVER REACHES AN ELEMENT. The document is byte-identical across a whole run,
 //     which is what keeps setProp() and the scenario write seam out of this feature entirely;
 //   * the marks on the map are the states, one class per junction and no junction wearing two;
-//   * AN EDIT CLEARS THE RUN, marks and all -- a picture of a network that has since changed is
-//     worse than no picture.
+//   * AN EDIT NO LONGER CLEARS THE RUN (Tom, asked directly whether fire flow rings should keep
+//     the same "off means off, not hide or delete" treatment as the rest of the page: "Yes...
+//     for fire flow rings, we could provide a button in that box to clear the rings."). The rings
+//     are a snapshot like every other stale answer; only a deliberate Clear removes them, and
+//     only opening a genuinely different network still clears them on its own.
 //
 // The network is the shipped gallery example, opened the way a visitor opens it.
 
@@ -48,6 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetAsk: function (k, v) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk[k] = v; },\n" +
 	"\t\task: function () { return fireFlowAsk; },\n" +
 	"\t\trun: function () { return fireFlowRun; },\n" +
+	"\t\tclearFireFlowRun: clearFireFlowRun,\n" +
 	"\t\tdocGuard: function () { return fireFlowDocGuard; },\n" +
 	"\t\tscheduleSolve: scheduleSolve,\n" +
 	"\t\tnodeClass: function (id) { return nodeEls[id] ? (nodeEls[id].circle.getAttribute('class') || '') : null; },\n" +
@@ -462,9 +466,20 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	});
 	ok('and it is the state that junction actually got', agree);
 
-	console.log('\n--- a result set describes the network it was run on ---');
+	console.log('\n--- the rings are a snapshot: an edit leaves them, a Clear removes them ---');
 	L.scheduleSolve();   // what every edit on this page goes through
-	ok('an edit clears the run', L.run() === null);
+	ok('an ordinary edit does NOT clear the run -- "off means a snapshot, never hide or delete"',
+		L.run() !== null);
+	const stillMarkedAfterEdit = L.junctionIds().filter(function (id) {
+		return MARKS.some(m => L.nodeClass(id).split(/\s+/).indexOf(m) >= 0);
+	});
+	ok('...and the marks are still on the map', stillMarkedAfterEdit.length > 0,
+		JSON.stringify(stillMarkedAfterEdit));
+	ok('...and the report still has its rows', textOf(byId.lpn_ff_report).trim() !== '');
+
+	// The deliberate Clear button, the thing Tom asked for in the same breath as the ruling above.
+	L.clearFireFlowRun(true);
+	ok('a deliberate Clear does remove the run', L.run() === null);
 	const stillMarked = L.junctionIds().filter(function (id) {
 		return MARKS.some(m => L.nodeClass(id).split(/\s+/).indexOf(m) >= 0);
 	});
