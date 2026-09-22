@@ -1924,15 +1924,24 @@ off. The curve is flatter; it is not flat, and at the fit view it cannot be.
 
 *"A human would have slid the two labels at A toward B, shortening the leaders without any bad
 effects."* `Collide.slideTowardAnchors()`, after the gang repair and before the crossing shed: each
-drawn label with a leader steps along its own leader toward its node, a quarter text height at a
-time, and stops at the first step that would touch a label, a symbol, a pipe label or another
-leader. A leader that only gets shorter cannot cross anything new, so only the box is asked.
-Shortest leader first, measured against longest-first (29 labels slide against 23). A label that
-claimed room to grow slides with its room, or the slide itself would make a prefix move labels
-again (measured: 2 at 4x). On his northwest case, ID plus three properties at 3x: node 120's leader
-3.9 -> 3.2 text heights, node 257's 2.5 -> 1.8, no new contacts, no label lost
-(`label-slide-harness.js`). It costs a few moves at 1x and 2x in the R-075 count (30 -> 38 on
-Net3-World) and none at 4x or 8x.
+drawn label with a leader is put down at the NEAREST clear spot along its own leader, tried a
+quarter text height at a time from the resting offset outward, and the pass goes round again
+(at most three times) until nothing moves. Clear means no label, symbol, pipe label, node leader,
+link-label leader or Text callout. A leader that only gets shorter is a piece of the old one and
+cannot cross anything new, so only the box is asked. A label that claimed room to grow is tested
+as its room, or the slide itself would make a prefix move labels again.
+
+- **Nearest clear, not nearest reachable.** The first version stepped inward and stopped at the
+  first obstruction; one label in the way left clear ground nearer the node unused.
+- **Round again**, because the order is shortest leader first in WORLD length and a one-row label
+  can be shorter than a four-row one standing in its way: node 251 was judged before node 249 and
+  saw 249 where it was about to leave.
+- Measured on his corner (ID + elevation + demand + pressure, `label-slide-harness.js`): node 251
+  28.0 -> 19.1 text heights at 2x, longest leader at 3x 23.8 -> 4.8, 257 1.4 -> 1.1 and 0.9; no new
+  contacts and no fewer labels drawn. 251 is still long because a neighbour's reserved room and
+  leader lie along its line. At 2x one pair that already crossed swaps which label the shed hides
+  (179 for 171), because the shed breaks ties on leader length. R-075 over four zooms: 11 -> 10
+  moved on Net3-World, 9 -> 10 on Net3, none at 4x or 8x.
 
 ### 20e2. After master's symbol cap landed (2026-09-22)
 
