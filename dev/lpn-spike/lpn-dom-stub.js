@@ -722,7 +722,19 @@ global.localStorage = {
 };
 global.window = {
   localStorage: global.localStorage, document: global.document,
-  addEventListener: () => {}, innerWidth: 1200, innerHeight: 900,
+  // **WINDOW LISTENERS ARE RECORDED AND CAN BE DISPATCHED**, for the same reason document's are a
+  // few hundred lines above: this was `() => {}`, so nothing registered on the window could be
+  // tested at all -- and `pagehide`, `beforeunload` and `resize` are all window events that carry
+  // real decisions. ROADMAP Task 706's flush-before-the-page-goes is the first thing that needed
+  // it. Recording a listener changes nothing on its own; only a test that dispatches sees them.
+  _listeners: {},
+  addEventListener(t, f) { (global.window._listeners[t] = global.window._listeners[t] || []).push(f); },
+  removeEventListener() {},
+  dispatchEvent(e) {
+    (global.window._listeners[e && e.type] || []).slice().forEach(function (f) { f(e); });
+    return true;
+  },
+  innerWidth: 1200, innerHeight: 900,
   confirm: () => true, prompt: () => 'X', alert: () => {},
   // **A WIDTH QUERY IS ANSWERED FROM innerWidth, and that is the one physical relationship this
   // stub has to keep** (dev/testing-notes.md: a stub that holds constant what the real thing varies
