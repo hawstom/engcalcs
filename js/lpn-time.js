@@ -1533,6 +1533,19 @@
 		return (next === undefined || next === null) ? start
 			: start + ' - ' + EC.lpnTimeElapsedText(next);
 	}
+	// **THE CLOCK READING DID NOT GO AWAY; IT MOVED INTO THE ROW'S TIP.** The label used to be
+	// `elapsed  ·  clock` -- two readings of ONE instant side by side -- and Tom read it as a
+	// range and was right to: two times separated by a mark is a range to everybody. His
+	// instruction, 2026-09-21: *"Fix it to say 24:00 - 25:00, and fix all subsequent steps."*
+	// So the LABEL is now a genuine run-time range and cannot wrap. The clock is still the thing
+	// a pattern is keyed on, so it is kept where it costs no width, and it is the reason the
+	// signature below still has to notice a project that states the SAME grid from a different
+	// hour -- every row would otherwise keep the clock of the project before it.
+	function stepClockText(t, next) {
+		var times = docTimes(), start = EC.lpnTimeClockText(times, t);
+		return (next === undefined || next === null) ? start
+			: start + ' - ' + EC.lpnTimeClockText(times, next);
+	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
 	// pressed, and dev/toolbar-icons.md rules that a toggle keeps one name.
@@ -1650,20 +1663,25 @@
 	};
 
 	function renderTransport() {
-		var stops, labels, sig, i;
+		var stops, labels, clocks, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
 		labels = stops.map(function (t, i) { return stepText(t, stops[i + 1]); });
+		clocks = stops.map(function (t, i) { return stepClockText(t, stops[i + 1]); });
 		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
-		// the rows themselves changed -- an edit to the duration or to the report step; rebuilding
-		// on every solve would close the list under a user who had it open. It was `stops.join(',')`
-		// until 2026-09-09, and a raw stop list cannot tell "the grid changed" from "nothing did".
-		sig = labels.join('|');
+		// the rows themselves changed -- an edit to the duration, to the report step, or to the
+		// clock time at the start; rebuilding on every solve would close the list under a user who
+		// had it open. It was `stops.join(',')` until 2026-09-09, and that misses a project that
+		// states the SAME reporting grid from a different hour: every row keeps the clock time of
+		// the project before it, which is a wrong number rather than a missing one. **THE CLOCKS
+		// ARE IN THE KEY EVEN THOUGH THEY ARE NO LONGER IN THE LABEL** -- they are in the tip, and
+		// a stale tip is the same defect one surface further in.
+		sig = labels.join('|') + '\u0001' + clocks.join('|');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
 			labels.forEach(function (text, k) {
-				ui.step.appendChild(el('option', { value: String(k) }, text));
+				ui.step.appendChild(el('option', { value: String(k), title: clocks[k] }, text));
 			});
 		}
 		i = stops.indexOf(state.t);
