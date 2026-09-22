@@ -1205,7 +1205,10 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+- 100|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+  **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
+  performance win read as the bigger story: it is his top item *"because the network has to exist
+  first."*
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
   having read the clerk's wish list, *"I am sympathetic."* His conditions, which are the whole
@@ -1898,9 +1901,18 @@ the block.
     feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
     already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
 
-- 75|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
+- 100|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
   Found by Declan 2026-09-21, answering Tom's *"is it fast enough for Declan?"* -- his answer was
   **yes**, and this is the thing he found while proving it.
+  - **TOM RULED 2026-09-21: BUILD IT, DO NOT WAIT FOR THE MEASUREMENT.** His words: *"I think this
+    would be cheap enough to fix that we should fix it without waiting for measurement. To be
+    honest, I am not sure what it means to save the whole project and why we would ever do that
+    when we can just save the entry at hand. My intuition is that we would always just save the
+    entry at hand and only save the whole project ... when there is a pause. See Off Means Off."*
+    So the five-minutes-of-a-real-browser line below is no longer a gate; it is a way to check the
+    result afterwards. **His intuition IS the design: write the one thing that changed, and defer
+    the whole-project write to a pause**, which is the same shape as the recalculation rule he
+    already ruled on.
   - **The recalculation waits until you pause. The save does not.** Every cell commit serialises
     and stores the entire project, not the one thing that changed, on every keystroke-equivalent,
     uncapped.
