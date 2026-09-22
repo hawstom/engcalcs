@@ -101,7 +101,12 @@ async function main() {
 			}
 			await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => r())));
 		}
-		async function openViaGallery(title) {
+		// **BY KEY, NEVER BY LITERAL** (harness_wording_check.php): a card is matched against
+		// `pageConfig`'s own current English, read through the DOM stub's real language file, so a
+		// future rewording of these two titles does not turn this probe red for no reason.
+		const GRID_KEY = 'lpn_ex_net3_title', WORLD_KEY = 'lpn_ex_net3_world_title';
+		async function openViaGallery(titleKey) {
+			const title = await s.lang(titleKey);
 			await s.menuClick(await s.lang('lpn_examples_menu'), 'file');
 			await page.waitForSelector('#lpn_examples_pane .lpn-example-card', { state: 'visible' });
 			const cards = await page.$$('#lpn_examples_pane .lpn-example-card');
@@ -112,10 +117,10 @@ async function main() {
 			}
 			if (!clicked) { throw new Error('no gallery card titled "' + title + '"'); }
 		}
-		async function timedOpen(title, label) {
+		async function timedOpen(titleKey, label) {
 			perfLines.length = 0;
 			const t0 = Date.now();
-			await openViaGallery(title);
+			await openViaGallery(titleKey);
 			await settleOnPerf(40000);
 			const t1 = Date.now();
 			const wallMs = t1 - t0;
@@ -127,36 +132,36 @@ async function main() {
 
 		console.log('\n=== run 1 of 3 ===');
 		await freshLoad();
-		await openViaGallery('EPANET Net3'); // grid, untimed warm-up
+		await openViaGallery(GRID_KEY); // grid, untimed warm-up
 		await settleOnPerf(20000);
-		await timedOpen('EPANET Net3, lat/lon', 'Net3 lat/lon, with Net3 (grid) already open — run 1');
+		await timedOpen(WORLD_KEY, 'Net3 lat/lon, with Net3 (grid) already open — run 1');
 
 		await freshLoad();
-		await openViaGallery('EPANET Net3, lat/lon'); // lat/lon, untimed warm-up
+		await openViaGallery(WORLD_KEY); // lat/lon, untimed warm-up
 		await settleOnPerf(40000);
-		await timedOpen('EPANET Net3', 'Net3 (grid), with Net3 lat/lon already open — run 1 (comparison)');
+		await timedOpen(GRID_KEY, 'Net3 (grid), with Net3 lat/lon already open — run 1 (comparison)');
 
 		console.log('\n=== run 2 of 3 ===');
 		await freshLoad();
-		await openViaGallery('EPANET Net3');
+		await openViaGallery(GRID_KEY);
 		await settleOnPerf(20000);
-		await timedOpen('EPANET Net3, lat/lon', 'Net3 lat/lon, with Net3 (grid) already open — run 2');
+		await timedOpen(WORLD_KEY, 'Net3 lat/lon, with Net3 (grid) already open — run 2');
 
 		await freshLoad();
-		await openViaGallery('EPANET Net3, lat/lon');
+		await openViaGallery(WORLD_KEY);
 		await settleOnPerf(40000);
-		await timedOpen('EPANET Net3', 'Net3 (grid), with Net3 lat/lon already open — run 2 (comparison)');
+		await timedOpen(GRID_KEY, 'Net3 (grid), with Net3 lat/lon already open — run 2 (comparison)');
 
 		console.log('\n=== run 3 of 3 ===');
 		await freshLoad();
-		await openViaGallery('EPANET Net3');
+		await openViaGallery(GRID_KEY);
 		await settleOnPerf(20000);
-		await timedOpen('EPANET Net3, lat/lon', 'Net3 lat/lon, with Net3 (grid) already open — run 3');
+		await timedOpen(WORLD_KEY, 'Net3 lat/lon, with Net3 (grid) already open — run 3');
 
 		await freshLoad();
-		await openViaGallery('EPANET Net3, lat/lon');
+		await openViaGallery(WORLD_KEY);
 		await settleOnPerf(40000);
-		await timedOpen('EPANET Net3', 'Net3 (grid), with Net3 lat/lon already open — run 3 (comparison)');
+		await timedOpen(GRID_KEY, 'Net3 (grid), with Net3 lat/lon already open — run 3 (comparison)');
 
 		console.log('\n\n==== SUMMARY ====');
 		results.forEach((r) => console.log(`${r.wallMs} ms  ${r.label}`));
