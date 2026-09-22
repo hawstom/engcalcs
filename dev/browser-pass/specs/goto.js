@@ -127,15 +127,19 @@ exports.run = async function ({ browser, report }) {
 		GOTO_ROW = await a.lang('lpn_goto_menu');
 
 		// ---- where the row is, and is not -------------------------------------------------------
-		let rows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(!rows.includes(GOTO_ROW),
-			'an XY project has no Go to… row — its x and y have no place on the Earth',
-			'hidden here rather than greyed, because there is no street map a grid could go to');
+		// **GREYED, NOT HIDDEN, SINCE 2026-09-22** (Tom: Go to and Search "can show for unnamed CRS
+		// projects, but disabled when a world map is not attached (no georeference)").
+		let full = await a.menuRows('map');
+		let row = full.find(r => r.label === GOTO_ROW);
+		report.ok(!!row && row.disabled,
+			'an XY project with no world map shows Go to… greyed — its x and y have no place on the Earth yet',
+			row ? 'disabled=' + row.disabled : full.map(r => r.label).join(' | '));
 
 		await a.newGeoProject();
 		await a.settle(500);
-		rows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(rows.includes(GOTO_ROW), 'a lat/lon project offers it on the View menu');
+		full = await a.menuRows('map');
+		row = full.find(r => r.label === GOTO_ROW);
+		report.ok(!!row && !row.disabled, 'a lat/lon project offers it, live, on the Map menu');
 
 		// ---- it goes there ----------------------------------------------------------------------
 		// **AND THE SCALE IS THE ONE IT WAS**, which is now the whole of what Go to promises about

@@ -448,7 +448,7 @@ class Session {
 	//
 	// US units unless a spec says otherwise — a project's units are the project's since Task 263,
 	// and a spec should not inherit whatever the strip happened to hold.
-	async newProject(system = 'us') { await this._newFromBox('xy', system); }
+	async newProject(system = 'us') { await this._newFromBox('local', system); }
 	// A lat/lon project: longitudes and latitudes, and a street map behind it.
 	async newGeoProject(system = 'us') { await this._newFromBox('geo', system); }
 	async _newFromBox(coords, system) {
