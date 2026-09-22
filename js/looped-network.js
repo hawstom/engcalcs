@@ -8482,7 +8482,12 @@ var EngCalcs = EngCalcs || {};
 	// stops growing -- is a separate, not-yet-written zoom-rules design and is not built here.**
 	var LPN_METER_NODE_FRAC = 0.25;      // of a junction's own radius -- his figure
 	var LPN_SERVICE_STROKE_FRAC = 0.5;   // of settings.linkWidth, screen px
-	var LPN_SERVICE_MIN_PX = 0.75;
+	// **1 px IS HIS OWN FLOOR, VERBATIM** -- *"a lesser multiple of the link width or always just
+	// 1 px until we get to the zoom where everything stops growing ... at which point it shrinks
+	// below 1px."* The first half is LPN_SERVICE_STROKE_FRAC and the floor is this. The third
+	// clause -- shrinking BELOW a pixel once the whole drawing stops growing -- depends on a zoom
+	// rule that does not exist yet (ROADMAP Task 705) and is deliberately not invented here.
+	var LPN_SERVICE_MIN_PX = 1;
 
 	// How many metres one world unit is, HERE. In a grid project a world unit IS the display length
 	// unit, so this is one conversion. In a geographic project a world unit is a DEGREE, and how
@@ -8963,6 +8968,31 @@ var EngCalcs = EngCalcs || {};
 	// **ONE PLACE ANSWERS "IS A CUSTOMER LABEL DRAWN AT ALL", and every reason lives in it** -- the
 	// setting, and the suppressor that already governs generated annotation. A second test anywhere
 	// would be a second answer.
+	// **THE CAPTURE MUST READ THE QUANTITY THE GATE READS -- THE SAME DIMENSION AND THE SAME UNIT**
+	// (Tom, 2026-09-21: *"'Use current view' button of 'Widest view that attempts to display
+	// customer labels' uses height (I think), not width. Then it's applied as advertised, to width.
+	// So it appears not to work."*). He is right, and on BOTH halves.
+	//
+	// The button was matched to `feat/label-gang-search`'s, whose own threshold genuinely is
+	// `mapSpan('min')`. Two things came across that do not hold here:
+	//   - **DIMENSION.** `customerLabelsAttempted()` measures `visibleMapMetres()`, which is the
+	//     WIDTH. `mapSpan('min')` is min(width, height), so on any landscape window it is the
+	//     HEIGHT -- a smaller number written into a box that is compared against the width, so the
+	//     press hides the very labels the user was looking at when they pressed it.
+	//   - **UNIT.** The gate converts the box's number to metres (`customerLabelWidthLimitSI()`)
+	//     and compares it against metres. `mapSpan()` returns WORLD units, which on a lat/lon
+	//     project are DEGREES -- five orders of magnitude out, in the other direction.
+	// On a plain XY grid `toDisplay(visibleMapMetres())` IS `visibleMapWidth()` exactly, which is
+	// why only the dimension half of this was ever visible on a grid drawing.
+	//
+	// **ROUNDED UP, NEVER TO NEAREST, AND THAT IS NOT A NICETY.** `toPrecision(3)` rounds to
+	// nearest, so about half of all views round DOWN -- and a threshold one part in a thousand
+	// below the view it was captured from hides the labels the button just promised to keep.
+	function captureCustomerViewWidth() {
+		var m = visibleMapMetres();
+		if (!(m > 0)) { return 0; }
+		return ceilToPrecision(toDisplay(m, 'lpn_u_length'), 3);
+	}
 	function customerLabelsAttempted() {
 		var lim = customerLabelWidthLimitSI(), wide;
 		if (dataLabelsHidden || !lim) { return false; }
@@ -32462,23 +32492,19 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 		});
 		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
-		// view' button like the other one we restored in a different branch."*). It is that button,
-		// matched rather than re-invented: same words, same `mapSpan('min')`, same rounding UP to
-		// three significant figures.
-		//
-		// **ROUNDED UP, NEVER TO NEAREST, AND THAT IS NOT A NICETY.** `toPrecision(3)` rounds to
-		// nearest, so about half of all views round DOWN -- and a threshold one part in a thousand
-		// below the view it was captured from hides the very labels the user was looking at when
-		// they pressed the button.
+		// view' button like the other one we restored in a different branch."*). Same words and the
+		// same rounding UP; the QUANTITY is captured by captureCustomerViewWidth(), which reads what
+		// this box is actually compared against rather than what the other branch's box is -- see
+		// the comment there for the two ways a verbatim copy was wrong.
 		//
 		// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps the pair
 		// inside the row's control column instead of pushing the whole group left.
 		useBtn.type = 'button';
 		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
 		useBtn.addEventListener('click', function () {
-			var w = mapSpan('min');
+			var w = captureCustomerViewWidth();
 			if (!(w > 0)) { return; }
-			labelSettings.customerMaxWidth = ceilToPrecision(w, 3);
+			labelSettings.customerMaxWidth = w;
 			input.value = String(labelSettings.customerMaxWidth);
 			saveToStorage();
 			refreshLabelText();

@@ -750,7 +750,13 @@ the block.
     replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
     and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
     rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
-    current view** capture button matching `feat/label-gang-search`'s.
+    current view** capture button. **It does NOT match `feat/label-gang-search`'s, and copying that
+    one verbatim was the defect** (his 2026-09-21 pass): that branch's threshold IS `mapSpan('min')`
+    and this one is the view WIDTH in METRES, so the copy captured the height of a landscape window
+    (1,000 ft of a 2,000 ft view) and, on a geographic project, degrees into a box read as feet
+    (0.005 against 2,880). `dev/lpn-spike/customer-view-capture-harness.js`. The service line's
+    1 px floor is in the same harness; the rest of his service-line sentence -- shrinking BELOW a
+    pixel once the drawing stops growing -- is Task 705 and is deliberately not invented here.
   - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
     property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
     selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
