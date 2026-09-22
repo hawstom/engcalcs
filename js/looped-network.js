@@ -30764,10 +30764,6 @@ var EngCalcs = EngCalcs || {};
 		// claim safe is NOT the lock's liveness but the freshness check in writeOpenProjectToFile() --
 		// a stale claim cannot cause an overwrite, so it is free to outlive a minimise or a reboot.
 
-		// The browser's own "leave site?" prompt, and ONLY for a file project with unsaved changes. A
-		// browser project is NOT at risk -- it lives in localStorage and survives the browser closing;
-		// only CLOSING ITS TAB ends it, and closeTab() asks that question itself. Prompting on every
-		// page close teaches people to click through the one prompt that matters.
 		// **THE DEFERRED WRITE IS DISCHARGED BEFORE THE PAGE CAN GO** (ROADMAP Task 706). Three
 		// doors, the same three releaseAllLocks() uses and for the same reason: `pagehide` is the
 		// one the standard actually promises, `visibilitychange -> hidden` is the one that fires on
@@ -30782,6 +30778,10 @@ var EngCalcs = EngCalcs || {};
 		document.addEventListener('visibilitychange', function () {
 			if (document.hidden) { flushSave(); }
 		});
+		// The browser's own "leave site?" prompt, and ONLY for a file project with unsaved changes. A
+		// browser project is NOT at risk -- it lives in localStorage and survives the browser closing;
+		// only CLOSING ITS TAB ends it, and closeTab() asks that question itself. Prompting on every
+		// page close teaches people to click through the one prompt that matters.
 		window.addEventListener('beforeunload', function (e) {
 			flushSave();
 			releaseAllLocks();
