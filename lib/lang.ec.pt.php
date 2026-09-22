@@ -1082,7 +1082,6 @@ $ec_lang['lpn_time_slider']='Tempo';
 $ec_lang['lpn_time_no_period']='Este projeto não tem simulação de período estendido definida, então há apenas um momento para mostrar. Defina uma Duração total da simulação em Configurações, Cálculo, Tempo para executar uma simulação de período estendido.';
 $ec_lang['lpn_time_run']='Executar';
 $ec_lang['lpn_time_run_tip']='Calcula esta rede em cada horário hidráulico, do início ao fim do período.';
-$ec_lang['lpn_time_run_note']='Você está vendo a rede no primeiro horário de relatório. O ajuste Recalcular automaticamente está desligado, então os resultados dos horários posteriores não são mantidos atualizados enquanto você trabalha. Pressione o botão Executar para atualizá-los.';
 $ec_lang['lpn_time_no_engine']='O solucionador interno calcula um momento de cada vez, então isto é a rede apenas em {time}: cada padrão é lido nesse momento, e cada tanque ainda está no seu nível inicial, em vez de encher e esvaziar. Conecte-se à internet uma vez para buscar o solucionador EPANET, que executa uma simulação de período estendido.';
 $ec_lang['lpn_time_running']='Calculando a simulação de período estendido com o solucionador EPANET.';
 $ec_lang['lpn_time_format_tip']='Escreva um horário como horas e minutos, como 2:30. Um número simples significa horas, então 8 é oito horas. Meia hora é 0:30.';

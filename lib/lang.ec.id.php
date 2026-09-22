@@ -1136,7 +1136,6 @@ $ec_lang['lpn_time_tank']='Tangki';
 $ec_lang['lpn_time_level']='Muka air';
 $ec_lang['lpn_time_run']='Hitung';
 $ec_lang['lpn_time_run_tip']='Selesaikan jaringan ini pada setiap langkah waktu hidrolik, dari awal proses hingga akhir.';
-$ec_lang['lpn_time_run_note']='Anda sedang melihat jaringan pada waktu pelaporan pertama. Pengaturan Hitung ulang otomatis sedang nonaktif, sehingga hasil pada waktu-waktu berikutnya tidak diperbarui selama Anda bekerja. Tekan tombol Hitung untuk memperbaruinya.';
 $ec_lang['lpn_time_speed']='Kecepatan';
 $ec_lang['lpn_time_speed_tip']='Seberapa cepat pemutaran berjalan.';
 $ec_lang['lpn_settings_search']='Cari pengaturan';

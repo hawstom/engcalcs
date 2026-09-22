@@ -1135,7 +1135,6 @@ $ec_lang['lpn_time_tank']='ታንክ';
 $ec_lang['lpn_time_level']='የውሃ መጠን ደረጃ';
 $ec_lang['lpn_time_run']='አስላ';
 $ec_lang['lpn_time_run_tip']='ይህን መረብ ከመጀመሪያው እስከ መጨረሻው ካለው የሃይድሮሊክ ጊዜ ደረጃ ሁሉ ላይ ይፈታል።';
-$ec_lang['lpn_time_run_note']='እያዩ ያሉት መረብ በመጀመሪያው የዘገባ ጊዜ ላይ ነው። በራስ-ሰር እንደገና አስላ ቅንብር ጠፍቷል፣ ስለዚህ የኋለኞቹ ጊዜያት ውጤቶች እየሰሩ ባሉበት ወቅት ወቅታዊ ሆነው አይቆዩም። ወቅታዊ ለማድረግ አስላ የሚለውን ይጫኑ።';
 $ec_lang['lpn_time_speed']='ፍጥነት';
 $ec_lang['lpn_time_speed_tip']='ሩጫው በምን ያህል ፍጥነት እንደሚጫወት።';
 $ec_lang['lpn_settings_search']='ቅንብሮችን ፈልግ';

@@ -1143,7 +1143,6 @@ $ec_lang['lpn_time_tank']='Tanki';
 $ec_lang['lpn_time_level']='Kiwango cha maji';
 $ec_lang['lpn_time_run']='Kokotoa';
 $ec_lang['lpn_time_run_tip']='Tatua mtandao huu kwa kila hatua ya wakati wa haidroliki, kutoka mwanzo wa uendeshaji hadi mwisho wake.';
-$ec_lang['lpn_time_run_note']='Unaona mtandao katika wakati wake wa kwanza wa taarifa. Mpangilio wa Kokotoa kiotomatiki umezimwa, hivyo matokeo ya nyakati za baadaye hayasasishwi unapofanya kazi. Bonyeza kitufe cha Kokotoa ili kuyasasisha.';
 $ec_lang['lpn_time_speed']='Kasi';
 $ec_lang['lpn_time_speed_tip']='Ni kwa kasi gani uendeshaji unachezwa tena.';
 $ec_lang['lpn_settings_search']='Tafuta mipangilio';

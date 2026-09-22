@@ -9809,7 +9809,15 @@ var EngCalcs = EngCalcs || {};
 		}
 		return svg;
 	}
-	function updateNode(id) {
+	// `contentChanged` is FALSE BY DEFAULT ON PURPOSE. A node drag alone calls this on every
+	// animation frame (see the tick()/applyDrag() architecture), where only POSITION moved and
+	// recomposing the label's text would force a getBBox() layout read every frame for nothing --
+	// exactly the cost the write/read split above this function exists to avoid. A property
+	// editor that actually changed a VALUE (elevation, demand, a tank dimension...) passes `true`,
+	// which is the stale-snapshot ruling reaching node labels the way rebuildLink() already
+	// reaches link ones: refreshOneLabelInPlace() rewrites only THIS node's own label, never a
+	// network-wide pass.
+	function updateNode(id, contentChanged) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
 		if (ne.hit) { syncNodeHit(n); }
@@ -9817,6 +9825,7 @@ var EngCalcs = EngCalcs || {};
 		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+		if (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }
 		scheduleSolve();
 	}
 	function updateVertex(linkId, vidx) {
@@ -9861,13 +9870,97 @@ var EngCalcs = EngCalcs || {};
 		(le.repeats || []).forEach(function (r) { r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
 		if (le.symbolG) { le.symbolG.remove(); }
 	}
+	// **TUNNEL VISION, NOT A FULL LABEL PLACEMENT PASS** (Tom, on the stale-snapshot ruling: "we can
+	// have tunnel vision on only the label we change"). This used to end with refreshLabelText() --
+	// the full content-and-collision pass over EVERY node and link in the drawing, run for a change
+	// to ONE of them. refreshOneLabelInPlace() rewrites this link's own label text and reflows only
+	// this link's own label; every other label on the map keeps exactly where it was.
 	function rebuildLink(l) {
 		removeLinkEls(l.id);
 		buildLinkEls(l);
 		// A BEND ADDED OR REMOVED CHANGES THE ARC LENGTH, so a Text anchored at a fraction of it
 		// resolves to a new point. This path does not run updateLinkGeometry(), so it says so here.
 		updateTextOnLink(l.id);
-		refreshLabelText();
+		refreshOneLabelInPlace(l);
+	}
+	// **THE ONE LABEL A SINGLE EDIT OWES, AND NOTHING ELSE'S.** Builds this element's own content
+	// lines with the same per-field formatting refreshLabelTextPass() uses, writes its glyphs and
+	// repositions only IT -- no network-wide extrema (a decoration mark may lag one edit behind,
+	// which is a smaller wrong than repainting a drawing nobody touched), no shed cascade against
+	// its neighbours, no collision avoidance. The next real content pass (a solve, a unit switch, a
+	// project reopen) recomputes everything properly; this is only what has to be true the instant
+	// an edit lands, with recalculate off and no solve running.
+	function refreshOneLabelInPlace(el) {
+		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
+			fsNow = effectiveFontSize() + 'px', lines;
+		if (group === 'node') {
+			var n = el, ne = nodeEls[n.id];
+			if (!ne) { return; }
+			lines = [];
+			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **GUARDED, WHERE THE FULL PASS IS NOT.** A junction with no demand stated at all
+			// resolves to `undefined` (resolvedDemand()/baseDemandTotal() hand back `rows[0].base`
+			// verbatim), and rawLine() has no guard of its own -- plainRound() returns undefined for
+			// a non-number and `.toFixed()` on that throws. refreshLabelTextPass() carries the same
+			// unguarded call and has simply never been driven at this one node with demandActual on;
+			// a single-element refresh reaches combinations a whole-document pass may not have, so
+			// it cannot rely on that silence. Same treatment elev/quality/initQuality already get.
+			var demandActualVal = resolvedDemand(n), demandVal = baseDemandTotal(n);
+			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof demandActualVal === 'number') { lines.push(affix('node', 'demandActual', rawLine(demandActualVal, null, nd.demandActual))); }
+			if (!isFixedHeadNode(n) && ls.node.demand && typeof demandVal === 'number') { lines.push(affix('node', 'demand', rawLine(demandVal, null, nd.demand))); }
+			var headVal = isFixedHeadNode(n)
+				? toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'))
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
+			var pressVal = isFixedHeadNode(n)
+				? fixedHeadPressure(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
+			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
+			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
+			var qualVal = nodeQualityValue(n);
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, nd.quality))); }
+			var initQualVal = nodeInitQuality(n);
+			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, null, nd.initQuality))); }
+			ne.empty = lines.length === 0;
+			if (lines.length === 0) { lines.push({ text: '' }); }
+			lines = nodeDisplayOrder(lines);
+			ne.allLines = lines;
+			writeNodeLabelGlyphs(ne, n, lines, fsNow);
+			measureLabelWidths(ne);
+			layoutNodeLabel(n.id);
+		} else if (group === 'link') {
+			var l = el, le = linkEls[l.id];
+			if (!le) { return; }
+			lines = [];
+			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (l.type === 'pipe') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
+				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), null, ld.length))); }
+				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), null, ld.roughness))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), null, ld.km))); }
+			} else if (l.type === 'valve') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
+			}
+			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss))); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), null, ld.gradient, gradientSuffix()))); }
+				var fricVal = linkFrictionFactor(l);
+				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, null, ld.friction))); }
+			}
+			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
+			var lqVal = linkQualityValue(l);
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, ld.quality))); }
+			var lrVal = linkReactionRate(l);
+			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, null, ld.rate))); }
+			le.empty = lines.length === 0;
+			if (lines.length === 0) { lines.push({ text: '' }); }
+			le.allLines = lines;
+			writeLabelGlyphs(le, l, lines, fsNow);
+			measureLabelWidths(le);
+			layoutLinkLabel(l.id);
+		}
 	}
 	// **BOTH OF THESE SNAPSHOT FOR THEMSELVES, AND THAT IS THE POINT OF PUTTING IT HERE.**
 	// (ROADMAP Task 567's first strand, found 2026-09-01 by the utility-field-operator agent.)
@@ -16087,7 +16180,7 @@ var EngCalcs = EngCalcs || {};
 	function replaceRedraw(el, group) {
 		if (group === 'link') { rebuildLink(el); }
 		else if (group === 'customer') { updateCustomerGeometry(el.id); }
-		else if (nodeEls[el.id]) { updateNode(el.id); }
+		else if (nodeEls[el.id]) { updateNode(el.id, true); }
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id)
@@ -16180,6 +16273,7 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
+		refreshPaneIfOpen();
 		// The query is re-run over the document it just changed, because the rows are the panel's
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
@@ -17701,7 +17795,7 @@ var EngCalcs = EngCalcs || {};
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
 			get: function (n) { return n.elev; },
-			set: function (n, v) { n.elev = v; updateNode(n.id); } };
+			set: function (n, v) { n.elev = v; updateNode(n.id, true); } };
 	}
 	/**
 	 * **A NODE'S POSITION AS TWO COLUMNS** (ROADMAP Task 674), the property popup's own two rows
@@ -18205,7 +18299,7 @@ var EngCalcs = EngCalcs || {};
 					// whose water surface is its ground, not a reservoir with no head.
 					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
-						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
+						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id, true); } },
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
@@ -18233,16 +18327,16 @@ var EngCalcs = EngCalcs || {};
 						set: function (n, v) { setProp(n, 'level', v); } },
 					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.minLevel; },
-						set: function (n, v) { n.minLevel = v; updateNode(n.id); } },
+						set: function (n, v) { n.minLevel = v; updateNode(n.id, true); } },
 					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
-						set: function (n, v) { n.maxLevel = v; updateNode(n.id); } },
+						set: function (n, v) { n.maxLevel = v; updateNode(n.id, true); } },
 					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
 					// distance across the ground, and inches would put a 15 m tank on screen as
 					// 15000. The popup says the same thing in its tip.
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
 						get: function (n) { return n.tankDiameter; },
-						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
+						set: function (n, v) { n.tankDiameter = v; updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
@@ -23663,7 +23757,9 @@ var EngCalcs = EngCalcs || {};
 		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
 		// rings describe the network they were run on, and this is a different project.
 		perfDebugTime('scheduleSolve', function () {
-			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleSolve(); }
+			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
+			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
+			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
 		});
 		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
@@ -27539,13 +27635,116 @@ var EngCalcs = EngCalcs || {};
 	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
 	// things this handler closes and nothing else: the Find box, for instance, is not on Escape at
 	// all, so an open Find must not stand between the reader and their tool.
+	/**
+	 * **BIG GUARDS ON CLOSING A BOX: ESCAPE REACHES A BOX ONLY WHEN FOCUS IS INSIDE IT** (Tom,
+	 * 2026-09-19: *"please don't let Escape close those boxes when the mouse cursor is elsewhere.
+	 * When I say 'only when box is in focus', I mean it in the strongest way possible. Big guards
+	 * on closing a box."*).
+	 *
+	 * The handler below used to be page-wide for every one of its closers, so an Escape meant for
+	 * something else -- leaving a tool, clearing a selection, dismissing a menu -- also swept away
+	 * a Properties, Settings or Libraries box standing quietly in a corner that the reader had not
+	 * touched. That is a FOCUS defect and not a question about whether Escape may close a box at
+	 * all: the old handler asked `document.activeElement` nothing.
+	 *
+	 * **THE THREE STANDING BOXES ARE SCOPED AND THE MENUS ARE NOT**, which is the line Ida drew
+	 * (`dev/agents/interface-designer/journal.md`, 2026-09-18) out of Higley's "Escaping 101": a
+	 * pull-down and a view popover never take focus, so there is no focus to ask about and
+	 * page-wide dismissal is the whole convention -- and Tom's own 2026-08-13 ruling already says
+	 * *"these are menus, not boxes"*. A standing box DOES take focus, and Escape is legitimate
+	 * there exactly while it holds the interaction.
+	 *
+	 * **AND THIS TAKES NO KEYBOARD EXIT AWAY.** All three boxes carry a real `<button>` close
+	 * control in the tab order, so a reader who never focused the box was never using Escape to
+	 * leave it, and one who DID focus it still gets the one-key exit that guard is protecting.
+	 *
+	 * It is deliberately blunt about what counts: `body` and the document element are not "inside"
+	 * anything, so the ordinary state -- a reader who has clicked the drawing, or clicked nothing
+	 * at all -- reaches no box. That bluntness is the guard.
+	 */
+	var ESCAPE_SCOPED_BOXES = ['lpn_popup', 'lpn_settings_box', 'lpn_library_box'];
+	function escapeFocusIsInside(id) {
+		var box = document.getElementById(id), el;
+		if (!box) { return false; }
+		try { el = document.activeElement; } catch (err) { return false; }
+		if (!el || el === document.body || el === document.documentElement) { return false; }
+		return el === box || (typeof box.contains === 'function' && box.contains(el));
+	}
+	/**
+	 * **FOCUS IS NOT ENOUGH, BECAUSE THE MOUSE CAN WALK AWAY WITHOUT TAKING FOCUS WITH IT** (Tom,
+	 * 2026-09-19: *"What about mouse away and I don't click away, then I press Esc? I want to be
+	 * very severe against accidental Esc closures of the boxes."*).
+	 *
+	 * The case he names: he clicks into the box, so focus is genuinely inside it; he then moves
+	 * the POINTER off somewhere else without clicking, which changes no focus at all; and the
+	 * Escape he presses there is about whatever he is now looking at. The focus test says "inside"
+	 * and his attention says "elsewhere", and the focus test is the one that was wrong.
+	 *
+	 * **SO BOTH HAVE TO AGREE, AND WHERE THEY DISAGREE THE BOX STAYS OPEN.** That is the severity
+	 * he asked for stated as a rule: Escape closes a standing box only when focus is inside it AND
+	 * the pointer is over it.
+	 *
+	 * **THE RULE CHOSEN, AND WHY IT IS THIS ONE RATHER THAN "HAS THE POINTER MOVED SINCE THE BOX
+	 * OPENED".** The pointer position is believed only once the pointer has been used on this page
+	 * at all; until then there is no position to believe and the test passes. Two things follow,
+	 * and both are wanted:
+	 *
+	 *   - **A KEYBOARD-ONLY READER IS NEVER STRANDED.** Somebody who tabbed into the box and has
+	 *     not touched a mouse leaves on Escape exactly as before. (All three boxes also carry a
+	 *     real focusable close button, so the keyboard exit never rested on this key alone.)
+	 *   - **A MOUSE READER MUST HAVE THE POINTER ON THE BOX.** Opening the box by clicking a
+	 *     toolbar button or a pipe leaves focus outside it anyway, so nothing changes there; the
+	 *     only way focus gets inside is a click into the box or a Tab, and after a click the
+	 *     pointer IS on the box until it is moved off -- which is Tom's case, and it now stays
+	 *     open.
+	 *
+	 * Measuring since-the-box-opened instead would need every open path to stamp a mark, and a box
+	 * shown by any route that missed the stamp would answer wrongly. This asks one question of the
+	 * live pointer and needs no bookkeeping anywhere else.
+	 *
+	 * Every uncertainty resolves TOWARDS LEAVING THE BOX OPEN: no element, no measurable rectangle
+	 * or a zero-sized one all read as "not over it".
+	 */
+	var escapePointerAt = null;
+	function escapeNotePointer(e) {
+		if (!e || typeof e.clientX !== 'number') { return; }
+		escapePointerAt = { x: e.clientX, y: e.clientY };
+	}
+	['mousemove', 'mousedown', 'pointermove', 'pointerdown'].forEach(function (type) {
+		document.addEventListener(type, escapeNotePointer, true);
+	});
+	function escapePointerIsOver(id) {
+		var box = document.getElementById(id), r;
+		if (!escapePointerAt) { return true; }
+		if (!box || typeof box.getBoundingClientRect !== 'function') { return false; }
+		r = box.getBoundingClientRect();
+		if (!r || (!r.width && !r.height)) { return false; }
+		return escapePointerAt.x >= r.left && escapePointerAt.x <= r.right &&
+			escapePointerAt.y >= r.top && escapePointerAt.y <= r.bottom;
+	}
+	function escapeOwnsBox(id) {
+		return escapeFocusIsInside(id) && escapePointerIsOver(id);
+	}
+	function escapeOwnsScopedBox() {
+		return ESCAPE_SCOPED_BOXES.some(escapeOwnsBox);
+	}
+	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
+	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
+	// things this handler closes and nothing else: the Find box, for instance, is not on Escape at
+	// all, so an open Find must not stand between the reader and their tool.
+	//
+	// **AND IT ASKS THE SAME FOCUS QUESTION THE CLOSERS DO**, which is the half that is easy to
+	// miss: a box that is open but unfocused is no longer something this press is going to cost,
+	// so counting it here would make Escape cost NOTHING at all -- neither the box nor the tool --
+	// for as long as that box sat there. Scoping the closers without scoping this would trade
+	// Tom's complaint for a dead Escape key.
 	function escapeClosableOpen() {
-		var open = ['lpn_menu_popup', 'lpn_popup'].concat(VIEW_POPOVERS).some(function (id) {
+		var open = ['lpn_menu_popup'].concat(VIEW_POPOVERS).some(function (id) {
 			var p = document.getElementById(id);
 			return !!p && !!p.style.display && p.style.display !== 'none';
 		});
 		var hint = document.getElementById('lpn_empty_hint');
-		return open || setboxIsOpen() || libBoxIsOpen() ||
+		return open || escapeOwnsScopedBox() ||
 			!!(hint && hint.style.display === 'block');
 	}
 	// Escape dismisses whatever pull-down is showing -- the other half of "these are menus, not
@@ -27563,15 +27762,19 @@ var EngCalcs = EngCalcs || {};
 		// not reach, and it is the box people open most. Field values are already committed on
 		// `change`, which fires on blur before this handler runs, so dismissing cannot lose a typed
 		// number -- the same contract every other box here has.
-		closePopup();
-		// ...and the Settings box, which is a standing box like the property popup and is closed
-		// the same three ways: its X, the button that opened it, and Escape. Its filter field takes
-		// Escape first while it holds text (see wireSettingsBox), so a typo costs the search rather
-		// than the box.
-		closeSettingsBox();
-		// ...and the Libraries box, which is the same kind of standing box and is closed the same
-		// three ways. It carries no filter field, so nothing here takes the key first.
-		closeLibraryBox();
+		//
+		// ...and the Settings box and the Libraries box, which are standing boxes of the same kind
+		// and are closed the same three ways: their X, the button that opened them, and Escape.
+		// Settings' filter field takes Escape first while it holds text (see wireSettingsBox), so a
+		// typo costs the search rather than the box.
+		//
+		// **ALL THREE ONLY WHEN FOCUS IS INSIDE THE BOX AND THE POINTER IS ON IT** -- see escapeOwnsBox()
+		// for Tom's words and the reasoning. Each is asked separately rather than as one group, so
+		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
+		// press, one thing, which is the rule the rest of this handler already keeps.
+		if (escapeOwnsBox('lpn_popup')) { closePopup(); }
+		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
+		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
@@ -38702,17 +38905,27 @@ var EngCalcs = EngCalcs || {};
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
 	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
 	// third of it.
+	//
+	// **AND, SINCE this edit's own map label, EVERYWHERE ELSE THAT SAME INPUT SHOWS** (Tom, on the
+	// stale-snapshot ruling: "Any input we edit must be reflected wherever it shows, Table,
+	// Properties, and map labels... we can have tunnel vision on only the label we change"). The
+	// Tables pane was the missing leg -- refillPaneTable() already reads the element correctly, but
+	// nothing here ever asked it to. Node group in particular never touched the map label at all:
+	// updateNode() repositions a node's label but never rewrites its TEXT (it also runs on every
+	// animation frame of a drag, where recomposing content would be wasted work), so an elevation
+	// or demand typed into Properties or the table sat on the map until the next real solve.
 	function afterPropertyEdit(el) {
 		var group = elGroup(el);
 		if (group === 'link') { rebuildLink(el); }
 		// A Text label's redraw is its content, its measured width and its visibility -- the same
 		// three whether the words changed or the label was switched off (Task 407).
 		else if (group === 'label') { refreshLabelContent(el.id); }
-		else if (nodeEls[el.id]) { updateNode(el.id); }
+		else if (nodeEls[el.id]) { updateNode(el.id, true); }
 		refreshScenarioMarks();
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
+		refreshPaneIfOpen();
 	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
@@ -40029,12 +40242,12 @@ var EngCalcs = EngCalcs || {};
 				['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
 				['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']],
 			model,
-			function (v) { n.mixingModel = v; updateNode(n.id); refreshPopupIfOpen(); },
+			function (v) { n.mixingModel = v; updateNode(n.id, true); refreshPopupIfOpen(); },
 			pc.lpn_mixing_model_tip);
 		if (model !== '2COMP') { return; }
 		numberFieldBlank(fields, pc.lpn_mixing_fraction || 'Mixing fraction',
 			n.mixingFraction,
-			function (v) { n.mixingFraction = v; updateNode(n.id); },
+			function (v) { n.mixingFraction = v; updateNode(n.id, true); },
 			pc.lpn_mixing_fraction_tip);
 	}
 	function qualityResultRow(fields, n) {
@@ -40100,28 +40313,28 @@ var EngCalcs = EngCalcs || {};
 			// trap Tom named on the pump (see addLink()).
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_tank_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
-				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
 			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
 				function () { return n.minLevel; },
-				function (v) { n.minLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.minLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_minlevel_tip);
 			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
 				function () { return n.maxLevel; },
-				function (v) { n.maxLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_maxlevel_tip);
 			// The Elevation/Head unit, NOT the pipe-diameter unit, and the tip says so. A tank
 			// diameter is a distance across the ground, of the same order as the elevations beside
 			// it; reading it in inches or millimetres would put a 15 m tank on screen as 15000.
 			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_elevhead',
 				function () { return n.tankDiameter; },
-				function (v) { n.tankDiameter = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.tankDiameter = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
@@ -40146,10 +40359,10 @@ var EngCalcs = EngCalcs || {};
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
 			// as already filled in without pretending the user typed it. Clearing it hands the head
 			// back to the elevation. Both setters re-render the popup, because each field feeds the
@@ -40158,7 +40371,7 @@ var EngCalcs = EngCalcs || {};
 
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
-				function (v) { setProp(n, 'head', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { setProp(n, 'head', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
 			// **HOW THAT HEAD MOVES THROUGH THE RUN** (Task 248.02), the reservoir's twin of the
 			// junction's demand pattern below: the total head is the head above times the pattern's
@@ -40168,7 +40381,7 @@ var EngCalcs = EngCalcs || {};
 			// variable a scenario asks "what if" about.
 			patternField(fields, pc.lpn_field_head_pattern || 'Head pattern',
 				function () { return n.headPattern; },
-				function (v) { n.headPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
+				function (v) { n.headPattern = v || null; updateNode(nodeId, true); scheduleSolve(); saveToStorage(); },
 				pc.lpn_field_head_pattern_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above shows this reservoir's head, typed or inherited.
@@ -40184,10 +40397,10 @@ var EngCalcs = EngCalcs || {};
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); },
 				pc.lpn_field_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
 			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
 			// specially. What we need to do is remove the original Base demand and Demand pattern
@@ -44449,7 +44662,8 @@ var EngCalcs = EngCalcs || {};
 			boxes = {},
 			engine,
 			run,
-			stop;
+			stop,
+			clear;
 		if (!host) { return; }
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
@@ -44524,6 +44738,15 @@ var EngCalcs = EngCalcs || {};
 		stop.type = 'button';
 		stop.disabled = !fireFlowBusy;
 		stop.addEventListener('click', function () { fireFlowStop = true; });
+		// **A DELIBERATE CLEAR, NOW THAT AN EDIT NO LONGER CLEARS FOR YOU** (Tom, asked whether the
+		// rings should stop clearing themselves on an edit: *"Yes... for fire flow rings, we could
+		// provide a button in that box to clear the rings."*). Disabled where there is nothing to
+		// clear, exactly as Stop is disabled where nothing is running. `true` (quiet): this is the
+		// user's own decision, not news to tell them about.
+		clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
+		clear.type = 'button';
+		clear.disabled = !fireFlowRun;
+		clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
@@ -45802,11 +46025,10 @@ var EngCalcs = EngCalcs || {};
 				'These rules name an element that is no longer in this project, so they were ignored in this run: {ids}'),
 			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
 				'These rules could not be read, so they were ignored in this run: {ids}'),
-			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
-			// known to read the numbers on screen. Here, that only the first reporting time is
-			// being kept up to date, because working the whole period out costs more than this
-			// page is willing to spend while you are still typing (js/lpn-time.js, LPN_TIME_AUTO).
-			EngCalcs.lpnTimeStatusNote ? EngCalcs.lpnTimeStatusNote() : '']
+			// (A note about the later times being out of date used to be composed here. It is gone:
+			// off means off now, so there is no state in which SOME of a run is up to date --
+			// see EC.lpnTimeStandDown() in js/lpn-time.js.)
+			'']
 			.filter(function (t) { return !!t; }).join(' '));
 		// The engine notes go to their OWN span, so their two-minute clock runs independently of
 		// this diagnostic. Written only when one of them was actually raised THIS solve --
@@ -45964,14 +46186,101 @@ var EngCalcs = EngCalcs || {};
 	// architecture ported from the spike) -- solving on every one of those would both be wasted
 	// work and would fight the drag for the main thread.
 	var solveTimer = null;
+	var manualSaveTimer = null;
 	function scheduleSolve() {
-		// **A FIRE FLOW RUN DESCRIBES THE NETWORK IT WAS RUN ON** (Task 530). This is the one thing
-		// every edit on this page goes through, so it is the one place the stale result set can be
-		// dropped -- leaving the rings on a drawing that has since changed would be a picture that
-		// is quietly wrong, which is worse than no picture.
+		// **THE RINGS STAY, LIKE EVERY OTHER STALE ANSWER, AND THIS REVERSES TASK 530** (Tom, asked
+		// directly whether fire flow rings should keep the same "off means off, not hide or
+		// delete" treatment as the rest of the page: *"Yes... for fire flow rings, we could provide
+		// a button in that box to clear the rings."*). An edit used to drop the whole result set
+		// here, on the argument that a ring on a drawing that has since changed is quietly wrong.
+		// He decided the user gets to judge that, exactly as with every other stale number, and
+        // gets an explicit Clear button in the fire flow box instead of a clear he never asked for.
+		// A genuinely different network -- opening another project or tab -- still clears them; see
+		// scheduleArrivalSolve() and the project-open path, neither of which is an edit.
+		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = null;
+		// **OFF MEANS OFF** (Tom, 2026-09-19: *"With recalculate off and no zooms happening, there
+		// should be nothing happening when I change inputs. It should be lightning fast."*).
+		//
+		// **AND UNTIL NOW IT DID NOT MEAN OFF AT ALL.** `settings.autoRun` was read in exactly one
+		// place that could stop arithmetic -- js/lpn-time.js's scheduleIdleRun() -- so all the
+		// switch ever suppressed was the LATER time steps of an extended-period run. The steady
+		// solve at the first reporting time still ran on every edit, and on a document with no
+		// duration at all the switch suppressed nothing whatsoever. Measured on the shipped Net3
+		// example with the box unticked: one pipe roughness edit still produced one full EPANET
+		// solve, 26 ms of main-thread work before the engine was even called
+		// (dev/lpn-spike/manual-recalc-harness.js).
+		//
+		// So the gate belongs HERE, at the one door every edit goes through, rather than one layer
+		// further in where only half the edits could ever reach it.
+		if (settings.autoRun === false) { afterManualEdit(); return; }
+		solveTimer = setTimeout(runSolve, 300);
+	}
+	/**
+	 * **OFF MEANS OFF ON THE WAY IN TOO** (Tom, 2026-09-19: *"Calculate on open: No. Off means
+	 * off; you say it, but do you believe it? Consent, people! And the industry is used to
+	 * that."*).
+	 *
+	 * **THIS REVERSES WHAT SHIPPED EARLIER THE SAME DAY.** Arriving used to solve whatever the
+	 * switch said, on the argument that opening a file is the user asking for answers rather than
+	 * changing them. He rejected that argument: a switch with an exception in it is not a switch,
+	 * and EPANET and its peers open a model without solving it, which is what he means by the
+	 * industry being used to it. So a project opened with the box unticked draws, and holds
+	 * whatever answers came with it, until he presses Calculate.
+	 *
+	 * The fire-flow run still goes, because that is not arithmetic being withheld -- its rings
+	 * describe the network they were run on, and this is a different project.
+	 *
+	 * EC.lpnTimeArrived() has already flagged a period run as wanted by the time this is reached,
+	 * so the off branch has to stand that flag down as well: leaving it set would fire a full
+	 * 24-hour run the next time anything at all called through, which is the defect wearing a
+	 * different hat.
+	 */
+	function scheduleArrivalSolve() {
 		clearFireFlowRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = null;
+		if (settings.autoRun === false) {
+			if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
+			return;
+		}
 		solveTimer = setTimeout(runSolve, 300);
+	}
+	/**
+	 * Everything an edit still owes the page when no solve is going to happen. **Exactly two
+	 * things, and taking the old answers away is not one of them.**
+	 *
+	 *   1. **THE EDIT STILL HAS TO PERSIST.** Autosave piggybacked on the solve debounce -- see
+	 *      runSolve()'s own saveToStorage() -- so cutting the solve out without this would lose
+	 *      every edit made with the switch off at the next reload. Same 300 ms, so one burst of
+	 *      typing is still one save.
+	 *   2. **NOTHING MAY BE LEFT QUEUED.** An idle period run scheduled before the switch went off
+	 *      would fire in a second and make a liar of it.
+	 *
+	 * **THE STALE NUMBERS STAY EXACTLY WHERE THEY ARE, AND THIS REVERSES WHAT SHIPPED EARLIER THE
+	 * SAME DAY** (Tom, 2026-09-19: *"Recalc off Old values: Leave in place stale. Don't clear.
+	 * Trust the user."*). The first repair cleared `lastSolveResult`, repainted the labels and
+	 * said so in the status bar, on the argument that a pressure shown for a pipe whose diameter
+	 * has since changed is believable and therefore worse than a blank. He rejected it: with the
+	 * switch off he is the one who decides when the answers are worked out, so he is also the one
+	 * who decides how long the last set is worth looking at. There is no grey-out and no sentence
+	 * either -- he said *leave in place*, not *mark it*. **Do not reinstate any of the three
+	 * without his word**; this is the "a calculator stores what the user typed, and we do not
+	 * decide for him" rule reaching the results half of the screen.
+	 *
+	 * The drawing itself is not touched here at all: whoever called us has already redrawn what
+	 * they changed, which is why an edit with the switch off still SHOWS.
+	 *
+	 * **SO EVERY EDIT OF A BURST COSTS THE SAME NOTHING**: a comparison, a timer reset and one
+	 * debounced write. There is no repaint at all on this path now.
+	 */
+	function afterManualEdit() {
+		if (manualSaveTimer) { clearTimeout(manualSaveTimer); }
+		manualSaveTimer = setTimeout(function () {
+			manualSaveTimer = null;
+			saveToStorage();
+		}, 300);
+		if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
 	}
 
 	// calcAndSave() calls this unconditionally, from the units strip's own selects and from
