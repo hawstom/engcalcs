@@ -1927,31 +1927,12 @@ the block.
     feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
     already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
 
-- 100|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
-  Found by Declan 2026-09-21, answering Tom's *"is it fast enough for Declan?"* -- his answer was
-  **yes**, and this is the thing he found while proving it.
-  - **TOM RULED 2026-09-21: BUILD IT, DO NOT WAIT FOR THE MEASUREMENT.** His words: *"I think this
-    would be cheap enough to fix that we should fix it without waiting for measurement. To be
-    honest, I am not sure what it means to save the whole project and why we would ever do that
-    when we can just save the entry at hand. My intuition is that we would always just save the
-    entry at hand and only save the whole project ... when there is a pause. See Off Means Off."*
-    So the five-minutes-of-a-real-browser line below is no longer a gate; it is a way to check the
-    result afterwards. **His intuition IS the design: write the one thing that changed, and defer
-    the whole-project write to a pause**, which is the same shape as the recalculation rule he
-    already ruled on.
-  - **The recalculation waits until you pause. The save does not.** Every cell commit serialises
-    and stores the entire project, not the one thing that changed, on every keystroke-equivalent,
-    uncapped.
-  - **He would not claim a number he could not honestly measure**, and that restraint is the point:
-    with no real browser he built a stand-in on a document shaped like Tom's and got **about 2.6 ms
-    per save at 400 elements -- a FLOOR, not a ceiling**, because it skips the browser's actual
-    write. Small enough not to change his verdict today, and it grows with the network.
-  - **A third thing of the same shape is NAMED and deliberately not sized:** a scan across every
-    element on the map on every commit, running even when nothing about scenarios has changed
-    (`refreshScenarioMarks()`).
-  - **THE CHEAP WAY TO SETTLE IT IS FIVE MINUTES OF A REAL BROWSER** -- the Performance tab open,
-    ten cells typed down a column of the biggest real project. That replaces a stand-in number with
-    a real one, and it is the one thing that could overturn his yes.
+- 50|707| **Five minutes of a real browser on the Task 706 repair.** The Performance tab open, ten
+  cells typed down a column of the biggest real project. The repair shipped on Tom's ruling without
+  waiting for a measurement; every number behind it is a stand-in
+  (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
+  browser's own write, and the real cost of a style invalidation). This is what replaces the floor
+  with a number.
 
 - 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
   Tom, 2026-09-21, asking for discussion and a plan rather than a build.
