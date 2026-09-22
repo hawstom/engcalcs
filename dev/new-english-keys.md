@@ -620,7 +620,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**13 still to read**, of 13 new keys across 8 unmerged branch(es).
+**13 still to read**, of 13 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -631,9 +631,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/tom-0922 (`b2485826`) — adds no English strings
-
-### feat/label-gang-search (`2b528452`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/label-gang-search (`3bf1ade7`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -648,9 +646,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Automatic: {width}
   @@ NEEDS RULING
 
-### feat/map-menu (`574f4dd3`) — adds no English strings
+### feat/map-menu (`52a4ea57`) — adds no English strings
 
-### feat/notice-log (`1e48999b`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/notice-log (`cd98ae4e`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_lock_open_cancelled`**
   > That file was not opened, and nothing here changed. Somebody else still has it open.
@@ -674,7 +672,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`a04de77f`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`9595a1e7`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_pane_goto_tip`**
   > Zoom & select
@@ -683,8 +681,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not used
   @@ NEEDS RULING
 
-### feat/zoom-symbol-size (`e1c025ca`) — adds no English strings
-
-### fix/daily-report-headings (`f3edca07`) — adds no English strings
-
-### fix/example-open (`e3ff6a6e`) — adds no English strings
+### fix/example-open (`3b1f4e9f`) — adds no English strings
