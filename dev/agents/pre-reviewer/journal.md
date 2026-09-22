@@ -134,3 +134,37 @@ rather than loosening it.
 **One bookkeeping miss worth naming because it would have misled a translation sprint:** a report
 claimed "no new language keys anywhere on the branch" and one had been added and correctly wired.
 A wrong count is cheap to make and expensive to inherit.
+
+## 2026-09-21 — sixth outing: the repair for the repair still has a hole
+
+OBSERVED, checked 2026-09-21, `feat/tables-spreadsheet` at `d8ee55a0`.
+
+**Eight of nine items (R-035, R-082, R-083, R-085, R-086, R-087, R-088, and the `refTo`
+half of R-085(c) on customer columns) CONFIRMED by running real events through the actual
+door**, not by reading. The `refTo` fallback was worth constructing beyond the shipped
+harness's own sample (which only drives Pipes' From/To): a customer detached from its pipe
+(dangling `link` id) and a customer with no `link` field at all both fell back cleanly to the
+customer's own row rather than mistargeting or crashing -- a case the queue's own item (c)
+names ("a customer's lumped junction") and the shipped harness never drives.
+
+**The one MISS: the repair for R-038's own overreach only covers `<select>` and checkbox
+cells, not a text cell already in Edit or Entry mode.** The mouse-half fix (4fc86c07) made
+every plain mousedown on the table call `preventDefault()`, to stop the browser arming its
+own character-drag-selection while extending a cell RANGE with the mouse. The follow-up
+(4cfbd343) exempted a pull-down and a checkbox from that -- but never asked whether a TEXT
+cell that is already open for editing needs the same exemption. It does: `paneEnterEdit()`
+selects the whole value on entry (F2 or double-click), and the natural next move -- click
+inside the text to place the caret for a partial edit, or drag to select a substring to
+retype -- fires the SAME mousedown listener, which prevents the default caret placement and
+then just re-focuses the already-focused box, leaving the caret exactly where it was.
+**Verified with a real mousedown fired at the table's own listener, after entering edit mode
+with a real dblclick**: `preventDefault` still fires (count 1) on the second press. The
+shipped harness's own equivalent assertion ("a press on a typed cell still blocks the
+browser's text selection") only ever runs in Ready mode, so it could not have caught this.
+
+**The standing check earns its place again, in a new shape**: the fix for an overreach is
+itself checked by re-running the SAME small set of cases (select, checkbox, one Ready-mode
+text cell) rather than by asking what OTHER state the same code path now runs in. Worth
+adding to the standing list: **a "we exempted X and Y" repair is exactly the moment to ask
+what THIRD state shares the same code path** -- here, editing is not select or checkbox, but
+it is not Ready either, and nothing asked about it.
