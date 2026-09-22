@@ -343,6 +343,9 @@ html[lang="zh"] .ec-welcome {
 
 /* Looped Pipe Network map editor (prefix lpn_, ROADMAP Task 146). Canvas mechanics ported
    from the validated dev/lpn-spike/canvas-spike.html -- see phase0-acceptance.md. */
+/* --lpn-symf is the same factor WITHOUT the Task 705 maximum map size: the editing furniture
+   (selection and pending rings, vertex grips, rubber band, marquee, the just-moved pulse) reads it,
+   because those speak to the person at the mouse and must not shrink away with the drawing. */
 /* --lpn-sym is the symbol-size factor (Settings > "Symbol size (relative to text)"), set on the
    SVG element by refreshSymbolSizes() in looped-network.js. Every stroke width below is written as
    its original fixed value times that factor, so the default of 1 renders exactly what shipped
@@ -379,7 +382,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -654,9 +657,9 @@ html[lang="zh"] .ec-welcome {
    The whole mode is one class on the canvas, so nothing is created or destroyed to enter or leave
    it, and a bend added while it is on is styled by the same rule with no extra code. */
 .lpn-vertexmode .lpn-vhandle {
-	r: calc(1.5 * var(--lpn-sym, 0));
+	r: calc(1.5 * var(--lpn-symf, 0));
 	fill: var(--lpn-map-bg, #fff);
-	stroke-width: calc(0.4 * var(--lpn-sym, 0));
+	stroke-width: calc(0.4 * var(--lpn-symf, 0));
 }
 /* Every pipe's bends are legible while the mode is on, not only the selected one: Tom, 2026-09-01,
    *"We could tweak the behavior to enable vertices mode for all pipes if that's efficient."* It is
@@ -921,7 +924,7 @@ html[lang="zh"] .ec-welcome {
    BEFORE .lpn-node-pending (mid-pipe-draw is about what your next click does, which is more
    urgent still). */
 .lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
-.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
+.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
 .lpn-lbl.lpn-selected { fill: #1976d2; }
 /* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
    rather than hidden, because the whole point of the inactive/active pair is to see both at once --
@@ -936,17 +939,17 @@ html[lang="zh"] .ec-welcome {
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
-.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
+.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
 /* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
    mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
-.lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-sym, 0)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
+.lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-symf, 0)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
 /* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
    band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
    that both follow the pointer and must never be mistaken for each other. A faint wash inside it,
    so a lasso reads as an enclosure rather than as a scribble; pointer-events off, or the shape
    being drawn would swallow the hit tests of everything under it. */
 .lpn-marquee {
-	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-sym, 0)); stroke-dasharray: 1.2 1;
+	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-symf, 0)); stroke-dasharray: 1.2 1;
 	fill: #0645ad; fill-opacity: .08; pointer-events: none;
 }
 /* **THE DISCLOSURE TRIANGLE** (Task 266). It says "this control holds more than it shows", which
@@ -1172,12 +1175,12 @@ html[lang="zh"] .ec-welcome {
    frame of the fade would be a black ring that then vanishes when the animation lets go. */
 .lpn-node.lpn-just-dragged { animation-name: lpn-just-moved-node; }
 @keyframes lpn-just-moved-node {
-	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
-	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
-	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
-	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
-	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; animation-timing-function: linear; }
-	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
+	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; }
+	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; }
+	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; }
+	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; }
+	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; animation-timing-function: linear; }
+	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-symf, 0)); paint-order: stroke fill; }
 }
 /* BOTH of them, and the node one by name: `.lpn-node.lpn-just-dragged` above outranks the shorthand
    reset below, so a reader who honours prefers-reduced-motion would still get the blinking ring. */

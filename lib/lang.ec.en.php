@@ -2876,13 +2876,12 @@ $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 $ec_lang['lpn_settings_leader_snap']='Snap leader lines to set angles';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label away from its asset.';
-// **THE LABELING THRESHOLD** (Tasks 669 and 705). Four strings: the row's name, its tip, the
-// capture button beside the box, and the placeholder, which is the only place on screen that says
-// what a blank box means. The row's name takes the project's length unit at run time, so it is not
-// in the string.
-$ec_lang['lpn_settings_label_max_width']='Widest view that shows labels';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Map symbols stop growing at this same view, so past it they hold their size on the ground and shrink on the screen. Reservoirs and tanks are exempt and keep their size on the screen.';
-$ec_lang['lpn_settings_label_use_view']='Use current view';
+// **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
+// Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
+// row's key, because it is the same button doing the same thing. The placeholder is the only place
+// on screen that says what a blank box means. The length unit is shown beside the box at run time.
+$ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map width or less';
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

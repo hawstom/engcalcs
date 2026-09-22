@@ -6420,6 +6420,13 @@ var EngCalcs = EngCalcs || {};
 	// the ground and starts shrinking on the screen, which is exactly his sentence.
 	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
 	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	// **KEYED ON THE DOCUMENT AND ITS LINK COUNT AS WELL AS INVALIDATED BY NAME.** A cache keyed on
+	// the count alone survived a project switch on feat/label-gang-search and laid 119 of 216 labels
+	// out from the previous document's number, so the key is the `doc.links` ARRAY ITSELF plus its
+	// length -- a switch, an undo and a rebuild all replace the array -- and buildDom() and a node
+	// drag clear it outright. What neither catches is a node nudged by a hand-typed coordinate, and
+	// a 10th percentile of up to 512 lengths does not move measurably for one pipe.
+	var p10LinkKeyArr = null, p10LinkKeyLen = -1;
 	function invalidateSymbolCap() { symbolCapCache = null; }
 	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
 	// they change only when the drawing does, while the cap also moves with the window and the
@@ -6430,10 +6437,15 @@ var EngCalcs = EngCalcs || {};
 	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
 	// left out rather than counted: a pump and a valve are zero-length by construction, and a
 	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	var LPN_SYMBOL_CAP_SAMPLE = 512;
 	function p10LinkLengthWorld() {
+		var list = doc.links || [], n = list.length, step, lens = [], i, l, a, b, d;
+		if (list !== p10LinkKeyArr || n !== p10LinkKeyLen) {
+			p10LinkKeyArr = list; p10LinkKeyLen = n;
+			p10LinkLengthCache = null; symbolCapCache = null;
+		}
 		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
-		var list = doc.links || [], n = list.length, step = Math.max(1, Math.ceil(n / 512)),
-			lens = [], i, l, a, b, d;
+		step = Math.max(1, Math.ceil(n / LPN_SYMBOL_CAP_SAMPLE));
 		for (i = 0; i < n; i += step) {
 			l = list[i];
 			a = nodeAt(nodeById(l.from)); b = nodeAt(nodeById(l.to));
@@ -6448,8 +6460,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function computeSymbolCapScale() {
 		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
-		if (!(px > 0)) { return 0; }
-		if (limSI > 0) {
+		if (limSI > 0 && px > 0) {
 			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
 			v = currentView();
 			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
@@ -6459,23 +6470,34 @@ var EngCalcs = EngCalcs || {};
 		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
 		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
 		l10 = p10LinkLengthWorld();
-		return (l10 > 0) ? settings.symbolSize / l10 : 0;
+		return (l10 > 0 && settings.symbolSize > 0) ? settings.symbolSize / l10 : 0;
 	}
 	function symbolCapScale() {
+		p10LinkLengthWorld();   // cheap when nothing moved; clears the cap when the document did
 		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
 		return symbolCapCache;
+	}
+	// The scale a capped size is divided by: the scale in force, or the cap when the view is further
+	// out than it. `atScale` lets the zoom-to-fit search ask about a scale that is not in force.
+	function symbolScaleAt(atScale) {
+		var s = atScale || state.s || 1, cap = symbolCapScale();
+		return (cap > 0 && cap > s) ? cap : s;
 	}
 	// **THE ONE DOOR, AND IT IS THE CAPPED ONE.** Every symbol this map draws goes through here, so
 	// the cap is the default and an exception has to ask for it by name.
 	function symbolFactor() {
-		var s = state.s || 1, cap = symbolCapScale();
-		return (settings.symbolSize / 2) / JUNCTION_R / ((cap > 0 && cap > s) ? cap : s);
+		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
 	}
 	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
 	// the two things a reader is looking FOR on a wide view -- where does the water come from and
 	// where is it stored -- so they keep their size on the screen at every zoom while everything
 	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
 	// already branch on those two types.
+	//
+	// **AND THE EDITING FURNITURE, WHICH IS NOT A SYMBOL AT ALL:** a vertex grip, the selection
+	// ring, the pending-pipe ring, the rubber band and the marquee. They are the page talking to the
+	// person holding the mouse, not the drawing, and a grip that shrinks to nothing is a grip nobody
+	// can take hold of. Published to CSS as --lpn-symf beside --lpn-sym.
 	function symbolFactorFull() {
 		return (settings.symbolSize / 2) / JUNCTION_R / (state.s || 1);
 	}
@@ -6712,6 +6734,8 @@ var EngCalcs = EngCalcs || {};
 		if (!force && s === lastPublishedScale) { return; }
 		lastPublishedScale = s;
 		svg.style.setProperty('--lpn-sym', symbolFactor());
+		// Uncapped: the editing furniture's factor (Task 705) -- see symbolFactorFull().
+		svg.style.setProperty('--lpn-symf', symbolFactorFull());
 		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
 		// The invisible grab band, in world units at this zoom -- a CONSTANT number of screen
 		// pixels, like every other tolerance on this page, so zooming out never makes a pipe
@@ -8594,14 +8618,14 @@ var EngCalcs = EngCalcs || {};
 	// multiple of the pipe's own screen width is screen-constant like every other line weight on
 	// this map, so it never grows past a fraction of what the pipe itself draws at, at any zoom.
 	// **The other half of his sentence -- the line shrinking below 1px once the whole drawing
-	// stops growing -- is a separate, not-yet-written zoom-rules design and is not built here.**
+	// stops growing -- is Task 705's maximum map size**, applied in serviceStrokeWorld().
 	var LPN_METER_NODE_FRAC = 0.25;      // of a junction's own radius -- his figure
 	var LPN_SERVICE_STROKE_FRAC = 0.5;   // of settings.linkWidth, screen px
 	// **1 px IS HIS OWN FLOOR, VERBATIM** -- *"a lesser multiple of the link width or always just
 	// 1 px until we get to the zoom where everything stops growing ... at which point it shrinks
 	// below 1px."* The first half is LPN_SERVICE_STROKE_FRAC and the floor is this. The third
-	// clause -- shrinking BELOW a pixel once the whole drawing stops growing -- depends on a zoom
-	// rule that does not exist yet (ROADMAP Task 705) and is deliberately not invented here.
+	// clause -- shrinking BELOW a pixel once the whole drawing stops growing -- is the symbol cap
+	// (Task 705): past symbolCapScale() the width is held on the GROUND, so on screen it thins.
 	var LPN_SERVICE_MIN_PX = 1;
 	// **AND THE FLOOR IS CAPPED BY THE PIPE ITSELF, BECAUSE A FLOOR ALONE CAN OVERTAKE IT.**
 	// "A lesser multiple of the link width" is a claim about every link width, not about the
@@ -8648,10 +8672,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	// `x`/`y` are kept in the signature though unused now -- every call site already names the
 	// point for meterHalfWorld() beside it, and a screen-constant width genuinely needs no location.
+	// **DIVIDED BY THE CAPPED SCALE, NOT THE SCALE** (Task 705, R-051 (2)'s last clause): once the
+	// view is further out than the symbol cap, a service keeps its width on the ground with the
+	// meter it runs to, and so goes below a pixel on the screen.
 	function serviceStrokeWorld(x, y) {
-		var s = state.s || 1, lw = settings.linkWidth;
+		var lw = settings.linkWidth;
 		return Math.min(LPN_SERVICE_MAX_FRAC * lw,
-			Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / s;
+			Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / symbolScaleAt();
 	}
 
 	function customerById(id) {
@@ -9081,13 +9108,28 @@ var EngCalcs = EngCalcs || {};
 	// project's own length unit and compared here in metres, so a project in feet keeps the number
 	// its reader typed and a geographic one is measured against a real distance rather than against
 	// degrees of longitude.
-	function customerLabelWidthLimitSI() {
-		var v = labelSettings.customerMaxWidth;
+	//
+	// **ONE CONCEPT, TWO LEVELS** (Task 705, reconciling this with Task 669's labeling threshold).
+	// `settings.labelMaxWidth` is the widest view that shows ANY generated label, and it also sets
+	// the symbol cap (symbolCapScale()); this one is a second, narrower gate for customers alone,
+	// read INSIDE the first -- customerLabelsAttempted() refuses whenever dataLabelsHidden, which the
+	// labeling threshold sets. Both are the same quantity in the same unit through the same three
+	// functions below, and both boxes are filled by the same captureViewWidth().
+	function viewWidthLimitSI(v) {
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
 	}
-	function visibleMapMetres() {
-		var v = currentView(), w = visibleMapWidth();
+	function customerLabelWidthLimitSI() { return viewWidthLimitSI(labelSettings.customerMaxWidth); }
+	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
+	// project's own length unit, so a project in feet keeps the number its reader typed and changing
+	// the unit REINTERPRETS it, exactly as every other typed number on this page.
+	function labelWidthLimitSI() { return viewWidthLimitSI(settings.labelMaxWidth); }
+	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
+	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
+	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
+	// out. `atScale` asks about a scale not in force; the centre is the view's own either way.
+	function visibleMapMetres(atScale) {
+		var v = currentView(), w = atScale > 0 ? mapBox().w / atScale : visibleMapWidth();
 		if (!isFinite(w) || w <= 0) { return 0; }
 		return w * metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
 	}
@@ -9114,7 +9156,7 @@ var EngCalcs = EngCalcs || {};
 	// **ROUNDED UP, NEVER TO NEAREST, AND THAT IS NOT A NICETY.** `toPrecision(3)` rounds to
 	// nearest, so about half of all views round DOWN -- and a threshold one part in a thousand
 	// below the view it was captured from hides the labels the button just promised to keep.
-	function captureCustomerViewWidth() {
+	function captureViewWidth() {
 		var m = visibleMapMetres();
 		if (!(m > 0)) { return 0; }
 		return ceilToPrecision(toDisplay(m, 'lpn_u_length'), 3);
@@ -9713,6 +9755,8 @@ var EngCalcs = EngCalcs || {};
 		// broken. Guarded because the spike harnesses that hand-roll their layer stack have no
 		// such layer; those fall back to nodesLayer, which IS emptied above.
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
+		// A wholesale rebuild is a new drawing as far as the symbol cap knows (Task 705).
+		invalidateLinkLengths();
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
 		// **ONE CANVAS MEASUREMENT AND ONE SEGMENT INDEX FOR THE WHOLE REBUILD** (Task 680, and it
@@ -10275,14 +10319,14 @@ var EngCalcs = EngCalcs || {};
 	function fitItem(out, x, y, l, r, t, b) {
 		if (isFinite(x) && isFinite(y)) { out.push({ x: x, y: y, l: l, r: r, t: t, b: b }); }
 	}
-	// `atScale` is the scale being CONSIDERED, not the one currently in force -- the per-pipe rule
-	// that hides a label longer than its own pipe must be answered for the scale being TESTED, or
-	// the fit reserves room for labels that will not be there. (`atScale` is read further down by
-	// the per-pipe test; nothing here is a map-width threshold any more -- see
-	// applyLabelVisibility().)
+	// `atScale` is the scale being CONSIDERED, not the one currently in force. Two rules about what
+	// gets drawn are thresholds -- the labeling threshold that hides all generated annotation
+	// (Tasks 669 and 705) and the per-pipe one that hides a label longer than its own pipe -- and
+	// both must be answered for the scale being TESTED, or the fit reserves room for labels that
+	// will not be there.
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
-			ignoreDataLabels = !!modelOnly;
+			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
 		function boxFor(x, y, bx, by, bw, bh) {
 			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
 		}
@@ -32415,6 +32459,10 @@ var EngCalcs = EngCalcs || {};
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+				// Pipe lengths moved, so the 10th percentile is re-read at the next re-size (Task
+				// 705). Not re-applied here: one moved junction does not move it visibly, and a drop
+				// that re-sized every symbol would be a flicker nobody asked for.
+				invalidateLinkLengths();
 			}
 			// **THE GRIP GOES BACK ONTO THE CONNECTION WHEN THE HAND LETS GO** -- see custHandleAt,
 			// which is view state for the length of one gesture and nothing else. Cleared on a
@@ -33662,6 +33710,9 @@ var EngCalcs = EngCalcs || {};
 	// One redraw for either answer: the document's numbers or their meaning changed, so everything
 	// derived from them is stale -- the labels, the solve, and what is on disk.
 	function afterUnitChange() {
+		// On a geographic project the threshold's metres move with the unit while a world unit
+		// (a degree) does not, so the cap is re-derived (Task 705). On a grid it is unit-invariant.
+		invalidateSymbolCap();
 		refreshAllFromDocument();
 		saveToStorage();
 	}
@@ -34226,7 +34277,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
 		// view' button like the other one we restored in a different branch."*). Same words and the
-		// same rounding UP; the QUANTITY is captured by captureCustomerViewWidth(), which reads what
+		// same rounding UP; the QUANTITY is captured by captureViewWidth(), which reads what
 		// this box is actually compared against rather than what the other branch's box is -- see
 		// the comment there for the two ways a verbatim copy was wrong.
 		//
@@ -34235,7 +34286,7 @@ var EngCalcs = EngCalcs || {};
 		useBtn.type = 'button';
 		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
 		useBtn.addEventListener('click', function () {
-			var w = captureCustomerViewWidth();
+			var w = captureViewWidth();
 			if (!(w > 0)) { return; }
 			labelSettings.customerMaxWidth = w;
 			input.value = String(labelSettings.customerMaxWidth);
@@ -34760,8 +34811,12 @@ var EngCalcs = EngCalcs || {};
 			state.ty = now.height / 2 - sc * cy;
 			setTransform();
 		}
+		// **A NEW WIDTH MOVES THE SYMBOL CAP AND THE LABEL GATE** (Task 705): both are a view width
+		// on the ground, and the same scale shows more ground in a wider window.
+		var widthMoved = !!lastMapBox && Math.abs(now.width - lastMapBox.w) > 0.5;
 		lastMapBox = { w: now.width, h: now.height };
 		before = now;
+		if (widthMoved && labelWidthLimitSI() > 0) { labelThresholdChanged(); }
 		// **IF IT STILL RUNS OFF THE BOTTOM, MEASURE ONCE MORE AND BELIEVE THE SECOND ANSWER.**
 		//
 		// Every term in the formula measures a page still assembling itself -- the navbar above the
@@ -35010,41 +35065,16 @@ var EngCalcs = EngCalcs || {};
 	function visibleMapWidth() {
 		return mapBox().w / (state.s || 1);
 	}
-	// **THE SAME WIDTH, ON THE GROUND.** On an XY grid a world unit IS the display length unit, so
-	// this is `visibleMapWidth()` in metres and nothing more. On a geographic project a world unit
-	// is a DEGREE, and a threshold compared against degrees is five orders of magnitude out -- the
-	// defect Tom found on the customer-label control on 2026-09-21. Measured at the view's own
-	// centre, with the same metresPerWorldUnit() that fills every derived length on this map.
-	function visibleMapMetres() {
-		var v = currentView(), w = visibleMapWidth();
-		if (!isFinite(w) || w <= 0) { return 0; }
-		return w * metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-	}
-	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
-	// project's own length unit, so a project in feet keeps the number its reader typed and
-	// changing the unit REINTERPRETS it, exactly as every other typed number on this page.
-	function labelWidthLimitSI() {
-		var v = settings.labelMaxWidth;
-		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
-		return toSI(v, 'lpn_u_length');
-	}
-	// What the capture button writes: the SAME quantity the gate reads, in the box's own unit,
-	// rounded UP so the view that was captured still qualifies. See ceilToPrecision().
-	function captureLabelViewWidth() {
-		var m = visibleMapMetres();
-		if (!(m > 0)) { return 0; }
-		return ceilToPrecision(toDisplay(m, 'lpn_u_length'), 3);
-	}
-	// Whether generated annotation is past the threshold at the scale being considered. `atScale`
-	// is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in force.
+	// Whether generated annotation is past the LABELING THRESHOLD at the scale being considered.
+	// `atScale` is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in
+	// force. The quantity is visibleMapMetres(), the one the customer-label gate and both capture
+	// buttons read, so a captured view cannot disagree with the gate it feeds (R-090).
 	function labelsPastThreshold(atScale) {
-		var limSI = labelWidthLimitSI(), v, mpu, px;
-		if (!(limSI > 0)) { return false; }
-		px = mapBox().w;
-		if (!(px > 0)) { return false; }
-		v = currentView();
-		mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-		return (px / (atScale || 1)) * mpu > limSI;
+		var lim = labelWidthLimitSI(), wide;
+		if (!(lim > 0)) { return false; }
+		wide = visibleMapMetres(atScale);
+		// A view we cannot measure is not one we refuse to label -- customerLabelsAttempted()'s rule.
+		return wide > 0 && wide > lim;
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -35128,6 +35158,16 @@ var EngCalcs = EngCalcs || {};
 	// refreshFontSizes()/relayoutLabels() (see onZoomChanged), so labels that come back after a zoom
 	// are still positioned for the scale they were hidden at. Same revival the zoom path runs, in
 	// one place, so a future suppressor cannot forget it.
+	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
+	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
+	// labels re-decided. Never on the zoom path: a zoom changes neither input.
+	function labelThresholdChanged() {
+		invalidateSymbolCap();
+		if (!svg) { return; }
+		refreshSymbolSizes();
+		refreshLabelSuppression();
+		if (!dataLabelsHidden) { relayoutLabels(); }
+	}
 	function refreshLabelSuppression() {
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
@@ -35988,9 +36028,49 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
 			pc.lpn_settings_leader_snap_tip);
-		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
-		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
-		// 2026-08-19); the Labels section and Thematic mode are where labels are turned off now.
+		// ---- THE LABELING THRESHOLD (Tasks 669 and 705, restored 2026-09-22) ----
+		// It sat at this point until 2026-08-19 and is back on Tom's asking, in his words for the
+		// row. **A NUMBER AND A CAPTURE BUTTON**: no default is meaningful across networks 400 ft
+		// and 40 miles across, so the reader zooms until the drawing is as far out as lettering is
+		// worth, presses the button, and the view's width becomes the number. Blank is "always",
+		// which the placeholder says, because it is the one place the rule is written on screen.
+		//
+		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
+		// captureViewWidth(), rounded UP -- and one number doing two jobs: it hides generated labels
+		// and it is where symbols stop growing on the ground (symbolCapScale()). The tip says both.
+		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
+			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
+		lmwWrap.className = 'lpn-set-ctlgroup';
+		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
+		lmwInput.id = 'lpn_set_label_max_width';
+		lmwInput.style.width = '7em';
+		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
+		lmwInput.value = labelWidthLimitSI() > 0 ? String(settings.labelMaxWidth) : '';
+		// Blank, zero or anything unreadable is "no threshold", stored as null -- the value a
+		// project that has never been asked carries, so there is exactly one way to say it.
+		function setLabelMaxWidth(v) {
+			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v > 0) ? v : null;
+			lmwInput.value = settings.labelMaxWidth === null ? '' : String(settings.labelMaxWidth);
+			labelThresholdChanged();
+			saveToStorage();
+		}
+		lmwInput.addEventListener('change', function () {
+			var t = lmwInput.value.trim();
+			setLabelMaxWidth(t === '' ? null : +t);
+		});
+		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
+		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		lmwBtn.addEventListener('click', function (e) {
+			// Inside a <label>, so the press must not also be read as a click on the box.
+			if (e && e.preventDefault) { e.preventDefault(); }
+			var w = captureViewWidth();
+			if (w > 0) { setLabelMaxWidth(w); }
+		});
+		lmwUnit.className = 'lpn-set-note';
+		lmwUnit.textContent = unitLabel('lpn_u_length');
+		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwBtn); lmwWrap.appendChild(lmwUnit);
+		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
+			lmwWrap, pc.lpn_settings_label_max_width_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -43663,9 +43743,29 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// **NO "Always show this label" CHECKBOX.** It was the escape hatch from the map-width hide
-		// threshold, and with that threshold gone (Tom, 2026-08-19) it answers a question nobody is
-		// asked any more. Whether a note is on the drawing is the Active row above.
+		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed). With the
+		// labeling threshold back, a note needs its own answer to it. **TICKED BY DEFAULT**: a Text
+		// object is authored content and has always stayed on the drawing, and the shipped Net3 note
+		// reading "Zoom in to see labels" only makes sense if it outlives the labels it speaks of.
+		// Stored only when UNticked (`allZoom: false`), so every note written before this switch
+		// existed keeps showing. BASE-WIDE like size and position, and for the same reason.
+		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
+		allZoomInput.type = 'checkbox';
+		allZoomInput.checked = lb.allZoom !== false;
+		allZoomInput.addEventListener('change', function () {
+			if (allZoomInput.checked === (lb.allZoom !== false)) { return; }
+			saveUndoSnapshot();
+			if (allZoomInput.checked) { delete lb.allZoom; }
+			else { lb.allZoom = false; }   // base-write: zoom visibility is Base-owned, exactly as size is
+			applyLabelVisibility();
+			saveToStorage();
+		});
+		allZoomLabel.appendChild(allZoomInput);
+		allZoomLabel.appendChild(document.createTextNode(' '));
+		setFieldLabel(allZoomLabel.appendChild(document.createElement('span')),
+			pc.lpn_field_text_all_zoom || 'Show at all zoom levels', pc.lpn_field_text_all_zoom_tip);
+		fields.appendChild(allZoomLabel);
+		fields.appendChild(document.createElement('br'));
 		// ---- Justification (Task 342) ------------------------------
 		// `lb.align`/`lb.valign` have been in the document since Task 332 and are interpreted in ONE
 		// place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them is the row.
