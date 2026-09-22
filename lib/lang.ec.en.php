@@ -2511,7 +2511,6 @@ $ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is ex
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
-$ec_lang['lpn_mapgeo_replace']='This project already has the world map attached. Replace that georeferencing?';
 $ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.';
 $ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
 $ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';

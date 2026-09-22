@@ -11193,7 +11193,12 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!basemapChoosable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		// **HIDDEN WHILE DETACHED** (Perry's re-review, 2026-09-22). It asked basemapChoosable() --
+		// "a placement exists" -- so on a Detached project it re-attached the map silently, with no
+		// notice and no undo step. World map, Attach is the one way back, per Tom's "Detach and
+		// attach provide the same functionality"; this only swaps street for satellite on a map
+		// that is already showing.
+		if (!worldMapAttached() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -11209,8 +11214,14 @@ var EngCalcs = EngCalcs || {};
 	// twice and lost the basemap entirely -- "I get satellite, but now I lost map. No more map.
 	// Satellite has attribution, Map has nothing." Turning the tiles off is Map, World map, Detach,
 	// where a row says so in words.
+	// **A SWITCH IS ITS OWN UNDO STEP, ALWAYS** (2026-09-22). The style is on the project and every
+	// undo snapshot carries it, so a switch that took no snapshot of its own would be reverted by
+	// the NEXT unrelated Ctrl+Z -- a street map coming back because somebody undid a pipe. One
+	// snapshot per press makes Ctrl+Z after a switch put the other style back, and nothing else.
 	function toggleBasemapTeaser() {
-		setBasemapStyle(basemapOn() && basemapStyle() === 'satellite' ? 'osm' : 'satellite');
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
+		setBasemapStyle(basemapStyle() === 'satellite' ? 'osm' : 'satellite');
 	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
@@ -14215,11 +14226,10 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		// **IT CONFIRMS BEFORE IT REPLACES ONE**, which is the first thing his own summary asks of
-		// this row: the georeferencing already on file is an answer somebody gave, and starting the
-		// wizard throws it away the moment the first frame is drawn.
-		if (xyGeorefOk() && !window.confirm(pc.lpn_mapgeo_replace ||
-				'This project already has the world map attached. Replace that georeferencing?')) { return; }
+		// **NO REPLACE-CONFIRMATION ANY MORE, because nothing reaches this with a placement on file**
+		// (2026-09-22). World map, Attach puts a kept placement straight back and calls this only
+		// when there is none; changing a placement is Re-adjust. The confirm and its string
+		// (lpn_mapgeo_replace) went when that made them unreachable.
 		ext = mapgeoExtent();
 		mapgeo = {
 			step: MAPGEO_STEP_WORLD,
@@ -44173,7 +44183,8 @@ var EngCalcs = EngCalcs || {};
 			// restored on almost none of them: undoing a diameter must not move the map, but a
 			// document put back into a frame the camera is not in has its whole drawing off screen
 			// -- grid numbers under a street-level lat/lon view. undo() draws that line.
-			coords: project.coords, basemap: project.basemap, view: currentView()
+			coords: project.coords, basemap: project.basemap, basemapLast: project.basemapLast,
+			view: currentView()
 		};
 	}
 	function pushUndoSnapshot(snap) {
@@ -44205,8 +44216,15 @@ var EngCalcs = EngCalcs || {};
 		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
 		var coordsChanged = snap.coords !== project.coords;
+		// **AND THE MAP ITSELF WHEN ITS PICTURE CHANGED** (Perry's re-review, 2026-09-22). World
+		// map, Detach and Attach, and a switch on the corner toggle, change `project.basemap` and
+		// never `coords`, so repainting only on a kind change left Ctrl+Z restoring the menu's
+		// idea of the map while the canvas kept the tiles it had. The comparison is made before the
+		// assignment, like `coordsChanged`.
+		var basemapChanged = snap.basemap !== project.basemap;
 		project.coords = snap.coords;
 		project.basemap = snap.basemap;
+		project.basemapLast = snap.basemapLast;
 		// The backdrop rides in the same snapshot rather than in a stack of its own: a Move that
 		// nudged the image and a Move that nudged a node are the same kind of event to the person
 		// pressing Ctrl+Z, and two stacks would make the order of undos depend on which kind each one
@@ -44232,7 +44250,7 @@ var EngCalcs = EngCalcs || {};
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
 		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
-		if (coordsChanged) {
+		if (coordsChanged || basemapChanged) {
 			refreshBasemap();
 			refreshMapStatus();
 		}

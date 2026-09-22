@@ -2606,7 +2606,6 @@ EngCalcs.pageConfig = {
 	lpn_map_attach_remove_tip: <?=json_encode($ec_lang['lpn_map_attach_remove_tip'])?>,
 	lpn_map_attach_done: <?=json_encode($ec_lang['lpn_map_attach_done'])?>,
 	lpn_map_attach_removed: <?=json_encode($ec_lang['lpn_map_attach_removed'])?>,
-	lpn_mapgeo_replace: <?=json_encode($ec_lang['lpn_mapgeo_replace'])?>,
 	lpn_mapgeo_intro: <?=json_encode($ec_lang['lpn_mapgeo_intro'])?>,
 	lpn_mapgeo_step1: <?=json_encode($ec_lang['lpn_mapgeo_step1'])?>,
 	lpn_mapgeo_step2: <?=json_encode($ec_lang['lpn_mapgeo_step2'])?>,

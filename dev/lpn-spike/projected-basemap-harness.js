@@ -91,6 +91,7 @@ const L = loadLoopedNetwork(
 	"\t\tmapRows: mapMenuRows, refreshTeaser: refreshBasemapTeaser,\n" +
 	"\t\tworldMapUsable: worldMapUsable, worldMapAttach: worldMapAttach,\n" +
 	"\t\tworldMapDetach: worldMapDetach, worldMapAttached: worldMapAttached,\n" +
+	"\t\tundo: undo, teaserPress: toggleBasemapTeaser, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tgoToLatLon: goToLatLon, satAvailable: satelliteAvailable,\n" +
 	// Task 692's audit: the last gate that asked the narrow question and meant the wide one.
 	"\t\tviewLonLat: viewLonLat,\n" +
@@ -783,6 +784,73 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			delete L.getProject().basemap;
 			delete L.getProject().georef;
 		}
+	}
+
+	head('13c. UNDO PUTS THE MAP BACK ON THE CANVAS, NOT ONLY IN THE MENU -- Perry, 2026-09-22');
+	// undo() restored `project.basemap` but repainted only when `coords` changed, and Detach/Attach
+	// never change coords: after Ctrl+Z the submenu read attached over a canvas with no tiles. So
+	// every assertion here is a TILE COUNT -- what is painted -- and never the menu's opinion.
+	// (There is no redo command on this page, so there is no redo to assert.)
+	{
+		const PC = global.EngCalcs.pageConfig;
+		PC.lpn_mapbox_token = 'pk.test';
+		const n = () => L.tiles().length;
+		function kind(label, setup) {
+			setup();
+			L.setCanvas(W, H); L.setMapSized();
+			L.refreshBasemap();
+			const shown = n();
+			ok(label + ': set up, the map is painted', shown > 0 && L.worldMapAttached(), shown + ' tiles');
+			L.worldMapDetach();
+			ok('...Detach clears the canvas', n() === 0, n() + ' tiles');
+			L.undo();
+			ok('...**Ctrl+Z after Detach PAINTS THE TILES AGAIN**', n() > 0 && L.worldMapAttached(),
+				n() + ' tiles');
+			L.worldMapDetach();
+			L.worldMapAttach();
+			ok('...Attach paints them', n() > 0, n() + ' tiles');
+			L.undo();
+			ok('...**Ctrl+Z after Attach CLEARS THEM AGAIN**', n() === 0 && !L.worldMapAttached(),
+				n() + ' tiles');
+			L.worldMapAttach();
+			// The corner toggle: a style switch is its own undo step, and it is gone while detached.
+			const before = L.getProject().basemap || 'osm';
+			const depth = L.undoDepth();
+			L.teaserPress();
+			ok('...a corner-toggle switch takes exactly ONE undo step', L.undoDepth() === depth + 1);
+			ok('...and paints the other source', n() > 0 && L.getProject().basemap !== before,
+				String(L.getProject().basemap));
+			L.undo();
+			ok('...and Ctrl+Z puts the first source back ON THE CANVAS',
+				(L.getProject().basemap || 'osm') === before && n() > 0 &&
+				L.tiles().every((t) => /mapbox/.test(String(t.href)) === (before === 'satellite')),
+				String(L.getProject().basemap));
+			L.worldMapDetach();
+			byId.lpn_basemap_teaser.style.display = '';
+			L.refreshTeaser();
+			ok('...while DETACHED the corner toggle is hidden', byId.lpn_basemap_teaser.style.display === 'none');
+			const d2 = L.undoDepth();
+			L.teaserPress();
+			ok('...and a press that reaches it anyway re-attaches nothing and records nothing',
+				!L.worldMapAttached() && n() === 0 && L.undoDepth() === d2);
+			L.worldMapAttach();
+		}
+		kind('lat/lon', function () {
+			L.newProject('geo', '');
+			L.applyView({ cx: L.inwardX(PHOENIX.lon), cy: L.inwardY(PHOENIX.lat), s: 200 });
+		});
+		kind('EPSG', function () {
+			L.newProject(null, ZONE12N);
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+		});
+		kind('attached grid', function () {
+			L.newProject(null, '');
+			L.getProject().georef = { anchor: { x: 0, y: 0 }, origin: { lon: PHOENIX.lon, lat: PHOENIX.lat },
+				metersPerUnit: 0.3048, rotDeg: 0 };
+			L.applyView({ cx: L.inwardX(0), cy: L.inwardY(0), s: 0.5 });
+		});
+		delete L.getProject().georef;
 	}
 
 	head('14. The last reader the audit turned up -- where the New project box opens');
