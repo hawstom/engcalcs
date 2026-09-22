@@ -139,6 +139,10 @@ run_check "log format selftest"          blocking php dev/scripts/log_format_sel
 # looks fine -- plus the leg that matters most: the page must carry no total of the two consent
 # buckets, because one counts people and the other counts page loads.
 run_check "usage report selftest"        blocking php dev/scripts/usage_report_selftest.php
+# 2026-09-22, R-121/122/123: the mailed rank-by-shopping table had no heading and Tom guessed wrong
+# about what "people" and "page loads" meant. A fixture through the real dev/scripts/daily_report.sh
+# extraction, because the failure is a good-looking table with the wrong or missing heading.
+run_check "daily report selftest"        blocking php dev/scripts/daily_report_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
