@@ -10318,6 +10318,7 @@ var EngCalcs = EngCalcs || {};
 	function basemapScheduleRetry(key, img) {
 		var n = (basemapFails[key] || 0) + 1, wait;
 		basemapFails[key] = n;
+		tileSeen(key).retries = n;
 		if (n > LPN_TILE_RETRIES) { return; }
 		wait = 800 * Math.pow(3, n - 1);        // 0.8 s, 2.4 s, 7.2 s
 		setTimeout(function () {
@@ -10337,6 +10338,138 @@ var EngCalcs = EngCalcs || {};
 			if (basemapEls.hasOwnProperty(k) && !basemapEls[k]._lpnSettled) { n++; }
 		}
 		return n;
+	}
+	// ---- ?debug=tiles : a readout of what the basemap asked for and what came back ---------------
+	//
+	// **AN INSTRUMENT, NOT A FIFTH GUESSED CAUSE** (ROADMAP Task 703). Four causes of blank
+	// satellite squares have been found, measured and fixed -- a west-edge request order, the
+	// picture being deleted on every wheel nudge, a failed tile never being asked for again, and a
+	// tile at the antipode of the transform's origin drawn backwards -- and Tom still sees white
+	// rectangles: *"Still missing some tiles. Usable, but frustrating. Not good for my
+	// reputation."* (2026-09-21). Each of those four was measured HERE and none of them was the
+	// whole of it, so the next measurement has to be taken on HIS machine, where the failure is.
+	//
+	// **IT OBSERVES AND CHANGES NOTHING.** Every write below is to a bookkeeping record that
+	// nothing in the drawing path reads. The one thing it does that costs a request is the failure
+	// PROBE, and that only runs when the switch is on and only for a tile that has already failed.
+	//
+	// **THE PROBE IS WHY A REASON CAN BE GIVEN AT ALL.** An SVG <image> `error` event carries no
+	// status, no headers and no body -- it is a single bit. So when a tile fails with the switch on,
+	// the same URL is fetched once and the answer is reported as the browser gives it: an HTTP
+	// status, or a network error, or an abort. **A BYTE COUNT IS PART OF THE ANSWER AND NOT A
+	// DECORATION**: the Mapbox token is URL-RESTRICTED, so a 23-byte Forbidden reply can arrive
+	// looking like a delivered tile to anything counting only success, and it has already cost one
+	// agent a whole wrong measurement. A tile that is 23 bytes is a refusal whatever its status
+	// line says.
+	var basemapSeen = {}, basemapWantKeys = [], basemapDebugTimer = null;
+	function tileDebugOn() { return debugOn('tiles'); }
+	// One record per tile key, for the life of the page. Bounded: a record is a handful of numbers,
+	// and past a few thousand keys the whole set is dropped rather than grown -- the readout is
+	// about the CURRENT view, so an old record has no reader.
+	function tileSeen(key) {
+		if (!basemapSeen[key]) {
+			if (Object.keys(basemapSeen).length > 4000) { basemapSeen = {}; }
+			// **`viewSrc` IS PER VIEW AND THE REST IS PER PAGE.** "Requested" has to mean "this
+			// view had to go to the network for it", or the cache makes the number meaningless:
+			// a pan away and back asks for nothing and would still read as a screenful of
+			// requests. So the source is re-stated at every paint, and a tile still resident
+			// from the paint before keeps whichever answer it already had.
+			basemapSeen[key] = { req: 0, viewSrc: '', state: 'new', why: '', retries: 0 };
+		}
+		return basemapSeen[key];
+	}
+	// **WHY DID THIS ONE FAIL?** Asked of the network, once per failure, only under the switch.
+	function tileProbeFailure(key, url) {
+		if (!tileDebugOn() || typeof fetch !== 'function') { return; }
+		var rec = tileSeen(key);
+		if (rec.why) { return; }
+		rec.why = 'asking…';
+		fetch(url, { cache: 'no-store' }).then(function (res) {
+			return res.arrayBuffer().then(function (buf) {
+				// A short body is the signature of a refusal served with a success status, which is
+				// exactly what a URL-restricted token produces.
+				rec.why = 'HTTP ' + res.status + ', ' + buf.byteLength + ' bytes'
+					+ (buf.byteLength < 200 ? ' (too small to be a picture)' : '');
+				tileDebugRender();
+			});
+		}).catch(function (e) {
+			rec.why = 'network error: ' + ((e && e.name === 'AbortError') ? 'aborted' : (e && e.message) || e);
+			tileDebugRender();
+		});
+	}
+	// The counts, all derived from the CURRENT want list so a number can never describe a view the
+	// reader has already left.
+	function tileDebugCounts() {
+		var out = { wanted: basemapWantKeys.length, requested: 0, arrived: 0, drawn: 0,
+			failed: 0, retried: 0, outstanding: 0, cached: 0, fails: [] };
+		basemapWantKeys.forEach(function (k) {
+			var rec = basemapSeen[k] || {}, img = basemapEls[k];
+			if (rec.viewSrc === 'cache') { out.cached++; }
+			else if (rec.viewSrc === 'net') { out.requested++; }
+			out.retried += (rec.retries || 0);
+			if (img && img._lpnOk) { out.drawn++; }
+			if (rec.state === 'ok') { out.arrived++; }
+			else if (rec.state === 'fail') {
+				out.failed++;
+				if (out.fails.length < 6) { out.fails.push(k + ' — ' + (rec.why || 'no answer yet')); }
+			} else { out.outstanding++; }
+		});
+		return out;
+	}
+	function tileDebugRender() {
+		var box = document.getElementById('lpn_tile_bench_out');
+		if (!box) { return; }
+		var c = tileDebugCounts(), z = basemapWantKeys.length
+			? basemapWantKeys[0].split('/')[1] : '—';
+		var lines = [
+			'source ' + basemapStyle() + ' • zoom ' + z
+				+ ' • token ' + (mapboxToken() ? 'present' : 'ABSENT'),
+			'wanted ' + c.wanted + ' • from cache ' + c.cached + ' • requested ' + c.requested,
+			'arrived ' + c.arrived + ' • drawn ' + c.drawn + ' • failed ' + c.failed,
+			'retried ' + c.retried + ' • still outstanding ' + c.outstanding
+		];
+		if (c.fails.length) { lines.push('— failures —'); lines = lines.concat(c.fails); }
+		box.textContent = lines.join('\n');
+	}
+	function buildTileBench() {
+		if (!tileDebugOn() || document.getElementById('lpn_tile_bench')) { return; }
+		var box = document.createElement('div');
+		box.id = 'lpn_tile_bench';
+		box.className = 'd-print-none';
+		// LOWER RIGHT: the label bench already owns the lower left, and Settings and Labels are
+		// top-right. The width is capped for the reason the label bench states -- a fixed box with
+		// no width sizes to its widest child, and a tile key has no wrap opportunity.
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
+			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
+			+ 'overflow-wrap:anywhere');
+		var h = document.createElement('div');
+		h.setAttribute('style', 'font-weight:bold;margin-bottom:4px');
+		h.textContent = 'basemap tile bench';
+		box.appendChild(h);
+		var out = document.createElement('div');
+		out.id = 'lpn_tile_bench_out';
+		box.appendChild(out);
+		var btns = document.createElement('div');
+		btns.setAttribute('style', 'margin-top:6px;display:flex;gap:6px');
+		var b = document.createElement('button');
+		b.type = 'button';
+		b.textContent = 'copy';
+		b.addEventListener('click', function () {
+			var t = document.getElementById('lpn_tile_bench_out');
+			if (!t) { return; }
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(t.textContent);
+			}
+		});
+		btns.appendChild(b);
+		box.appendChild(btns);
+		document.body.appendChild(box);
+		// **A TICK AS WELL AS THE EVENTS.** Every arrival and every failure repaints this already;
+		// the timer is what makes "still outstanding 3" visibly STAY at 3, which is the reading
+		// that names the failure. One second, and only while the switch is on.
+		if (!basemapDebugTimer) { basemapDebugTimer = setInterval(tileDebugRender, 1000); }
+		tileDebugRender();
 	}
 	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
 	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
@@ -10735,9 +10868,18 @@ var EngCalcs = EngCalcs || {};
 				? basemapTileList(xbnds.west, xbnds.south, xbnds.east, xbnds.north, scaleForTiles)
 				: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
 		want = {};
+		// **THE WANT LIST IS THE INSTRUMENT'S DENOMINATOR** (?debug=tiles, Task 703): every number
+		// the readout prints is counted over this list, so it can only ever describe the view on
+		// screen now. Nothing in the drawing path reads it.
+		basemapWantKeys = list.tiles.map(function (t) { return t.key; });
 		list.tiles.forEach(function (t) {
 			want[t.key] = true;
-			if (basemapEls[t.key]) { return; }
+			if (basemapEls[t.key]) {
+				// Still on screen from the paint before -- nothing new happens to it, and it keeps
+				// whichever answer to "where did this come from" it already had.
+				if (!tileSeen(t.key).viewSrc) { tileSeen(t.key).viewSrc = 'net'; }
+				return;
+			}
 			// **ALREADY FETCHED IN THIS PAGE'S LIFE.** The element is re-attached with the picture
 			// still in it: no request, no wait, nothing new to draw. The key carries the source, so
 			// a street tile can never be handed back while the satellite credit is showing.
@@ -10747,6 +10889,8 @@ var EngCalcs = EngCalcs || {};
 				if (oi >= 0) { basemapCacheOrder.splice(oi, 1); }
 				basemapLayer.appendChild(hit);
 				basemapEls[t.key] = hit;
+				tileSeen(t.key).viewSrc = 'cache';
+				tileSeen(t.key).state = 'ok';
 				return;
 			}
 			// **WHERE the tile goes is the branch; MAKING it is not.** Two `el('image')` calls
@@ -10832,6 +10976,11 @@ var EngCalcs = EngCalcs || {};
 				href: t.url, preserveAspectRatio: 'none', crossorigin: 'anonymous',
 				'class': 'lpn-basemap-tile'
 			}, place), basemapLayer);
+			var trec = tileSeen(t.key);
+			trec.req++;
+			trec.viewSrc = 'net';
+			trec.state = 'pending';
+			trec.why = '';
 			// **WHETHER THIS TILE HAS FINISHED ONE WAY OR THE OTHER**, which is what tells the
 			// carried-over tiles below when they may go. `error` counts as finished: a 404 over
 			// the provider's ceiling never arrives, and waiting on it forever would pin the old
@@ -10848,6 +10997,9 @@ var EngCalcs = EngCalcs || {};
 				var settle = function (ok) {
 					img._lpnSettled = true;
 					img._lpnOk = ok;
+					trec.state = ok ? 'ok' : 'fail';
+					if (!ok) { tileProbeFailure(t.key, t.url); }
+					tileDebugRender();
 					if (ok) { delete basemapFails[t.key]; } else { basemapScheduleRetry(t.key, img); }
 					if (!basemapPendingCount()) { basemapDropCarried(); }
 				};
@@ -10903,6 +11055,7 @@ var EngCalcs = EngCalcs || {};
 			basemapCarried = carried;
 			basemapDropCarried();
 		}
+		tileDebugRender();
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -30216,6 +30369,7 @@ var EngCalcs = EngCalcs || {};
 		georefWireBar();
 		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
+		buildTileBench();    // no-op unless ?debug=tiles is on the URL
 		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener
 		// already ran EngCalcs.initTips(document) once (script load order puts that listener
 		// first) -- so a button's .ec-help[title] tip (Select, Labels) would otherwise never get
