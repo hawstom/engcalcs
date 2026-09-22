@@ -8,55 +8,33 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
 ## STOP -- read before merging anything
 
 - **`feature_freeze.active` in `dev/branch-policy.json` is the second lock.** Tom's all-clear in
-  `dev/branch-all-clears.json` (pin field is **`head`**, not `commit`) does not merge a `protected`
-  branch while the freeze stands. Only Tom lifts it. It is currently OFF.
-- **`master` is `51768b2d`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
-- **Production is whatever Tom last pulled, and it is not master.** Never say "it is live." On
-  2026-09-21 production (`~/addon_html/hawsedc.com/engcalcs` on the `jconstru` host) was clean on
-  master at **`2751faba`**, which is a long way behind. Everything below that says "on master" is
-  therefore something he has NOT yet seen.
-- **FOUR FEATURE BRANCHES ARE BUILT AND EVERY ONE AWAITS HIS BROWSER PASS. NONE MAY MERGE.** All
-  four are in `protected`: `feat/tables-spreadsheet` (8096), `feat/customer-find-labels` (8098),
-  `feat/label-gang-search` (8090), `feat/notice-log` (8099, new). **A session that merges one of
-  these on its own green build is the 2026-09-13 failure repeating.**
-- **THE APACHE CONFIG FOR THE PREVIEW PANEL IS AHEAD OF THE LOADED ONE.** Three ports were retired
-  and one added on 2026-09-21, so Tom must run the two commands at the foot of this file before
-  8099 answers. `diff ~/webdev/worktrees/_panel/branch-preview.conf
-  /etc/apache2/sites-available/branch-preview.conf` settles whether it is still needed.
+  `dev/branch-all-clears.json` (pin field is **`head`**) does not merge a `protected` branch while
+  the freeze stands. Only Tom lifts it. It is currently OFF.
+- **Production is whatever Tom last pulled, and it is not master.** Never say "it is live."
+- **FOUR FEATURE BRANCHES AWAIT HIS BROWSER PASS. NONE MAY MERGE WITHOUT HIS ALL-CLEAR.** All are
+  in `protected`: `feat/tables-spreadsheet` (8096), `feat/notice-log` (8099),
+  `feat/label-gang-search` (8090), `feat/map-menu` (8101). Every one has been through Perry at
+  least twice this round. **A session that merges one on its own green build is the 2026-09-13
+  failure repeating.**
+- **EVERY `check_all.sh` AND EVERY HEADLESS BROWSER RUN GOES THROUGH A LOCK** (adopted 2026-09-22,
+  after a freeze forced Tom to kill the session): `flock /tmp/engcalcs-checkall.lock sh
+  dev/scripts/check_all.sh` and `flock /tmp/engcalcs-browser.lock node ...`. One at a time on
+  this 4-core, 7 GB box. It is slow and it did not freeze once.
 
----
+## THE LABEL QUESTION: WHERE IT STANDS (Task 539, `feat/label-gang-search`)
 
-## THE LABEL QUESTION: HE WAS RIGHT, AND HE HAS NOW ASKED THREE TIMES
-
-**HIS OWN WORDS, 2026-09-21: *"This is the mystery I will not let rest. You say nineteen while I
-say zero."*** He is right, and the three answers he was given before were each a weaker fact
-wearing a stronger word. The trap list below says a repeated question means the RULE is the
-suspect. This is that trap, resolved rather than survived. **The full answers are in
-`dev/tom-review-queue.md` rows R-101 to R-103 and on ROADMAP Task 539; do not re-derive them.**
-
-The three things worth carrying:
-
-- **THE SPOTS DO NOT MOVE; THE BOXES GROW INTO EACH OTHER.** The candidate set is identical at
-  both widths on all 97 labels, so where a label may be OFFERED a place never reads its text. The
-  spots sit at a fixed geometric spacing around the node. Two labels at neighbouring spots collide
-  exactly when their half-widths together exceed that spacing -- so a narrow label stacks endlessly
-  because the spacing wins, and a wide one **occupies spots it is not standing on**.
-- **NINETEEN IS THE COUNT THAT TOUCHED SOMETHING. ZERO IS THE COUNT THAT HAD TO MOVE, AND HIS IS
-  THE ONE THAT DECIDES WHAT GETS BUILT.** 36 of 97 labels vanish and not one was boxed in: the
-  search gives up after 28 spots inside one gap while there was room just outside it.
-- **HIS `spot_prime` MODEL WAS NEVER TRIED, AND THAT IS OWNED NOW.** Only step 4 of his four-step
-  sketch was built. `dev/label-placement-algorithms.md` §9d says *"report back before building
-  it"* about the one part he flagged himself -- and nobody ever did, though he had written *"if
-  it's hard, let me know."* **The first step is cheap and half present:** the node's ranked table
-  of gaps between its pipes is already computed and already survives a zoom, and the code throws
-  all but the biggest away (his R-079).
-
-**AND SAY "NOTHING SHIPPED" OUT LOUD THE MOMENT IT IS TRUE.** He once spent a browser pass on
-`feat/label-gang-search` when every candidate had been abandoned and nobody told him. The shipped
-default on that branch is still byte-identical to what he tested; the rescue is behind
-`?debug=labels`. Lead with that sentence, every time.
-
----
+**He was right that a lattice blind to label size was a bug (R-108), and on testing the fix he
+wrote *"I am incredulous. You made huge progress."*** What is built: a node label first claims
+"room to grow" (about six rows of clear space), so text length stops deciding where it goes; gang
+columns slide as one; labels slide toward their nodes; a label still far out may leave its own
+leader line. **R-075, stated honestly, both halves every time:** adding 12345678 moves and hides
+NOTHING at 4x and 8x on Net3 and Net3-World, and at the fit view still moves 5-7 and hides 16-18,
+of which 18-19 had nowhere to stay whatever the placer did. **The cost is real: the label pass is
+about 2 to 2.5 times master at the fit view**, and it is the GANG REPAIR, fed by room to grow --
+not the slide, which measures 2-5% of the pass. The next cheapening is a spatial index for the
+repair's trial scoring, which needs no decision from him. **Never report one percentage from a
+label harness on a loaded machine**: Perry once read 1.7 s -> 4.9 s off a single wall-clock
+sample that measured the machine, not the code.
 
 ## THE TWO STEP TWOS: A QUESTION OUTSTANDING WITH TOM
 
@@ -152,6 +130,13 @@ of them does the thing the standing ruling says we never do.
 - **`check_all.sh` stamps `.git/check-all-passed` ONLY ON A CLEAN TREE**, and `pre-push` refuses an
   unstamped commit. Commit first, then run the suite. **The pre-commit hook also REFUSES a
   non-merge commit on master**, which is working as designed: move the work to a branch.
+- **A USAGE LIMIT KILLS EVERY RUNNING AGENT AT ONCE, AND ONLY WHAT THEY COMMITTED SURVIVES.**
+  2026-09-22: four agents died mid-work on one 429; their commits were intact and their reports
+  were gone. Brief every agent to commit as each piece lands, and relaunch a dead one with "read
+  `git log master..HEAD` first" rather than the original brief.
+- **A PREVIEW PORT SERVES THE WORKTREE AS IT STANDS, SO TOM CAN TEST MID-BUILD.** He did, on
+  2026-09-22, and cleared a branch whose agent committed three more times after he looked. Pin the
+  all-clear to the final head and SAY so in `pin_note`.
 - **DO NOT GUESS A CAUSE. MEASURE IT.** The DEM defect was mis-diagnosed four times before anyone
   measured. On 2026-09-18 a stale service worker was the leading theory for a control missing from
   port 8094; **Tom hard-reloaded and it was still missing**, so the theory was wrong and an evening
@@ -166,97 +151,51 @@ of them does the thing the standing ruling says we never do.
 
 ---
 
-## STATE -- 2026-09-21b, perishable
+## STATE -- 2026-09-22, perishable
 
-### HIS REVIEW COMMENTS LIVE IN A FILE AND HE USES IT
+### HIS REVIEW COMMENTS LIVE IN `dev/tom-review-queue.md` AND HE USES IT
 
-`dev/tom-review-queue.md`, guarded by `review_queue_check.php`. **Every `check_all.sh` run prints
-the outstanding rows under a NOTE.** He prunes it himself and REOPENS rows with dated notes
-underneath, which is the file working as intended. **On 2026-09-21 he wrote *"I can't see that my
-edits were addressed. Please address them"* -- the sub-bullets under a row are as much his input as
-the row, and a session that reads only the row text misses half of what he said.** Commit his edits
-verbatim, under his own authorship, before touching anything else.
+Rounds R-126 to R-152 are this session's. **He asked for engagement, not accumulation** (*"Engage
+with me on tom-review-queue.md so that it is fully addressed and deleted or used further instead
+of going stale"*). Four old rows sit open only because they wait on him: R-004, R-043, R-062 (his
+code-review question, answered), R-104 (answered). Put them to him by name for a clear/keep word.
 
-### PERRY EARNED THE SEAT THREE MORE TIMES ON 2026-09-21
+### ON MASTER AND PUSHED. HE HAS PULLED NONE OF IT
 
-He reviewed three branches and found a real defect on two of them, both of which would have cost
-Tom a browser pass:
+- `feat/zoom-symbol-size` (Task 705, on his all-clear): symbols stop growing on the ground past
+  the labeling threshold, or past the 10th-percentile link length when none is set; reservoirs and
+  tanks exempt; one threshold row in Settings. Four open questions from the build are in the
+  final report of 2026-09-22 and not yet asked.
+- `fix/example-open` (on his all-clear): the gallery closes on the first click and ignores repeats.
+  His 25-second wait did NOT reproduce (2-4 s under load); R-130 stays open for his retry.
+- `fix/daily-report-headings`: the rank-by-shopping table now has its heading row (the report
+  script's own filter was throwing it away) and a two-line note on what people and page loads
+  count. Both require 10+ seconds on the page, so robots are nearly all excluded; there is no robot
+  list anywhere in the code. The host needs no reinstall: the cron job fetches master itself.
+- Task 703 closed on his word; Task 708 opened (every property in every venue, his question).
 
-- **On `feat/tables-spreadsheet`, a regression WORSE than the defect it came from.** The R-038 fix
-  blocked the browser's own mouse press on every table cell, to stop character-dragging while
-  extending a cell range -- including **inside the one cell being typed in**, so the mouse could no
-  longer place the caret or select a substring. On the page where Tom types four hundred numbers at
-  a sitting. The shipped harness could not see it because every press it fired was in Ready mode
-  and it never once entered Edit mode. Fixed, four mutations killed.
-- **On `feat/customer-find-labels`, a number reported as if it were the answer.** A drop rate given
-  as 0.8%/0.8% was one seed; his own sweep of ten gave 0.4% to 2.4%, the build agent's own re-sweep
-  gave 0.0% to 1.6%. **This is the SECOND time this exact harness has done it.** Also a reachable
-  defect: the service line was as heavy as the main at a 1 px link width and heavier below it, and
-  the Settings box's `min="1"` is advice to a spinner and nothing at all to a typed entry.
-- **His standing check that keeps paying: construct the case the author did not.** It is always the
-  SAMPLE, never the numbers. And: **when a report gives one percentage from a harness, ask what
-  seed it is and re-run it.** Put that sentence in every build brief.
+### THE FOUR BRANCHES, AND WHAT IS STILL OPEN ON EACH
 
-### ON MASTER AND PUSHED: `51768b2d`. HE HAS PULLED NONE OF IT
-
-- **His four rulings applied:** About Mission now opens *"HawsEDC Engineering Calculators have been
-  offered freely online since 2010"* and the License paragraph 2 is now his single sentence alone
-  (**both are PUBLIC CLAIMS and both strings are in drift in 26 languages**); Task 610 promoted to
-  100; Task 706 promoted to 100 with his intuition written in as the design.
-- **Three branches merged on his all-clears and deleted:** `feat/engine-fetch-wait` (Task 608 was
-  already closed on his word; **the previous handoff said it had MERGED and it had not**, which is
-  why he found it still on the panel), `feat/lock-initials-later` (Task 698), and
-  `feat/xy-world-map` (Task 646). Each has a pinned entry in `dev/branch-all-clears.json` whose
-  `pin_note` names the commits that landed AFTER he cleared it.
-- **Task 706 CLOSED.** A committed cell writes nothing to storage; the whole-project write is
-  deferred 300 ms, the number this page already means by "a pause". Every deliberate save flushes
-  it, and three page-going-away doors do too. The scenario scan marks the one element edited
-  instead of walking all 560. Measured 34-54 ms a cell down to **3-4 ms**. **Task 707 is open for
-  the five minutes of a real browser that turns a stand-in into a real number.**
-- **His nine misc items shipped:** a time step now reads `24:00 - 25:00` and never wraps, with the
-  clock reading moved into the row's TIP rather than deleted; the nine symbology suffix and decimal
-  defaults, for a NEW project only; and reaction rate in Properties and in the Pipes table.
-- **The four questions he asked are ANSWERED IN THE QUEUE** (R-101 to R-104), not in a lost chat
-  message. The two that cost something to admit: **only step 4 of his `spot_prime` sketch was ever
-  built**, and nobody ever reported back on the one part he flagged; and his "zero real collisions"
-  is the right answer to the question that decides what gets built, while "nineteen" answered a
-  weaker one. Task 539 carries both.
-
-### THE HOST IS FIXED AND HIS COMMAND WAS GENUINELY INVALID
-
-He was right twice. `~/webdev/...` is a path on HIS machine and does not exist on the server, and
-**`dev/host/install.sh` did not install `check.mustblock` at all** -- the file the R-070 fix lives
-in. Both fixed. Installed from `~/tgh/engcalcs-report`, which is the checkout allowed to pull;
-**production may never fetch**, because a fetch rewrites `packed-refs` and the About box dates its
-build line from that. `sh ~/check.sh` now exits 0 and silent, so the spurious 2:22 AM mail is done.
-**Neither production checkout was dirty.** `~/dev_html/...` is still on `feat/lock-initials-later`,
-which no longer exists as a branch -- ask him what he wants that host on.
-
-### FOUR FEATURE BRANCHES AWAIT HIS BROWSER PASS
-
-| Branch | Port | What he must judge |
-|---|---|---|
-| `feat/tables-spreadsheet` | 8096 | nine items of his own, including the scroll paradigm and the mouse-caret repair |
-| `feat/customer-find-labels` | 8098 | the Use current view button (it was out by a factor of 576,000 on a map project), the service line, the reserved link-label room |
-| `feat/label-gang-search` | 8090 | **nothing to look at.** A measurement and a switchboard. Say that FIRST |
-| `feat/notice-log` | 8099 | the message log: one icon in the bottom-left strip, "Recent messages", last 30, in memory only |
+- **`feat/notice-log`: THE ICON EDIT IS BLOCKED AND IS HIS TO SETTLE.** He likes the drawing he saw
+  (*"I like the down arrow glyph"* -- the clock hands made a V). An earlier instruction had already
+  redrawn the hands as an L before his words arrived, and the agent's attempt to restore the V was
+  refused by Claude Code's own safety classifier as a relayed instruction. **Not worked around.**
+  The branch ships the L. It is a one-line revert of the hands in `lib/Icons.lib.php` `history`,
+  to be made in a session where he says it himself. Round three (flash, engine notes, dismiss
+  click, phone) was in flight when this was written -- read its commits before assuming.
+- **`feat/map-menu`**: Detach keeps a grid placement; nothing can DISCARD one now. His wording
+  needed if he wants a discard row. Re-adjust and Scale greyed on lat/lon as well as EPSG (he said
+  EPSG only) -- tell him.
+- **`feat/tables-spreadsheet`**: a first visit to a table is still a real build (about 0.5 s,
+  2.4 s at 4x CPU throttle). Chunked first build is scoped in the agent's report, not started.
+- **`feat/label-gang-search`**: above.
 
 ### WHAT IS OUTSTANDING WITH HIM
 
-1. **Task 703, the satellite tiles.** The instrument is built and is ON MASTER: he types
-   `?debug=tiles` on the page and gets wanted / from cache / requested / arrived / drawn / failed /
-   retried / still outstanding for the current view, with every failure named and its byte count.
-   **A number that sits at "still outstanding" and does not move is the reading that names it.**
-   A fifth cause was also found and fixed on the way. He has not run it yet.
-2. **Task 705, the zoom rules** -- he asked to DISCUSS, not to be handed a build. Two things now
-   wait on it: the service line shrinking below a pixel, and R-051(2)'s last clause.
-3. **The two "step 2" controls.** Still unanswered and still the same question: **ask him which
-   menu row he pressed.** One of them rewrites every coordinate by design.
-4. **R-062**, his own: how to spend real resources on a deep code review against AI techno-slop.
-5. **The 1 px heading misalignment:** what browser and zoom level, and was the scrollbar showing?
-6. **Row 3 of Ida's list** -- the 57 raw `alert()`/`confirm()` calls. Deliberately not started. The
-   first pass is a page of prose sorting them into must-block / could-be-a-notice / merely-informs,
-   and that sorting is HIS ruling to make, not an agent's.
+1. **The two "step 2" controls** -- ask which menu row he pressed (section above).
+2. **R-062**, how to spend on a deep review against AI slop -- answered in the queue, awaiting him.
+3. **Row 3 of Ida's list** -- the 57 raw `alert()`/`confirm()` calls; the sorting is his ruling.
+4. **The panel reload** below drops two retired ports; optional, nothing new needs it.
 
 ## What to hand Tom in the same breath as any panel change
 
