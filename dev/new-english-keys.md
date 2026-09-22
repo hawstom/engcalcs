@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**77 still to read on master**, of 137 untranslated keys, of 2004 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**79 still to read on master**, of 139 untranslated keys, of 2006 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (137, 77 to read @@ NEEDS RULING)
+## lpn_  (139, 79 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -188,6 +188,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_node_customers_tip`**
   > Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.
+  @@ NEEDS RULING
+- **`lpn_pane_goto_tip`**
+  > Show this on the map.
+  @@ NEEDS RULING
+- **`lpn_pane_not_used`**
+  > Not used
   @@ NEEDS RULING
 - **`lpn_pane_tab_customers`**
   > Customers
@@ -443,7 +449,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**69 still to read**, of 84 new keys across 9 unmerged branch(es).
+**65 still to read**, of 80 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -453,8 +459,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/review-round-4 (`2d718fd4`) — adds no English strings
 
 ### feat/customer-find-labels (`a84da469`) — 12 new, 12 to read @@ NEEDS RULING
 
@@ -546,7 +550,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 17 new, 5 to read @@ NEEDS RULING
+### feat/lock-initials-later (`1c9aba51`) — 17 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -600,19 +604,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`cfa207d7`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`7023acf4`) — adds no English strings
 
-- **`lpn_pane_goto_tip`**
-  > Show this on the map.
-  @@ NEEDS RULING
-- **`lpn_pane_not_used`**
-  > Not used
-  @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
-
-### feat/xy-world-map (`731ab367`) — 33 new, 30 to read @@ NEEDS RULING
+### feat/xy-world-map (`3efd322c`) — 32 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -710,11 +704,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
-
-### fix/stale-is-a-snapshot (`ba310f96`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 

@@ -686,8 +686,11 @@ console.log('\n--- heading and cells share one alignment ---');
 		const disagree = cols.filter((c, i) => align(ths[i]) !== align(tds[i]));
 		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ alignment',
 			disagree.map((c) => c.key).join(','));
-		// And nothing else may differ except that one documented pair.
-		const STATED = ['lpn-pane-stated', 'ec-help'];
+		// And nothing else may differ except the documented cell-only classes. `lpn-pane-idcell`
+		// joined them 2026-09-21: the ID cell holds a box AND the pin back to the map, and that
+		// class is what keeps the two on one line (Tom: *"the goto map icon ... is a line break
+		// below the ID number"*). The HEADING has no pin, so it correctly does not carry it.
+		const STATED = ['lpn-pane-stated', 'ec-help', 'lpn-pane-idcell'];
 		const extra = cols.filter((c, i) => {
 			const h = String(ths[i].className || '').split(/\s+/).filter(Boolean);
 			const d = String(tds[i].className || '').split(/\s+/).filter(Boolean);

@@ -17317,10 +17317,17 @@ var EngCalcs = EngCalcs || {};
 	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
 	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
 	// the pipe is how it changes.
+	// **`refTo` IS WHAT MAKES A SUPPORT COLUMN POINT SOMEWHERE ELSE** (Tom, 2026-09-21: *"when we
+	// right-click on a support column (like From and To) that contains an asset, we can Show on map
+	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
+	// the right-click menu's Select in map reads it; every other column has none and the menu falls
+	// back to the row's own element, which is what it has always done.
 	function paneColEnds() {
 		return [
-			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; } },
-			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; } }
+			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; },
+				refTo: function (l) { return { group: 'node', id: l.from }; } },
+			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
+				refTo: function (l) { return { group: 'node', id: l.to }; } }
 		];
 	}
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
@@ -17736,6 +17743,7 @@ var EngCalcs = EngCalcs || {};
 						.split('{id}').join(id) : '';
 				},
 				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
+				refTo: function (c) { var l = customerLink(c); return l ? { group: 'link', id: l.id } : null; },
 				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
@@ -17787,6 +17795,10 @@ var EngCalcs = EngCalcs || {};
 			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
 			// that says its demand is in no answer. The popup says so in words.
 			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
+				refTo: function (c) {
+					var n = customerNodeId(c);
+					return (n === null || n === undefined) ? null : { group: 'node', id: n };
+				},
 				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
 	}
@@ -18880,6 +18892,15 @@ var EngCalcs = EngCalcs || {};
 			 * table is a collision whichever of them a reader learns first.
 			 */
 			if (c.key === 'id') {
+				// **THE PIN SITS ON THE ID'S OWN LINE** (Tom, 2026-09-21: *"We have a gratuitous
+				// space waster at ID where the goto map icon (nice unsolicited touch!) is a line
+				// break below the ID number. Put on same line"*). The cell holds two inline boxes
+				// and the column is 5em wide, so the browser wrapped the second one -- doubling the
+				// height of EVERY row in every table to carry an icon. The class is what
+				// css/engcalcs.css hangs `white-space: nowrap` on; a wrapper element would have
+				// been the other fix and is the wrong one, because paneCellFocusable() reads the
+				// cell's own children to find the box the caret goes in.
+				td.className += ' lpn-pane-idcell';
 				btn = document.createElement('button');
 				btn.type = 'button';
 				btn.className = 'lpn-pane-goto ec-help';
@@ -19086,12 +19107,20 @@ var EngCalcs = EngCalcs || {};
 	// identity carry no control at all and are given tabIndex -1 so the caret can still land on
 	// them: End must be able to reach the last column even when it is read-only, exactly as a
 	// spreadsheet's End does not skip a protected cell.
+	// **A `<select>` IS THE CONTROL IN ITS CELL AND WAS NOT ON THIS LIST, WHICH IS TOM'S STUCK
+	// ARROW** (2026-09-21: *"Left and right arrows get stuck at selectors unless I first skip over
+	// them with Ctrl"*). A choice cell holds a `<select>`; this answered the `<td>` instead, and a
+	// `<td>` in that branch is given no tabIndex, so `focus()` on it does nothing at all. The caret
+	// was therefore left on `document.body` -- OUTSIDE the table -- and the next keystroke never
+	// reached the table's own keydown listener, which is the whole of "stuck". Ctrl+arrow escaped
+	// it because paneJumpEdge() runs THROUGH a pull-down (paneCellBlankAt: a choice is never blank)
+	// and lands on a real box, so the focus moved and the listener was live again.
 	function paneCellFocusable(td) {
 		var kids = (td && td.children) || [], i, tag;
 		if (!td) { return null; }
 		for (i = 0; i < kids.length; i++) {
 			tag = kids[i].tagName || (kids[i]._tag && String(kids[i]._tag).toUpperCase());
-			if (tag === 'INPUT' || tag === 'BUTTON') { return kids[i]; }
+			if (tag === 'INPUT' || tag === 'SELECT' || tag === 'BUTTON') { return kids[i]; }
 		}
 		return td;
 	}
@@ -19123,24 +19152,78 @@ var EngCalcs = EngCalcs || {};
 	// second lands the row well clear of the heading rather than flush against it. Measured
 	// directly rather than left to the browser, using the one number the CSS never states as a
 	// constant: the heading row's own rendered height.
+	/**
+	 * **ONE PARADIGM, AND IT IS HIS: A WHOLE CELL AT THE TOP** (Tom, 2026-09-21: *"Spreadsheet
+	 * software chooses a paradigm for where -- near or left/top -- to maintain exactly a whole cell
+	 * when arrowing past the edge of the screen... my vote is whole cell at top."*).
+	 *
+	 * **WE HAD BOTH OPINIONS AT ONCE, WHICH IS WHY IT LOOKED RANDOM.** Going up, the old code
+	 * aligned the cell's TOP flush under the heading; going down, it aligned the cell's BOTTOM
+	 * flush with the panel's floor -- and a bottom-flush scroll leaves whatever fraction of a row
+	 * happens to be left over clipped under the heading. Two rules, so the picture after a Down and
+	 * the picture after an Up were different kinds of picture, which is his (a).
+	 *
+	 * The rule here is ONE invariant, stated once and true whichever way the caret moved: **the
+	 * scroll always comes to rest on a row boundary, so the first row under the heading is always a
+	 * whole row**, and the cell the caret is on is always completely visible. Going down that means
+	 * scrolling the SMALLEST amount that shows the cell and then rounding on DOWN to the next row
+	 * boundary -- never a page, never the top, which is his (b).
+	 *
+	 * **IT SETS scrollTop ABSOLUTELY RATHER THAN NUDGING IT, and that is what kills the jump.**
+	 * `.focus()` has already asked the browser to scroll, and the browser's notion of "in view"
+	 * counts the pixels the sticky heading is painted over (which is the Ctrl+Down/Ctrl+Up
+	 * workaround he found). A relative correction inherits whatever the browser did first; an
+	 * absolute one overrules it, so there is exactly one answer for a given cell and it does not
+	 * depend on which way the caret arrived.
+	 *
+	 * The arithmetic is paneScrollTopFor(), kept separate because it is the part with a right
+	 * answer: this function only measures.
+	 */
+	function paneScrollTopFor(cur, viewH, headH, cellTop, cellBottom, rowTops) {
+		var want, i, best = null;
+		// ABOVE the fold, or clipped by the heading: the cell becomes the first whole row under it.
+		if (cellTop < cur + headH) { return Math.max(0, cellTop - headH); }
+		// Fully visible: nothing moves. A scroll on a key that did not need one is the "disorienting"
+		// half of what he reported.
+		if (cellBottom <= cur + viewH) { return cur; }
+		// BELOW the fold: the least scroll that shows the whole cell, then on DOWN to a row
+		// boundary so the top of the view is a whole row rather than a sliver of one.
+		want = cellBottom - viewH;
+		for (i = 0; i < rowTops.length; i++) {
+			if (rowTops[i] - headH >= want && (best === null || rowTops[i] < best)) { best = rowTops[i]; }
+		}
+		if (best !== null) { want = best - headH; }
+		// A row taller than the band would otherwise be pushed off its own top edge.
+		want = Math.min(want, cellTop - headH);
+		return Math.max(0, want);
+	}
 	function paneScrollCellIntoView(host, cellTd) {
-		var theadEl, theadRow, headH, hostRect, cellRect, over;
+		var theadEl, theadRow, headH, hostRect, cellRect, cur, viewH, top, bottom, rowTops = [],
+			tbody, i, kids, r;
 		if (!host || !cellTd || !host.getBoundingClientRect || !cellTd.getBoundingClientRect) { return; }
 		theadEl = host.querySelector && host.querySelector('thead');
 		theadRow = theadEl && theadEl.children && theadEl.children[0];
 		headH = (theadRow && theadRow.getBoundingClientRect) ? theadRow.getBoundingClientRect().height : 0;
 		hostRect = host.getBoundingClientRect();
 		cellRect = cellTd.getBoundingClientRect();
-		over = (hostRect.top + headH) - cellRect.top;
-		if (over > 0) { host.scrollTop -= over; return; }
-		over = cellRect.bottom - hostRect.bottom;
-		if (over > 0) { host.scrollTop += over; }
+		cur = host.scrollTop || 0;
+		viewH = (typeof host.clientHeight === 'number' && host.clientHeight) ? host.clientHeight : hostRect.height;
+		// Content coordinates: what the panel would measure with scrollTop at 0.
+		top = (cellRect.top - hostRect.top) + cur;
+		bottom = top + cellRect.height;
+		tbody = host.querySelector && host.querySelector('tbody');
+		kids = (tbody && tbody.children) || [];
+		for (i = 0; i < kids.length; i++) {
+			r = kids[i].getBoundingClientRect && kids[i].getBoundingClientRect();
+			if (r) { rowTops.push((r.top - hostRect.top) + cur); }
+		}
+		host.scrollTop = paneScrollTopFor(cur, viewH, headH, top, bottom, rowTops);
 	}
 	function paneFocusCell(spec, id, key) {
 		var active = activeElementSafe(), target, cellTd;
 		spec._selMoving = true;
 		try {
-			if (active && active.blur && active.tagName === 'INPUT') { active.blur(); }
+			if (active && active.blur && (active.tagName === 'INPUT' || active.tagName === 'SELECT')) { active.blur(); }
 			cellTd = spec.tds && spec.tds[id] && spec.tds[id][key];
 			target = paneCellFocusable(cellTd);
 			if (!target) { return false; }
@@ -19282,8 +19365,16 @@ var EngCalcs = EngCalcs || {};
 	// `readOnly`/caret state -- a range of one cell IS a cell in READY, and a range of more than
 	// one is READY plus a highlighted rectangle. paneFourthMode() below is where the two are put
 	// back together into the label he actually uses.
+	// **A PULL-DOWN IS A CELL TOO, AND SAYING SO IS WHAT UNSTICKS THE ARROW KEYS** (Tom,
+	// 2026-09-21: *"Left and right arrows get stuck at selectors unless I first skip over them
+	// with Ctrl; interesting."*). It used to answer `null` for anything that was not an `<input>`,
+	// which made a choice cell a thing the mode machinery had no word for. A `<select>` has no
+	// `readOnly` property at all, so `undefined !== false` answers READY by itself -- which is the
+	// truth about it: a pull-down is never being typed in, and paneEnterEdit() turns it away on
+	// its own `type !== 'text'` test.
 	function paneCellMode(input) {
-		if (!input || input.tagName !== 'INPUT' || !input._lpnCell) { return null; }
+		if (!input || !input._lpnCell) { return null; }
+		if (input.tagName !== 'INPUT' && input.tagName !== 'SELECT') { return null; }
 		if (input.readOnly !== false) { return 'ready'; }
 		return input._lpnEntry ? 'entry' : 'edit';
 	}
@@ -19515,7 +19606,12 @@ var EngCalcs = EngCalcs || {};
 		// **DELETE EMPTIES A CELL IN NAVIGATION MODE.** The map's own Delete listener cannot reach
 		// here -- keyboardIsTyping() turns away any key inside an <input> -- so this is the only
 		// meaning Delete has with the caret in a table, and a spreadsheet user expects exactly one.
-		if (!editing && (key === 'Delete' || key === 'Backspace') && active && active._lpnCell) {
+		// A TEXT box only: a checkbox carries its answer in `checked` and a pull-down can only
+		// hold one of the options it offers, so "empty it" is not a request either of them has a
+		// reading for -- the same argument paneCellBlankAt() already makes about what counts as a
+		// blank. Before pull-downs could hold the caret at all this was unreachable for them.
+		if (!editing && (key === 'Delete' || key === 'Backspace') &&
+				active && active._lpnCell && active.tagName === 'INPUT' && active.type === 'text') {
 			active.value = '';
 			paneCommitCell(active);
 			return true;
@@ -19674,12 +19770,26 @@ var EngCalcs = EngCalcs || {};
 			 * Shift+press must NOT move focus this way -- R-036 keeps the border on the cell the
 			 * range STARTED from, and calling focus() on the cell just pressed would drag it there.
 			 */
-			e.preventDefault();
 			if (!e.shiftKey) {
 				var focusable = paneCellFocusable(td);
+				/**
+				 * **A PULL-DOWN AND A CHECKBOX KEEP THE BROWSER'S OWN PRESS.** The
+				 * `preventDefault()` below exists to stop a browser arming its native
+				 * click-and-drag selection of the CHARACTERS inside a text box -- a select has no
+				 * characters to drag over, and preventing its mousedown stops the list from
+				 * opening and stops a checkbox toggling, which would trade R-038 for a control
+				 * that does nothing. The browser's own focus then reaches the focusin listener
+				 * above, which is what makes the press a selection.
+				 */
+				if (focusable && (focusable.tagName === 'SELECT' ||
+						(focusable.tagName === 'INPUT' && focusable.type === 'checkbox'))) {
+					return;
+				}
+				e.preventDefault();
 				if (focusable && focusable.focus) { focusable.focus(); }
 				return;   // a plain press is the focusin above; Shift extends below instead
 			}
+			e.preventDefault();
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
 			if (r < 0 || c < 0) { return; }
@@ -19767,9 +19877,10 @@ var EngCalcs = EngCalcs || {};
 		// fires, whether the press kept the existing range or collapsed it to the cell under the
 		// pointer -- so the menu only has to read paneSelBox() as it stands.
 		table.addEventListener('contextmenu', function (e) {
-			if (!paneTdOfEvent(spec, e.target)) { return; }
+			var td = paneTdOfEvent(spec, e.target);
+			if (!td) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
-			paneOpenContextMenu(spec, e.clientX || 0, e.clientY || 0);
+			paneOpenContextMenu(spec, e.clientX || 0, e.clientY || 0, td);
 		});
 	}
 	// The open menu, at most one at a time -- a second right-click anywhere replaces it rather
@@ -19850,9 +19961,51 @@ var EngCalcs = EngCalcs || {};
 	 * reused for the imperative alone and not its sentence, because the map tool and this command
 	 * genuinely differ (see paneDeleteSelection() above).
 	 */
-	function paneOpenContextMenu(spec, x, y) {
+	// **A MENU THAT RUNS OFF THE SCREEN IS A MENU WITH NOTHING ON IT** (Tom, 2026-09-21: *"When I
+	// right-click on a cell near the bottom of the screen, the right-click menu goes off the bottom
+	// of the screen."*). It is `position: fixed` at the pointer's own client coordinates, so
+	// nothing was ever going to stop it -- the pointer is frequently within four rows of the
+	// bottom, because the bottom pane IS the bottom of the window.
+	//
+	// **FLIP FIRST, CLAMP SECOND**, which is what every desktop menu does: put the menu ABOVE the
+	// pointer rather than sliding it up under it, so the pointer is still outside the menu and the
+	// first item is not sitting under the finger that opened it. The clamp is only the second
+	// answer, for a menu taller than the window, where there is no side to flip to.
+	function paneClampXY(x, y, w, h, vw, vh) {
+		var pad = 4, nx = x, ny = y;
+		if (nx + w > vw - pad) { nx = x - w; }
+		if (nx + w > vw - pad) { nx = vw - pad - w; }
+		if (ny + h > vh - pad) { ny = y - h; }
+		if (ny + h > vh - pad) { ny = vh - pad - h; }
+		return { x: Math.max(pad, nx), y: Math.max(pad, ny) };
+	}
+	function paneClampMenu(menu, x, y) {
+		var r = menu.getBoundingClientRect && menu.getBoundingClientRect(),
+			vw = (typeof window === 'object' && window.innerWidth) || 0,
+			vh = (typeof window === 'object' && window.innerHeight) || 0, at;
+		if (!r || !vw || !vh) { return; }
+		at = paneClampXY(x, y, r.width, r.height, vw, vh);
+		menu.style.left = at.x + 'px';
+		menu.style.top = at.y + 'px';
+	}
+	// Which element this menu's Select in map is about: the row's own, unless the cell under the
+	// pointer is a support column that NAMES another one -- see `refTo` on paneColEnds().
+	function paneCtxTarget(spec, td, rows, box) {
+		var col, el, ref, i;
+		if (td && td._lpnPaneKey) {
+			col = paneColByKey(spec, td._lpnPaneKey);
+			i = paneIndexOfId(rows, td._lpnPaneId);
+			el = i >= 0 ? rows[i] : null;
+			if (col && col.refTo && el) {
+				ref = col.refTo(el);
+				if (ref && ref.id !== undefined && ref.id !== null && ref.id !== '') { return ref; }
+			}
+		}
+		return { group: spec.group, id: rows[box.ar].id };
+	}
+	function paneOpenContextMenu(spec, x, y, td) {
 		var pc = EngCalcs.pageConfig || {}, rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), menu, mk;
+			box = paneSelBox(spec, rows, cols), menu, mk, aim;
 		paneCloseContextMenu();
 		if (!box) { return; }
 		menu = document.createElement('div');
@@ -19885,12 +20038,15 @@ var EngCalcs = EngCalcs || {};
 				}
 			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
 		});
+		aim = paneCtxTarget(spec, td, rows, box);
 		mk(pc.lpn_pane_goto_tip || 'Show this on the map.', function () {
-			findGoTo(spec.group, rows[box.ar].id);
+			findGoTo(aim.group, aim.id);
 		});
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
+		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
+		paneClampMenu(menu, x, y);
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
