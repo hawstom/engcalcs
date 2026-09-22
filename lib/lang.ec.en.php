@@ -1157,16 +1157,17 @@ $ec_lang['lpn_menu_insert']='Insert';
 // them was the word "View" in its own language, and a translated "View" under a key drawn as Map
 // would be the one kind of wrong a reader cannot see. Absent is the correct untranslated state.
 $ec_lang['lpn_menu_map']='Map';
-// The street map behind a geographic project (ROADMAP Task 145). Two keys rather than one, because
-// this menu has no checkmark column, so the row has to say what it will DO. "Street map" rather than
+// The street map behind a geographic project (ROADMAP Task 145). "Street map" rather than
 // "basemap": a person who has never used GIS knows what a street map is.
+//
+// **THE MENU'S OWN HIDE/SHOW ROWS RETIRED 2026-09-22** (Tom: "I think we can retire the Hide/Show
+// street map and satellite images rows. Detach and attach provide the same functionality."). Map,
+// World map, Attach/Detach is now the on/off switch for every project kind. These two SHOW keys
+// stay because the corner teaser (refreshBasemapTeaser()) still uses them for its street/satellite
+// swap; lpn_basemap_hide, lpn_basemap_satellite_hide, lpn_basemap_tip and lpn_basemap_satellite_tip
+// were deleted with the rows -- nothing else read them.
 $ec_lang['lpn_basemap_show']='Show street map';
-$ec_lang['lpn_basemap_hide']='Hide street map';
-$ec_lang['lpn_basemap_tip']='Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.';
 $ec_lang['lpn_basemap_satellite_show']='Show satellite images';
-$ec_lang['lpn_basemap_satellite_hide']='Hide satellite images';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_basemap_satellite_tip']='Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.';
 // ROADMAP Task 145's placement tool. **THE PAIR OF NOUNS IS 'XY' and 'lat/lon', LOWER CASE** --
 // Tom, 2026-08-18, after withdrawing his own earlier "GeoMap" ("too evocative of a trademarkish
 // thing") and after rejecting "world map". Flat Earth / Round Earth is the same distinction told as
@@ -1357,12 +1358,9 @@ $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
-// "Reduce map clutter" rather than "Hide map readouts" (Tom, 2026-08-21: "more honest and
-// understandable"). The row names what it will DO, and what it does is take furniture off the
-// picture -- a reader who has never met the word "readout" still knows what clutter is.
-$ec_lang['lpn_clean_map']='Hide map readouts';
-$ec_lang['lpn_clean_map_off']='Show map readouts';
-$ec_lang['lpn_clean_map_tip']='Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.';
+// **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
+// But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
+// lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
 // lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
