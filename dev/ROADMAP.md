@@ -1850,11 +1850,18 @@ the block.
     overshoot-and-correct -- discards a tile that had already loaded and re-fetches it, because the
     "do we already have this" test reads two buckets and never the third one a tile sits in while a
     view is still loading. Every gesture the fixing agent tested was one-directional.
-  - **THE NEXT MOVE IS NOT ANOTHER CAUSE, IT IS AN INSTRUMENT HE CAN RUN.** Four rounds of
-    measure-and-fix have each ended with him still seeing white squares, so the measurement is not
-    reaching the state his machine is in. What is missing is a readout, on his own screen, saying
-    for the current view: wanted, requested, arrived, drawn, failed, retried, cached. Then the next
-    report is his, not ours.
+  - **THE INSTRUMENT IS BUILT AND IT IS `?debug=tiles`** (feat/xy-world-map). Add `?debug=tiles`
+    to the page URL and a panel sits in the lower right saying, for the CURRENT view: wanted, from
+    cache, requested, arrived, drawn, failed, retried, still outstanding -- plus the source, the
+    zoom and whether a token is present -- and it names every failed tile with the reason the
+    network gave. It updates on every arrival and on a one-second tick, so a number that STAYS put
+    is the reading. `dev/lpn-spike/basemap-debug-readout-harness.js` grades the counts against
+    hand-worked outcomes and is mutation-tested. **The next report is his, not ours.**
+  - **A REASON NEEDS A SECOND REQUEST AND THAT IS WHY THE SWITCH EXISTS.** An SVG `<image>` error
+    event is one bit -- no status, no headers, no body -- so under the switch a failed tile's URL
+    is fetched once more and the answer is printed as given. **THE BYTE COUNT IS PART OF THE
+    ANSWER**: a URL-restricted token can refuse in 23 bytes, which looks like a delivered tile to
+    anything counting only success.
   - Remember the token is URL-restricted: a satellite tile fetched from anywhere but hawsedc.com or
     librewaternet.org is a 23-byte Forbidden reply that **looks like a delivered tile to anything
     counting bytes**, and that has already cost one agent a whole wrong measurement.

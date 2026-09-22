@@ -110,7 +110,6 @@ judgement and does not belong to a script.
 
 ### feat/xy-world-map
 
-- [ ] R-066 feat/xy-world-map | The date-line tile mirror: *"I will have to trust you."* Ours to build, with a regression check, since he will not be the one who sees it come back. -- feat/xy-world-map 731ab367 -- **AND THE DIAGNOSIS IT WAS HANDED WAS WRONG IN ONE IMPORTANT WAY: it is not the date-line tile at all.** The tear sits at the ANTIPODE OF THE TRANSFORM'S ORIGIN. At step 1 the origin starts at 0,0, whose antipode IS the date line, which is why it looked like a date-line defect and showed only there. The cause is one function asking *which way round the world is this longitude nearer* -- the right question for one POINT and the wrong one for the two ENDS OF AN EDGE, which can land on opposite branches. Measured before and after at three places and two zooms: -1,750 becomes +250; -1,666.7 becomes +238.1; -1,062.4 becomes +354.1. A negative width IS a picture drawn backwards. The regression check grades against a width derived a DIFFERENT way rather than restating the fix, and is mutation-tested
   - I would like you to try to show this problem to me unless it has been fixed. If it has been fixed, please delete this.
 
 ## Round of 2026-09-21 -- after two days of his own testing
