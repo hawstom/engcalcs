@@ -45,9 +45,12 @@ const MULTS = [1, 2, 4, 8];
 // Re-measured after master's symbol cap (Task 705) landed and the gang repair and the slide began
 // judging a room-claiming label by its room: 102 -> 11 moved over the four zooms on Net3-World. The
 // hidden count rose with the cap itself, which hides more at the fit view on master alone (26).
+// Re-measured the same day when the leader slide began taking the nearest clear spot and going round
+// until nothing moved: Net3-World 11 -> 10, Net3 9 -> 10 (one more at its fit view). Traded
+// knowingly for the longest leader on his northwest case, 28 -> 19 text heights at 2x.
 const CEILING = {
-	'Net3-Novato-CA-World.lwn': { moved: 11, hidden: 29 },
-	'Net3.lwn': { moved: 9, hidden: 22 }
+	'Net3-Novato-CA-World.lwn': { moved: 10, hidden: 29 },
+	'Net3.lwn': { moved: 10, hidden: 22 }
 };
 
 // THE BEFORE: room to grow switched off through the stub's own source hook, so every label is
@@ -213,7 +216,8 @@ function runChild(file, before, quick) {
 const SWEEP = '1234567890';
 function sweepIn(L, Collide, doc, ls, sFit, cx, cy, snap, lastCall, timed) {
 	const rows = [];
-	[1, 2].forEach(function (mult) {
+	// Fit and 2x by default, where the ratchet was measured; LPN_SWEEP_MULTS=1,2,4,8 reads further in.
+	(process.env.LPN_SWEEP_MULTS || '1,2').split(',').map(Number).forEach(function (mult) {
 		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
 		let base = null;
 		for (let k = 0; k <= SWEEP.length; k++) {

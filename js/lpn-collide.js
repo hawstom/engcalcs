@@ -628,6 +628,8 @@ EngCalcs.lpnCollide = (function () {
 	// Measured on Net3-World with the ID prefix swept 0 to 10 characters: the worst top-of-column
 	// leader fell from 5.7 to 3.5 text heights at 16 steps, and 40 bought nothing more.
 	var COLUMN_SLIDE_STEPS = 16;
+	// How many times slideTowardAnchors() goes round (its own note says why more than once).
+	var SLIDE_PASSES = 3;
 	function cardinalSides(anchor, offset, arcs, opts) {
 		opts = opts || {};
 		var dx = Math.abs((offset && offset.x) || 0), dy = Math.abs((offset && offset.y) || 0),
@@ -1328,7 +1330,9 @@ EngCalcs.lpnCollide = (function () {
 	//
 	//   labels   the first-fit specs (anchor, w, h, yOff, lines, home, dragged)
 	//   placed   the results after every placement pass; a COPY comes back with slid entries
-	//   opts     { pad, leaderMin, step }  -- `step` in world units, default a quarter text height
+	//   opts     { pad, leaderMin, step, leaders }  -- `step` in world units, default a quarter text
+	//            height; `leaders` the drawn leaders of labels this pass does not move (link labels,
+	//            Text callouts), which a moved box must not land on either
 	function slideTowardAnchors(labels, placed, obstacles, opts) {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
@@ -1337,7 +1341,8 @@ EngCalcs.lpnCollide = (function () {
 				for (k in r) { if (Object.prototype.hasOwnProperty.call(r, k)) { c[k] = r[k]; } }
 				return c;
 			}),
-			hard = (obstacles && obstacles.boxes) || [], live = [], slid = 0, saved = 0;
+			hard = (obstacles && obstacles.boxes) || [], live = [], slid = 0, saved = 0,
+			fixedLeaders = (opts.leaders || []).filter(function (g) { return !!g; });
 		(labels || []).forEach(function (l) { specs[l.id] = l; });
 		// **A LABEL THAT CLAIMED ROOM TO GROW SLIDES WITH ITS ROOM, not with its text** (see
 		// placeLabelsFirstFit()). Sliding the bare text would make where it stops depend on how long
@@ -1369,17 +1374,27 @@ EngCalcs.lpnCollide = (function () {
 					}
 					if (m.leader && segmentInBoxFraction(m.leader, bs[k]) > 0) { return false; }
 				}
+				for (j = 0; j < fixedLeaders.length; j++) {
+					if (segmentInBoxFraction(fixedLeaders[j], bs[k]) > 0) { return false; }
+				}
 			}
 			return true;
 		}
 		// SHORTEST leader first, and that was measured against longest-first: the label nearest its
 		// node moves out of the way of the ones behind it, so more of them get to slide (29 labels
 		// against 23 on Net3-World's fit view). The order is fixed by the drawing either way.
-		live.slice().sort(function (a, b) {
+		//
+		// **AND AGAIN, UNTIL NOTHING MOVES (at most SLIDE_PASSES)**, because shortest-first is in
+		// WORLD length and a one-row label can be shorter in world units than a four-row label in
+		// its way: node 251 at 2x on Net3-World was judged before node 249, found 249 still standing
+		// where it was about to leave, and kept a 28 text height leader. A second pass sees 249
+		// gone. Every pass only ever shortens leaders, so this ends.
+		var order = live.slice().sort(function (a, b) {
 			var la = Math.hypot(out[a.i].x - a.sp.anchor.x, out[a.i].y - a.sp.anchor.y),
 				lb = Math.hypot(out[b.i].x - b.sp.anchor.x, out[b.i].y - b.sp.anchor.y);
 			return la - lb || (a.sp.id < b.sp.id ? -1 : 1);
-		}).forEach(function (me) {
+		}), movedIds = {}, movedThisPass = 0, pass;
+		function slideOne(me) {
 			var r = out[me.i], ax = me.sp.anchor.x, ay = me.sp.anchor.y,
 				len = Math.hypot(r.x - ax, r.y - ay),
 				step = opts.step > 0 ? opts.step : me.sp.h / 4,
@@ -1389,22 +1404,33 @@ EngCalcs.lpnCollide = (function () {
 				ux, uy, d, c, bs, best = null, bestBoxes = null;
 			if (!(len > floor + step)) { return; }
 			ux = (r.x - ax) / len; uy = (r.y - ay) / len;
-			for (d = len - step; d >= floor; d -= step) {
+			// NEAREST CLEAR SPOT ON THE LEADER, not the nearest one reachable by sliding: the box
+			// does not travel, it is put down once. Stepping inward and stopping at the first
+			// obstruction left node 251 at 28 text heights at 2x on Net3-World with three properties
+			// on, behind one label while clear ground lay nearer still. Any spot on the leader keeps
+			// the shorter leader a piece of the old one, so it still crosses nothing new.
+			for (d = floor; d <= len - step; d += step) {
 				c = { x: ax + ux * d, y: ay + uy * d };
 				bs = labelLineBoxes(me.sp, c);
-				if (!clearAt(me, bs)) { break; }
-				best = c; bestBoxes = bs;
+				if (clearAt(me, bs)) { best = c; bestBoxes = bs; break; }
 			}
 			if (!best) { return; }
-			slid++; saved += len - Math.hypot(best.x - ax, best.y - ay);
+			if (!movedIds[r.id]) { movedIds[r.id] = true; slid++; }
+			movedThisPass++;
+			saved += len - Math.hypot(best.x - ax, best.y - ay);
 			r.dx += best.x - r.x; r.dy += best.y - r.y;
 			r.x = best.x; r.y = best.y;
 			r.box = labelBoxAtEnd(me.sp.text || me.sp, best);
 			r.boxes = me.sp.text ? labelLineBoxes(me.sp.text, best) : bestBoxes;
 			me.boxes = bestBoxes;
 			me.leader = segment(ax, ay, best.x, best.y, 'leader', r.id);
-		});
-		return { results: out, stats: { slid: slid, saved: saved } };
+		}
+		for (pass = 0; pass < SLIDE_PASSES; pass++) {
+			movedThisPass = 0;
+			order.forEach(slideOne);
+			if (!movedThisPass) { pass++; break; }
+		}
+		return { results: out, stats: { slid: slid, saved: saved, passes: pass } };
 	}
 	// ROOM TO GROW's two pieces (placeLabelsFirstFit() carries the reasoning), at module level so a
 	// replay of the pass -- label-width-cause-harness.js -- asks the identical question rather than

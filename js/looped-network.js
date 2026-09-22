@@ -3072,8 +3072,20 @@ var EngCalcs = EngCalcs || {};
 		// would have slid the two labels at A toward B"*). Collide.slideTowardAnchors() carries the
 		// reasoning; after the repair so it shortens what the repair chose, before the crossing shed
 		// so the shed judges the drawing the reader will see.
+		// The leaders the slide must not land a box on, beyond the node labels' own: the link
+		// labels' and the Text callouts', which the crossing shed below counts exactly as it counts
+		// a node leader. Without them a label moved nearer its node could sit on a link label's
+		// leader and the shed would then hide one of the two (measured: node 179 at 2x, Net3-World).
+		var fixedLeaders = [];
+		placed.forEach(function (r) {
+			if (!r.dropped && r.leader && Math.hypot(r.leader.bx - r.leader.ax, r.leader.by - r.leader.ay) > leaderThreshold()) {
+				fixedLeaders.push(r.leader);
+			}
+		});
+		crossingForeigners(obs).forEach(function (f) { if (f.leader) { fixedLeaders.push(f.leader); } });
 		var slide = Collide.slideTowardAnchors(nodeLabels, nodePlaced,
-			{ boxes: obs.boxes, segments: obs.segments }, { pad: pad, leaderMin: leaderThreshold() });
+			{ boxes: obs.boxes, segments: obs.segments },
+			{ pad: pad, leaderMin: leaderThreshold(), leaders: fixedLeaders });
 		nodePlaced = slide.results;
 		lastLeaderSlide = slide.stats;
 		if (repairT0) { spotDebugMs = performance.now() - repairT0; }
