@@ -286,7 +286,37 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
 		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:row;align-items:flex-start;gap:4px;pointer-events:none">
+			<?php // **THE MESSAGE LOG BUTTON LIVES WHERE THE MESSAGES DO** (ROADMAP Task 704; Tom,
+			      // 2026-09-21, having used it: *"the button/glyph must be where the messages appear,
+			      // and it must appear and possibly highlight while a message displays."*). It shipped
+			      // in the bottom strip beside the scenario button and the coordinate readout, which
+			      // is the opposite corner of the map from the thing it recalls. Ida, agreeing: *"That
+			      // is a real defect, not a matter of taste, and I should have caught it before you
+			      // did."*
+			      //
+			      // **THE FIXED LEFT EDGE OF THE WHOLE COLUMN, OUTSIDE THE PART THE NOTICE COVERS.**
+			      // #lpn_map_notice covers #lpn_mode_hint exactly while it shows, so a control placed
+			      // inside that stack would be underneath a message half the time it was wanted. This
+			      // overlay is therefore a ROW: the button, then everything that comes and goes. It
+			      // reads left to right as [glyph] [whatever the map is currently saying], in both
+			      // states -- mode line showing and notice showing alike.
+			      //
+			      // **AND THE MESSAGE TEXT IS NEVER PUT ON THIS LINE.** Folding the sentence into the
+			      // mode line is the obvious next step and is wrong: the mode hint already wraps to
+			      // two lines in several languages, and a row that must fit a glyph and a sentence
+			      // side by side at 320px in a language 40% longer than English fits neither. The two
+			      // stay stacked, one covering the other, exactly as they were.
+			      //
+			      // Same size, font-size and translucent pill as the mode text beside it, so the row
+			      // reads as one readout rather than as a control parked next to one. ?>
+			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
+			<?php // Everything that comes and goes, in the stack it has always been in. `position:
+			      // relative` is load-bearing: #lpn_map_notice is absolutely positioned at THIS box's
+			      // top-left, which is how it goes on covering the mode hint now that the column no
+			      // longer starts at the map's own corner. One number to get right, not two that have
+			      // to be kept in step. ?>
+			<div id="lpn_map_overlay_tl_col" style="position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
 			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
 			      // instructions popup bubble for how to continue and end the current mode."*). A
@@ -345,7 +375,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // states no size the bar runs INDETERMINATE -- it still exists and still moves, because
 			      // his ruling is that the unknown belongs in the bar rather than out of it. ?>
 			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
-		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the
 		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
@@ -919,19 +948,21 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // A host carrying `lpn-set-part` is TRANSPARENT TO THE SEARCH: the filter recurses
 				      // into it and hides row by row, so two builders can share one sub-heading without a
 				      // search for "opacity" turning up everything either of them wrote. ?>
-				<?php // ---- Section: VISUALIZATION ----
-				      // Tom, 2026-08-19: "Group the three Node and Link headings under a new Visualization
-				      // main heading -- the first main heading ... to be honest, I really like Visualization.
-				      // Leave the sub-heading Node and link as is." He named and rejected his own
-				      // alternatives (Analysis View, Labels and colors, Seeing numbers), and Visualization is
-				      // also the word GIS uses for exactly this -- what is drawn and what is printed beside
-				      // it -- so no better term was found to offer against it.
+				<?php // ---- Section: SYMBOLOGY ----
+				      // Tom, 2026-09-19: "Let's try changing main heading Visualization to Symbology and
+				      // its subheadings to Node, Link, Customer, and All." That SUPERSEDES his own
+				      // 2026-08-19 wording ("I really like Visualization ... leave the sub-heading Node and
+				      // link as is"), and the change is the whole of it: each sub-heading used to repeat
+				      // the main heading's word back at the reader -- Node symbology, Link symbology,
+				      // Customer symbology -- which is four words to say what one says once the heading
+				      // above them is Symbology. "All" replaces "Node and link" because the two controls
+				      // under it are now true of a customer as well.
 				      //
 				      // FIRST, which is a claim about what this page is for: you draw a network and you look
 				      // at it, and the index now opens on the controls that decide what you see. Map and page
 				      // keeps what is true of the whole SHEET rather than of one kind of element. ?>
 				<section id="lpn_set_sec_visual" class="lpn-set-sec" data-set-sec="visual">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_visualization']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_symbology']?></h3>
 					<div class="lpn-set-secbody">
 						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
 						      // what is PRINTED beside it, which is one question and was two panels. Tom:
@@ -943,12 +974,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // now one complete answer to "how is this kind of element drawn", scheme
 						      // included -- which is why the ramp is stored per group; see
 						      // defaultSettings() in js/looped-network.js. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_node_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_node_fields"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_link_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_link_fields"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
@@ -958,7 +989,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // link label alike, so they belong to neither group and were being read as
 						      // part of whichever one they were filed under. rebuildLabelsFields() fills
 						      // this host. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
+						<?php // **CUSTOMER SYMBOLOGY, A SECTION OF ITS OWN** (ROADMAP Task 247, Tom
+						      // 2026-09-19). What a customer label says is chosen HERE and not in
+						      // Node above -- he overruled his earlier ruling, because a junction's
+						      // label answers "what is the pressure here" and a service's answers
+						      // "whose is this and how much does it draw". It also carries the one
+						      // question those rows cannot, namely how close the view has to be
+						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_labels_customer_fields"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
 							<?php // Thematic map (Tom, 2026-08-19: "Move Thematic map to the Node and link
@@ -1492,8 +1534,6 @@ EngCalcs.pageConfig = {
 	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
 	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
 	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
-	lpn_field_account: <?=json_encode($ec_lang['lpn_field_account'])?>,
-	lpn_field_account_tip: <?=json_encode($ec_lang['lpn_field_account_tip'])?>,
 	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
 	lpn_field_meter_demand_tip: <?=json_encode($ec_lang['lpn_field_meter_demand_tip'])?>,
 	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
@@ -1504,6 +1544,8 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
 	lpn_field_meter_pipe_suggest: <?=json_encode($ec_lang['lpn_field_meter_pipe_suggest'])?>,
 	lpn_meter_pipe_unknown: <?=json_encode($ec_lang['lpn_meter_pipe_unknown'])?>,
+	lpn_field_meter_pattern_tip: <?=json_encode($ec_lang['lpn_field_meter_pattern_tip'])?>,
+	lpn_meter_pattern_unknown: <?=json_encode($ec_lang['lpn_meter_pattern_unknown'])?>,
 	lpn_meter_placed: <?=json_encode($ec_lang['lpn_meter_placed'])?>,
 	lpn_field_meter_station: <?=json_encode($ec_lang['lpn_field_meter_station'])?>,
 	lpn_field_meter_station_tip: <?=json_encode($ec_lang['lpn_field_meter_station_tip'])?>,
@@ -2006,6 +2048,10 @@ EngCalcs.pageConfig = {
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
+	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
+	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
+	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
+	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
 	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
 	lpn_labels_mark_extrema_tip: <?=json_encode($ec_lang['lpn_labels_mark_extrema_tip'])?>,

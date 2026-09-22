@@ -174,11 +174,27 @@ Object.keys(def.priority.node).forEach(function (k) {
 Object.keys(def.priority.link).forEach(function (k) {
 	ok(def.link[k] !== undefined, 'link priority ' + k + ' names a real label field');
 });
+// **A `field:mode` KEY IS NOT A FIELD AND MUST NOT BE REQUIRED TO CARRY ITS OWN RANK.** `decimals`
+// gained `quality:trace` on 2026-09-21, a MODE-SPECIFIC override so a source share prints whole
+// (Tom: Source share Decimal = 0) while water age and concentration keep their tenth. It is still
+// the field `quality`, drawn in the same row, shed in the same order, and `qualityDecimalsKey()`
+// is its only reader -- so the rank that governs it is `quality`'s, and giving it a second rank
+// would be the non-total order this section exists to prevent, not a cure for one. The base name
+// is therefore what is looked up, and a key naming a base field that has no rank still FAILS.
+function baseField(k) { var i = k.indexOf(':'); return i < 0 ? k : k.slice(0, i); }
 Object.keys(def.decimals.node).forEach(function (k) {
-	ok(def.priority.node[k] !== undefined, 'numeric node field ' + k + ' carries a rank');
+	ok(def.priority.node[baseField(k)] !== undefined, 'numeric node field ' + k + ' carries a rank');
 });
 Object.keys(def.decimals.link).forEach(function (k) {
-	ok(def.priority.link[k] !== undefined, 'numeric link field ' + k + ' carries a rank');
+	ok(def.priority.link[baseField(k)] !== undefined, 'numeric link field ' + k + ' carries a rank');
+});
+// And the override is not allowed to name a mode nothing produces: `qualityDecimalsKey()` writes
+// exactly one such key, so a second one appearing here is a typo nobody would ever see on screen.
+['node', 'link'].forEach(function (side) {
+	Object.keys(def.decimals[side]).filter(function (k) { return k.indexOf(':') >= 0; })
+		.forEach(function (k) {
+			ok(k === 'quality:trace', side + ' decimals override ' + k + ' is one the page can ask for');
+		});
 });
 
 // The compiled directions. Asserted by name because they are not user-settable and because

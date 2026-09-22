@@ -153,21 +153,34 @@ ok('...and the no-period sentence is back, which is TRUE of this project',
 // The rows were rebuilt only when the STOP LIST changed, so a project stating the same reporting
 // grid from a different hour kept the hours of the project before it -- a wrong number rather than
 // a missing one, and invisible to anybody who only ever opens one project.
+//
+// **THE CLOCK MOVED FROM THE LABEL TO THE ROW'S TIP ON 2026-09-21 AND THIS SECTION FOLLOWED IT.**
+// Tom read the old `elapsed  ·  clock` label as a range -- two times separated by a mark is a
+// range to everybody -- and asked for a real one: *"Fix it to say 24:00 - 25:00."* The label is
+// now a run-time range that cannot wrap, and the clock is in the tip, where it still has to
+// follow the project on screen. A stale tip is the same defect one surface further in, so the
+// assertions below read `title` rather than the text and the guard is unchanged in substance.
 console.log('\n--- 4. the clock time on each row belongs to the project on screen ---');
 L.applySaved(net3());
 L.refreshAllFromDocument();
-const midnightRow = optionText(step.children[0]);
+const midnightRow = step.children[0].title;
+const midnightLabel = optionText(step.children[0]);
 const sixAm = net3();
 sixAm.times.startClock = 6 * 3600;
 sixAm.times.text.startClock = '6 am';
 L.applySaved(sixAm);
 L.refreshAllFromDocument();
-const sixAmRow = optionText(step.children[0]);
+const sixAmRow = step.children[0].title;
 ok('the same grid from a different hour redraws the rows', midnightRow !== sixAmRow,
 	JSON.stringify(midnightRow) + ' vs ' + JSON.stringify(sixAmRow));
 ok('...and the first row states the hour this project starts at',
 	sixAmRow.indexOf(global.EngCalcs.lpnTimeClockText(sixAm.times, 0)) >= 0,
 	JSON.stringify(sixAmRow));
+// **AND THE LABEL ITSELF IS DELIBERATELY THE SAME AT BOTH START HOURS**, which is the whole point
+// of the change: run time does not know what hour the clock says.
+ok('...while the LABEL is run time and does not move with the start hour',
+	midnightLabel === optionText(step.children[0]),
+	JSON.stringify(midnightLabel) + ' vs ' + JSON.stringify(optionText(step.children[0])));
 
 // ============================================================================================
 // 5. THE CALCULATE BUTTON IS PROJECT DATA TOO

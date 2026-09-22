@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2044,
-        "delta_key_count": 188,
+        "expected_key_count": 2049,
+        "delta_key_count": 193,
         "exempt_key_count": 30,
         "exempt_keys": [
             "u_imgd",
@@ -526,18 +526,18 @@
         "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
         "lpn_pane_tab_customers": "Customers",
         "lpn_customer_heading": "Customer {id}",
-        "lpn_field_account": "Account number",
-        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
         "lpn_field_meter_demand": "Demand per service",
         "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
-        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count": "Number of services",
         "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
         "lpn_field_meter_total": "Total demand",
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
-        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.",
+        "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
+        "lpn_meter_placed": "Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.",
         "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
         "lpn_field_meter_station": "Station along the pipe (%)",
         "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
@@ -549,10 +549,10 @@
         "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
         "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
         "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
-        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.",
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
-        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
@@ -626,6 +626,11 @@
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
+        "lpn_settings_sym_customer": "Customer",
+        "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
+        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
+        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -716,18 +721,18 @@
         "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
         "lpn_pane_tab_customers": "Customers",
         "lpn_customer_heading": "Customer {id}",
-        "lpn_field_account": "Account number",
-        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
         "lpn_field_meter_demand": "Demand per service",
         "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
-        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count": "Number of services",
         "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
         "lpn_field_meter_total": "Total demand",
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
-        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.",
+        "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
+        "lpn_meter_placed": "Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.",
         "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
         "lpn_field_meter_station": "Station along the pipe (%)",
         "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
@@ -739,10 +744,10 @@
         "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
         "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
         "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
-        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.",
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
-        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
@@ -816,6 +821,11 @@
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
+        "lpn_settings_sym_customer": "Customer",
+        "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
+        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
+        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -981,38 +991,6 @@
                 }
             }
         },
-        "lpn_field_account": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "موڑ نقاط",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "ونڈو کا ایک کونا کلک کریں۔",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_account_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "موڑ نقاط",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "ونڈو کا ایک کونا کلک کریں۔",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
         "lpn_field_meter_demand": {
             "reason": "missing",
             "current_value": null,
@@ -1142,6 +1120,38 @@
             }
         },
         "lpn_meter_pipe_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "موڑ نقاط",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "ونڈو کا ایک کونا کلک کریں۔",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "موڑ نقاط",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "ونڈو کا ایک کونا کلک کریں۔",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_pattern_unknown": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2578,6 +2588,86 @@
                     "key": "lpn_backdrop_scale_prompt1",
                     "value": "پس منظر کی تصویر پر دو پوائنٹس پر کلک کریں، جیسے بار سکیل کے دو سرے۔ پھر ان کے درمیان اصل فاصلہ ٹائپ کریں۔",
                     "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_settings_sym_customer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_sym_link",
+                    "value": "لنک کی علامتیں",
+                    "english": "Link"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "صفحہ",
+                    "english": "Page"
+                }
+            }
+        },
+        "lpn_labels_customer_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_sym_link",
+                    "value": "لنک کی علامتیں",
+                    "english": "Link"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "صفحہ",
+                    "english": "Page"
+                }
+            }
+        },
+        "lpn_labels_customer_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_sym_link",
+                    "value": "لنک کی علامتیں",
+                    "english": "Link"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "صفحہ",
+                    "english": "Page"
+                }
+            }
+        },
+        "lpn_labels_customer_width_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_sym_link",
+                    "value": "لنک کی علامتیں",
+                    "english": "Link"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "صفحہ",
+                    "english": "Page"
+                }
+            }
+        },
+        "lpn_settings_label_use_view": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_sym_link",
+                    "value": "لنک کی علامتیں",
+                    "english": "Link"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "صفحہ",
+                    "english": "Page"
                 }
             }
         },

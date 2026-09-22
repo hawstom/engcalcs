@@ -255,9 +255,25 @@ the block.
     undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
     hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
     whatever `tables-interface` already holds.
-  - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
-    tables is the defect inside that programme. Read it before opening anything new.
-  - At 50 because he named it as long-term, not next. Promoting it is his call.
+  - **`tables-interface` IS RETIRED, 2026-09-21, AND EVERYTHING IT HELD IS THE FOUR BULLETS BELOW.**
+    It was one commit off master, made 2026-09-14, holding nothing but a roadmap block -- and that
+    block numbered itself **666**, which was closed the same day for an unrelated lock defect, so
+    the branch could not have passed `roadmap_id_check.php` and could never have merged. It sat for
+    a week. The work itself is live on `feat/tables-spreadsheet`; only the reasoning was stranded,
+    and it is salvaged here rather than deleted with the branch.
+    - Tom, 2026-09-14: *"Tables spreadsheet editing: Copy/paste doesn't work right. We need a
+      tables-interface branch that may be a long-term tweaking project to include column-widths,
+      copy/paste, etc."*
+    - **COPY AND PASTE IS THE DEFECT; THE REST IS THE PROGRAMME.** Fix it first rather than let it
+      wait on the long work -- a broken paste is the `data-entry-clerk`'s whole day. Also named the
+      same day: user-resizable columns, headings that do not wrap, columns too wide.
+    - **THE TABLE IS AN EDITOR OF THE DOCUMENT, NOT A GRID**, and that shapes all of it. Cells write
+      through `setProp()` (`scenario_seam_check.php`), a blank is a STATE not a zero where a column
+      declares `blank`, and `multiGroups()` builds the multi-properties box from these same specs.
+      **So a paste is a batch of validated property writes under one undo snapshot; getting that
+      wrong is silent inside a scenario.**
+    - **Shares the bottom pane's tab strip** with anything else that writes it, so name that seam in
+      any brief or sequence the tracks.
 
 - 100|691| **Create a better error and notice messaging system.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
@@ -712,7 +728,7 @@ the block.
   left is his call.**
   - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
     connector, the two-click gesture and its one-click door, the **Count** (so
-    forty-two residential services are one symbol), the derived junction,
+    forty-two residential services are one symbol), the draggable attachment, the derived junction,
     the detached state, a Customers tab, and the `.inp` answer.
     `dev/lpn-spike/customer-harness.js`, 66 assertions.
   - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
@@ -722,11 +738,60 @@ the block.
     meter does rewrites a number the user typed on a junction.**
   - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
     row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
+  - **THE ACCOUNT NUMBER IS GONE, AND A CUSTOMER CARRIES DESCRIPTION AND TAG INSTEAD** (2026-09-19,
+    his own two sentences): *"Didn't I say to trash Account number since they can just make a Custom
+    property for that or anything else?"* and *"Since Customer is a pseudo-node, what if we provide
+    existing properties like Description and Tag instead of Account number? Then we aren't inventing
+    something, and we incur no language debt."* The field, its two language keys and its column are
+    deleted; the popup, the Customers table, Find and Replace all use the two identity properties
+    every node and link already has. **A saved project's account number is CARRIED into the tag**
+    (into the description where a tag is already there), because a number that came out of a file is
+    the user's -- `customer-node-harness.js` §5 asserts all four cases. The `[DEMANDS]` CATEGORY
+    slot now carries the TAG, which is a better map than the old one: it is EPANET's own join key.
+  - **`feat/customer-find-labels` (2026-09-18) adds four things**, all from his message of that
+    day: custom properties respected in a customer's Properties box and Customers table; a Customer
+    scope in Find and replace; a demand PATTERN on a customer, reaching both solvers and the `.inp`;
+    and customer LABELS. Their placement is his own two fixed locations along the service line with
+    a drop if both are taken -- *"This much simpler than general node label placement."*
+  - **HIS BROWSER PASS OF 2026-09-19 REWROTE THE LABEL HALF OF THAT.** A customer label no longer
+    follows the node checkboxes: **Settings > Customer symbology** is a third section of its own
+    (*"since we may want only demand or only demand and description"*), the values are laid out on
+    ONE LINE the way a link label's are (*"Can we make labels one-line concats like link labels?"*),
+    and there is deliberately **no separate text size**. **THE SIZE WAS STILL WRONG AND THE
+    "it was only the stacking" ANSWER IS WITHDRAWN** (his screenshot, 2026-09-19): the zoom path
+    rewrote node, link and Text label sizes and not customers, so a customer label carried the size
+    of whatever scale it was last composed at -- 11 px beside a node label's 2.75 px at 4x.
+    Measured and guarded in `dev/lpn-spike/customer-label-size-harness.js`. The **symbol is 0.25 of
+    a junction and follows Symbol scale**,
+    replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
+    and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
+    rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
+    current view** capture button. **It does NOT match `feat/label-gang-search`'s, and copying that
+    one verbatim was the defect** (his 2026-09-21 pass): that branch's threshold IS `mapSpan('min')`
+    and this one is the view WIDTH in METRES, so the copy captured the height of a landscape window
+    (1,000 ft of a 2,000 ft view) and, on a geographic project, degrees into a box read as feet
+    (0.005 against 2,880). `dev/lpn-spike/customer-view-capture-harness.js`. The service line's
+    1 px floor is in the same harness; the rest of his service-line sentence -- shrinking BELOW a
+    pixel once the drawing stops growing -- is Task 705 and is deliberately not invented here.
+  - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
+    property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
+    selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
+    labelled and neither colourable; the largest is that a custom property can be searched,
+    replaced and typed and cannot be printed on the map or coloured by.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
-    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **THE LABEL PLACEMENT MYSTERY IS MEASURED, AND TOM WAS RIGHT** (2026-09-19,
+    `dev/lpn-spike/customer-label-cause-harness.js`). He guessed a LINK label was the conflict, was
+    first told it is not, and **that answer is withdrawn**: the fixture stood its customers at round
+    numbers on a main whose label repeats somewhere else, so the case was never on the drawing. A
+    neighbouring customer's label is the commonest blocker and that outcome is a shuffle; a link
+    label blocks too, and **that outcome is a SILENT DROP -- 2.4% of services on the pipe label's
+    own side, 1.2% on the far side**, measured on a random street.
+    **AWAITING HIS CALL:** a third position, letting a customer displace a link label, or making
+    the drop visible -- each spends something he chose. `dev/customer-demands.md` §6a.
   - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
-    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
     so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
     here is a pointer gesture no harness can hold.
 
@@ -766,6 +831,22 @@ the block.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
     may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
     in the harness.
+  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
+    don't understand why we are spending effort on the rings model instead of giving the spot-prime
+    box model a good college try."* **The honest answer is that of his four steps only step 4 was
+    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
+    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
+    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
+    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
+    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+    The rings work got the effort because it was reachable. That is a reason about us, not about
+    the two models.
+  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
+    gap between its pipes is already computed and already survives a zoom, and the code then throws
+    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
+    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
+    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
+    found, which is the thing he asked to be told.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
@@ -1893,8 +1974,11 @@ the block.
     AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
     own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
     look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
-  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (66 sites, one door,
-    8-second expiry, **a later message silently replaces an earlier one**), `setStatus()` (19
+  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (one door, 8-second
+    expiry, **a later message silently replaces an earlier one**, **83 sites** -- the 66 first
+    written here was an undercount Perry re-derived on 2026-09-21, which changes nothing about the
+    fix, since one door is one door, but a number restated as fact that nobody re-checked is
+    exactly the shape that seat watches for), `setStatus()` (19
     sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
     `renderBanner()` (one render door, five kinds, dismissable and not restorable),
     `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
@@ -1917,34 +2001,19 @@ the block.
     feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
     already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
 
-- 100|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
-  Found by Declan 2026-09-21, answering Tom's *"is it fast enough for Declan?"* -- his answer was
-  **yes**, and this is the thing he found while proving it.
-  - **TOM RULED 2026-09-21: BUILD IT, DO NOT WAIT FOR THE MEASUREMENT.** His words: *"I think this
-    would be cheap enough to fix that we should fix it without waiting for measurement. To be
-    honest, I am not sure what it means to save the whole project and why we would ever do that
-    when we can just save the entry at hand. My intuition is that we would always just save the
-    entry at hand and only save the whole project ... when there is a pause. See Off Means Off."*
-    So the five-minutes-of-a-real-browser line below is no longer a gate; it is a way to check the
-    result afterwards. **His intuition IS the design: write the one thing that changed, and defer
-    the whole-project write to a pause**, which is the same shape as the recalculation rule he
-    already ruled on.
-  - **The recalculation waits until you pause. The save does not.** Every cell commit serialises
-    and stores the entire project, not the one thing that changed, on every keystroke-equivalent,
-    uncapped.
-  - **He would not claim a number he could not honestly measure**, and that restraint is the point:
-    with no real browser he built a stand-in on a document shaped like Tom's and got **about 2.6 ms
-    per save at 400 elements -- a FLOOR, not a ceiling**, because it skips the browser's actual
-    write. Small enough not to change his verdict today, and it grows with the network.
-  - **A third thing of the same shape is NAMED and deliberately not sized:** a scan across every
-    element on the map on every commit, running even when nothing about scenarios has changed
-    (`refreshScenarioMarks()`).
-  - **THE CHEAP WAY TO SETTLE IT IS FIVE MINUTES OF A REAL BROWSER** -- the Performance tab open,
-    ten cells typed down a column of the biggest real project. That replaces a stand-in number with
-    a real one, and it is the one thing that could overturn his yes.
+- 50|707| **Five minutes of a real browser on the Task 706 repair.** The Performance tab open, ten
+  cells typed down a column of the biggest real project. The repair shipped on Tom's ruling without
+  waiting for a measurement; every number behind it is a stand-in
+  (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
+  browser's own write, and the real cost of a style invalidation). This is what replaces the floor
+  with a number.
 
-- 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
-  Tom, 2026-09-21, asking for discussion and a plan rather than a build.
+- 100|705| **Limit zoom symbol mapwise size growth.**
+  **HIS OWN TITLE, 2026-09-21**, replacing "New zoom rules: a symbol may not grow past a size the
+  network itself sets." **And he gave the go-ahead the same day:** *"New zoom rules: If you have no
+  questions or objections, you can proceed to implement this in a branch for me to test."* It is
+  building on `feat/zoom-symbol-size`. What follows was his discussion brief and stands as the
+  design.
   - **(1) EVERY SYMBOL BUT A DECLARED EXCEPTION HAS A MAXIMUM MAP SIZE.** His starting proposal,
     offered as a starting point and not a ruling: the junction is the reference, and **the maximum
     junction map size is the 10th-percentile link length**. Reservoir and tank are the exceptions he

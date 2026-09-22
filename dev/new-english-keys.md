@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**118 still to read on master**, of 193 untranslated keys, of 2051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**119 still to read on master**, of 191 untranslated keys, of 2049 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (193, 118 to read @@ NEEDS RULING)
+## lpn_  (191, 119 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -49,8 +49,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > {n} customers are no longer connected to a pipe. Their demand is not in the answers.
   @@ NEEDS RULING
 - **`lpn_customer_fixed_head`**
-  > ⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.
-  _Ruled 2026-09-17: Can you clarify the case? Like a reservoir?_
+  > ⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.
+  @@ NEEDS RULING
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
@@ -69,12 +69,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ff_clear`**
   > Clear rings
   @@ NEEDS RULING
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -85,7 +79,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.
   _Ruled OK 2026-09-17._
 - **`lpn_field_meter_count`**
-  > Services at this customer
+  > Number of services
   @@ NEEDS RULING
 - **`lpn_field_meter_count_tip`**
   > How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.
@@ -107,6 +101,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_field_meter_offset_tip`**
   > How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.
+  @@ NEEDS RULING
+- **`lpn_field_meter_pattern_tip`**
+  > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
   @@ NEEDS RULING
 - **`lpn_field_meter_pipe`**
   > Connected asset
@@ -139,7 +136,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
 - **`lpn_inp_export_flat_customers`**
-  > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
+  > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
+  @@ NEEDS RULING
+- **`lpn_labels_customer_note`**
+  > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
+  @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  @@ NEEDS RULING
+- **`lpn_labels_customer_width_tip`**
+  > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
   @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
@@ -213,9 +219,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
   _Ruled OK 2026-09-17._
-- **`lpn_lock_open_cancelled`**
-  > That file was not opened, and nothing here changed. Somebody else still has it open.
-  @@ NEEDS RULING
 - **`lpn_lock_open_care`**
   > To avoid data loss, choose carefully from the options below.
   _Ruled OK 2026-09-17._
@@ -318,6 +321,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
+- **`lpn_meter_pattern_unknown`**
+  > No pattern in this project is named {id}, so the customer was left as it was.
+  @@ NEEDS RULING
 - **`lpn_meter_pick_pipe`**
   > Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.
   @@ NEEDS RULING
@@ -325,28 +331,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Nothing in this project is named {id}, so the customer was left where it was.
   @@ NEEDS RULING
 - **`lpn_meter_placed`**
-  > Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.
+  > Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.
   @@ NEEDS RULING
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.
-  @@ NEEDS RULING
-- **`lpn_msglog_ago`**
-  > {x} ago
-  @@ NEEDS RULING
-- **`lpn_msglog_empty`**
-  > No messages yet.
-  @@ NEEDS RULING
-- **`lpn_msglog_heading`**
-  > Recent messages
-  @@ NEEDS RULING
-- **`lpn_msglog_name`**
-  > Messages
-  @@ NEEDS RULING
-- **`lpn_msglog_note`**
-  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
-  @@ NEEDS RULING
-- **`lpn_msglog_tip`**
-  > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
 - **`lpn_node_customers`**
   > Customer demands
@@ -360,6 +348,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_settings_label_use_view`**
+  > Use current view
+  @@ NEEDS RULING
+- **`lpn_settings_sym_customer`**
+  > Customer
+  @@ NEEDS RULING
 - **`lpn_survey_axis_east`**
   > Easting
   @@ NEEDS RULING
@@ -611,7 +605,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**63 still to read**, of 63 new keys across 6 unmerged branch(es).
+**28 still to read**, of 34 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -622,109 +616,22 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-find-labels (`bd620e4f`) — 20 new, 20 to read @@ NEEDS RULING
-
-- **`lpn_field_meter_pattern_tip`**
-  > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
-  @@ NEEDS RULING
-- **`lpn_file_training_3`**
-  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
-- **`lpn_file_training_name`**
-  > Your initials
-  @@ NEEDS RULING
-- **`lpn_labels_customer_note`**
-  > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
-  @@ NEEDS RULING
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  @@ NEEDS RULING
-- **`lpn_labels_customer_width_tip`**
-  > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
-  @@ NEEDS RULING
-- **`lpn_lock_open_choices`**
-  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
-  @@ NEEDS RULING
-- **`lpn_lock_open_copy`**
-  > Create a copy
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_saved`**
-  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_seen`**
-  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_times`**
-  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_unsaved`**
-  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
-  @@ NEEDS RULING
-- **`lpn_lock_prompt_name`**
-  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
-- **`lpn_meter_pattern_unknown`**
-  > No pattern in this project is named {id}, so the customer was left as it was.
-  @@ NEEDS RULING
-- **`lpn_settings_label_use_view`**
-  > Use current view
-  @@ NEEDS RULING
-- **`lpn_settings_sec_symbology`**
-  > Symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sym_all`**
-  > All
-  @@ NEEDS RULING
-- **`lpn_settings_sym_customer`**
-  > Customer
-  @@ NEEDS RULING
-- **`lpn_settings_sym_link`**
-  > Link
-  @@ NEEDS RULING
-- **`lpn_settings_sym_node`**
-  > Node
-  @@ NEEDS RULING
-
-### feat/label-gang-search (`344c0cc4`) — 19 new, 19 to read @@ NEEDS RULING
+### feat/label-gang-search (`ae48c735`) — 13 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   @@ NEEDS RULING
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
-  @@ NEEDS RULING
-- **`lpn_file_training_3`**
-  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
-- **`lpn_file_training_name`**
-  > Your initials
-  @@ NEEDS RULING
+- **`lpn_field_account`**
+  > Account number
+  _Ruled OK 2026-09-17._
+- **`lpn_field_account_tip`**
+  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
+  _Ruled OK 2026-09-17._
 - **`lpn_labels_restore`**
   > Restore label defaults
   @@ NEEDS RULING
 - **`lpn_labels_restore_tip`**
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  @@ NEEDS RULING
-- **`lpn_lock_open_choices`**
-  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
-  @@ NEEDS RULING
-- **`lpn_lock_open_copy`**
-  > Create a copy
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_saved`**
-  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_seen`**
-  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_times`**
-  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_unsaved`**
-  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
-  @@ NEEDS RULING
-- **`lpn_lock_prompt_name`**
-  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
   @@ NEEDS RULING
 - **`lpn_settings_label_always`**
   > Always show labels
@@ -738,91 +645,84 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_max_width_tip`**
   > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
   @@ NEEDS RULING
-- **`lpn_settings_label_use_view`**
-  > Use current view
+- **`lpn_settings_link_symbology`**
+  > Link symbology
   @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
   @@ NEEDS RULING
 
-### feat/notice-log (`778d4c95`) — adds no English strings
+### feat/notice-log (`5191e8d3`) — 13 new, 11 to read @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`d8ee55a0`) — 11 new, 11 to read @@ NEEDS RULING
+- **`lpn_field_account`**
+  > Account number
+  _Ruled OK 2026-09-17._
+- **`lpn_field_account_tip`**
+  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
+  _Ruled OK 2026-09-17._
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  @@ NEEDS RULING
+- **`lpn_msglog_ago`**
+  > {x} ago
+  @@ NEEDS RULING
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  @@ NEEDS RULING
+- **`lpn_msglog_heading`**
+  > Recent messages
+  @@ NEEDS RULING
+- **`lpn_msglog_name`**
+  > Messages
+  @@ NEEDS RULING
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
+  @@ NEEDS RULING
+- **`lpn_msglog_tip`**
+  > Read the recent messages again. They are kept only while this page is open.
+  @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 
-- **`lpn_file_training_3`**
-  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
-- **`lpn_file_training_name`**
-  > Your initials
-  @@ NEEDS RULING
-- **`lpn_lock_open_choices`**
-  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
-  @@ NEEDS RULING
-- **`lpn_lock_open_copy`**
-  > Create a copy
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_saved`**
-  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_seen`**
-  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_times`**
-  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_unsaved`**
-  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
-  @@ NEEDS RULING
-- **`lpn_lock_prompt_name`**
-  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
+### feat/tables-spreadsheet (`64b1a0e0`) — 8 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_field_account`**
+  > Account number
+  _Ruled OK 2026-09-17._
+- **`lpn_field_account_tip`**
+  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
+  _Ruled OK 2026-09-17._
 - **`lpn_pane_goto_tip`**
   > Show this on the map.
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-
-### fix/save-entry-at-hand (`e8e39758`) — adds no English strings
-
-### tables-interface (`e34970bc`) — 13 new, 13 to read @@ NEEDS RULING
-
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+- **`lpn_settings_link_symbology`**
+  > Link symbology
   @@ NEEDS RULING
-- **`lpn_file_training_3`**
-  > Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
+- **`lpn_settings_node_link`**
+  > Node and link
   @@ NEEDS RULING
-- **`lpn_file_training_name`**
-  > Your initials
+- **`lpn_settings_node_symbology`**
+  > Node symbology
   @@ NEEDS RULING
-- **`lpn_lock_open_choices`**
-  > Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.
-  @@ NEEDS RULING
-- **`lpn_lock_open_copy`**
-  > Create a copy
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_saved`**
-  > {name} has this file open; the last edit was {x} ago, and their work is saved to the file.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_seen`**
-  > {name} has this file open but has not edited it. Their browser last checked in {x} ago.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_times`**
-  > {name} has this file open; the last edit was {x} ago, {y} after the last save.
-  @@ NEEDS RULING
-- **`lpn_lock_open_heading_unsaved`**
-  > {name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.
-  @@ NEEDS RULING
-- **`lpn_lock_prompt_name`**
-  > What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.
-  @@ NEEDS RULING
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+- **`lpn_settings_sec_visualization`**
+  > Visualization
   @@ NEEDS RULING
