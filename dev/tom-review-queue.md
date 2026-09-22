@@ -49,6 +49,7 @@ judgement and does not belong to a script.
 
 - [ ] R-019 feat/xy-world-map | Mapbox satellite is connected and working, a little. I am getting huge hesitance to load tiles I need. I see tiles around the edges of my map. Zooming in and out coaxes the tiles slowly to load, but it's a slow and uncertain slog. Frustratingly, it's the area I care about most that disappears when I zoom in, while peripheral tiles keep showing. Can you please debug this? How can we get what we need from Mapbox? -- feat/xy-world-map 4505b5db -- MEASURED: tiles were requested from the WEST EDGE across, so the middle of the screen sat about 35th in a queue of up to 192; and every wheel nudge deleted the whole picture and restarted the queue from that same corner. Centre-out now, and the old picture stays up underneath
   - TGH 2026-09-19 23:55 UTC · 731ab367: Still missing some tiles. Usable, but frustrating. Not good for my reputation. I pasted an image in chat.
+  - INSTRUMENT, not a fifth guess: add `?debug=tiles` to the page URL and a panel in the lower right says, for the view on screen, how many tiles were wanted, came from the cache, were requested, arrived, were drawn, failed, were retried and are still outstanding -- and names every failure with the answer the network gave. Please read it off the screen where you see the white squares and tell us the numbers.
 
 ### feat/tables-spreadsheet
 
@@ -110,7 +111,6 @@ judgement and does not belong to a script.
 
 ### feat/xy-world-map
 
-- [ ] R-066 feat/xy-world-map | The date-line tile mirror: *"I will have to trust you."* Ours to build, with a regression check, since he will not be the one who sees it come back. -- feat/xy-world-map 731ab367 -- **AND THE DIAGNOSIS IT WAS HANDED WAS WRONG IN ONE IMPORTANT WAY: it is not the date-line tile at all.** The tear sits at the ANTIPODE OF THE TRANSFORM'S ORIGIN. At step 1 the origin starts at 0,0, whose antipode IS the date line, which is why it looked like a date-line defect and showed only there. The cause is one function asking *which way round the world is this longitude nearer* -- the right question for one POINT and the wrong one for the two ENDS OF AN EDGE, which can land on opposite branches. Measured before and after at three places and two zooms: -1,750 becomes +250; -1,666.7 becomes +238.1; -1,062.4 becomes +354.1. A negative width IS a picture drawn backwards. The regression check grades against a width derived a DIFFERENT way rather than restating the fix, and is mutation-tested
   - I would like you to try to show this problem to me unless it has been fixed. If it has been fixed, please delete this.
 
 ## Round of 2026-09-21 -- after two days of his own testing

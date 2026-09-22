@@ -395,6 +395,90 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
 			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
 		</div>
+		<?php // THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18). Its own bar and not a second mode of
+		      // the placement bar above: that one ends by converting every coordinate in the project and
+		      // this one ends by converting none, so a shared strip would be one set of buttons meaning
+		      // two opposite things. Go to and Place name search are the placement bar's own labels
+		      // reused whole, because they are the same two commands. ?>
+		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<div id="lpn_mapgeo_step" style="margin-bottom:2px;font-weight:bold"></div>
+			<div id="lpn_mapgeo_hint" style="margin-bottom:4px"></div>
+			<?php // Its own line rather than a second sentence glued to the one above: a string
+			      // composed at render time is the thing this suite's label rules forbid, and this
+			      // one is only true while the dial is on screen. ?>
+			<?php // **THE GESTURE SPLIT, STATED RATHER THAN DISCOVERED** (Tom, 2026-09-19: *"Zoom
+			      // (normal gestures) works on everything (both) together, and we state this in the
+			      // wizard. Pan (normal gestures) works on the map only, and we state this in the
+			      // wizard."*). Two gestures with two different subjects is the one thing a reader
+			      // cannot work out by trying, because both look like the whole picture moving. ?>
+			<div id="lpn_mapgeo_hint_gestures" style="margin-bottom:4px"></div>
+			<div id="lpn_mapgeo_hint_dial" style="margin-bottom:4px"></div>
+			<?php // **THE TWO BUTTONS THAT LEAVE THE STEP SIT AT THE RIGHT** (Tom, 2026-09-19:
+			      // *"'Place approximately', for a new user, this and 'Cancel' need to be at the
+			      // right side of the box."*). They were in one run with Search and Go to, so the
+			      // button that ENDS the step sat in the middle of a row of buttons that do not,
+			      // and a reader meeting the wizard for the first time had no way to tell them
+			      // apart. Left: the two that help you find your place, and both are step 1 only.
+			      // Right: Place approximately (step 1) or Georeference here (step 2), and Cancel.
+			      //
+			      // `margin-left:auto` and not two fixed columns, so that when the left group is
+			      // hidden in step 2 the right group is still at the right; and `flex-wrap`, so a
+			      // narrow window stacks them rather than pushing the box off the screen. ?>
+			<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+				<span style="display:flex;flex-wrap:wrap;gap:6px">
+					<button type="button" id="lpn_mapgeo_search"><?=$ec_lang['lpn_crs_place']?></button>
+					<button type="button" id="lpn_mapgeo_goto"><?=$ec_lang['lpn_georef_goto']?></button>
+				</span>
+				<span style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto">
+					<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
+					<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
+					<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+				</span>
+			</div>
+		</div>
+		<?php // ---- THE TWO SLIDERS, step 2 only (Tom, 2026-09-19) ----------------------------
+		      //
+		      // **TWO TALL VERTICAL SLIDERS SIDE BY SIDE, AND NO KNOB.** His own specification after
+		      // using the first build: *"The slider is too small. I\'d like to see it almost as tall as
+		      // the map... It may be best to use a slider for rotation also (the knob control is too
+		      // hard to use), where the middle is 0, and up is counter-clockwise with a limit of about
+		      // 10 degrees (since most convergence angles are less than 1 degree)."*
+		      //
+		      // **THE 10 DEGREE LIMIT IS THE POINT OF THE CONTROL, not a safety rail.** A knob spends
+		      // its whole travel on a full circle, so the tenth of a degree that actually matters is a
+		      // hair of it; a slider that ends at ten degrees spends all of its travel there. The cap
+		      // is not a refusal either, because Cancel and the Map menu\'s own rows reopen this on the
+		      // placement already on file, so a bigger correction is two passes rather than none.
+		      //
+		      // **EACH SLIDER CARRIES A NUMBER BOX, and the number is RELATIVE** -- his word. It is an
+		      // adjustment to the fit step 1 left, not a heading and not an absolute size, so 1 and 0
+		      // are what "leave it alone" reads as on the two of them.
+		      //
+		      // The height is set by JavaScript against the CANVAS, never declared here: the bottom
+		      // pane cuts the canvas at will, and a control sized from the markup slid up under the
+		      // toolbar. See mapgeoPlaceDial().
+		      ?>
+		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:8px;z-index:6;font-size:11px;text-align:center;background:#fff;border:1px solid #05a;padding:6px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<?php // **THE NUMBER BOX AND THE READOUT SIT ABOVE THE BAR, not under it.** The bar is
+			      // as tall as the map by instruction, so anything below it is at the far end of a
+			      // 600 px control from the label that names it, and on a first-visit page the
+			      // consent banner covers the bottom of the canvas outright. Measured in a real
+			      // Chrome: at 1366x768 the panel reaches y = 733 and the boxes were not on screen. ?>
+			<div style="display:flex;gap:10px;align-items:stretch">
+				<div style="display:flex;flex-direction:column;align-items:center">
+					<div id="lpn_mapgeo_size_label" style="white-space:nowrap"><?=htmlspecialchars($ec_lang['lpn_mapgeo_dial_size'])?></div>
+					<input type="number" id="lpn_mapgeo_size_num" step="any" value="1" aria-labelledby="lpn_mapgeo_size_label" style="width:62px;font-size:11px;text-align:center;margin:3px 0">
+					<div id="lpn_mapgeo_size_read" style="margin-bottom:3px;white-space:nowrap"></div>
+					<input type="range" id="lpn_mapgeo_size" min="-1000" max="1000" step="1" value="0" aria-labelledby="lpn_mapgeo_size_label" style="writing-mode:vertical-lr;direction:rtl;-webkit-appearance:slider-vertical;width:26px;height:150px;margin:0 auto;touch-action:none">
+				</div>
+				<div style="display:flex;flex-direction:column;align-items:center">
+					<div id="lpn_mapgeo_turn_label" style="white-space:nowrap"><?=htmlspecialchars($ec_lang['lpn_mapgeo_dial_turn'])?></div>
+					<input type="number" id="lpn_mapgeo_turn_num" step="any" value="0" aria-labelledby="lpn_mapgeo_turn_label" style="width:62px;font-size:11px;text-align:center;margin:3px 0">
+					<div id="lpn_mapgeo_turn_read" style="margin-bottom:3px;white-space:nowrap"></div>
+					<input type="range" id="lpn_mapgeo_turn" min="-100" max="100" step="1" value="0" aria-labelledby="lpn_mapgeo_turn_label" style="writing-mode:vertical-lr;direction:rtl;-webkit-appearance:slider-vertical;width:26px;height:150px;margin:0 auto;touch-action:none">
+				</div>
+			</div>
+		</div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
 		      // for whichever fields are toggled on needs a separate, always-visible home to survive
@@ -1476,6 +1560,7 @@ EngCalcs.pageConfig = {
 	lpn_field_coord_tip: <?=json_encode($ec_lang['lpn_field_coord_tip'])?>,
 	lpn_coord_off_world: <?=json_encode($ec_lang['lpn_coord_off_world'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
+	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,
@@ -2162,6 +2247,7 @@ EngCalcs.pageConfig = {
 	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
 	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
 	lpn_file_import_geo: <?=json_encode($ec_lang['lpn_file_import_geo'])?>,
+	lpn_copy_of: <?=json_encode($ec_lang['lpn_copy_of'])?>,
 	lpn_file_import_geo_tip: <?=json_encode($ec_lang['lpn_file_import_geo_tip'])?>,
 	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
 	lpn_georef_step1: <?=json_encode($ec_lang['lpn_georef_step1'])?>,
@@ -2496,6 +2582,36 @@ EngCalcs.pageConfig = {
 	lpn_storage_full: <?=json_encode($ec_lang['lpn_storage_full'])?>,
 	lpn_storage_unreadable: <?=json_encode($ec_lang['lpn_storage_unreadable'])?>,
 	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
+	lpn_map_attach_menu: <?=json_encode($ec_lang['lpn_map_attach_menu'])?>,
+	lpn_map_attach_tip: <?=json_encode($ec_lang['lpn_map_attach_tip'])?>,
+	lpn_map_attach_add: <?=json_encode($ec_lang['lpn_map_attach_add'])?>,
+	lpn_map_attach_readjust: <?=json_encode($ec_lang['lpn_map_attach_readjust'])?>,
+	lpn_map_attach_readjust_tip: <?=json_encode($ec_lang['lpn_map_attach_readjust_tip'])?>,
+	lpn_map_attach_scale_from: <?=json_encode($ec_lang['lpn_map_attach_scale_from'])?>,
+	lpn_map_attach_scale_from_prompt: <?=json_encode($ec_lang['lpn_map_attach_scale_from_prompt'])?>,
+	lpn_map_attach_scale_from_bad: <?=json_encode($ec_lang['lpn_map_attach_scale_from_bad'])?>,
+	lpn_map_attach_scale_from_done: <?=json_encode($ec_lang['lpn_map_attach_scale_from_done'])?>,
+	lpn_map_attach_none: <?=json_encode($ec_lang['lpn_map_attach_none'])?>,
+	lpn_map_attach_remove: <?=json_encode($ec_lang['lpn_map_attach_remove'])?>,
+	lpn_map_attach_remove_tip: <?=json_encode($ec_lang['lpn_map_attach_remove_tip'])?>,
+	lpn_map_attach_done: <?=json_encode($ec_lang['lpn_map_attach_done'])?>,
+	lpn_map_attach_removed: <?=json_encode($ec_lang['lpn_map_attach_removed'])?>,
+	lpn_mapgeo_replace: <?=json_encode($ec_lang['lpn_mapgeo_replace'])?>,
+	lpn_mapgeo_intro: <?=json_encode($ec_lang['lpn_mapgeo_intro'])?>,
+	lpn_mapgeo_step1: <?=json_encode($ec_lang['lpn_mapgeo_step1'])?>,
+	lpn_mapgeo_step2: <?=json_encode($ec_lang['lpn_mapgeo_step2'])?>,
+	lpn_mapgeo_hint1: <?=json_encode($ec_lang['lpn_mapgeo_hint1'])?>,
+	lpn_mapgeo_hint2: <?=json_encode($ec_lang['lpn_mapgeo_hint2'])?>,
+	lpn_mapgeo_gestures: <?=json_encode($ec_lang['lpn_mapgeo_gestures'])?>,
+	lpn_mapgeo_dial_turn: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn'])?>,
+	lpn_mapgeo_dial_turn_read: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn_read'])?>,
+	lpn_mapgeo_dial_size: <?=json_encode($ec_lang['lpn_mapgeo_dial_size'])?>,
+	lpn_mapgeo_dial_size_read: <?=json_encode($ec_lang['lpn_mapgeo_dial_size_read'])?>,
+	lpn_mapgeo_dial_help: <?=json_encode($ec_lang['lpn_mapgeo_dial_help'])?>,
+	lpn_mapgeo_place: <?=json_encode($ec_lang['lpn_mapgeo_place'])?>,
+	lpn_mapgeo_finish: <?=json_encode($ec_lang['lpn_mapgeo_finish'])?>,
+	lpn_mapgeo_cancelled: <?=json_encode($ec_lang['lpn_mapgeo_cancelled'])?>,
+	lpn_mapgeo_locked: <?=json_encode($ec_lang['lpn_mapgeo_locked'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
 	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,
 	lpn_backdrop_scale_entry: <?=json_encode($ec_lang['lpn_backdrop_scale_entry'])?>,

@@ -3575,8 +3575,21 @@ var EngCalcs = EngCalcs || {};
 			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
 		}
 		code = projectCrsCode();
-		return code ? crsOptionText({ code: code, name: crsLabel(code) })
-			: (pc.lpn_crs_none || 'Not georeferenced');
+		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
+		/**
+		 * **THREE VALUES, NOT TWO, AND THE MIDDLE ONE ANSWERS TWO QUESTIONS ON PURPOSE** (Tom,
+		 * 2026-09-17, overruling a recommendation of ours that this strip should answer only one):
+		 * *"I think that it does answer two questions. 'unnamed' means that the world map is
+		 * attached (the project is georeferenced), but that it's not any named CRS. It's probably
+		 * only an approximate anchor point and convergence angle from our UI."*
+		 *
+		 * So: the EPSG name and number where the project states one, `unnamed` where the custom
+		 * georeference wizard has put the drawing on the Earth without naming the coordinate
+		 * system it thereby defines, and `Not georeferenced` where the drawing sits nowhere at all.
+		 * Lower case, because it is not a proper name -- that is the whole of what it is saying.
+		 */
+		if (xyGeorefOk()) { return pc.lpn_crs_unnamed || 'unnamed'; }
+		return pc.lpn_crs_none || 'Not georeferenced';
 	}
 	// **THE AXES ARE NAMED FOR THE COORDINATE SYSTEM AND READ IN PUBLIC ORDER** (Task 641, and
 	// CLAUDE.md's coordinate-order rule). Latitude before longitude, northing before easting: both
@@ -10174,6 +10187,290 @@ var EngCalcs = EngCalcs || {};
 	// 45 is 0.03 px at zoom 12 and falls as h^2 -- below a pixel at every zoom a network is drawn
 	// at, so the map and the pipes register.
 	var basemapLayer = null, basemapEls = {}, basemapTimer = null;
+	// **THE PLACEMENT A CACHED TILE WAS DRAWN WITH, so the map can be told the ground has moved.**
+	//
+	// A tile element is kept by key and never touched again (`if (basemapEls[t.key]) { return; }`),
+	// which is right for a pan or a zoom -- the CAMERA moves, the whole `world` group moves with it,
+	// and a tile sitting in drawing coordinates is carried along correct. It is WRONG the moment the
+	// GROUND moves under a still drawing, which is the one thing Map, World map does: every tile's
+	// affine is computed from `project.georef`, so a changed transform makes every cached tile a
+	// picture of where that patch of ground USED TO BE. Nothing repainted it, so the streets stayed
+	// nailed to the screen while the blue rectangle swung across them -- which reads exactly like the
+	// project rotating, and is what Tom photographed on 2026-09-18: *"Ida is wrong. See images. The
+	// project is moved and rotated, not the map."* He was right, and the arithmetic in mapgeoTurned()
+	// was right the whole time; what was wrong was that nobody redrew the ground.
+	//
+	// **AND THE REASON IT HAS TO BE THE PROJECT THAT HOLDS STILL, not the streets** (Tom, on the
+	// phrase "eyes-on alignment against the streets"): *"We are not interested in aligning the
+	// project with the streets. We want to align the streets with the project."* The project is the
+	// survey and the thing of value; the map is decoration being fitted to it. Read it the other way
+	// round and nailing the map to the screen looks like the obvious thing to do, which is how this
+	// got written.
+	var basemapPlacedSig = '';
+	// **THE PREVIOUS VIEW'S TILES, KEPT UNDER THE NEW ONES WHILE THOSE LOAD.** See the note at the
+	// carry in paintBasemapTiles(): exactly one generation is ever held, so this cannot grow with a
+	// long pan, and it is emptied the moment every wanted tile has settled.
+	var basemapCarried = {};
+	// **A TILE ALREADY FETCHED IS KEPT, IN MEMORY, FOR THE LIFE OF THE PAGE** (Tom's R-055,
+	// 2026-09-19: *"Why do we throw away satellite tiles? We should have a good-sized cache where we
+	// throw away only the oldest, right?"*). He is right: until now a tile that left the view was
+	// DESTROYED, so zooming out one notch and back in, or panning away and back, re-fetched every
+	// photograph the reader had already waited for.
+	//
+	// **IT IS THE ELEMENT ITSELF THAT IS KEPT, not a copy of the bytes.** A detached <image> holds
+	// its decoded picture, so re-attaching it draws instantly and asks the network for nothing --
+	// which is also why there is no second opinion here about what a tile's URL is.
+	//
+	// **MEMORY ONLY, AND THAT IS A RULE RATHER THAN AN IMPLEMENTATION DETAIL** (CLAUDE.md, and
+	// dev/geographic-projects.md section 4). Nothing here reaches localStorage, IndexedDB, the Cache
+	// API or the service worker: a tile stored on the visitor's DEVICE is a tile-policy problem and
+	// a storage-consent problem at once, and would make a sentence in `consent_body` false. This
+	// cache dies with the tab, like any other variable.
+	//
+	// **THE SIZE IS MEASURED, not round.** A real satellite tile at zoom 19 over Novato is 18,385
+	// bytes (`curl` against the v4 raster endpoint, 2026-09-19) and a screenful is 72 to 105 tiles
+	// on a 2560 x 1400 window. The bound is TWICE THE PAGE'S OWN PER-REFRESH CEILING, LPN_TILE_BUDGET
+	// -- so the largest view this page is ever allowed to ask for fits whole, twice over, which is
+	// what makes a zoom out and back, or a pan away and back, cost nothing. In bytes that is about
+	// 7 MB of compressed picture; the decoded bitmaps are the browser's to keep or discard, and it
+	// discards them for a detached element under pressure, which is the behaviour being relied on.
+	var LPN_TILE_CACHE = 384;
+	var basemapCache = {}, basemapCacheOrder = [];
+	function basemapCacheTouch(key) {
+		var i = basemapCacheOrder.indexOf(key);
+		if (i >= 0) { basemapCacheOrder.splice(i, 1); }
+		basemapCacheOrder.push(key);
+	}
+	// **OLDEST FIRST, WHICH IS HIS OWN WORDING AND IS ALSO THE ONLY DEFENSIBLE ORDER HERE.** A tile
+	// is touched when it is put in and when it is taken out, so what falls off the front is the tile
+	// the reader has been furthest from for longest.
+	function basemapCacheTrim() {
+		var k;
+		while (basemapCacheOrder.length > LPN_TILE_CACHE) {
+			k = basemapCacheOrder.shift();
+			if (basemapCache[k]) {
+				if (basemapCache[k].remove) { basemapCache[k].remove(); }
+				delete basemapCache[k];
+			}
+		}
+	}
+	function basemapCacheClear() {
+		var k;
+		for (k in basemapCache) {
+			if (basemapCache.hasOwnProperty(k) && basemapCache[k].remove) { basemapCache[k].remove(); }
+		}
+		basemapCache = {};
+		basemapCacheOrder = [];
+	}
+	// Take a tile off the screen and keep it, IF it is a picture. **A TILE THAT NEVER ARRIVED MUST
+	// NEVER ENTER THE CACHE** -- caching a blank would serve that blank back for the life of the
+	// page, which is R-056 rebuilt on purpose.
+	function basemapRetire(key, img) {
+		if (!img) { return; }
+		if (img.remove) { img.remove(); }
+		if (!img._lpnOk) { return; }
+		basemapCache[key] = img;
+		basemapCacheTouch(key);
+		basemapCacheTrim();
+	}
+	function basemapDropCarried() {
+		var k;
+		for (k in basemapCarried) {
+			if (basemapCarried.hasOwnProperty(k)) { basemapRetire(k, basemapCarried[k]); }
+		}
+		basemapCarried = {};
+	}
+	// **EMPTY THE LAYER.** `keep` retires every picture into the cache first, which is right when
+	// the basemap is merely switched off or the window is not sized yet. The callers that pass
+	// false are the ones where the PLACEMENT has changed -- a cached tile is then a picture of
+	// somewhere else, and the honest thing is to throw the lot away.
+	function basemapEmpty(keep) {
+		var k;
+		basemapDropCarried();
+		for (k in basemapEls) {
+			if (!basemapEls.hasOwnProperty(k)) { continue; }
+			if (keep) { basemapRetire(k, basemapEls[k]); }
+			else if (basemapEls[k].remove) { basemapEls[k].remove(); }
+		}
+		basemapEls = {};
+		basemapCarried = {};
+		if (basemapLayer) { basemapLayer.innerHTML = ''; }
+		if (!keep) { basemapCacheClear(); basemapFails = {}; }
+	}
+	// **A TILE WHOSE REQUEST FAILED IS ASKED FOR AGAIN** (Tom's R-056, 2026-09-19: *"There are still
+	// a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw
+	// these tiles."*). We did decide not to draw them, and this is where.
+	//
+	// **MEASURED, in real headless Chrome against the real tile servers**
+	// (dev/lpn-spike/basemap-blank-tile-probe.js, 2026-09-19): with 33 of 105 tile requests failed
+	// and then a perfect network restored and the view left alone, all 33 were still blank after 5,
+	// 15 and 30 seconds, each still showing exactly ONE request. 18.8% of the canvas stayed white.
+	// The only thing that ever repaired it was a gesture that produced DIFFERENT tile keys. The
+	// mechanism is `if (basemapEls[t.key]) { return; }` reading "we made an element for this key" as
+	// "this tile is handled", while the `error` listener marked it settled and moved on.
+	//
+	// Three attempts with a widening gap, and then it stops: a tile over the provider's own ceiling
+	// 404s every time, and a retry that never gives up is the bulk-download the tile policy
+	// forbids. Jitter spreads a failed screenful instead of sending it all back out in one volley,
+	// and the repaint is the DEBOUNCED one, so a hundred retries collapse into a single repaint.
+	var LPN_TILE_RETRIES = 3;
+	var basemapFails = {};
+	function basemapScheduleRetry(key, img) {
+		var n = (basemapFails[key] || 0) + 1, wait;
+		basemapFails[key] = n;
+		tileSeen(key).retries = n;
+		if (n > LPN_TILE_RETRIES) { return; }
+		wait = 800 * Math.pow(3, n - 1);        // 0.8 s, 2.4 s, 7.2 s
+		setTimeout(function () {
+			// The view may have moved on, or this element may already have been replaced. Only the
+			// tile that is still the current one for its key is ours to repair.
+			if (basemapEls[key] !== img) { return; }
+			if (img.remove) { img.remove(); }
+			delete basemapEls[key];
+			scheduleBasemapRefresh();
+		}, wait + Math.random() * wait * 0.5);
+	}
+	// How many tiles the CURRENT view is still waiting on. Only the wanted set counts -- a carried
+	// tile that never arrives must not keep the generation before it alive.
+	function basemapPendingCount() {
+		var k, n = 0;
+		for (k in basemapEls) {
+			if (basemapEls.hasOwnProperty(k) && !basemapEls[k]._lpnSettled) { n++; }
+		}
+		return n;
+	}
+	// ---- ?debug=tiles : a readout of what the basemap asked for and what came back ---------------
+	//
+	// **AN INSTRUMENT, NOT A FIFTH GUESSED CAUSE** (ROADMAP Task 703). Four causes of blank
+	// satellite squares have been found, measured and fixed -- a west-edge request order, the
+	// picture being deleted on every wheel nudge, a failed tile never being asked for again, and a
+	// tile at the antipode of the transform's origin drawn backwards -- and Tom still sees white
+	// rectangles: *"Still missing some tiles. Usable, but frustrating. Not good for my
+	// reputation."* (2026-09-21). Each of those four was measured HERE and none of them was the
+	// whole of it, so the next measurement has to be taken on HIS machine, where the failure is.
+	//
+	// **IT OBSERVES AND CHANGES NOTHING.** Every write below is to a bookkeeping record that
+	// nothing in the drawing path reads. The one thing it does that costs a request is the failure
+	// PROBE, and that only runs when the switch is on and only for a tile that has already failed.
+	//
+	// **THE PROBE IS WHY A REASON CAN BE GIVEN AT ALL.** An SVG <image> `error` event carries no
+	// status, no headers and no body -- it is a single bit. So when a tile fails with the switch on,
+	// the same URL is fetched once and the answer is reported as the browser gives it: an HTTP
+	// status, or a network error, or an abort. **A BYTE COUNT IS PART OF THE ANSWER AND NOT A
+	// DECORATION**: the Mapbox token is URL-RESTRICTED, so a 23-byte Forbidden reply can arrive
+	// looking like a delivered tile to anything counting only success, and it has already cost one
+	// agent a whole wrong measurement. A tile that is 23 bytes is a refusal whatever its status
+	// line says.
+	var basemapSeen = {}, basemapWantKeys = [], basemapDebugTimer = null;
+	function tileDebugOn() { return debugOn('tiles'); }
+	// One record per tile key, for the life of the page. Bounded: a record is a handful of numbers,
+	// and past a few thousand keys the whole set is dropped rather than grown -- the readout is
+	// about the CURRENT view, so an old record has no reader.
+	function tileSeen(key) {
+		if (!basemapSeen[key]) {
+			if (Object.keys(basemapSeen).length > 4000) { basemapSeen = {}; }
+			// **`viewSrc` IS PER VIEW AND THE REST IS PER PAGE.** "Requested" has to mean "this
+			// view had to go to the network for it", or the cache makes the number meaningless:
+			// a pan away and back asks for nothing and would still read as a screenful of
+			// requests. So the source is re-stated at every paint, and a tile still resident
+			// from the paint before keeps whichever answer it already had.
+			basemapSeen[key] = { req: 0, viewSrc: '', state: 'new', why: '', retries: 0 };
+		}
+		return basemapSeen[key];
+	}
+	// **WHY DID THIS ONE FAIL?** Asked of the network, once per failure, only under the switch.
+	function tileProbeFailure(key, url) {
+		if (!tileDebugOn() || typeof fetch !== 'function') { return; }
+		var rec = tileSeen(key);
+		if (rec.why) { return; }
+		rec.why = 'asking…';
+		fetch(url, { cache: 'no-store' }).then(function (res) {
+			return res.arrayBuffer().then(function (buf) {
+				// A short body is the signature of a refusal served with a success status, which is
+				// exactly what a URL-restricted token produces.
+				rec.why = 'HTTP ' + res.status + ', ' + buf.byteLength + ' bytes'
+					+ (buf.byteLength < 200 ? ' (too small to be a picture)' : '');
+				tileDebugRender();
+			});
+		}).catch(function (e) {
+			rec.why = 'network error: ' + ((e && e.name === 'AbortError') ? 'aborted' : (e && e.message) || e);
+			tileDebugRender();
+		});
+	}
+	// The counts, all derived from the CURRENT want list so a number can never describe a view the
+	// reader has already left.
+	function tileDebugCounts() {
+		var out = { wanted: basemapWantKeys.length, requested: 0, arrived: 0, drawn: 0,
+			failed: 0, retried: 0, outstanding: 0, cached: 0, fails: [] };
+		basemapWantKeys.forEach(function (k) {
+			var rec = basemapSeen[k] || {}, img = basemapEls[k];
+			if (rec.viewSrc === 'cache') { out.cached++; }
+			else if (rec.viewSrc === 'net') { out.requested++; }
+			out.retried += (rec.retries || 0);
+			if (img && img._lpnOk) { out.drawn++; }
+			if (rec.state === 'ok') { out.arrived++; }
+			else if (rec.state === 'fail') {
+				out.failed++;
+				if (out.fails.length < 6) { out.fails.push(k + ' — ' + (rec.why || 'no answer yet')); }
+			} else { out.outstanding++; }
+		});
+		return out;
+	}
+	function tileDebugRender() {
+		var box = document.getElementById('lpn_tile_bench_out');
+		if (!box) { return; }
+		var c = tileDebugCounts(), z = basemapWantKeys.length
+			? basemapWantKeys[0].split('/')[1] : '—';
+		var lines = [
+			'source ' + basemapStyle() + ' • zoom ' + z
+				+ ' • token ' + (mapboxToken() ? 'present' : 'ABSENT'),
+			'wanted ' + c.wanted + ' • from cache ' + c.cached + ' • requested ' + c.requested,
+			'arrived ' + c.arrived + ' • drawn ' + c.drawn + ' • failed ' + c.failed,
+			'retried ' + c.retried + ' • still outstanding ' + c.outstanding
+		];
+		if (c.fails.length) { lines.push('— failures —'); lines = lines.concat(c.fails); }
+		box.textContent = lines.join('\n');
+	}
+	function buildTileBench() {
+		if (!tileDebugOn() || document.getElementById('lpn_tile_bench')) { return; }
+		var box = document.createElement('div');
+		box.id = 'lpn_tile_bench';
+		box.className = 'd-print-none';
+		// LOWER RIGHT: the label bench already owns the lower left, and Settings and Labels are
+		// top-right. The width is capped for the reason the label bench states -- a fixed box with
+		// no width sizes to its widest child, and a tile key has no wrap opportunity.
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
+			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
+			+ 'overflow-wrap:anywhere');
+		var h = document.createElement('div');
+		h.setAttribute('style', 'font-weight:bold;margin-bottom:4px');
+		h.textContent = 'basemap tile bench';
+		box.appendChild(h);
+		var out = document.createElement('div');
+		out.id = 'lpn_tile_bench_out';
+		box.appendChild(out);
+		var btns = document.createElement('div');
+		btns.setAttribute('style', 'margin-top:6px;display:flex;gap:6px');
+		var b = document.createElement('button');
+		b.type = 'button';
+		b.textContent = 'copy';
+		b.addEventListener('click', function () {
+			var t = document.getElementById('lpn_tile_bench_out');
+			if (!t) { return; }
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(t.textContent);
+			}
+		});
+		btns.appendChild(b);
+		box.appendChild(btns);
+		document.body.appendChild(box);
+		// **A TICK AS WELL AS THE EVENTS.** Every arrival and every failure repaints this already;
+		// the timer is what makes "still outstanding 3" visibly STAY at 3, which is the reading
+		// that names the failure. One second, and only while the switch is on.
+		if (!basemapDebugTimer) { basemapDebugTimer = setInterval(tileDebugRender, 1000); }
+		tileDebugRender();
+	}
 	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
 	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
 	//
@@ -10284,6 +10581,26 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		}
+		// **THE MIDDLE OF THE SCREEN IS ASKED FOR FIRST, AND THIS IS HALF OF Tom's R-019 FIX.**
+		// The loops above walk x outer and y inner, so the list came out column by column from the
+		// WEST edge -- and a browser fetches images in the order the elements are appended.
+		// MEASURED in dev/lpn-spike/basemap-tile-load-probe.js against real Mapbox tiles in real
+		// headless Chrome, twice: arrival time tracked the element's position in the layer
+		// EXACTLY, 0 through 71 and 0 through 35, and had no relation at all to where the tile sat
+		// on the screen. So the patch of ground the reader is actually looking at was served
+		// halfway down a queue of up to 192 photographs, every time -- and because a repaint
+		// discarded whatever had not arrived, a second wheel notch threw that queue away and
+		// started again at the west edge. Tom, 2026-09-19: *"it's the area I care about most that
+		// disappears when I zoom in, while peripheral tiles keep showing."* That is this, exactly.
+		//
+		// Sorting by distance from the middle of the tile window costs one sort of at most 192
+		// items and changes nothing else: the same tiles, the same keys, the same places. Tiles do
+		// not overlap, so their paint order is not a visual fact.
+		var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+		out.sort(function (a, b) {
+			return ((a.x - cx) * (a.x - cx) + (a.y - cy) * (a.y - cy)) -
+				((b.x - cx) * (b.x - cx) + (b.y - cy) * (b.y - cy));
+		});
 		return { z: z, tiles: out };
 	}
 	// Stored on the PROJECT, beside `coords`, because both are declarations about what this document
@@ -10313,7 +10630,58 @@ var EngCalcs = EngCalcs || {};
 	 * elevation buttons."* Both are the same question and now they ask it once.
 	 */
 	function projectLocatable() { return isLatLonProject() || projectedBasemapOk(); }
-	function basemapOn() { return projectLocatable() && project.basemap !== 'off'; }
+	/**
+	 * **AN XY PROJECT THAT STATES WHERE ON THE EARTH IT IS DRAWN** (ROADMAP Task 646). Tom,
+	 * 2026-09-13: *"Even an arbitrary XY project can have a world map background with a good
+	 * wizard... Attach the world map to this project without changing it any other way."*
+	 *
+	 * **IT IS THE OPPOSITE DOOR TO THE PLACEMENT WIZARD AND IS SAFE FOR EXACTLY THAT REASON.**
+	 * georefStart() rewrites every coordinate in the document, which is why ruling P2 keeps it away
+	 * from a project that declares a coordinate system. This writes NOTHING into the drawing: the
+	 * transform lives on `project.georef`, the tiles are placed THROUGH it, and every x and y in
+	 * the file is the byte it always was. dev/lpn-spike/xy-world-map-harness.js asserts that, which
+	 * is the acceptance criterion rather than a nicety.
+	 *
+	 * It is MODELLING data and therefore the project's, on the rule that governs every other
+	 * declaration beside `coords` and `basemap`: where the drawing sits on the Earth is a fact
+	 * about the document and not about the browser reading it. serializeProject() writes the whole
+	 * of `project`, so it rides along with no new plumbing, and an older reader ignores it.
+	 */
+	function xyGeoref() {
+		var t = project && project.georef;
+		if (isLatLonProject() || isProjectedProject() || !t || !t.origin || !t.anchor) { return null; }
+		return (isFinite(t.origin.lon) && isFinite(t.origin.lat) && isFinite(t.anchor.x) &&
+			isFinite(t.anchor.y) && isFinite(t.rotDeg) && t.metersPerUnit > 0) ? t : null;
+	}
+	function xyGeorefOk() { return !!xyGeoref(); }
+	// Which projects may be OFFERED the attachment: the plain grid ones, and nothing else. A
+	// geographic project is already on the Earth and a projected one declares its own plane, so for
+	// both of those the question is answered and the row would be a second answer to it.
+	function xyMapAttachable() { return !isLatLonProject() && !isProjectedProject(); }
+	// **THE ONE PREDICATE THE STREET/SATELLITE ROWS AND THE CORNER TEASER SHARE.** It was
+	// `isLatLonProject()` written in three places, and widening two of them would have left the corner
+	// tile offering a basemap the menu no longer agreed about -- the drift refreshBasemapTeaser()'s
+	// own comment warns against.
+	function basemapChoosable() { return projectLocatable() || xyGeorefOk(); }
+	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
+	// oversight.** It gates the place-name search and the DEM elevations as well as the tiles, and
+	// both of those want more than a transform: Go to points a camera whose units are DEGREES in a
+	// lat/lon project, and the DEM writes numbers into the document. Attaching a backdrop is meant
+	// to change nothing, so it unlocks the tiles and stops there; the other two rows are Tom's to
+	// ask for.
+	//
+	// **AND THIS IS TASK 692's QUESTION ASKED A FOURTH TIME.** That audit found four capabilities
+	// gated on "are these coordinates a latitude and a longitude" where what they meant was "can
+	// this project be put on the Earth at all", and renamed the first question isLatLonProject().
+	// An XY project with the world map attached is the case that could not exist when the audit
+	// ran: emphatically not lat/lon, and locatable all the same. **The BASEMAP rows answer the
+	// second question and are the only ones that do** -- satellite included, which is the half Tom
+	// found missing on 2026-09-18 (*"I am specifically not getting satellite view"*). Go to, the
+	// place-name search and the DEM elevations still answer the first, because each of them needs
+	// more than a transform and nobody has built it; a row that is offered and does nothing is the
+	// defect 692 closed, and widening these three would re-open it from the other side.
+	// dev/lpn-spike/xy-world-map-harness.js asserts both halves.
+	function basemapOn() { return basemapChoosable() && project.basemap !== 'off'; }
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
 	function setBasemapStyle(style) {
@@ -10348,7 +10716,7 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!projectLocatable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		if (!basemapChoosable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -10418,8 +10786,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!basemapOn() || !svg || !mapSized) {
-			basemapLayer.innerHTML = '';
-			basemapEls = {};
+			// The pictures are kept: turning the basemap off and on again, or a window that has not
+			// been measured yet, does not move the ground under a single tile.
+			basemapEmpty(true);
 			return;
 		}
 		r = svg.getBoundingClientRect();
@@ -10431,7 +10800,48 @@ var EngCalcs = EngCalcs || {};
 		// come back through the transform -- from the whole perimeter rather than four corners,
 		// because a projected rectangle's edges bow and a corner-only box leaves a strip of
 		// missing tiles along the top. lpnCrsBounds() states that.
-		var proj = projectedBasemapOk(), bnds = null;
+		// **AND AN XY PROJECT WITH AN ATTACHMENT ASKS IT THROUGH ITS OWN TRANSFORM** (Task 646).
+		// FOUR CORNERS ARE ENOUGH HERE and are not enough in the projected branch below, which is
+		// the one difference worth reading: lpnGeorefToLonLat() freezes its radii at the
+		// transform's origin latitude, so the map from drawing units to lon/lat is AFFINE, a
+		// rectangle maps to a parallelogram, and the bounding box of the four corners is exact. A
+		// real projection bows its edges, which is why lpnCrsBounds() walks the whole perimeter.
+		var xg = xyGeoref(), xbnds = null;
+		if (xg) {
+			var cs = [[tl.x, tl.y], [br.x, tl.y], [br.x, br.y], [tl.x, br.y]].map(function (c) {
+				return EngCalcs.lpnGeorefToLonLat(xg, outwardX(c[0]), outwardY(c[1]));
+			});
+			xbnds = {
+				west: Math.min.apply(null, cs.map(function (p) { return p.lon; })),
+				east: Math.max.apply(null, cs.map(function (p) { return p.lon; })),
+				south: Math.min.apply(null, cs.map(function (p) { return p.lat; })),
+				north: Math.max.apply(null, cs.map(function (p) { return p.lat; }))
+			};
+			if (!isFinite(xbnds.west) || !isFinite(xbnds.south) ||
+					!isFinite(xbnds.east) || !isFinite(xbnds.north)) {
+				basemapEmpty(false); return;
+			}
+		}
+		// **THE GROUND MOVED, SO EVERY CACHED TILE IS A PICTURE OF SOMEWHERE ELSE.** The affine each
+		// tile carries was computed from the transform standing when it was made; change the
+		// transform and the only honest thing to do is throw them away and place them again. Cheap:
+		// a wizard frame repaints one screenful, and a pan or a zoom -- where the camera moves and
+		// the tiles are still correct -- leaves the signature untouched and costs one comparison.
+		// **AND THE CACHE MAKES THIS SIGNATURE CARRY MORE THAN IT DID.** A tile kept from an earlier
+		// view is only re-usable while the map from a lon/lat box to a place in the drawing is
+		// unchanged, so the signature now names the FRAME as well as the attachment: the coordinate
+		// kind and, for a projected project, the CRS code. Changing either used to be safe because
+		// nothing survived the repaint; now something does.
+		var proj = projectedBasemapOk();
+		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
+			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
+				'|' + xg.metersPerUnit + '|' + xg.rotDeg
+			: '');
+		if (placeSig !== basemapPlacedSig) {
+			basemapEmpty(false);
+			basemapPlacedSig = placeSig;
+		}
+		var bnds = null;
 		if (proj) {
 			// outwardX/outwardY, exactly as the geographic branch below uses them: they are the
 			// one boundary out of the drawing frame, and in a projected project they hand back
@@ -10439,7 +10849,7 @@ var EngCalcs = EngCalcs || {};
 			// undone.
 			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(),
 				outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
-			if (!bnds) { basemapLayer.innerHTML = ''; basemapEls = {}; return; }
+			if (!bnds) { basemapEmpty(false); return; }
 		}
 		// **THE ZOOM ARGUMENT IS A SCALE IN THE FRAME'S OWN UNITS AND THEY ARE NOT THE SAME UNITS.**
 		// `state.s` is pixels per world unit: per DEGREE in a geographic project, per metre or per
@@ -10447,18 +10857,59 @@ var EngCalcs = EngCalcs || {};
 		// ask for zoom 0 over a city. So it is converted to the degrees-per-pixel the tile chooser
 		// expects, using the ground width the view actually covers.
 		var scaleForTiles = state.s;
-		if (proj) {
+		if (proj || xg) {
 			var wpx = Math.max(1, r.right - r.left);
-			var degPerPx = (bnds.east - bnds.west) / wpx;
+			var degPerPx = ((proj ? bnds : xbnds).east - (proj ? bnds : xbnds).west) / wpx;
 			scaleForTiles = degPerPx > 0 ? 1 / degPerPx : state.s;
 		}
 		list = proj
 			? basemapTileList(bnds.west, bnds.south, bnds.east, bnds.north, scaleForTiles)
-			: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
+			: xg
+				? basemapTileList(xbnds.west, xbnds.south, xbnds.east, xbnds.north, scaleForTiles)
+				: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
 		want = {};
+		// **THE WANT LIST IS THE INSTRUMENT'S DENOMINATOR** (?debug=tiles, Task 703): every number
+		// the readout prints is counted over this list, so it can only ever describe the view on
+		// screen now. Nothing in the drawing path reads it.
+		basemapWantKeys = list.tiles.map(function (t) { return t.key; });
 		list.tiles.forEach(function (t) {
 			want[t.key] = true;
-			if (basemapEls[t.key]) { return; }
+			if (basemapEls[t.key]) {
+				// Still on screen from the paint before -- nothing new happens to it, and it keeps
+				// whichever answer to "where did this come from" it already had.
+				if (!tileSeen(t.key).viewSrc) { tileSeen(t.key).viewSrc = 'net'; }
+				return;
+			}
+			// **ALREADY ON SCREEN, CARRIED UNDER THE LAST VIEW.** The third bucket, and the one
+			// the "do we already have this" test never read: a tile that left the want list on
+			// one paint is still hanging in the layer, holding its picture or its request, until
+			// the carry is released. An ordinary overshoot-and-correct -- a gesture that reverses
+			// direction -- brings exactly those keys back, and until now each one was thrown away
+			// and fetched again while a perfectly good copy was on the screen underneath.
+			// **A FAILED CARRIED TILE IS NOT RECLAIMED**, which is R-056's rule: settled without a
+			// picture means ask again, never hand the blank back.
+			if (basemapCarried[t.key]) {
+				var held = basemapCarried[t.key];
+				if (!held._lpnSettled || held._lpnOk) {
+					delete basemapCarried[t.key];
+					basemapEls[t.key] = held;
+					if (!tileSeen(t.key).viewSrc) { tileSeen(t.key).viewSrc = 'net'; }
+					return;
+				}
+			}
+			// **ALREADY FETCHED IN THIS PAGE'S LIFE.** The element is re-attached with the picture
+			// still in it: no request, no wait, nothing new to draw. The key carries the source, so
+			// a street tile can never be handed back while the satellite credit is showing.
+			if (basemapCache[t.key]) {
+				var hit = basemapCache[t.key], oi = basemapCacheOrder.indexOf(t.key);
+				delete basemapCache[t.key];
+				if (oi >= 0) { basemapCacheOrder.splice(oi, 1); }
+				basemapLayer.appendChild(hit);
+				basemapEls[t.key] = hit;
+				tileSeen(t.key).viewSrc = 'cache';
+				tileSeen(t.key).state = 'ok';
+				return;
+			}
 			// **WHERE the tile goes is the branch; MAKING it is not.** Two `el('image')` calls
 			// would be two places to remember crossorigin, the class and the aspect rule, and
 			// dev/lpn-spike/basemap-harness.js counts the creation sites for exactly that reason.
@@ -10482,6 +10933,46 @@ var EngCalcs = EngCalcs || {};
 						inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
 					].join(' ') + ')'
 				};
+			} else if (xg) {
+				// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
+				// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
+				// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
+				// while this frame is linear in latitude, which over one tile is far under the
+				// width of the line a pipe is drawn with.
+				// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
+				// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
+				// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
+				// nearer, independently -- so the tile holding the ANTIPODE of the transform's
+				// origin got its east edge wrapped a whole world away from its west edge. At the
+				// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
+				// the world-zoom view always contains it: measured, the offending tile's placement
+				// width came out **-1,750 where it should be +250**, and a negative width draws
+				// the raster BACKWARDS, stretched across the whole screen over every other tile.
+				// Tom saw it as reversed, upside-down place names.
+				//
+				// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
+				// the two latitude cuts are -- and there is no branch to choose in a difference,
+				// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
+				// corner-plus-edge is exactly the corner the old expression meant, everywhere the
+				// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
+				var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
+				if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return; }
+				var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
+					dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
+				// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
+				// census asks of every site here: three corners go through the same door rather
+				// than each spelling the boundary out again.
+				var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
+				var gtl = inw(ptl.x, ptl.y),
+					gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
+					gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
+				place = {
+					x: 0, y: 0, width: 1, height: 1,
+					transform: 'matrix(' + [
+						gtr.x - gtl.x, gtr.y - gtl.y,
+						gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
+					].join(' ') + ')'
+				};
 			} else {
 				// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
 				// keeps its own proportions and needs no matrix at all. This said "NOT square in
@@ -10498,17 +10989,90 @@ var EngCalcs = EngCalcs || {};
 			// rather than letting the renderer letterbox on a sub-pixel rounding difference at a
 			// tile seam -- and in the projected case it is doing real work, because the matrix
 			// deliberately makes the box a parallelogram.
-			basemapEls[t.key] = el('image', Object.assign({
+			var img = el('image', Object.assign({
 				href: t.url, preserveAspectRatio: 'none', crossorigin: 'anonymous',
 				'class': 'lpn-basemap-tile'
 			}, place), basemapLayer);
+			var trec = tileSeen(t.key);
+			trec.req++;
+			trec.viewSrc = 'net';
+			trec.state = 'pending';
+			trec.why = '';
+			// **WHETHER THIS TILE HAS FINISHED ONE WAY OR THE OTHER**, which is what tells the
+			// carried-over tiles below when they may go. `error` counts as finished: a 404 over
+			// the provider's ceiling never arrives, and waiting on it forever would pin the old
+			// picture in place. A stub with no addEventListener is settled on the spot, so no
+			// harness waits for an event it can never fire.
+			img._lpnSettled = false;
+			img._lpnOk = false;
+			if (img.addEventListener) {
+				// **`_lpnOk` IS THE NEW HALF AND IT SEPARATES TWO THINGS THAT WERE ONE.** Settled
+				// means "stop waiting for it"; ok means "there is a picture in it". A failure is
+				// still settled -- otherwise a 404 would pin the previous view on screen forever --
+				// but it is no longer treated as a delivered tile: it is not cached, and it is
+				// asked for again.
+				var settle = function (ok) {
+					img._lpnSettled = true;
+					img._lpnOk = ok;
+					trec.state = ok ? 'ok' : 'fail';
+					if (!ok) { tileProbeFailure(t.key, t.url); }
+					tileDebugRender();
+					if (ok) { delete basemapFails[t.key]; } else { basemapScheduleRetry(t.key, img); }
+					if (!basemapPendingCount()) { basemapDropCarried(); }
+				};
+				img.addEventListener('load', function () { settle(true); });
+				img.addEventListener('error', function () { settle(false); });
+			} else {
+				// A stub with no addEventListener has no network either, so there is nothing to
+				// wait for and nothing that can have failed.
+				img._lpnSettled = true;
+				img._lpnOk = true;
+			}
+			basemapEls[t.key] = img;
 		});
+		// **THE OLD TILES STAY ON SCREEN UNTIL THE NEW ONES HAVE ARRIVED**, which is the other
+		// half of Tom's R-019 (2026-09-19: *"it's the area I care about most that disappears when
+		// I zoom in"*). Until now a repaint deleted every tile the new view did not want, in the
+		// same turn that it asked for the replacements -- so the map went BLANK the instant the
+		// wheel settled and stayed blank for as long as the photographs took to come down the
+		// wire. Removing an <image> also CANCELS its fetch, so a second nudge threw away
+		// everything in flight and started over.
+		//
+		// The old tiles are ground-referenced exactly as the new ones are, so they line up; they
+		// were appended earlier, so they sit UNDER the new ones and are covered tile by tile as
+		// each arrives. This is what every map does, and it costs one extra generation of
+		// elements -- bounded, because only ONE generation is ever carried.
+		// **NEVER ACROSS A CHANGE OF SOURCE, and that is a licence rule rather than a nicety.**
+		// The credit swaps with the style, so an OpenStreetMap tile left under the Mapbox credit
+		// while the satellite photographs load would be crediting the wrong provider -- the exact
+		// failure the key's own style prefix was introduced to stop. A source change therefore
+		// blanks, as it always did; only a zoom or a pan carries. Caught by
+		// dev/lpn-spike/basemap-credit-harness.js the first time this shipped without the test.
+		var style = basemapStyle(), carried = {};
 		for (k in basemapEls) {
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
-				if (basemapEls[k].remove) { basemapEls[k].remove(); }
+				if (k.slice(0, style.length + 1) === style + '/') {
+					carried[k] = basemapEls[k];
+				} else {
+					// **THE OTHER SOURCE'S TILES LEAVE THE SCREEN AT ONCE, and are KEPT.**
+					// basemapRetire() detaches before it stores, so the licence rule is untouched --
+					// nothing of OpenStreetMap's is ever on screen under the Mapbox credit -- and
+					// switching back to the map you were just looking at now costs nothing.
+					basemapRetire(k, basemapEls[k]);
+				}
 				delete basemapEls[k];
 			}
 		}
+		if (basemapPendingCount()) {
+			basemapDropCarried();
+			basemapCarried = carried;
+		} else {
+			// Nothing is waiting, so there is nothing to cover up: the honest thing is the old
+			// behaviour, an immediate removal, and no second generation left lying about.
+			basemapCarried = carried;
+			basemapDropCarried();
+		}
+		tileDebugRender();
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -11134,6 +11698,33 @@ var EngCalcs = EngCalcs || {};
 		if (svg && svg.classList) { svg.classList.toggle('lpn-panning', !!on); }
 	}
 	var dragDirty = false;
+	// **ONE DOOR FOR "THE USER ASKED TO ZOOM", because the wizard spends it differently.** Outside
+	// the custom georeference wizard a zoom moves the camera; inside it the camera is what holds the
+	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
+	// pinch come through here, so the two cannot come to different ideas about which is happening.
+	function wheelZoom(sx, sy, factor) {
+		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
+		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
+		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
+		// that also resized the map could undo a fit that took three drags to get right, and a
+		// notch of an over-sensitive wheel is not a decision anybody made. **The same guard covers
+		// the pinch**, which arrives here rather than at the wheel listener -- one door, so the two
+		// cannot come to different answers.
+		if (mapgeoActive()) {
+			// **STEP 1 SPENDS A ZOOM ON THE MAP; STEP 2 SPENDS IT ON THE CAMERA** (Tom, 2026-09-19:
+			// *"At Step 2 (a) Zoom (normal gestures) works on everything (both) together"*). In step
+			// 1 the reader is hunting for their place on the Earth, so the ground is what has to
+			// change size. In step 2 the fit is what they are judging, and judging it needs the
+			// drawing and the streets magnified TOGETHER -- which is what moving the camera does,
+			// the tiles being drawn in the same world group as the pipes. **It said `return` here
+			// until 2026-09-19, so a wheel notch in step 2 did nothing at all**; that was his own
+			// earlier instruction (*"The map zooms during step 2. It should not zoom or pan"*) and
+			// this supersedes it, because what he was refusing was the map moving UNDER the drawing.
+			if (mapgeo.step === MAPGEO_STEP_FINE) { zoomAbout(sx, sy, factor); return; }
+			mapgeoZoomAbout(sx, sy, factor); return;
+		}
+		zoomAbout(sx, sy, factor);
+	}
 	function zoomAbout(sx, sy, factor) {
 		var r = svg.getBoundingClientRect(), lx = sx - r.left, ly = sy - r.top,
 			wx = (lx - state.tx) / state.s, wy = (ly - state.ty) / state.s;
@@ -11903,8 +12494,9 @@ var EngCalcs = EngCalcs || {};
 		// on the Earth it is, and this asks the same question rather than a narrower one: it read
 		// isLatLonProject() while the row read projectLocatable(), so on a projected project the row
 		// was offered and the press did nothing at all. goToPoint() below travels through the
-		// transform, so there is nothing here a projected project cannot do.
-		if (!projectLocatable()) { return; }
+		// transform, so there is nothing here a projected project cannot do. The wizard's own live
+		// transform is the one addition: while it is open, the drawing can say where it is.
+		if (!projectLocatable() && !mapgeoActive()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -11921,6 +12513,10 @@ var EngCalcs = EngCalcs || {};
 	// `extent` is optional and is the geocoder's `{south, north, west, east}`. Absent means "I know
 	// where, not how big" -- see the zoom note below.
 	function goToPoint(ll, extent) {
+		// **THE CUSTOM GEOREFERENCE WIZARD TRAVELS BY MOVING THE GROUND, not the camera** -- see
+		// mapgeoGoTo(). First, because everything below this moves the view, which during that
+		// wizard would carry the drawing off the map it is being placed on.
+		if (mapgeoActive()) { mapgeoGoTo(ll, extent); return; }
 		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
 		// Go to... box, ask for lat/lon and approximate size of project area in project length
 		// units. Provide a default of either 1000m or 3000 ft."* That is the half we do NOT have --
@@ -12247,11 +12843,14 @@ var EngCalcs = EngCalcs || {};
 		// deserves a round default. Four figures keeps any other length unit honest.
 		return +toDisplay(m > 0.5 ? 1000 : 914.4, 'lpn_u_length').toPrecision(4);
 	}
-	function georefAskSize() {
+	// `defSI` is optional and is what the box opens on, in SI: the attachment wizard re-runs with
+	// the width already on file, so adjusting an attachment is an edit rather than a retype.
+	function georefAskSize(defSI) {
 		var pc = EngCalcs.pageConfig || {};
 		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
-		var v = window.prompt(text, String(georefDefaultSpan()));
+		var def = defSI > 0 ? +toDisplay(defSI, 'lpn_u_length').toPrecision(6) : georefDefaultSpan();
+		var v = window.prompt(text, String(def));
 		if (v === null) { return 0; }
 		var n = parseFloat(String(v).replace(',', '.'));
 		return isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0;
@@ -12734,6 +13333,696 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
+	}
+
+	// ---- THE WORLD MAP BEHIND AN XY DRAWING (ROADMAP Task 646) ----------------------------------
+	//
+	// **THE PROJECT DOES NOT MOVE, AND THAT IS THE WHOLE FEATURE.** Everything above this line
+	// converts: georefStart() holds the file's coordinates aside, maps them through a transform and
+	// writes degrees back, and the project stops being a grid project. This does the opposite --
+	// it states the transform and leaves the drawing alone -- so it is safe on a project whose
+	// numbers somebody measured, and it is reversible by one menu row rather than by closing the
+	// file unsaved.
+	//
+	// **WHAT IT REUSES, AND THE ONE THING IT DOES NOT.** The arithmetic is entirely
+	// js/lpn-georef.js's: lpnGeorefBounds() for the extent, lpnGeorefToLonLat() to ask which patch
+	// of Earth is on screen and lpnGeorefFromLonLat() to place each tile, with georefCapture() and
+	// georefAskSize() reused verbatim for the model's own points and for the site-width question.
+	// What it does NOT touch is georefActive(): that flag means "a placement is in flight, so
+	// suppress the label pass and the solver" (Task 145), and there is nothing to suppress here.
+	// Nothing is held still, nothing is previewed, no coordinate is in an intermediate state, and
+	// labels and the solver stay live throughout. A new state beside it would have been a second
+	// thing for applyLabelVisibility() to read for no gain.
+	//
+	// **THE WIZARD IS TYPED RATHER THAN DRAGGED, deliberately.** In the placement tool the Earth is
+	// fixed and the model is dragged over it; here the DRAWING is fixed -- it is the frame -- so a
+	// drag would have to move the map, and a corner handle on a box that cannot resize means
+	// nothing. Three questions fully determine a similarity: where the middle of the drawing is,
+	// how wide the site is, and which way it is turned. Re-running the row opens each box on the
+	// answer already on file, so correcting an attachment is an edit and not a retype.
+	// ---- THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18) ---------------------------------------
+	//
+	// **THE DEFAULT WAY TO GEOREFERENCE, AND IT CONVERTS NOTHING.**
+	// dev/tom-coordinate-vocabulary-2026-09-16.md: *"Converting coordinates is no longer the default
+	// way to georeference a local coordinate system. The default way to georeference is as easy to
+	// the user as attaching a background map... Their project does not become a lat/lon project.
+	// Their coordinates do not change."* So this writes one declaration, `project.georef`, and not
+	// one number in the drawing -- which dev/lpn-spike/xy-world-map-harness.js asserts by comparing
+	// the whole serialized project byte for byte before, during and after.
+	//
+	// **THE INVERSION IS THE WHOLE SAFETY ARGUMENT, and it is his own, step by step:** *"(1) Show
+	// the world map with our project in the middle of the Atlantic Ocean or near Nigeria (0,0)...
+	// Let the user Zoom and Pan, Search by name, or use Goto... When they are happy, they 'Place
+	// approximately'. (2) We show a drag, scale rotate rectangle/square that controls THE WORLD MAP,
+	// NOT THEIR PROJECT... Then they click 'Georeference here'. (3) We show 'unnamed' in the map
+	// status bar."* Every gesture here therefore edits the TRANSFORM and never the document: the
+	// drawing is the fixed frame and the Earth is what slides under it. georefStart(), the wizard
+	// beside this one, is the opposite and rewrites every coordinate -- which is why that one is
+	// now the exception path reached from File, Convert coordinates as.
+	//
+	// **WHICH ANSWERS HIS OWN WORRY ABOUT ZOOMING AWAY** (*"I am not sure what we do about the
+	// absurdity of zooming away from their project"*): here you cannot. The VIEW never moves during
+	// the wizard -- a pan or a wheel is spent on the map -- so the drawing stays on screen at the
+	// size it was fitted to, and what travels is the ground behind it. Going to the other side of
+	// the world is one press of Go to and puts the drawing's own middle there.
+	//
+	// **THE TRANSFORM IS A SIMILARITY ON A TANGENT PLANE, so a custom georeference is only
+	// reasonably correct over a limited patch of the Earth** -- the same thing that is true of any
+	// EPSG coordinate system, and the reason js/lpn-georef.js freezes its radii at the origin's own
+	// latitude. Nothing here refuses a large one; what to do about lengths at that size is Tom's
+	// open question and is not answered by a number this file could invent.
+	var mapgeo = null;
+	var MAPGEO_STEP_WORLD = 1, MAPGEO_STEP_FINE = 2;
+	// The equator, in metres. The FIRST placement makes the drawing that wide, so that a project
+	// fitted to the window is a project with the whole world behind it -- "project and map both
+	// Zoomed to Fit", which is where his step 1 opens.
+	var MAPGEO_EARTH_M = 40075017;
+
+	function mapgeoActive() { return !!mapgeo; }
+	function mapgeoT() { return (project && project.georef) || null; }
+	// The drawing's own extent, through the ONE iterator the placement wizard uses, so the two
+	// cannot come to different ideas about which points are the document's.
+	function mapgeoExtent() {
+		var b = EngCalcs.lpnGeorefBounds(georefCapture());
+		return { b: b, span: Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
+			cx: (b.minX + b.maxX) / 2, cy: (b.minY + b.maxY) / 2 };
+	}
+	// ---- the three edits, and they are the whole of the arithmetic -------------------------------
+	//
+	// The transform maps a drawing point to a place: `lonlat = origin + R(rotDeg)·metersPerUnit·
+	// (q - anchor)`. Moving the MAP under a still drawing is the inverse of moving the drawing over
+	// a still map, so each of these is stated as "the transform that puts the old ground where the
+	// gesture says", and each keeps its pivot EXACTLY fixed by construction rather than by a
+	// compensating translation somebody has to get right.
+	function mapgeoTranslated(t, dx, dy) {
+		return { anchor: { x: t.anchor.x + dx, y: t.anchor.y + dy },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit, rotDeg: t.rotDeg };
+	}
+	function mapgeoScaled(t, f, c) {
+		if (!(f > 0) || !isFinite(f)) { return t; }
+		return { anchor: { x: c.x + (t.anchor.x - c.x) * f, y: c.y + (t.anchor.y - c.y) * f },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit / f, rotDeg: t.rotDeg };
+	}
+	function mapgeoTurned(t, rad, c) {
+		var cos = Math.cos(rad), sin = Math.sin(rad),
+			dx = t.anchor.x - c.x, dy = t.anchor.y - c.y;
+		return { anchor: { x: c.x + dx * cos - dy * sin, y: c.y + dx * sin + dy * cos },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit, rotDeg: t.rotDeg - rad * 180 / Math.PI };
+	}
+	// The one write seam for "the map moved". Nothing below it touches the document, which is why
+	// there is no snapshot, no markEdited() and no solve on this path.
+	function mapgeoSet(t) {
+		if (!mapgeo || !t || !(t.metersPerUnit > 0) || !isFinite(t.metersPerUnit) ||
+			!isFinite(t.anchor.x) || !isFinite(t.anchor.y) ||
+			!isFinite(t.origin.lon) || !isFinite(t.origin.lat) || !isFinite(t.rotDeg)) { return; }
+		project.georef = t;
+		refreshBasemap();
+		mapgeoRefreshBar();
+		// **EVERY OTHER WAY OF MOVING THE MAP RE-BASELINES THE DIAL**, so the middle of the bar and
+		// a needle pointing straight up always mean "the fit as it stands". A rectangle drag, the
+		// wheel, Go to and Place name search all land here; only the dial itself is exempt, and it
+		// says so rather than being recognised by what it changed.
+		if (!mapgeoDialWriting) { mapgeoDialDrop(); }
+	}
+	// ---- THE SIZE AND TURN DIAL ------------------------------------------------------------------
+	//
+	// **A SLIDER BEATS THE RECTANGLE HERE BECAUSE THERE IS NO DIRECT MANIPULATION TO GIVE UP** (Tom,
+	// 2026-09-18): *"The map is practically infinite. There is no way to visually enlarge it or
+	// reduce it. The rectangle is a poor metaphor (and isn't working anyway). And the scroll wheel is
+	// discrete, not continuous."* A corner handle is a grip on a BOUNDED object; the ground has no
+	// edge to take hold of, so the rectangle was a picture of the drawing pretending to be a picture
+	// of the map. And the rectangle's own turn handle stands off the north edge of a drawing that has
+	// just been fitted to the window, which puts it above the canvas and under the toolbar -- measured
+	// in a real browser on 2026-09-18, where elementFromPoint at the handle returned `lpn_toolbar`.
+	//
+	// **THE MIDDLE IS THE SIZE STEP 1 LEFT**, which is his: *"a slider for scale with 1 (from step 1)
+	// in the middle"*. So the dial is read against a BASE transform rather than against the live one,
+	// and every other gesture -- a rectangle drag, Go to, the wheel -- re-baselines it through
+	// mapgeoSet(), so the middle always means "the fit I have".
+	//
+	// **THE BAND IS NARROW AND THAT IS SAFE BECAUSE THERE IS A DOOR OUT.** He allowed 0.5 to 2.0 and
+	// then narrowed it himself: *"We may even want to narrow the band to 0.75-ish to 1.5."* A bigger
+	// correction is Map, World map, Move or Scale by picking, which is the pick-it-up-again door he
+	// names. The two ends are NOT symmetric about 1, so the scale is log-interpolated in each half
+	// separately: that is what puts 1.0 exactly at the middle of the travel while keeping both of his
+	// numbers.
+	//
+	// **AND THE PROJECT IS THE ONE THAT HOLDS STILL** (Tom, on "eyes-on alignment against the
+	// streets"): *"We are not interested in aligning the project with the streets. We want to align
+	// the streets with the project."* The project is the survey and the thing of value; the map is
+	// decoration being fitted to it.
+	var MAPGEO_DIAL_MIN = 0.75, MAPGEO_DIAL_MAX = 1.5, MAPGEO_DIAL_STEPS = 1000;
+	// **THE TURN SLIDER'S WHOLE TRAVEL IS TEN DEGREES, and that is the control rather than a rail**
+	// (Tom, 2026-09-19): *"the middle is 0, and up is counter-clockwise with a limit of about 10
+	// degrees (since most convergence angles are less than 1 degree)."* A knob spends its travel on
+	// a full circle, so the tenth of a degree that matters is a hair of it. Read in TENTHS, which is
+	// what the markup's own min/max/step state.
+	var MAPGEO_TURN_LIMIT = 10, MAPGEO_TURN_STEPS = 10;
+	// The sliders' full height. They are sized against the CANVAS at runtime -- "almost as tall as
+	// the map" is his instruction -- and this is only the markup's declared height, which
+	// mapgeoPlaceDial() reads back so its overhead arithmetic starts from a known number.
+	var MAPGEO_DIAL_BAR_PX = 150;
+	// True only while the dial itself is writing, so mapgeoSet() can tell "the dial moved the map"
+	// from "something else did" and re-baseline on the second.
+	var mapgeoDialWriting = false;
+	function mapgeoDialEl(id) { return document.getElementById(id); }
+	// Slider travel to a factor. -1 is the bottom of the bar, 0 the middle, +1 the top.
+	function mapgeoDialFactor(pos) {
+		if (!isFinite(pos)) { return 1; }
+		return Math.exp(pos >= 0
+			? pos * Math.log(MAPGEO_DIAL_MAX)
+			: -pos * Math.log(MAPGEO_DIAL_MIN));
+	}
+	// Where the dial is measured FROM. Dropped whenever anything but the dial moves the map, so the
+	// middle of the bar and a needle straight up always mean "as it stands".
+	//
+	// **TAKEN LAZILY, AND THAT IS NOT AN OPTIMISATION FOR ITS OWN SAKE.** mapgeoSet() runs on every
+	// frame of every drag, and mapgeoExtent() walks the whole document to find its middle; taking
+	// the base there would put a full pass over every node and vertex inside the rectangle's own
+	// gesture loop, on the page whose largest networks are the reason that loop is written the way
+	// it is. Dropping a reference costs nothing, and the walk happens once, when somebody actually
+	// touches the dial.
+	function mapgeoDialDrop() {
+		if (!mapgeo) { return; }
+		mapgeo.dial = null;
+		mapgeoDialRefresh();
+	}
+	function mapgeoDialNeed() {
+		var t = mapgeoT(), ext;
+		if (!mapgeo || !t) { return null; }
+		if (!mapgeo.dial) {
+			ext = mapgeoExtent();
+			mapgeo.dial = { base: t, pivot: { x: ext.cx, y: ext.cy }, turn: 0, pos: 0 };
+		}
+		return mapgeo.dial;
+	}
+	// **BOTH EDITS TAKE THE SAME PIVOT, THE MIDDLE OF THE DRAWING**, which is what lets them be
+	// applied in one expression: a scale and a turn about one point commute, so there is no order to
+	// get wrong and no compensating translation. The pivot is the middle of the drawing rather than
+	// of the rectangle for the reason Scale from the current size states: it is the one place a
+	// reader can predict will not move.
+	function mapgeoDialApply() {
+		var d = mapgeo && mapgeo.dial, t;
+		if (!d) { return; }
+		t = mapgeoScaled(d.base, mapgeoDialFactor(d.pos), d.pivot);
+		// **THE SIGN IS THE WHOLE CONTRACT OF THE CONTROL, AND IT WAS THE WRONG WAY ROUND UNTIL
+		// 2026-09-19.** Tom: *"The rotation slider needs up to be counterclockwise."* It was
+		// negated here, on a comment reasoning about which way the DRAWING would sweep -- and the
+		// drawing never moves. The thing that turns is the MAP, which is the standing ruling in
+		// this file stated as an arithmetic sign: we align the streets with the project.
+		//
+		// MEASURED rather than reasoned, because reasoning about it is what got it wrong: a point
+		// of GROUND due east of the pivot, put through mapgeoTurned() and back out to the screen
+		// frame where y runs DOWN, went from 0 to +5 degrees on a slider pushed UP -- clockwise.
+		// It now goes to -5, which is the counterclockwise he asked for.
+		// dev/lpn-spike/mapgeo-turn-direction-harness.js holds it.
+		//
+		// **NOTHING STORED CHANGED MEANING.** `rotDeg` is what it always was and mapgeoTurned()
+		// was not touched; what flipped is which way the reader must push the bar, which is the
+		// only thing he asked about.
+		t = mapgeoTurned(t, d.turn * Math.PI / 180, d.pivot);
+		mapgeoDialWriting = true;
+		try { mapgeoSet(t); } finally { mapgeoDialWriting = false; }
+		mapgeoDialRefresh();
+	}
+	function mapgeoDialRefresh() {
+		var pc = EngCalcs.pageConfig || {}, d = mapgeo && mapgeo.dial,
+			turn = mapgeoDialEl('lpn_mapgeo_turn'), size = mapgeoDialEl('lpn_mapgeo_size'),
+			turnNum = mapgeoDialEl('lpn_mapgeo_turn_num'), sizeNum = mapgeoDialEl('lpn_mapgeo_size_num'),
+			deg, f, want;
+		if (!turn || !size) { return; }
+		// No base taken yet means the sliders read "as it stands", which is zero turn and a factor
+		// of one -- the honest readout, and the one the controls must show after any other gesture.
+		deg = d ? Math.round(d.turn * 10) / 10 : 0;
+		f = d ? mapgeoDialFactor(d.pos) : 1;
+		mapgeoDialEl('lpn_mapgeo_turn_read').textContent =
+			(pc.lpn_mapgeo_dial_turn_read || '{d} degrees').replace('{d}', String(deg));
+		mapgeoDialEl('lpn_mapgeo_size_read').textContent =
+			(pc.lpn_mapgeo_dial_size_read || '{f} times').replace('{f}', f.toFixed(2));
+		// **WRITTEN ONLY WHEN IT DIFFERS, on both the slider and the number box.** Assigning a
+		// range's own value back to it during its `input` event restarts the drag in some engines,
+		// and assigning to a number box while somebody is part way through typing `1.` throws the
+		// dot away. The guard is not tidiness; it is what lets one function answer every source.
+		want = String(Math.round((d ? d.pos : 0) * MAPGEO_DIAL_STEPS));
+		if (String(size.value) !== want) { size.value = want; }
+		want = String(Math.round(deg * MAPGEO_TURN_STEPS));
+		if (String(turn.value) !== want) { turn.value = want; }
+		if (sizeNum && document.activeElement !== sizeNum) { sizeNum.value = f.toFixed(3); }
+		if (turnNum && document.activeElement !== turnNum) { turnNum.value = String(deg); }
+	}
+	/**
+	 * **THE SLIDERS ARE SIZED FROM THE CANVAS, AND THAT IS TWO REQUIREMENTS AT ONCE.**
+	 *
+	 * The first is Tom's, 2026-09-19: *"The slider is too small. I'd like to see it almost as tall
+	 * as the map."* So the travel is whatever the canvas leaves after the labels, the number boxes
+	 * and the readouts, rather than the 150 px the markup declares.
+	 *
+	 * The second is a measured defect from the day before. The box was 306 px tall and placed with
+	 * `top: 50%` on a box whose height is the CANVAS's, which the bottom pane cuts at will. Measured
+	 * in a real Chrome (dev/lpn-spike/mapgeo-browser-drive.js): at 1280x700 with the pane 340 px
+	 * open the canvas is 177 px tall, the control's top landed at y = 51, and `elementFromPoint`
+	 * over the turn control returned `lpn_toolbar` -- behind the toolbar, unpressable; at 1366x768
+	 * with a 300 px pane its top corner returned `formInput`. **Making the sliders taller makes that
+	 * failure easier, not harder**, which is why the two jobs are one function: the height is
+	 * DERIVED from the room, so there is no size that can overflow.
+	 *
+	 * **MEASURED AGAINST THE CANVAS, NEVER AGAINST THE BOX THE PANEL IS POSITIONED IN.** They are
+	 * not the same rectangle -- the positioning box also holds the coordinate readout and the pane's
+	 * own strip, so a panel centred in it sat correctly inside its parent and still over the tab
+	 * strip, where the size bar's own middle hit-tested as `lpn_pane_strip`.
+	 */
+	function mapgeoPlaceDial() {
+		var d = mapgeoDialEl('lpn_mapgeo_dial'), bars, overhead, p, pr, cv, cr, top, room, dh;
+		if (!d || d.style.display === 'none') { return; }
+		p = d.offsetParent;
+		if (!p || !p.getBoundingClientRect) { return; }
+		pr = p.getBoundingClientRect();
+		cv = document.getElementById('lpn_canvas');
+		cr = cv && cv.getBoundingClientRect ? cv.getBoundingClientRect() : null;
+		top = cr ? cr.top - pr.top : 0;
+		room = cr ? cr.height : p.clientHeight;
+		if (!room) { return; }
+		bars = [mapgeoDialEl('lpn_mapgeo_size'), mapgeoDialEl('lpn_mapgeo_turn')].filter(Boolean);
+		if (bars.length) {
+			// **THE CAP FROM THE LAST RUN COMES OFF BEFORE ANYTHING IS MEASURED.** Left on, it
+			// clamps `d.offsetHeight`, the overhead comes out short by whatever the cap removed,
+			// and the bars are sized too tall -- so the panel scrolls and its own controls are laid
+			// out BELOW its clipped box. Measured: the size bar's middle hit-tested as
+			// `lpn_pane_strip`, a control scrolled off the bottom of a control.
+			d.style.maxHeight = 'none';
+			bars.forEach(function (b) { b.style.height = MAPGEO_DIAL_BAR_PX + 'px'; });
+			// The two sit SIDE BY SIDE, so the overhead is the panel's height less ONE bar's -- not
+			// less both. Getting that wrong halves the travel on a tall window and overflows on a
+			// short one, and neither is visible from the source.
+			overhead = d.offsetHeight - bars[0].offsetHeight;
+			bars.forEach(function (b) {
+				b.style.height = Math.max(56, Math.min(room - 16 - overhead, room)) + 'px';
+			});
+		}
+		d.style.maxHeight = Math.max(80, room - 16) + 'px';
+		d.style.overflowY = 'auto';
+		dh = d.offsetHeight;
+		if (!dh) { return; }
+		d.style.top = Math.round(top + Math.max(8, (room - dh) / 2)) + 'px';
+	}
+	function mapgeoDialSetTurn(deg) {
+		var d = mapgeoDialNeed();
+		if (!d || !isFinite(deg)) { return; }
+		d.turn = Math.max(-MAPGEO_TURN_LIMIT, Math.min(MAPGEO_TURN_LIMIT, deg));
+		mapgeoDialApply();
+	}
+	function mapgeoDialSetPos(pos) {
+		var d = mapgeoDialNeed();
+		if (!d || !isFinite(pos)) { return; }
+		d.pos = Math.max(-1, Math.min(1, pos));
+		mapgeoDialApply();
+	}
+	/**
+	 * **FOUR CONTROLS, TWO QUANTITIES, ONE SEAM EACH.** A slider and a number box for the size, a
+	 * slider and a number box for the turn; both of each pair write through mapgeoDialSetPos() /
+	 * mapgeoDialSetTurn() and read back through mapgeoDialRefresh(), so neither box can come to hold
+	 * a number the map does not have. That is the same rule the property popup follows, and it is
+	 * why the refresh writes a value only when it differs.
+	 *
+	 * **THE NUMBER BOXES ARE RELATIVE** (Tom, 2026-09-19: *"an input on each slider to enter
+	 * relative zoom and rotation by text"*). 1 and 0 are "leave it alone", because the middle of
+	 * each slider is the fit step 1 left.
+	 */
+	function mapgeoWireDial() {
+		var size = mapgeoDialEl('lpn_mapgeo_size'), turn = mapgeoDialEl('lpn_mapgeo_turn'),
+			sizeNum = mapgeoDialEl('lpn_mapgeo_size_num'), turnNum = mapgeoDialEl('lpn_mapgeo_turn_num');
+		if (!size || !turn) { return; }
+		size.addEventListener('input', function () {
+			mapgeoDialSetPos((parseFloat(size.value) || 0) / MAPGEO_DIAL_STEPS);
+		});
+		turn.addEventListener('input', function () {
+			mapgeoDialSetTurn((parseFloat(turn.value) || 0) / MAPGEO_TURN_STEPS);
+		});
+		// A number box is read on every keystroke that parses, so the map follows the typing; a
+		// value it cannot read leaves the map alone rather than snapping it to zero, and `change`
+		// puts the box back to what the map actually holds when the field is left.
+		if (sizeNum) {
+			sizeNum.addEventListener('input', function () {
+				var f = parseFloat(String(sizeNum.value).replace(',', '.'));
+				if (!(f > 0) || !isFinite(f)) { return; }
+				mapgeoDialSetPos(mapgeoDialPosFor(f));
+			});
+			sizeNum.addEventListener('change', mapgeoDialRefresh);
+		}
+		if (turnNum) {
+			turnNum.addEventListener('input', function () {
+				var v = parseFloat(String(turnNum.value).replace(',', '.'));
+				if (!isFinite(v)) { return; }
+				mapgeoDialSetTurn(v);
+			});
+			turnNum.addEventListener('change', mapgeoDialRefresh);
+		}
+	}
+	// The inverse of mapgeoDialFactor(): where on the travel a typed factor sits. Clamped by
+	// mapgeoDialSetPos(), so a number outside the band lands on the end rather than being refused --
+	// the box is an adjustment, and the nearest adjustment we can make is the honest answer.
+	function mapgeoDialPosFor(f) {
+		if (!(f > 0) || !isFinite(f)) { return 0; }
+		return f >= 1 ? Math.log(f) / Math.log(MAPGEO_DIAL_MAX)
+			: -Math.log(f) / Math.log(MAPGEO_DIAL_MIN);
+	}
+	function mapgeoStart() {
+		var pc = EngCalcs.pageConfig || {}, ext;
+		if (mapgeo || georefActive()) { return; }
+		if (isLatLonProject()) {
+			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+			return;
+		}
+		// A project that STATES a coordinate system already says where it is, and a second answer
+		// to that question is the drift ruling P2 exists to stop.
+		if (!xyMapAttachable()) {
+			setNotice(pc.lpn_georef_projected ||
+				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
+			return;
+		}
+		if (!doc.nodes.length) {
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
+			return;
+		}
+		if (!EngCalcs.lpnGeorefToLonLat || !EngCalcs.lpnGeorefFromLonLat) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		// **IT CONFIRMS BEFORE IT REPLACES ONE**, which is the first thing his own summary asks of
+		// this row: the georeferencing already on file is an answer somebody gave, and starting the
+		// wizard throws it away the moment the first frame is drawn.
+		if (xyGeorefOk() && !window.confirm(pc.lpn_mapgeo_replace ||
+				'This project already has the world map attached. Replace that georeferencing?')) { return; }
+		ext = mapgeoExtent();
+		mapgeo = {
+			step: MAPGEO_STEP_WORLD,
+			openId: library ? library.openId : null,
+			// Everything Cancel puts back. The wizard marks nothing edited and saves nothing until
+			// Georeference here, so cancelling is an assignment rather than an undo.
+			prev: {
+				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
+				basemap: project.basemap, view: currentView()
+			}
+		};
+		if (!project.basemap || project.basemap === 'off') { project.basemap = 'osm'; }
+		setMode('select');
+		// 0 N 0 E: the Gulf of Guinea, which is where a drawing with no georeferencing honestly
+		// sits, and the whole equator wide so that the fit below shows the whole world.
+		project.georef = { anchor: { x: ext.cx, y: ext.cy }, origin: { lon: 0, lat: 0 },
+			metersPerUnit: MAPGEO_EARTH_M / ext.span, rotDeg: 0 };
+		zoomExtent(true);
+		mapgeoSet(project.georef);
+		refreshMapStatus();
+		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+	}
+	// **THE FIVE WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
+	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
+	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
+	// comes and goes teaches nobody what the feature can do.
+	//
+	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
+	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
+	// a corner and turns on the round handle; writing a second gesture for each would be a second
+	// opinion about what moving a map means. What the two rows buy is that a reader looking for
+	// "move it a bit" and a reader looking for "it is the wrong size" each find a row with their own
+	// word on it, and the hint that comes up names the handle they want.
+	function mapgeoRows() {
+		var pc = EngCalcs.pageConfig || {}, has = xyGeorefOk();
+		return [
+			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
+				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
+			// **ONE ROW, BECAUSE THE TWO OPENED THE IDENTICAL THING** (Tom, 2026-09-19: *"Map
+			// submenus a lie: Yes. I see. Let's replace rows two and three (I like their
+			// behavior; good call) with 'Re-adjust'"*). Move and Scale by picking named two
+			// HANDLES of the blue rectangle; the rectangle was deleted, so from that day both
+			// rows ran the same code and showed the same sentence. Two names for one command is a
+			// menu telling the reader something untrue about itself. The label and the tip are
+			// his own words, verbatim. KEYS DELETED WITH THE ROWS: lpn_map_attach_move,
+			// lpn_map_attach_move_tip, lpn_map_attach_scale, lpn_map_attach_scale_tip -- none of
+			// them had ever been translated.
+			{ icon: 'position', label: pc.lpn_map_attach_readjust || 'Re-adjust',
+				tip: pc.lpn_map_attach_readjust_tip,
+				fn: mapgeoAdjust, disabled: !has },
+			{ icon: 'scale', label: pc.lpn_map_attach_scale_from || 'Scale from the current size…',
+				fn: mapgeoScaleFromCurrent, disabled: !has },
+			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Detach',
+				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !has }
+		];
+	}
+	/**
+	 * Re-adjust: the wizard's step 2, opened on the placement already on file.
+	 *
+	 * **IT KEEPS THE TRANSFORM AND OPENS AT STEP 2, which is what makes it a correction rather than
+	 * a fresh placement.** mapgeoStart() throws the map out to the whole world at 0 N 0 E, because
+	 * that is the honest place for a drawing nobody has placed yet; a reader who came to nudge an
+	 * existing map would lose the placement they were correcting. Everything else is shared with the
+	 * wizard, Cancel included, so there is one way back and it puts the old transform back exactly.
+	 */
+	function mapgeoAdjust() {
+		var pc = EngCalcs.pageConfig || {};
+		if (mapgeo || georefActive()) { return; }
+		if (!xyMapAttachable() || !xyGeorefOk()) {
+			setNotice(pc.lpn_map_attach_none ||
+				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
+			return;
+		}
+		if (!EngCalcs.lpnGeorefToLonLat || !EngCalcs.lpnGeorefFromLonLat) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		mapgeo = {
+			step: MAPGEO_STEP_FINE,
+			openId: library ? library.openId : null,
+			prev: {
+				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
+				basemap: project.basemap, view: currentView()
+			}
+		};
+		if (!project.basemap || project.basemap === 'off') { project.basemap = 'osm'; }
+		setMode('select');
+		mapgeoSet(project.georef);
+		refreshMapStatus();
+		// **ONE SENTENCE, BECAUSE THERE IS ONE ROW.** Move and Scale by picking used to name two
+		// HANDLES of the blue rectangle; deleting the rectangle left both rows opening the
+		// identical step 2, and Tom closed the loose end on 2026-09-19 by replacing them with a
+		// single Re-adjust. The `kind` argument went with them -- it distinguished two things that
+		// had stopped being two things.
+		setNotice(pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+	}
+	/**
+	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.
+	 *
+	 * **THE PIVOT IS THE MIDDLE OF THE DRAWING AND IS NOT PICKED.** The background image's own
+	 * version asks for a point first, because a picture can be pinned by a feature somebody
+	 * recognises in it; the ground behind a drawing has no such point, and the middle of the drawing
+	 * is the one place a reader can predict will not move. It writes through mapgeoScaled(), which
+	 * keeps that pivot fixed by construction, and touches not one document number -- the same
+	 * `project.georef` declaration the wizard writes, and nothing else.
+	 */
+	function mapgeoScaleFromCurrent() {
+		var pc = EngCalcs.pageConfig || {}, t = mapgeoT(), ext, answer, f;
+		if (mapgeo || georefActive()) { return; }
+		if (!xyMapAttachable() || !xyGeorefOk() || !t) {
+			setNotice(pc.lpn_map_attach_none ||
+				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
+			return;
+		}
+		answer = window.prompt(pc.lpn_map_attach_scale_from_prompt ||
+			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
+		if (answer === null) { return; }
+		f = parseFloat(String(answer).replace(',', '.'));
+		if (!(f > 0) || !isFinite(f)) {
+			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type one number greater than zero.');
+			return;
+		}
+		ext = mapgeoExtent();
+		project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
+		markEdited();
+		saveToStorage();
+		refreshBasemap();
+		refreshMapStatus();
+		setNotice(pc.lpn_map_attach_scale_from_done ||
+			'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+	}
+	// **STEP 2 NAILS A RECTANGLE TO THE GROUND.** It is stated in latitude and longitude, so it
+	// belongs to the Earth and not to the drawing: when the map moves, the rectangle moves with it,
+	// which is what makes dragging it read as dragging the map. It starts as the drawing's own
+	// extent, which is the one rectangle the user can already see the meaning of.
+	function mapgeoPlaceApproximately() {
+		var pc = EngCalcs.pageConfig || {}, t = mapgeoT(), ext;
+		if (!mapgeo || mapgeo.step !== MAPGEO_STEP_WORLD || !t) { return; }
+		ext = mapgeoExtent();
+		mapgeo.step = MAPGEO_STEP_FINE;
+		mapgeoSet(t);
+		setNotice(pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+	}
+	/**
+	 * **THE BLUE RECTANGLE IS GONE** (Tom, 2026-09-19: *"The rectangle control is gone."*), and with
+	 * it mapgeoCaptureRect(), mapgeoRectSrc(), mapgeoRectCentre(), mapgeoDrawFrame(), mapgeoInward()
+	 * and the whole `lpn-georef` overlay layer this wizard drew.
+	 *
+	 * **IT WAS READ AS THE PROJECT, WHICH IS THE ONE THING IT WAS NOT.** It opened drawn exactly on
+	 * the drawing's own bounding box, wearing the corner-handle grammar every graphics program uses
+	 * for "grab this object", so a control that only ever wrote `project.georef` looked like a grip
+	 * on the survey. And its rotate handle stands off the NORTH edge of a drawing just fitted to the
+	 * window, which puts it above the canvas: measured in a real Chrome on 2026-09-18,
+	 * `elementFromPoint` at the handle returned `lpn_toolbar`, so the gesture could not be started
+	 * at all. Two sliders say what they move, cannot be mistaken for the drawing, and are reachable.
+	 *
+	 * Do not bring it back as an "advanced" affordance. The replacement is the two sliders plus the
+	 * pan gesture below, and a second way to do the same thing is a second opinion about what moving
+	 * a map means.
+	 */
+	// ---- the gestures ---------------------------------------------------------------------------
+	//
+	// Through the existing `drag` record and the existing rAF tick, so pointer capture, the pinch
+	// guard and the pointerup cleanup are the proven ones. **Every frame is computed from the
+	// transform the drag STARTED with**, never from the previous frame: an incremental gesture
+	// accumulates the pointer's own jitter into the rotation, and an absolute one is idempotent.
+	function mapgeoPointerSrc(clientX, clientY) {
+		var w = screenToWorld(clientX, clientY);
+		return { x: outwardX(w.x), y: outwardY(w.y) };
+	}
+	/**
+	 * **A DRAG MOVES THE MAP, IN BOTH STEPS, ANYWHERE ON THE CANVAS** (Tom, 2026-09-19: *"Pan
+	 * (normal gestures) works on the map only, and we state this in the wizard."*). One gesture,
+	 * one meaning, and the wizard says so in words rather than leaving it to be discovered.
+	 *
+	 * **THIS REVERSES 2026-09-18's "in step 2 only the rectangle moves anything", and the reversal
+	 * is his.** That rule was right while the rectangle existed: two things on screen that both
+	 * slid the map, one of them invisible, is a gesture nobody chose. With the rectangle deleted
+	 * there is no second thing, and a full-window drawing surface whose drag does NOTHING is worse
+	 * than either.
+	 */
+	function mapgeoPointerDown(e) {
+		var t = mapgeoT();
+		if (!mapgeo || !t) { return false; }
+		drag = {
+			type: 'mapgeo', kind: 'move', pointerId: e.pointerId,
+			startX: e.clientX, startY: e.clientY, t0: t,
+			start: mapgeoPointerSrc(e.clientX, e.clientY)
+		};
+		return true;
+	}
+	function mapgeoApplyDrag(p) {
+		var t0 = drag.t0, now = mapgeoPointerSrc(p.x, p.y);
+		if (!mapgeo || !t0) { return; }
+		// The ground the pointer grabbed follows the pointer. Computed from the transform the drag
+		// STARTED with, never from the previous frame: an incremental gesture accumulates the
+		// pointer's own jitter, and an absolute one is idempotent.
+		mapgeoSet(mapgeoTranslated(t0, now.x - drag.start.x, now.y - drag.start.y));
+	}
+	// The wheel and the pinch, spent on the map instead of on the view. zoomAbout() is left alone:
+	// moving the camera during the wizard is what would let somebody zoom away from their project.
+	function mapgeoZoomAbout(sx, sy, factor) {
+		var t = mapgeoT();
+		if (!mapgeo || !t) { return; }
+		mapgeoSet(mapgeoScaled(t, factor, mapgeoPointerSrc(sx, sy)));
+	}
+	/**
+	 * **WHERE Go to AND Place name search LAND WHILE THE WIZARD IS OPEN.** goToPoint() is the one
+	 * door to a place on the Earth and it moves the CAMERA, which during this wizard would move the
+	 * drawing off the map it is being placed on. So the same request is spent on the transform: the
+	 * middle of the drawing is put at the place, and an extent -- which only the geocoder has --
+	 * also sets how wide the drawing is on the ground.
+	 */
+	function mapgeoGoTo(ll, extent) {
+		var t = mapgeoT(), ext = mapgeoExtent(), mpu = t ? t.metersPerUnit : 1, mpd, wide, high;
+		if (!mapgeo) { return; }
+		if (extent && isFinite(extent.east) && isFinite(extent.west) &&
+				isFinite(extent.north) && isFinite(extent.south) &&
+				extent.east >= extent.west && extent.north >= extent.south) {
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(ll.lat);
+			wide = (extent.east - extent.west) * mpd.lon;
+			high = (extent.north - extent.south) * mpd.lat;
+			if (Math.max(wide, high) > 0) { mpu = Math.max(wide, high) / ext.span; }
+		}
+		mapgeoSet({ anchor: { x: ext.cx, y: ext.cy }, origin: { lon: ll.lon, lat: ll.lat },
+			metersPerUnit: mpu, rotDeg: t ? t.rotDeg : 0 });
+	}
+	function mapgeoFinish() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!mapgeo) { return; }
+		if (!xyGeorefOk()) { mapgeoCancel(); return; }
+		mapgeo = null;
+		// **THE FIRST AND ONLY WRITE.** markEdited() so the declaration is saved with the project;
+		// no undo snapshot, because the stack holds the DOCUMENT and not one thing in it moved --
+		// the way back is Map, World map, Detach.
+		markEdited();
+		saveToStorage();
+		refreshBasemap();
+		refreshMapStatus();
+		mapgeoRefreshBar();
+		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+	}
+	function mapgeoCancel() {
+		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
+		if (!mapgeo) { return; }
+		mapgeo = null;
+		if (prev) {
+			if (prev.georef) { project.georef = prev.georef; } else { delete project.georef; }
+			project.basemap = prev.basemap;
+			if (prev.view) { applyView(prev.view); }
+		}
+		refreshBasemap();
+		refreshMapStatus();
+		mapgeoRefreshBar();
+		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+	}
+	// ---- the bar ---------------------------------------------------------------------------------
+	function mapgeoBarEl(id) { return document.getElementById(id); }
+	function mapgeoShow(id, on) {
+		var b = mapgeoBarEl(id);
+		if (b) { b.style.display = on ? '' : 'none'; }
+	}
+	function mapgeoRefreshBar() {
+		var pc = EngCalcs.pageConfig || {}, bar = mapgeoBarEl('lpn_mapgeo_bar'), world1;
+		if (!bar) { return; }
+		bar.style.display = mapgeo ? 'block' : 'none';
+		if (!mapgeo) { mapgeoShow('lpn_mapgeo_dial', false); return; }
+		world1 = mapgeo.step === MAPGEO_STEP_WORLD;
+		mapgeoBarEl('lpn_mapgeo_step').textContent = world1
+			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
+			: (pc.lpn_mapgeo_step2 || 'Step 2 of 2: fit the map behind your drawing');
+		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
+			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.')
+			: (pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+		// Step 2 only, both of them: in step 1 the drag and the wheel both spend on the map, so
+		// there is no split to state and a sentence about one would be noise.
+		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
+			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
+		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
+		mapgeoShow('lpn_mapgeo_search', world1);
+		mapgeoShow('lpn_mapgeo_goto', world1);
+		mapgeoShow('lpn_mapgeo_place', world1);
+		mapgeoShow('lpn_mapgeo_finish', !world1);
+		mapgeoShow('lpn_mapgeo_dial', !world1);
+		mapgeoPlaceDial();
+	}
+	function mapgeoWireBar() {
+		var place = mapgeoBarEl('lpn_mapgeo_place'), b;
+		if (!place) { return; }
+		place.addEventListener('click', mapgeoPlaceApproximately);
+		mapgeoBarEl('lpn_mapgeo_finish').addEventListener('click', mapgeoFinish);
+		mapgeoBarEl('lpn_mapgeo_cancel').addEventListener('click', mapgeoCancel);
+		b = mapgeoBarEl('lpn_mapgeo_goto');
+		if (b) { b.addEventListener('click', goToLatLon); }
+		b = mapgeoBarEl('lpn_mapgeo_search');
+		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
+		mapgeoWireDial();
+	}
+	function removeMapAttach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!xyGeorefOk()) { return; }
+		delete project.georef;
+		markEdited();
+		refreshBasemap();
+		saveToStorage();
+		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 
 	// ---- toolbar mode ----
@@ -23577,7 +24866,7 @@ var EngCalcs = EngCalcs || {};
 	// One of OUR documents, off a disk, landed as a new project. Split out of the reader above so
 	// that File > Import XY to lat/lon… reaches the identical landing (Task 447) -- a second copy of this
 	// would be a second place for "an uploaded project arrives SAVED" to drift.
-	function landProjectText(text, asGeo) {
+	function landProjectText(text, asGeo, name) {
 		var pc = EngCalcs.pageConfig || {};
 		var saved = acceptImportedText(text);
 		if (!saved) { return; }
@@ -23591,7 +24880,7 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { renameToNumbered(upId); georefStart(); }
+		if (asGeo && upId) { renameToNumbered(upId, name); georefStart(); }
 	}
 	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
 	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
@@ -23599,10 +24888,13 @@ var EngCalcs = EngCalcs || {};
 	// the coordinates it always held; what is on screen is a second document about to be placed
 	// somewhere else. Carrying the name over would give two different documents one name, and the
 	// one this page can save is the one that is not the original.
-	function renameToNumbered(id) {
+	// `name` is optional and is what File, Convert coordinates as calls its copy: the file route
+	// arrives holding somebody else's document and gets a number, while the copy route is a second
+	// version of the project you are looking at and says so by name.
+	function renameToNumbered(id, name) {
 		var entry = indexEntry(id);
 		if (!entry || !project) { return; }
-		project.name = nextProjectName();
+		project.name = name || nextProjectName();
 		entry.name = project.name;
 		saveIndex();
 		saveToStorage();
@@ -24890,6 +26182,53 @@ var EngCalcs = EngCalcs || {};
 	function pickGeoFile() {
 		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
+	}
+	/**
+	 * **File, Convert coordinates as: a Save as that converts.** Tom's design, 2026-09-18, in
+	 * his own three steps: *"(1) the row becomes File, Convert coordinates as...; (2) it offers a
+	 * file picker OR makes a duplicate tab named `Copy of {project_name}`; (3) the redesigned
+	 * conversion wizard runs."*).
+	 *
+	 * **WHAT SHIPPED BEFORE THIS WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ
+	 * CORRECTLY.** The row opened a FILE and placed it; he wants a row that converts THIS project.
+	 * Tom: *"let's not fool ourselves, conversion of all coordinates is happening"* -- and the rule
+	 * this repository actually holds is never to convert IN PLACE, which a Save as does not: the
+	 * project you were looking at is still open, still unconverted, and still on its own tab.
+	 *
+	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
+	 * georeference is Map, World map, Attach, which moves no coordinate at all;
+	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
+	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
+	 * in most situations. As always, we prefer the preserve-the-inputs path."*
+	 *
+	 * **THE "OR" IN HIS STEP 2 IS ANSWERED BY THE PROJECT ITSELF RATHER THAN BY A DIALOG.** An
+	 * empty tab has nothing to copy, so that is the case where the picker is the only thing the
+	 * command can mean; a tab with a network in it is the thing being converted. Asking which of
+	 * the two somebody meant, when the answer is already on the screen, is a modal for nothing.
+	 */
+	function convertCoordsAs() {
+		var pc = EngCalcs.pageConfig || {}, saved, name;
+		if (isLatLonProject()) {
+			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+			return;
+		}
+		// Nothing here to convert: the row can only mean the file route.
+		if (!doc.nodes.length) { pickGeoFile(); return; }
+		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
+		if (!saved || !saved.project) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
+		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId
+		// is what the lock broker and every live file handle key on, so two tabs sharing one would
+		// be two documents claiming to be the same file. And the world map attached to the original
+		// is a statement about coordinates that are about to be replaced, so it goes too.
+		delete saved.project.docId;
+		delete saved.project.georef;
+		saved.project.name = name;
+		landProjectText(JSON.stringify(saved), true, name);
 	}
 
 	// ---- Live file handles ----
@@ -26741,6 +28080,14 @@ var EngCalcs = EngCalcs || {};
 	// true of a save, and a refusal that describes the wrong act teaches the wrong thing.
 	function georefBlocksProjectSwitch(reason) {
 		var pc = EngCalcs.pageConfig || {};
+		// **THE CUSTOM GEOREFERENCE WIZARD TAKES THE SAME REFUSAL, in its own words.** Its
+		// placement is provisional until Georeference here, so a save would write a world map the
+		// user has not agreed to and a tab switch would leave it behind on a project nobody is
+		// looking at. One sentence for both acts, because the actionable half is the same button.
+		if (mapgeoActive()) {
+			setNotice(pc.lpn_mapgeo_locked || 'Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.');
+			return true;
+		}
 		if (!georefActive()) { return false; }
 		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
@@ -27974,8 +29321,8 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
-			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Convert coordinates as…',
+			  tip: pc.lpn_file_import_geo_tip, fn: convertCoordsAs },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -28403,6 +29750,23 @@ var EngCalcs = EngCalcs || {};
 			// submenu, so six commands about one picture cost one row.
 			{ icon: 'image', label: pc.lpn_backdrop_menu || 'Background image…',
 				submenu: function () { return backdropRows(false); } },
+			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Beside the background image
+			// because it is the same kind of thing -- something placed BEHIND the drawing that
+			// changes nothing in it.
+			//
+			// **ONE ROW WITH A SUBMENU, SHAPED LIKE THE ROW ABOVE IT** (Tom, 2026-09-18: *"Change
+			// Map, Custom georeference to Map, World map... (to be parallel with Background image).
+			// And can it have a submenu with Attach (at top), Move, Scale by picking, Scale from
+			// the current size..., Detach, similar to the Background map submenu."*). It was two
+			// top-level rows -- the wizard, and the undoing of the wizard -- on the argument that a
+			// feature with two commands should not cost a click. **PARALLELISM BEAT THAT ARGUMENT,
+			// and the reason is that a reader does not meet these rows one feature at a time**: a
+			// picture behind the drawing and a map behind the drawing are the same kind of thing,
+			// so a reader who has learnt one submenu has learnt the other.
+			{ icon: 'globe', hidden: !xyMapAttachable(),
+				label: pc.lpn_map_attach_menu || 'World map…',
+				tip: pc.lpn_map_attach_tip,
+				submenu: function () { return mapgeoRows(); } },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -28438,7 +29802,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { EngCalcs.lpnSearchOpen(); }
 			},
 			{
-				hidden: !projectLocatable(), icon: 'view',
+				hidden: !basemapChoosable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'osm')
 					? (pc.lpn_basemap_hide || 'Hide street map')
 					: (pc.lpn_basemap_show || 'Show street map'),
@@ -28449,7 +29813,7 @@ var EngCalcs = EngCalcs || {};
 			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
 			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
 			{
-				hidden: !projectLocatable() || !satelliteAvailable(), icon: 'view',
+				hidden: !basemapChoosable() || !satelliteAvailable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'satellite')
 					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
 					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
@@ -29161,7 +30525,9 @@ var EngCalcs = EngCalcs || {};
 		setTransform();
 		wireToolbar();
 		georefWireBar();
+		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
+		buildTileBench();    // no-op unless ?debug=tiles is on the URL
 		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener
 		// already ran EngCalcs.initTips(document) once (script load order puts that listener
 		// first) -- so a button's .ec-help[title] tip (Select, Labels) would otherwise never get
@@ -29790,7 +31156,7 @@ var EngCalcs = EngCalcs || {};
 	function wirePointerEvents() {
 		svg.addEventListener('wheel', function (e) {
 			e.preventDefault();
-			zoomAbout(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1 / 1.1);
+			wheelZoom(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1 / 1.1);
 		}, { passive: false });
 
 		// Corner coordinate tracker (Tom) -- PC-oriented (hover-driven); the popup's read-only
@@ -29877,6 +31243,10 @@ var EngCalcs = EngCalcs || {};
 			// above: one flag, checked once, and every editing gesture below is simply not reached.
 			// Panning still works on empty canvas -- it is how you look at where you are putting the
 			// model -- so a miss falls through to a pan rather than to nothing.
+			// **AND THE CUSTOM GEOREFERENCE WIZARD TAKES EVERY PRESS**, because in that wizard the
+			// drawing is the fixed frame: a press on bare canvas slides the MAP rather than the
+			// camera, which is what stops anybody zooming away from the project they are placing.
+			if (mapgeoActive()) { mapgeoPointerDown(e); return; }
 			if (georefActive()) {
 				if (!georefPointerDown(e)) { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common); }
 				return;
@@ -30150,8 +31520,20 @@ var EngCalcs = EngCalcs || {};
 		// depends on is false -- so picking a node as the target of a Move also opens that node's
 		// popup, or with the Delete tool active DELETES it. Gating the tap's START, not its end, is
 		// what makes this hold: the pointerdown happens while regMode is unambiguously still on.
+		// **AND THE CUSTOM GEOREFERENCE WIZARD IS EXEMPT TOO, which it was not** (Tom, 2026-09-18:
+		// *"On step 1 of 2, pan and zoom must be enabled. I only have zoom. I need pan."*). This
+		// pair named `georefActive()` -- the OTHER placement wizard -- and said nothing about
+		// mapgeoActive(), so while the world map was being placed every press was still being
+		// recorded as a possible tap. A press that travelled less than the tap slop therefore went
+		// on to the ordinary select machinery: a nudge of the map opened the popup of whatever
+		// happened to be under the pointer, on a canvas where the drawing fills the screen, and the
+		// nudge itself did nothing because it was below the drag slop. That reads exactly as "I
+		// have no pan" -- the map does not move and something else happens instead. The drag path
+		// was never broken; this is what was sitting on top of it. The signature is the one this
+		// file records again and again: a construct written twice, with the discriminating test on
+		// one of them and absent from the other.
 		svg.addEventListener('pointerdown', function (e) {
-			if (regMode || georefActive()) { downPt = null; return; }
+			if (regMode || georefActive() || mapgeoActive()) { downPt = null; return; }
 			// The TIME and the POINTER TYPE come along, because a press is not only a place any
 			// more: the profile's chooser reads a short touch, a long one and a double one as three
 			// different gestures (Task 506), and both facts are only available here.
@@ -30159,7 +31541,7 @@ var EngCalcs = EngCalcs || {};
 			areaLastPointer = e.pointerType || 'mouse';   // so the select-area bubble knows a finger from a mouse before its own first press
 		});
 		svg.addEventListener('pointerup', function (e) {
-			if (regMode || georefActive()) { downPt = null; return; } // a pending registration sequence, or a placement in progress
+			if (regMode || georefActive() || mapgeoActive()) { downPt = null; return; } // a pending registration sequence, or either placement wizard
 			// **A DRAG IS NEVER ALSO A TAP.** `gestureMoved` is the fact -- this press armed a drag
 			// and moved the document -- and the distance test is what covers the modes that set no
 			// `drag` at all (add-*, delete), where nothing arms anything but a travelling press is
@@ -30598,7 +31980,7 @@ var EngCalcs = EngCalcs || {};
 			var pts = Array.from(pointers.values());
 			var d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
 			var mx = (pts[0].x + pts[1].x) / 2, my = (pts[0].y + pts[1].y) / 2;
-			zoomAbout(mx, my, (d / drag.d0) * drag.s0 / state.s);
+			wheelZoom(mx, my, (d / drag.d0) * drag.s0 / state.s);
 			return;
 		}
 		var p = pointers.get(drag.pointerId);
@@ -30607,6 +31989,8 @@ var EngCalcs = EngCalcs || {};
 		// drawing rather than one element of it, and because nothing below it applies while the model
 		// is locked.
 		if (drag.type === 'georef') { georefApplyDrag(p); return; }
+		// Its opposite number: the custom georeference wizard, where the gesture moves the ground.
+		if (drag.type === 'mapgeo') { mapgeoApplyDrag(p); return; }
 		// The path handle (Task 509). Early, beside georef, because it edits no element at all -- it
 		// re-routes a reader's path -- so none of the snapshot, label or element machinery below
 		// applies to it.
@@ -32286,6 +33670,9 @@ var EngCalcs = EngCalcs || {};
 		// A resize moves both the bottom edge the legends measure from and the width at which the
 		// footer wraps, so the dodge is recomputed here rather than left until the next render.
 		placeLegends();
+		// The wizard's dial is centred on the canvas box, so it is re-placed for the same reason --
+		// and this is the door the BOTTOM PANE comes through, applyPaneLayout() calling here.
+		mapgeoPlaceDial();
 	}
 	// **THIS ONLY EVER HIDES; IT NEVER SHOWS.** renderLabelsLegend() owns the other two reasons the
 	// box can be absent -- nothing to show, and thematic mode -- so a function that also un-hid would
@@ -45458,7 +46845,11 @@ var EngCalcs = EngCalcs || {};
 	// what a geographic project is, how to travel to a point, and where to speak. The geocoder, its
 	// usage-policy budget, its own consent gate and every string in them live in that file.
 	if (EngCalcs.lpnSearchInit) {
-		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
+		// **THE WIZARD IS LOCATABLE WHILE IT RUNS**, which is what makes Tom's step 1 offer Search
+		// by name on a project that states no coordinate system at all: the place is what the
+		// wizard is asking for, so refusing to look one up would refuse the question.
+		EngCalcs.lpnSearchInit({ locatable: function () { return projectLocatable() || mapgeoActive(); },
+			goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
 	// can say where on the Earth a point of it is, the token that decides whether the feature

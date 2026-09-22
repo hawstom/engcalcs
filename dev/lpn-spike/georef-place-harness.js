@@ -214,17 +214,21 @@ ok('a project already on the GeoMap is refused, not re-placed', L.georefState() 
 // map, which says "there is no such command" rather than "not for this project". The row is read out
 // of the source, because a menu is not reachable from a headless document.
 //
-// **THE ROW IS NOW "Import xy to lat/lon…" AND IT IS NEVER DISABLED** (Task 447). What used to convert the
-// open project in place is gone; the wizard starts from a FILE, which lands in a new tab, so no state
-// of the current project can make the command impossible. Three rows, in this order, and each of the
-// three names what kind of file it takes.
+// **THE ROW CONVERTS THIS PROJECT NOW, AND IT IS STILL NEVER DISABLED** (Tom, 2026-09-18, and this
+// REPLACES Task 447's file-first reading). What shipped was an "Open as": it opened a FILE and
+// placed that, which is why no name for the row ever read correctly. His version is a Save as --
+// the row copies the open project to a new tab and converts the COPY, so the project in front of
+// you is untouched and the rule against converting in place still holds. An empty tab has nothing
+// to copy, so there and only there the command still means the file picker. Never disabled either
+// way: the command always has something to do.
 console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
 {
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_import_geo'),
 		lnSrc.indexOf('label: pc.lpn_file_import_geo') + 200);
-	ok('File carries Import xy to lat/lon…, and it opens a file rather than converting the open project',
-		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: pickGeoFile/.test(row), row.split('\n')[1]);
+	ok('File carries the row, and it converts the open project into a copy',
+		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: convertCoordsAs/.test(row),
+		row.split('\n')[1]);
 	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
 		!/disabled/.test(row));
 	// **TWO OF TOM'S RULINGS COLLIDE HERE AND THE LATER ONE WINS, WHICH IS WHY THIS ASSERTION

@@ -1166,9 +1166,12 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Open xy file on map…';
+$ec_lang['lpn_file_import_geo']='Convert coordinates as…';
+// **HIS OWN NAME FOR THE COPY** (Tom, 2026-09-18): the command belongs to the Save as family,
+// so its result is a second version of this project and is named the way a second version is.
+$ec_lang['lpn_copy_of']='Copy of {name}';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.';
+$ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
@@ -1701,7 +1704,7 @@ $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. 
 $ec_lang['lpn_new_coordsys_geo']='Geographic projection';
 $ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
 $ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
-$ec_lang['lpn_new_coordsys_local_tip']='Not georeferenced. Attach your own background image or none.';
+$ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image, or the world map, at any time from the Map menu. Your coordinates never change when you do.';
 // ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -1740,6 +1743,11 @@ $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 $ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
+// **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
+// 2026-09-17). The custom georeference wizard defines a coordinate system of its own -- an anchor
+// point, a scale and a turn -- and no register has a name or a number for it, so the strip says
+// that it has one and that it is nobody's. Lower case: it is not a proper name.
+$ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
@@ -2464,6 +2472,62 @@ $ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web br
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
+// **THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Tom's own sentence is the tip, because the
+// point of these rows is that the project's own numbers are untouched, which is the whole of what
+// separates this from the placement wizard that converts a project.
+// **ONE ROW WITH A SUBMENU, BUILT TO MATCH Background image** (Tom, 2026-09-18: *"Change Map,
+// Custom georeference to Map, World map... (to be parallel with Background image). And can it have
+// a submenu with Attach (at top), Move, Scale by picking, Scale from the current size..., Detach,
+// similar to the Background map submenu."*). The two rows this replaces named the WIZARD and named
+// the UNDOING of it, which is a pair of commands rather than a thing; a picture behind the drawing
+// and a map behind the drawing are the same kind of thing to a reader, so they read the same way.
+$ec_lang['lpn_map_attach_menu']='World map…';
+$ec_lang['lpn_map_attach_tip']='Attach the world map to this project without changing it any other way.';
+$ec_lang['lpn_map_attach_add']='Attach';
+$ec_lang['lpn_map_attach_readjust']='Re-adjust';
+$ec_lang['lpn_map_attach_readjust_tip']='Return to Step 2 of the map attachment process.';
+$ec_lang['lpn_map_attach_scale_from']='Scale from the current size…';
+$ec_lang['lpn_map_attach_scale_from_prompt']='Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
+$ec_lang['lpn_map_attach_scale_from_bad']='Type one number greater than zero.';
+$ec_lang['lpn_map_attach_scale_from_done']='The map is resized, and your drawing and every coordinate in it are exactly as they were.';
+$ec_lang['lpn_map_attach_none']='There is no world map attached to this project yet. Use Map, World map, Attach first.';
+$ec_lang['lpn_map_attach_remove']='Detach';
+$ec_lang['lpn_map_attach_remove_tip']='Take the world map away. The drawing and its coordinates are untouched either way.';
+$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.';
+$ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is exactly as it was.';
+// **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
+// dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
+// never converting a coordinate, so every sentence below says what stays still as well as what
+// moves: the drawing does not move, the ground does.
+$ec_lang['lpn_mapgeo_replace']='This project already has the world map attached. Replace that georeferencing?';
+$ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.';
+$ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
+$ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
+$ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
+$ec_lang['lpn_mapgeo_hint2']='Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_gestures']='Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.';
+// ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
+//
+// **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
+// objection: *"The map is practically infinite. There is no way to visually enlarge it or reduce
+// it. The rectangle is a poor metaphor (and isn't working anyway). And the scroll wheel is
+// discrete, not continuous."* A corner handle is a grip on a bounded object and the ground has no
+// bounds, so the rectangle was never a picture of the thing it was resizing.
+//
+// **AND THE MIDDLE IS WHERE STEP 1 LEFT IT.** He asked for *"a slider for scale with 1 (from step
+// 1) in the middle"*, so the readout is a factor and not a distance: it says how much bigger or
+// smaller the ground is than the fit already agreed, which is the only quantity a person can judge
+// by looking. The band is narrow on purpose and a wider move is the rectangle's job, or Map, World
+// map, Move, which is the pick-it-up-again door.
+$ec_lang['lpn_mapgeo_dial_turn']='Turn the map';
+$ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
+$ec_lang['lpn_mapgeo_dial_size']='Map size';
+$ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
+$ec_lang['lpn_mapgeo_place']='Place approximately';
+$ec_lang['lpn_mapgeo_finish']='Georeference here';
+$ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
+$ec_lang['lpn_mapgeo_locked']='Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
