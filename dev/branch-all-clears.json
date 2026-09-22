@@ -48,6 +48,13 @@
             "words": "The task is complete. Merge, delete, and close.",
             "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
         },
+        "feat/xy-world-map": {
+            "head": "765ac3bc21cecec85175e15628746c9dc465ff22",
+            "date": "2026-09-21",
+            "words": "feat/xy-world-map: Why is this branch still present? The task has been closed. Merge, delete, and update?",
+            "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/lock-initials-later and feat/engine-fetch-wait. What he cleared is the map-attach wizard and the georeferencing work. WHAT HE HAS NOT CLEARED, AND MUST NOT BE READ AS CLEARED, IS TASK 703: he still sees white squares after four measured-and-fixed causes, and that task stays OPEN on master after this merge, as do queue rows R-019 and R-056.",
+            "pin_note": "HE CLEARED IT AT 731ab367 AND THE PIN IS FOUR COMMITS LATER, WHICH IS STATED RATHER THAN GLOSSED, because those four are work he has not seen. They are: 5f2b49ab and 2b12b16d, the `?debug=tiles` readout -- an instrument built so HE can diagnose Task 703 himself, invisible to anyone who does not type the switch; 69d9c8ee, a fifth measured cause closed (a tile still hanging on screen under the new view was thrown away and re-fetched on an overshoot-and-correct gesture, with a harness and two killed mutations); and 5ade3041 and 765ac3bc, edits to dev/tom-review-queue.md, one of them deleting R-066 on his own written instruction (*\"If it has been fixed, please delete this.\"*). The judgement made here was that an instrument switched off by default plus one measured defect fix is not a feature he needs to re-clear, and that leaving the branch alive for an open task is the stale-ref problem. If that judgement was wrong, this line is where to catch it."
+        },
         "feat/engine-fetch-wait": {
             "head": "e9319a0ad8af40c6f86f2cee2204e80c95afbf96",
             "date": "2026-09-21",
