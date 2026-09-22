@@ -29,6 +29,13 @@
 // drives it with REAL clicks and a REAL Escape key, which is the only way to prove an
 // outside-click listener actually closes something: a real click(), not a synthetic dispatch, is
 // what document-level capture listeners are written against.
+//
+// **ADDED AGAIN, Perry's second review, same day:** two more real-browser-only defects, neither
+// visible to the DOM stub (no layout, no hit-testing): (1) dismissing the panel by clicking the
+// map also selected whatever was under the pointer, because the dismiss listener was on `click`
+// while the canvas decides selection on `pointerdown`, which finishes first; (2) at 390px on a
+// fresh project #lpn_examples_pane painted over the glyph and answered its clicks. Both are
+// asserted here with real presses at real screen coordinates.
 
 const { Session } = require('../lib/session');
 
@@ -164,6 +171,86 @@ exports.run = async function ({ browser, report }) {
 			} finally {
 				await a.context.close();
 			}
+		}
+	}
+
+	// ---- Dismissing the panel must not also act on the drawing (Perry's review, 2026-09-22) ----
+	// msglogOutsideHandler used to listen for `click`, but the canvas wires its own
+	// selection/tool handling on `pointerdown`, which fires and finishes BEFORE a `click` ever
+	// reaches a document-level listener -- so a press meant only to put the panel away also did
+	// whatever a plain press there does. Fixed by moving the dismiss listener to a capture-phase
+	// `pointerdown` that calls stopPropagation()+preventDefault() before the map ever sees it.
+	// Proven here with a REAL node on the canvas, not empty space: pressing it while the panel is
+	// open must select nothing, and the very next press on the same node must select it normally.
+	{
+		const a = await Session.open(browser, 'dismiss-no-side-effect', { viewport: { width: 1280, height: 900 } });
+		try {
+			await a.goto('Looped-Network.php?ec_nolog=1&lang=en');
+			await a.makeEdit();   // places one junction, ends back on the Select tool, nothing selected
+			const spot = await a.page.evaluate(() => {
+				const el = document.querySelector('#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)');
+				const r = el.getBoundingClientRect();
+				return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+			});
+			function selectedCount() {
+				return a.page.evaluate(() => document.querySelectorAll('.lpn-selected').length);
+			}
+			report.eq(await selectedCount(), 0, 'dismiss-no-side-effect: nothing selected before the test begins');
+
+			await a.page.click('#lpn_msglog_btn');
+			await a.settle(80);
+			report.ok(await a.page.evaluate(() => getComputedStyle(document.getElementById('lpn_msglog_panel')).display !== 'none'),
+				'dismiss-no-side-effect: the panel is open');
+
+			// The dismiss press, landing squarely on the node.
+			await a.page.mouse.click(spot.x, spot.y);
+			await a.settle(80);
+			report.ok(await a.page.evaluate(() => getComputedStyle(document.getElementById('lpn_msglog_panel')).display === 'none'),
+				'dismiss-no-side-effect: that press closed the panel');
+			report.eq(await selectedCount(), 0,
+				'dismiss-no-side-effect: and did NOT select the node it landed on -- the side effect Perry found');
+
+			// The NEXT press on the same spot is an ordinary click again, panel gone from the
+			// picture entirely, and must behave normally.
+			await a.page.mouse.click(spot.x, spot.y);
+			await a.settle(80);
+			report.eq(await selectedCount(), 1,
+				'dismiss-no-side-effect: the very next press on the same node selects it, as an ordinary click should');
+		} finally {
+			await a.context.close();
+		}
+	}
+
+	// ---- The glyph must be pressable on a FRESH project too (Perry's review, reported twice) ----
+	// #lpn_empty_hint/#lpn_examples_pane cover the whole canvas while the examples wall is
+	// showing, and at 390px `.lpn-examples` (margin:0 auto;max-width:68rem) is wider than the
+	// viewport so its max-width does nothing -- the block spans the canvas and, having no z-index
+	// of its own, painted over #lpn_map_overlay_tl (which had none either) because it comes later
+	// in the DOM. Fixed with z-index:6 on the overlay row, matching #lpn_georef_bar. Deliberately
+	// NOT calling dismissGallery() here -- the whole point is the state where the wall is still up.
+	{
+		const a = await Session.open(browser, 'glyph-on-fresh-project', { viewport: { width: 390, height: 844 } });
+		try {
+			await a.goto('Looped-Network.php?ec_nolog=1&lang=en');
+			const wallShowing = await a.page.evaluate(() =>
+				getComputedStyle(document.getElementById('lpn_empty_hint')).display !== 'none');
+			report.ok(wallShowing, 'glyph-on-fresh-project: the examples wall is up, as a fresh project shows it');
+			// The element the browser would ACTUALLY hit-test at the glyph's own centre point --
+			// this is what "the pane intercepts the click" looks like from outside: not an error,
+			// just the wrong element answering.
+			const hit = await a.page.evaluate(() => {
+				const r = document.getElementById('lpn_msglog_btn').getBoundingClientRect();
+				const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+				return el && (el.id || el.closest('[id]') && el.closest('[id]').id);
+			});
+			report.ok(hit === 'lpn_msglog_btn', 'glyph-on-fresh-project: the glyph itself answers a hit-test at its own centre, not the examples pane', String(hit));
+			await a.page.click('#lpn_msglog_btn');
+			await a.settle(80);
+			const opened = await a.page.evaluate(() =>
+				getComputedStyle(document.getElementById('lpn_msglog_panel')).display !== 'none');
+			report.ok(opened, 'glyph-on-fresh-project: and a real click on it actually opens the panel');
+		} finally {
+			await a.context.close();
 		}
 	}
 };

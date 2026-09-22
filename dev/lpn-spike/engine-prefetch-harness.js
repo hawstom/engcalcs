@@ -39,7 +39,12 @@ const INJECT =
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
-	"\t\t\trubberBandEl = el('line', {}, world); },\n";
+	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
+	// **THE FLASH GUARD IS OFF HERE ON PURPOSE** -- see the identical comment in
+	// dev/lpn-spike/engine-progress-harness.js. This file is testing WHEN the fetch starts and
+	// whether the banner names the right sentence, both of which must be visible synchronously.
+	"\t\tsetEngineBannerTiming: function (showMs, minMs) {\n" +
+	"\t\t\tENGINE_BANNER_SHOW_DELAY_MS = showMs; ENGINE_BANNER_MIN_SHOWN_MS = minMs; },\n";
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -139,6 +144,7 @@ function fresh() {
 	const L = loadLoopedNetwork(INJECT);
 	L.buildLayers();
 	L.seedDefaultInputs();
+	L.setEngineBannerTiming(0, 0);
 	// **EPANET IS NOT ALLOWED TO ANSWER IN THIS HARNESS.** runSolveEpanet() would otherwise reach
 	// the real bridge, which loads the engine through its own path -- a second caller of the thing
 	// being counted. Removing it is exactly what runSolve() sees before the engine has arrived,

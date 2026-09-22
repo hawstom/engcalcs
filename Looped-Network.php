@@ -285,8 +285,20 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // Only the mode hint is reserved against by zoomExtent() (overlayReserve). The
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
-		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:row;align-items:flex-start;gap:4px;pointer-events:none">
+		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js).
+		      //
+		      // **z-index:6, MATCHING #lpn_georef_bar** (Perry's review, 2026-09-22, reported
+		      // twice: at 390px on a fresh project, #lpn_examples_pane intercepted every press
+		      // meant for the glyph). `.lpn-examples` is `margin:0 auto;max-width:68rem` -- at
+		      // 1280px that centres it narrower than the viewport, clear of this row's left edge,
+		      // but at 390px the max-width does nothing and the block spans the canvas, painting
+		      // OVER this row because #lpn_empty_hint comes later in the DOM and neither had a
+		      // z-index. `pointer-events:auto` on `.lpn-examples` covers its whole padding box, not
+		      // just its buttons, so the glyph was hit-tested underneath rather than on top. A
+		      // stacking context on this row, not a change to the examples pane, because every
+		      // other reader of #lpn_map_overlay_tl already assumes plain DOM-order painting for
+		      // its own children. ?>
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:6;display:flex;flex-direction:row;align-items:flex-start;gap:4px;pointer-events:none">
 			<?php // **THE MESSAGE LOG BUTTON LIVES WHERE THE MESSAGES DO** (ROADMAP Task 704; Tom,
 			      // 2026-09-21, having used it: *"the button/glyph must be where the messages appear,
 			      // and it must appear and possibly highlight while a message displays."*). It shipped

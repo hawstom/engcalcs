@@ -45106,10 +45106,22 @@ var EngCalcs = EngCalcs || {};
 	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
 	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
 	// without hunting for a close button the panel does not have (it is a readout, not a form).
-	function msglogOutsideHandler(e) {
+	// **CAPTURED ON pointerdown, NOT click, AND CONSUMED** (Perry's review, 2026-09-22: dismissing
+	// the panel by clicking the map also did whatever that click would otherwise have done -- the
+	// canvas wires its own selection/tool handling on `pointerdown`
+	// (`svg.addEventListener('pointerdown', ...)`), which fires and finishes BEFORE a `click`
+	// listener ever sees the gesture, so listening for `click` here could never have intercepted
+	// anything). Registered with `capture: true` on `document`, which runs before the canvas's own
+	// listener on the `svg` element sees the event at all, so `stopPropagation()` here genuinely
+	// stops it from reaching the map -- and `preventDefault()` alongside it, since a canvas built
+	// on pointer events reads default-prevention as "this gesture is somebody else's" the same way
+	// a native control does.
+	function msglogOutsidePointerDown(e) {
 		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
 		if (panel && panel.contains(e.target)) { return; }
 		if (btn && btn.contains(e.target)) { return; }
+		e.stopPropagation();
+		if (e.preventDefault) { e.preventDefault(); }
 		closeMessageLogPanel();
 	}
 	function msglogKeyHandler(e) {
@@ -45124,10 +45136,11 @@ var EngCalcs = EngCalcs || {};
 		fitMsglogPanelHeight(panel);
 		msglogPanelOpen = true;
 		if (btn) { btn.setAttribute('aria-expanded', 'true'); }
-		// Deferred one tick so the click that opened the panel is not the same click that
-		// immediately closes it again via the outside-click listener.
+		// Deferred one tick so the pointerdown that opened the panel (the press on the glyph
+		// itself) is not the same pointerdown the outside-dismiss listener sees and immediately
+		// closes the panel again on.
 		setTimeout(function () {
-			document.addEventListener('click', msglogOutsideHandler, true);
+			document.addEventListener('pointerdown', msglogOutsidePointerDown, true);
 			document.addEventListener('keydown', msglogKeyHandler, true);
 		}, 0);
 	}
@@ -45141,7 +45154,7 @@ var EngCalcs = EngCalcs || {};
 		// exactly what that harness exists to make unnecessary.
 		hidePanel(panel);
 		if (btn) { btn.setAttribute('aria-expanded', 'false'); }
-		document.removeEventListener('click', msglogOutsideHandler, true);
+		document.removeEventListener('pointerdown', msglogOutsidePointerDown, true);
 		document.removeEventListener('keydown', msglogKeyHandler, true);
 	}
 	function toggleMessageLogPanel() {
@@ -45339,6 +45352,12 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
+		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
+		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
+		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
+		// logged the moment it is set, same as setStatus() beside it.
+		if (text) { logMessage(text, 'notice'); }
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
@@ -46504,11 +46523,52 @@ var EngCalcs = EngCalcs || {};
 	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
 	// choice and a page that reports a wait the reader is already in are different pages. The words
 	// are Tom's own, 2026-09-06.
-	var lastEngineBannerBase = '';
+	//
+	// **NEVER A FLASH** (Perry's review, 2026-09-22, live on port 8099: opening an example showed
+	// this exact banner for ~300ms then cleared it -- "SOLVER" and "POWER" share four of six
+	// letters in the same positions, which is a good match for the word Tom saw and could not
+	// read, "similar to POWER", and asked to stop happening. Naming the string was not fixing it).
+	// Most solves finish inside a second, so most of the time nobody should see this banner at
+	// all; a banner on screen for less time than a human can read a sentence is worse than no
+	// banner. Two rules, both against WALL TIME rather than against the fetch's own progress
+	// events, because the flash was never about bytes:
+	//   1. NOT SHOWN until the wait has lasted ENGINE_BANNER_SHOW_DELAY_MS. If the wait ends before
+	//      then, nothing was ever shown and nothing is logged -- there is no message to keep.
+	//   2. ONCE SHOWN, held at least ENGINE_BANNER_MIN_SHOWN_MS even if the wait ends sooner, so a
+	//      genuinely fast finish still leaves something readable rather than a second flash.
+	var ENGINE_BANNER_SHOW_DELAY_MS = 1000;
+	var ENGINE_BANNER_MIN_SHOWN_MS = 1500;
+	var engineBannerShowTimer = null;     // pending "show" timeout id, or null
+	var engineBannerHideTimer = null;     // pending "hide" timeout id (deferred by rule 2), or null
+	var engineBannerPendingBase = '';     // base sentence waiting out the show delay
+	var engineBannerPendingFull = '';     // its full text (base + progress), refreshed every tick
+	var engineBannerShownBase = '';       // base sentence actually on screen, '' if none
+	var engineBannerShownAt = 0;          // Date.now() of the actual (not scheduled) show
+	function paintEngineBanner(el, full) {
+		el.textContent = full;
+		el.style.display = full ? 'block' : 'none';
+		refreshEpanetBar(!!full);
+	}
+	// **LOGGED HERE, AND ONLY HERE** (Task 704: "log it only if it was actually shown"). This is
+	// the one place text actually reaches the screen, so it is the one place that can honestly say
+	// a message was shown.
+	function showEngineBannerNow(el, base, full) {
+		if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+		engineBannerShownBase = base;
+		engineBannerShownAt = Date.now();
+		logMessage(base, 'notice');
+		paintEngineBanner(el, full);
+	}
+	function hideEngineBannerNow(el) {
+		if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+		engineBannerShownBase = '';
+		engineBannerShownAt = 0;
+		paintEngineBanner(el, '');
+	}
 	function refreshEpanetBanner() {
 		var el = document.getElementById('lpn_engine_banner'),
 			pc = EngCalcs.pageConfig || {},
-			text = '';
+			base = '', full, elapsed;
 		if (!el) { return; }
 		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
 		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
@@ -46524,37 +46584,76 @@ var EngCalcs = EngCalcs || {};
 		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
 		// anything modal.
 		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
-			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+			base = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
 		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
-				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
+				base = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
 			} else if (epanetWarmState === 'unavailable') {
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
+				base = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
-		// **LOGGED ON THE SENTENCE, NOT ON EVERY TICK** (Task 704, Tom 2026-09-22, live on port
-		// 8099: *"On load I see two messages ... But when I click the expando button, I get
-		// 'No messages yet.' **All** messages now need to go through this messenger system."*).
-		// `text` at this point is the BASE sentence, before the progress percentage is appended
-		// below -- logging here, once per change of base sentence, is what keeps a download that
-		// ticks fifty times from writing fifty rows. `lastEngineBannerBase` remembers what was last
-		// logged so an unchanged sentence on a later call (most calls, while nothing has changed)
-		// logs nothing again.
-		if (text !== lastEngineBannerBase) {
-			if (text) { logMessage(text, 'notice'); }
-			lastEngineBannerBase = text;
-		}
-		if (text && epanetWarmState === 'warming') {
+		full = base;
+		if (base && epanetWarmState === 'warming') {
 			var prog = epanetProgressText();
-			if (prog) { text += ' ' + prog; }
+			if (prog) { full = base + ' ' + prog; }
 		}
-		el.textContent = text;
-		el.style.display = text ? 'block' : 'none';
-		refreshEpanetBar(!!text);
+		if (base) {
+			if (engineBannerShownBase === base) {
+				// Already on screen with this exact sentence -- just refresh the ticking progress
+				// text underneath it. No re-log (logMessage() would dedupe it anyway, but there is
+				// no new SHOW event here either) and no timer to touch.
+				paintEngineBanner(el, full);
+				return;
+			}
+			if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+			if (engineBannerShownBase) {
+				// Something else is already visible and the reader is already looking at this
+				// slot -- replace it immediately. The flash guard is for the FIRST appearance
+				// only; a mid-read swap is not the defect Perry measured.
+				showEngineBannerNow(el, base, full);
+				return;
+			}
+			if (engineBannerPendingBase === base && engineBannerShowTimer) {
+				// Already waiting out the delay for this exact sentence -- keep the text current
+				// for whenever the timer fires, but do not restart the wall-clock wait.
+				engineBannerPendingFull = full;
+				return;
+			}
+			if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+			// ENGINE_BANNER_SHOW_DELAY_MS <= 0 means "no guard" -- the harness knob
+			// (dev/lpn-spike/engine-progress-harness.js) uses exactly this to test the byte/percent
+			// arithmetic synchronously; the shipped page never sets it below 1000.
+			if (ENGINE_BANNER_SHOW_DELAY_MS <= 0) { showEngineBannerNow(el, base, full); return; }
+			engineBannerPendingBase = base;
+			engineBannerPendingFull = full;
+			engineBannerShowTimer = setTimeout(function () {
+				engineBannerShowTimer = null;
+				showEngineBannerNow(el, engineBannerPendingBase, engineBannerPendingFull);
+			}, ENGINE_BANNER_SHOW_DELAY_MS);
+			return;
+		}
+		// base is empty: nothing left to report right now.
+		if (engineBannerShowTimer) {
+			// Never shown -- the wait ended inside the delay, which is the whole point of rule 1.
+			clearTimeout(engineBannerShowTimer);
+			engineBannerShowTimer = null;
+		}
+		engineBannerPendingBase = '';
+		if (!engineBannerShownBase) { return; }
+		elapsed = Date.now() - engineBannerShownAt;
+		if (elapsed >= ENGINE_BANNER_MIN_SHOWN_MS) {
+			hideEngineBannerNow(el);
+			return;
+		}
+		if (engineBannerHideTimer) { return; }
+		engineBannerHideTimer = setTimeout(function () {
+			engineBannerHideTimer = null;
+			hideEngineBannerNow(el);
+		}, ENGINE_BANNER_MIN_SHOWN_MS - elapsed);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:

@@ -65,9 +65,12 @@ const INJECT =
 	"\t\tnoteMapUnmeasurable: noteMapUnmeasurable,\n" +
 	"\t\tpresentOpenChoice: presentOpenChoice,\n" +
 	"\t\tsetStatus: setStatus,\n" +
+	"\t\tsetEngineNotes: setEngineNotes,\n" +
 	"\t\trefreshEpanetBanner: refreshEpanetBanner,\n" +
 	"\t\tsetEpanetWarmState: function (s) { epanetWarmState = s; },\n" +
 	"\t\tsettings: function () { return settings; },\n" +
+	"\t\tbannerText: function () { var e = document.getElementById('lpn_engine_banner');\n" +
+	"\t\t\treturn (e && e.style.display !== 'none' && e.textContent) || ''; },\n" +
 	"\t\tnoticeText: function () { return document.getElementById('lpn_map_notice').textContent || ''; }\n";
 
 let fails = 0;
@@ -78,26 +81,54 @@ function ok(name, cond, extra) {
 }
 
 // ---------------------------------------------------------------------------
-// The notice's own expiry timer, intercepted BY VALUE (8000 ms), exactly as
+// Every timer this file needs to control, intercepted BY VALUE, exactly as
 // engine-note-once-harness.js intercepts the engine note's two. Replacing
 // setTimeout wholesale would stop the page dead -- it runs on real timers for
 // the 300 ms solve debounce -- and intercepting by value is also what makes
-// this file fail loudly if STATUS_NOTICE_MS ever moves, instead of passing by
-// never firing.
+// this file fail loudly if any of these constants moves, instead of passing
+// by never firing. One shared bucket, keyed by ms, so a new intercepted
+// constant is one more entry rather than a new pair of functions.
 // ---------------------------------------------------------------------------
 const realSetTimeout = global.setTimeout, realClearTimeout = global.clearTimeout;
 const NOTICE_MS = 8000;
-let noticeTimers = [];
+// The engine banner's flash guard (Perry's review, 2026-09-22): do not show it before this long,
+// and once shown, hold it at least this long. Both live on refreshEpanetBanner() in
+// js/looped-network.js.
+const ENGINE_BANNER_SHOW_DELAY_MS = 1000;
+const ENGINE_BANNER_MIN_SHOWN_MS = 1500;
+let noticeTimers = [];      // ms === NOTICE_MS
+let bannerTimers = [];      // the show delay, or the MIN-SHOWN hold
+const timerSlots = [];      // negative id -> { bucket, index }, so clearTimeout finds either bucket
+// **THE HOLD TIMER IS A REMAINDER, NOT A CONSTANT, SO IT CANNOT BE MATCHED BY EXACT VALUE.**
+// hideEngineBannerNow()'s own delay is `ENGINE_BANNER_MIN_SHOWN_MS - elapsed`, where `elapsed` is
+// real wall-clock ms since the banner actually appeared -- a few ms of real test overhead here,
+// never exactly 1500. So the banner bucket takes any ms in (0, ENGINE_BANNER_MIN_SHOWN_MS], which
+// this file's own test sequence never shares with anything else: no doc edit runs here to arm the
+// unrelated 300 ms solve debounce.
+function isBannerMs(ms) { return ms > 0 && ms <= ENGINE_BANNER_MIN_SHOWN_MS; }
 global.setTimeout = function (fn, ms) {
-	if (ms === NOTICE_MS) { noticeTimers.push(fn); return -noticeTimers.length; }
-	return realSetTimeout.apply(this, arguments);
+	if (ms !== NOTICE_MS && !isBannerMs(ms)) { return realSetTimeout.apply(this, arguments); }
+	const bucket = ms === NOTICE_MS ? noticeTimers : bannerTimers;
+	bucket.push(fn);
+	timerSlots.push({ bucket, index: bucket.length - 1 });
+	return -timerSlots.length;
 };
 global.clearTimeout = function (id) {
-	if (typeof id === 'number' && id < 0) { noticeTimers[-id - 1] = null; return; }
+	if (typeof id === 'number' && id < 0) {
+		const slot = timerSlots[-id - 1];
+		if (slot) { slot.bucket[slot.index] = null; }
+		return;
+	}
 	return realClearTimeout.apply(this, arguments);
 };
 function expireNotices() {
 	const due = noticeTimers.splice(0, noticeTimers.length);
+	due.forEach(f => { if (f) { f(); } });
+}
+// Fires every DUE banner timer -- both the show-delay and the min-shown hold use this file's own
+// clock, so advancing it once can trigger either or both depending which is pending.
+function advanceEngineBannerClock() {
+	const due = bannerTimers.splice(0, bannerTimers.length);
 	due.forEach(f => { if (f) { f(); } });
 }
 
@@ -116,6 +147,8 @@ const writes = [];
 
 function load(mutate) {
 	noticeTimers = [];
+	bannerTimers = [];
+	timerSlots.length = 0;
 	const L = loadLoopedNetwork(INJECT, null, mutate);
 	setUnitSet('us');
 	return L;
@@ -419,13 +452,34 @@ console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 
 	L4.setStatus('');
 	ok('clearing the diagnostic logs nothing -- there is no message to keep', L4.noticeLog()[0].text === 'This network took 3.2 s to calculate.');
 
-	console.log('  8b. refreshEpanetBanner() -- the EPANET-download banner, logged on the SENTENCE not the tick');
+	console.log('  8b. refreshEpanetBanner() -- NEVER A FLASH, and logged only when actually shown');
+	// Perry's review, 2026-09-22: opening an example showed "Loading solver..." for ~300ms then
+	// cleared it -- "SOLVER" and "POWER" share four of six letters, a good match for the word Tom
+	// saw and asked to stop happening. Naming the string did not fix it; this is the fix.
 	const S = L4.settings();
 	S.engine = 'epanet';
 	L4.setEpanetWarmState('warming');
 	const beforeB = L4.noticeLog().length;
 	L4.refreshEpanetBanner();
-	ok('the first appearance of the wait sentence is logged',
+	ok('NOT shown the instant the wait begins -- this is the flash guard',
+		L4.bannerText() === '');
+	ok('and nothing is logged yet either -- there is no message to keep until one is actually shown',
+		L4.noticeLog().length === beforeB);
+
+	console.log('  8c. a wait that ends inside the delay is never shown and never logged at all');
+	L4.setEpanetWarmState('ready');
+	L4.refreshEpanetBanner();
+	advanceEngineBannerClock();
+	ok('the pending show never fires -- the wait was over before it would have appeared',
+		L4.bannerText() === '' && L4.noticeLog().length === beforeB);
+
+	console.log('  8d. a wait that outlasts the delay is shown, held, and logged once');
+	L4.setEpanetWarmState('warming');
+	L4.refreshEpanetBanner();
+	advanceEngineBannerClock();
+	ok('the show timer fires and the sentence appears',
+		L4.bannerText() === PC.lpn_engine_wait);
+	ok('and it is logged the moment it actually shows',
 		L4.noticeLog().length === beforeB + 1 && L4.noticeLog()[0].text === PC.lpn_engine_wait);
 	L4.refreshEpanetBanner();
 	L4.refreshEpanetBanner();
@@ -435,8 +489,71 @@ console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 
 		L4.noticeLog().length === beforeB + 1);
 	L4.setEpanetWarmState('ready');
 	L4.refreshEpanetBanner();
-	ok('when the banner clears (engine ready, nothing left to report) nothing new is logged either',
-		L4.noticeLog().length === beforeB + 1);
+	ok('the wait ending does not clear the banner immediately -- it is held for the minimum',
+		L4.bannerText() === PC.lpn_engine_wait);
+	advanceEngineBannerClock();
+	ok('and clears once the minimum has elapsed, logging nothing new -- there is nothing new to say',
+		L4.bannerText() === '' && L4.noticeLog().length === beforeB + 1);
+}
+
+console.log('  8e. setEngineNotes() -- the ~2-minute fading note beside the diagnostic '
+	+ '(Perry\'s second review: found never calling logMessage() at all)');
+{
+	const L5 = load();
+	const beforeE = L5.noticeLog().length;
+	// A real string, not the pinned one his review quoted (harness_wording_check.php): built the
+	// same way the real caller does, out of a language key rather than typed as English.
+	const NOTE = String(PC.lpn_engine_manning_note).trim();
+	L5.setEngineNotes(NOTE);
+	ok('logged the moment it is set -- it stands for two minutes, so there is no flash to guard against',
+		L5.noticeLog().length === beforeE + 1 && L5.noticeLog()[0].text === NOTE);
+	L5.setEngineNotes(NOTE);
+	ok('and repeating the SAME note adds no second row', L5.noticeLog().length === beforeE + 1);
+	L5.setEngineNotes('');
+	ok('clearing it logs nothing -- there is no message to keep', L5.noticeLog().length === beforeE + 1);
+}
+
+console.log('  8f. every element this branch\'s own top-left column writes user-visible text into '
+	+ 'has exactly one writer, and every writer is DECLARED -- a new one fails until it is added '
+	+ 'to this list (Perry\'s ask: "a harness section should enumerate the writers so a new one fails")');
+{
+	// **SCOPE, STATED RATHER THAN IMPLIED.** This enumerates the AMBIENT map-overlay elements --
+	// the ones that appear over the drawing and can disappear again with no action from the
+	// reader, which is the exact shape Tom's complaint is about ("disappeared too fast and
+	// unrecoverable"). It deliberately does NOT enumerate every `.textContent =` in js/*.js (285
+	// of them): the Find box, the Library panel, an import report and similar are content of a
+	// box the reader explicitly opened and can re-open at will -- there is no "flash" for a panel
+	// that stays until closed, so logging it would be recording clicks, not messages. Two ticking
+	// PROGRESS COUNTERS (js/lpn-time.js's run box, the fire-flow run box's `count.textContent`) are
+	// excluded the same way #lpn_engine_bar's own percentage is: a number that changes fifty times
+	// a second is not a message, its OWN completion sentence already goes through setStatus().
+	const src = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
+	// One porthole per element id: the ids named in CLAUDE.md / this branch's own comments as
+	// carrying exactly one writer. Declared here as {id, writers}, where `writers` are the
+	// function names allowed to write into it (by call to getElementById(id)) and each entry says
+	// whether that writer logs (or why it need not).
+	const ELEMENTS = [
+		{ id: 'lpn_map_notice', writers: ['showNotice', 'noteMapUnmeasurable', 'msglogPanelTopCompensation'] },
+		{ id: 'lpn_status', writers: ['setStatus', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_status_text', writers: ['setStatus', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_status_notes', writers: ['setEngineNotes', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_engine_banner', writers: ['refreshEpanetBanner', 'paintEngineBanner', 'showEngineBannerNow', 'hideEngineBannerNow'] },
+		{ id: 'lpn_lock_banner', writers: ['renderBanner'] }
+	];
+	function enclosingFunctionName(at) {
+		const before = src.slice(0, at);
+		const m = before.match(/function\s+(\w+)\s*\([^)]*\)\s*\{(?:(?!\bfunction\b)[\s\S])*$/);
+		return m ? m[1] : '(top level or nested)';
+	}
+	ELEMENTS.forEach(function (e) {
+		const re = new RegExp("getElementById\\('" + e.id + "'\\)", 'g');
+		const found = new Set();
+		let m;
+		while ((m = re.exec(src))) { found.add(enclosingFunctionName(m.index)); }
+		const unknown = Array.from(found).filter(function (n) { return e.writers.indexOf(n) < 0; });
+		ok('#' + e.id + ' is read only by its declared function(s)',
+			unknown.length === 0, 'undeclared reader(s): ' + JSON.stringify(unknown) + '; found: ' + JSON.stringify(Array.from(found)));
+	});
 }
 
 console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and group 1 must go red');
@@ -463,16 +580,69 @@ console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and grou
 }
 {
 	const M3 = load(src => {
-		const mark = "if (text) { logMessage(text, 'notice'); }\n\t\t\tlastEngineBannerBase = text;\n";
-		if (src.indexOf(mark) < 0) { throw new Error("refreshEpanetBanner()'s logMessage() call has moved"); }
-		return src.replace(mark, '\t\t\tlastEngineBannerBase = text;\n');
+		const mark = "\t\tlogMessage(base, 'notice');\n";
+		if (src.indexOf(mark) < 0) { throw new Error("showEngineBannerNow()'s logMessage() call has moved"); }
+		return src.replace(mark, '');
 	});
 	M3.settings().engine = 'epanet';
 	M3.setEpanetWarmState('warming');
 	M3.refreshEpanetBanner();
-	ok('without refreshEpanetBanner()\'s hook, "EPANET solver" never reaches the log either -- '
-		+ 'item 8b\'s defect restored on purpose',
-		M3.noticeLog().length === 0, 'the mutant still logged ' + M3.noticeLog().length);
+	advanceEngineBannerClock();
+	ok('without showEngineBannerNow()\'s hook, "EPANET solver" never reaches the log either -- '
+		+ 'item 8b\'s defect restored on purpose, even though it still shows on screen',
+		M3.noticeLog().length === 0 && M3.bannerText() === PC.lpn_engine_wait,
+		'log length ' + M3.noticeLog().length + ', banner ' + JSON.stringify(M3.bannerText()));
+}
+{
+	// Removes the delay entirely and paints immediately -- structurally the ORIGINAL bug Perry
+	// measured (a synchronous show with no wait-and-see), not merely a shorter number.
+	const M4 = load(src => {
+		const mark = "\t\t\tengineBannerShowTimer = setTimeout(function () {\n"
+			+ "\t\t\t\tengineBannerShowTimer = null;\n"
+			+ "\t\t\t\tshowEngineBannerNow(el, engineBannerPendingBase, engineBannerPendingFull);\n"
+			+ "\t\t\t}, ENGINE_BANNER_SHOW_DELAY_MS);\n";
+		if (src.indexOf(mark) < 0) { throw new Error('the show-delay scheduling block has moved'); }
+		return src.replace(mark, '\t\t\tshowEngineBannerNow(el, base, full);\n');
+	});
+	M4.settings().engine = 'epanet';
+	M4.setEpanetWarmState('warming');
+	M4.refreshEpanetBanner();
+	ok('WITHOUT the show delay, the wait sentence flashes on screen immediately -- Perry\'s exact '
+		+ 'complaint restored on purpose',
+		M4.bannerText() === PC.lpn_engine_wait, JSON.stringify(M4.bannerText()));
+}
+{
+	const M5 = load(src => {
+		const mark = "\t\tif (text) { logMessage(text, 'notice'); }\n\t\tif (text) {\n\t\t\tengineNoteTimer = setTimeout";
+		if (src.indexOf(mark) < 0) { throw new Error("setEngineNotes()'s logMessage() call has moved"); }
+		return src.replace(mark, "\t\tif (text) {\n\t\t\tengineNoteTimer = setTimeout");
+	});
+	M5.setEngineNotes(PC.lpn_engine_manning_note);
+	ok('without setEngineNotes()\'s hook, the ~2-minute note never reaches the log either -- '
+		+ 'item 8e\'s defect restored on purpose',
+		M5.noticeLog().length === 0, 'the mutant still logged ' + M5.noticeLog().length);
+}
+{
+	// A plausible NEW writer of #lpn_map_notice, undeclared -- the enumeration in 8f must name it.
+	const src = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
+	const anchor = "\tfunction showNotice(text) {\n";
+	if (src.indexOf(anchor) < 0) { throw new Error('showNotice() has moved'); }
+	const mutated = src.replace(anchor,
+		"\tfunction aNewUndeclaredWriter() { document.getElementById('lpn_map_notice').textContent = 'sneaky'; }\n"
+		+ anchor);
+	const ELEMENTS_RE = /getElementById\('lpn_map_notice'\)/g;
+	function enclosingFunctionName(text, at) {
+		const before = text.slice(0, at);
+		const m = before.match(/function\s+(\w+)\s*\([^)]*\)\s*\{(?:(?!\bfunction\b)[\s\S])*$/);
+		return m ? m[1] : '(top level or nested)';
+	}
+	const found = new Set();
+	let m;
+	while ((m = ELEMENTS_RE.exec(mutated))) { found.add(enclosingFunctionName(mutated, m.index)); }
+	const declared = ['showNotice', 'noteMapUnmeasurable', 'msglogPanelTopCompensation'];
+	const unknown = Array.from(found).filter(function (n) { return declared.indexOf(n) < 0; });
+	ok('a new, undeclared writer of #lpn_map_notice is caught by the SAME scan 8f runs',
+		unknown.indexOf('aNewUndeclaredWriter') >= 0, JSON.stringify(unknown));
 }
 
 global.setTimeout = realSetTimeout;
