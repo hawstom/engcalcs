@@ -8,11 +8,9 @@
 //             (annotationEl()), not remembered as a selector list in a stylesheet. Section 1
 //             asserts the membership, both halves: every generated mark carries the class, and the
 //             user's own Text label -- authored content -- does not.
-//   Task 669  THE LABELING THRESHOLD: a width of visible map outside which the drawing is not
-//             labeled, and for an authored Text object that width times its own size multiplier.
-//             Section 2, both halves -- blank box hides nothing, a number hides on schedule.
-//   Task 407  A Text label is on the drawing or it is not, by scenario membership, and membership
-//             beats the threshold. Section 2a.
+//   Task 407  A Text label is on the drawing or it is not, by scenario membership -- and that is
+//             the ONLY thing that hides one now. Sections 2 and 2a: 2 is the guard that no label
+//             hides because of the zoom, 2a is the rule that survived.
 //   Task 330  The label halo is switchable, and the switch belongs to the project. Section 3.
 //
 // WHY SECTION 1 IS WORTH ITS LINES, since "does this element have a class" reads like a tautology:
@@ -40,9 +38,6 @@ const L = loadLoopedNetwork(
 	"\t\t\tan = lb.anchorNode ? nodeById(lb.anchorNode) : null;\n" +
 	"\t\t\treturn textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y); },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
-	"\t\tgetSetting: function (k) { return settings[k]; },\n" +
-	"\t\tdefaultLabelMaxWidth: defaultLabelMaxWidth,\n" +
-	"\t\tceilToPrecision: ceilToPrecision,\n" +
 	"\t\tdelSetting: function (k) { delete settings[k]; },\n" +
 	// How wide the map is on screen, and the zoom that turns that into model length units. BOTH
 	// dimensions: mapSpan('min') is the house standard, so a harness that sets only the width leaves
@@ -115,24 +110,18 @@ console.log('--- generated annotation carries the class, authored content does n
 		classes(ne.text) + ' / ' + classes(ne.leader));
 }
 
-// ---- 2. THE LABELING THRESHOLD (Task 669) ----------------------------------------------------
-// It shipped, Tom removed it himself on 2026-08-19, and he asked for it back three times. This
-// section used to be the guard that kept it gone; it is now the guard that keeps it working, and
-// the sweep it kept is the first half: with the box BLANK nothing hides however far out you are.
+// ---- 2. NO LABEL HIDES BECAUSE OF THE ZOOM ---------------------------------------------------
+// Tom, 2026-08-19: *"Always show labels, Zoom level, Current view, etc.: Remove that entire concept
+// from our repository now that we have good hiding and Thematic map."* A map-width threshold used
+// to hide generated annotation and, scaled by each label's own size ratio, the user's Text labels
+// too. It is gone, and this is the guard that keeps it gone: an implicit automatic mechanism beside
+// the Visibility panel's explicit one is a thing to learn and a thing to be surprised by.
 //
-// The zooms span four orders of magnitude of visible map width on purpose -- a threshold, once
-// given, fires somewhere in that range whatever number it is.
-//
-// The second half is the rule in his own words: *"There must be a zoom outside of which the map is
-// not labeled."* Generated annotation goes at the threshold; a Text object goes at the threshold
-// times its OWN size multiplier, so a title block set at 3x outlives the notes around it.
-console.log('\n--- a stored zero: nothing hides because of how far out you are ---');
+// The zooms below span four orders of magnitude of visible map width on purpose -- the old rule
+// fired somewhere in that range for every threshold it could have been given.
+console.log('\n--- nothing hides because of how far out you are ---');
 {
 	L.setCanvas(1000, 1000);   // square, so the smaller dimension is unambiguous
-	// **ZERO IS THE ANSWER "ALWAYS SHOW", AND IT IS WHAT AN EMPTY BOX WRITES.** It used to be
-	// spelled by DELETING the setting, and since 2026-09-18 an absent setting means something else
-	// -- the automatic threshold below -- so the two had to stop being the same value.
-	L.setSetting('labelMaxWidth', 0);
 	[1, 0.8, 0.2, 0.001, 50].forEach(function (z) {
 		L.setZoom(z);
 		L.applyLabelVisibility();
@@ -141,96 +130,6 @@ console.log('\n--- a stored zero: nothing hides because of how far out you are -
 		ok('...and so is a 1x Text label', !hidden(L.labelEl(note.id).text));
 		ok('...and so is a 3x title block', !hidden(L.labelEl(title.id).text));
 	});
-}
-
-// ---- 2b. THE AUTOMATIC THRESHOLD, for a project that has never set one ------------------------
-// Tom, 2026-09-18: *"Now we need a default. How about when text height is larger than twice the
-// median link length? That's conservatively large, I think, but it gives us an upper limit."* His
-// own proposal, and the two things worth asserting about it are the ARITHMETIC and the fact that it
-// is an upper limit rather than a working setting.
-//
-// The arithmetic is asserted against the definition rather than against a number typed here: the
-// lettering is a SCREEN size, so its height in map units is textSize/s and the threshold has to be
-// 2 x medianLink x minPx / textSize for the scale to cancel. One pipe, so the median is its length.
-console.log('\n--- never asked: the automatic threshold, from the drawing itself ---');
-{
-	L.setCanvas(1000, 1000);
-	L.delSetting('labelMaxWidth');
-	const want = 2 * 100 * 1000 / L.getSetting('textSize');
-	const got = L.defaultLabelMaxWidth();
-	ok('the automatic width is 2 x median link x screen pixels / text size',
-		Math.abs(got - want) < 1e-9, got + ' against ' + want);
-	// Inside it, everything is drawn -- including at the fit-ish zooms the sweep above used, which
-	// is what "conservatively large" has to mean if it is not to take labels off a working view.
-	[50, 1, 0.8, 0.2].forEach(function (z) {
-		L.setZoom(z);
-		L.applyLabelVisibility();
-		ok('at zoom ' + z + ' (' + L.visibleMapWidth() + ' units across, inside ' + got + ') labels are drawn',
-			!L.svgHas('lpn-labels-hidden'));
-	});
-	// And far enough out it does what it is for: a drawing that would be nothing but lettering is
-	// not labeled at all.
-	L.setZoom(1000 / (got * 2));
-	L.applyLabelVisibility();
-	ok('twice the automatic width, the generated annotation is gone',
-		L.svgHas('lpn-labels-hidden'), L.visibleMapWidth() + ' units across');
-	ok('...and so is the 1x note', hidden(L.labelEl(note.id).text));
-	ok('...and the 3x title block is still drawn: its own width is three times this one',
-		!hidden(L.labelEl(title.id).text));
-	L.setZoom(1000 / (got * 4));
-	L.applyLabelVisibility();
-	ok('four times out, the 3x title block goes too', hidden(L.labelEl(title.id).text),
-		L.visibleMapWidth() + ' units across');
-	L.setSetting('labelMaxWidth', 0);
-	L.setZoom(1);
-	L.applyLabelVisibility();
-}
-
-console.log('\n--- a threshold of 500 map units ---');
-{
-	L.setCanvas(1000, 1000);
-	L.setSetting('labelMaxWidth', 500);
-
-	L.setZoom(4);              // 250 units across -- inside the threshold
-	L.applyLabelVisibility();
-	ok('inside the threshold the generated annotation is drawn', !L.svgHas('lpn-labels-hidden'),
-		L.visibleMapWidth() + ' units across');
-	ok('...and so is the 1x note', !hidden(L.labelEl(note.id).text));
-	ok('...and so is the 3x title block', !hidden(L.labelEl(title.id).text));
-
-	L.setZoom(1);              // 1000 units across -- outside 500, inside 3 x 500
-	L.applyLabelVisibility();
-	ok('outside the threshold the generated annotation is hidden', L.svgHas('lpn-labels-hidden'),
-		L.visibleMapWidth() + ' units across');
-	ok('...and so is the 1x note', hidden(L.labelEl(note.id).text));
-	ok('...and the 3x title block is STILL DRAWN: its own threshold is 3 x 500',
-		!hidden(L.labelEl(title.id).text));
-
-	L.setZoom(0.5);            // 2000 units across -- outside 3 x 500 as well
-	L.applyLabelVisibility();
-	ok('far enough out the 3x title block goes too', hidden(L.labelEl(title.id).text),
-		L.visibleMapWidth() + ' units across');
-
-	// **THE CAPTURE BUTTON MAY NEVER HIDE THE VIEW IT CAPTURED**, which is the promise "Use current
-	// view" makes and the one it broke. It rounds to three significant figures because the number is
-	// a judgement rather than an accident of the pan -- and `toPrecision(3)` rounds to NEAREST, so
-	// about half of all views round DOWN and the drawing the user was looking at goes out on the
-	// press. Found by driving a real browser on 2026-09-18: 1114 units across captured as 1110.
-	// Asserted over a sweep, because the failure needs a view whose third digit rounds down and a
-	// single fixture would sit on one that does not.
-	[1114, 1115, 999.6, 1000.4, 0.0001234, 87654, 3.14159].forEach(function (v) {
-		var got = L.ceilToPrecision(v, 3);
-		ok('a capture of ' + v + ' rounds UP, to ' + got, got >= v);
-		ok('...and not by more than one part in a hundred', got <= v * 1.01);
-	});
-
-	// A threshold of zero or a negative is not a threshold, it is a blank box: otherwise a stray 0
-	// would blank the drawing with no way back that reads as one.
-	L.setSetting('labelMaxWidth', 0);
-	L.applyLabelVisibility();
-	ok('a zero threshold reads as "always show", not as "hide everything"', !L.svgHas('lpn-labels-hidden'));
-	L.setZoom(1);
-	L.applyLabelVisibility();
 }
 
 // ---- 2a. WHAT DOES STILL HIDE A TEXT LABEL: MEMBERSHIP ----------------------------------------

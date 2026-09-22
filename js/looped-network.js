@@ -6689,7 +6689,8 @@ var EngCalcs = EngCalcs || {};
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {},
 		labelsByLinkAnchor = {};
 	// Whether generated annotation is currently suppressed, for ANY of the reasons
-	// applyLabelVisibility() knows about -- including the labeling threshold (Task 669). Written only there, and read by the three entry points of
+	// applyLabelVisibility() knows about, the labeling threshold among them. Written only there, and
+	// read by the three entry points of
 	// the label pipeline -- refreshLabelText(), relayoutLabels() and refreshFontSizes() -- plus the
 	// zoom path and the debounced re-shed, all of which skip their work when nothing is drawn.
 	var dataLabelsHidden = false;
@@ -10585,9 +10586,8 @@ var EngCalcs = EngCalcs || {};
 				// hardcoded 2 is right only at text size 2.5, and at the shipped default a title at
 				// sizeMult 2 is 40 units tall, so zoom-to-fit clips it.
 				lbox = textLabelBox(lb, le, px, py);
-			// Same rule for an authored label, which has its OWN size-scaled threshold (Task 669):
-			// a note that has vanished at this zoom is not part of what is being fitted, while a
-			// title block at 3x may still be.
+			// Same rule for an authored label: a note that is not drawn is not part of what is
+			// being fitted.
 			if (ignoreDataLabels && le.text && le.text.classList &&
 				le.text.classList.contains('lpn-lbl-hidden')) { continue; }
 			inc(lbox.x, lbox.y); inc(lbox.x + lbox.w, lbox.y + lbox.h);
@@ -44145,7 +44145,6 @@ var EngCalcs = EngCalcs || {};
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(labelId);
-			applyLabelVisibility();   // the size IS this label's own threshold (Task 669)
 			saveToStorage();
 		});
 		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size multiplier') + ' ';
