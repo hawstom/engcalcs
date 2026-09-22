@@ -766,6 +766,22 @@ the block.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
     may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
     in the harness.
+  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
+    don't understand why we are spending effort on the rings model instead of giving the spot-prime
+    box model a good college try."* **The honest answer is that of his four steps only step 4 was
+    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
+    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
+    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
+    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
+    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+    The rings work got the effort because it was reachable. That is a reason about us, not about
+    the two models.
+  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
+    gap between its pipes is already computed and already survives a zoom, and the code then throws
+    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
+    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
+    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
+    found, which is the thing he asked to be told.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
