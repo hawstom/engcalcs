@@ -1919,40 +1919,6 @@ the block.
     genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
     world-wide first screen**, which every geographic project passes through.
 
-- 100|703| **The satellite tiles: still blank patches after everything measured so far.**
-  Tom, 2026-09-21, on a screenshot showing six large white rectangles across a satellite mosaic he
-  had left alone: *"Still missing some tiles. Usable, but frustrating. Not good for my reputation."*
-  - **SPLIT OUT OF TASK 646 ON HIS OWN WORDS** -- *"We are just fighting the Satellite tiles now,
-    and that's peripheral to this task."* 646 is closed; this carries the fight.
-  - **THREE CAUSES HAVE ALREADY BEEN FOUND AND FIXED AND THE SYMPTOM SURVIVES ALL THREE**, which is
-    the fact that should shape the next attempt. (1) Tiles were requested west-edge-across, so the
-    middle of the screen sat about 35th in a queue of up to 192. (2) Every wheel nudge deleted the
-    whole picture and threw away everything in flight. (3) **A tile whose request FAILED was never
-    asked for again** -- 33 knocked out of 105 stayed white after 30 seconds. Each was measured, each
-    was real, and none of them was the whole of it.
-  - **PERRY'S FOURTH IS NOW FIXED TOO, and it is the fifth cause rather than the last one**: a
-    direction-REVERSED gesture -- an ordinary overshoot-and-correct -- discarded a tile that had
-    already loaded and re-fetched it, because the "do we already have this" test read two buckets
-    and never the third one a tile sits in while a view is still loading. Every gesture the
-    earlier fixing rounds tested was one-directional. `basemap-cache-harness.js` section 5 is the
-    guard, mutation-tested, and it includes the half that bites: a reclaimed tile must LEAVE the
-    carry, or the release at the end of a still-pending paint takes it straight back off screen.
-  - **THE INSTRUMENT IS BUILT AND IT IS `?debug=tiles`** (feat/xy-world-map). Add `?debug=tiles`
-    to the page URL and a panel sits in the lower right saying, for the CURRENT view: wanted, from
-    cache, requested, arrived, drawn, failed, retried, still outstanding -- plus the source, the
-    zoom and whether a token is present -- and it names every failed tile with the reason the
-    network gave. It updates on every arrival and on a one-second tick, so a number that STAYS put
-    is the reading. `dev/lpn-spike/basemap-debug-readout-harness.js` grades the counts against
-    hand-worked outcomes and is mutation-tested. **The next report is his, not ours.**
-  - **A REASON NEEDS A SECOND REQUEST AND THAT IS WHY THE SWITCH EXISTS.** An SVG `<image>` error
-    event is one bit -- no status, no headers, no body -- so under the switch a failed tile's URL
-    is fetched once more and the answer is printed as given. **THE BYTE COUNT IS PART OF THE
-    ANSWER**: a URL-restricted token can refuse in 23 bytes, which looks like a delivered tile to
-    anything counting only success.
-  - Remember the token is URL-restricted: a satellite tile fetched from anywhere but hawsedc.com or
-    librewaternet.org is a 23-byte Forbidden reply that **looks like a delivered tile to anything
-    counting bytes**, and that has already cost one agent a whole wrong measurement.
-
 - 100|704| **An error and notice messaging system, because a banner that vanishes is a defect.**
   Tom, 2026-09-18, testing the lock work: *"The banner message about 'We asked your colleague to
   close the file' disappeared too fast and unrecoverable. 'Help! What did I miss!' We need a better
