@@ -249,6 +249,59 @@ console.log('\n--- item 5: a press on a pull-down still opens it ---');
 	fire(tableEl, 'mouseup', {});
 }
 
+console.log('\n--- item 5: but a cell BEING TYPED IN keeps its own mouse ---');
+{
+	// Perry's pre-review, 2026-09-21. The block that stops a browser highlighting characters in a
+	// cell nobody is typing in must not reach INSIDE the one cell that is being typed in: there
+	// the characters are the user's, and the mouse is how the caret gets to them. Blocking it left
+	// the caret wherever Edit mode had put it, with only Home, End and the arrows able to move it.
+	//
+	// **THIS IS THE CASE THE FIRST VERSION OF THIS HARNESS NEVER CONSTRUCTED** -- every press it
+	// fired was in READY mode, so the exemption it was really testing was "not while editing" and
+	// it never once entered Edit mode to find out.
+	const c = cell('junctions', ids[0], 'elev');
+	const cTd = td('junctions', ids[0], 'elev');
+	// Edit mode through its own door -- a real double-click, not by writing the flag.
+	fire(tableEl, 'focusin', { target: cTd });
+	global.document.activeElement = c;
+	fire(c, 'dblclick', {});
+	report(L.mode(c) === 'edit', 'a double-click really did open the cell for editing', String(L.mode(c)));
+
+	let prevented = 0, refocused = 0;
+	const realFocus = c.focus;
+	c.focus = function () { refocused++; if (realFocus) { realFocus.call(c); } };
+	fire(tableEl, 'mousedown', { target: cTd, button: 0, shiftKey: false,
+		preventDefault: function () { prevented++; } });
+	report(prevented === 0, 'a press inside the cell being typed in is left to the browser',
+		String(prevented));
+	report(refocused === 0, '...and it is not re-focused, which would put the caret back',
+		String(refocused));
+	// Dragging across part of the value must select the CHARACTERS, not start a cell range --
+	// so the press must not have armed the drag either. Dragged onto the NEXT ROW, because a
+	// drag that ends on the cell it began on leaves a one-cell rectangle whether it was armed
+	// or not, which is a test that cannot fail.
+	fire(tableEl, 'mouseover', { target: td('junctions', ids[1], 'elev'), buttons: 1,
+		preventDefault: function () {} });
+	const dragBox = L.selBox('junctions');
+	report(dragBox.r1 === dragBox.r0 && dragBox.c1 === dragBox.c0,
+		'...and dragging out of it does not start extending a cell range',
+		(dragBox.r1 - dragBox.r0 + 1) + 'x' + (dragBox.c1 - dragBox.c0 + 1));
+	fire(tableEl, 'mouseup', {});
+	c.focus = realFocus;
+
+	// A press on a DIFFERENT cell while this one is being edited is an ordinary move, and the
+	// block must be back on for it -- otherwise the fix above would trade one defect for R-038.
+	prevented = 0;
+	fire(tableEl, 'mousedown', { target: td('junctions', ids[1], 'elev'), button: 0,
+		shiftKey: false, preventDefault: function () { prevented++; } });
+	report(prevented === 1, 'a press on another cell while one is being edited still blocks',
+		String(prevented));
+	fire(tableEl, 'mouseup', {});
+	// Leave the table in READY mode for whatever runs after this block.
+	fire(tableEl, 'keydown', { key: 'Escape', shiftKey: false, ctrlKey: false, metaKey: false,
+		altKey: false, preventDefault: function () {} });
+}
+
 // ---------------------------------------------------------------------------------------------
 // 6(a). THE PIN SHARES THE ID'S LINE
 // ---------------------------------------------------------------------------------------------

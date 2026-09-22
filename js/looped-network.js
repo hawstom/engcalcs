@@ -19227,7 +19227,14 @@ var EngCalcs = EngCalcs || {};
 			cellTd = spec.tds && spec.tds[id] && spec.tds[id][key];
 			target = paneCellFocusable(cellTd);
 			if (!target) { return false; }
-			target.focus();
+			// **THE BROWSER IS ASKED NOT TO SCROLL AT ALL, so there is only ever one scroll**
+			// (Perry's pre-review, 2026-09-21). `.focus()` scrolls the target into view by its own
+			// approximate reckoning -- which is the reckoning that cannot see a sticky heading --
+			// and paneScrollCellIntoView() then sets the right answer absolutely. Both writes land
+			// in one task, so a browser would paint once either way; `preventScroll` removes the
+			// question rather than relying on that. A browser that does not know the option
+			// ignores it and behaves exactly as before.
+			target.focus({ preventScroll: true });
 			paneScrollCellIntoView(document.getElementById(spec.panel), cellTd);
 			// **ARRIVING AT A CELL SELECTS NO CHARACTERS** (Tom, 2026-09-19: *"the appearance is as
 			// Edit mode in that the contents of each cell are selected as I pass through/over/on
@@ -19750,6 +19757,23 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			spec._keepSel = false;
+			/**
+			 * **A CELL THAT IS BEING TYPED IN KEEPS ITS OWN MOUSE, AND THAT IS THE HALF R-038's
+			 * FIX FORGOT TO ASK ABOUT** (Perry's pre-review, 2026-09-21, reproduced through the
+			 * real events). The `preventDefault()` below exists to stop a browser arming its own
+			 * drag-selection of the CHARACTERS in a cell nobody is typing in. **Inside a cell that
+			 * IS being typed in, those characters are the user's and the mouse is how they reach
+			 * them**: click in the middle of `1250` to put the caret between the 2 and the 5, or
+			 * drag across `50` to type over it. Preventing the press killed both -- the caret
+			 * stayed wherever Edit mode had left it and only Home, End and the arrows could move
+			 * it, on a page where four hundred numbers get typed at a sitting.
+			 *
+			 * It is the press on THIS cell only. A press on any OTHER cell, while this one is
+			 * being edited, is an ordinary move: it commits what was typed and goes there, with
+			 * the block back on, which is what keeps a drag from cell to cell working.
+			 */
+			var pressed = paneCellFocusable(td);
+			if (pressed && pressed === activeElementSafe() && paneInEdit(pressed)) { return; }
 			dragging = true;
 			/**
 			 * **A PLAIN PRESS MUST STILL PREVENT THE BROWSER'S OWN TEXT SELECTION** (Tom,
@@ -19771,7 +19795,7 @@ var EngCalcs = EngCalcs || {};
 			 * range STARTED from, and calling focus() on the cell just pressed would drag it there.
 			 */
 			if (!e.shiftKey) {
-				var focusable = paneCellFocusable(td);
+				var focusable = pressed;
 				/**
 				 * **A PULL-DOWN AND A CHECKBOX KEEP THE BROWSER'S OWN PRESS.** The
 				 * `preventDefault()` below exists to stop a browser arming its native

@@ -57,6 +57,11 @@ judgement and does not belong to a script.
 - [x] R-037 feat/tables-spreadsheet | Right-clicking anywhere in a selection should not perturb the selection. But I see it changing the selection to the right-clicked cell. -- feat/tables-spreadsheet f688970a
 - [x] R-038 feat/tables-spreadsheet | A selection should highlight cells, not characters. But I see characters highlighting as in Entry mode when selecting by mouse. -- feat/tables-spreadsheet f688970a
   - TGH: Still manifesting 2026-09-20 00:39 UTC · abf10dc1
+  - **AND THE SECOND FIX OVERREACHED, which Perry caught before Tom did.** Blocking the browser's
+    press to stop it highlighting characters reached INSIDE the cell being typed in as well, where
+    the characters are the user's: a click could no longer place the caret in the middle of a
+    number and a drag could no longer select part of one. The block is a Ready/Select-mode rule
+    now and stops at the cell in Edit mode; a press on any OTHER cell still blocks. `pane-review-2-harness.js`
   - **HE WAS RIGHT AND THE FIRST FIX WAS THE WRONG HALF.** f688970a dropped a `select()` call, which was the KEYBOARD half; a mouse drag was never that call. A browser arms its own character selection from `mousedown` whatever `readOnly` and `user-select` say, so only `preventDefault()` there stops it -- feat/tables-spreadsheet 4fc86c07, and 2026-09-21 it learned to leave a pull-down and a checkbox alone, or neither could be opened
 
 ### Defects found while reviewing
