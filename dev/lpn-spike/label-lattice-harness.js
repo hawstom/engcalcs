@@ -34,11 +34,13 @@ const ROOTJS = path.join(ROOT, 'js/lpn-collide.js');
 const NARROW = '', WIDE = process.env.LPN_WIDE_AFFIX || '1234=';
 
 // **THE RATCHET IS ON THE DIAGNOSIS, NOT ON THE DRAWING.** These are the measured cloud-to-box
-// ratios at the default affix. They may RISE (the lattice grew to fit the box, which is the fix) and
-// may not FALL. An LPN_WIDE_AFFIX override prints its own numbers and asserts nothing about them.
+// ratios, which were 8.04 narrow against 2.19 wide before the reach took a floor in box widths and
+// are 8.04 against 8.00 after. They may RISE and may not FALL. An LPN_WIDE_AFFIX override prints
+// its own numbers and holds the same floors, because the whole point is that the ratio no longer
+// depends on how long the string is.
 const FIXTURES = [
-	{ tag: 'Net3-World fit', arg: 5000, floor: { narrow: 0.9, wide: 0.30 } },
-	{ tag: 'Net3-World 2x', arg: 12000, floor: { narrow: 0.9, wide: 0.30 } }
+	{ tag: 'Net3-World fit', arg: 5000, floor: { narrow: 7.5, wide: 7.5 } },
+	{ tag: 'Net3-World 2x', arg: 12000, floor: { narrow: 7.5, wide: 7.5 } }
 ];
 
 let checks = 0, failures = 0;
@@ -51,21 +53,20 @@ function report(ok, label, detail) {
 // The mutations the selftest uses, made in the SOURCE through the stub's own `mutate` hook, for the
 // reason label-width-stability-harness.js records: the page calls these through its own closure.
 const MUTATIONS = {
-	// CAUGHT: a candidate cloud that already scaled with the box would make the wide ratio rise to
-	// meet the narrow one, and the "the lattice is blind to the box" finding would be false.
-	'reach-reads-width': function (src) {
+	// CAUGHT: the WIDTH-BLIND LATTICE PUT BACK -- the reach as it stood before 2026-09-21, floored
+	// on the symbol alone. This is the defect itself, so every leg above must go red on it.
+	'blind-lattice': function (src) {
 		return src.replace(
-			'reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),',
-			'reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS) '
-				+ '+ labelBoxWidth(ne) * 2,');
+			'labelBoxWidth(ne) * LPN_NODE_REACH_BOX_WIDTHS),',
+			'0),');
 	},
-	// CONTROL: every candidate pushed out by the same constant. The cloud grows at BOTH widths, so
-	// the RATIO between them is unmoved and the finding must survive. A part that fails everything
-	// asserts nothing.
-	'cloud-shifted': function (src) {
+	// CONTROL: a finer angle step, so MORE candidates are generated at both widths and none of them
+	// moves a radius. The drawing changes and the ratio does not, so the fix must still read as
+	// present. A part that fails everything asserts nothing.
+	'finer-angles': function (src) {
 		return src.replace(
-			'reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),',
-			'reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS) * 1.3,');
+			'rings: rings, max: 8 * rings,',
+			'rings: rings, max: 20 * rings, angleStep: 10,');
 	}
 };
 
@@ -266,22 +267,24 @@ function show(tag, w, m) {
 function assertFixture(f, res, verbose) {
 	if (res.error) { report(false, f.tag, res.error); return; }
 	['narrow', 'wide'].forEach(function (w) { show(f.tag, w, res[w]); });
-	const override = !!process.env.LPN_WIDE_AFFIX;
-	// **THE FINDING, AS AN ASSERTION: the offered cloud does not grow with the box.** The narrow run
-	// offers a cloud comfortably wider than its box; the wide run offers the SAME cloud and a wider
-	// box, so the ratio collapses. If a future change makes the lattice read the box, the wide floor
-	// rises and this line is the place to raise it.
+	// **THE FIX, AS AN ASSERTION: a wide label is offered geometrically the SAME search a narrow one
+	// gets.** Until 2026-09-21 the cloud was IDENTICAL at both widths -- 11.95 label-heights for a
+	// 1.49 box and for a 5.45 one -- so the ratio collapsed from 8.04 to 2.19 and the wide label ran
+	// out of lattice rather than out of plane. The floor on the reach makes both ratios 8, so the
+	// two legs below are the defect inverted: the ratio must SURVIVE the widening, and the cloud
+	// must DIFFER because it now reads the box.
 	report(res.narrow.medRatio >= f.floor.narrow,
 		f.tag + ': narrow labels are offered a cloud wider than the box they place',
 		'median cloud/box ' + res.narrow.medRatio.toFixed(2) + ', floor ' + f.floor.narrow);
-	if (!override) {
-		report(res.wide.medRatio >= f.floor.wide,
-			f.tag + ': the wide run is offered the same cloud for a wider box',
-			'median cloud/box ' + res.wide.medRatio.toFixed(2) + ', floor ' + f.floor.wide);
-	}
-	report(Math.abs(res.narrow.medCloud - res.wide.medCloud) < 1e-6,
-		f.tag + ': the cloud is IDENTICAL at both widths -- the lattice never reads the box',
+	report(res.wide.medRatio >= f.floor.wide,
+		f.tag + ': a wide label is offered the same hunting ground in its own box widths',
+		'median cloud/box ' + res.wide.medRatio.toFixed(2) + ', floor ' + f.floor.wide);
+	report(res.wide.medCloud > res.narrow.medCloud * 1.5,
+		f.tag + ': the lattice READS the box -- a wider box is offered a wider cloud',
 		res.narrow.medCloud.toFixed(2) + ' against ' + res.wide.medCloud.toFixed(2));
+	report(res.wide.medDistinct >= res.narrow.medDistinct,
+		f.tag + ': a wide label has at least as many genuinely different places as a narrow one',
+		res.narrow.medDistinct + ' against ' + res.wide.medDistinct);
 	console.log('        cloud/box histogram (wide):  '
 		+ res.wide.bands.map(function (b) {
 			return (b.hi === Infinity ? '>' + b.lo : b.lo + '-' + b.hi) + ': ' + b.n;
@@ -299,18 +302,19 @@ function assertFixture(f, res, verbose) {
 
 function selftest() {
 	const f = FIXTURES[0];
-	// CAUGHT: a cloud that reads the box width. The two clouds then differ and the finding is false.
-	const bad = child(f.arg, 'reach-reads-width');
-	report(!bad.error && Math.abs(bad.narrow.medCloud - bad.wide.medCloud) > 1e-6,
-		'selftest: caught -- a candidate cloud that reads the label width',
-		bad.error ? bad.error : bad.narrow.medCloud.toFixed(2) + ' against ' + bad.wide.medCloud.toFixed(2));
-	// CONTROL: the cloud grown by a constant at both widths. Still blind to the box, so the finding
-	// must survive.
-	const ctl = child(f.arg, 'cloud-shifted');
-	report(!ctl.error && Math.abs(ctl.narrow.medCloud - ctl.wide.medCloud) < 1e-6
-		&& ctl.wide.medCloud > ctl.wide.medW,
-		'selftest: control, not caught -- the cloud grown by a constant at both widths',
-		ctl.error ? ctl.error : ctl.narrow.medCloud.toFixed(2) + ' against ' + ctl.wide.medCloud.toFixed(2));
+	// CAUGHT: the width-blind lattice restored. The clouds become identical and the wide ratio
+	// collapses, which is exactly the defect.
+	const bad = child(f.arg, 'blind-lattice');
+	report(!bad.error && Math.abs(bad.narrow.medCloud - bad.wide.medCloud) < 1e-6
+		&& bad.wide.medRatio < f.floor.wide,
+		'selftest: caught -- the width-blind lattice put back',
+		bad.error ? bad.error : 'clouds ' + bad.narrow.medCloud.toFixed(2) + '/' + bad.wide.medCloud.toFixed(2)
+			+ ', wide ratio ' + bad.wide.medRatio.toFixed(2));
+	// CONTROL: the candidate window nudged at both widths. The drawing changes; the ratio does not.
+	const ctl = child(f.arg, 'finer-angles');
+	report(!ctl.error && ctl.wide.medRatio >= f.floor.wide && ctl.narrow.medRatio >= f.floor.narrow,
+		'selftest: control, not caught -- a finer angle step at both widths',
+		ctl.error ? ctl.error : ctl.narrow.medRatio.toFixed(2) + ' against ' + ctl.wide.medRatio.toFixed(2));
 }
 
 function main() {
@@ -322,7 +326,7 @@ function main() {
 	console.log('--- the lattice a node label is offered, measured against the box it must place ---');
 	console.log('    affix: "' + (WIDE || '(none)') + '"   (LPN_WIDE_AFFIX to change)');
 	FIXTURES.forEach(function (f) { assertFixture(f, child(f.arg), process.argv[2] !== '--quiet'); });
-	if (process.argv[2] === '--selftest' || !process.env.LPN_WIDE_AFFIX) { selftest(); }
+	selftest();
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);
 }
