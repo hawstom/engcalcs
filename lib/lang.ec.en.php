@@ -1980,6 +1980,10 @@ $ec_lang['lpn_lock_ask']='Ask';
 $ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
 $ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
 $ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
+// **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
+// out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
+// reflex had no way to learn what had just been offered. It says what did not happen, and why.
+$ec_lang['lpn_lock_open_cancelled']='That file was not opened, and nothing here changed. Somebody else still has it open.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
@@ -1987,6 +1991,17 @@ $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
 $ec_lang['lpn_ago_days']='{n} days';
 $ec_lang['lpn_ago_unknown']='an unknown time';
+// ---- The message log (ROADMAP Task 704) ----
+// A notice is on screen for eight seconds and is then gone; these name the place it went. Kept in
+// memory only, for as long as the page is open.
+$ec_lang['lpn_msglog_name']='Messages';
+$ec_lang['lpn_msglog_tip']='Read the recent messages again. They are kept only while this page is open.';
+$ec_lang['lpn_msglog_heading']='Recent messages';
+$ec_lang['lpn_msglog_empty']='No messages yet.';
+// The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"
+// wherever its own grammar wants it.
+$ec_lang['lpn_msglog_ago']='{x} ago';
+$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is

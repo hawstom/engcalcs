@@ -27111,7 +27111,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
 		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
-		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
+		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
+		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
+		if (initials === null) {
+			setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.');
+			return;
+		}
 		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
 		setNotice((r && r.ok && r.requested)
 			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
@@ -27151,7 +27156,11 @@ var EngCalcs = EngCalcs || {};
 			// answer from the rest. It licenses exactly that much and no colour.
 			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
 			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
+			// **CANCEL LEAVES A RESIDUE** (ROADMAP Task 704). It used to leave nothing at all: the
+			// dialog closed, the file did not open, and there was no trace anywhere of what had
+			// just been offered or why the file did not appear. That is exactly "Help! What did I
+			// miss!", and it costs one sentence to fix.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.'); } },
 			{
 				// **THE GLYPH IS THE VERDICT STRINGS' OWN, AND IT IS PREPENDED HERE RATHER THAN
 				// WRITTEN INTO THE LANGUAGE FILE.** `⚠` is decorative, international and RTL-safe,
@@ -27415,6 +27424,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		banner.innerHTML = '';
 		if (!state) { banner.style.display = 'none'; settle(); return; }
+		// **THE BANNER'S MESSAGES LAND IN THE MESSAGE LOG TOO** (ROADMAP Task 704, row 2 of Ida's
+		// ranking). This bar carries real decisions -- who has the file, what you may still do
+		// about it -- and once dismissed there is no way back to the words. logMessage() keeps one
+		// row per distinct message, so a repaint on every tab switch does not fill the log.
+		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
 		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
 		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
@@ -30638,6 +30652,7 @@ var EngCalcs = EngCalcs || {};
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
+		wireMessageLogButton();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -43830,6 +43845,111 @@ var EngCalcs = EngCalcs || {};
 	// same element is wiped just slowly enough for the user not to see it. Separate slots dissolve
 	// that -- both can be on screen at once and nothing has to arbitrate.
 
+	// ---- THE MESSAGE LOG (ROADMAP Task 704, rows 1 and 2 of Ida's ranking) ----
+	//
+	// **A BANNER THAT VANISHES IS A DEFECT** (Tom, 2026-09-18, testing the lock work: *"The banner
+	// message about 'We asked your colleague to close the file' disappeared too fast and
+	// unrecoverable. 'Help! What did I miss!' We need a better messaging system."*).
+	//
+	// setNotice() is already ONE DOOR with 66 call sites and an eight-second expiry, and a later
+	// message silently REPLACES an earlier one. That replacement is the whole of the complaint, and
+	// the answer is not a longer timer -- it is a place the message went. QGIS splits exactly here:
+	// QgsMessageBar is transient, QgsMessageLog is the store behind it, reached from one icon at
+	// the end of the status bar. This is that split and nothing more.
+	//
+	// **IN MEMORY ONLY, AND THAT IS A RULING RATHER THAN A SHORTCUT.** Anything written to a
+	// visitor's device makes a sentence in consent_body false, which is a banner rewrite, 26
+	// retranslations and an EC_CONSENT_VERSION bump that re-asks everybody. A log that lives as
+	// long as the page answers "what did I miss", and that is a question about the last few
+	// minutes, not about last Tuesday.
+	//
+	// **THIRTY, AND THE BOUND IS CHOSEN FOR THE READER RATHER THAN FOR THE MEMORY.** Thirty rows is
+	// about one long working session of opens, saves, lock answers and unit changes. It fits the
+	// dialog at a glance, which is the point at which a log is still a way BACK to something rather
+	// than a second document to search. The storage cost of any bound here is nil; the reading cost
+	// is not.
+	//
+	// **ONE ROW PER DISTINCT MESSAGE, AND A REPEAT MOVES TO THE TOP RATHER THAN ADDING A ROW.**
+	// renderBanner() repaints on every tab switch and every lock answer, so an append-only log
+	// would bury the one thing somebody missed under forty identical read-only banners. The time
+	// shown is therefore the LAST time that message was on screen, which is what the reader is
+	// asking about.
+	var NOTICE_LOG_MAX = 30;
+	var noticeLog = [];   // newest FIRST: { text, severity, at }
+	// **TWO LEVELS, AND THE SECOND IS THE ONE THE BANNER ALREADY DRAWS.** renderBanner() paints
+	// amber for "you may work through this" and red for "this has taken editing away"; everything
+	// setNotice() carries is a completed action. That is two honest kinds of event and this page
+	// does not have four, so QGIS's four severities are deliberately not imported -- a level
+	// nobody can assign consistently is a colour that means nothing by the third week.
+	function logMessage(text, severity) {
+		var t = String(text == null ? '' : text).trim(), kind, i;
+		if (!t) { return; }
+		kind = severity === 'warning' ? 'warning' : 'notice';
+		for (i = 0; i < noticeLog.length; i++) {
+			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
+		}
+		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
+		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
+	}
+	// "{x} ago" as its own key rather than an English concatenation: agoText() already solves the
+	// plural problem (n is never 1), and this wrapper lets a language put its word for "ago"
+	// wherever its own grammar wants it.
+	function messageAgeText(at) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_msglog_ago || '{x} ago').replace('{x}', agoText(Math.max(1, Date.now() - at)));
+	}
+	// **A DIALOG, NOT A FIFTH BAR OF CHROME** (Ida, 2026-09-21). A persistent panel is what this
+	// page cannot afford -- Tom has said more than once that it carries too many bars -- so the log
+	// borrows the modal that already exists, costs nothing while nobody is reading it, and takes no
+	// room on the map at any window size.
+	function openMessageLog() {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var head = document.createElement('p');
+			head.style.margin = '0 0 8px';
+			head.style.fontWeight = 'bold';
+			head.textContent = pc.lpn_msglog_heading || 'Recent messages';
+			body.appendChild(head);
+			if (!noticeLog.length) {
+				var none = document.createElement('p');
+				none.style.margin = '0';
+				none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
+				body.appendChild(none);
+				return;
+			}
+			var ul = document.createElement('ul');
+			ul.className = 'lpn-msglog-list';
+			noticeLog.forEach(function (row) {
+				var li = document.createElement('li');
+				li.className = 'lpn-msglog-row' + (row.severity === 'warning' ? ' lpn-msglog-warn' : '');
+				var when = document.createElement('span');
+				when.className = 'lpn-msglog-when';
+				when.textContent = messageAgeText(row.at);
+				li.appendChild(when);
+				var what = document.createElement('span');
+				what.textContent = row.text;
+				li.appendChild(what);
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+			var note = document.createElement('p');
+			note.className = 'lpn-msglog-note';
+			note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+				.replace('{n}', NOTICE_LOG_MAX);
+			body.appendChild(note);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	// **STANDING RATHER THAN CONDITIONAL, for the reason the grievance button beside it is.** A
+	// control that appears only once there is something to read is one nobody learns, and it would
+	// reflow the strip under the hand every time a notice landed. It is one icon in a strip that
+	// already exists, already wraps, and is already reserved against by zoomExtent().
+	function wireMessageLogButton() {
+		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		setIconLabel(btn, 'info', pc.lpn_msglog_name || 'Messages',
+			pc.lpn_msglog_tip || 'Read the recent messages again. They are kept only while this page is open.');
+		btn.addEventListener('click', openMessageLog);
+	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
 	function showNotice(text) {
@@ -43859,6 +43979,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		// Logged on the TRANSITION only, not on every re-show: this message is re-shown whenever an
+		// ordinary notice has covered it, and each of those is the same standing fact said again.
+		if (!mapUnmeasurable) { logMessage(words, 'warning'); }
 		mapUnmeasurable = true;
 		el = document.getElementById('lpn_map_notice');
 		if (el && el.textContent === words) { return; }
@@ -43866,6 +43989,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
+		// sites already go through, which is why the log needed no second seam: teaching the door
+		// teaches all of them at once.
+		logMessage(text, 'notice');
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {

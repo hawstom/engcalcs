@@ -2948,6 +2948,34 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
+/* ---- The message log button and list (ROADMAP Task 704) ----
+   The button is a cell of #lpn_map_footer, so it needs the strip's own translucent readout paint
+   rather than the grievance link's transparent one: it sits over the drawing and an icon with no
+   ground behind it disappears over a dark tile. pointer-events:auto because the strip is inert. */
+.lpn-msglog-btn {
+	pointer-events: auto;
+	display: inline-flex; align-items: center;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 1px 4px; font: inherit; font-size: 11px; line-height: 1;
+	color: #555; cursor: pointer;
+}
+.lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: #222; border-color: #888; }
+/* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
+   short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
+   takes the Close button with it. */
+.lpn-msglog-list { margin: 0; padding: 0; list-style: none; max-height: 45vh; overflow-y: auto; }
+/* The age leads the row and is a fixed column, so thirty rows read as a column of times against a
+   column of sentences rather than as ragged prose. It is the quieter of the two: the message is
+   what the reader came back for. */
+.lpn-msglog-row { display: flex; gap: 8px; padding: 4px 0 4px 6px; border-top: 1px solid #eee; border-left: 3px solid transparent; }
+.lpn-msglog-row:first-child { border-top: 0; }
+.lpn-msglog-when { flex: none; width: 7.5em; color: #666; }
+/* THE SECOND OF EXACTLY TWO LEVELS. Amber is what renderBanner() already paints for a warning, so
+   the log says the same thing the bar said; a marker WORD would be a word to translate and one
+   more thing to get wrong in five right-to-left languages. */
+.lpn-msglog-warn { border-left-color: #a80; background: #fffbe6; }
+.lpn-msglog-note { margin: 8px 0 0; font-size: 0.85em; color: #666; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;

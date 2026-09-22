@@ -589,6 +589,23 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      //
 			      // LAST IN THE STRIP so it never pushes a live readout, and quiet by design -- it must
 			      // not compete with the drawing. ?>
+			<?php // **THE MESSAGE LOG (ROADMAP Task 704, row 1 of Ida's ranking).** A notice is on
+			      // screen for eight seconds and a later one replaces it, which is the whole of
+			      // Tom's complaint (2026-09-18: *"The banner message ... disappeared too fast and
+			      // unrecoverable. 'Help! What did I miss!'"*). This is the icon the log is behind.
+			      //
+			      // A CELL OF THIS STRIP, for the same three reasons the satellite teaser and the
+			      // grievance link are cells of it: the strip is already the bottom-left band,
+			      // already reserved against by zoomExtent(), already wraps on a narrow window and
+			      // is already d-print-none. **It is deliberately NOT a fifth bar of chrome** --
+			      // the log itself is the page's existing modal, so nothing standing is added to
+			      // the map at any window size, and one icon is what it costs at 640px too.
+			      //
+			      // ICON ONLY, filled by wireMessageLogButton() in js/looped-network.js through
+			      // setIconLabel(), which is the one door that also writes the aria-label and the
+			      // tip -- a button whose only content is an aria-hidden <svg> has no accessible
+			      // name at all. The name lives in PHP because the strings do. ?>
+			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
 			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
@@ -2462,6 +2479,12 @@ EngCalcs.pageConfig = {
 	lpn_tab_unsaved: <?=json_encode($ec_lang['lpn_tab_unsaved'])?>,
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
 	lpn_dialog_ok: <?=json_encode($ec_lang['lpn_dialog_ok'])?>,
+	lpn_msglog_name: <?=json_encode($ec_lang['lpn_msglog_name'])?>,
+	lpn_msglog_tip: <?=json_encode($ec_lang['lpn_msglog_tip'])?>,
+	lpn_msglog_heading: <?=json_encode($ec_lang['lpn_msglog_heading'])?>,
+	lpn_msglog_empty: <?=json_encode($ec_lang['lpn_msglog_empty'])?>,
+	lpn_msglog_ago: <?=json_encode($ec_lang['lpn_msglog_ago'])?>,
+	lpn_msglog_note: <?=json_encode($ec_lang['lpn_msglog_note'])?>,
 	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
 	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
 	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
@@ -2538,6 +2561,7 @@ EngCalcs.pageConfig = {
 	lpn_lock_ask_prompt: <?=json_encode($ec_lang['lpn_lock_ask_prompt'])?>,
 	lpn_lock_ask_sent: <?=json_encode($ec_lang['lpn_lock_ask_sent'])?>,
 	lpn_lock_ask_failed: <?=json_encode($ec_lang['lpn_lock_ask_failed'])?>,
+	lpn_lock_open_cancelled: <?=json_encode($ec_lang['lpn_lock_open_cancelled'])?>,
 	lpn_lock_requested: <?=json_encode($ec_lang['lpn_lock_requested'])?>,
 	lpn_ago_seconds: <?=json_encode($ec_lang['lpn_ago_seconds'])?>,
 	lpn_ago_minutes: <?=json_encode($ec_lang['lpn_ago_minutes'])?>,
