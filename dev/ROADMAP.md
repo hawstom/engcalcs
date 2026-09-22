@@ -1909,8 +1909,11 @@ the block.
     AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
     own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
     look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
-  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (66 sites, one door,
-    8-second expiry, **a later message silently replaces an earlier one**), `setStatus()` (19
+  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (one door, 8-second
+    expiry, **a later message silently replaces an earlier one**, **83 sites** -- the 66 first
+    written here was an undercount Perry re-derived on 2026-09-21, which changes nothing about the
+    fix, since one door is one door, but a number restated as fact that nobody re-checked is
+    exactly the shape that seat watches for), `setStatus()` (19
     sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
     `renderBanner()` (one render door, five kinds, dismissable and not restorable),
     `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
