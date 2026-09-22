@@ -1523,8 +1523,15 @@
 	var ui = null;
 
 	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
-	function stepText(t) {
-		return EC.lpnTimeElapsedText(t) + '  ·  ' + EC.lpnTimeClockText(docTimes(), t);
+	// **THE LABEL IS THE STEP'S RUN-TIME RANGE, NEVER THE WALL CLOCK.** `next` is the following
+	// reporting time, so a step reads `24:00 - 25:00` and keeps climbing past a day -- it must
+	// never fall back to `EC.lpnTimeClockText()`, whose whole job is to WRAP at 24:00 for a
+	// CLOCKTIME control, and which read as `24:00 - 0:00` here before this was written. The last
+	// step has no following stop, so it shows one bare elapsed time.
+	function stepText(t, next) {
+		var start = EC.lpnTimeElapsedText(t);
+		return (next === undefined || next === null) ? start
+			: start + ' - ' + EC.lpnTimeElapsedText(next);
 	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
@@ -1589,8 +1596,8 @@
 		// is no visible label beside it on an icon-only strip.
 		//
 		// **BOTH ARE WIDTH-CAPPED.** The one wide control this strip ever had was a field-name
-		// dropdown, and it was removed for being wide (Task 427). A step reads as two clock times at
-		// its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
+		// dropdown, and it was removed for being wide (Task 427). A step reads as two elapsed times
+		// at its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
 		// spare -- and a max-width means a long translation shrinks the control rather than the map.
 		function picker(id, label, tip, w) {
 			var sel = document.createElement('select');
@@ -1646,13 +1653,11 @@
 		var stops, labels, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
-		labels = stops.map(stepText);
+		labels = stops.map(function (t, i) { return stepText(t, stops[i + 1]); });
 		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
-		// the rows themselves changed -- an edit to the duration, to the report step, or to the
-		// clock time at the start; rebuilding on every solve would close the list under a user who
-		// had it open. It was `stops.join(',')` until 2026-09-09, and that misses a project that
-		// states the SAME reporting grid from a different hour: every row keeps the clock time of
-		// the project before it, which is a wrong number rather than a missing one.
+		// the rows themselves changed -- an edit to the duration or to the report step; rebuilding
+		// on every solve would close the list under a user who had it open. It was `stops.join(',')`
+		// until 2026-09-09, and a raw stop list cannot tell "the grid changed" from "nothing did".
 		sig = labels.join('|');
 		if (ui.sig !== sig) {
 			ui.sig = sig;

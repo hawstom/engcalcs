@@ -4884,10 +4884,17 @@ var EngCalcs = EngCalcs || {};
 				// quality 1 -- a water age in hours reads as a whole number and a first decimal
 				// ("14.3 hr"); two would be a minute and a half of false precision on a quantity
 				// whose own transport step is five minutes. A source share in percent is the same
-				// shape of number.
+				// shape of number, EXCEPT that Tom wants it whole (Task 664): a share reading
+				// "43.0%" claims a precision the trace does not have, so 'quality:trace' is the one
+				// MODE-SPECIFIC override this map carries -- see qualityDecimals() below, which is
+				// the only reader of it. It is a new key, so an old save (which never had an opinion
+				// on it) picks it up the same way it would pick up any other field added after it
+				// was written; a save that DID customize the flat `quality` entry keeps governing
+				// water age and concentration exactly as before.
 				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
 				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1, initQuality: 2 },
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1,
+					'quality:trace': 0, initQuality: 2 },
 				// friction 4 -- a Darcy f runs 0.015 to 0.04, so 2 places is two significant figures
 				//   at best and reads as "0.02" for most of a network.
 				// **STATUS HAS NO ENTRY AND THAT IS THE POINT**: this map is the one place naming
@@ -4896,7 +4903,7 @@ var EngCalcs = EngCalcs || {};
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4,
 				// rate 2 -- a reaction rate runs from a hundredth to a few units of the chemical's
 				//   own concentration per day, and the report EPANET prints it in shows two places.
-					friction: 4, quality: 1, rate: 2 }
+					friction: 4, quality: 1, 'quality:trace': 0, rate: 2 }
 			},
 			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
 			// of them and the number.
@@ -9534,7 +9541,7 @@ var EngCalcs = EngCalcs || {};
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
 			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, nd.quality))); }
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
 			var initQualVal = nodeInitQuality(n);
 			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, null, nd.initQuality))); }
 			ne.empty = lines.length === 0;
@@ -9567,7 +9574,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
 			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, ld.quality))); }
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, qualityDecimals(ld)))); }
 			var lrVal = linkReactionRate(l);
 			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, null, ld.rate))); }
 			le.empty = lines.length === 0;
@@ -18640,6 +18647,20 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day');
 	}
+	// **THE RESULT the two paneColReaction() coefficients above feed** (Task 664): a pipe's own
+	// reaction rate, read the identical way the map label and the Properties popup read it --
+	// linkReactionRate() through colorLinkValue(), so a number in this column can never disagree
+	// with the one on the map or in the popup. No unit FAMILY, exactly as the quality column
+	// declares `unitText` rather than `unit`: reactionRateUnitText() is the document's own
+	// concentration label, converted by nobody. Gated on `reactionFieldsShown` for the same reason
+	// the two coefficient columns beside it are -- the column has nothing to say until a chemical
+	// is being tracked.
+	function paneColLinkReactionRate() {
+		var c = paneColLinkResult('rate', 'lpn_result_reaction_rate', null);
+		c.unitText = reactionRateUnitText;
+		c.when = reactionFieldsShown;
+		return c;
+	}
 	// The valve's type, as the word the popup's own selector shows. READ-ONLY here on purpose:
 	// changing the type re-seeds the setting and drops every scenario's override on it, which is a
 	// decision that belongs where its consequences are spelled out.
@@ -19010,7 +19031,8 @@ var EngCalcs = EngCalcs || {};
 					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkReactionRate()
 				])
 			},
 			{
@@ -33166,12 +33188,18 @@ var EngCalcs = EngCalcs || {};
 		// -- that map is the one place naming which fields are numeric, so ID (and any future
 		// non-numeric field) is skipped without a second list to keep in sync.
 		function decimalsFor(group, key) {
-			var map = labelSettings.decimals[group];
+			var map = labelSettings.decimals[group], k;
 			if (typeof map[key] !== 'number') { return null; }
+			// **THE SPINNER FOLLOWS THE CURRENT QUALITY MODE** for the one field that has a
+			// mode-specific override (qualityDecimalsKey()) -- Source share reads and writes its own
+			// 0, and Water age / Concentration keep reading and writing the flat `quality` entry they
+			// always have. Every other field is unaffected: k === key and this is decimalsFor() as it
+			// was.
+			k = (key === 'quality') ? qualityDecimalsKey() : key;
 			return {
-				value: map[key], max: 32,
+				value: (typeof map[k] === 'number') ? map[k] : map[key], max: 32,
 				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
-				onChange: function (v) { map[key] = v; }
+				onChange: function (v) { map[k] = v; }
 			};
 		}
 		// **THE SAME GATE AS decimalsFor(), AND THE SAME REASON: THE MAP IS THE LIST.** A field gets a
@@ -42052,6 +42080,17 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
+			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
+			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
+			// valve, or any other analysis, simply has none and the row does not appear. No unit
+			// FAMILY, like a concentration: reactionRateUnitText() is the document's own label,
+			// converted by nobody, same as qualityResultRow()'s concentration row on a node.
+			var rateVal = linkReactionRate(l);
+			if (rateVal !== undefined) {
+				readonlyField(fields,
+					(pc.lpn_result_reaction_rate || 'Reaction rate') + ' (' + reactionRateUnitText() + ')',
+					rateVal);
+			}
 		}
 		importNotesField(fields, l);
 		tipsIn(fields);
@@ -44123,7 +44162,23 @@ var EngCalcs = EngCalcs || {};
 		var m = LPN_DEFAULT_LABEL_PREFIX[group] || {};
 		return typeof m[field] === 'string' ? m[field] : '';
 	}
-	function labelDefaultSuffix() { return ''; }
+	// **THE QUALITY ROW AND initQuality GET A REAL DEFAULT** (Task 664), everything else stays
+	// empty exactly as it always has. Both are computed here rather than stored in
+	// defaultLabelSettings(), on labelDefaultPrefix()'s own precedent (roughness's symbol): a
+	// FUNCTION default never competes with a document's own stored value, because
+	// labelSuffixFor() only reaches it once both the mode-keyed and the legacy flat lookups have
+	// come back empty. A quality suffix a document already states -- under any mode, from before
+	// this shipped -- is untouched; `dev/lpn-spike/symbology-defaults-harness.js` opens one and
+	// asserts it. Concentration's ' mg/L' is a leading space on purpose, matching the shipped
+	// initQuality suffix it sits beside on the same row family.
+	function labelDefaultSuffix(group, field) {
+		if (field === 'quality') {
+			var mode = qualityMode();
+			return mode === 'trace' ? '%' : mode === 'chemical' ? ' mg/L' : ' hr';
+		}
+		if (field === 'initQuality') { return ' mg/L'; }
+		return '';
+	}
 	// undefined -> the default; '' -> the user's own answer of "none". See defaultLabelSettings().
 	// **ONE ROW, THREE QUANTITIES, SO THE AFFIXES CANNOT BE ONE SETTING** (Tom, 2026-09-04: *"if I
 	// put mg/L as an 'After' string for Concentration, then change my analysis to Source trace or
@@ -44151,7 +44206,19 @@ var EngCalcs = EngCalcs || {};
 		var m = (labelSettings.suffix || {})[group] || {}, k = labelAffixKey(field);
 		if (typeof m[k] === 'string') { return m[k]; }
 		if (k !== field && typeof m[field] === 'string') { return m[field]; }
-		return labelDefaultSuffix();
+		return labelDefaultSuffix(group, field);
+	}
+	// **THE ONE MODE-SPECIFIC DECIMALS OVERRIDE** (Task 664): a source share is whole (0 places),
+	// where a water age and a concentration keep the flat `quality` entry they always had. Unlike
+	// the affixes above, this key is SHIPPED as part of defaultLabelSettings() rather than computed
+	// as a fallback function -- there is no pre-existing per-mode concept for decimals to protect,
+	// so a document saved before this key existed simply picks it up the way it already picks up
+	// any other field added to the defaults after it was written, while its own customized flat
+	// `quality` number keeps governing every mode but trace, exactly as before.
+	function qualityDecimalsKey() { return qualityMode() === 'trace' ? 'quality:trace' : 'quality'; }
+	function qualityDecimals(map) {
+		var k = qualityDecimalsKey();
+		return (typeof map[k] === 'number') ? map[k] : map.quality;
 	}
 	// The one write seam for both affixes, so the legacy retirement above happens in exactly one
 	// place rather than at each of the two editors.
@@ -44344,7 +44411,7 @@ var EngCalcs = EngCalcs || {};
 			// plainRound(), not displayRound(): nodeQualityValue() has already crossed into the
 			// displayed unit, exactly as resolvedDemand() has. Crossing twice is the Task 255 shape
 			// of defect and it looks like a plausible number.
-			quality: nodeValueMap(function (n) { return plainRound(nodeQualityValue(n), nd.quality); }),
+			quality: nodeValueMap(function (n) { return plainRound(nodeQualityValue(n), qualityDecimals(nd)); }),
 			// plainRound(): a typed starting concentration is already in the unit the document
 			// states beside the chemical's name and crosses nothing (Task 638).
 			initQuality: nodeValueMap(function (n) { return plainRound(nodeInitQuality(n), nd.initQuality); })
@@ -44413,7 +44480,7 @@ var EngCalcs = EngCalcs || {};
 			// **NO STATUS ENTRY**: an extrema tick means "this is the highest in the network", which
 			// is not a thing an open pipe is.
 			friction: fieldExtrema(doc.links.map(function (l) { return plainRound(linkFrictionFactor(l), ld.friction); })),
-			linkQuality: fieldExtrema(doc.links.map(function (l) { return plainRound(linkQualityValue(l), ld.quality); })),
+			linkQuality: fieldExtrema(doc.links.map(function (l) { return plainRound(linkQualityValue(l), qualityDecimals(ld)); })),
 			// plainRound() again (Task 652): the rate is in the document's own concentration per
 			// day, which is a label and not a factor, so there is no unit to round it through.
 			rate: fieldExtrema(doc.links.map(function (l) { return plainRound(linkReactionRate(l), ld.rate); }))
@@ -44456,7 +44523,7 @@ var EngCalcs = EngCalcs || {};
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.
 			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, nd.quality))); }
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, qualityDecimals(nd)))); }
 			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
 			// "nobody stated a starting concentration" and "the starting concentration is zero" are
 			// different facts, and printing 0.00 for the first is the same defect an unsolved
@@ -44536,7 +44603,7 @@ var EngCalcs = EngCalcs || {};
 			// why it has no entry in the decimals map and gets no spinner.
 			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
 			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, ld.quality))); }
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, qualityDecimals(ld)))); }
 			// rawLine() for the third time on this block, and for the third reason: the number is
 			// already in the unit its heading names and there is no factor to run it through.
 			var lrVal = linkReactionRate(l);
