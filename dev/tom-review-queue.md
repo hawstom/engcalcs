@@ -256,8 +256,9 @@ judgement and does not belong to a script.
 
 ### Open example
 
-- [ ] R-129 fix/example-open | When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project.
+- [x] R-129 fix/example-open | When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project. -- **SHIPPED** `b043a319`: the gallery closes on the first click, and further clicks are ignored until that example has opened; a failed download brings the gallery back so you can retry. `example-open-guard-harness.js`
 - [ ] R-130 fix/example-open | The delay in opening the Net3 lat/lon example when Net3 was already open was over 25 seconds. This is a failure for a new shopper. This was on hawsedc.local on the current master branch. That said, I may have been experiencing high CPU load from CC WSL.
+  - MEASURED 2026-09-22, real headless Chrome with other work loading the machine: Net3 lat/lon opened over Net3 in 2.0 to 4.2 s (six runs); the page's own work was 0.6 to 0.9 s of that, the rest is OpenStreetMap tiles arriving. **No 25-second phase reproduced.** The likeliest account is R-129 itself: five clicks during a 4 s wait each started an open. Please retry on the merged build and say whether it is still slow
 
 ### Closed on his word
 
