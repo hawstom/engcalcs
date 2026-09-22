@@ -3083,11 +3083,13 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		crossingForeigners(obs).forEach(function (f) { if (f.leader) { fixedLeaders.push(f.leader); } });
+		var slideT0 = (typeof performance !== 'undefined') ? performance.now() : 0;
 		var slide = Collide.slideTowardAnchors(nodeLabels, nodePlaced,
 			{ boxes: obs.boxes, segments: obs.segments },
 			{ pad: pad, leaderMin: leaderThreshold(), leaders: fixedLeaders });
 		nodePlaced = slide.results;
 		lastLeaderSlide = slide.stats;
+		if (slideT0) { lastLeaderSlide.ms = performance.now() - slideT0; }
 		if (repairT0) { spotDebugMs = performance.now() - repairT0; }
 		spotDebugTrace = repaired.stats.trace;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The

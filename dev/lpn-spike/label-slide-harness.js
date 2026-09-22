@@ -35,7 +35,12 @@ const HIS = ['120', '251', '257'];
 // the slide took the nearest clear spot rather than the nearest reachable one and went round until
 // nothing moved: 28.0 -> 19.1 at 2x and 23.8 -> 4.8 at 3x. The one-pass stepping slide gave 28.0 and
 // 10.1, so this is the assertion that fails if either change is undone.
-const LONGEST_CEILING = { 2: 19.2, 3: 4.9 };
+// Then re-measured when a label still over four text heights out may leave its own leader line for
+// the nearest clear spot at any angle (slideTowardAnchors()): 19.1 -> 9.1 at 2x, 4.8 -> 3.8 at 3x,
+// and node 251 -- the label of his screenshot -- 19.1 -> 3.4 at 2x.
+const LONGEST_CEILING = { 2: 9.2, 3: 3.9 };
+// His own label at the zoom of his own screenshot, which is the case R-137 is closed on.
+const HIS_CEILING = { 2: { '251': 3.5 } };
 const ZOOMS = (process.env.LPN_ZOOMS || '2,3').split(',').map(Number);
 
 let checks = 0, failures = 0;
@@ -134,6 +139,14 @@ async function runChild(noSlide) {
 				});
 			});
 		});
+		// Leaders crossing each other count as contacts too: the leave-the-line step is the one
+		// place a leader changes direction, and a new crossing is what it could add.
+		for (let i = 0; i < drawn.length; i++) {
+			for (let j = i + 1; j < drawn.length; j++) {
+				if (drawn[i].lead * drawn[i].sp.h > 1e-12 && drawn[j].lead * drawn[j].sp.h > 1e-12
+						&& Collide.segmentsCross(drawn[i].leader, drawn[j].leader)) { touch++; }
+			}
+		}
 		const his = {};
 		drawn.forEach(function (p) { if (HIS.indexOf(p.id) >= 0) { his[p.id] = p.lead; } });
 		out.push({ zoom: z, drawn: drawn.map(function (p) { return p.id; }), touch: touch, his: his,
@@ -172,6 +185,10 @@ async function main() {
 				report(a.max <= LONGEST_CEILING[a.zoom], 'x' + a.zoom + ': the longest leader against the ratchet',
 					f(a.max) + ' h (ceiling ' + LONGEST_CEILING[a.zoom] + ')');
 			}
+			Object.keys((HIS_CEILING[a.zoom] || {})).forEach(function (id) {
+				report(a.his[id] !== undefined && a.his[id] <= HIS_CEILING[a.zoom][id],
+					'x' + a.zoom + ': node ' + id + ' (his screenshot) is near its node', f(a.his[id]) + ' h (ceiling ' + HIS_CEILING[a.zoom][id] + ')');
+			});
 			report(a.touch <= b.touch, 'x' + a.zoom + ': the slide adds no contact with a label, a symbol or a leader',
 				b.touch + ' -> ' + a.touch);
 			// COUNTED, not per label: a slide never creates a crossing (a shorter leader is a piece

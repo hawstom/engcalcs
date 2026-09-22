@@ -1942,6 +1942,22 @@ as its room, or the slide itself would make a prefix move labels again.
   leader lie along its line. At 2x one pair that already crossed swaps which label the shed hides
   (179 for 171), because the shed breaks ties on leader length. R-075 over four zooms: 11 -> 10
   moved on Net3-World, 9 -> 10 on Net3, none at 4x or 8x.
+- **Then a label still over four text heights out may LEAVE its own leader line** (Perry's review:
+  19 was still the number Tom complained about). It tries rings round its node, nearest first,
+  24 angles, the angle nearest its present one first; it takes the first spot whose box is clear
+  and whose new leader crosses no leader and runs through no label. Node 251 at 2x: 19.1 -> 3.4;
+  longest leader 9.1 at 2x and 3.8 at 3x; contacts (now counting leader-on-leader) unchanged.
+- **Cost, measured on its own** (`lastLeaderSlide.ms`, 5 runs, machine load average ~12 from other
+  agents, so read the ratio, not the milliseconds): 2 to 77 ms against a 500 to 2500 ms content
+  pass, 2 to 5 percent. Each label now gathers, once, only the obstacles, labels and leaders whose
+  bounds meet the ground it could move into; about 35 to 2,100 box tests per pass. The review's
+  1,731 -> 4,944 ms was one wall-clock sample of the whole pass on that machine.
+- **Where the time does go: the gang repair, and room to grow is what feeds it.** At 4x on
+  Net3-World the repair finds 0 gangs with room to grow off and 3 with it on (403 trials,
+  130 to 630 ms of CPU); it judges a room-claiming label by its room, so a leader through
+  somebody's empty reserve counts. Candidate cheapenings, not built: trigger the repair on text
+  and leaders only while still scoring trials by room; index the trial scoring spatially rather
+  than against every live label.
 
 ### 20e2. After master's symbol cap landed (2026-09-22)
 

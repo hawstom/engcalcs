@@ -630,6 +630,10 @@ EngCalcs.lpnCollide = (function () {
 	var COLUMN_SLIDE_STEPS = 16;
 	// How many times slideTowardAnchors() goes round (its own note says why more than once).
 	var SLIDE_PASSES = 3;
+	// When a label may leave its own leader line after the slide (slideTowardAnchors()): a leader
+	// still longer than this many text heights, tried at this many angles round its node.
+	var SLIDE_LEAVE_ROWS = 4;
+	var SLIDE_LEAVE_ANGLES = 24;
 	function cardinalSides(anchor, offset, arcs, opts) {
 		opts = opts || {};
 		var dx = Math.abs((offset && offset.x) || 0), dy = Math.abs((offset && offset.y) || 0),
@@ -1341,44 +1345,104 @@ EngCalcs.lpnCollide = (function () {
 				for (k in r) { if (Object.prototype.hasOwnProperty.call(r, k)) { c[k] = r[k]; } }
 				return c;
 			}),
-			hard = (obstacles && obstacles.boxes) || [], live = [], slid = 0, saved = 0,
-			fixedLeaders = (opts.leaders || []).filter(function (g) { return !!g; });
+			hard = ((obstacles && obstacles.boxes) || []).map(function (o) { return { o: o, bb: boxBB(o, pad) }; }),
+			live = [], slid = 0, saved = 0, left = 0, work = 0,
+			fixedLeaders = (opts.leaders || []).filter(function (g) { return !!g; })
+				.map(function (g) { return { g: g, bb: segBB(g) }; });
 		(labels || []).forEach(function (l) { specs[l.id] = l; });
 		// **A LABEL THAT CLAIMED ROOM TO GROW SLIDES WITH ITS ROOM, not with its text** (see
 		// placeLabelsFirstFit()). Sliding the bare text would make where it stops depend on how long
 		// the text is -- measured: it put two moves back at 4x on Net3-World, where room to grow had
 		// made adding a prefix move nothing. So such a label is tested, and seen by the others, as
 		// the room it claimed; the real text lies inside that box by construction.
-		var asSpec = roomSpec;
 		out.forEach(function (r, i) {
 			var sp0 = specs[r.id], sp;
 			if (r.dropped || !sp0 || sp0.dragged) { return; }
-			sp = asSpec(sp0, r);
+			sp = roomSpec(sp0, r);
 			live.push({ i: i, sp: sp, boxes: labelLineBoxes(sp, { x: r.x, y: r.y }),
 				leader: segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
 		});
-		function clearAt(me, bs) {
+		live.forEach(function (m) { m.bb = liveBB(m); });
+		// **ONLY WHAT IS NEAR IS ASKED** (the review of 2026-09-22 measured the slide at up to 100 ms
+		// on a loaded machine, scanning every obstacle and every label per step). Each label first
+		// gathers, once, the obstacles, labels and leaders whose bounding boxes meet the region it
+		// could move into; every step then asks only those. The region is the label's own reach, so
+		// nothing outside it can ever answer differently.
+		function gather(me, region) {
+			var near = { hard: [], live: [], fixed: [] }, j;
+			for (j = 0; j < hard.length; j++) {
+				if (hard[j].o.owner !== undefined && hard[j].o.owner === me.sp.id) { continue; }
+				if (bbMeet(hard[j].bb, region)) { near.hard.push(hard[j].o); }
+			}
+			for (j = 0; j < live.length; j++) {
+				if (live[j] !== me && bbMeet(live[j].bb, region)) { near.live.push(live[j]); }
+			}
+			for (j = 0; j < fixedLeaders.length; j++) {
+				if (bbMeet(fixedLeaders[j].bb, region)) { near.fixed.push(fixedLeaders[j].g); }
+			}
+			return near;
+		}
+		function clearAt(near, bs) {
 			var j, k, m, o, g;
+			work++;
 			for (k = 0; k < bs.length; k++) {
 				g = pad > 0 ? box(bs[k].cx, bs[k].cy, bs[k].w + 2 * pad, bs[k].h + 2 * pad, bs[k].a) : bs[k];
-				for (j = 0; j < hard.length; j++) {
-					o = hard[j];
-					if (o.owner !== undefined && o.owner === me.sp.id) { continue; }
-					if (boxOverlapDepth(g, o) > 0) { return false; }
+				for (j = 0; j < near.hard.length; j++) {
+					if (boxOverlapDepth(g, near.hard[j]) > 0) { return false; }
 				}
-				for (j = 0; j < live.length; j++) {
-					m = live[j];
-					if (m === me) { continue; }
+				for (j = 0; j < near.live.length; j++) {
+					m = near.live[j];
 					for (o = 0; o < m.boxes.length; o++) {
 						if (boxOverlapDepth(g, m.boxes[o]) > 0) { return false; }
 					}
 					if (m.leader && segmentInBoxFraction(m.leader, bs[k]) > 0) { return false; }
 				}
-				for (j = 0; j < fixedLeaders.length; j++) {
-					if (segmentInBoxFraction(fixedLeaders[j], bs[k]) > 0) { return false; }
+				for (j = 0; j < near.fixed.length; j++) {
+					if (segmentInBoxFraction(near.fixed[j], bs[k]) > 0) { return false; }
 				}
 			}
 			return true;
+		}
+		// A NEW LEADER, for the leave-the-line step below, which is the only place a leader changes
+		// direction: it must cross no other leader and pass through no other label, or the crossing
+		// shed would simply hide one of the two afterwards. The own symbol is where it starts, so a
+		// box holding the anchor is not asked.
+		function leaderClear(me, near, seg) {
+			var j, k, m, o, ax = me.sp.anchor.x, ay = me.sp.anchor.y;
+			for (j = 0; j < near.hard.length; j++) {
+				o = near.hard[j];
+				if (Math.abs(ax - o.cx) <= o.w / 2 && Math.abs(ay - o.cy) <= o.h / 2) { continue; }
+				if (segmentInBoxFraction(seg, o) > 0) { return false; }
+			}
+			for (j = 0; j < near.live.length; j++) {
+				m = near.live[j];
+				if (m.leader && segmentsCross(seg, m.leader)) { return false; }
+				for (k = 0; k < m.boxes.length; k++) {
+					if (segmentInBoxFraction(seg, m.boxes[k]) > 0) { return false; }
+				}
+			}
+			for (j = 0; j < near.fixed.length; j++) {
+				if (segmentsCross(seg, near.fixed[j])) { return false; }
+			}
+			return true;
+		}
+		function moveTo(me, best, bestBoxes) {
+			var r = out[me.i], ax = me.sp.anchor.x, ay = me.sp.anchor.y;
+			if (!me.moved) { me.moved = true; slid++; }
+			saved += Math.hypot(r.x - ax, r.y - ay) - Math.hypot(best.x - ax, best.y - ay);
+			r.dx += best.x - r.x; r.dy += best.y - r.y;
+			r.x = best.x; r.y = best.y;
+			r.box = labelBoxAtEnd(me.sp.text || me.sp, best);
+			r.boxes = me.sp.text ? labelLineBoxes(me.sp.text, best) : bestBoxes;
+			me.boxes = bestBoxes;
+			me.leader = segment(ax, ay, best.x, best.y, 'leader', r.id);
+			me.bb = liveBB(me);
+		}
+		function floorOf(me) {
+			// Never nearer than the resting offset: that is where an unmoved label sits, and the four
+			// corners already say it is the nearest place a label belongs.
+			var ax = me.sp.anchor.x, ay = me.sp.anchor.y;
+			return Math.max(leaderMin, me.sp.home ? Math.hypot(me.sp.home.x - ax, me.sp.home.y - ay) : 0);
 		}
 		// SHORTEST leader first, and that was measured against longest-first: the label nearest its
 		// node moves out of the way of the ones behind it, so more of them get to slide (29 labels
@@ -1393,17 +1457,19 @@ EngCalcs.lpnCollide = (function () {
 			var la = Math.hypot(out[a.i].x - a.sp.anchor.x, out[a.i].y - a.sp.anchor.y),
 				lb = Math.hypot(out[b.i].x - b.sp.anchor.x, out[b.i].y - b.sp.anchor.y);
 			return la - lb || (a.sp.id < b.sp.id ? -1 : 1);
-		}), movedIds = {}, movedThisPass = 0, pass;
+		}), movedThisPass = 0, pass;
 		function slideOne(me) {
 			var r = out[me.i], ax = me.sp.anchor.x, ay = me.sp.anchor.y,
 				len = Math.hypot(r.x - ax, r.y - ay),
 				step = opts.step > 0 ? opts.step : me.sp.h / 4,
-				// Never nearer than the resting offset: that is where an unmoved label sits, and the
-				// four corners already say it is the nearest place a label belongs.
-				floor = Math.max(leaderMin, me.sp.home ? Math.hypot(me.sp.home.x - ax, me.sp.home.y - ay) : 0),
-				ux, uy, d, c, bs, best = null, bestBoxes = null;
+				floor = floorOf(me), ux, uy, d, c, bs, near, region;
 			if (!(len > floor + step)) { return; }
 			ux = (r.x - ax) / len; uy = (r.y - ay) / len;
+			// The region: every box this label could stand in along its leader, from the floor out
+			// to where it is now.
+			region = bbUnion(bbOfBoxes(labelLineBoxes(me.sp, { x: ax + ux * floor, y: ay + uy * floor }), pad),
+				bbOfBoxes(me.boxes, pad));
+			near = gather(me, region);
 			// NEAREST CLEAR SPOT ON THE LEADER, not the nearest one reachable by sliding: the box
 			// does not travel, it is put down once. Stepping inward and stopping at the first
 			// obstruction left node 251 at 28 text heights at 2x on Net3-World with three properties
@@ -1412,26 +1478,74 @@ EngCalcs.lpnCollide = (function () {
 			for (d = floor; d <= len - step; d += step) {
 				c = { x: ax + ux * d, y: ay + uy * d };
 				bs = labelLineBoxes(me.sp, c);
-				if (clearAt(me, bs)) { best = c; bestBoxes = bs; break; }
+				if (clearAt(near, bs)) { movedThisPass++; moveTo(me, c, bs); return; }
 			}
-			if (!best) { return; }
-			if (!movedIds[r.id]) { movedIds[r.id] = true; slid++; }
-			movedThisPass++;
-			saved += len - Math.hypot(best.x - ax, best.y - ay);
-			r.dx += best.x - r.x; r.dy += best.y - r.y;
-			r.x = best.x; r.y = best.y;
-			r.box = labelBoxAtEnd(me.sp.text || me.sp, best);
-			r.boxes = me.sp.text ? labelLineBoxes(me.sp.text, best) : bestBoxes;
-			me.boxes = bestBoxes;
-			me.leader = segment(ax, ay, best.x, best.y, 'leader', r.id);
 		}
 		for (pass = 0; pass < SLIDE_PASSES; pass++) {
 			movedThisPass = 0;
 			order.forEach(slideOne);
 			if (!movedThisPass) { pass++; break; }
 		}
-		return { results: out, stats: { slid: slid, saved: saved, passes: pass } };
+		// **AND A LABEL STILL FAR OUT MAY LEAVE ITS OWN LEADER LINE** (Tom's R-137 at 2x: node 251
+		// stayed 19 text heights out after the slide, because a neighbour's room and leader lay
+		// along its line while open ground sat beside the node at another angle). Only a label whose
+		// leader is still longer than SLIDE_LEAVE_ROWS text heights is asked, so this is a handful of
+		// labels, not the drawing. It tries rings round its node from the floor outward, nearest
+		// ring first and, on a ring, the angle nearest its present one; the first spot whose box is
+		// clear AND whose new leader crosses no leader and runs through no label wins. A new leader
+		// is the one thing this can add, and that test is what keeps it from adding a crossing.
+		live.slice().sort(function (a, b) { return a.sp.id < b.sp.id ? -1 : 1; }).forEach(function (me) {
+			var r = out[me.i], ax = me.sp.anchor.x, ay = me.sp.anchor.y, h = me.sp.h,
+				len = Math.hypot(r.x - ax, r.y - ay), floor = floorOf(me), here, near, rad, k, t, a, c, bs,
+				reach, angles = [];
+			if (!(len > SLIDE_LEAVE_ROWS * h) || !(len > floor + h)) { return; }
+			here = Math.atan2(r.y - ay, r.x - ax);
+			for (k = 0; k < SLIDE_LEAVE_ANGLES; k++) {
+				a = k * 2 * Math.PI / SLIDE_LEAVE_ANGLES;
+				t = Math.abs(Math.atan2(Math.sin(a - here), Math.cos(a - here)));
+				angles.push({ a: a, t: t });
+			}
+			angles.sort(function (p, q) { return p.t - q.t || p.a - q.a; });
+			reach = len + me.sp.w + 2 * h + pad;
+			near = gather(me, { x0: ax - reach, y0: ay - reach, x1: ax + reach, y1: ay + reach });
+			for (rad = floor; rad < len - h / 2; rad += h / 2) {
+				for (k = 0; k < angles.length; k++) {
+					c = { x: ax + Math.cos(angles[k].a) * rad, y: ay + Math.sin(angles[k].a) * rad };
+					bs = labelLineBoxes(me.sp, c);
+					if (!clearAt(near, bs)) { continue; }
+					if (!leaderClear(me, near, segment(ax, ay, c.x, c.y, 'leader', r.id))) { continue; }
+					left++;
+					moveTo(me, c, bs);
+					return;
+				}
+			}
+		});
+		return { results: out, stats: { slid: slid, saved: saved, passes: pass, left: left, tests: work } };
 	}
+	// Axis-aligned bounds, for the slide's "only what is near" gathering. A box may be rotated (a
+	// pipe label along its pipe), so its bounds are those of the rotated rectangle; `a` is degrees.
+	function boxBB(b, pad) {
+		var rad = (b.a || 0) * Math.PI / 180, c = Math.abs(Math.cos(rad)), s = Math.abs(Math.sin(rad)),
+			hw = (b.w / 2) * c + (b.h / 2) * s + (pad || 0), hh = (b.w / 2) * s + (b.h / 2) * c + (pad || 0);
+		return { x0: b.cx - hw, y0: b.cy - hh, x1: b.cx + hw, y1: b.cy + hh };
+	}
+	function segBB(g) {
+		return { x0: Math.min(g.ax, g.bx), y0: Math.min(g.ay, g.by), x1: Math.max(g.ax, g.bx), y1: Math.max(g.ay, g.by) };
+	}
+	function bbUnion(p, q) {
+		if (!p) { return q; }
+		if (!q) { return p; }
+		return { x0: Math.min(p.x0, q.x0), y0: Math.min(p.y0, q.y0), x1: Math.max(p.x1, q.x1), y1: Math.max(p.y1, q.y1) };
+	}
+	function bbOfBoxes(bs, pad) {
+		var u = null, i;
+		for (i = 0; i < bs.length; i++) { u = bbUnion(u, boxBB(bs[i], pad)); }
+		return u;
+	}
+	function bbMeet(p, q) {
+		return !!p && !!q && p.x0 <= q.x1 && q.x0 <= p.x1 && p.y0 <= q.y1 && q.y0 <= p.y1;
+	}
+	function liveBB(m) { return bbUnion(bbOfBoxes(m.boxes, 0), m.leader ? segBB(m.leader) : null); }
 	// ROOM TO GROW's two pieces (placeLabelsFirstFit() carries the reasoning), at module level so a
 	// replay of the pass -- label-width-cause-harness.js -- asks the identical question rather than
 	// keeping a second opinion about it. The room is a box `lbl.grow` wide hanging off the endpoint
