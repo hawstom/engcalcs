@@ -608,8 +608,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
 		      // labels legend dodges under it instead of through it. ?>
 		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:rgba(255,255,255,.85);border:1px solid #999">
-			<button type="button" id="lpn_zoom_in" style="display:block;width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
-			<button type="button" id="lpn_zoom_out" style="display:block;width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_in" style="width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
 		</div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:

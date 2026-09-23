@@ -13444,7 +13444,7 @@ var EngCalcs = EngCalcs || {};
 	// Leaving the mode mid-drag (Escape, another tool, undo's own snapshot) drops the box rather
 	// than zooming to a rectangle the user never finished asking for -- the same rule Task 266's
 	// half-drawn marquee follows.
-	function zoomWinCancel() { zoomWinDrag = null; paintZoomWin(); }
+	function zoomWinCancel() { zoomWinDrag = null; zoomWinPressAt = null; paintZoomWin(); }
 	function zoomWinFinish() {
 		if (!zoomWinDrag) { return; }
 		var a = zoomWinDrag.start, b = zoomWinDrag.live;
@@ -13461,6 +13461,47 @@ var EngCalcs = EngCalcs || {};
 		// 'fit' rather than a remembered preference (see its own comment). setMode()'s own
 		// zoom-window exit hook does that reset and repaints the toolbar button.
 		setMode('select');
+	}
+	// **R-180 (Tom, 2026-09-23): "It seems inconsistent for us to use click for selection, but drag
+	// for zoom. I think we should have a consistent idiom."** Ida's answer: Zoom Window takes
+	// EXACTLY the gesture shape select-area's window already takes -- click-a-corner,
+	// click-the-opposite-corner, OR press-drag-release, both committing the same box (EPANET's own
+	// Zoom-In tool is click-click; the suite already defers to EPANET's conventions). This mirrors
+	// `areaPress()`/`areaPointerUp()` (`:15547`/`:15612` in Ida's own citation) but reads and writes
+	// `zoomWinDrag` alone, never `areaRing` -- the two tools' state stays deliberately unshared, per
+	// the comment on `zoomWinDrag`'s own declaration above.
+	//
+	// `zoomWinPressAt` is `areaPressAt`'s exact counterpart: recorded on every press, before the
+	// press itself runs, so `started` can still answer "did THIS press open the box" after the
+	// press has changed what `zoomWinDrag` holds.
+	var zoomWinPressAt = null;   // { id: pointerId, x, y, started } in SCREEN coords, or null
+	// One press in zoom-window mode. No box open yet: this press OPENS one, exactly like
+	// `areaPress()`'s first call. A box already open: this press is the "second click" of a
+	// click-click pair, and commits it immediately -- `zoomWinFinish()`'s own zero-movement guard
+	// then protects a genuine miss (two clicks on the same spot) by leaving the box open rather
+	// than zooming to nothing.
+	function zoomWinPress(w, pointerId) {
+		if (!zoomWinDrag) { zoomWinBegin(w, pointerId); return 'start'; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return 'commit';
+	}
+	// **THE RELEASE OF A PRESS-DRAG-RELEASE, ON A POINTER** -- `areaPointerUp()`'s counterpart. A
+	// release that never travelled past the tap threshold is the up-stroke of an ordinary click
+	// that just opened the box (or, before this existed, was silently discarded by
+	// `zoomWinFinish()`'s own zero-movement guard on every plain click -- the defect R-180 named).
+	// Leaving the box open there, instead of finishing, is what makes the SECOND click able to find
+	// it and close it. A release that DID travel is a genuine drag ending, and commits exactly as
+	// before.
+	function zoomWinPointerUp(e, w) {
+		var from = zoomWinPressAt;
+		if (!from || from.id !== e.pointerId) { return false; }
+		zoomWinPressAt = null;
+		if (!from.started || !zoomWinDrag) { return false; }
+		if (Math.hypot(e.clientX - from.x, e.clientY - from.y) < tapMovePx(e)) { return false; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return true;
 	}
 
 	// ---- Task 497: elevations read from the land surface ------------------------------------------
@@ -15535,6 +15576,16 @@ var EngCalcs = EngCalcs || {};
 	// pressing it a second time rather than by a memory of what was last used.
 	var zoomToolShape = 'fit';   // 'fit' | 'window'
 	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
+	// **R-181 (Tom, 2026-09-23): "the first time you click, it does not change modes... I think
+	// that it should act like Select area. Click twice in a row to get mode change."** This is a
+	// SEPARATE flag from `zoomToolShape` above on purpose (Ida's spec) -- `zoomToolShape` is what
+	// the button currently SHOWS, and R-181 asks that the first press not change what it shows at
+	// all, so the paint decision and the "was the last press this same button, with nothing else
+	// pressed in between" question cannot share one variable. Set true the instant Zoom to fit
+	// fires; cleared by the same setMode() reset hook that already drops `zoomToolShape` back to
+	// 'fit' (extended below to fire on every mode change, not only a zoom-window exit), so any
+	// other tool or mode change in between un-arms the second press.
+	var zoomToolArmed = false;
 	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
 	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
 	// simply nothing to fade.
@@ -24615,6 +24666,13 @@ var EngCalcs = EngCalcs || {};
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// **R-181's ARMED FLAG UN-ARMS ON ANY MODE CHANGE, NOT ONLY A ZOOM-WINDOW EXIT** -- picking
+		// any other tool between the first and second press means there was no "second, consecutive
+		// press" left to complete (Ida's spec, Task 682 follow-up). This runs before the
+		// zoom-window-only block below because arming has nothing to do with being IN zoom-window
+		// mode -- the armed state lives entirely inside 'select', between the first Zoom to fit and
+		// a second press that has not happened yet.
+		if (newMode !== mode) { zoomToolArmed = false; }
 		// **ZOOM WINDOW IS THE SAME SHAPE OF HALF-DRAWN MARQUEE** (ROADMAP Task 682) -- and it also
 		// drops the toolbar button back to showing Zoom to fit, because the disclosure is one-shot
 		// rather than a remembered preference (see `zoomToolShape`'s own comment).
@@ -33823,19 +33881,29 @@ var EngCalcs = EngCalcs || {};
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
 			if (mode === 'zoom-window') { setMode('select'); return; }
+			// **R-181 (Tom, 2026-09-23): the FIRST press never changes what the button shows -- it
+			// only does what it already showed, exactly as select-area's own button never re-labels
+			// itself on the press that enters the tool.** `zoomToolArmed` is the one-shot memory of
+			// "the last thing pressed was this button, doing Zoom to fit, with nothing else in
+			// between" -- setMode()'s reset hook clears it on any other mode change, so it is only
+			// ever true here on a genuine SECOND, CONSECUTIVE press.
+			if (zoomToolArmed) {
+				zoomToolArmed = false;
+				zoomToolShape = 'window';
+				setMode('zoom-window');
+				paintZoomToolButton();
+				return;
+			}
 			// **`zoomExtent(false)`, EXPLICITLY, never a bare call** -- view-memory-harness.js
 			// greps the whole file for an unmarked `zoomExtent()` on the argument that every real
 			// call site must SAY whether it is a fit nobody asked for (Tom, 2026-08-15: "there are
 			// no automatic zooms or pans... a fit that establishes a view the document never had is
 			// not a change to it"). This one is a press, which is an edit, so it says so.
-			if (zoomToolShape === 'fit') {
-				zoomExtent(false);
-				zoomToolShape = 'window';
-				paintZoomToolButton();
-				return;
-			}
-			setMode('zoom-window');
-			paintZoomToolButton();
+			zoomExtent(false);
+			zoomToolArmed = true;
+			// **NO paintZoomToolButton() HERE, ON PURPOSE.** The face stays "Zoom to fit" -- Tom:
+			// "Changing the first time you click is confusing." `zoomToolShape` is untouched too,
+			// so a second press elsewhere (a different tool, then back here) starts this over.
 		});
 		repaintZoomTool = paintZoomToolButton;
 		paintZoomToolButton();
@@ -34140,10 +34208,15 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			// **ZOOM WINDOW IS ALSO ITS OWN MODE, FOR THE SAME REASON** (ROADMAP Task 682): the
-			// whole gesture is a press-drag-release box, on a mouse or a finger alike, so `drag`
-			// (the pan/node/vertex/label state machine below) never arms while it is open.
+			// whole gesture is a press-drag-release box OR a click-click box (R-180), on a mouse or
+			// a finger alike, so `drag` (the pan/node/vertex/label state machine below) never arms
+			// while it is open.
 			if (mode === 'zoom-window') {
-				zoomWinBegin(screenToWorld(e.clientX, e.clientY), e.pointerId);
+				// Recorded BEFORE the press, exactly as select-area's own `areaPressAt` is, because
+				// `started` asks "did THIS press open the box" and there is no way left to ask that
+				// once zoomWinPress() has run.
+				zoomWinPressAt = { id: e.pointerId, x: e.clientX, y: e.clientY, started: !zoomWinDrag };
+				zoomWinPress(screenToWorld(e.clientX, e.clientY), e.pointerId);
 				return;
 			}
 			// **SELECT AREA IS ITS OWN MODE AND NOTHING ELSE HAPPENS IN IT** (Task 266). No node
@@ -34280,11 +34353,15 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
-			// The Zoom Window release (ROADMAP Task 682) -- a cancelled pointer drops the box
+			// The Zoom Window release (ROADMAP Task 682; R-180) -- a cancelled pointer drops the box
 			// rather than zooming to wherever the browser happened to take the gesture away, the
-			// same rule select-area's own cancel follows two lines down.
-			if (mode === 'zoom-window' && zoomWinDrag && zoomWinDrag.id === e.pointerId) {
-				if (cancelled) { zoomWinCancel(); } else { zoomWinFinish(); }
+			// same rule select-area's own cancel follows two lines down. A release that is not
+			// cancelled goes through `zoomWinPointerUp()`, exactly as select-area's own release
+			// does through `areaPointerUp()`: a release that never travelled leaves the box open
+			// for a second click, and only a release that DID travel commits it here.
+			if (mode === 'zoom-window') {
+				if (cancelled) { zoomWinPressAt = null; if (zoomWinDrag) { zoomWinCancel(); } }
+				else { zoomWinPointerUp(e, screenToWorld(e.clientX, e.clientY)); }
 			}
 			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
 			// because nothing else on this page owns that finger: select-area arms no `drag`.

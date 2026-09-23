@@ -4112,6 +4112,17 @@ tr.lpn-ff-error { background: #f2f2f2; }
    inline display would beat any stylesheet rule (Perry, 2026-09-23). */
 #lpn_zoom_control { display: flex; flex-direction: column; }
 
+/* R-179 (Tom, 2026-09-23): "The + and - glyphs are not centered in their boxes." Each button had
+   no layout of its own, so the icon fell back to being an ordinary inline glyph -- `button >
+   .ec-icon`'s `margin-inline-end: 0.4em` (the gap it earns everywhere it prefixes a WORD) shoved
+   it left of centre here, where there is no word to gap from, and `.ec-icon`'s
+   `vertical-align: -0.16em` (tuned to sit on a line of TEXT's optical centre) had no baseline to
+   sit on in an otherwise-empty button. Flex centring on the button answers both axes at once, and
+   the margin is zeroed the same way the lpn menu's icon column already zeroes it for its own
+   icon-only cells. */
+#lpn_zoom_in, #lpn_zoom_out { display: flex; align-items: center; justify-content: center; }
+#lpn_zoom_in > .ec-icon, #lpn_zoom_out > .ec-icon { margin-inline-end: 0; }
+
 /* ---- The profile's path chooser (Tasks 433, 504) ---------------------------------------------
    The line that says what the next press does. It lives in the profile panel's control row, which
    is `font-size: .9em` already, and since Task 504 it is the ONLY thing in there that changes --

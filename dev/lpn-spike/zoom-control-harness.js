@@ -52,7 +52,9 @@ const L = stub.loadLoopedNetwork(
 	"\t\tkeyZoom: keyZoom, getState: function () { return state; },\n" +
 	"\t\tgetZoomToolShape: function () { return zoomToolShape; },\n" +
 	"\t\tsetZoomToolShape: function (s) { zoomToolShape = s; },\n" +
+	"\t\tgetZoomToolArmed: function () { return zoomToolArmed; },\n" +
 	"\t\tzoomWindowOpen: function () { return !!zoomWinDrag; },\n" +
+	"\t\twireToolbar: wireToolbar,\n" +
 	"\t\tnoteMapSized: noteMapSized,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -177,7 +179,7 @@ console.log('\n--- 3. Zoom to fit\'s second mode drags a box and zooms to it ---
 	ok('...and the toolbar button falls back to Zoom to fit', L.getZoomToolShape() === 'fit');
 }
 
-console.log('\n--- 3b. a click with no drag does nothing, and stays armed to retry ---');
+console.log('\n--- 3b. a click with no drag does nothing YET, and leaves the box open for a second click (R-180) ---');
 {
 	reset();
 	svg._listeners = {};
@@ -190,9 +192,56 @@ console.log('\n--- 3b. a click with no drag does nothing, and stays armed to ret
 	const after = L.getState();
 	ok('the view is unchanged', after.s === before.s && after.tx === before.tx && after.ty === before.ty);
 	ok('the tool stays armed for another try', L.getMode() === 'zoom-window');
+	// **THE DEFECT R-180 NAMED**: before the fix, `zoomWinFinish()`'s own zero-movement guard
+	// nulled `zoomWinDrag` unconditionally, so a plain click silently threw the box away instead of
+	// leaving it open for a second click -- click-click could never work no matter how the button
+	// or the pointer handlers wired it. This is the one assertion that would have caught it.
+	ok('...and the half-open box survives the click, unlike before this fix', L.zoomWindowOpen());
 }
 
-console.log('\n--- 3c. leaving the mode mid-drag drops the half-drawn box (Task 266\'s own rule) ---');
+console.log('\n--- 3c. click-a-corner, click-the-opposite-corner zooms to the SAME box a drag would (R-180) ---');
+{
+	reset();
+	svg._listeners = {};
+	L.wirePointerEvents();
+	L.setZoomToolShape('window');
+	L.setMode('zoom-window');
+	// Same box as section 3's drag: (200,100)-(600,400), so the expected view is identical --
+	// EXACTLY Tom's ask, "a consistent idiom" for the same result.
+	fire('pointerdown', { pointerId: 12, clientX: 200, clientY: 100, pointerType: 'mouse', button: 0 });
+	fire('pointerup', { pointerId: 12, clientX: 200, clientY: 100, pointerType: 'mouse' });
+	ok('the first click opens the box rather than committing it', L.zoomWindowOpen());
+	ok('...and stays in the mode, unchanged', L.getMode() === 'zoom-window');
+	// The SECOND click's PRESS commits, exactly as areaPress()'s second call falls through to
+	// commitArea() -- select-area's own window/lasso shape never waits for that click's release.
+	fire('pointerdown', { pointerId: 12, clientX: 600, clientY: 400, pointerType: 'mouse', button: 0 });
+	const st = L.getState();
+	const expectS = Math.min(1000 / 400, 500 / 300);
+	ok('the second click commits the identical box a drag would', Math.abs(st.s - expectS) < 1e-6, String(st.s));
+	ok('...centred the same way (tx)', Math.abs(st.tx - (500 - expectS * 400)) < 1e-6, String(st.tx));
+	ok('...centred the same way (ty)', Math.abs(st.ty - (250 - expectS * 250)) < 1e-6, String(st.ty));
+	ok('a completed click-click is one-shot -- back to Select, same as a drag', L.getMode() === 'select');
+	fire('pointerup', { pointerId: 12, clientX: 600, clientY: 400, pointerType: 'mouse' });   // the real up event that follows any down, no-op once mode has left zoom-window
+	ok('...and the toolbar button falls back to Zoom to fit', L.getZoomToolShape() === 'fit');
+}
+
+console.log('\n--- 3d. Escape cancels a half-drawn box, click-click or drag alike ---');
+{
+	reset();
+	svg._listeners = {};
+	L.wirePointerEvents();
+	L.setZoomToolShape('window');
+	L.setMode('zoom-window');
+	fire('pointerdown', { pointerId: 13, clientX: 50, clientY: 50, pointerType: 'mouse', button: 0 });
+	fire('pointerup', { pointerId: 13, clientX: 50, clientY: 50, pointerType: 'mouse' });
+	ok('a half-drawn box is open after one click', L.zoomWindowOpen());
+	keydown({ key: 'Escape' });
+	ok('Escape drops it', !L.zoomWindowOpen());
+	ok('...and returns to Select', L.getMode() === 'select');
+	ok('...it did not zoom to the half-drawn box', L.getState().s === 1);
+}
+
+console.log('\n--- 3e. leaving the mode mid-drag drops the half-drawn box (Task 266\'s own rule) ---');
 {
 	reset();
 	svg._listeners = {};
@@ -243,6 +292,95 @@ console.log('\n--- 4. the +/- chip is hidden at the phone breakpoint, and only t
 		!/id="lpn_zoom_control"[^>]*style="[^"]*display:/.test(php));
 	ok('its flex layout lives in the stylesheet instead',
 		css.indexOf('#lpn_zoom_control { display: flex;') >= 0);
+}
+
+// ---------------------------------------------------------------------------
+// 5. R-179 (Tom, 2026-09-23): "The + and - glyphs are not centered in their boxes."
+//    A stub with no real layout engine cannot measure a rendered glyph's bounding box, so this is
+//    SOURCE-LEVEL -- it checks the fix is actually in place, not that it renders true. The
+//    render-true half was measured separately in a real headless Chromium
+//    (dev/browser-pass/lib/env.js, playwright-core, under flock /tmp/engcalcs-browser.lock) and is
+//    reported in the build's own report rather than duplicated here as a number this harness
+//    cannot reproduce: both buttons' glyph bounding-box centre landed within 0.5 px of the
+//    button's own centre (#lpn_zoom_in: 0.01 px both axes; #lpn_zoom_out: 0.01 px / 0.49 px).
+// ---------------------------------------------------------------------------
+console.log('\n--- 5. R-179: the +/- buttons flex-centre their glyph, and carry no inline display to beat it ---');
+{
+	const css = fs.readFileSync(ROOT + 'css/engcalcs.css', 'utf8');
+	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	ok('#lpn_zoom_in flex-centres its own content',
+		/#lpn_zoom_in,\s*#lpn_zoom_out\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center[^}]*justify-content:\s*center/.test(css)
+		|| /#lpn_zoom_in,\s*#lpn_zoom_out\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*center[^}]*align-items:\s*center/.test(css));
+	ok('...and the icon\'s own trailing-word margin is zeroed for these two icon-only buttons',
+		/#lpn_zoom_in\s*>\s*\.ec-icon,\s*#lpn_zoom_out\s*>\s*\.ec-icon\s*\{[^}]*margin-inline-end:\s*0/.test(css));
+	// Both buttons carried an inline `display:block` until this fix -- an inline display beats any
+	// stylesheet rule (the same lesson the chip's own container already learned, bcaa8319), so the
+	// flex centring above would have been dead code with that inline value still in the markup.
+	ok('#lpn_zoom_in carries no inline display of its own',
+		!/id="lpn_zoom_in"[^>]*style="[^"]*display:/.test(php));
+	ok('#lpn_zoom_out carries no inline display of its own',
+		!/id="lpn_zoom_out"[^>]*style="[^"]*display:/.test(php));
+}
+
+// ---------------------------------------------------------------------------
+// 6. R-181 (Tom, 2026-09-23): "With Select area, the first time you click, it does not change
+//    modes... I think that it should act like Select area. Click twice in a row to get mode
+//    change." Driven through the REAL toolbar button and its own click handler -- not the
+//    zoomToolShape/setMode primitives sections 3-3e use directly -- because the whole defect was
+//    in what the CLICK HANDLER did before reaching those primitives.
+// ---------------------------------------------------------------------------
+console.log('\n--- 6. the toolbar button: first press fits and says so; only a SECOND, CONSECUTIVE press enters Zoom Window ---');
+{
+	function findByDataTool(root, tool) {
+		if (!root || !root.children) { return null; }
+		for (const c of root.children) {
+			if (c.dataset && c.dataset.tool === tool && String(c.tagName) === 'BUTTON') { return c; }
+			const found = findByDataTool(c, tool);
+			if (found) { return found; }
+		}
+		return null;
+	}
+	function click(btn) { (btn._listeners.click || []).forEach(function (fn) { fn({}); }); }
+	const pc = global.EngCalcs.pageConfig;
+
+	reset();
+	svg._listeners = {};
+	L.wirePointerEvents();
+	stub.byId.lpn_toolbar.children.length = 0;   // a clean strip: wireToolbar() appends, it does not replace
+	L.wireToolbar();
+	const btn = findByDataTool(stub.byId.lpn_toolbar, 'zoom-window');
+	ok('the button is on the strip', !!btn);
+	if (btn) {
+		// **WORDING ASSERTED THROUGH pageConfig KEYS, NEVER AN ENGLISH LITERAL** (harness_wording_check.php).
+		ok('it opens showing Zoom to fit', btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent);
+
+		click(btn);
+		ok('...the face still says Zoom to fit after the first press -- R-181\'s whole point',
+			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent);
+		ok('...and the tool has NOT entered zoom-window mode yet', L.getMode() !== 'zoom-window');
+		ok('...armed, waiting for a second press', L.getZoomToolArmed());
+
+		click(btn);
+		ok('the SECOND, CONSECUTIVE press flips the face to Zoom Window',
+			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_window);
+		ok('...and enters the mode', L.getMode() === 'zoom-window');
+		ok('...un-arming itself', !L.getZoomToolArmed());
+
+		// Exit and start over, to test the intervening-action reset in isolation.
+		L.setMode('select');
+		L.setZoomToolShape('fit');
+
+		click(btn);
+		ok('re-armed after a fresh first press', L.getZoomToolArmed());
+		// **ANY OTHER MODE CHANGE IN BETWEEN RESETS IT** (Ida's spec) -- picking a different tool is
+		// exactly the "something else pressed in between" case R-181 is about.
+		L.setMode('select-area');
+		ok('an intervening tool change un-arms it', !L.getZoomToolArmed());
+		L.setMode('select');
+		click(btn);
+		ok('...so the very next press is a first press again, not a second one',
+			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent && L.getMode() !== 'zoom-window');
+	}
 }
 
 console.log('\n' + checks + ' checks, ' + failures + ' failed');
