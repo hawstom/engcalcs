@@ -411,7 +411,7 @@ run_check "review queue selftest"        blocking php dev/scripts/review_queue_s
 # to that file, because dev/*.md's 31 dead citations are nearly all legitimate history.
 run_check "check table parity"           blocking php dev/scripts/check_table_parity_check.php
 run_check "check table selftest"         blocking php dev/scripts/check_table_parity_selftest.php
-run_check "CLAUDE.md paths resolve"      blocking php dev/scripts/doc_path_check.php
+run_check "start-of-session doc paths"  blocking php dev/scripts/doc_path_check.php
 run_check "doc path selftest"            blocking php dev/scripts/doc_path_selftest.php
 # The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
 # one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
