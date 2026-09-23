@@ -413,6 +413,10 @@ and that a `nav item` is not merely a pull-down row.
   a missed lang file leaves an orphan, a missed call site renders an empty string. That expense is
   what made leaving a bad name the rational choice. It does not rewrite `dev/english-friction/*.json`
   (a dated record) and reports those hits instead.
+- **A rename carries the translations, so rename only when the meaning is unchanged.** If the
+  English now says something different, delete the 26 translated values after the rename so English
+  shows until the next sprint. A stale translation blocks the English fallback (`lpn_file_convert_as`,
+  2026-09-23: 26 languages still offered the retired "Open an xy file on the map").
 - **`php dev/scripts/key_hygiene_check.php`** reports keys rendered by nothing (each costs 27
   translated strings forever) and suffix names that drifted from their siblings. Advisory.
 - **A key rendered by nothing is not automatically debt.** It may be parked for a returning feature,
