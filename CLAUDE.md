@@ -6,176 +6,63 @@ computation runs client-side in JavaScript. No database, no authentication.
 
 **License:** GNU GPL v3 or later. Copyright 2009 Thomas Gail Haws.
 
-**How to read this file:** it states the current rules, not how they were arrived at. Where a rule is
-enforced by a script, the script's own error text is the authority — this file only names it. Run
-`sh dev/scripts/check_all.sh` before every commit; it runs everything listed under "Automated
-checks" below.
+**How to read this file:** it states the current rules, tersely. The reasoning, quotes and
+measurements behind them live in the `dev/*.md` each section points at. Where a rule is enforced by
+a script, the script's own error text is the authority. Run `sh dev/scripts/check_all.sh` before
+every commit. **Read `dev/session-handoff.md` before the roadmap** — its top block is the current
+freeze, the branches you may not merge, and any open deploy blocker.
 
 ---
 
 ## Git Workflow
 
-**Commit and push by default, without asking, at the end of every piece of work.** This overrides the
-general assistant default. The only exception is Tom explicitly saying to leave something
-uncommitted; silence means commit and push.
+Full record, with Tom's words and the history of each rule: `dev/git-workflow.md`.
 
-- **`master` IS THE PRODUCTION LINE AND NOBODY WORKS ON IT** (Tom, 2026-09-12, retooling the
-  paradigm: *"Master as sacred production line lets us work more happily merging all the while into
-  and from master at will... I am eager for the freedom of branches."*). **Every change starts on a
-  branch, however small, and reaches master only by a merge somebody decided to make.** Branches are
-  cheap; that is what they are for.
-  - **A RELEASE BRANCH IS HOW THE LINE IS HELD, AND A FREEZE IS NOT** (2026-09-17, on Tom's own
-    question: *"Where is the EWB release branch in case hot fixes are needed today?"*). Trunk-based
-    development cuts `release/<name>` from the SHA production is actually running; that branch takes
-    **only** fixes, while master goes on taking whatever is finished. He deploys by `git pull`, so
-    he already has most of this for free -- the thing a freeze was protecting against is that **you
-    cannot pull half of master**, and a release branch is a half of master you CAN pull.
-    - **`release/ewb` EXISTS AND IS CUT FROM `81792180`**, the SHA he had deployed. A hotfix during
-      a held window is: branch off `release/ewb`, fix, `check_all`, merge to `release/ewb`, push,
-      and he pulls THAT. The same fix is then merged to master separately. Nothing on master needs
-      to stop, and nothing unfinished rides along.
-    - **AND THE 2026-09-13 ADVICE THAT A CLEAN RELEASE COULD NOT BE EXTRACTED WAS WRONG.** Tom
-      complained the day `projection` reached master and was told extricating a clean release from
-      what had been done was impossible; he was later told cherry-picking a release branch off
-      master is a matter of course. **Both cannot be true and the second one is right.** The first
-      projection merge is `06a1deab`; every commit before it is projection-free, so a release could
-      have been cut from any of them and the fixes he wanted cherry-picked on. **That was never
-      owned, and it is owned here**: the bad merge was one mistake and the advice that it could not
-      be undone was a second, larger one, because it left him believing he had to choose between
-      shipping unfinished work and shipping nothing.
-  - **SACRED MEANS ONE TESTABLE THING: master is pullable at any moment.** `sh dev/scripts/check_all.sh`
-    passes on the MERGE RESULT before the merge is pushed -- not on the branch beforehand, which is a
-    different tree. A red master is a production outage waiting for whenever Tom next pulls.
-  - **THIS SUPERSEDES "work directly on master, no feature branches", and WHO ARGUED WHICH SIDE is
-    the part to keep.** The original rule was inferred from an observation -- Tom worked on master,
-    therefore branching practice did not apply here -- and that inference was AI's, not his
-    instruction. **He then questioned it twice and was talked out of it twice**, on a STALE REFS
-    argument and a CONCURRENCY argument, neither of which answers the release one. His own account,
-    2026-09-12: *"I knew better, but I am not very assertive. Why fight CC when it's moving
-    forward."* What finally decided it: **you cannot pull half of master.** With features landing on master, a fix during a frozen window ships every
-    unfinished thing beside it, so the whole team stops. With master sacred, a fix is a two-commit
-    branch and everyone else keeps working -- Tom: *"most of the company doesn't care about EWB,
-    because they are still working hard on projection at projection-custom-property."*
-  - **THE STALE-REF FAILURE IS REAL AND IS NOW A CHECK, not a promise.** `branch_hygiene_check.php`
-    lists every branch with its age, its distance from master and whether it is merged. It is
-    ADVISORY -- when a branch should die is judgement -- but it means an abandoned branch is
-    reported rather than discovered a year later. **Merged or killed, never left to rot.**
-  - **A BRANCH NAMES ITS CAPABILITY, IN THE SINGULAR, in the database tradition** (Tom, 2026-09-12):
-    `customer`, `projection`, `graph`, `custom-property`. He renamed all four the day they were
-    made, and the reason outlives the convention: three were plural because plural is what gut feel
-    produces, and when the fourth came out singular the others were left alone on the argument that
-    a projection list "is not a database entity" -- gut feel wearing a reason's clothes. *"It's not
-    a reasoned exception. If we are plural here, we should be plural everywhere. Gut feel is not a
-    good reason."* A UI label naming a real collection is a separate question decided on its own:
-    the Water menu's **Graphs** submenu holds five different graphs and stays plural, which Tom
-    allowed in the same breath -- *"Public-facing menu is plural and natural and gut feely."*
-  - **AND THE GENERAL LESSON, which is not about git: WHEN TOM QUESTIONS A STANDING RULE TWICE,
-    THE RULE IS THE SUSPECT -- not the question.** He is not very assertive and will not fight a
-    session that is moving confidently forward; an AI that keeps producing a reasoned-sounding
-    defence will therefore win every time, including the times it is wrong. Three weeks of a
-    paradigm he never wanted is what that cost here. **A repeated question is evidence. Re-argue the
-    rule from scratch, out loud, and say plainly which parts of the original reasoning do not
-    address what is being asked** -- as the concurrency argument did not address release safety.
-  - **MERGE FROM MASTER OFTEN. INTO MASTER ONLY WHEN TOM SAYS A CAPABILITY BRANCH IS DONE.** A
-    long-lived branch that never takes master back is a merge conflict being saved up, so the first
-    half is unchanged. **The second half used to read "into master when done" and that sentence cost
-    six unasked merges in one session on 2026-09-13** -- it never said WHO decides done, and the AI
-    read its own green build as the answer. Tom: *"Really you should never merge a major branch to
-    master without my all-clear on completion."*
-    - **GREEN IS NOT DONE, and this is the distinction the old wording lost.** `check_all.sh` says
-      the code works. It cannot say whether the FEATURE is finished. Every one of those six merges
-      was green; `projection` went in without the projection universe he had asked for TWICE, and
-      `custom-property` with a validator that does not validate and that he never asked for. No
-      suite can see either.
-    - **A DEFECT TRACK STILL MERGES ON THE OLD RULE** -- green on the merge result, and push. The
-      gate is only for a branch listed in `dev/branch-policy.json`, because a gate that stops all
-      work is a gate somebody switches off.
-    - **AND SINCE 2026-09-15 THERE ARE TWO LOCKS, BECAUSE TOM'S APPROVAL IS NOT THE ONLY ONE.** He
-      asked: *"Remember that we are in a feature freeze. I will test. But even if I were to approve
-      a merge, the scripts must block it until the freeze is removed. Right?"* **As built the answer
-      was NO** -- an all-clear was the only lock, so his approval and the freeze were one key turned
-      twice. `feature_freeze.active` in `dev/branch-policy.json` is the second: it refuses a merge of
-      a `protected` branch **even with a correctly pinned all-clear on file**, and his approval keeps
-      standing until the freeze lifts. **Only he lifts it.**
-      - **IT IS NOT `freeze.active`, AND THE DIFFERENCE IS THE WHOLE POINT.** That one is an
-        EMERGENCY STOP refusing every merge but a `hotfix:`, and switching it on cost a full day of
-        bug fixes he was waiting for. `feature_freeze` refuses only what `protected` already names,
-        so **a defect or tooling track merges untouched** -- `branch_policy_selftest.php` case 8c
-        asserts exactly that, and it is the case that matters most.
-    - **IT IS A CHECK NOW, NOT THIS PARAGRAPH.** `dev/hooks/pre-merge-commit` refuses the merge;
-      `dev/branch-all-clears.json` records his exact words pinned to the commit he cleared, so the
-      approval LAPSES BY ITSELF when the branch moves, exactly as a ruling in
-      `dev/english-key-rulings.json` lapses when the English changes. A FREEZE in
-      `dev/branch-policy.json` stops every merge but a `hotfix:`, which is how development continues
-      while the production line holds still.
-    - The four capability branches are large, speculative and abandonable, which is what a branch is
-      genuinely for -- and is exactly why finishing one is a judgement about the product rather than
-      about the build.
-  - **THEY SHARE SEAMS, so read the worktree rule below before running two of them at once.**
-    `graph` and `custom-property` both write the bottom pane's tab strip; `custom-property` and
-    `customer` both add fields to the Properties box and to Find; `projection` and `customer` both
-    place things by coordinate. Two in flight together is the five-defect shape
-    `scenario_seam_check.php` exists because of -- name the seam in both briefs, or sequence them.
-  - **CONCURRENT SESSIONS NOW REQUIRE A WORKTREE, and this is the change that bites.** Under the old
-    paradigm two sessions shared one checkout and both sat on master, needing only explicit staging.
-    **One checkout can only be on one branch**, so a second session that checks out a different
-    branch rewrites the files under the first one. A branch does not isolate concurrent sessions --
-    it never did, which is what the old rejection got right -- so the worktree rule below stops being
-    a subagent convenience and becomes how two sessions coexist at all.
-- **Stage explicit paths. Never `git add -A`** — Tom runs concurrent sessions in the same working
-  directory, and a broad add commits their in-progress work under your message.
-- **Report the push state unabridged and unprompted:** the commit SHA, and that
-  `git log --oneline origin/master..master` is empty. Never tell Tom to `git pull` before verifying
-  the push landed.
+**Commit and push by default, without asking, at the end of every piece of work**, unless Tom says
+to leave something uncommitted.
 
-### Every AI commit is authored "Claude Code for Tom Haws" (Tom, 2026-09-08)
+- **`master` is the production line and nobody works on it.** Every change starts on a branch,
+  however small, and reaches master only by a merge somebody decided to make. "Sacred" means one
+  testable thing: `check_all.sh` passes on the MERGE RESULT before the merge is pushed.
+- **A release branch holds the line; a freeze does not.** `release/ewb` is cut from the SHA Tom
+  deployed. A hotfix: branch off `release/ewb`, fix, `check_all`, merge, push; he pulls that; the
+  same fix is merged to master separately. A clean release can always be cut from a pre-merge SHA
+  and fixes cherry-picked on — never tell him otherwise.
+- **Merge FROM master often. Merge a capability branch INTO master only on Tom's all-clear.**
+  Green is not done. `dev/hooks/pre-merge-commit` enforces it for branches listed in
+  `dev/branch-policy.json`; `dev/branch-all-clears.json` pins his words to the commit he cleared,
+  so the approval lapses when the branch moves. `feature_freeze.active` refuses a protected merge
+  even with an all-clear (only Tom lifts it); `freeze.active` is the separate emergency stop that
+  refuses everything but a `hotfix:`. A defect or tooling track merges on green alone.
+- **A branch names its capability, in the singular** (`customer`, `projection`, `graph`,
+  `custom-property`). A public menu label naming a real collection may be plural.
+- **Merged or killed, never left to rot.** `branch_hygiene_check.php` reports stale branches.
+- **Capability branches share seams** (`graph`/`custom-property` the bottom-pane tab strip;
+  `custom-property`/`customer` the Properties box and Find; `projection`/`customer` placement by
+  coordinate). Name the seam in both briefs, or sequence them.
+- **When Tom questions a standing rule twice, the rule is the suspect.** Re-argue it from scratch,
+  out loud, and say which parts of the original reasoning do not answer what he asked.
+- **Stage explicit paths. Never `git add -A`** — concurrent sessions share the working directory.
+- **Report the push state unprompted:** the SHA, and that `git log --oneline origin/master..master`
+  is empty. Never tell Tom to `git pull` before verifying the push landed.
+- **Author every AI commit** `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`, so `git
+  log` and `git blame` tell his commits from ours.
+- **Commit message: a subject of ≤72 characters and no body.** A body only when a future reader
+  would act differently without it, ≤40 words. Reasoning belongs in code comments or the roadmap.
+  End with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 
-**`git commit --author="Claude Code for Tom Haws <tom.haws@gmail.com>"` on every commit an AI
-makes**, in a worktree or on `master`. Tom: *"I would like some way to distinguish my own commits
-from those done by Claude Code."* The committer stays Tom, so nothing about push rights or
-attribution to the account changes; `git log --author="Claude Code"` and `git blame` tell the two
-apart. The trailer line is not enough because `blame` does not read trailers.
+### Worktrees
 
-### Commit messages: subject only by default (Tom, 2026-08-16)
-
-**Write a subject line of ≤72 characters and NO body.** Add a body only when a future reader would
-genuinely act differently without it; when one is warranted, ≤40 words.
-
-Measured in this repo: Tom's own oldest 300 commits had no body 68% of the time and a median of 84
-total words. The AI era wrote a body on 99 of the last 100 commits at a median of 297 words. Normal
-human OSS practice is a 50–72 char subject with no body about half the time. The bloat is entirely
-in bodies, and it is expensive because it makes `git log` unreadable.
-
-The reasoning, the rejected alternatives and the quotes belong in the code comment or the roadmap
-block, where people actually look for them. End with:
-
-```
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
-```
-
-### Worktrees: how two workers coexist in one checkout
-
-- **A worktree is justified by CONCURRENCY, never by caution.** One worker alone needs only a
-  branch; a second worker at the same time needs a worktree, because one checkout holds one branch.
-- **The orchestrator merges promptly and deletes the branch** as each track lands. A worktree branch
-  outliving its agent is the stale-ref problem by another door.
-- **Give concurrent agents disjoint file territory, and say so in the brief.** Two tracks that both
-  need `js/looped-network.js` are sequential work in a parallel costume.
-- **Disjoint files are not enough — tracks also share SEAMS.** Two tracks with perfectly disjoint
-  files once produced five user-reachable defects because both wrote element properties and only one
-  knew about `setProp()`, the single write seam. **When two tracks share a CONCEPT — a write seam, a
-  resolver, a single source of truth — either sequence them, or name that seam in BOTH briefs and
-  require each to say how it goes through it.** `dev/scripts/scenario_seam_check.php` guards that
-  particular one.
-- **Subagents commit inside their worktree and never push.** Pushing is the orchestrator's, after
-  the merge and after `check_all.sh` passes on the merged tree.
-- **A SUBAGENT NEVER REGENERATES `dev/translation_payloads/`. The orchestrator does, once, before
-  the commit** (Tom, 2026-08-25: *"Regenerate only at the orchestrator sounds like the right
-  answer to me."*). The generator rewrites all 27 files, so two tracks that each add one language
-  key produce a 27-file conflict on every merge — measured on 2026-08-25, twice in one session, and
-  it resolves only by regenerating anyway. **A subagent that adds a key says so in its report and
-  leaves the payloads alone**; if its own `check_all.sh` then reports `payload freshness`, that
-  failure is EXPECTED and is not its to fix.
+- **Concurrent sessions require a worktree** — one checkout holds one branch. A worktree is
+  justified by concurrency, never by caution.
+- **Give concurrent agents disjoint file territory, and name shared SEAMS in both briefs** (a write
+  seam, a resolver, a single source of truth) or sequence them. `scenario_seam_check.php` guards the
+  `setProp()` one.
+- **Subagents commit in their worktree and never push.** The orchestrator merges promptly, runs
+  `check_all.sh` on the merged tree, pushes, and deletes the branch.
+- **Only the orchestrator regenerates `dev/translation_payloads/`, once, before the commit.** A
+  subagent that adds a key says so and leaves the payloads alone; its `payload freshness` failure
+  is expected.
 
 ---
 
@@ -183,10 +70,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 
 Every page starts with `require_once('lib/base.inc.php');` — config, language, units, menus, and the
 calculator form library. The global `$ec_lang[]` holds all localized strings for the current
-language.
-
-`lib/config.inc.php` reads `APP_ENV`: `development` → `DEBUG_MODE=true` (shows HTML validator links);
-anything else → false.
+language. `lib/config.inc.php` reads `APP_ENV`: `development` → `DEBUG_MODE=true`.
 
 ### Key files
 
@@ -196,88 +80,62 @@ anything else → false.
 | `lib/Calculators.lib.php` | `echoCalculatorForm()`, `ecTipLabel()`, `ecLinkTipLabel()` |
 | `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
 | `lib/Units.lib.php` | Unit families, presets, conversion factors |
-| `lib/Canonical.lib.php` | `ecCanonicalPaths()` — which URL a page nominates, the one place a pretty URL is declared |
+| `lib/Canonical.lib.php` | `ecCanonicalPaths()` — the one place a pretty URL is declared |
 | `lib/Language.lib.php` | Language detection and switching |
 | `lib/Language.Settings.php` | Per-language `QUALITY` weight used in Accept-Language negotiation |
 | `lib/lang.ec.??.php` | Localized string arrays (27 files) |
 | `js/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
 | `js/Manning.lib.js` | Shared Manning/irregular geometry and sketch rendering |
 | `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` |
-| `js/lpn-geom.js` | `lpn_` pure geometry — arc-length, arrow dodge, leader attachment, label rects. No DOM |
-| `js/lpn-collide.js` | `lpn_` label collision avoidance as pure weighted-box relaxation. No DOM |
+| `js/lpn-geom.js` | `lpn_` pure geometry. No DOM |
+| `js/lpn-collide.js` | `lpn_` label collision avoidance. No DOM |
 | `js/lpn-solver.js` | Looped-network global gradient algorithm |
 | `js/lpn-epanet.js` | Bridge to the vendored EPANET engine |
-| `js/lpn-inp.js` | EPANET `.inp` import |
-| `js/lpn-rules.js` | `lpn_` EPANET `[RULES]` grammar: parse a rule, know each clause's quantity kind, convert. No DOM |
+| `js/lpn-inp.js` | EPANET `.inp` import and export |
+| `js/lpn-rules.js` | `lpn_` EPANET `[RULES]` grammar. No DOM |
 | `js/looped-network.js` | `lpn_` map editor |
 | `css/engcalcs.css` | App-wide styles |
 
+Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
+
 ### Specialist agents (`.claude/agents/`, journals in `dev/agents/`)
 
-Persistent agents with a library, a journal and a research programme. **Six seats are filled:**
-`utility-planning-engineer` (2026-08-24, the design-and-planning engineer inside a water utility --
-Tom: *"Scale is my big and first blind spot... I have designed many Elm Street Center projects, but
-no Novatos."*), `utility-field-operator` (2026-08-25, the map read on a phone in the street),
-`market-researcher` and `data-entry-clerk` (both 2026-09-04 -- the world outside this repository,
-and entry at volume by keyboard), `interface-designer` (2026-09-09, Ida -- visual hierarchy and the
-frame around the content), and **`pre-reviewer` (2026-09-19, on Tom's own ask: *"I just want
-independent review, not self-review, of all work before I see it"*). It runs on every branch after
-the build agent reports and BEFORE Tom is told the branch is ready, and it REPORTS rather than
-fixes** -- a reviewer who repairs the work becomes its author and stops being independent. The two
-failures it was made from are in its journal, both from the day it was hired, and both the same
-shape: an agent verifying that it had done what it set out to do rather than that the result was
-what was asked for. **An agent must carry something this repo does not
-already have** -- external evidence, or a vantage point nobody occupies; an agent briefed from our
-own prose is an echo chamber in a second voice. Roster, the provenance rules, and the seats named
-but not filled: `dev/agents/README.md`. **Each agent keeps its own ranked wish list** — its
-priorities, in its order, expected to disagree with `dev/ROADMAP.md` and to say why. An agent
-never edits the roadmap; promoting a row is Tom's call.
+Six seats: `utility-planning-engineer`, `utility-field-operator`, `market-researcher`,
+`data-entry-clerk`, `interface-designer` (Ida), and **`pre-reviewer`, which runs on every branch
+after the build agent reports and BEFORE Tom is told it is ready, and reports rather than fixes.**
+An agent must carry something this repo does not already have — external evidence or an unoccupied
+vantage point. Each keeps its own ranked wish list; an agent never edits the roadmap. Roster and
+provenance rules: `dev/agents/README.md`.
 
 ### Dev folder (`dev/`, blocked from web access)
 
 | Path | Purpose |
 |------|---------|
+| `dev/session-handoff.md` | **Read first.** RULINGS, TRAPS and dated STATE; delete a state line once checked |
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
-| `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves. An index, not a record — the text is in git |
-| `dev/scripts/` | All CLI tools and checks |
-| `dev/scripts/glossary.json` | Engineering term glossary for translation prompts |
-| `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators. `calc-page.js` is the scaffolding; `README.md` is the recipe for a new worked example |
-| `dev/lpn-spike/` | Headless tests for the lpn solver and map editor |
+| `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
+| `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
+| `dev/scripts/` | All CLI tools and checks; `glossary.json` is the engineering term glossary |
+| `dev/calc-spike/`, `dev/lpn-spike/` | Headless tests. `dev/calc-spike/README.md` is the recipe for a worked example |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
 | `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
 | `dev/translation-process.md` | Sprint SOP and full mechanics |
 | `dev/testing-notes.md` | What actually catches defects here |
-| `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the EXACT text ruled on, so a ruling lapses by itself when the wording changes. `new_english_keys.php` prints them back and leads with the count still to read. **Never hand-edit `dev/new-english-keys.md` expecting it to survive** — `--write` refuses over a hand-edited file, which is the guard that exists because his first pass was lost |
-| `dev/enforceable-rules-survey.md` | Which of this file's rules a script COULD hold, ranked, with the count: 75 enforced, 4 left that no blocking check can hold, 41 permanently prose (Task 322) |
-| `dev/session-handoff.md` | **READ THIS FIRST, BEFORE THE ROADMAP.** What a cold session needs from the last one, sorted into RULINGS (permanent), TRAPS (permanent, measured here) and STATE (dated, perishable). **Its top block is the current FREEZE, the capability branches you may not merge, and any open deploy blocker** -- on 2026-09-14 it gained a STOP header, because a session that skipped this file merged six capability branches onto master against Tom's own plan recorded inside it. **Delete a state line once you have checked it** |
-| `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
-| `dev/unit-families.md` | Unit-family design record and per-field rationale |
+| `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the exact text so a ruling lapses when the wording changes. Never hand-edit `dev/new-english-keys.md` expecting it to survive |
+| `dev/automated-checks.md` | What each check guards and why, in full |
+| `dev/git-workflow.md`, `dev/lpn-rulings.md`, `dev/unit-rulings.md`, `dev/storage-rulings.md`, `dev/deploying.md`, `dev/conventions-record.md` | The full record behind the matching sections of this file |
+| `dev/enforceable-rules-survey.md` | Which prose rules a script could hold |
+| `dev/unit-families.md` | Unit-family design record |
 | `dev/cookie-storage-inventory.md` | Everything stored on a visitor's device, and why |
-| `dev/scenario-seam-repair.md` | The `setProp()` write-seam incident and its guard |
-| `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org. **Authority for every public claim, this repo's and the landing page's alike** |
-| `dev/librewaternet-landing.md` | The landing page left this repo 2026-08-24; where it went and what stayed |
-| `dev/reputation-and-practice.md` | **The plan from 18 Sep 2026** (Task 676). Why the reputation damage came from four SILENT outages and not from the merge; what already guards a merge; the uptime watch, the derived weekly report and the mail path that must be proven first; what is portable to Tom's other Claude Code projects and what would be cargo cult; and a list of what NOT to do, because the pull after an incident is toward ceremony |
+| `dev/positioning.md` | **Authority for every public claim**, this repo's and the landing page's |
+| `dev/reputation-and-practice.md` | The 2026-09-18 plan: silent outages, uptime watch, what not to do |
+| `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
 
-### PUSH THE SIBLING SITES TOO, ALWAYS (Tom, 2026-09-11)
+### Sibling sites
 
-**`git push` is part of finishing work in `~/webdev/librewaternet.org` and `~/webdev/not-epanet.org`
-exactly as it is here**, and no longer waits for Tom. His words: *"push lwn and make a note that I
-expect you always to push lwn and the other sibling site."* This SUPERSEDES the standing "both site
-repositories are committed and NOT pushed, deliberately -- a push publishes" that
-`dev/session-handoff.md` records from 2026-09-06; he has changed his mind, and the reason it was
-ever true (copy that had to be read before it went public) is served by his reading the commit, not
-by the work sitting on a shelf. The only exception is his saying so for a particular change.
-
-### The sibling repository: `~/webdev/librewaternet.org`
-
-The Claude Code project stays rooted HERE and drives both. **The catch is that the other
-repository's own `CLAUDE.md` does not load from a session rooted here** — so before writing or
-editing one word of landing-page copy, read `~/webdev/librewaternet.org/CLAUDE.md`. It carries the
-claim rules that have already had to be corrected on that draft twice (no completeness claim against
-EPANET; "a phone", never "your phone"). `dev/positioning.md` remains the authority; that file points
-back at it rather than restating it, so there is one record and not two.
-
-Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
+**Push `~/webdev/librewaternet.org` and `~/webdev/not-epanet.org` exactly as this repo is pushed**
+(Tom, 2026-09-11), unless he says otherwise for a particular change. Before writing landing-page
+copy, read `~/webdev/librewaternet.org/CLAUDE.md` — it does not load from a session rooted here.
 
 ---
 
@@ -305,216 +163,63 @@ new unique prefix and document it here.
 | `bpn_` | Branched Pipe Network — parent-pointer topology, two-pass fixed-demand solve |
 | `lpn_` | Looped Pipe Network, map interface — see below |
 
-Three prefixes predate the `*_main_menu` convention and name their menu entry `<prefix>_menu`
-instead: `mi`, `mtc`, `wi`. The coverage declaration lists them by exact key for that reason, and
-also still lists `irr`, which owns no keys at all — probably a legacy alias of `ip`.
+`mi`, `mtc`, `wi` predate the `*_main_menu` convention and name their menu entry `<prefix>_menu`.
+The coverage declaration also lists `irr`, which owns no keys — probably a legacy alias of `ip`.
 
 ### `lpn_` in particular
 
-A canvas/map-centric looped network solved by the global gradient algorithm (`js/lpn-solver.js`) with
-a map editor over it (`js/looped-network.js`). **A core calculator, in scope in all 26 languages.**
-Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 and its
-`146.nn` children.
+A canvas/map-centric looped network solved by the global gradient algorithm, with a map editor over
+it. **A core calculator, in scope in all 26 languages. Never call it "preview".** Scope:
+`dev/looped-network-calculator-scope.md`. **Every rule below is argued in full in
+`dev/lpn-rulings.md`; read the matching paragraph there before changing the behaviour.**
 
-- **RECALCULATE OFF MEANS A SNAPSHOT, NEVER HIDE OR DELETE** (Tom: *"Off means Off, but it doesn't
-  mean Hide or Delete. It means Snapshot in time."* And: *"The reason I am saying Yes to everything
-  is that if we clear these things prematurely, it robs the user of an important point of
-  reference. It's important to leave some value in the model when we have it."*). With the switch
-  off, an edit runs no solve — but every stale answer already on screen stays exactly where it is:
-  `lastSolveResult`, the Tables pane's result columns, the Properties box, the status bar, the
-  energy/run report, and the fire flow rings all keep showing what they showed, until the user
-  presses Calculate or a deliberate control (fire flow's own Clear button) says otherwise. **Only a
-  genuinely different network — opening another project or tab — clears a result set**; an edit to
-  the one on screen never does. **AND AN EDIT STILL HAS TO SHOW UP EVERYWHERE THE INPUT IS SHOWN,
-  IMMEDIATELY** (Tom: *"Any input we edit must be reflected wherever it shows, Table, Properties,
-  and map labels... we can have tunnel vision on only the label we change."*) — `afterPropertyEdit()`
-  and `updateNode(id, true)` keep the Tables pane and the map label of the ELEMENT JUST EDITED
-  current, through `refreshOneLabelInPlace()`, which rewrites only that one label's text and
-  position. **Tunnel vision is the point and not a shortcut**: a full network-wide content-and-
-  collision pass (`refreshLabelTextPass()` + `relayoutLabels()`) is exactly the delay the switch
-  exists to avoid, so a plain edit must never trigger one. `dev/lpn-spike/stale-snapshot-harness.js`
-  asserts all of this, mutation-tested.
-- **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
-  EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
-  EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
-  For THOSE TWO OBJECTS there is no industry standard to defer to, so write new strings in our
-  vocabulary — every one written in EPANET's adds to a rename we have already declined.
-  - **THAT RULE IS ABOUT ONE COLLISION AND NOTHING ELSE.** It was read far more widely and produced
-    strings a hydraulic engineer does not recognise — `Rest pressure` for static pressure, `Pulled
-    down` for drawdown, `settle` for converge, `Solves` for runs. Tom, twice in one reading: *"why
-    are we inventing language that engineers will not recognize?"* and *"we should default... to the
-    EPANET terminology."*
-  - **THERE IS NO HOUSE STYLE FOR ENGLISH STRINGS ANY MORE, and that is deliberate** (Tom,
-    2026-09-01: *"Anywhere you find anything addressing the need for a certain kind of English or
-    language, just strike it. Let's trust our synonyms, glossary, scripts, and feedback
-    procedures."*). `dev/language-strings.md` used to carry a "Simple English" rule; it licensed
-    exactly the inventions above three times, survived two written corrections, and is gone rather
-    than qualified a fourth time. **Do not write a new one.** The mechanisms that carry it are
-    `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php`, and Tom reading
-    `dev/new-english-keys.md` — each evidence about a specific string, where a house style is a
-    prediction about every future one. **One advisory survived the purge and only one: avoid the em
-    dash in visitor-facing English, until further notice.** It survives because it is not a claim
-    about good English — the dash is fine, the reader is not, and a page that leans on it reads as
-    AI-written whatever it says. A ratchet on new and edited strings, not a sweep: 60 shipped
-    strings carry 69 of them and rewriting those would buy 1,560 retranslations of text whose
-    meaning did not move. `dev/language-strings.md` has the scope and Tom's wording.
-  - **AND THE ONE THING THAT IS NOW SETTLED IS MECHANICS, WHICH IS NOT A VOICE** (Tom, 2026-09-08:
-    *"After doing some research, I see that we need to follow APA, not Oxford. Please make the
-    change and teach me as we go."* This supersedes his 2026-09-06 choice of Oxford). **The APA
-    Publication Manual, 7th edition, is this project's reference for spelling, punctuation, numbers
-    and the serial comma**, in `dev/*.md`, in code comments, in commit messages and in
-    visitor-facing English alike. In practice: Merriam-Webster American spelling (*color*, *center*,
-    *meter*, *modeling*, *-ize*), the serial comma, numerals from 10 up and for anything with a unit.
-    A ratchet on new and edited strings, never a sweep. The full list of what it settles, with
-    examples, is in `dev/language-strings.md`. This does NOT reinstate the rule struck above and
-    must not be read as licence to: it decides whether a list takes a comma before "and", not
-    whether a sentence is allowed to say *drawdown*. **The one place it is deliberately overruled is
-    the em dash**, which APA is happy with and this project is not, for the reason above. He is
-    willing to state the choice in public, so it may appear on a page; nothing has been written yet.
-  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
-    trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
-    named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
-    share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it
-    reports is a **Source share**, a percentage. Two things, two words, and the tip ties them.
-- **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
-  Tanks fill and drain, demands follow patterns, the TOOLBAR's transport scrubs the frames (it
-  mounts into `lpn_toolbar_run`, not a bottom pane -- this line said bottom pane until 2026-09-10
-  and sent a design brief off on the wrong control); checked against
-  all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
-  (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
-  getting one** — with EPANET unreachable the page solves one instant and says so. Patterns on a
-  reservoir head and on a pump speed shipped 2026-08-24 (248.02), and rule-based `[RULES]` closed
-  2026-09-05 (248.03): `js/lpn-rules.js` is EPANET's own grammar, parsing a rule so that every number
-  in it can be converted per clause into the engine's units. **EPANET checks its rule base BETWEEN
-  time steps, so a rule changes nothing on a single-instant solve** — the engine's behaviour, copied. **EPANET's pump speed pattern REPLACES the SPEED setting rather than
-  scaling it** — measured against the engine, and the exporter writes SPEED or PATTERN, never both.
-  **"No extended-period simulation yet" is FALSE.** It stood in this file and on the LibreWaterNet
-  landing draft until 2026-08-21, three days after the run shipped, and Tom caught it, not a check.
-  Do not restore it.
-- **Valves are the one place the two engines deliberately differ.** A throttle valve (TCV) is a minor
-  loss on a zero-length link and solves in either engine. PRV/PSV/FCV switch their own state inside
-  the iteration and solve through **EPANET only** — a second implementation was not written.
-  *(Corrected 2026-08-30: this used to say EPANET is "measured ~9x faster than our own solver".
-  It is not, any more. Task 322's solver work replaced a dense Cholesky with an envelope one and
-  a re-run puts native at 3.93 ms against EPANET's 3.31 ms at 201 nodes — ratio 0.8x, ours
-  marginally faster. **Speed is no longer a reason to prefer either engine**; the reason valves
-  route to EPANET is that it implements their state switching and we do not.)* A network holding one is routed to EPANET automatically and
-  the status bar says so, **without rewriting the user's stored `engine` setting** (the setting is a
-  preference; the routing is a fact about this network). The native solver refuses such a network by
-  name if the engine is unreachable. `EngCalcs.lpnValveIsNative` is the one place that line is drawn;
-  `EngCalcs.lpnLinkK` is the one place a TCV's loss is read from its SETTING rather than its `k`.
-- **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE** (Task 586, Tom
-  2026-09-05: *"move all pump curve data to the Library under curves and leave only curve
-  references in the pump properties"*). `doc.curves` holds `{id, kind, points, src, tok}`; a pump,
-  a GPV and a pump's efficiency STATE one by id, and the Library's Curves section is where one is
-  created, renamed, edited and deleted. **The element popup edits no points at all, and that was
-  finished 2026-09-06** (Tom, asked whether it still should: *"No. Remove that UI."*): a pump, a
-  GPV and an efficiency reference each show a chooser and a link to the Curves library, and the
-  point tables, `mintCurveFor()` and `curveForEdit()` went with them. Two editors of one definition
-  were two chances to disagree about what editing it meant. Deleted with the UI, and named here so
-  they are not re-added: `lpn_pump_effic_note`, `lpn_pump_curve_note`, `lpn_pump_point1/2/3`,
-  `lpn_curve_long_note`, `lpn_curve_shared_note`, `lpn_gpv_curve_note`, `lpn_pump_effic_remove`.
-  **And a reference is STATED, never "named"** (Tom, 2026-09-06, on the transitive verb: *"I am not
-  liking the word 'name' ... Alert that in some contexts 'name' may mean 'use'."*). Use *state*,
-  *indicate*, *refer to*, *select* or *call* in a visitor-facing string; his own edit of
-  `lpn_library_curves_note` uses *indicates*. Per-element `curvePoints`/`efficPoints` and the `curveRef`
-  borrow are GONE, and were an accident of chronology rather than a design — the pump curve was
-  written in the first two days of this page, before there was a Library. **The REFERENCE is
-  scenario-overridable (his ruling: *"Scenario pump reference: Yes."*) and the POINTS are not** —
-  a curve is shared, so a scenario editing its points would move every other scenario's answer.
-  **The three-point FIT is DERIVED and stored nowhere**, which is what lets a curve keep every
-  point the file stated: a >3-point pump curve used to be sampled to three on import and
-  re-sampled off our fit for the engine, so a manufacturer's curve was rewritten twice.
-  Deleting a curve elements use is REFUSED by name; renaming one carries every reference.
-  **EPANET HAS EXACTLY FOUR KINDS and states each in a `;PUMP:`-style COMMENT** above the curve's
-  own rows: PUMP, EFFICIENCY, VOLUME, HEADLOSS (Tom, 2026-09-05). Read it, keep it, write it back —
-  it is the only thing that can type a curve nothing references, which is what the Library's own
-  Add button makes. `generic` is not a fifth kind, it is EPANET's `G_CURVE`, and no control offers
-  it. **A VOLUME curve is USED, and only by a run** (Task 587, closed 2026-09-05): a tank states
-  which curve it uses, `EngCalcs.lpnTankVolumeAttach()` hangs the converted points on the model
-  beside the clock, and `js/lpn-epanet.js` writes the eighth `[TANKS]` column so the engine
-  integrates the real shape. We have no level-to-volume arithmetic of our own and grew none — the
-  whole defect was delivery. **`EngCalcs.lpnIsFixedHead` is untouched and stays so:** a water
-  surface is the level the document states whatever the vessel's shape, so a single instant is
-  identical either way and only `dLevel/dt = Q / (dVolume/dLevel)` sees a curve. A curve EPANET
-  would refuse (under two points, x not strictly increasing, y not rising) is LEFT OFF rather than
-  repaired. Abscissa is level in the elevation unit; ordinate is that unit CUBED, because EPANET
-  pairs volume with length and this page has no volume selector at all.
-  `dev/lpn-spike/tank-volume-curve-harness.js` anchors it on 216 m³ into one tank: 3.7502 m as a
-  10 m cylinder against 6.1200 m on a stepped curve, both hand-computed.
-  `dev/lpn-spike/curve-library-harness.js`; `dev/pump-energy.md` for the efficiency side.
-- **A tank is a fixed head at its water surface** — what EPANET itself solves at t=0.
-  `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
-  LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts
-  that, because no solve ever reads it.
-- **A geographic project draws raster tiles behind it, and can read ELEVATIONS from the same
-  account** (Task 497, `js/lpn-terrain.js`) — OpenStreetMap for the street map, Mapbox for satellite
-  and for Terrain-RGB (all gated on `EC_MAPBOX_TOKEN`; absent means neither option exists). The
-  tiles are never cached by us, never in the service worker's manifest, attribution required on the
-  map and one credit set per source. It is `project.basemap`, never `backdrop.href`, and an `.inp`
-  exporter must skip it. **The elevation fill is TWO ORDINARY CONTROLS and NOT a menu row** (Task
-  542, and the row it names was deleted twice over — the menu became Map, not View, under Task 543):
-  `Settings > New assets > Elevation source`, where a node is born reading its own ground and nothing
-  existing is touched, and `From Mapbox DEM` as the New-value source in Find and replace, where the
-  user has already chosen the set. **Do not add a third door** — a menu row that filled the whole
-  drawing in one press is what Tom called *"a cool new button that I found"*, and it is the defect
-  542 exists to have removed. It TYPES numbers into the document, so it never overwrites an
-  elevation the user has without their having asked for exactly that, it is one undo snapshot, and
-  it states its ~30 m accuracy in the interface, not in a comment. A burst of drawing is one batch
-  of requests, never one per node.
-- **THE SUITE MAKES FOUR THIRD-PARTY REQUESTS, ALL ON THIS PAGE, ALL OPT-IN:** OSM tiles, Mapbox
-  satellite tiles, Nominatim place-name search (`js/lpn-search.js`), and Mapbox Terrain-RGB elevation
-  lookup (`js/lpn-terrain.js`, Task 497). **The last two are the sensitive ones and each has its own
-  consent gate** — `ec_geosearch` and `ec_terrain`, separate from the analytics one and from each
-  other, because a tile says where you are LOOKING, a search says what you TYPED, and a node
-  coordinate says where your NETWORK IS. Do not write "the only third-party request" anywhere; it has
-  been false since the geocoder shipped. **Adding one does NOT touch `consent_body`** — that banner
-  asks about one analytics digit and says nothing about third-party requests; each feature asks its
-  own question, so a fifth service is a new paragraph in `privacy.php`, not a version bump.
-  A geographic project is **drawn in Web Mercator and stored in longitude and latitude** —
-  `outwardY()`/`inwardY()` is the whole boundary, x needs nothing because Mercator x IS longitude, and
-  a tile box is square because the drawing frame is the tiles' own. **Storing the projection is
-  forbidden:** `mercLat(mercY(lat))` differs in the last bits for 69.8% of latitudes, so it would
-  rewrite every latitude on every open-and-save.
-  **THE MISSION SCOPE IS A 300 km SYSTEM SPAN** (Tom, 2026-08-25), and it is a statement about who
-  this page is for rather than about arithmetic — a globe-spanning utility has a budget in trillions.
-  Nothing enforces it and nothing should without his word. What it protects is `geodesicMeters()`,
-  which is NOT a geodesic: it treats a leg as flat in the frame of its mid-latitude, and that is what
-  fills every `lenAuto` length. Measured against Vincenty in
-  `dev/lpn-spike/scope-of-service-harness.js`: **206 ppm at the 300 km scope, still 0.1% at double
-  it** — so "highly conservative" is his phrase and the number agrees. Full record, and the three
-  things the bound does NOT mean: `dev/geographic-projects.md` (§2b, and the rest of that file for
-  everything else geographic).
-- **Reads AND WRITES EPANET `.inp` files** (`js/lpn-inp.js` — one file, so one opinion about the
-  format). Import takes the supported subset and reports every difference, never rejecting and never
-  dropping silently; export shipped 2026-08-18 and returns 1,280 numeric tokens across Net1/2/3
-  character-for-character. Five round trips are genuinely impossible and are REPORTED rather than
-  faked (see the closed Task 281 entry for the list). **"Does not write one yet" is FALSE.**
-- **Design this page for a pointer; then make a phone survivable.** It is a full-window drawing
-  surface with a menu bar, toolbar, tab strip and property popup, so the desktop layout is the
-  authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
-  hand-and-mouse tolerance; a 44px touch target is not an argument here.
-  **BUT NEVER CALL IT A PC APPLICATION IN PUBLIC — Tom, 2026-08-24: *"It is not a PC application; it
-  is a web application."*** That is a ruling about IDENTITY, and it does not touch the design rule
-  above: pointer-first is still how it is built, and "it runs everywhere a browser runs" is still
-  what it is. The two are only in tension if you let a design priority leak into a positioning
-  claim, which is exactly what happened — the sentence *"And it is a PC application, the way EPANET
-  is"* stood on the LibreWaterNet draft and he struck it. Do not restore it, and do not reach for
-  epanet-js's harder version of the same stance either. Tom ruled it **not usable on a
-  phone** on 2026-08-22; the four small-screen items he named — hide page titles, collapse the
-  navbar, keep only the transport controls, drop menu text to icons — shipped the same day at one
-  `max-width: 640px` breakpoint (closed Task 486, guarded by `dev/lpn-spike/small-screen-harness.js`),
-  and on 2026-08-23 he passed it: *"For today's standards, we are gold."* On 2026-08-24, after using
-  it: *"phone usability is super solid now. I am a bit surprised."* **The sanctioned public claim is
-  his own, and it is the LANDING PAGE'S current sentence, not a paraphrase:** *"And although you of
-  course prefer working on your PC, it works also on a phone in tall mode."* The indefinite article is load-bearing
-  and he chose it deliberately (*"to be scrupulously honest"*) — **"a phone" is a claim about the
-  software; "your phone" is a promise about a device we have never seen.** Never write the second.
-  **"In tall mode" joined it 2026-08-24 and is a narrowing of the same kind** — Tom uses the phone
-  upright and says that is best, so the claim names the orientation actually observed. It is also
-  what closed Task 442: the toolbar does NOT become a side menu, on any screen.
-  (Superseded, recorded so it is not reinstated by habit: "Try it. We did.") The other calculators
-  are a form and an answer and are fine as they are.
+- **Recalculate OFF means a snapshot, never hide or delete.** Stale results stay on screen until
+  Calculate or a deliberate Clear; only opening a different network clears them. An edit still shows
+  immediately in the Tables pane, Properties and that element's own map label
+  (`refreshOneLabelInPlace()`), and never triggers a network-wide label pass.
+  `dev/lpn-spike/stale-snapshot-harness.js`.
+- **Vocabulary:** our **Label** is EPANET's Notation; EPANET's **Label** is our **Text**. That one
+  collision is the only place we depart from EPANET — **otherwise default to EPANET terminology**
+  (static pressure, drawdown, converge, runs), and never invent plain-English substitutes.
+- **There is no house style for English strings. Do not write one.** The mechanisms are
+  `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php` and Tom's reading of
+  `dev/new-english-keys.md`. One advisory survives: **avoid the em dash in visitor-facing English**
+  (a ratchet, `em_dash_ratchet_check.php`).
+- **Mechanics follow APA 7th:** American spelling, serial comma, numerals from 10 up and with units —
+  in docs, comments, commits and visitor English alike. Ratchet, never a sweep. It is overruled only
+  on the em dash.
+- **When one name does two jobs, split it.** Source trace (the analysis, on a Trace node) vs Source
+  share (the percentage).
+- **Extended-period simulation shipped, through the EPANET engine only** (`js/lpn-time.js`), with
+  patterns, reservoir-head and pump-speed patterns, and `[RULES]`. The transport mounts in
+  `lpn_toolbar_run`. The built-in solver solves one instant and is not getting a time dimension.
+  **"No EPS yet" is false.**
+- **PRV/PSV/FCV solve through EPANET only**; TCV solves in either engine. Such a network routes to
+  EPANET automatically without rewriting the stored `engine` setting.
+  `EngCalcs.lpnValveIsNative` draws that line. Speed is no longer a reason to prefer either engine.
+- **A curve is a document object; an element holds only a reference.** `doc.curves` holds
+  `{id, kind, points, src, tok}`; the Library's Curves section is the only editor. The reference is
+  scenario-overridable, the points are not. The three-point fit is derived, never stored. Four
+  kinds, stated in a `;PUMP:`-style comment: PUMP, EFFICIENCY, VOLUME, HEADLOSS. A reference is
+  *stated*/*selected*, never "named", in visitor strings. A VOLUME curve is used only by a run.
+- **A tank is a fixed head at its water surface** (`EngCalcs.lpnIsFixedHead`). Tank diameter is in
+  the LENGTH unit, pipe diameter in millimetres.
+- **Basemap and terrain** (`js/lpn-terrain.js`): OSM street tiles; Mapbox satellite and Terrain-RGB,
+  gated on `EC_MAPBOX_TOKEN`. Never cached, never precached, attribution required, stored as
+  `project.basemap`. Elevation fill has exactly two doors — `Settings > New assets > Elevation
+  source` and `From Mapbox DEM` in Find and replace. **Do not add a third.**
+- **Four third-party requests, all on this page, all opt-in:** OSM tiles, Mapbox satellite,
+  Nominatim search (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`).
+  Never write "the only third-party request". A fifth service is a new paragraph in `privacy.php`,
+  not a `consent_body` change.
+- **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** Never store
+  the projection. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
+  (206 ppm at scope). `dev/geographic-projects.md`.
+- **Reads and writes EPANET `.inp`** (`js/lpn-inp.js`). Import reports every difference, never
+  rejects, never drops silently. Export is character-exact on Net1/2/3.
+- **Design for a pointer; make a phone survivable.** Never call it a PC application in public — it
+  is a web application. The sanctioned phone claim is the landing page's: *"it works also on a
+  phone in tall mode"* — **"a phone", never "your phone"**. The toolbar never becomes a side menu.
 
 ---
 
@@ -522,644 +227,286 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 
 1. Copy an existing calculator (e.g. `Manning-Pipe-Flow.php`).
 2. Choose a short prefix and add it to the table above.
-3. Define `$arrayInputs` and `$arrayResults` referencing `$ec_lang['prefix_key']`.
-   Declare each field's units as a **family name** (`'units' => 'distance_small'`), never an inline
-   array.
-4. **Add your language keys to `lib/lang.ec.en.php` ONLY.** `lib/base.inc.php` requires
-   `lang.ec.en.php` and *then* the visitor's language, so an absent key already falls back to
-   English — an ABSENT key is the correct untranslated state. A key present-and-byte-identical in a
-   non-English file is a different thing: `lang_syntax_validate.php` flags it `identical-to-english`
-   and **that finding blocks the build** (its own docblock still says "warning-grade"; the docblock
-   is stale). Then regenerate the payloads so a future sprint picks the keys up.
+3. Define `$arrayInputs` and `$arrayResults` referencing `$ec_lang['prefix_key']`. Declare each
+   field's units as a **family name** (`'units' => 'distance_small'`), never an inline array.
+4. **Add language keys to `lib/lang.ec.en.php` ONLY.** An absent key falls back to English; a key
+   byte-identical to English in another file blocks the build. Then regenerate the payloads.
 5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the page's `<script>` block.
 6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, `echoFooter`.
 7. Add it to `lib/Menus.lib.php`.
-8. Set `$html_desc = $ec_lang['<prefix>_main_desc'];` before `echoHeader()` — see below.
-9. Include the calculator JS with `filemtime()` cache-busting, never a hardcoded `?v=N`:
+8. Set `$html_desc = $ec_lang['<prefix>_main_desc'];` before `echoHeader()`. Reuse `_main_desc`;
+   never add a meta-description key, and never point `$html_desc` at a title. It also feeds
+   `og:description`.
+9. Include the JS with `filemtime()` cache-busting, never a hardcoded `?v=N`:
    `<script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>`
-10. **Add a worked example to `dev/calc-spike/`.** The smoke harness picks the page up automatically
-    (the list is derived), so it is already checked for running, for not emitting NaN, and for
-    opening on a passing design. What that cannot check is whether the math is right — copy
-    `mpf-harness.js` and anchor against the source method. Recipe: `dev/calc-spike/README.md`.
-11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,**
-    listing the `glossary.json` terms it uses. A missing prefix silently falls back to three default
-    terms, so every glossary entry written for the calculator — definitions, `translations`,
-    and the `avoid` arrays that are the whole point of a trap term — becomes invisible to its
-    translation agents. Nothing warns you: payloads generate, `--check` says FRESH, the sprint runs,
-    and the guards were never delivered. **Verify by reading `glossary_terms_by_prefix.<prefix>` out
-    of a generated payload — exactly three entries means the map is missing.**
-
-### Meta description
-
-`echoHTMLHead()` escapes one global into `<meta name="Description">`:
-`$html_desc = $ec_lang['mpf_main_desc'];`
-
-- **Reuse `<prefix>_main_desc`; do not add a meta-description key.** It is already written and
-  already translated into 27 languages, and already differs from the title. A dedicated key per page
-  would read better as a search snippet but costs 20 × 26 = 520 new strings for an incremental SEO
-  gain — a free fix that is 80% as good beat a paid one. Weigh any future proposal against that.
-- **Never point `$html_desc` at `$html_title` or a `*_main_title` key.** Google discards a
-  duplicate-of-title description and auto-generates a snippet from a page whose content is a form.
-- A page with no `*_main_desc` sets nothing — **`contact.php`, `Compare-Languages.php`,
-  `formmailsuccess.php`, `privacy.php`, `terms.php`.** *(Corrected 2026-08-25: `index.php` has
-  its own description and no longer belongs on this list; `privacy.php` and `terms.php` were
-  missing from it. Found while wiring the share cards, which read the same global.)*
-- **`$html_desc` now feeds `og:description` as well as `<meta name="Description">`** (Task 534),
-  so a page that sets nothing emits no `og:description` either — a card with a title and a
-  picture and no subtitle, which is a normal card. Never a placeholder: "undefined" on a share
-  card is a defect that only strangers see.
-- Whatever key you point at becomes plain-text-constrained automatically —
-  `plainTextBoundKeys()` derives it from the assignment.
+10. **Add a worked example to `dev/calc-spike/`** anchored against the source method
+    (`mpf-harness.js` is the model; recipe in `dev/calc-spike/README.md`).
+11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`.**
+    A missing prefix silently falls back to three default terms; verify by reading
+    `glossary_terms_by_prefix.<prefix>` out of a generated payload.
 
 ---
 
 ## Labels, Tips and Shared Concepts
 
-### Call the helper; do not write the markup
-
-```php
-ecTipLabel($ec_lang['mpf_flow'], $ec_lang['mpf_flow_tip'])                  // tip, no link
-ecLinkTipLabel('https://...', $ec_lang['hw_roughness'], $ec_lang['hw_tip']) // link + tip
-```
-
-`tip_markup_check.php` fails the build on hand-assembled `.ec-help`/`.ec-tip`. The helpers handle the
-`strip_tags()` + `htmlspecialchars()` a `title=""` needs, and the two **opposite** nestings: with a
-link, `.ec-help` wraps the `?` glyph alone (the `<a>` is already a big target); without one,
-`.ec-help` wraps the label text *and* the glyph, or the tap target is one character. `$text` is
-trusted HTML; `$tip` is plain text.
-
-The judgement calls the helpers cannot make:
-
-- **Exactly one `?` per label, and it is always the tip.**
-- **A link with no tip needs no wrapper** — plain `<a>` is correct.
-- **Never put explanatory text in a link's `title=`.** `js/Calculators.lib.js` only activates
-  tap-triggered tooltips on `.ec-help[title]`, so on touch a bare `<a title="...">` just navigates.
-- **If the linked page has no translation**, say so in the tip ("English only").
-
-### Concept-level label reuse
-
-When two calculators need the same concept, **reuse one whole label** rather than re-keying it — but
-only **whole labels** (complete noun phrases). Never compose a label from fragments at render time;
-fragment composition is what broke the original word-level design in gendered / word-order / RTL
-languages.
-
-- **Owner:** the shared concept lives under one owning calculator's key; others borrow it. No neutral
-  prefix. **Incumbency decides** — the key already used by materially more pages wins. Menu order is
-  only the tiebreak.
-- **Wording:** menu order picks which key survives; the surviving key's English *value* takes the
-  best wording found across the cluster.
-- **Loss symbols:** lowercase `h` for loss components (`h_f`, `h_m`, `h_L`; coefficient `k_m`);
-  capital `H` for total/gross/net heads. The local-loss term is **"Minor (local) loss"** suite-wide —
-  the "(local)" blocks the "smaller loss" mistranslation.
-- A shared label must fit its **narrowest** use: put the short form in the shared key and long forms
-  in tooltips, never the reverse.
-- **Reuse stops at sentences.** A tip shared across controls must be true of all of them.
-
-Consolidation is one full-suite English-only pass, never chunked per calculator category — a
-duplicate's two halves live in different categories. Record: `dev/label-normalization-decision.md`.
-
-### Verdict / check-string convention
-
-- **Leading verdict glyph, then short text:** `✓` pass, `⚠` caution. The glyph is decorative,
-  international and RTL-safe — never add a translated marker word ("Warning:"/"OK:").
-- **The entire verdict string is the `ec-tip` target**, with the full explanation in its `title` — not
-  just the glyph, which is a one-character tap target.
-
-### Results table column width
-
-Column width is king. Keep headings narrow; mid-word wrap is acceptable. Do not widen a column to
-expand an abbreviation. English column-heading abbreviations are **not** a translation obstacle —
-verified against wave-1 output in 14 languages, every one produced its own natural short form. Do not
-re-flag a `layout: column heading` abbreviation merely for looking terse.
+- **Call `ecTipLabel()` / `ecLinkTipLabel()`; never hand-write `.ec-help`/`.ec-tip` markup.**
+  `$text` is trusted HTML; `$tip` is plain text. Exactly one `?` per label, always the tip. A link
+  with no tip needs no wrapper. Never put explanation in a link's `title=` (touch just navigates).
+  If the linked page is untranslated, say "English only" in the tip.
+- **Reuse whole labels across calculators, never fragments.** Incumbency decides the owning key;
+  menu order breaks ties; the survivor takes the best wording. A shared label fits its narrowest
+  use; reuse stops at sentences. Loss symbols: lowercase `h` for components (`h_f`, `h_m`, `h_L`,
+  `k_m`), capital `H` for total heads; the term is **"Minor (local) loss"**. Record:
+  `dev/label-normalization-decision.md`.
+- **Verdict strings lead with `✓` or `⚠`, never a marker word**, and the whole string is the tip
+  target.
+- **Results columns: width is king.** Keep headings narrow; do not re-flag terse abbreviations.
 
 ---
 
 ## Language Keys
 
 All display strings live in `lib/lang.ec.??.php` (en + 26: am, ar, bg, bn, cs, de, es, fa, fr, he,
-hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh). Keys follow `prefix_description`.
-**Full rules — universal/conventional/translatable wording, the synonym channel, the polysemy
-protocol, the tag vocabulary — are
-in `dev/language-strings.md`. Read it before editing any string value.** The non-negotiable parts:
+hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh). **Read `dev/language-strings.md`
+before editing any string value.** `lang_syntax_validate.php` enforces: (A) never an HTML entity;
+(B) never a tag in a plain-text-bound string, including dialog text; (C) advisory name/derivation
+mismatch; (D) single-quoted values only.
 
-| Rule | What it requires | Enforced by |
-|---|---|---|
-| **A** | Never an HTML entity in any language string, anywhere — use the literal UTF-8 character (`—` not `&mdash;`). Absolute, because whether an entity survives depends on the call site, which is invisible from the string. | `lang_syntax_validate.php` |
-| **B** | Never an HTML tag in a plain-text-constrained string (`title` `placeholder` `alt` `aria-label` `data-*`, and a string handed to `alert()` / `confirm()` / `prompt()` — a browser dialog renders its argument as text, so a tag does not degrade there, it SHOWS). "Reaches plain text" is derived from the source by `plainTextBoundKeys()`, not from the key's name — 999 dialog values were bound by nothing until 2026-09-06 because that deriver did not model the sink. | `lang_syntax_validate.php` |
-| **C** | Advisory (`--rule-c`): where a key's name and its derivation disagree. 31 disagree on purpose. | `lang_syntax_validate.php` |
-| **D** | Single-quoted: `$ec_lang['k']='value';`. A double-quoted value **interpolates**, and one such key silently depended on another being assigned earlier in the same file. | `lang_syntax_validate.php` |
-
-The script names the violation and the fix in its own error text. Trust it; do not add prose on top.
-
-**`$ec_lang_syn` is OFF-LIMITS to AI.** Never add, change or remove an entry without explicit written
-permission in that conversation. AI proposes a diff; the human approves; only then does AI write.
-There are **no standing carve-outs.** Its payload is SYNONYMS, not descriptions, and every phrase
-must pass the **substitution test**: it could stand on the control as the label itself.
-
-**Routing — one question decides where a fix goes: does an English reader also stumble?**
-
-| Test | Home |
-|---|---|
-| An English reader must re-read, or can read it two ways | **Fix the English** — one edit fixes all 27 languages |
-| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_syn`** |
-| The concept recurs across labels or calculators | **`glossary.json`** |
-
-**Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply` does all 27
-lang files, `$ec_lang_syn`, every call site, the drift manifest, the exempt list and the coverage
-declaration in one pass. A hand rename is ~40 edits and every miss fails **silently**.
-`key_hygiene_check.php` reports keys rendered by nothing and names that drifted from their siblings;
-It also reports keys whose only reader is itself unreachable — a reference from an uncalled function
-is still a reference, which is why a reference count alone could not see the two terrain strings
-Task 542 stranded. That walk is advisory and lists CANDIDATES: reachability through a dynamic
-dispatch is undecidable, so it is deliberately conservative and prints what it turned away.
-**Since 2026-09-17 it also NAMES what only a harness reaches (finding 1c), which the walk itself
-can never list** -- a harness ROOTS a function, correctly, because a test seam is not a corpse, so
-`EC.lpnTerrainFill()` sat rooted by `terrain-harness.js` alone from the day Task 542 deleted its
-menu row, and two of its strings went on being translated into 27 languages for a state no visitor
-could reach. Tom found it by reading: *"When could that possibly display?"* A worklist and not a
-verdict -- 23 rows today and most of them are genuine seams; the question it puts to a person is
-whether the function SAYS anything a visitor could see.
-a key rendered by nothing is not automatically debt, so decide per key and never bulk-delete.
-**Keep sibling keys parallel in NAME and in VALUE across all 27 files.**
+- **`$ec_lang_syn` is OFF-LIMITS to AI** without explicit written permission in that conversation.
+  Propose a diff; Tom approves; then write. No standing carve-outs. Entries are synonyms that pass
+  the substitution test.
+- **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
+  → `$ec_lang_syn`; the concept recurs → `glossary.json`.
+- **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
+- **Keep sibling keys parallel in name and value across all 27 files.** An unrendered key is not
+  automatically debt; decide per key, never bulk-delete (`key_hygiene_check.php` lists candidates).
 
 ## Translation Sprints
 
-**Full mechanics are in `dev/translation-process.md`** — pre-sprint checklist, the coverage cross,
-batching, post-sprint QA, quality tiers. Read it before proposing a sprint. The hard gates:
+**Full mechanics: `dev/translation-process.md`.** Hard gates:
 
-- **REQUIRED: explicit user authorization before launching.** A sprint spawns up to 26 paid agents.
-  Always propose → confirm → launch. Never infer authorization from a general "proceed".
-- **Announce the count before spawning:** "Starting N agents, one for each language." Note the
-  platform cap — **20 concurrent subagents**, so 26 languages means 20 at once and 6 as slots free.
-  Say it that way in the proposal.
-- **Sonnet is mandatory for every translation agent, every batch size, every language, no
-  exceptions.** Haiku is fully deprecated for translation.
-- **One agent per language, in parallel**, each writing in ~50-key batches and saving each batch
-  before translating the next. A session limit can kill a sprint at any moment; an agent that
-  composed in memory loses everything, one that has been appending keeps what is on disk.
-- **Three scripts must exit 0 before launch**, and a non-zero exit is a hard stop:
-  `friction_check.php --sprint=<id>`, `gloss_ref_check.php`, and
-  `generate_translation_payloads.php --check`. Regenerating payloads is the orchestrating AI's job,
-  never the user's.
-- **Glossary write-back is mandatory before a sprint is closed**, not queued for later.
-- **Wave 0 does not re-litigate a string Tom has ruled on.** `wave0_keyset.php` excludes every key
-whose EXACT current English carries a ruling in `dev/english-key-rulings.json` — 146 of them on the
-day it landed. Tom, 2026-09-06, on a key he had personally reworded two days earlier and which the
-pass then filed HIGH: *"We resolved this yesterday. Please note this so that it doesn't arise again.
-You are wrong."* A wave-0 agent reads cold by design, and that blindness is what makes the pass
-work, so the memory has to live in the keyset. It lapses by itself: reword the string and nobody has
-approved the new words, so it comes back.
-
-**`detect_english_drift.php --baseline-new` closes the sprint.** Without it a sprint's new keys stay
-  `NEW` forever and a later English edit becomes invisible to *both* tools at once.
+- **Explicit authorization before launching**, never inferred from "proceed". Announce the count
+  ("Starting N agents, one for each language"); the cap is 20 concurrent, so 26 runs as 20 then 6.
+- **Sonnet for every translation agent, always.** One agent per language, saving ~50-key batches as
+  it goes.
+- **Must exit 0 before launch:** `friction_check.php --sprint=<id>`, `gloss_ref_check.php`,
+  `generate_translation_payloads.php --check`. Regenerating payloads is the AI's job.
+- **Glossary write-back before the sprint closes.** `detect_english_drift.php --baseline-new`
+  closes it.
+- **Wave 0 never re-litigates a string Tom has ruled on** (`wave0_keyset.php` excludes them).
 
 **Anchor languages are declared in `glossary.json`'s `meta.anchor_languages` — read that, not this
-line.** They are `es, pt, fr, tr`: the core languages and the measured top four by confirmed human
-reach. They replaced `es, fr, ru, ar` because an anchor is a reference point other renderings get
-checked against, and `ru` (1 measured human) and `ar` (0) cannot be observed. **This is about
-reference points only** — ru and ar translation quality stays fully in scope, and "zero reach ≠ low
-value" holds.
+line.** They are `es, pt, fr, tr`. They replaced `es, fr, ru, ar`
+because ru and ar cannot be observed; their translation quality stays fully in scope.
 
-**The coverage declaration** (`dev/scripts/translation_coverage.json`) says what we intend to
-translate, and must never be merged with the exempt-key list: **exempt** means identical-to-English is
-permanently correct (the key is finished); **out of scope** means a cell we have not translated yet
-(the key is not started, and can earn its way in). **A cell is in scope iff the calculator is core OR
-the language is core** — core calculators `mpf`, `mtc`, `lpn`; core languages `es`, `pt`, `fr`, `tr`.
-That OR makes it a cross; an AND would leave Manning Pipe Flow untranslated in 22 languages. Identity
-strings are the floor and are never out of scope.
-
-**`QUALITY` in `lib/Language.Settings.php`** must carry an honest current estimate of defect risk —
-`1.0` English, `0.95` a verified native review **on file**, `0.85` AI-translated plus independent
-back-translation and cross-language checks, `0.65` the low-resource tier (am/km/my/ps/sw), which gets
-less verification by design. Update via `update_quality_score.php`, never by hand. **Never log a
-language as "awaiting native review"** — no native speaker will realistically see such a flag.
-
-## Automated checks — `sh dev/scripts/check_all.sh`
-
-Seconds, free, and the first thing to reach for. Blocking failures exit 1. Each script explains its
-own failure; this table is an index, not a duplicate of that text.
-
-| Check | Guards |
-|---|---|
-| php + js + shell syntax | Every `.php`, every `js/*.js` and `js/vendor/*.js` (the vendored EPANET engine ships to visitors and was once unchecked) |
-| `html_balance_check.php` | Every page produces well-formed HTML |
-| `pageconfig_check.php` + selftest | The PHP→JS pageConfig bridge; an unsupplied key shows the visitor "undefined". **Reads ALIASES since 2026-08-28** (`var pc = EngCalcs.pageConfig`) — before that it saw only the literal form, so `js/looped-network.js` and its 838 keys were invisible to it and it reported OK while a key translated into 26 languages reached no screen |
-| `tip_markup_check.php` | `.ec-help`/`.ec-tip` built by the helpers, not by hand |
-| `js_fallback_string_check.php` + selftest | The other half of the pageConfig bridge. `js/*.js` writes almost every read as `pc.<key> \|\| '<English literal>'`, so **892 fallback literals ship as an uncontrolled second copy of `lang.ec.en.php`** — and because `pageconfig_check.php` guarantees the key IS supplied, a wrong one never renders and nothing had ever compared them. **199 disagreed on the day it was written** — a sentence struck as false, a control named `Run` against the language file's `Calculate`, two falling back to the EMPTY STRING — and all 199 were corrected the same day, mechanically out of `$ec_lang` itself so no wording judgement entered the sweep. **The ratchet is now absolute at 0**, so the first fallback to drift fails the build. Its selftest DIED OF SUCCESS the same day (its corpus guard required at least one drift, to stop a blinded scan reading as progress) and is now a LIVE MUTATION instead: a temporary file with one wrong fallback is written into `js/`, the real check must name it. The undefined-key leg blocks at zero: a fallback on a key no page can supply is not a fallback, it is the only text there will ever be, in all 27 languages. It does not keep a second opinion about what a pageConfig alias is; it calls `ecPageConfigReads()`. **It reads a SECOND shape since 2026-09-06:** `js/looped-network.js` declares its property bands as `[prop, key, 'English']` triples and reads the key dynamically as `pc[entry[1]]`, so the fallback and the `||` are in different functions and the `||` pattern saw none of the 21. `ecPageConfigReads()` cannot see a dynamic read and never will, so the discriminator there is a DEFINED English key in the middle slot — which is also what stops `['pipe', 'pump', 'valve']` reading as one |
-| `blank_target_check.php` + selftest | A new tab this suite's own markup opens carries `rel="noopener"` — and in `window.open()`, where it is a FEATURE STRING entry rather than an attribute, which is the spelling that gets dropped when a link becomes a script call. Without it the opened page holds a live `window.opener` back to ours and can navigate this tab while the visitor is reading the other one. **The tree had decided this twice in opposite directions** — 13 links carried it and 12 did not, with no rule written anywhere — which is what a construct written 25 times with the security attribute on some of them looks like. Browsers imply the attribute now, so the omission had no symptom, and that is exactly why it drifted: the implication is their default, not our markup. **`lib/lang.ec.*.php` is OUT OF SCOPE by declaration and the reason is cost, not principle** — `lang_tag_parity_check.php --strict` makes one English attribute a hand edit in 26 translated files, five of them right-to-left, to change nothing a reader sees |
-| `icon_name_check.php` + selftest | Every icon this suite NAMES is one `lib/Icons.lib.php` draws — 147 naming sites across 56 names against 61 definitions, in PHP and in JS alike. **A misspelt name is the quietest failure here**: `ecIcon()` returns the empty string and `EngCalcs.iconEl()` returns null, every drawing site is written `if (ic)`, so the control keeps its word, its tip and its accessible name and simply has no picture — no console message, no warning, no layout shift, no failing harness. It has already happened, and `js/looped-network.js` records it: the toolbar's Settings popover shipped without its warning triangle, two render sites and one missed. The geometry table has **exactly two doors** — `ecIcon()` reads `$ec_icons`, `EngCalcs.iconEl()` reads `EngCalcs.icons`, and `setLabel()`/`setIconLabel()` go through the second rather than around it — so a third reader is a finding, being a naming route the scan would report OK about forever. A computed name has no literal to resolve and is turned away and COUNTED, and a NEW first-order wrapper fails until it is declared, because writing one means writing a new call to a door. An icon defined and named by no literal is printed, never failed: that is `key_hygiene_check.php`'s judgement call in another table |
-| `link_title_check.php` + selftest | No tip parked on an `<a title=>`. `js/Calculators.lib.js` wires tap tooltips on `.ec-help[title]` alone, so on touch the tap navigates and the explanation is simply gone. Reads RENDERED pages and judges by PROVENANCE — a tip-shaped `$ec_lang` value blocks; a title that NAMES its destination (`*_main_desc`, `LANGNAME`, `view_hide_line`) is correct and passes |
-| `dom_id_resolve_check.php` + selftest | Every DOM id this suite NAMES is one something can create — 1,447 references across 28 rendered pages, 35 scripts and the stylesheet: `getElementById()`, `<label for>`, `aria-controls`, `aria-labelledby`, `href="#…"`, `url(#…)` and the `#id` selectors in `css/engcalcs.css`. **The failure renders perfectly**: `getElementById()` returns null, this page's own idiom is `if (el)`, and so the control silently does nothing on a page that draws correctly; a `<label for>` naming nothing still shows its text and merely stops naming its field; a rule for an id nothing creates styles nothing, forever. It holds the other half too — an id names ONE element, so a duplicate on a rendered page is a finding. A computed id (`b.id = 'lpn_pane_tab_' + t.id`) contributes its literal half as a PREFIX and references under it are turned away and COUNTED, as are the 25 non-literal lookups that have nothing to compare. One declared dead lookup: `lpn_rpane_btn`, whose control was deliberately never built |
-| `web_manifest_check.php` + selftest | `manifest.json` agrees with the 28 pages that link it. **Nothing in this repository had ever read that file** — not a check, not a harness — while every page emits three references to it (`rel="manifest"`, `theme-color`, `apple-touch-icon`). Icon sizes are MEASURED against the declaration, `start_url` must be inside `scope`, and the colour must match the meta the pages emit. Every failure is silent: a malformed manifest is dropped whole and the app is simply never installable. **One declared ratchet**: the suite is served at two mounts and the scope covers one, so `/app` is not installable — widening to `/` claims the whole origin for the installed window, which is a product decision, not a mechanical edit. A SECOND uncovered mount fails |
-| `storage_guard_check.php` + selftest | Every `localStorage`/`sessionStorage` access sits inside a `try` — 26 of them, all guarded, so a ratchet at zero. The empty `catch` makes it look like superstition and it is not: **in a browser set to block site data the PROPERTY ACCESS itself throws**, before any method is called and not only in private browsing, so an unguarded access on an init path kills the rest of the module. The map editor reads six furniture keys during startup. Invisible here — no server error, no log row, and the stub gives every harness a storage that works — and it happens to the privacy-conscious visitors this suite is written for. `document.cookie` (a blocked read returns `''`), `indexedDB` (opened inside a Promise executor, where a throw is a rejection) and `js/vendor/` are out of scope with their reasons, printed |
-| `button_type_check.php` + selftest | A `<button>` inside a `<form>` declares its `type`, and so does one this suite builds in JavaScript. **A typeless `<button>` IS a submit button** — the HTML default, not a quirk — and what that costs depends on WHICH form. *(Corrected the day it landed: this row said the controls sit in `<form id="ec_form">` with no `action`, so a press "reloads the page". **There is no `ec_form` and no form in the suite lacks an `action`.** The check is unaffected; the reason given for it was wrong, and it missed the worst of the three cases.)* Inside `formInput`, whose action is `javascript:EngCalcs.submitForm()`, a typeless button RUNS THE CALCULATION — so a Reset that also has its own handler both resets and recalculates in an order nobody chose. Inside `<form class="ec-consent-actions" method="post" action="/engcalcs/consent.php">` it **POSTS AND NAVIGATES, recording a consent answer the visitor did not give** — and that is the form whose two buttons `.ec-consent-btn` styles identically on purpose. The nav's language switcher is `onsubmit="return false;"` and is harmless, which is exactly why the attribute is still required: whether it is harmless is decided on the FORM, six files from the button. Nothing is logged and the page still validates. The attribute is MISSING rather than wrong, so the control's own source reads correctly. 239 rendered buttons, 161 of them inside a form and **all 161 typed**, plus 56 built with `createElement('button')` in `js/*.js` and **all 56 typed** — a ratchet at zero on a construct written 217 times the same way and held by nothing. **Markup is judged from the RENDERED page because in-form-ness is not in the source at all**: `echoCalculatorForm()` opens the form in `lib/Calculators.lib.php` while the buttons are written in six other files, so neither half carries both facts. The 78 buttons OUTSIDE every form are turned away and counted — the default submits nothing there, `Install.php` ships one and it is correct — and in JavaScript the form test is dropped instead, because the element is built in one function and appended in another. The JS window is the ENCLOSING BLOCK by brace depth, never a line count: the two halves are 35 lines apart in `demandRowInto()` |
-| `bootstrap_global_check.php` + selftest | A shipped PHP function that reads a bootstrap global DECLARES it `global` — 31 reaches, 29 declaring, one taking the name as a parameter, one deliberate local. **PHP function scope does not see globals at all**, so a function reading `$ec_lang` without the line gets NULL and every label, tip and heading it writes comes out EMPTY IN ALL 27 LANGUAGES, with `display_errors` off in production, on a page that still validates and still has the right number of fields. **This has already happened here from the other side** and `dev/scripts/render_page.php` records it: a page included inside a function put the bootstrap globals in that function's scope, and `html_balance_check.php` printed ok for weeks about a 22 KB stub of a 45 KB page. **The name set is DERIVED, never typed** — a name is a bootstrap global because some shipped function already declares it one, so the set grows by itself and cannot go stale against the tree the way a four-item list in this file did (`lpn_furniture_check.php`, same reasoning); the derivation's own limit is printed, since a global nobody ever declares is indistinguishable from a local. Comments and single-quoted strings are blanked first, because `chooseLanguage()` carries `print_r($language_settings)` inside a commented-out debug block and counting it would be a finding against correct code. `compare_langs()` is the one declared exception — it unsets `$ec_lang` and requires two language files into its own scope to diff them, so the local copy IS the point — and **a declaration matching nothing fails**, an exception nobody can trip being a ratchet gone slack |
-| `script_interpolation_check.php` + selftest | A PHP value echoed INSIDE a `<script>` block goes through `json_encode()` — 1,369 of them, which is how every language string on this suite reaches JavaScript. **1,363 were written `<?=json_encode($ec_lang['k'])?>` and four were not**, all four in `Rock-Chute.php`, all four translator text, all four inside single quotes, three lines below fourteen neighbours doing it correctly. **An apostrophe in the value closes the JavaScript string literal** and the browser throws a SyntaxError over the ENTIRE inline script — on a calculator page that is `EngCalcs.pageConfig` itself, so the form renders, every field is in place, the Calculate button keeps its word, and nothing computes; a `</script>` in it ends the block outright. `json_encode()` escapes the quote and escapes `/` as `\/`, which is why `</script>` cannot survive a correctly encoded string. **None of the 27 files carries one today**, which is the reason to hold it now rather than after: it arrives with an ordinary French or Italian translation and is visible only to somebody loading that page in that language. Three declared exceptions, each a constant this repository defines rather than text anybody translates, and **a declaration matching nothing FAILS**. The 47 `<?php … ?>` islands inside a script block that echo no expression of their own — a comment, or a call such as `echoCookieScript()` — are turned away and COUNTED |
-| `attr_escape_check.php` + selftest | A `$ec_lang` value echoed into an HTML ATTRIBUTE goes through `htmlspecialchars()` — 69 of them, 49 escaped and **20 not**: sixteen `title=` links on this suite's own calculator menu, two `placeholder=` from the printable-title template, the contact form's own submit `value=`, and one `onclick=` that went through `addslashes()`, which escapes for a JavaScript string and leaves the quote in the markup. **A double quote in the value ENDS THE ATTRIBUTE** and what follows is read as further attributes on that tag. **Rule B does not cover this and the distinction is the point**: rule B forbids a TAG in a plain-text-constrained string, and a quotation mark is not a tag — it is ordinary, correct plain text in every language on the list, and it is the character that breaks the attribute. Scoped to `$ec_lang` reads alone, because the same attributes carry constants and language codes this repository writes, and widening it would buy an exception table nobody maintains. The 1,749 language strings echoed as element CONTENT are turned away and COUNTED — that count is the evidence the scan can still tell content from an attribute at all. Ratchet at zero |
-| `number_step_check.php` + selftest | A number input this suite builds declares its `step` — **105 of 105 rendered from PHP say `step="any"`, and 20 of the 25 built by hand in `js/*.js` declared one**. The five that did not were the map editor's property popup: `unitNumberField()`, the door every unit-bearing quantity goes through, and the pipe length field populated with `.toFixed(2)`. **An `<input type="number">` with no `step` has `step=1`** — the HTML default, not a quirk — and `css/engcalcs.css` hides the spinner on every number input but `.ec-spin`, so the keyboard is the only stepper left: press Up in a length reading 125.43 and it SNAPS to 126, silently discarding what the user typed, and the field reads `:invalid` the whole time it holds a decimal. Nothing on this side of the wire can see it: the page renders, the value is right, the solve is right, and the harnesses set `.value` directly, which no step ever constrains. WHICH step is right is not the check's business — `any` for a quantity and `1` for a bounded integer are both declarations. Read from the RENDERED page on one door and from the ENCLOSING BLOCK BY BRACE DEPTH on the other, never a line count, because `unitNumberField()` sets `.type` on its second line. A `.type` assigned from a VARIABLE has no literal to follow and is turned away and COUNTED. Ratchet at zero |
-| `focus_order_check.php` | The per-line hide control costs at most ONE keyboard stop; thirty one-character "X" links were 35-43% of every stop on the worst pages (Task 478) |
-| `social_card_check.php` | Every page's `og:image` is absolute, on an origin we serve, and backed by a real file of the size the tags declare — a share card only fails where nobody on this side looks (Task 534) |
-| `vendor_integrity_check.php` | The vendored third-party files are what the manifest says they are, nothing ships undeclared, and `package.json` agrees with what is committed (Task 413) |
-| `projection_catalogue_check.php` | `js/data/epsg-projected.json` — all 5,346 live projected CRS — is intact, well shaped, and **still agrees with the 182 rows the page keeps built in as its offline fallback**. A second catalogue of the same thing is the arrangement that drifts; `js_fallback_string_check.php` exists because 892 English fallbacks did exactly that and 199 disagreed the first time anybody compared them. **It is a WEAKER digest claim than Bootstrap's and says so**: nobody publishes a hash of our own derivation, so it proves integrity at rest, not agreement with the register — what proves that is re-running the generator against the **wheel pinned by hash** in `dev/vendor-manifest.json`, which is why the input is a pinned PyPI wheel and not IOGP's REST API (that route is ~9,000 requests for a snapshot nothing publishes a hash of). Offline always: the generator needs a 10 MB `proj.db` that production and every cold checkout lack, so `--check` cannot re-derive and must not pretend to. The serious failure it holds is a built-in code the register does **not** list live — a deprecated code is worse than an unknown one, because every GIS reads it and nothing complains |
-| `coord_order_check.php` | System order is lon,lat; PUBLIC order is lat,lon — and it knows the one sentence that pairs them with x and y |
-| `browser_lang_tag_check.php` | A stray tab in visitor text cannot forge a log row |
-| `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |
-| `sw_map_host_check.php` + selftest | No map host, and nothing tile-shaped, in the service worker — read out of what `sw.php` EMITS, so a hand-written fetch route counts as much as a manifest entry. A precached tile is fetched at install, on a page the visitor merely opened, which walks past that service's own consent gate; and every precache entry must be a same-origin absolute path, because `activate` deletes cross-origin ones on every load |
-| `sw_scope_check.php` + selftest | The worker's scope covers every path the suite is SERVED at, and it answers requests at none other. A worker controls only pages under its own scope, so one scoped to `/engcalcs/` is deaf to a visitor arriving at `/app` — no error, no warning, no symptom but a missing offline suite, which is why Tom found it by reading and no check could. **The mounts are DECLARED in `ecSwMounts()` and the scope, the `Service-Worker-Allowed` header and the fetch routing are all DERIVED from them**; the header is asserted as a call, never a literal, because a hardcoded `/` passes today and is wrong the day a mount is added. The widening is not an appetite: every route is gated on `inScope()`, so a page of the parent site this suite shares an origin with is controlled and then passed straight to the network |
-| `standalone_assets_check.php` | The suite ships its own assets — a parent-site CSS dependency broke a standalone deploy |
-| `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a host→origin WHITELIST, never derived from `HTTP_HOST`. Multi-domain serving needs the lookup; a derivation lets a spoofed Host point canonical URLs off-site, and the first symptom would be a search engine indexing somebody else's domain for us |
-| `canonical_path_check.php` + selftest | A page served at a PRETTY URL nominates that URL. `/app` is a rewrite onto `Looped-Network.php`, so `SCRIPT_NAME` under it is the SCRIPT and not the address anybody typed — and canonical, all 27 hreflang alternates and `og:url` all read that one function, so the suite's front door was the one URL that could not be indexed. The override is a DECLARATION in `lib/Canonical.lib.php` and never an inference: a rewrite is not invertible, and `REQUEST_URI` is client-supplied, so reversing one would let an arbitrary URL nominate itself. It also holds the declaration against `ecSwMounts()` in BOTH directions — a canonical address outside every mount is one the worker cannot control, and a mount no page claims is a page nominating its script's address, which is Task 479.01's split by another door |
-| `sitemap_canonical_check.php` + selftest | Every URL the sitemap ADVERTISES is the one that page nominates in its own `<link rel="canonical">`. **The failure is invisible from both ends**: the page renders correctly, its canonical tag is right, the XML is well-formed and every URL answers 200 -- the two documents simply disagree about the address, and the only place that surfaces is a Search Console report nobody in this repository can read. Google's name for it is *Alternative page with proper canonical tag*, which is an EXCLUSION: the page drops out of the index while every instrument here says the site is healthy. **Measured 2026-09-17: 2 of 545, and the other 543 agreed** -- the familiar signature of a construct written many times with the discriminating detail absent on a few, like `rel="noopener"`'s 13-against-12. The two were `privacy.php` and `terms.php`, which take no `?lang=` loop, so the bare path looked like the natural address while `echoHTMLHead()` self-canonicalises EVERY suite page to `?lang=<current>` -- always `?lang=en` for an English-only document. **It reads the GENERATOR, not the deployed file**, because `../sitemap.xml` lives outside this repository and is re-uploaded by hand, so a check reading it would pass on whatever happens to be on this machine. Three legs, all decidable: the path must be `ecCanonicalPath()`'s answer (Task 479.01's defect from the sitemap side), a `?lang=` must be present, and it must name a language file. Parent-site URLs are DECLARED out of scope and counted, emitting no canonical tag to compare against; an empty scan FAILS rather than reading as progress. **What it cannot see, stated rather than implied:** it never fetches a page, so a defect in `ecCanonicalPath()` itself is `canonical_path_check.php`'s business |
-| `nav_link_absolute_check.php` + selftest | Every `<a href>` the SUITE NAV emits is absolute from the origin, a full URL, or base-independent -- 1,275 of them across 27 rendered pages. They were RELATIVE, which is correct on the hawsedc mount and dead on the librewaternet one, because **`/app/` is a REWRITE onto `Looped-Network.php`** and a relative `Manning-Pipe-Flow.php` resolves against `/app/`. **The failure cannot be seen from inside this repository**: the HTML is byte-identical on both hosts, only the base URL differs, and no renderer here has one -- so the bar rendered perfectly, every link spelled correctly, and a third of it was dead at the suite's own front door from the day the rewrite shipped until Tom clicked it (2026-09-09). Scoped to the shared chrome and deliberately NOT to page bodies: a calculator linking a sibling relatively is correct, because those pages are served at exactly one address; only the chrome rides onto a page served somewhere else, and widening this would fail 5 correct links to catch nothing |
-| `deploy_identity_selftest.php` | The About box's build line describes the DEPLOY rather than a file. `ecDeployIdentity()` dated it `filemtime(__FILE__)` -- lib/config.inc.php, the file the function lives in -- and **a pull only touches the files it changed**, so the date froze at 2026-09-11 18:47 UTC while the sha beside it advanced with every deploy. That readout is how somebody decides whether a pull landed, which makes a plausible stale date worse than none: Tom debugged a working deploy for an exchange before spotting it (2026-09-12). The date now comes from the ref the SHA came from, newest of that and `.git/logs/HEAD`, so the two are ONE fact; `.git/FETCH_HEAD` is deliberately not consulted, because a bare `git fetch` rewrites it without deploying anything -- measured 8 minutes off the real deploy on this account the same day. **Nothing could have caught it by reading**: both halves were well-formed and only their relationship was wrong, which is visible only by moving one. So the selftest builds `.git` skeletons with mtimes it chooses -- loose ref, packed refs, detached HEAD, no `.git` at all -- and that is why the function takes an optional root; it was untestable while it could only read the real repository. Mutation-tested: the old source fails 7 of its assertions |
-| `js_page_url_check.php` + selftest | A suite page addressed from JAVASCRIPT is addressed from the origin. `nav_link_absolute_check.php`'s finding in another construct, and it needed a second check because that one reads the RENDERED nav of 27 pages, while these URLs are built inside a JS menu at the moment somebody opens it -- so the navbar was fixed 2026-09-09 and the Help menu beside it stayed broken. Six sites said `'privacy.php'`, `'terms.php'`, `'contact.php?from=…'` and `'Install.php'` relatively: correct at `https://hawsedc.com/engcalcs/` and **404 at `https://librewaternet.org/app/`**, because `/app/` is a REWRITE and a rewrite is not a directory. **It cannot be seen from inside this repository** -- the JS is byte-identical on both hosts, the row draws, the link spells correctly, and Tom had to click it (2026-09-12). `suiteUrl()` is the one door and `EngCalcs.suiteBase` is `EC_SW_BASE` emitted by `echoHTMLHead()`; the check holds BOTH ends, because a door reading a base no page emits is right only by accident. Comments are blanked and string literals are not -- the reverse of most scans here, because the finding IS a literal while the prose quotes page names constantly -- and the blanker knows a REGEX LITERAL from a division: `/['"]/` in `js/Calculators.lib.js` otherwise swallows every comment after it, which is how the first run reported fifteen lines of prose about the definition of a foot. A candidate must also be URL-shaped, and anything else is turned away and COUNTED. Ratchet at zero |
-| `third_party_request_check.php` + selftest | The suite makes FOUR third-party requests, all opt-in, each behind its own gate — OSM tiles, Mapbox satellite, Nominatim search, Mapbox Terrain-RGB. Reads `js/*.js` with comments BLANKED, because 11 hosts appear there and only 3 are requests; every other host is declared non-request with a reason, and is still failed if it turns up at a `fetch(`. Also that each purpose still has its owner module, its gate and its `privacy.php` paragraph, and that `consent_body` never names one |
-| `storage_inventory_check.php` + selftest | Every cookie, `localStorage`/`sessionStorage` key and IndexedDB store a shipped file WRITES is in `dev/cookie-storage-inventory.md`. It found two that were not — `bpn_sketch_toggles` and the `engcalcs-lpn` handle store — in the file whose only claim is that it is complete. A deletion is not a write; four dynamic sites are declared with the names they produce. It never asks whether something SHOULD be stored: that is the exemption test, and it belongs to a person |
-| `cookie_attribute_check.php` + selftest | Every cookie this suite SETS names its own `samesite`, `secure` and `httponly` — nine writes, five in PHP and four in JS. **The tree had decided this twice in opposite directions**, which is `blank_target_check.php`'s finding in another construct: five sites named all three and argued each in a comment, and the two `ec_nolog` writes named none, being in the POSITIONAL form of `setcookie()`, whose fourth argument is the path and which has no slot for SameSite at all. **An attribute we do not name is one the visitor's browser names for us, and browsers do not agree** — Chrome applies Lax where an older engine applies None, so the same page behaves differently for two visitors with nothing to see in either; and this host answers on http as well as https, where a cookie with no `Secure` decision travels in clear. **The rule is DECLARATION, not a value**: `'httponly' => false` on the consent cookie is correct and says why. A DELETION is exempt and that is not leniency — only name, path and domain identify the cookie one has to match, so demanding the other three would be demanding text that changes nothing. Comments are blanked before the scan, because the fix for a finding is a comment naming `setcookie()` |
-| `page_meta_check.php` + selftest | Every page sets `$html_desc` or is on a declared exempt list; it never points at the title (Google discards a duplicate and writes its own snippet from a form); no hardcoded `?v=N`. **The exempt list in prose was wrong until 2026-08-25** — that is why it is a check |
-| `calculator_page_check.php` + selftest | Steps 2 and 7 of "How to Add a New Calculator": every calculator page is linked from `lib/Menus.lib.php` and owns a prefix documented in the table above. A calculator is a page calling `echoCalculatorForm()`, so the 9 pages that are not one are DECLARED with a reason each; an unmenued calculator renders perfectly and no visitor can reach it, and an undocumented prefix is free to be handed to the next calculator |
-| `verdict_string_check.php` + selftest | A verdict string leads with `✓`/`⚠` and carries no marker word, in all 27 languages. **Which strings are verdicts is read out of the RENDERER**, never guessed from key names: `writeCheckHTML()`'s short-text argument and the labels objects, resolved one hop through `pageConfig` — 32 keys, 945 values. A glyph IN such a string ships two, because the renderer prepends one; and any value carrying a glyph must lead with it, which is the leg that matters in the five RTL languages |
-| `log_bucket_check.php` + selftest | Every appended log row carries `ecLogBucketSuffix()`, and carries it LAST. CLAUDE.md has stated this since the buckets existed and nothing held it. **An unmarked row does not read as unlabelled — it joins the CONSENTED bucket**, which is deduplicated and counts people, so one new writer inflates the human count by its own page loads, in a report nobody re-derives. Position is part of the rule and not tidiness: the logs are tab-separated and read positionally, so a bucket written mid-line shifts every column after it. Six appending writers today and all six comply, which makes it a ratchet; `formmail.php` is the one that did not, and its own comment records the symptom — a funnel with a denominator in two units and a numerator in neither. `fwrite()` is read too and DECLARED, never inferred: `lpn-lock.php` writes a lock, not a row, and says so |
-| `log_format_selftest.php` | The 2026-09-08 log additions still read: the POINTER column on the two confirmed-human logs (Task 285 -- `coarse`, `fine` or blank, before the bucket), `save` and `rename` as naming fields for Looped-Network, and the served/asked reading of the reach log by region. A mixed-vintage fixture -- four-field legacy, five-field bucketed, six-field with pointer -- is run through the REAL `log/lang-log-stats.sh` with `--archive=`, and the counts it must print are asserted. An old row and a new one differ in field count and awk reads positionally, so a reader testing the wrong field prints a number that looks fine; the fixture also found that the report derived its no-title-field page list beside the LOG directory, so every archived run had an empty list |
-| `no_session_check.php` + selftest | No shipped PHP starts a session, by token scan. See the storage section: the number is zero |
-| `docroot_exposure_check.php` + selftest | Every directory in this tree is DECLARED web-served or BLOCKED, and the blocks are still there. Deployment is `git pull`, so every tracked directory sits under the document root whether or not a visitor has business in it. Five said so -- `dev/`, `log/`, `lpn-locks/`, `spock/` and `.git` by a `RedirectMatch` -- and **`.claude`, `.github` and `.vscode` did not: `/engcalcs/.claude/settings.json` answered HTTP 200**, serving the agent definitions, the hook scripts and the permission allow-list. **It was found by the ACCOUNT'S OWN DAILY PAGE CHECK and by nothing in this repository**, which is the argument Task 676 is made of -- 80-odd checks about the CONTENTS of this tree and not one that can ask what a URL answers. **And not by reading either:** the root `<FilesMatch "^\.">` LOOKS like it covers the case and matches FILENAMES only, so `settings.json` is not a dotfile just because its directory is -- the exact lesson already written above the `.git` rule in that same file, then made three more times. The signature is the familiar one: a construct written eight times with the discriminating detail on five and absent on three, like `rel="noopener"`'s 13-against-12. A dot-directory is held at **two override levels** deliberately (the blanket rule is mod_alias, the per-directory files are mod_authz_core) because this same file records that a host change can silence one grant and not another. Three legs and all decidable, so a false positive is impossible; the third is the valuable one -- **a new top-level directory declared NEITHER way FAILS**, not because it is wrong but because exposed-by-default is the state this ends. It reads DECLARATIONS and never the live site: proving Apache obeys them needs a request, and that is the account's own daily page check on the host, whose script Task 676 brings into this tree |
-| `public_claim_check.php` + selftest | The four sentences that shipped and Tom struck — *"your phone"*, *"PC application"*, *"the only third-party request"*, *"no extended-period simulation yet"* — cannot come back in a shipped English string. Deliberately blind to `dev/*.md`, where all four appear inside the rule forbidding them. A floor, not a guarantee: it cannot see the landing page |
-| `plain_english_swap_check.php` + selftest | Be universal, conventional and translatable — not esoteric (Tom's own wording, which REPLACED the "Simple English" rule after it licensed this three times). Four substitutions Tom struck — *rest pressure* for static pressure, *pulled down* for drawdown, *settle* for converge, *the usual value* for the default — cannot stand in a shipped English string. **Two failure modes, and only one is about register**: `settle` is the right idea in the wrong word; *the usual value* is a DIFFERENT idea (Tom, 2026-09-01: *"'Usual' ... doesn't mean 'What will be done internally if you leave this blank.' No amount of Simple English can make that right."*) — a default is a promise about an empty box, what is usual is a fact about the world, and no plainer synonym fixes the second kind. **It found EIGHT the day it was written**, three years of `lpn_settings_*` tips saying a network would not "settle". A DECLARED table, never a cleverness: "is this word standing in for a term of art" is undecidable, so a row is earned by shipping and being struck. `usually` as an ordinary adverb is correct three times in `lang.ec.en.php` and is deliberately not matched. **The root cause it closes is a documentation one** — the correction was written into this file and NOT into `dev/language-strings.md`, which this file tells a string writer to read first, so the next writer did as instructed and got the uncorrected rule |
-| `em_dash_ratchet_check.php` | The one advisory that survived striking the house style, and it is about an AUDIENCE rather than about good English: the dash is fine, the reader is not, and a sentence a visitor reads carrying one reads as machine-written whatever it says. Held as a RATCHET — 69 in shipped English on the day it landed, and rewriting those would buy 60 x 26 = 1,560 retranslations of text whose meaning did not move, so the number may FALL and may not RISE. Lower the baseline when you fix some; the script deliberately does not rewrite its own. **Code comments, `dev/*.md`, roadmap blocks and commit messages are out of scope on Tom's own instruction** (*"Use it all you want in private. It's lovely."*), and so is a dash SEPARATING two names in a `<title>` or the language switcher, which is a typographic separator and carries none of the tell |
-| `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
-| `lpn_furniture_check.php` + selftest | A `lpn_` setting belongs to the PROJECT or to the BROWSER, never to both (Task 584): window furniture never enters `serializeProject()`. A leak is invisible to whoever wrote it — on their machine it restores the layout they already had — and visible only to the colleague who opens the file on a laptop and inherits a 32-inch layout. **The furniture list is DERIVED** from the page's own direct `localStorage.setItem(<CONST>)` writes rather than typed, because CLAUDE.md names four and the page writes six; an underived key fails until somebody says which home it is in, which is the question Task 584 exists to force. The project store is excluded by construction: it writes through `writeJSON()` with a computed key. `storage_inventory_check.php` asks whether a key is DOCUMENTED; this asks which of the two homes it lives in |
-| `js_constant_check.php` + selftest | A physical constant in `js/*.js` is the suite's own exact value, never a decimal somebody typed off it. `unit_factor_check.php` re-derives every `$ec_units` factor and **has never read a line of JavaScript**, where 28 constants live: 24 agreed exactly and 4 were rounded — `0.0283168466` for a cubic foot in two modules, `0.0438126364` for a million gallons a day, and `0.703070` for a psi of water column, which `dev/session-handoff.md` had written down as an open question rather than as a defect. The error is parts in ten million and the size is not the point: the suite has ONE definition of a foot, and a second one a few digits away is what makes two answers that ought to be identical disagree. A literal fires only when it is within one part in a thousand of a quantity this script DERIVES from the exact definitions and is not equal to it, so a number that far from a conversion factor and not that factor is a retyping; everything else is never looked at again. Exact agreements are COUNTED and printed, because a scan that has gone blind reports zero findings and reads as progress. Comments and quoted string bodies are blanked (a `/v/3.28084/` in a URL is not a constant); `js/vendor/` is out of scope by declaration, being held byte-for-byte elsewhere. Only quantities the suite DEFINES are in the table, so the imperial gallon is invisible by construction and not by oversight. Ratchet at zero; the four found were derived rather than declared, because none had an argument for being approximate |
-| `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it. **Also that a unit's identity is its NAME** — no `data-unit`, no `objForm['xu'].value`, no `<option>` valued with a factor (Task 390) |
-| `unit_family_check.php` + selftest | The four unit-family absolutes, each of which fails with a page that RENDERS AND LOOKS RIGHT: a family missing from a preset, a preset picking a unit its family does not offer, an offered unit with no factor, a page naming a family that does not exist. `echoUnitSelect()` catches the first at render time — that is, possibly by a visitor; this reads the declarations before it ships |
-| `unit_select_family_check.php` + selftest | A unit `<select>` names a FAMILY, never a raw array — such a select carries no family and is invisible to the US/SI buttons, so the page converts every field but that one. Reads both doors: the `echoUnitSelect()` call and the `'units' => array(...)` declaration `unit_family_check.php` cannot see. A non-literal argument is out of reach and is printed as a count, not a silence |
-| `unit_default_preset_check.php` + selftest | A page's `default` number is in the DISPLAYED unit, so a field whose family shows one unit under `us` and another under `si` declares one default per preset. A scalar `6` there reads as 6 in under `us` and 6 mm under `si`: the page renders, the select shows the right unit, the answer comes back, and it is wrong by 25.4 for exactly the half of the world the author was not using. Empty and zero stay allowed, being unit-independent. Declarations are split on `'name' =>` rather than by line, because `Manning-Trap.php`'s `d50_in` spans four lines and a line scanner reads 62 of 63 and reports OK. Neither `unit_family_check.php` nor `unit_select_family_check.php` has ever read the word `default` |
-| `form_field_units_check.php` + selftest | A calculator's `hasUnits` argument agrees with the form it is reading. `js/Calculators.lib.js` has three seams between the arithmetic and the page -- `readFormInput()`, `readFormInputPerUnit()` and `writeFormResult()` -- and each takes a field NAME and a BOOLEAN that decides whether the number is converted at all. **The page is the other half of that pair**: a field is unit-bearing exactly when the render carries a `<select name="<name>u">`, and nobody had ever compared the two ends in either direction. `hasUnits = false` on a field that has a select takes the number raw, so a 6 typed into a box labelled `in` reaches the solver as 6 metres -- **the page renders, the select still shows `in`, an answer comes back, and it is wrong by 25.4** for whoever is not working in the SI base unit. It is `unit_default_preset_check.php`'s defect one layer further in. It holds the cheaper half too: `objForm[name]` on a field the form does not have throws inside `pageCalculator()`, so the results table silently stops updating. **Read from the RENDERED page**, because `Manning-Trap.php` proves the declaration is not enough -- `d50_safety` is a real input built by hand with `inputHtml()` inside another field's label. 221 literal calls across 16 calculator pages, all agreeing; the three pages reaching none of the seams are NAMED so silence is not read as coverage |
-| `unit_default_set_selftest.php` | The first-visit PRESET rule and the measured option ORDER, both taken on the usage data 2026-09-08 and both wrong with a page that renders and looks right. `ecDefaultUnitSet()` gives US customary only to an English page in a browser whose Accept-Language region is the United States; every other tag, a bare `en` and every other language get SI, and a request with NO header keeps the status quo so the calc-spike worked examples still render US. The first option of each reordered family is pinned to the pooled `units` counts in `dev/usage-data-log.md`, so an "SI first" tidy-up fails here rather than undoing a measurement |
-| `lang_syntax_validate.php` | Rules A–D |
-| `lang_key_resolve_check.php` + selftest | Every literal `$ec_lang['k']` a shipped page READS is a defined key — an undefined one renders as the empty string in all 27 languages with no warning. A token scan, so a concatenated or variable key is invisible to it and a false positive is impossible. Its advisory sibling `key_hygiene_check.php` asks the opposite question, whether a key is debt, which is judgement |
-| `lang_tag_parity_check.php --strict` | Markup matches English |
-| `lang_placeholder_check.php` + selftest | Every `{placeholder}` a shipped string carries is one the suite can substitute, and one that repeats is substituted GLOBALLY. `lang_tag_parity_check.php --strict` already holds a translation's placeholder SET against its English source; it never asks whether anything can substitute the token at all, and it `unique()`s, so it cannot see a repeat. **An unsubstituted token reaches the visitor with its braces on, in all 27 languages at once, in a sentence that otherwise reads correctly** -- the third member of the name-resolution family beside `icon_name_check.php` and `dom_id_resolve_check.php`. **And `String.replace()` with a STRING pattern replaces the first occurrence only**, which the tree has decided twice in opposite directions: 154 first-only sites against 12 global ones. That matters because a repeat already ships -- `lpn_push_base_only` carries `{base}` twice in all 27 files and both its sites use `/g`, which is the evidence somebody met this once -- and the translation payload explicitly invites an agent to move a placeholder where their language needs it. Four idioms are read, the message-call form POOLED PER FILE with the reason stated (a wrapper hop) and gated on the first argument being a defined `$ec_lang` key, without which `svgEl('rect', {x1: ...})` reads as a message and 50 geometry properties become substitutable tokens. 61 tokens, 174 sites, a ratchet at zero; the XYZ raster tile template `{z}/{x}/{y}` is declared exempt from the orphan note, being somebody else's format |
-| `gloss_ref_check.php` | Every `gloss:` resolves and is wired to its prefix |
-| `anchor_language_check.php` + selftest | The anchor languages are `glossary.json`'s `meta.anchor_languages`, and the prose restating them agrees. Scoped to `CLAUDE.md` and `dev/translation-process.md`, because 15 lines elsewhere in `dev/*.md` name an anchor set correctly as history; the three lookalikes inside that scope are declared with the words that make them history. **No script read `meta.anchor_languages` at all before this one** |
-| `js_module_wiring_check.php` + selftest | A new JS module is on a page and in `dev/lpn-spike/lpn-dom-stub.js`, or declared. 7 of the 14 modules the `lpn_` page loads before the editor are pulled in per-harness — each declared, and each required to be loaded by a real harness. The service-worker leg is `sw_manifest_check.php`'s and is deliberately not duplicated |
-| `layout_tag_check.php` | A layout tag matches the widget it claims to describe |
-| `syn_tag_side_check.php` + selftest | No `layout`/`avoid`/`gloss`/`symbol`/`runtime` tag LEFT of the pipe in `$ec_lang_syn`. The generator strips commentary by POSITION, so a tag on the wrong side — or a value with no pipe at all — ships to 26 agents as a synonym and nothing warns anybody. The unguarded half of `layout_tag_check.php`'s rule, taking its vocabulary from that file rather than keeping a second copy |
-| `native_review_flag_check.php` + selftest | No language logged as "awaiting native review" — the framing promises a resolution that is not coming and makes an honest `QUALITY` tier look provisional. It must READ the documents that state its own rule, so a quoted phrase and a line carrying a prohibition marker are demoted as mentions; the tree's four real mentions are fixtures |
-| `language_declaration_check.php` + selftest | `$all_language_settings` lists exactly the `lib/lang.ec.??.php` files that exist, each with a `QUALITY` in (0,1] and a `LANGNAME`. Declared-with-no-file is a fatal for the one visitor whose browser asked for that language, and we advertise it in `hreflang`; a file nobody declared is a paid-for translation nothing can reach. Not the tier VALUES — which tier a language is in is judgement |
-| `coverage_selftest.php` | The coverage cross, the identity floor, exempt/out-of-scope separation |
-| `generate_translation_payloads.php --check` | Payload freshness |
-| `payload_freshness_selftest.php` | Both directions of the freshness gate. It judged by MTIME until 2026-08-29 and so reported all 26 payloads stale in any freshly checked-out tree — `git pull` does not preserve mtimes and neither does a worktree, and four subagents in one session each had to work out whether the failure was theirs. Freshness is decided by CONTENT now, and building the payload IS the input list, which retires an eight-path list that had already missed an include once |
-| `key_hygiene_selftest.php` | The reachability walk (finding 1b of `key_hygiene_check.php`) still sees a dead reader, and still turns away the shapes that only look like one. Blocking, though the check it guards is advisory and finds nothing today: the case it was written for was already deleted, so fixture 1 is that shape verbatim and is the only thing standing between the walk and a silent zero |
-| `prefix_map_check.php` + selftest | Every calculator prefix is wired to glossary terms or declared to own none. A prefix missing from `prefixToTermNames()` does not fail — it silently gets three default terms, and the calculator's definitions, preferred translations and `avoid` arrays reach no translation agent. `lpn`/`bpn` were missing for months |
-| `new_english_keys.php --check` | `dev/new-english-keys.md` is fresh, so the list Tom rules on cannot go stale between the day a key is written and the day he reads it |
-| `harvest_english_rulings.php --check` + `harvest_rulings_selftest.php` | **A mark Tom writes on `dev/new-english-keys.md` reaches a file that survives regeneration.** He hand-edits that list — the header says never to, and he does, because it is the list in front of him — and three times running the marks stayed only in the working tree and he was asked the same questions again: *"I already ruled on many of these. You are losing my rulings."* The `--write` refusal beside it stops a regeneration DESTROYING a mark; this stops one merely being ignored, which loses it just as completely. Two destinations, because the file asks two kinds of question: an answer in the translators' section is a finding's `human_answer` in `dev/english-friction/*.json`; anything else is a ruling in `dev/english-key-rulings.json`, keyed on the exact English as an approval already is. **His words are stored verbatim, not reduced to a boolean** — "OK." and "It's fine as is. Add a _syn per 1." are both readings and only one is finished — and printed back on the key, which is the receipt. Idempotent by asking the DESTINATION, never "has the file changed". The selftest is a live mutation, because a check that passes by finding nothing is the shape that has already died of success here once |
-| `generate_examples.php --check` | The served `examples/` matches its source |
-| `generate_features.php --check` | `dev/features.md` matches its hand-written source, and every ID a feature cites is genuinely closed |
-| `hook_install_check.php` | The two git hooks that keep master the production line are installed and byte-identical to `dev/hooks/`. **A copy, not `core.hooksPath`, and that reversal was MEASURED**: core.hooksPath resolves INTO THE WORKING TREE, so checking out a commit without `dev/hooks/` silently deletes every guard -- a commit straight onto master went through unrefused for exactly that reason on the day they were written. It failed OPEN and SILENTLY. A copy in `.git/` survives every checkout and buys one problem, staleness, which is what this check is. Not-installed is a failure too: a checkout nobody ran `dev/hooks/install.sh` in has no guard at all, which is the state this exists to make visible |
-| `branch_policy_selftest.php` | **GREEN IS NOT DONE, AND NEITHER IS TOM'S APPROVAL ON ITS OWN.** `dev/hooks/pre-merge-commit` refuses a merge of a branch listed in `dev/branch-policy.json` unless `dev/branch-all-clears.json` records Tom's words PINNED TO THE COMMIT he cleared -- **and since 2026-09-15 a `feature_freeze` refuses it anyway**, because he asked whether the scripts would block an approved merge during a freeze and the answer was no. The approval keeps standing and takes effect when the freeze lifts. **It is deliberately NOT `freeze.active`**, the emergency stop that refuses every merge but a `hotfix:` and whose one outing cost a day of bug fixes: `feature_freeze` refuses only what `protected` names, so a defect track is untouched -- **case 8c asserts that and is the case that matters most**, because a gate that stops all work is a gate somebody switches off. Four mutations of the new leg are killed, including one that would have made it block ordinary branches -- so the approval lapses by itself the moment the branch moves, the way an English ruling lapses when the wording changes. Written after six capability merges landed on master in one session, every one of them green and two of them unfinished in ways only he could see. **The existing hooks had nothing to say because neither watches a MERGE**: pre-commit exempts merge commits by construction, and pre-push passes as soon as the suite is re-run. Blocking, and the selftest is why: this hook only speaks when it refuses, so one that has silently stopped working is indistinguishable from one nobody has tripped -- the failing-open shape that already cost this project a guard on 2026-09-12. Nine cases against a throwaway git repository the test builds, including a freeze that stops an ORDINARY branch and still lets a `hotfix:` through |
-| `wait_guard_selftest.php` | **A BACKGROUND WAIT LOOP MUST BE ABLE TO FINISH.** Eight were left polling on 2026-09-13 for work that had already completed; ten hours later they were still sleeping at 0.0% CPU, and the only symptom was that **Claude Code would not exit** -- Tom, 2026-09-14: *"It tells me things are running. And there are 8 shells, whatever that means."* He should not have to know what it means. Two shapes, both measured on those eight. **A SELF-MATCHING `pgrep`** (three of them): `until ! pgrep -f "run_harnesses.sh"` cannot exit, because the shell running the loop HAS that text in its own command line, so pgrep finds ITSELF -- bracket the first character (`[r]un_harnesses`) and it matches the same processes and not this one. **AN UNBOUNDED WAIT** (the other five): `until grep -q "^EXIT="` cannot exit if the watched job was KILLED, because nothing then writes the marker; those five waited on files reading `[exited with code 144]`. **THE GUARD LIVES IN `.claude/hooks/guard-wait-loops.php`, NOT IN `dev/scripts/`, and that is forced rather than chosen**: the defect never reaches this repository -- it is a command a session types at runtime and throws away -- so nothing reading committed files can ever see it, and a PreToolUse hook is the one place it is visible BEFORE it runs. Scope is narrow on purpose, because a guard that cries wolf gets switched off: the unbounded shape is judged only on a BACKGROUNDED command, since a foreground loop is visible and interruptible. `dev/scripts/wait_for.sh` is the bounded waiter every denial points at, and it gives up loudly rather than leaking; `dev/scripts/reap_stale_waiters.sh` clears strays the guard never saw. **Mutation-tested, and that found a real hole**: all three self-matching fixtures were ALSO unbounded, so the second detector caught them and neutering the first one still passed -- the selftest now carries a self-matching loop that IS bounded, which only the first detector can fail |
-| `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else; and **priority is one of 100, 95, 75, 50, 25, 5, 0 and no other number**. That last leg was prose in the roadmap's own header for three weeks and drifted anyway -- seven tasks had settled at 30, 40, 60 and 70 by the day Tom read the file (*"the system has been completely lost. Restore it."*, 2026-09-12), on the same screen as a header sentence saying five values and nothing between them. An off-tier number is invisible: the file still sorts and still reads, and every 60 is a private opinion about a gap nobody else can re-derive. **A temporary 95 tier was retired on 2026-09-12, the day after it was made** -- it parked work past EWB, and branch work needs no parking: with master as the production line a task ships when its branch merges and not before |
-| `review_queue_check.php` + selftest | **Tom's browser-pass comments survive the session that read them.** A browser pass is the one input nothing here can produce and nobody else can give, and it is the one most easily lost, because of its SHAPE: it arrives as prose in a single message, a session acts on part of it, and the rest exists only in that session's context -- which ends. Nothing in this tree had ever held one. He asked for it in his own words, 2026-09-19: *"Always ensure that my review comments are not lost until they are cleared/addressed. These reviews, while they are enjoyable, nay, even fun, cost me a lot of time and focus."* `dev/tom-review-queue.md` is the ledger, one row per thing he typed, quoted rather than paraphrased -- a paraphrase is how "put station and offset in Find" becomes "improve Find". **Two legs, split on what a machine can decide.** The BLOCKING one holds the FORM: every row parses, every id is unique and none is written past the declared next-free pointer, no invented fifth status marker, and an empty ledger FAILS rather than reading as a clean bill of health. The ADVISORY one prints every outstanding row on **every** run, and **exits non-zero while anything is open on purpose** -- that printing is the whole feature, and an advisory whose findings never reach the reader is not an advisory, which is the lesson `detect_english_drift.php`'s own line in `check_all.sh` already records. **It decides nothing**: `[-]` DECLINED is Tom's marker alone, because a script that could close his items would be a script that could lose them. Its selftest is a live mutation -- nine breakages of a throwaway ledger, each of which the real script must name, including a fence that swallows the rows after it, which would blind the check completely while it went on printing a pass |
-| `check_table_parity_check.php` + selftest | This table and `check_all.sh` name the same checks. Matched on script filename, not on labels — the two files may word a check differently. Eight checks ran unlisted when it was written |
-| `doc_path_check.php` + selftest | Every path `CLAUDE.md` cites exists. Scoped to that file: `dev/*.md` has 31 dead citations and nearly all are legitimate history, which would make it a judgement call. Deliberately timid about what looks like a path, and prints how much it turned away. `~/webdev/...` and `../sitemap.xml` are outside this tree, so their absence proves nothing |
-| `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
-| `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
-| `harness_wording_check.php` + selftest | A harness must not pin English WORDING as a literal. On 2026-09-08 Tom reworded three strings and three harnesses went red — not because anything broke, but because each asserted the old English (`/none of them changed/`, `/Limiting potential/i`, four copies of `lpn_goto_bad`). **There were 199 more, and 147 of them were repaired the same day — the baseline is 52.** A pin taxes exactly the work this project most wants to be free: `dev/english-key-rulings.json` is built on a ruling LAPSING when the wording moves, and a pinned harness makes that cost a red build in a file about hydraulics whose message names a fitting rather than a string. The fix is one line and already works — assert against `EngCalcs.pageConfig.<key>`, which the DOM stub fills from the real language file; where a harness loads no stub it reads `lang.ec.en.php` itself, and a message carrying `{placeholders}` becomes a PATTERN with the numbers left open. **A RATCHET, not a repair**, because the judgement is per site: three of the 147 were asserting against the WRONG key and passed anyway (`lpn_replace_none` for `lpn_scenario_push_none`, `lpn_engine_unavailable` for `lpn_time_no_engine`), which is what a fragment shared between two strings buys you. **18 sites are DECLARED correct as they stand** in the check's own exception table, keyed on file and exact literal with a reason each, and a declaration matching nothing FAILS: an assertion read off `PC.<key>` about a consent gate's own content is meant to go red, a project name the harness types in is not the page's text at all, and a `pc.x || 'English'` fallback in fixture code is `js_fallback_string_check.php`'s business. The remaining 52 are all in `dev/browser-pass/`. A literal is a pin when, normalised, it is a substring of a normalised English value; three words and twelve characters is the floor, and a shorter one is turned away and COUNTED, being an element id or a unit keyword far more often than wording. A harness that builds its expected text at runtime has no literal to compare and is invisible, which is what makes a false positive impossible |
-| `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
-| `stale_claim_selftest.php` | The DEMOTIONS in the check above, against fixtures. Blocking, because the check it guards is not: a demotion trades coverage for a shorter list and the tool looks identical either way. The three real false claims must keep ranking HIGH |
-| `usage_report_selftest.php` | The private usage report page (`usage-report/index.php`, Tom 2026-09-17: *"I'm feeling a bit private at the moment, so password protection might be nice. Historical graphs might be nice."*) reads the right field, and NEVER SUMS THE TWO CONSENT BUCKETS. `log_format_selftest.php`'s method on a second reader: a mixed-vintage fixture -- four-field legacy, five-field bucketed, six- and seven-field -- through the REAL library and the REAL page, because **a report that reads the wrong field prints a number that looks fine** and the only thing that can see it is a fixture whose answers were worked out by hand. The leg that matters most is the last one: one bucket counts PEOPLE (consented, deduplicated per person per page) and the other counts PAGE LOADS (everybody else, undeduplicated), so a total would have a denominator in two units and a numerator in neither -- the symptom `formmail.php`'s own comment records. The rendered page is parsed and asserted to carry no total/sum/combined/all column and no row wider than three cells. It also holds the things that make this page not a liability: it STORES NOTHING (no cookie, no local storage, no session, no script, and it does not even require `lib/config.inc.php`, whose load-time behaviour reads and can clear analytics cookies -- so `consent_body` stays true and nobody is re-asked anything), the fixture door is a CONSTANT and never a request parameter, and `usage-report/.htaccess` still declares HTTP Basic with a `Require valid-user`, that file being the only thing between these numbers and the open web. The page has a DIRECTORY OF ITS OWN because an auth directive needs `AllowOverride AuthConfig`, a separate grant from the `FileInfo`/`Limit` the rest of the suite relies on, and Apache 500s the directory holding a directive it refuses -- the `Options -Indexes` lesson, with the blast radius reduced to one page. Two mutations killed: a pointer read off the field beside it, and a bucket read off a fixed index. Password, sections and sources: `dev/usage-report-page.md` |
-| `daily_report_selftest.php` | The RANK BY SHOPPING table `dev/scripts/daily_report.sh` mails carries its column headings and honest bucket labels (Tom's review queue, R-121/122/123: he read the mailed table with no heading at all and guessed wrong about what "people" and "page loads" meant). `log/lang-log-stats.sh` already prints a header row on this table; `daily_report.sh`'s own extraction awk picked up only digit-leading lines, so the mailed copy silently dropped the header along with every other line of prose. Checked against the source: "people" is the CONSENTED bucket (one row per person per page, nothing to do with dwell time, never "long-dwell"), "page loads" is everybody else, and both columns of this one table come from the >=10s-dwell "shopping" beacon, so it already excludes nearly all robots by behaviour -- there is no user-agent or robot list anywhere in this codebase. A fixture `log/lang-log-stats.sh` stand-in (POSIX `/bin/sh` only) run through the real `daily_report.sh`, for the same reason `log_format_selftest.php` and `usage_report_selftest.php` read a fixture rather than eyeballing the shell code |
-| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php`, `branch_hygiene_check.php`, `nested_repo_boundary_check.php`, `host_script_parity_check.php` | Judgement calls that must not block a commit — and one that cannot run everywhere: two read a repository OUTSIDE this tree and print that they checked nothing rather than passing in silence -- the screenshot one reads the sibling site, the host-parity one reads the SERVER over ssh (`dev/host/` has two copies and until 2026-09-15 the only one was the server's), and the nested-repo one reads the PARENT repository this suite sits inside, whose one `.gitignore` line naming this directory WITH A TRAILING SLASH is the only thing stopping it swallowing 1,452 files that have their own origin. That rule was once written with a star instead, and over-matched `engcalcs-parent-hooks.php`, a real file of the parent site, which is why it is a script and not a sentence. `dev/git-organization-recommendation.md` |
-| *advisory:* `sibling_exposure_check.php` | The two SIBLING websites are still guarded the way this tree is. `docroot_exposure_check.php` was written because `.claude/settings.json` answered 200 here; two days later `https://librewaternet.org/tools/` answered 200 with a full index, `build-chrome.php` answered 200 **EXECUTED** and `build-features.php` 500 **executed and fatal** -- remote execution of that site's own build scripts, found because Tom noticed the untracked `error_log` the fatal wrote. **Both exposures were found from OUTSIDE while every check inside the repository passed.** The real check lives in EACH SIBLING -- `~/webdev/librewaternet.org/tools/exposure-check.sh` reading a `docroot-declarations` file beside it, run by that repo's own `check.sh` and so by its pre-push hook -- because the declaration is a statement about THAT site's document root and its contributors read that repository, not this one. Same three legs and the same ratchet: an undeclared top-level directory FAILS, a declared block that stopped denying FAILS, a declaration matching nothing FAILS; plus a blanket dot-path rule in each root `.htaccess`, because `.git` is untracked and the 403 it returns today comes from a host-wide setting we do not own. **`Require all denied`, never `Options -Indexes`** -- an `Options` line where `AllowOverride Options` is not granted returns 500 for every request under the path. Its own selftest there is a LIVE MUTATION: nine breakages of a throwaway tree, each of which the real script must name, including `Options -Indexes` offered as a block and `<FilesMatch "^\.">` offered as a dot-PATH rule. **This one only notices a sibling that has gone UNGUARDED** -- script deleted, `check.sh` no longer calling it, the two copies drifted -- which is the single failure a sibling's own green build cannot report. Advisory, and it prints that it checked nothing rather than passing in silence |
-
-**When you are about to write a new rule in this file, first ask whether it can be a check.** Every
-rule here that became a script stopped being violated. Every rule that stayed prose kept being
-violated, sometimes for months, by people who had read it: `lang_syntax_validate.php` found 660
-pre-existing double-quoted assignments; the missing `prefixToTermNames()` wiring silently blinded two
-calculators' whole glossary while being documented the entire time. **A rule a machine enforces is
-worth roughly ten a human must remember**, and this file's unexecutable half is decoration.
-
-### The two tiers above the free one
-
-- **`/code-review` — billed, and only a human can start it.** An AI cannot launch it; do not try. It
-  reads code for design, duplication and subtle logic errors, the entire class the free tier cannot
-  see. Worth spending when a change alters logic a person cannot confirm by using the page, touches
-  storage/privacy/money/legal text, or is cross-cutting. The natural moments are the
-  expensive-to-undo ones: before a 26-agent sprint, and before anything that changes what is stored
-  on a visitor's device.
-- **Tom's own attention — the scarcest, and he has said he will not read code.** Reserve it for
-  naming, scope, wording, and whether an unreferenced key is debt or lost content.
-
-### What the free tier does NOT cover
-
-- **Every calculator now has a worked-example test of its math except `rc`**, which is partial (its
-  Robinson coefficients are unverified — the paper is paywalled and the free copy is a page scan).
-  The five that had none — `mi`, `wi`, `ip`, `bpn`, `cs` — were anchored 2026-08-21 and **two of them
-  were wrong**: Canal Seepage's currency inputs converted backwards (Task 473) and Manning Irregular's
-  region Froude number mixed a region area with a segment top width (Task 474). Both are fixed, and
-  each is now asserted by its own harness. Add a worked example for any new page;
-  it is under an hour, and `dev/calc-spike/README.md` is the recipe.
-- **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
-  Weir-Flow-Irregular) now build their rows in their OWN per-page harness — `calc-page.js` grew
-  `initRows()`/`addRow()`/`cell()` and the pages' own initializers do the building. The SMOKE harness
-  still does not, and names them as it goes. `Manning-Irregular.php` is the exception even per-page:
-  its initializer seeds through the cookie, so its shipped defaults are covered only by
-  `dev/browser-pass/mi-defaults.js`.
+**The coverage declaration** (`dev/scripts/translation_coverage.json`): a cell is in scope iff the
+calculator is core (`mpf`, `mtc`, `lpn`) OR the language is core (`es`, `pt`, `fr`, `tr`).
+**Exempt** (identical-to-English is correct) and **out of scope** (not translated yet) are never
+merged. **`QUALITY`** in `lib/Language.Settings.php` is an honest defect-risk estimate, set via
+`update_quality_score.php`. **Never log a language as "awaiting native review."**
 
 ---
 
+## Automated checks — `sh dev/scripts/check_all.sh`
+
+Blocking failures exit 1; each script explains its own failure. **What each check guards, why, and
+what it measured when written: `dev/automated-checks.md`.** Run it under the lock:
+`flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`, and no more than about three at once.
+
+| Check | Guards |
+|---|---|
+| php + js + shell syntax | Every `.php`, `.sh`, `js/*.js` and `js/vendor/*.js` |
+| `html_balance_check.php` | Well-formed HTML on every page |
+| `pageconfig_check.php` + selftest | Every pageConfig key JS reads is supplied (aliases included) |
+| `tip_markup_check.php` | Tips built by the helpers |
+| `js_fallback_string_check.php` + selftest | `pc.key \|\| 'English'` fallbacks equal the English value; ratchet at 0 |
+| `blank_target_check.php` + selftest | New tabs carry `noopener` |
+| `icon_name_check.php` + selftest | Every named icon exists |
+| `link_title_check.php` + selftest | No tip parked on `<a title=>` |
+| `dom_id_resolve_check.php` + selftest | Every referenced DOM id can exist; no duplicates |
+| `web_manifest_check.php` + selftest | `manifest.json` agrees with the pages |
+| `storage_guard_check.php` + selftest | Every web-storage access is inside `try` |
+| `button_type_check.php` + selftest | Every `<button>` declares its `type` |
+| `bootstrap_global_check.php` + selftest | Functions reading bootstrap globals declare them `global` |
+| `script_interpolation_check.php` + selftest | PHP echoed into `<script>` goes through `json_encode()` |
+| `attr_escape_check.php` + selftest | `$ec_lang` echoed into an attribute goes through `htmlspecialchars()` |
+| `number_step_check.php` + selftest | Every number input declares `step` |
+| `focus_order_check.php` | Hide control costs one keyboard stop |
+| `social_card_check.php` | `og:image` absolute and real |
+| `vendor_integrity_check.php` | Vendored files match the manifest |
+| `projection_catalogue_check.php` | EPSG catalogue intact and agreeing with the built-in fallback |
+| `coord_order_check.php` | lon,lat in system, lat,lon in public |
+| `browser_lang_tag_check.php` | No forged log rows |
+| `sw_manifest_check.php` | Service worker precaches what pages request |
+| `sw_map_host_check.php` + selftest | No map host or tile in the service worker |
+| `sw_scope_check.php` + selftest | Worker scope covers every mount (`ecSwMounts()`) |
+| `standalone_assets_check.php` | The suite ships its own assets |
+| `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a whitelist, never `HTTP_HOST` |
+| `canonical_path_check.php` + selftest | Pretty URLs nominate themselves |
+| `sitemap_canonical_check.php` + selftest | Sitemap URLs equal each page's canonical |
+| `nav_link_absolute_check.php` + selftest | Suite nav links are origin-absolute |
+| `deploy_identity_selftest.php` | About box build line describes the deploy |
+| `js_page_url_check.php` + selftest | JS-built suite URLs go through `suiteUrl()` |
+| `third_party_request_check.php` + selftest | Exactly four gated third-party requests |
+| `storage_inventory_check.php` + selftest | Every stored item is in the inventory |
+| `cookie_attribute_check.php` + selftest | Every cookie names samesite/secure/httponly |
+| `page_meta_check.php` + selftest | `$html_desc` set or declared exempt; no `?v=N` |
+| `calculator_page_check.php` + selftest | Every calculator is menued and its prefix documented above |
+| `verdict_string_check.php` + selftest | Verdicts lead with a glyph in all 27 languages |
+| `log_bucket_check.php` + selftest | Log rows end with `ecLogBucketSuffix()` |
+| `log_format_selftest.php` | Log readers read mixed-vintage rows correctly |
+| `no_session_check.php` + selftest | No PHP session, ever |
+| `docroot_exposure_check.php` + selftest | Every directory declared served or blocked |
+| `public_claim_check.php` + selftest | Struck public claims cannot return |
+| `plain_english_swap_check.php` + selftest | Struck plain-English substitutes cannot return |
+| `em_dash_ratchet_check.php` | Em dashes in visitor English may fall, never rise |
+| `scenario_seam_check.php` | Overridable properties go through `setProp()` |
+| `lpn_furniture_check.php` + selftest | Window furniture never enters `serializeProject()` |
+| `js_constant_check.php` + selftest | JS physical constants are exact |
+| `unit_factor_check.php` | `$ec_units` factors re-derived and mutually consistent |
+| `unit_family_check.php` + selftest | Unit-family absolutes |
+| `unit_select_family_check.php` + selftest | Unit selects name a family |
+| `unit_default_preset_check.php` + selftest | Unit-bearing defaults declared per preset |
+| `form_field_units_check.php` + selftest | `hasUnits` agrees with the rendered form |
+| `unit_default_set_selftest.php` | First-visit preset rule and measured option order |
+| `lang_syntax_validate.php` | Rules A–D |
+| `lang_key_resolve_check.php` + selftest | Every literal `$ec_lang['k']` read is defined |
+| `lang_tag_parity_check.php --strict` | Markup matches English |
+| `lang_placeholder_check.php` + selftest | Every `{placeholder}` can be substituted, globally if repeated |
+| `gloss_ref_check.php` | Every `gloss:` resolves |
+| `anchor_language_check.php` + selftest | Anchor prose agrees with `glossary.json` |
+| `js_module_wiring_check.php` + selftest | New JS modules are on a page and in the DOM stub |
+| `layout_tag_check.php` | Layout tags match their widget |
+| `syn_tag_side_check.php` + selftest | Tags sit right of the pipe in `$ec_lang_syn` |
+| `native_review_flag_check.php` + selftest | No "awaiting native review" |
+| `language_declaration_check.php` + selftest | Declared languages equal shipped files |
+| `coverage_selftest.php` | The coverage cross |
+| `generate_translation_payloads.php --check` | Payload freshness |
+| `payload_freshness_selftest.php` | Freshness judged by content, both directions |
+| `key_hygiene_selftest.php` | The reachability walk still sees a dead reader |
+| `prefix_map_check.php` + selftest | Every prefix wired to glossary terms |
+| `new_english_keys.php --check` | `dev/new-english-keys.md` is fresh |
+| `harvest_english_rulings.php --check` + `harvest_rulings_selftest.php` | Tom's marks on that list reach a durable file |
+| `generate_examples.php --check` | Served `examples/` matches source |
+| `generate_features.php --check` | `dev/features.md` matches its source |
+| `hook_install_check.php` | Git hooks installed as copies and current |
+| `branch_policy_selftest.php` | Merge gate: all-clear pinned to commit, feature freeze, defect tracks untouched |
+| `wait_guard_selftest.php` | Background wait loops can finish (`.claude/hooks/guard-wait-loops.php`) |
+| `roadmap_id_check.php` | Unique IDs; priority is 100, 75, 50, 25, 5 or 0 |
+| `review_queue_check.php` + selftest | Tom's review comments are well-formed and printed while open |
+| `check_table_parity_check.php` + selftest | This table and `check_all.sh` agree |
+| `doc_path_check.php` + selftest | Every path this file cites exists |
+| `run_harnesses.sh` | lpn solver and editor harnesses |
+| `run_calc_harnesses.sh` | Each calculator against its rendered HTML |
+| `harness_wording_check.php` + selftest | Harnesses assert `pageConfig` keys, not English literals; ratchet |
+| `stale_claim_check.php` | *Advisory.* Cited closed tasks beside a negation |
+| `stale_claim_selftest.php` | That check's demotions |
+| `usage_report_selftest.php` | Usage report reads the right fields and never sums the two buckets |
+| `daily_report_selftest.php` | Mailed report keeps its headings and bucket labels |
+| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php`, `branch_hygiene_check.php`, `nested_repo_boundary_check.php`, `host_script_parity_check.php` | Judgement calls, and checks that read outside this tree |
+| *advisory:* `sibling_exposure_check.php` | Sibling sites still guard their document roots |
+
+**Before writing a new rule in this file, ask whether it can be a check.** Every rule that became a
+script stopped being violated; every rule that stayed prose kept being violated by people who had
+read it.
+
+**Beyond the free tier:** `/code-review` is billed and only a human can start it — worth it for logic
+nobody can confirm by using the page, storage/privacy/legal text, or cross-cutting changes. Tom's
+attention is scarcest and he will not read code: reserve it for naming, scope, wording, and whether
+an unreferenced key is debt. Every calculator has a worked-example test except `rc` (partial).
+Row-table calculators build rows in their own per-page harness, not the smoke harness.
+
 ## Testing
 
-**Minimize Tom's browser passes** — they are slow and fatiguing. Write a harness in `dev/lpn-spike/`
-or `dev/calc-spike/` and reserve his time for what genuinely needs a real browser.
-**`dev/testing-notes.md` has the full set of lessons.** The two worth knowing before you start:
+**Minimize Tom's browser passes.** Write a harness in `dev/lpn-spike/` or `dev/calc-spike/`; full
+lessons in `dev/testing-notes.md`. Headless browser runs go through
+`flock /tmp/engcalcs-browser.lock`.
 
-- **A STUB THAT REMOVES THE COUPLING MAKES A HARNESS PASS FOR THE WRONG REASON.** When a harness
-  passes and the browser still misbehaves, suspect the stub before the code: ask which quantity the
-  real thing varies that the stub holds constant. Fix by teaching the stub that one physical
-  relationship, not by adding assertions.
-- **A page must be rendered at GLOBAL scope, ONE PAGE PER PROCESS.** `dev/scripts/render_page.php` is
-  the only correct way to render a page outside a web request; `include`ing one from inside a
-  *function* silently produces a page missing its menus and most of its unit selects.
+- **A stub that removes the coupling makes a harness pass for the wrong reason.** Suspect the stub;
+  teach it the one physical relationship it holds constant.
+- **Render a page at global scope, one page per process**, with `dev/scripts/render_page.php`.
+
+---
 
 ## Unit Sets
 
-A field declares a **named unit family**, never an inline array:
+Full record: `dev/unit-rulings.md` and `dev/unit-families.md`.
 
-```php
-Array('name' => 'd', 'type' => 'number', 'default' => '6', 'units' => 'distance_small', ...)
-```
-
-Families live in `lib/Units.lib.php` (`$ec_unit_families`); the two presets, `us` and `si`, map every
-family to one unit (`$ec_unit_sets`). `EC_DEFAULT_UNIT_SET` picks what a first-time visitor sees:
-US customary only for an English page in a browser whose Accept-Language region is the United
-States, SI for every other tag, for a bare `en` and for every other language (`ecDefaultUnitSet()`,
-decided on the measured preset clicks and the Search Console countries, 2026-09-08). A request with
-no header keeps US for English so the harnesses render what they were anchored on. **The option
-order inside a family is a measurement too** -- the unit people switch TO comes first, from the
-`units` signal rows; re-measure before re-sorting. Returning visitors are unaffected — the cookie stores each select's option
-value, which **is the unit's NAME** (`ft`), never its factor. Conversion factors (`$ec_units`) are
-"number of that unit per SI unit": multiply to display, divide to store, and JS reaches one only
-through `EngCalcs.unitFactor()`, a lookup on that name. Full rationale: `dev/unit-families.md`.
-
-- **Split a family when two fields want different *defaults*, not different *options*.**
-  `distance_small` and `distance_large` offer the identical four units and exist purely to carry
-  different defaults (inches for a pipe diameter, feet for a pipe length). Merging them re-creates the
-  original defect, where a 1,000 ft main rendered as 12,000 in. Where two families share a list, share
-  the PHP variable rather than duplicating it.
-- **Which family a field names is a per-page choice**, not a global property of the field name — the
-  same concept is `distance_small` on a pipe page and `distance_large` on a channel page. There is no
-  page-level override mechanism because the page already chooses.
-- **Every family must appear in every preset.** A missing entry silently leaves that field alone.
-- **A page's `default` number is in the *displayed* unit**, so a unit-bearing field declares one per
-  preset: `'default' => Array('us' => '6', 'si' => '150')`. A scalar is correct only when the value is
-  unit-independent. Getting this wrong is silent — a scalar `6` reads as 6 in under `us` and 6 mm
-  under `si`. A page seeding sample rows from JS must seed per preset too, keying off
-  `EngCalcs.defaultUnitSet`.
-- **Keep one page's cross-section geometry in one family.** A pipe page reads diameter, depth, top
-  width, wetted perimeter and hydraulic radius all in inches. Mixing them (an 18 in pipe reporting
-  `T` = 1.5 ft) is the defect to avoid.
-- **Choose defaults that open on a *passing* design.** A page that greets a first-time visitor with a
-  warning is worse than one that greets them with a worked example. Verify by running the page's own
-  `pageCalculator` against its rendered HTML, not by inspection.
-- **`echoUnitSelect()` still accepts a raw array** for backward compatibility, but such a select gets
-  no family and is therefore **invisible to the preset buttons**. Never leave a new one that way — 32
-  row-table selects were nearly shipped ignoring the presets.
-
-### ONLY THE USER TOUCHES A FILE'S NUMBERS (Tom, 2026-08-16 — absolute)
-
-**A number that came from a file is the user's. We display it, we solve from a COPY, and we write
-back exactly what came in.** We never rewrite it, and never round it, in the document.
-
-This is the same rule as "a calculator stores what the user typed", extended to imported files —
-and the `.inp` importer was precisely the third conversion site that rule warns about. It stored
-every value as `toDisplay(<SI>, <unit>)` after `js/lpn-inp.js` had already normalised to SI, so a
-US file made a round trip through two factors that are not exact inverses: **710 ft was stored as
-709.9913664 and 150 gpm as 149.98747841154.**
-
-- **Better constants do NOT fix this and it is a mistake to try.** Exact factors still fail in
-  doubles — `150 * 0.3048 * (1/0.3048) === 149.99999999999997`, and 26% of a 20,000-value sample
-  failed to round-trip bit-identically. **Pass-through is the only fix:** when the display unit
-  already equals the unit the file states, the file's own number goes straight through untouched.
-- **A unit is a LABEL and a MAGNITUDE, and they have different requirements.** The label is a
-  string — always storable and displayable verbatim. The magnitude is a factor, and only a *solve*
-  needs it. So an unrecognized unit has three outcomes, and the third is the one to get right:
-  recognized → display and solve; unrecognized but never computed with → carry it verbatim, no
-  problem; **unrecognized and needed for a solve → open the file, draw it faithfully, refuse to
-  solve, and say exactly which unit and why.** Never reject the file, never guess. "We don't
-  recognize this unit" is a different message from "we cannot give you answers"; say both.
-- **The one legitimate exception is the coordinate origin shift**, and it shows the shape a real
-  exception must have: `doc.origin` makes coordinates local so float32 rasterising cannot lose a
-  pipe at x ≈ 579,350 (Task 354) or a node at longitude −122 (Task 439). The absolute position is
-  unchanged **by construction**, and `dev/lpn-spike/local-origin-harness.js` counts the call sites.
-  Reversible, recoverable and guarded — anything claiming to be an exception must be all three.
-  - **The two kinds recover the origin differently, and only one stores it.** An XY grid stores
-    `origin` in the file. A GEOGRAPHIC document does not: it stores absolute longitude and latitude,
-    states `origin` as `{0, 0}`, and DERIVES the frame at load from its own extent, floored onto a
-    **1/128° power-of-two grid** so `(x − ox) + ox === x` exactly. Because the file already looked
-    like that, the format did not move — no v11, no migration.
-  - **Exactness needs nearness to the ORIGIN, not a small model**, which is the trap: an origin on
-    the 1/128° grid can sit a degree from a coordinate that is itself a hair from zero, so Sterbenz
-    does not save you. Both axes therefore carry the file's own value beside the drawn one
-    (`_xsrc`/`_ysrc`), believed only while the drawn number is still the one derived from it.
-- **Converting to SOLVE is not an exception**, because it does not touch the document.
-- **THE INPUT FILE IS CANONICAL, so nothing of ours can validate it.** Our conversion factors cannot
-  check a user's numbers — the only correct property is that they come back out unchanged. Phrasing
-  like "verify the examples still hold against the corrected factors" has the relationship backwards
-  and is the misunderstanding to watch for.
-- **Preserve the TOKEN, not the value.** `parseFloat()` at the point of reading a file throws away
-  the text, and no downstream code can reconstruct it: `710.0` can only ever come back as `710`,
-  and `1.50` as `1.5`. Keep the exact characters beside the parsed number at the one place text
-  becomes number, and store the token.
-- **The rule that makes this structural rather than a discipline: a number the user supplied and a
-  number we computed are different kinds of thing, and must never occupy the same field.** Once
-  they are separate there is no code path that writes to the user's field, so nobody has to
-  remember anything. Full design: ROADMAP Task 390 and `dev/unit-paradigm-migration.md`, which maps what of
-  the old SI-always paradigm is still un-purged.
-- **This is testable and must be tested: import then export is BYTE-IDENTICAL for every value the
-  user did not edit.** Not "within tolerance" — identical. That is also the acceptance criterion for
-  Task 281 (`.inp` export) — met, and guarded by `dev/lpn-spike/inp-export-harness.js`.
-
-### Coordinate order: system is x,y = lon,lat; PUBLIC is lat,lon
-
-Tom, 2026-08-24, having found a button saying `lon/lat` and a status bar leading with Longitude:
-*"It should be lat/lon everywhere... history says Lat/Lon."* **The order follows whoever is
-reading.**
-
-- **System order — lon, lat.** x is longitude, y is latitude. Arithmetic, GeoJSON, every projection
-  formula. Everything computed, stored, projected or exported. Name such a pair `lonLat` /
-  `{lon, lat}`.
-- **Public order — lat, lon.** Every place a person reads a pair or types one: the status readout,
-  the property popup, the Go-to prompt, prose that names the two. Name such a pair `latLon`.
-- **A bare `coords` or `point` is the defect** — it commits to neither, so the next reader guesses.
-- **The one longitude-first sentence is the one that PAIRS them with x and y** ("the x and y in this
-  file really are a longitude and a latitude"): there the order IS the claim, and reversing it makes
-  the sentence false. Three shipped strings do this and are correct.
-
-`coord_order_check.php` enforces both halves and knows the exception; it is blocking, and it catches
-the two defects that produced the rule.
-
-### Changing a unit reinterprets the typed number; it does not convert it
-
-1 becomes 1 ft instead of 1 m. Long-standing, deliberate, reviewed and kept. Do not "fix" it.
-**This is absolute**, and `lpn_` was the one place that broke it — it stored SI and displayed the
-conversion, so every unit switch silently rewrote the whole map. Tom: *"a bad design decision was
-made without my knowledge to convert inputs when units are switched. Scrub and ban this."* EPANET
-behaves the same way we do, so there is no authority on the other side.
-
-**A calculator stores what the user typed. Conversion happens at the solver, and on results coming
-back from it, and nowhere else.** If a third conversion site seems necessary, the design is wrong.
-
-### `lpn_` only: a setting belongs to the PROJECT or to the BROWSER, never to both
-
-**A new project gets the hard-coded defaults, always. If you want otherwise, save a template or copy
-a project. Window furniture is not project data and follows the browser.** (Tom, 2026-09-04, closing
-Task 584 — his own position, adopted verbatim.)
-
-- **MODELLING data belongs to the PROJECT** and rides in `serializeProject()`: units, friction
-  method, new-asset defaults, ID prefixes, colouring, labels, quality. A project records its own
-  unit selection and restores it on open, because declarative storage makes a bare number
-  meaningless without them — that is this rule stated for its hardest case, and there is
-  therefore **no per-browser unit cookie for this page**.
-- **FURNITURE belongs to the BROWSER** and is a `localStorage` sibling key that
-  `serializeProject()` must never learn about: `lpn_pane`, `lpn_rpane`, `lpn_setbox`,
-  `lpn_findbox`, and since 2026-09-08 `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`. Where a box sits and how wide a pane is is a fact about the SCREEN somebody is
-  sitting at, and a colleague opening the file on a laptop must not inherit a 32-inch layout.
-  **So opening a project does NOT open its windows as saved, and must not learn to** — furniture
-  is already where you left it, across every project, which is why the gap that name suggests
-  answers itself.
-- **NEVER a "save current settings as default" button.** It creates an invisible global that makes
-  two people see different behaviour from the same document, and it can never be inspected, shared
-  or versioned. A template is a FILE — visible, nameable, copyable, emailable, diffable. It is the
-  same argument this suite already makes about input files. `openNewProjectBox()` states it at the
-  one place it would be tempting.
-- The hard-coded HW default for the friction method (2026-09-03) is this rule working, not an
-  exception to it. Detail, the legacy-document conversion path, and the one case the code does not
-  yet meet: `dev/looped-network-calculator-scope.md`.
+- **A field declares a named unit family**, never an inline array. Families live in
+  `lib/Units.lib.php`; presets `us` and `si` map every family to one unit, and **every family must
+  appear in every preset.** Factors are "that unit per SI unit"; JS reads one only via
+  `EngCalcs.unitFactor()`. A stored unit is its NAME (`ft`), never its factor.
+- **First-visit preset** (`ecDefaultUnitSet()`): US only for an English page with a US region; SI
+  otherwise; no header keeps US for the harnesses. **Option order is measured** — re-measure before
+  re-sorting.
+- **Split a family when two fields want different defaults**, not different options
+  (`distance_small` vs `distance_large`). Which family a field names is a per-page choice.
+- **A `default` is in the displayed unit**, so unit-bearing fields declare one per preset:
+  `'default' => Array('us' => '6', 'si' => '150')`.
+- **Keep a page's cross-section geometry in one family.** Choose defaults that open on a passing
+  design, verified by running the page's own `pageCalculator`.
+- **Changing a unit reinterprets the typed number; it never converts it.** A calculator stores what
+  the user typed; conversion happens at the solver and on results, nowhere else.
+- **Only the user touches a file's numbers (absolute).** Display them, solve from a copy, write back
+  exactly what came in. Pass the token through when units match; keep the exact characters beside
+  every parsed number; a supplied number and a computed one never share a field. Import→export is
+  byte-identical for unedited values. An unrecognized unit: carry it verbatim, and if a solve needs
+  it, draw the file, refuse to solve, and say which unit. The one exception is the coordinate origin
+  shift (`doc.origin`), which is reversible by construction.
+- **Coordinates:** system order is lon,lat (`lonLat`); public order is lat,lon (`latLon`). A bare
+  `coords` is the defect. The one lon-first sentence is the one pairing them with x and y.
+- **`lpn_` settings belong to the PROJECT or the BROWSER, never both.** Modelling data (units,
+  friction method, defaults, prefixes, colouring, labels) rides in `serializeProject()`; window
+  furniture (`lpn_pane`, `lpn_rpane`, `lpn_setbox`, `lpn_findbox`, `lpn_ffbox`, `lpn_energybox`,
+  `lpn_cmpbox`, `lpn_reportbox`) is `localStorage` only. A new project gets hard-coded defaults.
+  **Never a "save current settings as default" button** — a template is a file.
 
 ---
 
 ## What may be stored on a visitor's device
 
-Full inventory: `dev/cookie-storage-inventory.md`.
+Full record: `dev/storage-rulings.md`; inventory: `dev/cookie-storage-inventory.md`.
 
-- **THIS SUITE STARTS NO PHP SESSION AT ALL, and the number is zero rather than "one, gated."**
-  Task 288 removed `PHPSESSID` outright — everything it held was "have we already counted this",
-  which needs no identifier to answer. A session writes that identifier to a visitor's device on the
-  response that starts it, before any banner has asked and with no way for one to take it back from
-  outside. `no_session_check.php` blocks on `session_start`, `session_id` and their siblings; it
-  reads tokens, so the comments recording the removal are invisible to it.
-  - *(Corrected 2026-08-28: this rule used to say "call `ecSessionStart()` (`lib/config.inc.php`)".
-    **That function does not exist** — it went with Task 288 — so the rule sent a future contributor
-    to a helper that is not there. Found while turning it into a check, which is the argument the
-    Task 322 survey makes about prose in general.)*
-  - Sessions coming back is a consent-version bump, a rewritten banner and 26 retranslations, plus a
-    deliberate edit to that check. Have that conversation first.
-- **The session is analytics ONLY** — it exists to de-duplicate usage logs. Do not put a
-  service-related value in it; that is what makes a mixed-purpose cookie unlawful under a per-purpose
-  test. A visitor preference belongs in its own deliberately-set cookie (`ec_language` is the worked
-  example).
-- **Before adding storage, check whether something EXEMPT already answers the question.** A
-  repeat-use signal wanted a visited-page list in `localStorage`; the page's own input cookie already
-  says the same thing, better ("they calculated here", not "they glanced at it"), and is exempt
-  because it holds what the visitor typed. **The cost of new storage is never the bytes — it is the
-  sentence in `consent_body` it makes false**, and therefore a banner rewrite, 26 retranslations and
-  an `EC_CONSENT_VERSION` bump that re-asks everybody. An analytics READ of exempt storage still needs
-  consent, so gate the log row; you just need not ask for anything new.
-- **New storage needs the exemption test, per purpose:** is it *strictly necessary for a service the
-  visitor explicitly requested*? User-input storage, an explicit preference, the consent record and
-  the log opt-out all pass. Anything whose job is to make a **statistic** better fails, whatever the
-  technology — `localStorage`, `sessionStorage` and IndexedDB are in scope exactly as cookies are.
-  Gate a failing item on `ecAnalyticsConsented()` / `EngCalcs.analyticsConsented()`, and make
-  withdrawal delete it.
-- **A new log writer must call `ecLogBucketSuffix()`** and append it to the line. Consented rows are
-  deduplicated and unmarked; everyone else's are marked `visit` and undeduplicated. **Never sum the
-  two buckets** — one counts people, the other counts page loads.
-- **Never restyle one consent button to stand out.** `.ec-consent-btn` styles both answers identically
-  on purpose; a coloured Accept beside a grey Reject is the dark pattern this design avoids.
-- **Cookie lifetimes are defensible out loud.** One year is the house default.
+- **No PHP session at all.** `no_session_check.php` blocks it. Bringing one back is a consent-version
+  bump and 26 retranslations — have that conversation first.
+- **Check whether something exempt already answers the question before adding storage.** The cost is
+  the sentence in `consent_body` it makes false.
+- **New storage passes the exemption test per purpose** (strictly necessary for a service the
+  visitor requested), or is gated on `ecAnalyticsConsented()` / `EngCalcs.analyticsConsented()` and
+  deleted on withdrawal. Applies to every storage technology.
+- **A new log writer appends `ecLogBucketSuffix()` last. Never sum the two buckets** — one counts
+  people, the other page loads.
+- **Never restyle one consent button to stand out.** Cookie lifetimes default to one year.
+- **Tell Tom about any change to what is stored on a visitor's device.**
 
 ---
 
-## Deploying: five facts that are in no file you will be editing
+## Deploying
 
-- **PRODUCTION IS NOT MASTER. Production is the SHA somebody last pulled** (Tom, 2026-09-12: *"Production
-  is not master. Say it again and again. Master is not production."*). Deployment is a `git pull` Tom
-  runs; master can advance for days and ship nothing. **Never say "it is live" because you pushed** --
-  say what you pushed, and let him say what he pulled. The About box's build line is the instrument
-  that answers it, and `ecDeployIdentity()` is why that line is trustworthy now: the SHA and the date
-  come from the same ref, so a stale date cannot sit beside a fresh sha. To check from here, read
-  `git rev-parse HEAD` in the deployed checkout -- the answer on 2026-09-12 happened to equal
-  `origin/master`, which is a fact about that day and not a rule.
-  - **THE ONE REAL COST, and it is the argument on the other side: you cannot pull half of master.**
-    A hotfix during a frozen window carries everything else on master with it. That is what makes a
-    shippable master worth protecting, and it is why feature work in such a window belongs on a
-    branch rather than on master with a promise not to pull.
-  - **The "nobody works on master" paradigm was declined TWICE on a concurrency argument, and that
-    argument does not answer the release one.** What was rejected -- see the Git Workflow section --
-    is branches as ISOLATION between concurrent sessions, which they do not provide in one shared
-    checkout. Tom, 2026-09-12, naming the real version: *"we could run a development paradigm where
-    master is the production line and nobody is allowed to work on master, and that would be the
-    big-house paradigm."* **That is a different proposal and the record does not contain a reasoned
-    rejection of it.** If it is raised again, argue it on release safety, and do not cite the
-    concurrency rejection as though it settled the question.
+Full record: `dev/deploying.md`.
 
-- **`Options -Indexes` in `.htaccess` needs `AllowOverride Options`, and where that grant is missing
-  Apache returns 500 FOR EVERY REQUEST under `/engcalcs/`** — it does not ignore the line. Confirmed
-  granted on the current host. **If the site moves, test that line first and drop it if the new host
-  500s.** This single directive can take the whole suite down on a host change, and it fails closed
-  with no partial symptom.
-- **`../sitemap.xml` is regenerated by `dev/scripts/generate_sitemap.php` but is NOT tracked by git.**
-  Deployment is `git pull`, so a regenerated sitemap does not travel with the commit — it must be
-  re-uploaded to the site root, or deleted URLs stay advertised to search engines. Any task that adds
-  or removes a page owes that upload.
-- **`git pull` does not preserve mtimes**, so every file's `filemtime` on production is its checkout
-  time. That is why the service worker is generated at request time rather than built — a baked file
-  cannot know the mtimes the pages will actually request.
-
-- **A NEW HOST SERVING THE SUITE MUST BE SET TO THE SAME PHP VERSION, and cPanel does not do it
-  for you.** `librewaternet.org` was created on `ea-php56` while `hawsedc.com` runs `ea-php83`, so
-  the moment the symlink made the suite reachable there, every page returned 500 with
-  `PHP Parse error: syntax error, unexpected '?' in lib/config.inc.php` -- the null coalescing
-  operator, which needs PHP 7.0 and appears 17 times in `lib/` alone. **Nothing in the repository
-  can see this: the same files parse fine on the other host.** Fix is one call,
-  `LangPHP::php_set_vhost_versions`, or MultiPHP Manager. **New domains on this account default to
-  `ea-php56`**, so the next one will do it again. Keep the two suite hosts on the SAME version; they
-  serve one checkout through a symlink, and a version split produces a bug that reproduces on one
-  URL and not the other.
-
-Production SSH is blocked on port 22; origin is GitHub, pulled over `ssh.github.com:443`.
+- **Production is not master; it is the SHA Tom last pulled.** Never say "it is live" because you
+  pushed. Tom does the pulling. The About box's build line reports what is deployed.
+- **`Options -Indexes` needs `AllowOverride Options`**, or Apache 500s the whole suite. Test it first
+  on any new host.
+- **`../sitemap.xml` is not tracked**; adding or removing a page owes a regenerate
+  (`dev/scripts/generate_sitemap.php`) and a manual upload.
+- **`git pull` does not preserve mtimes**, which is why the service worker is generated per request.
+- **Every host serving the suite runs the same PHP version** (currently `ea-php83`); new cPanel
+  domains default to `ea-php56` and 500 on every page.
+- Production SSH is blocked on port 22; origin is GitHub over `ssh.github.com:443`.
 
 ---
 
 ## Writing things down
 
-- **A correction SUBSTITUTES the superseded reasoning; it never appends to it.** Keep the conclusion
-  and the one rejected alternative that would otherwise be re-proposed, and delete the narrative of
-  how the team got there. Git carries that. Appending is what turned this file, the roadmap and
-  `js/looped-network.js` (47% comment lines) into transcripts of revision rather than statements of
-  current state.
-- **Compact by load frequency, not by file size.** This file is read every session and is the
-  expensive one. A `dev/*.md` nobody opens is cheap however long it is.
-- **WRITE ORDER, NOT ELAPSED TIME — you do not have a clock.** The environment supplies a DATE and
-  nothing finer, and a session can cover in twenty minutes what reads like a week. "An hour later",
-  "it stood for months", "it shipped OFF for one day" are inferences from message position, not
-  measurements, and a later reader acts on them — "it stood for months" and "it stood for one review"
-  justify very different caution. Say *before it shipped*, *between two rounds of review*, *the same
-  day*, or say nothing.
-- **Don't attribute repo prose to Tom.** `CLAUDE.md`, code comments and `dev/*.md` are AI-written.
-  Quote only the transcript or a dated first-person quote.
-- **ROADMAP priority is one of five numbers: 100 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked —
-  plus 0 for closed.** (A temporary 95 tier parked work past EWB for one day and was retired on
-  2026-09-12: branch work needs no parking, because a task ships when its branch merges.) Never a number between them, and
-  never a new tier. `roadmap_id_check.php` blocks on one.
-- **ROADMAP length discipline: the default is 1–3 lines, hard cap ~15.** The one test for adding a
-  line: *would a competent person, reading the short version, DO SOMETHING DIFFERENT if this line
-  were there?* Expansion is earned only by (a) a decision with a real rejected alternative, (b) a
-  measured number, (c) a non-obvious constraint or blocker, (d) a correction of something recorded
-  wrong. Past the cap, the content is a `dev/*.md` and the task is one line pointing at it.
-- **Closing a task means a one-line entry in `dev/roadmap-closed-ids.md` and deleting the block.** The
-  ledger is an index so a cited `Task N` still resolves; the text stays in git. Extract any unbuilt
-  phase to its own task first — closed blocks are never re-scanned.
-- **Suite-wide UX/convention issues go to `dev/ROADMAP.md`, not inline fixes** during
+- **A correction substitutes the superseded reasoning; it never appends.** Keep the conclusion and
+  the one rejected alternative that would otherwise be re-proposed.
+- **Compact by load frequency.** This file is read every session; detail belongs in `dev/*.md`.
+- **Write order, not elapsed time** — there is no clock finer than the date.
+- **Don't attribute repo prose to Tom.** Quote only the transcript or a dated first-person quote.
+- **ROADMAP priority is 100 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed** — never
+  between, never a new tier. Entries run 1–3 lines, hard cap ~15; past that, a `dev/*.md` and a
+  pointer. Closing a task is one line in `dev/roadmap-closed-ids.md` plus deleting the block.
+- **Suite-wide UX/convention issues go to `dev/ROADMAP.md`**, not inline fixes during
   single-calculator work.
