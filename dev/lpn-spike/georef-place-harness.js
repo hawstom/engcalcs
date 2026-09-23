@@ -236,10 +236,10 @@ ok('...and Cancel leaves it exactly as it was',
 console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
 {
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_import_geo'),
-		lnSrc.indexOf('label: pc.lpn_file_import_geo') + 200);
+	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_convert_as'),
+		lnSrc.indexOf('label: pc.lpn_file_convert_as') + 200);
 	ok('File carries the row, and it converts the open project into a copy',
-		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: convertCoordsAs/.test(row),
+		/label: pc\.lpn_file_convert_as \|\|/.test(lnSrc) && /fn: convertAs/.test(row),
 		row.split('\n')[1]);
 	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
 		!/disabled/.test(row));
@@ -260,7 +260,7 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 	// the half that still applies: the fallback sits BELOW Open. **If Tom would rather keep the
 	// August order, the menu changes back and this comment is the record of what that costs.**
 	ok('...the xy fallback sits below Open, and Import EPANET sits against Export',
-		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_open |') &&
+		lnSrc.indexOf('pc.lpn_file_convert_as') > lnSrc.indexOf('pc.lpn_file_open |') &&
 		lnSrc.indexOf('pc.lpn_file_import_inp') < lnSrc.indexOf('pc.lpn_file_export_inp'));
 	ok('the in-place "Convert to lat/lon" command is gone, key and all',
 		lnSrc.indexOf('lpn_georef_menu') === -1 && lnSrc.indexOf('lpn_georef_tip') === -1);

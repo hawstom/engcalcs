@@ -15,13 +15,13 @@ exports.title = '3. The File menu';
 // none yet; that row group appears only when a file has been opened.
 //
 // **THE ROWS ARE NAMED BY KEY, NOT BY TOM'S WORDS.** This list held eleven English literals until
-// 2026-09-09; his rewording of `lpn_file_import_geo` from 'Import xy to lat/lon…' to 'Open an xy
+// 2026-09-09; his rewording of `lpn_file_convert_as` from 'Import xy to lat/lon…' to 'Open an xy
 // file on the map…' would have failed it on a change that broke nothing — the shape
 // dev/session-handoff.md §4 records as having cost three harnesses. What this spec is actually
 // about is WHICH ROWS ARE THERE AND IN WHAT ORDER, so it asserts the keys' own values, resolved
 // from the page at run time.
 const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_inp',
-	'lpn_file_import_geo', 'lpn_file_export_inp',
+	'lpn_file_convert_as', 'lpn_file_export_inp',
 	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_saveall', 'lpn_file_revert', 'lpn_file_close'];
 
 exports.run = async function ({ browser, report }) {
@@ -47,7 +47,7 @@ exports.run = async function ({ browser, report }) {
 		// **Task 447: this row is never greyed either.** Its predecessor converted the OPEN project
 		// and had to be greyed on a project already on the map; this one opens a FILE into a new tab,
 		// so nothing on screen can make it impossible.
-		report.ok(!by('lpn_file_import_geo').disabled,
+		report.ok(!by('lpn_file_convert_as').disabled,
 			'the lat/lon row is always live — it opens a file, and always into a new tab');
 		// **NO FLY-OUT ANY MORE, AND THAT IS TASK 477 RATHER THAN A REGRESSION.** Task 264 gave this
 		// row a fly-out of templates; Task 477 replaced it with the New-project BOX, because the

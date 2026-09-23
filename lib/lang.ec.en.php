@@ -1177,12 +1177,37 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Convert coordinates as…';
+// **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
+// as a single wizard"*). The placement steps follow only when the coordinate system changes.
+$ec_lang['lpn_file_convert_as']='Convert as…';
 // **HIS OWN NAME FOR THE COPY** (Tom, 2026-09-18): the command belongs to the Save as family,
 // so its result is a second version of this project and is named the way a second version is.
 $ec_lang['lpn_copy_of']='Copy of {name}';
+// ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
+// The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
+// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+$ec_lang['lpn_convas_title']='Convert as';
+$ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted to. When it differs from this project\'s, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.';
+// {crs} is the name the map status strip shows for this project's coordinate system.
+$ec_lang['lpn_convas_from']='This project: {crs}';
+$ec_lang['lpn_convas_epsg']='EPSG coordinate system';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).';
+$ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
+$ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached at the place the project is.';
+$ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map.';
+$ec_lang['lpn_convas_units_tip']='The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.';
+$ec_lang['lpn_convas_round']='Round converted values';
+$ec_lang['lpn_convas_round_tip']='Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.';
+$ec_lang['lpn_convas_round_none']='No rounding';
+$ec_lang['lpn_convas_round_flow']='Demand and flow';
+$ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.';
+$ec_lang['lpn_convas_ok']='Convert';
+$ec_lang['lpn_convas_no_transform']='This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.';
+// {name} is the new project's name.
+$ec_lang['lpn_convas_done']='The converted copy is {name}. The original project is unchanged.';
+$ec_lang['lpn_convas_cancelled']='Nothing was converted. The copy is closed, and the original project is unchanged.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
+$ec_lang['lpn_file_convert_as_tip']='Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
@@ -1284,8 +1309,10 @@ $ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model counterclockwise to align with the world map.';
-$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
-$ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any asset to move it closer to where it really is.';
+// Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
+// the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.';
+$ec_lang['lpn_georef_done']='This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.';
 $ec_lang['lpn_georef_backdrop_unrotated']='The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 // The same refusal for the other coordinate system that is already on the Earth (Task 641). Said

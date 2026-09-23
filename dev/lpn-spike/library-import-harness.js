@@ -635,7 +635,7 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	// above the rows that REPLACE it would read as one of them.
 	const at = (label) => rows.map((t, i) => [t, i]).filter(p => p[0].indexOf(String(label)) >= 0)
 		.map(p => p[1])[0];
-	check(at(pc.lpn_library_import) > at(pc.lpn_file_import_geo),
+	check(at(pc.lpn_library_import) > at(pc.lpn_file_convert_as),
 		'below Open xy file on map, which is the last row that opens a project');
 	// AND IT IS THE ONLY ROW ANYWHERE THAT OPENS THE WIZARD. Section 8 asserts the Libraries box
 	// has none; this asserts the menu row is genuinely there to have taken their place, so the

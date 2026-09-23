@@ -672,7 +672,7 @@
                 "lpn_georef_finish",
                 "lpn_georef_goto",
                 "lpn_georef_intro",
-                "lpn_file_import_geo",
+                "lpn_file_convert_as",
                 "lpn_georef_on_map",
                 "lpn_georef_rotation",
                 "lpn_georef_rotation_tip",
@@ -682,7 +682,7 @@
                 "lpn_georef_step1",
                 "lpn_georef_step1_hint",
                 "lpn_georef_step2",
-                "lpn_file_import_geo_tip",
+                "lpn_file_convert_as_tip",
                 "lpn_georef_unavailable",
                 "lpn_goto_bad",
                 "lpn_goto_menu",
@@ -1326,8 +1326,8 @@
                 "lpn_ex_net3_world_desc",
                 "lpn_field_active_tip",
                 "lpn_field_demand_pattern_tip",
-                "lpn_file_import_geo",
-                "lpn_file_import_geo_tip",
+                "lpn_file_convert_as",
+                "lpn_file_convert_as_tip",
                 "lpn_file_import_inp_tip",
                 "lpn_find_menu",
                 "lpn_find_menu_tip",
@@ -2494,8 +2494,8 @@
         "lpn_file_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_file_export_inp": "f428aa355e86893429222bafcf7efe0be54a2384",
         "lpn_file_export_inp_tip": "55566b08607bac0890966d7c0804683704185f96",
-        "lpn_file_import_geo": "4332a91e7bcf28d852fc717f9e728b8dd184185b",
-        "lpn_file_import_geo_tip": "630e00f87066dd0999d9e196c15daac84d842112",
+        "lpn_file_convert_as": "4332a91e7bcf28d852fc717f9e728b8dd184185b",
+        "lpn_file_convert_as_tip": "630e00f87066dd0999d9e196c15daac84d842112",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "2baa6bb757db0d079fae4defea56157bcb9d3ec1",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
@@ -6344,11 +6344,11 @@
             "words": 32,
             "ends_sentence": true
         },
-        "lpn_file_import_geo": {
+        "lpn_file_convert_as": {
             "words": 7,
             "ends_sentence": false
         },
-        "lpn_file_import_geo_tip": {
+        "lpn_file_convert_as_tip": {
             "words": 81,
             "ends_sentence": true
         },

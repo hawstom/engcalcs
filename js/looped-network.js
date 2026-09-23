@@ -13986,9 +13986,11 @@ var EngCalcs = EngCalcs || {};
 		// an image to turn, and saying nothing would leave a site plan silently off its own network.
 		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
 		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any asset to move it closer to where it really is.')
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
+		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
+		convasPlaced();
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -14031,6 +14033,8 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
+		// File, Convert as: the copy never became what was asked for, so it is closed.
+		convasAbandon();
 	}
 
 	// ---- THE WORLD MAP BEHIND AN XY DRAWING (ROADMAP Task 646) ----------------------------------
@@ -14732,6 +14736,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+		convasPlaced();
 	}
 	function mapgeoCancel() {
 		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
@@ -14746,6 +14751,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+		convasAbandon();
 	}
 	// ---- the bar ---------------------------------------------------------------------------------
 	function mapgeoBarEl(id) { return document.getElementById(id); }
@@ -27422,7 +27428,9 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { renameToNumbered(upId, name); georefStart(); }
+		// The file route of File, Convert as (an empty tab has nothing to copy): the file lands, then
+		// the same box is offered for it (Task 696).
+		if (asGeo && upId) { renameToNumbered(upId, name); convertAsLanded(); }
 	}
 	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
 	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
@@ -28306,7 +28314,7 @@ var EngCalcs = EngCalcs || {};
 		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
-		if (asGeo) { renameToNumbered(id); georefStart(); }
+		if (asGeo) { renameToNumbered(id); convertAsLanded(); }
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -28725,48 +28733,563 @@ var EngCalcs = EngCalcs || {};
 		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
 	}
-	/**
-	 * **File, Convert coordinates as: a Save as that converts.** Tom's design, 2026-09-18, in
-	 * his own three steps: *"(1) the row becomes File, Convert coordinates as...; (2) it offers a
-	 * file picker OR makes a duplicate tab named `Copy of {project_name}`; (3) the redesigned
-	 * conversion wizard runs."*).
-	 *
-	 * **WHAT SHIPPED BEFORE THIS WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ
-	 * CORRECTLY.** The row opened a FILE and placed it; he wants a row that converts THIS project.
-	 * Tom: *"let's not fool ourselves, conversion of all coordinates is happening"* -- and the rule
-	 * this repository actually holds is never to convert IN PLACE, which a Save as does not: the
-	 * project you were looking at is still open, still unconverted, and still on its own tab.
-	 *
-	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
-	 * georeference is Map, World map, Attach, which moves no coordinate at all;
-	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
-	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
-	 * in most situations. As always, we prefer the preserve-the-inputs path."*
-	 *
-	 * **THE "OR" IN HIS STEP 2 IS ANSWERED BY THE PROJECT ITSELF RATHER THAN BY A DIALOG.** An
-	 * empty tab has nothing to copy, so that is the case where the picker is the only thing the
-	 * command can mean; a tab with a network in it is the thing being converted. Asking which of
-	 * the two somebody meant, when the answer is already on the screen, is a modal for nothing.
-	 */
-	function convertCoordsAs() {
-		var pc = EngCalcs.pageConfig || {}, saved, name;
-		// Nothing here to convert: the row can only mean the file route.
-		if (!doc.nodes.length) { pickGeoFile(); return; }
+	// ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing Tasks 688 and 693) ----------------------
+	//
+	// **ONE ROW FOR UNITS AND COORDINATES, AND IT IS A SAVE AS.** Tom, 2026-09-22/23: *"(a) Project
+	// and units (maybe this one menu row as 'Convert as...' can handle both units and coordinates),
+	// (b) step 1 (if CRS changed), (c) step 2 (if CRS changed)."* And: *"The first thing it needs to
+	// do is ask what coordinate system we are going to."* So the box asks the coordinate system
+	// first, then the units and the rounding, and the placement steps follow only when the
+	// coordinate system actually changes.
+	//
+	// **NEVER IN PLACE.** Tom: *"let's not fool ourselves, conversion of all coordinates is
+	// happening"*, and the rule this repository holds is that conversion never happens in place. The
+	// project on screen is serialized, the COPY is converted, and the copy lands in a new tab named
+	// `Copy of {name}`. The original's bytes are never touched (dev/lpn-spike/convert-as-harness.js).
+	//
+	// **THE UNIT SELECTOR BAN IS UNTOUCHED.** Changing a unit on the strip still reinterprets the
+	// typed number. This rewrites the stored numbers AND the recorded unit selection together, once,
+	// into a new project, which is Tom's own reconciliation of the two (Task 688: *"File, Convert
+	// units as...: I agree."*). Converting back is a second conversion and never an undo, because
+	// exact factors still fail in doubles (150 * 0.3048 / 0.3048 is 149.99999999999997).
+	//
+	// **THE THREE COORDINATE CASES ARE HIS** (R-155): an EPSG coordinate system (lat/lon is
+	// EPSG:3857 here, one of them), an unnamed (local) georeference, and not georeferenced.
+	//
+	// **WHERE THE COORDINATES ARE CONVERTED: ON THE SAVED DOCUMENT, NOT THE LIVE ONE.** A saved
+	// document states its frame plainly -- Cartesian, absolute through `origin`, and longitude and
+	// latitude for a lat/lon project -- so one pure function (convertSavedGeometry) can move every
+	// position, offset, scenario position and the background image without knowing about the live
+	// frame's Mercator y, its origin shift or its y-down memory. The placement steps between are the
+	// existing wizard, unchanged, which is where every conversion to a new place already went.
+	var convas = null;          // a conversion in flight, from the box to the end of the placement
+	var convasUnits = [];       // [{ name, sel, item }], cloned from the strip as the New project box does
+	var convasPick = { crs: LPN_CRS_WEBMERC, place: null };
+	var convasWired = false;
+	// Which of the three cases this project is, plus the EPSG code when it states one.
+	function projectCoordKind() {
+		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_WEBMERC }; }
+		if (projectCrsCode()) { return { kind: 'epsg', crs: projectCrsCode() }; }
+		return { kind: xyGeorefOk() ? 'unnamed' : 'none', crs: '' };
+	}
+	function convasCrsChanged(from, to) {
+		if (from.kind !== to.kind) { return true; }
+		return from.kind === 'epsg' && String(from.crs) !== String(to.crs);
+	}
+	// The menu row. An empty tab has nothing to copy, so there the row means the file picker, and the
+	// file that lands is then offered the same box (see landProjectText()).
+	function convertAs() {
 		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		if (!doc.nodes.length) { pickGeoFile(); return; }
+		openConvertAsBox();
+	}
+	// A file opened through the row's file route: the same box, unless there is nothing to convert.
+	function convertAsLanded() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!doc.nodes.length) {
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
+			return;
+		}
+		openConvertAsBox();
+	}
+	function convasEl() { return document.getElementById('lpn_convas_panel'); }
+	function convasKind() {
+		var k = ['epsg', 'unnamed', 'none'], i, r;
+		for (i = 0; i < k.length; i++) {
+			r = document.getElementById('lpn_convas_kind_' + k[i]);
+			if (r && r.checked) { return k[i]; }
+		}
+		return 'none';
+	}
+	function convasSetKind(kind) {
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.checked = (k === kind); }
+		});
+	}
+	// The chooser button and the name beside it, as the New project box shows its own.
+	function syncConvasCrs() {
+		var b = document.getElementById('lpn_convas_crs_pick'),
+			n = document.getElementById('lpn_convas_crs_name'),
+			off = convasKind() !== 'epsg';
+		if (b) { b.disabled = off; }
+		if (n) {
+			n.textContent = crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
+		}
+	}
+	function closeConvasBox() { hidePanel(convasEl()); }
+	function wireConvasBox() {
+		if (convasWired) { return; }
+		convasWired = true;
+		var box = convasEl();
+		if (!box) { return; }
+		var ok = document.getElementById('lpn_convas_ok'),
+			cancel = document.getElementById('lpn_convas_cancel'),
+			close = document.getElementById('lpn_convas_close'),
+			si = document.getElementById('lpn_convas_si'),
+			us = document.getElementById('lpn_convas_us'),
+			pick = document.getElementById('lpn_convas_crs_pick');
+		if (ok) { ok.addEventListener('click', convasOk); }
+		if (cancel) { cancel.addEventListener('click', closeConvasBox); }
+		if (close) { close.addEventListener('click', closeConvasBox); }
+		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); }); }
+		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); }); }
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.addEventListener('change', syncConvasCrs); }
+		});
+		if (pick) {
+			pick.addEventListener('click', function () {
+				openCrsBox(convasPick.crs, convasPick.place, function (code, ll) {
+					convasPick.crs = code;
+					convasPick.place = ll || convasPick.place;
+					convasSetKind('epsg');
+					syncConvasCrs();
+				});
+			});
+		}
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeConvasBox(); }
+		});
+	}
+	// **IT OPENS ON THE PROJECT AS IT IS**: its own coordinate case and system, its own units, and no
+	// rounding. Pressing Convert without changing anything therefore makes a plain copy.
+	function openConvertAsBox() {
+		var pc = EngCalcs.pageConfig || {}, box = convasEl(), from = projectCoordKind(), h, r, fromEl;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		wireConvasBox();
+		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
+		convasSetKind(from.kind);
+		fromEl = document.getElementById('lpn_convas_from');
+		if (fromEl) {
+			fromEl.textContent = String(pc.lpn_convas_from || 'This project: {crs}').replace('{crs}', crsDisplayName());
+		}
+		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
+		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_roughness') { u.item.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
+		});
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k);
+			if (s) { s.value = ''; }
+		});
+		syncConvasCrs();
+		box.style.display = 'block';
+		raisePanel(box);
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		initTipsIn(box);
+		var ok = document.getElementById('lpn_convas_ok');
+		if (ok && ok.focus) { ok.focus(); }
+	}
+	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
+	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
+	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
+	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
+	function convasAnswers() {
+		var kind = convasKind(), units = {}, rounding = {};
+		convasUnits.forEach(function (u) { units[u.name] = u.sel.value; });
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k);
+			rounding[k] = s ? String(s.value || '') : '';
+		});
+		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
+			units: units, rounding: rounding };
+	}
+	function convasOk() {
+		var a = convasAnswers();
+		closeConvasBox();
+		runConvertAs(a);
+	}
+	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
+	// only when a project needs them. Both ends are checked before anything is copied, so a system
+	// this page cannot transform refuses up front rather than half way through.
+	function runConvertAs(a) {
+		var pc = EngCalcs.pageConfig || {}, from = projectCoordKind(),
+			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_WEBMERC) : '' },
+			changed = convasCrsChanged(from, to), need = [], bornAs = library.openId;
+		if (changed) {
+			if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { need.push(from.crs); }
+			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
+		}
+		if (!need.length) { convasProceed(a, from, to, changed); return; }
+		var refuse = function () {
+			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+		};
+		if (!EngCalcs.lpnCrsLoad) { refuse(); return; }
+		EngCalcs.lpnCrsLoad(function () {
+			if (library.openId !== bornAs) { return; }
+			if (need.some(function (c) { return !EngCalcs.lpnCrsHas(c); })) { refuse(); return; }
+			convasProceed(a, from, to, changed);
+		});
+	}
+	// Metres in one of a length unit, from the suite's one factor table ("that unit per SI unit").
+	function metersPerLengthUnit(key) {
+		var f = key && EngCalcs.unitFactors ? EngCalcs.unitFactors[key] : 0;
+		return (f > 0) ? 1 / f : 1;
+	}
+	// A SAVED document's position, as longitude and latitude in {x, y}, for each case that knows
+	// where it is. Null for the case that does not.
+	function savedLonLatReader(saved, from) {
+		var t = saved.project && saved.project.georef;
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC) { return function (p) { return { x: p.x, y: p.y }; }; }
+		if (from.kind === 'epsg') {
+			return function (p) {
+				var ll = EngCalcs.lpnCrsInverse(from.crs, p);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		if (from.kind === 'unnamed' && t) {
+			return function (p) {
+				var ll = EngCalcs.lpnGeorefToLonLat(t, p.x, p.y);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		return null;
+	}
+	// **A LOCAL GRID FOR A PROJECT THAT KNOWS WHERE IT IS**: the tangent plane at the middle of the
+	// network, north up, in the copy's own length unit. The same transform an attached world map
+	// states, so "unnamed (local) georeference" is this plane with the transform kept, and "not
+	// georeferenced" is the same plane with it dropped.
+	function savedLocalPlane(saved, toLL, lenKey) {
+		var org = savedOrigin(saved), lon = 0, lat = 0, n = 0;
+		(saved.nodes || []).forEach(function (nd) {
+			if (!isFinite(nd.x) || !isFinite(nd.y)) { return; }
+			var ll = toLL({ x: nd.x + org.x, y: nd.y + org.y });
+			if (!ll) { return; }
+			lon += ll.x; lat += ll.y; n++;
+		});
+		if (!n) { return null; }
+		return { anchor: { x: 0, y: 0 }, origin: { lon: lon / n, lat: lat / n },
+			metersPerUnit: metersPerLengthUnit(lenKey), rotDeg: 0 };
+	}
+	function savedOrigin(saved) {
+		var geo = saved.project && saved.project.coords === LPN_COORDS_GEO, o = saved.origin;
+		return (!geo && o && isFinite(o.x) && isFinite(o.y)) ? { x: o.x, y: o.y } : { x: 0, y: 0 };
+	}
+	/**
+	 * **EVERY COORDINATE IN A SAVED DOCUMENT, THROUGH ONE MAP.** `map` takes an absolute POSITION in
+	 * the document's own frame -- longitude and latitude for a lat/lon document, the plane's own
+	 * numbers otherwise -- and returns the position in the new frame, or null. `dstGeo` says whether
+	 * the new frame is lat/lon, because that is the one frame whose DRAWING y (Mercator) differs from
+	 * its position y (latitude).
+	 *
+	 * Positions (nodes, vertices, free Text, detached customers, scenario positions) go through the
+	 * map directly. Offsets (label offsets, anchored Text, attached customers) are vectors, so they go
+	 * through the map's local derivative at their anchor, which carries a change of scale, a turn and
+	 * the Mercator stretch without a second opinion about any of them. The background image is moved
+	 * by its centre and rescaled by the same derivative; it is not turned, for the reason
+	 * georefWriteBackdrop() gives. The saved view is dropped, so the copy opens fitted to its network.
+	 *
+	 * Returns false if any position has no answer, and the caller converts nothing.
+	 */
+	function convertSavedGeometry(saved, map, dstGeo) {
+		var srcGeo = !!(saved.project && saved.project.coords === LPN_COORDS_GEO),
+			org = savedOrigin(saved), failed = false, nodes = {}, linksById = {}, drawAt = {},
+			minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, eps, jobs = [];
+		function mapPos(p) {
+			var q = map(p);
+			if (!q || !isFinite(q.x) || !isFinite(q.y)) { failed = true; return null; }
+			return q;
+		}
+		function drawToPos(d) { return srcGeo ? { x: d.x, y: Geom.mercLat(d.y) } : d; }
+		function posToDraw(p) { return dstGeo ? { x: p.x, y: Geom.mercY(p.y) } : p; }
+		function mapDraw(d) { var q = mapPos(drawToPos(d)); return q ? posToDraw(q) : null; }
+		function absPos(p) { return { x: p.x + org.x, y: p.y + org.y }; }
+		function drawOfPos(p) { var a = absPos(p); return srcGeo ? { x: a.x, y: Geom.mercY(a.y) } : a; }
+		// The derivative, read off the map itself, applied to one vector anchored at drawing point d.
+		function mapVec(d, v) {
+			var a = mapDraw(d), bx = mapDraw({ x: d.x + eps, y: d.y }), by = mapDraw({ x: d.x, y: d.y + eps });
+			if (!a || !bx || !by) { return null; }
+			return { x: ((bx.x - a.x) * v.x + (by.x - a.x) * v.y) / eps,
+				y: ((bx.y - a.y) * v.x + (by.y - a.y) * v.y) / eps };
+		}
+		(saved.nodes || []).forEach(function (n) {
+			nodes[n.id] = n;
+			if (!isFinite(n.x) || !isFinite(n.y)) { return; }
+			var d = drawOfPos(n);
+			drawAt[n.id] = d;
+			minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x);
+			minY = Math.min(minY, d.y); maxY = Math.max(maxY, d.y);
+		});
+		(saved.links || []).forEach(function (l) { linksById[l.id] = l; });
+		eps = isFinite(maxX) ? Math.max(maxX - minX, maxY - minY) * 1e-6 : 0;
+		if (!(eps > 0)) { eps = 1e-6; }
+		function linkAnchor(id) { var l = linksById[id]; return l ? (drawAt[l.from] || drawAt[l.to]) : null; }
+		// OFFSETS FIRST, while every anchor is still where the offset was measured from.
+		function offset(el, kx, ky, at) {
+			var hx = typeof el[kx] === 'number', hy = typeof el[ky] === 'number', v;
+			if ((!hx && !hy) || !at) { return; }
+			v = mapVec(at, { x: hx ? el[kx] : 0, y: hy ? el[ky] : 0 });
+			if (!v) { return; }
+			jobs.push(function () { if (hx) { el[kx] = v.x; } if (hy) { el[ky] = v.y; } });
+		}
+		(saved.nodes || []).forEach(function (n) { offset(n, 'lx', 'ly', drawAt[n.id]); });
+		(saved.links || []).forEach(function (l) { offset(l, 'lx', 'ly', linkAnchor(l.id)); });
+		(saved.labels || []).forEach(function (lb) {
+			if (lb.anchorNode) { offset(lb, 'x', 'y', drawAt[lb.anchorNode]); }
+			else if (lb.anchorLink) { offset(lb, 'x', 'y', linkAnchor(lb.anchorLink)); }
+		});
+		(saved.customers || []).forEach(function (c) { if (c.link) { offset(c, 'x', 'y', linkAnchor(c.link)); } });
+		// A SCENARIO'S OWN POSITIONS are absolute and may hold one axis only; the missing half comes
+		// from the node, as georefCaptureCoordOverrides() completes it, and only held axes are written.
+		(saved.scenarios || []).forEach(function (sc) {
+			if (sc.isBase) { return; }
+			Object.keys(sc.overrides || {}).forEach(function (key) {
+				var ov = sc.overrides[key], n = key.indexOf('n:') === 0 ? nodes[key.slice(2)] : null, a, q;
+				if (!ov || !n || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
+				a = absPos(n);
+				q = mapPos({ x: typeof ov.x === 'number' ? ov.x : a.x, y: typeof ov.y === 'number' ? ov.y : a.y });
+				if (!q) { return; }
+				jobs.push(function () {
+					if (typeof ov.x === 'number') { ov.x = q.x; }
+					if (typeof ov.y === 'number') { ov.y = q.y; }
+				});
+			});
+		});
+		// The background image: its centre moves, its scale follows the map's east-west derivative.
+		var bd = saved.backdrop;
+		if (bd && isFinite(bd.tx) && isFinite(bd.ty) && bd.s > 0) {
+			var bw = (bd.x || 0) + (bd.width || 0) / 2, bh = (bd.y || 0) + (bd.height || 0) / 2,
+				c = { x: bd.tx + (srcGeo ? 0 : org.x) + bd.s * bw, y: bd.ty + (srcGeo ? 0 : org.y) - bd.s * bh },
+				c2 = mapDraw(c), east = mapVec(c, { x: 1, y: 0 });
+			if (c2 && east) {
+				jobs.push(function () {
+					var s = bd.s * Math.hypot(east.x, east.y);
+					bd.s = s;
+					bd.tx = c2.x - s * bw;
+					bd.ty = c2.y + s * bh;
+				});
+			}
+		}
+		// POSITIONS, through eachStoredPoint()'s own list so nothing is missed -- minus the two
+		// {get, set} points, which are the view (dropped) and the backdrop (done above).
+		eachStoredPoint(saved, function (pt, get) {
+			if (get || !isFinite(pt.x) || !isFinite(pt.y)) { return; }
+			var q = mapPos(absPos(pt));
+			if (!q) { return; }
+			jobs.push(function () {
+				pt.x = q.x; pt.y = q.y;
+				// The file's own characters no longer state these numbers.
+				if (pt.tok) { delete pt.tok.x; delete pt.tok.y; }
+			});
+		});
+		if (failed) { return false; }
+		jobs.forEach(function (j) { j(); });
+		delete saved.view;
+		// A lat/lon document states origin {0, 0} and applySaved() derives its own; a plane document
+		// is given one here, which is what a State Plane or UTM number needs to be drawable.
+		delete saved.origin;
+		if (dstGeo) { saved.origin = { x: 0, y: 0 }; } else { rebaseDocument(saved); }
+		return true;
+	}
+	function savedSetKind(saved, kind, crs, georefT) {
+		var p = saved.project;
+		delete p.coords; delete p.crs; delete p.georef;
+		if (kind === 'geo') { p.coords = LPN_COORDS_GEO; p.basemap = p.basemap || 'osm'; }
+		else if (kind === 'epsg') { p.crs = String(crs); }
+		else if (kind === 'unnamed') { p.georef = georefT; }
+		else { delete p.basemap; }
+	}
+	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Destructive
+	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
+	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
+	// unit names that actually changed, which is what the rounding reads.
+	function convasApplyUnits(a) {
+		var changed = {};
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
+			if (!to || !from || to === from) { return; }
+			fOld = EngCalcs.unitFactors[from];
+			fNew = EngCalcs.unitFactors[to];
+			if (!fOld || !fNew) { return; }
+			applyOneUnit(name, to);
+			if (unitKey(name) !== to) { return; }   // not an option this select offers
+			convertUnitValues(name, fNew / fOld);
+			changed[name] = true;
+		});
+		convasRound(changed, a.rounding || {});
+		rememberUnitSelections();
+		afterUnitChange();
+		return changed;
+	}
+	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
+	// not 12.299999999999999.
+	function roundToStep(v, step) {
+		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+		return +(Math.round(v / step) * step).toFixed(d);
+	}
+	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
+	// typed, and rounding it would be a second edit nobody asked for.
+	function convasRound(changed, rounding) {
+		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
+		function rnd(obj, prop, s) { if (obj && typeof obj[prop] === 'number') { obj[prop] = roundToStep(obj[prop], s); } }
+		function ovs(prop, s) {
+			scenarios.forEach(function (sc) {
+				Object.keys(sc.overrides || {}).forEach(function (k) { rnd(sc.overrides[k], prop, s); });
+			});
+		}
+		var s = step('diameter');
+		if (s && changed.lpn_u_diameter) {
+			doc.links.forEach(function (l) { rnd(l, '_diameter', s); });
+			ovs('diameter', s);
+		}
+		s = step('depth');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_level', s); rnd(n, 'minLevel', s); rnd(n, 'maxLevel', s); });
+			ovs('level', s);
+		}
+		s = step('head');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_head', s); });
+			ovs('head', s);
+		}
+		s = step('flow');
+		if (s && changed.lpn_u_flow) {
+			doc.nodes.forEach(function (n) {
+				rnd(n, '_demand', s);
+				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
+			});
+			(doc.customers || []).forEach(function (c) { rnd(c, 'demand', s); });
+			doc.links.forEach(function (l) {
+				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { rnd(l, '_setting', s); }
+			});
+			ovs('demand', s);
+		}
+	}
+	/**
+	 * **THE COPY, CONVERTED IN THE ORDER THE TWO HALVES NEED.**
+	 *
+	 *   1. Serialize this project and give the copy its own name and no docId.
+	 *   2. Coordinates that need no placement are converted on the saved copy: a local grid rescaled
+	 *      with its length unit, a world map dropped, or a known location laid out as a local grid.
+	 *      A known location that is going to a new coordinate system is first expressed in lat/lon,
+	 *      so the placement steps open already answered.
+	 *   3. The copy lands in a new tab, and the units are converted in it.
+	 *   4. If the coordinate system changed, the placement steps run on the copy, and when they
+	 *      finish convasPlaced() lays the lat/lon result onto the chosen system.
+	 */
+	function convasProceed(a, from, to, changed) {
+		var pc = EngCalcs.pageConfig || {}, saved, name, id, origId = library.openId,
+			lenFrom = unitKey('lpn_u_length'), lenTo = (a.units && a.units.lpn_u_length) || lenFrom,
+			k = metersPerLengthUnit(lenFrom) / metersPerLengthUnit(lenTo), step = null, toLL, t2, ok = true;
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
 		if (!saved || !saved.project) {
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
-		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId
-		// is what the lock broker and every live file handle key on, so two tabs sharing one would
-		// be two documents claiming to be the same file. And the world map attached to the original
-		// is a statement about coordinates that are about to be replaced, so it goes too.
+		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
+		// what the lock broker and every live file handle key on.
 		delete saved.project.docId;
-		delete saved.project.georef;
 		saved.project.name = name;
-		landProjectText(JSON.stringify(saved), true, name);
+		if (!changed) {
+			// **A LOCAL GRID'S COORDINATES ARE IN ITS LENGTH UNIT** (Task 693), so a new length unit
+			// rescales them with the pipes, and an attached world map keeps its place on the ground.
+			if ((from.kind === 'none' || from.kind === 'unnamed') && k !== 1) {
+				ok = convertSavedGeometry(saved, function (p) { return { x: p.x * k, y: p.y * k }; }, false);
+				var g = saved.project.georef;
+				if (ok && g && g.anchor) {
+					g.anchor = { x: g.anchor.x * k, y: g.anchor.y * k };
+					g.metersPerUnit = g.metersPerUnit / k;
+				}
+			}
+		} else if (from.kind === 'unnamed' && to.kind === 'none') {
+			// Detaching changes no coordinate: the grid is the grid it always was.
+			savedSetKind(saved, 'none');
+		} else if (from.kind === 'none') {
+			// Nowhere yet: the steps start from the whole world, as they always have.
+			step = to.kind === 'unnamed' ? 'attach' : 'place';
+		} else {
+			toLL = savedLonLatReader(saved, from);
+			if (to.kind === 'none') {
+				t2 = toLL ? savedLocalPlane(saved, toLL, lenTo) : null;
+				ok = !!t2 && convertSavedGeometry(saved, function (p) {
+					var ll = toLL(p);
+					return ll ? EngCalcs.lpnGeorefFromLonLat(t2, ll.x, ll.y) : null;
+				}, false);
+				if (ok) { savedSetKind(saved, 'none'); }
+			} else {
+				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC)) {
+					ok = !!toLL && convertSavedGeometry(saved, toLL, true);
+					if (ok) { savedSetKind(saved, 'geo'); }
+				}
+				step = 'answered';
+			}
+		}
+		if (!ok) {
+			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+			return;
+		}
+		id = importProject(saved);
+		if (!id) { return; }
+		convasApplyUnits(a);
+		saveToStorage();
+		renderTabs();
+		if (!step) {
+			zoomExtent(true);
+			setNotice(String(pc.lpn_convas_done || 'The converted copy is {name}. The original project is unchanged.')
+				.replace('{name}', name));
+			return;
+		}
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
+		georefStart();
+		if (!georefActive()) { convasAbandon(); }
+	}
+	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
+	// this lays it onto the system the box asked for, on the saved document, and installs it in the
+	// same tab. A conversion to lat/lon itself is already finished.
+	function convasPlaced() {
+		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_WEBMERC)) { return; }
+		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
+		if (!saved || !saved.project) { return; }
+		if (c.to.kind === 'epsg') {
+			ok = convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnCrsForward(c.to.crs, { lon: p.x, lat: p.y });
+			}, false);
+			if (ok) { savedSetKind(saved, 'epsg', c.to.crs); }
+		} else {
+			t2 = savedLocalPlane(saved, function (p) { return { x: p.x, y: p.y }; }, c.lenKey);
+			ok = !!t2 && convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnGeorefFromLonLat(t2, p.x, p.y);
+			}, false);
+			if (ok) { savedSetKind(saved, c.to.kind, '', t2); }
+		}
+		if (!ok) {
+			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+			return;
+		}
+		writeJSON(projectKey(library.openId), saved);
+		prepared = prepareDocument(JSON.parse(JSON.stringify(saved)));
+		if (!prepared) { return; }
+		applySaved(prepared);
+		// The undo stack holds the lat/lon drawing the steps left, which is not this document's frame.
+		clearUndo();
+		saveToStorage();
+		refreshAllFromDocument();
+		zoomExtent(true);
+		renderTabs();
+		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+	}
+	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
+	// a half-converted duplicate left open is a second document nobody asked to keep.
+	function convasAbandon() {
+		var pc = EngCalcs.pageConfig || {}, c = convas;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (indexEntry(c.origId)) { switchToTab(c.origId); }
+		discardProject(c.copyId);
+		renderTabs();
+		setNotice(pc.lpn_convas_cancelled || 'Nothing was converted. The copy is closed, and the original project is unchanged.');
 	}
 
 	// ---- Live file handles ----
@@ -31215,11 +31738,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function buildNewBoxUnits() {
-		var host = document.getElementById('lpn_new_units_fields');
-		if (!host) { return; }
+	// Shared with the File, Convert as box (Task 696), which asks the same units question of a copy.
+	function cloneUnitStrip(hostId) {
+		var host = document.getElementById(hostId), out = [];
+		if (!host) { return out; }
 		host.innerHTML = '';
-		newBoxUnits = [];
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var live = unitEl(name), item = unitStripItem(live), copy, sel;
 			if (!item) { return; }
@@ -31230,8 +31753,12 @@ var EngCalcs = EngCalcs || {};
 			sel.removeAttribute('name');
 			sel.value = live.value;
 			host.appendChild(copy);
-			newBoxUnits.push({ name: name, sel: sel, item: copy });
+			out.push({ name: name, sel: sel, item: copy });
 		});
+		return out;
+	}
+	function buildNewBoxUnits() {
+		newBoxUnits = cloneUnitStrip('lpn_new_units_fields');
 	}
 	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
 	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
@@ -31247,10 +31774,11 @@ var EngCalcs = EngCalcs || {};
 	// A preset is a family => unit-key map and every select declares its family, which is exactly
 	// what EngCalcs.setUnits() does to the real strip. Applied to the clones here, because the real
 	// strip belongs to the project that is currently open.
-	function applyNewBoxPreset(system) {
+	function applyNewBoxPreset(system) { applyPresetToClones(newBoxUnits, system); }
+	function applyPresetToClones(list, system) {
 		var preset = (EngCalcs.unitSets || {})[system];
 		if (!preset) { return; }
-		newBoxUnits.forEach(function (u) {
+		list.forEach(function (u) {
 			var fam = (u.sel.dataset && u.sel.dataset.family) ||
 				(u.sel.getAttribute && u.sel.getAttribute('data-family')) || '';
 			var want = preset[fam];
@@ -31859,8 +32387,10 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Convert coordinates as…',
-			  tip: pc.lpn_file_import_geo_tip, fn: convertCoordsAs },
+			// **FILE, CONVERT AS... SINCE TASK 696**: one row for coordinates and units, which copies
+			// THIS project and converts the copy (convertAs()). On an empty tab it opens a file first.
+			{ icon: 'globe', label: pc.lpn_file_convert_as || 'Convert as…',
+			  tip: pc.lpn_file_convert_as_tip, fn: convertAs },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -35117,6 +35647,10 @@ var EngCalcs = EngCalcs || {};
 			});
 		} else if (name === 'lpn_u_flow') {
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
+			// A junction's further demand categories (Task 468) and a customer's own demand (Task
+			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
+			doc.nodes.forEach(function (nd) { (nd.extraDemands || []).forEach(function (d) { conv(d, 'base'); }); });
+			(doc.customers || []).forEach(function (c) { conv(c, 'demand'); });
 			convOverrides('demand');
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }

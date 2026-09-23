@@ -373,6 +373,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_crsbox', 'lpn_crsbox_title', 'lpn_crsbox_close', 'lpn_crsbox_view', 'lpn_crsbox_place',
   'lpn_crsbox_search', 'lpn_crsbox_name', 'lpn_crsbox_list', 'lpn_crsbox_note', 'lpn_crsbox_ok',
   'lpn_crsbox_cancel',
+  // The File, Convert as box (Task 696). Its three coordinate radios are read by id, and its unit
+  // selects are cloned into #lpn_convas_units_fields exactly as the New-project box clones its own.
+  'lpn_convas_panel', 'lpn_convas_units_fields', 'lpn_convas_kind_epsg', 'lpn_convas_kind_unnamed',
+  'lpn_convas_kind_none', 'lpn_convas_crs_pick', 'lpn_convas_crs_name', 'lpn_convas_from',
+  'lpn_convas_ok', 'lpn_convas_cancel', 'lpn_convas_close', 'lpn_convas_si', 'lpn_convas_us',
+  'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span

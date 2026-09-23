@@ -261,7 +261,7 @@ async function labelsHidden(a) {
 }
 
 // **THE ROW'S LABEL IS ASKED OF THE LANGUAGE FILE, never copied here.** It was pinned as
-// 'Import xy to lat/lon…' until 2026-09-09, and Tom's rewording of `lpn_file_import_geo` to
+// 'Import xy to lat/lon…' until 2026-09-09, and Tom's rewording of `lpn_file_convert_as` to
 // 'Open an xy file on the map…' made every check in this section throw at its first line — the
 // exact shape dev/session-handoff.md §4 names as having broken three harnesses. `a.lang()` reads
 // the value the page itself renders, so a rewording moves both ends at once.
@@ -289,9 +289,16 @@ async function openAsLatLon(a, name, text) {
 	await a.settle(900);
 }
 // Draw the L, then open it as lat/lon: the whole placement entry, in one line at each call site.
+// File, Convert as copies the project on screen (Task 696): the row opens its box, and lat/lon
+// (EPSG:3857) is chosen there. `name` is kept for the call sites; the copy is named by the page.
 async function placeCurrent(a, name) {
-	const text = await projectJson(a);
-	await openAsLatLon(a, name || 'placed.json', text);
+	await a.menuClick(ROW);
+	await a.settle(300);
+	await a.page.evaluate(() => {
+		const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');
+		if (r && ok) { r.checked = true; ok.click(); }
+	});
+	await a.settle(900);
 }
 
 exports.run = async function ({ browser, report }) {
@@ -302,7 +309,7 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await answerConsent(a);
 		await a.dismissGallery();
-		ROW = await a.lang('lpn_file_import_geo');
+		ROW = await a.lang('lpn_file_convert_as');
 
 		// ---- 1. the command is findable ------------------------------------------------------
 		const row = await fileRow(a, ROW);
