@@ -134,6 +134,40 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### RULED 2026-09-23: "Do X and Y happens" — the conversational conditional
+
+**Tom's instruction, in his own words:** *"What I would suggest you write into
+dev/language-strings.md is a warning against 'Do X and Y happens' and a few suggestions for
+alternate wordings like 'Do X to get Y' or 'If you do X, Y happens'."*
+
+He struck it on `lpn_field_meter_pattern_tip`, which read *"Leave it at No pattern and the customer
+follows the project's Default demand pattern instead"*, and rewrote it as *"Leave it at No pattern
+to follow the project's Default demand pattern."* His note on the edit: *"I removed your habitual
+'and it' construction where you mean 'If this, then that.'"*
+
+**WHY IT IS A RULE AND NOT A TASTE, and this is the part that survives the striking of the house
+style above:** the problem is not that the sentence is too plain. **`and` joining two clauses is
+CONVERSATIONAL AND REGIONAL where the meaning is CONDITIONAL** — Tom's own diagnosis. English
+speakers read "do this and that happens" as a promise; a reader working in a second language, and
+every one of the 26 translation agents, reads `and` as what it says, a conjunction of two facts.
+So the conditional has to be recovered from context that may not exist in their grammar, and a
+language that marks conditionals explicitly has nowhere to put the marker.
+
+**WRITE INSTEAD, either of his two:**
+
+| Struck | Write |
+|---|---|
+| Leave it at No pattern **and** the customer follows the default. | Leave it at No pattern **to follow** the default. |
+| Type a value here **and** it squares the service line. | **If you type** a value here, it squares the service line. |
+
+The infinitive (*to get Y*) is the shorter of the two and reads as purpose, which is usually what a
+tip means. The explicit conditional (*If you do X, Y happens*) is right when the clause is a
+consequence rather than a purpose — a warning, or something the reader might not want.
+
+**A ratchet on new and edited strings, never a sweep.** Nothing is enforced by a script: "is this
+`and` conditional or conjunctive" is a judgement, and a scan for the word `and` would fire on
+correct English constantly. It is here because he struck it twice in one reading pass.
+
 ### RULED 2026-09-06: when a string may mention EPANET
 
 **An EPANET mention earns its place when it explains something the reader is experiencing right
