@@ -12706,16 +12706,27 @@ var EngCalcs = EngCalcs || {};
 	// drawn, so a point lands on the same screen pixel it did then. One attribute, no arithmetic
 	// over the document, nothing rebuilt.
 	var georefSettleTimer = null;
+	// **THE BACKGROUND IMAGE IS HELD STILL WITH THE MODEL** (R-172, Tom 2026-09-22: *"In Step 1, a
+	// background image gets dragged around with the map (then snaps back on release of drag) instead
+	// of always staying with the project."*). The picture lives in backdropLayer, a sibling of
+	// modelLayer, so the compensation that held the model still never reached it: it rode the map
+	// during the gesture and jumped back when georefReproject() re-derived it at the settle. It is
+	// part of what is being placed (georefCaptureBackdrop), so it takes the same compensation.
 	function georefApplyCompensation() {
 		if (!modelLayer) { return; }
-		var f = georefDetached() ? georef.frozen : null;
+		var f = georefDetached() ? georef.frozen : null,
+			layers = [modelLayer].concat(backdropLayer && georef && georef.bd ? [backdropLayer] : []);
+		if (backdropLayer && !(georef && georef.bd)) { backdropLayer.removeAttribute('transform'); }
 		if (!f || (f.tx === state.tx && f.ty === state.ty && f.s === state.s)) {
-			modelLayer.removeAttribute('transform');
+			layers.forEach(function (g) { g.removeAttribute('transform'); });
+			if (backdropLayer) { backdropLayer.removeAttribute('transform'); }
 			return;
 		}
-		modelLayer.setAttribute('transform',
-			'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
-			') scale(' + (f.s / state.s) + ')');
+		layers.forEach(function (g) {
+			g.setAttribute('transform',
+				'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
+				') scale(' + (f.s / state.s) + ')');
+		});
 	}
 	// Called on every view change. While detached it holds the model still and books a settle;
 	// otherwise it makes sure the compensation is not left on.

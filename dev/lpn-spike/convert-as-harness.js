@@ -220,6 +220,14 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:3857', units: sameUnits(), rounding: {} });
 		const g = L.georef();
 		ok('the wizard opens at step 1', !!g && g.step === 1);
+		// R-172 (1): dragging the map in step 1 must carry the background image with the MODEL,
+		// held still on the screen, rather than with the map.
+		const v0 = L.currentView();
+		L.applyView({ cx: v0.cx + 50 / v0.s, cy: v0.cy, s: v0.s });
+		const tr = L.layerTransforms();
+		ok('R-172: in step 1 the background image is held still with the model while the map moves',
+			!!tr[0] && tr[0] === tr[1], JSON.stringify(tr));
+		L.applyView(v0);
 		ok('...with every node where the attached map already put it',
 			L.getDoc().nodes.every((nd, i) => near(L.outwardX(nd.x), want[i].lon, 1e-9) && near(L.outwardY(nd.y), want[i].lat, 1e-9)));
 		L.georefAttach();
