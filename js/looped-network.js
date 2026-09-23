@@ -48164,6 +48164,9 @@ var EngCalcs = EngCalcs || {};
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
+				// Task 708: an open Properties popup reads lastSolveResult too, at render time, and
+				// nothing here had ever asked it to redraw -- see the note at the success path below.
+				refreshPopupIfOpen();
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up with
@@ -48174,6 +48177,7 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 			refreshValueColors();
 			refreshPaneIfOpen();
+			refreshPopupIfOpen();   // Task 708
 			return;
 		}
 		// **A SOLVE THAT DID NOT CONVERGE IS DRAWN AND MARKED, NOT DISCARDED** (ROADMAP Task 565).
@@ -48308,6 +48312,15 @@ var EngCalcs = EngCalcs || {};
 		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
 		// schedules a solve, so the open tab follows the document with no listener of its own.
 		refreshPaneIfOpen();
+		// **AND WHERE THE OPEN PROPERTIES POPUP HUNG UNTIL NOW** (Task 708, Tom: "When I change
+		// Base demand in Properties, Demand, Pressure etc. change on the node label, but not in
+		// Properties"). afterPropertyEdit() already redraws an open popup the instant the edit
+		// lands, but that solve is DEBOUNCED 300 ms out -- and when it lands here, this function
+		// refreshed the map labels and the Tables pane and never asked the popup to redraw. A
+		// junction's Pressure/Head rows are read straight off lastSolveResult at render time, so
+		// the popup simply kept showing the number it had drawn a third of a second earlier,
+		// disagreeing with its own map label and table row until the popup was closed and reopened.
+		refreshPopupIfOpen();
 		// And the energy report, on the same seam and for the same reason: a run that has just
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.
