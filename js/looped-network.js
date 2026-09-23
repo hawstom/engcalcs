@@ -13695,10 +13695,12 @@ var EngCalcs = EngCalcs || {};
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
+		// **A lat/lon PROJECT IS NOT A REASON TO REFUSE** (Task 696; Tom, 2026-09-23: the wizard
+		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:3857 on
+		// this page, one coordinate system among hundreds, so being on it says nothing about whether
+		// somebody may convert to another. It says where the network already is, so the wizard opens
+		// with that answer in place rather than asking the question again from the whole world.
+		var fromGeo = isLatLonProject();
 		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
 		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
 		// project that states its own coordinate system. The xy grid it was built for states none.
@@ -13797,7 +13799,21 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
+		if (fromGeo) { georefOpenAnswered(); return; }
 		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.');
+	}
+	// **STEPS 1 AND 2 OPEN ALREADY ANSWERED** (Tom, 2026-09-22: *"If a project already has an
+	// attached World map ... the next step (placement step 1) uses our current georeferencing. In
+	// fact, we could just convert ... without further question. But we step them through Steps 1 and
+	// 2 in case they want to make any changes."*). The coordinates the copy arrived with are
+	// longitudes and latitudes, so the reinterpret path places the model exactly where they say, and
+	// the wizard then steps back to step 1 so both steps are still walked. Pressing Put the model
+	// here and Keep this placement without touching anything commits the placement unchanged.
+	function georefOpenAnswered() {
+		var pc = EngCalcs.pageConfig || {};
+		georefArmAsDegrees();
+		georefDetach();
+		setNotice(pc.lpn_georef_answered || 'This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.');
 	}
 	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
 	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
@@ -28734,10 +28750,6 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function convertCoordsAs() {
 		var pc = EngCalcs.pageConfig || {}, saved, name;
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
 		// Nothing here to convert: the row can only mean the file route.
 		if (!doc.nodes.length) { pickGeoFile(); return; }
 		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }

@@ -1195,6 +1195,10 @@ $ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts
 $ec_lang['lpn_georef_asdeg_btn']='These are already lat/lon';
 $ec_lang['lpn_georef_asdeg_tip']='Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.';
 $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.';
+// Task 696: a project that already knows where it is (lat/lon, an EPSG coordinate system, or an
+// attached world map) opens the placement steps already answered. Tom's own sentence for this case
+// from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
+$ec_lang['lpn_georef_answered']='This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.';
 $ec_lang['lpn_georef_intro']='Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.';
 $ec_lang['lpn_georef_adjust']='The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';

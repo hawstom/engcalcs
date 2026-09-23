@@ -204,8 +204,20 @@ ok('...and the placed coordinates are the ones that survive',
 ok('...on a local origin, which is what makes them drawable at street zoom',
 	L.docOrigin().x !== 0 || L.docOrigin().y !== 0, JSON.stringify(L.docOrigin()));
 
+// **NOT REFUSED ANY MORE** (Task 696, Tom 2026-09-23): lat/lon is one coordinate system among
+// hundreds, so being on it is no reason to refuse converting to another. It opens at step 1 with the
+// model already where its coordinates say, so nothing has to be placed again.
+const placedAgain = JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)]));
 L.georefStart();
-ok('a project already on the GeoMap is refused, not re-placed', L.georefState() === null);
+ok('a project already on the GeoMap opens the wizard, already answered, at step 1',
+	L.georefState() !== null && L.georefState().step === 1);
+const answered = doc.nodes.map(n => [L.outwardX(n.x), L.outwardY(n.y)]);
+ok('...with every node where its own coordinates already put it',
+	JSON.parse(placedAgain).every((p, i) => Math.abs(p[1] - answered[i][0]) < 1e-9 &&
+		Math.abs(p[2] - answered[i][1]) < 1e-9), JSON.stringify(answered));
+L.georefCancel();
+ok('...and Cancel leaves it exactly as it was',
+	JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)])) === placedAgain);
 
 // ---------------------------------------------------------------------------
 // 6. The command stays FINDABLE, and the coordinate box takes what people paste.

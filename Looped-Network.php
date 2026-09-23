@@ -2324,6 +2324,7 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
 	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
+	lpn_georef_answered: <?=json_encode($ec_lang['lpn_georef_answered'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
