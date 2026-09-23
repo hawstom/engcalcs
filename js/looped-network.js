@@ -26957,8 +26957,8 @@ var EngCalcs = EngCalcs || {};
 			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
 		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
-		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
-		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
+		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
+		// not an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
 		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is

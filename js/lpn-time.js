@@ -622,9 +622,13 @@
 	 * particular solve is a run rather than an edit. Returns false otherwise, and
 	 * js/looped-network.js carries on to the ordinary steady solve.
 	 *
-	 * **A HYDRAULIC EDIT RECALCULATES THE FIRST REPORTING TIME AND NOTHING ELSE** (Tom, 2026-08-19:
-	 * "On any edit, only the first time step should be recalculated"). Two things follow, and the
-	 * second is the whole point of the change:
+	 * **A HYDRAULIC EDIT ON A SLOW NETWORK SHOWS THE FIRST REPORTING TIME FIRST.** This answers Tom's
+	 * "multiplied burden of recalculating every time step at every value change" (2026-08-19, quoted
+	 * above LPN_TIME_AUTO). It is NOT a ruling of his that an edit recalculates only the first step:
+	 * a sentence to that effect was cited here as his, cannot be found in any transcript, and he
+	 * struck it on 2026-09-23 -- the one place first-step-only makes sense is while the EPANET engine
+	 * is still loading for a new browser. On a fast network an edit runs the period at once (see
+	 * editRunsNow()). Where the preview does run, two things follow:
 	 *
 	 *   1. The page stays LIVE. Returning false here hands the solve back, and what gets drawn is
 	 *      the steady solve of the document as it now stands -- the same as-you-type behaviour
@@ -632,9 +636,8 @@
 	 *   2. **THE FRAMES GO.** They describe a network that no longer exists, and a result that no
 	 *      longer matches the document must never be on screen as if it did. Dropping them rather
 	 *      than labelling them stale is EPANET's own answer, it keeps EC.lpnTimeCurrentFrame()
-	 *      honest for free, and it is what gives "only the first time step" a literal meaning on
-	 *      screen: the transport goes back to the start, because the start is the one moment that
-	 *      has actually been worked out.
+	 *      honest for free, and it is why the transport goes back to the start: the start is the
+	 *      one moment that has actually been worked out.
 	 *
 	 * The period comes back either by itself, after a quiet moment, or on the Run button -- see
 	 * EC.LPN_TIME_AUTO for which, and why that is a measurement rather than a preference.
@@ -704,8 +707,7 @@
 	 * part (hundreds of ms on Net3, measured). The one thing the preview buys is an EARLIER first
 	 * answer, and that is worth something only where the run itself is slow -- which is exactly
 	 * where the page already tells the user so. Below that line the preview is pure cost; above it
-	 * the order Tom asked for stands (2026-08-19, *"On any edit, only the first time step should
-	 * be recalculated"*), because there it is what keeps data entry live.
+	 * the preview keeps data entry live, which is Tom's "multiplied burden" concern (2026-08-19).
 	 *
 	 * **THREAD TIME, NOT WALL CLOCK.** `lastBusyMs` is the run's slices summed; the wall clock also
 	 * counts whatever the page did while the run yielded, and on opening a project that is the
