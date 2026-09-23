@@ -1818,7 +1818,10 @@ EngCalcs.lpnCollide = (function () {
 		// dev/lpn-spike/node-shed-harness.js with the rescue off and over 900 with it on, because
 		// every one of forty-odd deferred labels re-searches hundreds of points against a widened
 		// neighbourhood. Both halves of that say the same thing, so the bound is one test.
-		if (deferred.length * 4 > labels.length) {
+		// `opts.widenCrowd` is the fraction, for a caller that wants to see the rescue on a drawing
+		// this would refuse -- a harness fixture built to be full on purpose. The page never sets it.
+		var crowdFrac = (opts && opts.widenCrowd > 0) ? opts.widenCrowd : 0.25;
+		if (deferred.length > labels.length * crowdFrac) {
 			deferred.forEach(function (lbl) {
 				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
 					dropped: true, side: -1, box: null, leader: null });

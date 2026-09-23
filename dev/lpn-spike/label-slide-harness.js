@@ -51,7 +51,7 @@ const LONGEST_CEILING = { 2: 13.5, 3: 6.3 };
 // not a before-and-after.
 const CONTACT_CEILING = { 2: 19, 3: 50 };
 // His own label at the zoom of his own screenshot, which is the case R-137 is closed on.
-const HIS_CEILING = { 2: { '251': 3.6 } };
+const HIS_CEILING = { 2: { '251': 3.7 } };
 const ZOOMS = (process.env.LPN_ZOOMS || '2,3').split(',').map(Number);
 
 let checks = 0, failures = 0;

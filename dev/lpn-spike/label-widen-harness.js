@@ -337,7 +337,16 @@ function passLevelCheck() {
 		const c = {}; Object.keys(l).forEach(function (k) { c[k] = l[k]; }); c.widen = null; return c;
 	});
 	const off = C.placeLabelsFirstFit(bare, obstacles, { pad: 1 });
-	const on = C.placeLabelsFirstFit(labels, obstacles, { pad: 1 });
+	// **THE FIXTURE IS DELIBERATELY FULL, which the shipped pass refuses to widen on** (see the
+	// crowding bound in placeLabelsFirstFit): a longer leader is the answer for a few labels on a
+	// drawing with room elsewhere, not for a drawing with no elsewhere. So the rescue's own
+	// behaviour is measured with `widenCrowd` opened up, and the bound is asserted separately below.
+	const on = C.placeLabelsFirstFit(labels, obstacles, { pad: 1, widenCrowd: 1 });
+	const bounded = C.placeLabelsFirstFit(labels, obstacles, { pad: 1 });
+	report(bounded.filter(function (r) { return r.dropped; }).length
+			=== off.filter(function (r) { return r.dropped; }).length,
+		'pass level: and the shipped bound refuses to widen on a drawing this full',
+		off.filter(function (r) { return r.dropped; }).length + ' dropped either way');
 	const byId = {};
 	on.forEach(function (r) { byId[r.id] = r; });
 	let droppedOff = 0, rescued = 0, moved = 0, kept = 0;
