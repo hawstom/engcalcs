@@ -210,8 +210,7 @@
 			"x": 5012.227533983329,
 			"y": 5217.524631094085,
 			"anchorNode": null,
-			"sizeMult": 4,
-			"allZoom": true
+			"sizeMult": 4
 		},
 		{
 			"id": "X2",
