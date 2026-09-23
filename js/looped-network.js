@@ -20638,9 +20638,42 @@ var EngCalcs = EngCalcs || {};
 			return { c: c, at: (pos[c.key] === undefined) ? (tail + i) : pos[c.key] };
 		}).sort(function (a, b) { return a.at - b.at; }).map(function (x) { return x.c; });
 	}
-	function paneCols(spec) {
+	// **HIDE, THE OTHER HALF OF DECLAN'S DESIGN** (dev/agents/data-entry-clerk/journal.md, "Column
+	// hide and reorder"). Reorder already shipped as the column drag above; this is the remaining
+	// piece. Same key, same object per table id, a sibling of `w` and `order`: `{ hidden: [colKey] }`.
+	// **ID IS NEVER HIDEABLE** -- it is the only door findGoTo() gives a click-to-pan action
+	// through, and hiding it would strand a row with no way to identify which element it is.
+	function paneColHidden(specId, key) {
+		var h = paneColPrefs[specId] && paneColPrefs[specId].hidden;
+		return !!(h && h.indexOf(key) !== -1);
+	}
+	function paneSetColHidden(spec, key, hidden) {
+		var pref, h, i;
+		if (key === 'id') { return; }
+		pref = paneColPrefFor(spec.id);
+		if (!pref.hidden) { pref.hidden = []; }
+		h = pref.hidden;
+		i = h.indexOf(key);
+		if (hidden && i === -1) { h.push(key); }
+		else if (!hidden && i !== -1) { h.splice(i, 1); }
+		else { return; }
+		savePaneColPrefs();
+		paneTableReset(spec);
+		renderPaneTable(spec);
+	}
+	// **THE FULL, ORDERED LIST, HIDDEN COLUMNS INCLUDED.** Everything that reads the table --
+	// tabbing, arrow-jump, Home/End, paste, fill-down, copy, print -- goes through `paneCols()`
+	// below instead, which is the ordered list with a hidden column simply ABSENT rather than
+	// merely CSS-hidden (dev/agents/data-entry-clerk/journal.md): a paste that would have written
+	// into a hidden column falls into the same "dropped and COUNTED" bucket paneCols() already
+	// gives a paste that runs off the table's right edge, with no second rule needed. Only the
+	// hide/unhide menu itself needs the unfiltered list, to offer a hidden column back.
+	function paneColsAll(spec) {
 		return paneApplyColOrder(spec,
 			spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec)));
+	}
+	function paneCols(spec) {
+		return paneColsAll(spec).filter(function (c) { return !paneColHidden(spec.id, c.key); });
 	}
 	/**
 	 * **THE CUSTOM PROPERTY COLUMNS** (Task 636), appended rather than baked into buildPaneTables():
@@ -21122,6 +21155,16 @@ var EngCalcs = EngCalcs || {};
 			grip.addEventListener('dblclick', function (ev) { paneResetColOnDouble(spec, c.key, ev); });
 			th.appendChild(grip);
 			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
+			// **RIGHT-CLICK (OR LONG-PRESS) A HEADING TO HIDE IT** -- the fast, spreadsheet-native
+			// gesture Declan's design names alongside the popover, mirroring the one Sheets/Excel
+			// users already have. There is no popover in this build (reorder already shipped as the
+			// drag above, so only hide is new); this menu is the whole of the affordance, and it is
+			// also the obvious way BACK -- a hidden column's own entry offers to show it again.
+			th.addEventListener('contextmenu', function (ev) {
+				if (ev.preventDefault) { ev.preventDefault(); }
+				if (ev.stopPropagation) { ev.stopPropagation(); }
+				paneOpenColMenu(spec, ev.clientX || 0, ev.clientY || 0, c.key);
+			});
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -22475,6 +22518,40 @@ var EngCalcs = EngCalcs || {};
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
+		paneClampMenu(menu, x, y);
+	}
+	// **THE HEADING'S OWN MENU: HIDE THIS COLUMN, AND SHOW ONE BACK.** A right-click (or long-press)
+	// on any heading but ID offers to hide it; whenever this table has a hidden column, the same
+	// menu lists each one by name so showing it again is never more than a right-click away -- the
+	// "obvious way back" Declan's design asks for, with no separate popover to build.
+	function paneOpenColMenu(spec, x, y, key) {
+		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden;
+		paneCloseContextMenu();
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		mk = function (text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = text;
+			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
+			menu.appendChild(b);
+			return b;
+		};
+		if (key !== 'id') {
+			mk(pc.lpn_pane_hide_col || 'Hide this column', function () { paneSetColHidden(spec, key, true); });
+		}
+		hidden = cols.filter(function (c) { return paneColHidden(spec.id, c.key); });
+		hidden.forEach(function (c) {
+			mk(String(pc.lpn_pane_show_col || 'Show {col}').replace('{col}', paneHeadingText(c)),
+				function () { paneSetColHidden(spec, c.key, false); });
+		});
+		if (!menu.childNodes.length) { return; }   // ID's own heading with nothing hidden: no menu
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
 		paneClampMenu(menu, x, y);
 	}
 
