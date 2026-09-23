@@ -61,7 +61,8 @@
         "feat/zoom-control",
         "feat/convert-as",
         "feat/table-editing",
-        "feat/property-venue"
+        "feat/property-venue",
+        "fix/one-solve-per-change"
     ],
     "feature_freeze": {
         "active": false,
