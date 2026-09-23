@@ -1457,7 +1457,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="lpn-popover-body">
 		<fieldset class="lpn-new-block">
 			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></legend>
-			<div id="lpn_convas_from" class="lpn-dim"></div>
+			<div id="lpn_convas_from"></div>
 			<div>
 				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
 				<button type="button" id="lpn_convas_crs_pick" aria-describedby="lpn_convas_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_epsg']))?>">&hellip;</button>

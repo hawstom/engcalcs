@@ -28981,7 +28981,7 @@ var EngCalcs = EngCalcs || {};
 		convasSetKind(from.kind);
 		fromEl = document.getElementById('lpn_convas_from');
 		if (fromEl) {
-			fromEl.textContent = String(pc.lpn_convas_from || 'This project: {crs}').replace('{crs}', crsDisplayName());
+			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
 		}
 		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
 		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.

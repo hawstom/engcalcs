@@ -1196,7 +1196,7 @@ $ec_lang['lpn_copy_of']='Copy of {name}';
 $ec_lang['lpn_convas_title']='Convert as';
 $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted to. When it differs from this project\'s, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.';
 // {crs} is the name the map status strip shows for this project's coordinate system.
-$ec_lang['lpn_convas_from']='This project: {crs}';
+$ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
 $ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
