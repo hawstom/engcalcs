@@ -2637,6 +2637,7 @@
 		"textSize": 8,
 		"symbolSize": 8,
 		"linkWidth": 2,
+		"labelMaxWidth": 30,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.8,
 		"alignPipeLabels": true,
