@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**19 still to read on master**, of 189 untranslated keys, of 2039 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, 12 to read @@ NEEDS RULING)
+## lpn_  (189, 19 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -345,6 +345,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Drag a box on the map to zoom in on it.
+  @@ NEEDS RULING
 - **`lpn_msglog_ago`**
   > {x} ago
   _Ruled OK 2026-09-23._
@@ -525,6 +528,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window_tip`**
+  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
+  @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -573,12 +582,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
+- **`lpn_zoom_in`**
+  > Zoom in
+  @@ NEEDS RULING
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
+  @@ NEEDS RULING
+- **`lpn_zoom_out`**
+  > Zoom out
+  @@ NEEDS RULING
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 5 unmerged branch(es).
+**44 still to read**, of 67 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -786,7 +807,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/property-venue (`50ce4e93`) — adds no English strings
 
-### feat/table-editing (`e157bb40`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_pane_filldown`**
   > Fill down
@@ -801,26 +822,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`bcaa8319`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Drag a box on the map to zoom in on it.
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window_tip`**
-  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
-  @@ NEEDS RULING
-- **`lpn_zoom_in`**
-  > Zoom in
-  @@ NEEDS RULING
-- **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
-- **`lpn_zoom_out`**
-  > Zoom out
-  @@ NEEDS RULING
-- **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
+### feat/zoom-control (`c66c8e08`) — adds no English strings
