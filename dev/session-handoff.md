@@ -12,45 +12,16 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
   the freeze stands. Only Tom lifts it. It is currently OFF.
 - **Production is whatever Tom last pulled, and it is not master.** Never say "it is live."
 - **FOUR FEATURE BRANCHES AWAIT HIS BROWSER PASS. NONE MAY MERGE WITHOUT HIS ALL-CLEAR.** All are
-  in `protected`: `feat/tables-spreadsheet` (8096), `feat/notice-log` (8099),
-  `feat/label-gang-search` (8090), `feat/map-menu` (8101). Every one has been through Perry at
-  least twice this round. **A session that merges one on its own green build is the 2026-09-13
-  failure repeating.**
-- **EVERY `check_all.sh` AND EVERY HEADLESS BROWSER RUN GOES THROUGH A LOCK** (adopted 2026-09-22,
-  after a freeze forced Tom to kill the session): `flock /tmp/engcalcs-checkall.lock sh
-  dev/scripts/check_all.sh` and `flock /tmp/engcalcs-browser.lock node ...`. One at a time on
-  this 4-core, 7 GB box. It is slow and it did not freeze once.
-
-## THE LABEL QUESTION: WHERE IT STANDS (Task 539, `feat/label-gang-search`)
-
-**He was right that a lattice blind to label size was a bug (R-108), and on testing the fix he
-wrote *"I am incredulous. You made huge progress."*** What is built: a node label first claims
-"room to grow" (about six rows of clear space), so text length stops deciding where it goes; gang
-columns slide as one; labels slide toward their nodes; a label still far out may leave its own
-leader line. **R-075, stated honestly, both halves every time:** adding 12345678 moves and hides
-NOTHING at 4x and 8x on Net3 and Net3-World, and at the fit view still moves 5-7 and hides 16-18,
-of which 18-19 had nowhere to stay whatever the placer did. **The cost is real: the label pass is
-about 2 to 2.5 times master at the fit view**, and it is the GANG REPAIR, fed by room to grow --
-not the slide, which measures 2-5% of the pass. The next cheapening is a spatial index for the
-repair's trial scoring, which needs no decision from him. **Never report one percentage from a
-label harness on a loaded machine**: Perry once read 1.7 s -> 4.9 s off a single wall-clock
-sample that measured the machine, not the code.
-
-## THE TWO STEP TWOS: A QUESTION OUTSTANDING WITH TOM
-
-**He reported "step 2 controls still move the project" and it is NOT reproducible in the new
-wizard.** Driven in real headless Chrome on his own port: a 20 degree turn leaves `R1` at screen
-`18.9999,681.9706` **identical to four decimals**, while all six basemap tile affines change.
-`d4bb8a01`'s tile repaint works.
-
-**THERE ARE TWO CONTROLS CALLED "STEP 2" AND THE CODE SAYS HE IS PROBABLY IN THE OLDER ONE.**
-`georefStart()` / `GEOREF_STEP_ATTACHED`, reached from **File > Import XY to lat/lon...**, has the
-same drag/scale/rotate rectangle, the same "step 2" wording, **no dial at all**, and its
-`georefApplyDrag()` -> `georefSetTransform()` -> `georefWrite(t)` **genuinely rewrites every
-coordinate, by design, because it is a CONVERSION rather than a placement**. That single cause
-explains both of his reports exactly. **ASK HIM WHICH MENU ROW HE PRESSED.** If it was the File row,
-the defect is not the arithmetic -- it is that two different operations wear the same words, and one
-of them does the thing the standing ruling says we never do.
+  in `protected`: `feat/tables-spreadsheet`, `feat/notice-log`, `feat/label-gang-search`, and
+  **`feat/zoom-scale-rules`, which is new on 2026-09-22.** `feat/map-menu` MERGED and its branch and
+  worktree are gone -- he cleared it in his own words (*"Merge and delete branch"*).
+  **A session that merges one on its own green build is the 2026-09-13 failure repeating.**
+- **EVERY `check_all.sh` AND EVERY HEADLESS BROWSER RUN GOES THROUGH A LOCK:** `flock
+  /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh` and `flock /tmp/engcalcs-browser.lock
+  node ...`. **AND THE LOCK IS NOT A LICENCE TO DISPATCH SIX AGENTS** -- on 2026-09-22 six worktrees
+  queued on it at once and the head run held it for **65 minutes**, against a normal few. The lock
+  kept the box alive and made every agent slow; two of them handed back saying honestly that they
+  had never seen the suite run. **Three tracks at a time is the real number.**
 
 ## RULINGS -- permanent
 
@@ -151,52 +122,72 @@ of them does the thing the standing ruling says we never do.
 
 ---
 
-## STATE -- 2026-09-22, perishable
+## STATE -- 2026-09-22 (evening), perishable
 
-### HIS REVIEW COMMENTS LIVE IN `dev/tom-review-queue.md` AND HE USES IT
+### ON MASTER AND PUSHED AT `f9f87771`+. HE HAS PULLED NONE OF IT
 
-Rounds R-126 to R-152 are this session's. **He asked for engagement, not accumulation** (*"Engage
-with me on tom-review-queue.md so that it is fully addressed and deleted or used further instead
-of going stale"*). Four old rows sit open only because they wait on him: R-004, R-043, R-062 (his
-code-review question, answered), R-104 (answered). Put them to him by name for a clear/keep word.
+- **His 125 English rulings and his 17 own rewordings are harvested and applied.** The rulings are
+  in `dev/english-key-rulings.json`; the 17 edited strings are in `lib/lang.ec.en.php` in HIS
+  words. **Applying them broke `js_fallback_string_check.php`** -- six of those keys carry a
+  duplicate English literal inside `js/`, and moving the language file alone drifted them. Fixed
+  the same session. **Next time his edits land, run that check before assuming master is green.**
+- **27 language keys RETIRED** -- every one `lpn_survey_*`, none ever translated, none rendered by
+  anything. `lpn_survey_fmt_*` were dead by his own 2026-09-18 ruling that the format chooser shows
+  the bare acronym. **One of the 27 was `lpn_survey_err_no_coords`, which he had reworded by hand
+  that same morning** -- he spent attention on a string nothing can display. Tell him when it
+  happens; it is the `EC.lpnTerrainFill()` shape again.
+- `fix/property-echo`: editing Base demand now updates the Properties box, not just the map label
+  and the table. The open popup was never refreshed when the debounced solve landed.
+- `fix/time-step-instant`: the time-step selector names ONE instant per row again (`25:00`), not a
+  range. **Tom reopened his own R-105 and was right the second time**; Mary confirmed against
+  EPANET, epanet-js and Bentley's Time Browser. Elapsed time still climbs past 24:00 and the clock
+  reading stays in the tip.
+- Tasks 247, 669 and 705 CLOSED on his word; 708 promoted to 100; Task 696 kept OPEN with his
+  round-three findings folded in.
 
-### ON MASTER AND PUSHED. HE HAS PULLED NONE OF IT
+### THE FOUR BRANCHES, AND WHAT IS OPEN ON EACH
 
-- `feat/zoom-symbol-size` (Task 705, on his all-clear): symbols stop growing on the ground past
-  the labeling threshold, or past the 10th-percentile link length when none is set; reservoirs and
-  tanks exempt; one threshold row in Settings. Four open questions from the build are in the
-  final report of 2026-09-22 and not yet asked.
-- `fix/example-open` (on his all-clear): the gallery closes on the first click and ignores repeats.
-  His 25-second wait did NOT reproduce (2-4 s under load); R-130 stays open for his retry.
-- `fix/daily-report-headings`: the rank-by-shopping table now has its heading row (the report
-  script's own filter was throwing it away) and a two-line note on what people and page loads
-  count. Both require 10+ seconds on the page, so robots are nearly all excluded; there is no robot
-  list anywhere in the code. The host needs no reinstall: the cron job fetches master itself.
-- Task 703 closed on his word; Task 708 opened (every property in every venue, his question).
-
-### THE FOUR BRANCHES, AND WHAT IS STILL OPEN ON EACH
-
-- **`feat/notice-log`: THE ICON EDIT IS BLOCKED AND IS HIS TO SETTLE.** He likes the drawing he saw
-  (*"I like the down arrow glyph"* -- the clock hands made a V). An earlier instruction had already
-  redrawn the hands as an L before his words arrived, and the agent's attempt to restore the V was
-  refused by Claude Code's own safety classifier as a relayed instruction. **Not worked around.**
-  The branch ships the L. It is a one-line revert of the hands in `lib/Icons.lib.php` `history`,
-  to be made in a session where he says it himself. Round three landed at `f02da0be`: the
-  loading banner waits 1 s before showing and then holds 1.5 s, so it never flashes; engine notes
-  are logged; a click that closes the log panel no longer acts on the map.
-- **`feat/map-menu`**: Detach keeps a grid placement; nothing can DISCARD one now. His wording
-  needed if he wants a discard row. Re-adjust and Scale greyed on lat/lon as well as EPSG (he said
-  EPSG only) -- tell him.
-- **`feat/tables-spreadsheet`**: a first visit to a table is still a real build (about 0.5 s,
-  2.4 s at 4x CPU throttle). Chunked first build is scoped in the agent's report, not started.
-- **`feat/label-gang-search`**: above.
+- **`feat/notice-log`**: the "RIVER" bleed-through and the messages-on-one-line were ONE defect --
+  the panel was `display:flex` with no direction and had no background of its own. Both fixed and
+  confirmed live by Perry. The tip is off the glyph and `lpn_msglog_tip` is deleted.
+  **PERRY FOUND AN UNREQUESTED REGRESSION: dropping the tip also dropped "Messages" out of
+  Help > Toolbar key**, because `setIconLabel()` does both jobs. Repair dispatched. **THE GLYPH
+  ITSELF IS HIS TO SETTLE** -- Ida says neither the down arrow nor the `+` (the down triangle
+  already means "a menu opens below" twice on this page and marks column sort a third time; `+`
+  already means "make a new one" twice) and recommends repairing the same clock: a dot at the
+  centre and the hands spread wider.
+- **`feat/tables-spreadsheet`**: PRINT IS FIXED -- columns kept their em widths while the print
+  font stayed at 9pt, so headings shattered one letter per line; the sheet's font now shrinks by
+  the same factor. **THE 1px DIVIDER MISALIGNMENT DID NOT REPRODUCE** at device pixel ratios 1,
+  1.25, 1.5 and 2, at CSS zoom 80-150%, or with a forced classic scrollbar, measured by geometry
+  and by reading painted pixels. **This is the second session that failed to reproduce it. ASK HIM
+  for browser, zoom level, Windows display scaling, and whether a scrollbar was showing.**
+- **`feat/zoom-scale-rules`** (NEW): his four rulings of 2026-09-22 -- one percentile rule instead
+  of two, pipe widths shrinking too, Net3 threshold 30, and the misplaced `ft`.
+- **`feat/label-gang-search`**: round four in flight on his three items -- dropping must give way
+  to longer leaders, the one label in `_label-mystery.PNG` that both dropped properties and
+  travelled too far, and R-136's measured answer on why extra characters lengthen the gang.
+  **HE HAS SAID "This may be good to undo." THAT IS HIS CALL AND NOBODY ELSE'S.**
 
 ### WHAT IS OUTSTANDING WITH HIM
 
-1. **The two "step 2" controls** -- ask which menu row he pressed (section above).
-2. **R-062**, how to spend on a deep review against AI slop -- answered in the queue, awaiting him.
-3. **Row 3 of Ida's list** -- the 57 raw `alert()`/`confirm()` calls; the sorting is his ruling.
-4. **The panel reload** below drops two retired ports; optional, nothing new needs it.
+1. **The Messenger glyph** -- Ida's recommendation against both of his candidates, above.
+2. **The 1px table dividers** -- his browser and zoom, above.
+3. **The two "step 2" controls** -- still unanswered: which menu row did he press?
+4. **A discard row for a grid placement** -- Re-adjust opens step 2 only, so a grid project placed
+   in the wrong town has no way back. His wording needed.
+5. **His two general points about English**, which he asked to make general only "once we achieve
+   mutual understanding": (a) do not say a blank differs from zero, say what a blank is FOR;
+   (b) do not write "Leave it at X and Y happens" where the meaning is "Leave it at X to get Y."
+   Nothing has been written into `dev/language-strings.md` yet, deliberately.
+6. **R-004, R-043, R-062** -- open only because they wait on him.
+
+### THE SPRINT
+
+**NOT LAUNCHED, ON PURPOSE.** 168 keys are untranslated and 88 more wait on the four branches, and
+he has authorized a sprint "whenever you deem it prudent." It is not prudent yet: he reworded 17
+shipped strings this same day, and the branches will add more. A sprint now buys retranslations of
+text whose meaning is still moving. **Launch it when the four branches have merged.**
 
 ## What to hand Tom in the same breath as any panel change
 
