@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 2019,
-        "delta_key_count": 170,
+        "expected_key_count": 2021,
+        "delta_key_count": 172,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -619,6 +619,7 @@
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
         "lpn_mapgeo_dial_turn": "Rotate the map",
@@ -633,6 +634,7 @@
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -791,6 +793,7 @@
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
         "lpn_mapgeo_dial_turn": "Rotate the map",
@@ -805,6 +808,7 @@
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -2388,6 +2392,22 @@
                 }
             }
         },
+        "lpn_mapgeo_readjust_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "លុបរូបភាពផ្ទៃខាងក្រោយមែនទេ?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "ចុចពីរចំណុចលើរូបភាពផ្ទៃខាងក្រោយ ដូចជាចុងទាំងពីរនៃរបារមាត្រដ្ឋាន។ បន្ទាប់មកវាយចម្ងាយពិតប្រាកដរវាងចំណុចទាំងពីរ។",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
         "lpn_mapgeo_hint2": {
             "reason": "missing",
             "current_value": null,
@@ -2609,6 +2629,22 @@
                     "key": "lpn_settings_symbol_opacity",
                     "value": "ភាពស្រអាប់សញ្ញា (០ ដល់ ១)",
                     "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_time_clock_day": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "ម៉ោងនាឡិកានៅពេលចាប់ផ្ដើម",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_format_tip",
+                    "value": "សរសេរពេលវេលាជាម៉ោង និងនាទី ដូចជា 2:30។ លេខធម្មតាមានន័យជាម៉ោង ដូច្នេះ 8 មានន័យប្រាំបីម៉ោង។ កន្លះម៉ោងគឺ 0:30។",
+                    "english": "Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30)."
                 }
             }
         },
