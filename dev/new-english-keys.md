@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**19 still to read on master**, of 189 untranslated keys, of 2039 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (189, 19 to read @@ NEEDS RULING)
+## lpn_  (182, all ruled)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -323,7 +323,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_mapgeo_readjust_intro`**
   > Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_mapgeo_step1`**
   > Step 1 of 2: find your place in the world
   _Ruled OK 2026-09-23._
@@ -345,9 +345,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  @@ NEEDS RULING
 - **`lpn_msglog_ago`**
   > {x} ago
   _Ruled OK 2026-09-23._
@@ -389,7 +386,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
   > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -398,16 +395,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_settings_symbol_cap_mid`**
   > times the length of the
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_settings_symbol_cap_post`**
   > percentile pipe
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -443,19 +440,19 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_survey_format_internal`**
   > specified internally
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_format_label`**
   > File format:
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_ambiguous_elev`**
   > More than one column could be the elevation, so none of them was read.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_bad_coord`**
   > The {axis} does not read as a number.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_bad_elev`**
   > Non-numeric elevation. Imported without elevation.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_blank_rows`**
   > Blank lines skipped: {detail}.
   _Ruled OK 2026-09-23._
@@ -521,19 +518,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_time_clock_day`**
   > Day {day}, {clock}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_tool_add_meter`**
   > Customer
   _Ruled OK 2026-09-23._
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -582,24 +573,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
-- **`lpn_zoom_in`**
-  > Zoom in
-  @@ NEEDS RULING
-- **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
-- **`lpn_zoom_out`**
-  > Zoom out
-  @@ NEEDS RULING
-- **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**44 still to read**, of 67 new keys across 6 unmerged branch(es).
+**51 still to read**, of 74 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -610,7 +589,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`23de4dfd`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`fcf23dd8`) — 24 new, 24 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -805,7 +784,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/property-venue (`5d48bc3c`) — adds no English strings
+### feat/label-limit (`c949316e`) — adds no English strings
+
+### feat/property-venue (`de2ef299`) — adds no English strings
 
 ### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
 
@@ -822,6 +803,26 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`8e0dc003`) — adds no English strings
+### feat/zoom-control (`83eeb139`) — 7 new, 7 to read @@ NEEDS RULING
 
-### fix/one-solve-per-change (`6850e812`) — adds no English strings
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  @@ NEEDS RULING
+- **`lpn_zoom_in`**
+  > Zoom in
+  @@ NEEDS RULING
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
+  @@ NEEDS RULING
+- **`lpn_zoom_out`**
+  > Zoom out
+  @@ NEEDS RULING
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING

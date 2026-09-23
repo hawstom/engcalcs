@@ -830,6 +830,8 @@ the block.
   still costs 0.4-0.8 s, because `afterUnitChange()` redraws the whole project; and one change
   applies TWO solves (steady state, then the EPS run a second later), each a full label pass.
   Applying one result instead of two is the cheaper step before his background-service idea.
+  **THE DOUBLE SOLVE IS FIXED** (`fix/one-solve-per-change`, 2026-09-23): one change, one result, one
+  label pass on a network whose run takes under 1 s; busy time about halved. Unit selects remain.
   2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
   responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
   BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
