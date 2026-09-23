@@ -22024,6 +22024,51 @@ var EngCalcs = EngCalcs || {};
 			.replace('{skipped}', String(refused + dropped)));
 		return { wrote: wrote, refused: refused, dropped: dropped };
 	}
+	/**
+	 * **CTRL+D FILLS DOWN THE TOP ROW OF A MULTI-ROW SELECTION**, the spreadsheet convention Excel
+	 * and Sheets both bind to it. It goes through the same validated write as a paste --
+	 * paneWriteCellText(), which is c.set(), which is setProp() -- so a scenario override, a
+	 * result/read-only refusal and the count of what was skipped are all handled exactly as they
+	 * are for paste, and a fill-down inside a scenario records an override without touching base.
+	 *
+	 * **THE ID COLUMN IS SKIPPED BY NAME**, the same precedent paneDeleteSelection() already set:
+	 * filling a range of ids with the top row's own id would ask validateNewId() to refuse the same
+	 * collision once per row below it, and its refusal is an alert() -- the identical alert-storm
+	 * paneDeleteSelection()'s own comment names.
+	 *
+	 * **ONE UNDO SNAPSHOT FOR THE WHOLE FILL**, taken before anything is written and only when there
+	 * is a settable column in range -- an empty-selection or all-read-only Ctrl+D must not fill the
+	 * undo stack with a no-op, the same rule paneCommitCell() and paneDeleteSelection() both keep.
+	 */
+	function paneFillDown(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
+			r, c, el, col, text, wrote = 0, refused = 0, any = false;
+		if (!box || box.r1 <= box.r0) { return false; }
+		for (c = box.c0; c <= box.c1; c++) {
+			col = cols[c];
+			if (col.key === 'id' || paneCellIsPlain(col, rows[box.r0]) || !col.set) { continue; }
+			any = true;
+		}
+		if (!any) { return false; }
+		saveUndoSnapshot();
+		for (c = box.c0; c <= box.c1; c++) {
+			col = cols[c];
+			if (col.key === 'id') { continue; }
+			text = paneCellText(col, rows[box.r0]);
+			for (r = box.r0 + 1; r <= box.r1; r++) {
+				el = rows[r];
+				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		setNotice(String(pc.lpn_pane_filled || 'Filled down {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused)));
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -22101,6 +22146,14 @@ var EngCalcs = EngCalcs || {};
 		if (jump && !editing && (key === 'c' || key === 'C' || key === 'Insert')) {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 			return true;
+		}
+		// **CTRL+D FILLS DOWN**, the spreadsheet convention (Excel allows it from an ordinary
+		// selection, with no cell in edit -- so `!editing` guards it exactly like Ctrl+C above, and
+		// a typed "d" while a cell is being entered stays an ordinary character). preventDefault is
+		// returned only when a fill actually ran, so the browser's own Ctrl+D bookmark shortcut is
+		// left alone on a single-row selection, which paneFillDown() itself declines.
+		if (jump && !editing && (key === 'd' || key === 'D')) {
+			return paneFillDown(spec);
 		}
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
@@ -22514,6 +22567,12 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
 			findGoTo(aim.group, aim.id);
 		});
+		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
+		// spans more than one row -- a single row has nothing below it to fill, and an item that
+		// does nothing when clicked is worse than an absent one.
+		if (box.r1 > box.r0) {
+			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); });
+		}
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;

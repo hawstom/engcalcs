@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**9 still to read on master**, of 174 untranslated keys, of 2024 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**11 still to read on master**, of 176 untranslated keys, of 2026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (174, 9 to read @@ NEEDS RULING)
+## lpn_  (176, 11 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -351,6 +351,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_node_customers_tip`**
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
+- **`lpn_pane_filldown`**
+  > Fill down
+  @@ NEEDS RULING
+- **`lpn_pane_filled`**
+  > Filled down {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
 - **`lpn_pane_goto_tip`**
   > Zoom & select
   _Ruled OK 2026-09-23._
@@ -554,7 +560,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 80 new keys across 5 unmerged branch(es).
+**51 still to read**, of 80 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -780,6 +786,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_note`**
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
+
+### feat/table-editing (`d51963fc`) — adds no English strings
 
 ### feat/zoom-control (`bcaa8319`) — 7 new, 7 to read @@ NEEDS RULING
 
