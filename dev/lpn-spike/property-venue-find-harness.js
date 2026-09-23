@@ -20,6 +20,10 @@
 const { ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 ensure('lpn_find_form');
 ensure('lpn_find_results');
+// The real lib/lang.ec.en.php the stub loads, read once so this file never pins English wording
+// as a literal (dev/scripts/harness_wording_check.php) -- and so the "restore English" step below
+// puts back the actual current string rather than a copy typed here that could drift from it.
+const PC_EN = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -37,7 +41,42 @@ const L = loadLoopedNetwork(
 	"\t\tsetReplace: function (prop, value) { replaceState.prop = prop; replaceState.value = value; },\n" +
 	"\t\tspecFields: function (scope) { findState.scope = scope; return replaceSpecs().map(function (s) { return s.field; }); },\n" +
 	"\t\tpreview: runReplacePreview, apply: applyReplace, cancel: cancelReplace,\n" +
+	"\t\tpressFind: function () { runFind(); },\n" +
 	"\t\tpending: function () { return replacePending && replacePending.refs.map(function (r) { return r.group + ':' + r.id; }); },\n" +
+	// **THE ACTUAL SELECT-VALUED UI, DRIVEN AS A PERSON WOULD** (pre-review fix, Task 708): the
+	// panel is BUILT (rebuildFindForm(), the real function, into the real #lpn_find_form), the
+	// options a reader would see are read off the rendered <select> rather than off findChoiceDefs()
+	// directly -- which would pass even if renderFindControls() never called it -- and choosing one
+	// fires the same 'change' handler a click does.
+	"\t\tbuildPanel: rebuildFindForm,\n" +
+	"\t\tsetFindState: function (scope, prop, op, value) { findState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value; },\n" +
+	"\t\tsetWord: function (key, value) { EngCalcs.pageConfig[key] = value; },\n" +
+	// The Nth <select> under one root, in document order -- root is findControlsBox (scope,
+	// property, condition, then the value select when the property is a choice) or replaceBox
+	// (the property-to-change select, then the value select).
+	"\t\tselectAt: function (root, n) { var out = null, i = 0;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (c._tag === 'select') { i++; if (i === n) { out = c; } } walk(c); }); })(root);\n" +
+	"\t\t\treturn out; },\n" +
+	"\t\tfindControlsBox: function () { return findControlsBox; },\n" +
+	"\t\treplaceBox: function () { return replaceBox; },\n" +
+	"\t\tselectOptions: function (sel) { return sel ? sel.children.map(function (o) { return [o.value, o.textContent]; }) : null; },\n" +
+	"\t\tchooseOption: function (sel, v) { sel.value = v;\n" +
+	"\t\t\t(sel._listeners && sel._listeners.change || []).forEach(function (f) { f({}); }); },\n" +
+	"\t\tresultRows: function () { var out = [];\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (c._tag === 'button') { out.push(c.textContent); } walk(c); }); })(document.getElementById('lpn_find_results'));\n" +
+	"\t\t\treturn out; },\n" +
+	// The Settings box's "New assets" section and its one push button -- for the guard added
+	// beside pushFieldShown() at that button's own filter (Task 708 pre-review).
+	"\t\trebuildSettings: rebuildSettingsFields,\n" +
+	"\t\tlabelSettings: function () { return labelSettings; },\n" +
+	"\t\tsettingsDefaults: function () { return settings.defaults; },\n" +
+	"\t\tclick: function (elem) { (elem._listeners && elem._listeners.click || []).forEach(function (f) { f({}); }); },\n" +
+	"\t\tfirstButtonIn: function (root) { var out = null;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (!out && c._tag === 'button') { out = c; } walk(c); }); })(root);\n" +
+	"\t\t\treturn out; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -277,6 +316,127 @@ function build(unitSet) {
 	L.preview();
 	L.apply();
 	ok('a real pattern id is written', L.effective(linkOf(n.pump), 'energyPattern') === 'TARIFF');
+}
+
+// ---- 6. A CHOICE PROPERTY'S VALUE COMES FROM A <SELECT>, IN THE READER'S OWN LANGUAGE -------------
+//
+// PRE-REVIEW FIX (Task 708): a Spanish reader typing "cerrado" into a plain text box found
+// nothing, because the box compared their word against the stored English token, and a matched
+// row printed "closed" straight back at them. Sections 1 and 4 above proved the FIND/REPLACE
+// MACHINERY is right about the codes; this section proves the actual on-screen control is a
+// picklist built from the SAME words the popup already shows, in whatever language the page is
+// running -- built with rebuildFindForm()/buildReplaceForm(), the real functions, into the real
+// #lpn_find_form, and read off the rendered <select> rather than off findChoiceDefs() directly,
+// which would pass even if renderFindControls() had never been taught to call it.
+//
+// **REAL SPANISH WORDS, NOT INVENTED ONES** -- copied once from lib/lang.ec.es.php (the anchor
+// language nearest this feature) into a temporary pageConfig override via L.setWord(), the same
+// door find-harness.js's own doc block names for testing a second language "without a second lang
+// file." Every assertion below reads the word back off `es[key]`, never off a literal typed twice,
+// so this file has nothing in it for harness_wording_check.php to catch either way.
+{
+	console.log('\n--- a choice property is picked from a <select>, in Spanish (Task 708 pre-review) ---');
+	const n = build();
+	const es = {
+		lpn_result_status_open: 'Abierto', lpn_result_status_closed: 'Cerrado',
+		lpn_field_closed: 'Cerrada',
+		lpn_mixing_mixed: 'Mezcla completa', lpn_mixing_2comp: 'Mezcla en dos compartimentos',
+		lpn_mixing_fifo: 'Flujo pistón FIFO', lpn_mixing_lifo: 'Flujo pistón LIFO'
+	};
+	Object.keys(es).forEach(function (k) { L.setWord(k, es[k]); });
+	L.setProp(linkOf(n.p2), 'status', 'closed');
+
+	// ---- Find's value box ----
+	L.setFindState('pipe', 'status', 'equals', '');
+	L.buildPanel();
+	const statusOptions = L.selectOptions(L.selectAt(L.findControlsBox(), 4));
+	ok('the Find value select offers the Spanish words, not the English codes',
+		JSON.stringify(statusOptions) === JSON.stringify([['open', es.lpn_result_status_open], ['closed', es.lpn_result_status_closed]]),
+		JSON.stringify(statusOptions));
+	L.chooseOption(L.selectAt(L.findControlsBox(), 4), 'closed');
+	L.pressFind();
+	ok('choosing "Cerrado" from the select finds the closed pipe',
+		JSON.stringify(L.resultRows()).indexOf(n.p2) >= 0, JSON.stringify(L.resultRows()));
+	ok('...and the result row prints the Spanish word, not the English "closed"',
+		L.resultRows().some(function (t) { return t.indexOf(es.lpn_result_status_closed) >= 0; }) &&
+		!L.resultRows().some(function (t) { return t.indexOf('closed') >= 0; }),
+		JSON.stringify(L.resultRows()));
+
+	// ---- Replace's value box, writing through the select ----
+	L.buildPanel();
+	const replaceStatusOptions = L.selectOptions(L.selectAt(L.replaceBox(), 2));
+	ok('Replace offers the identical Spanish picklist for the same property',
+		JSON.stringify(replaceStatusOptions) === JSON.stringify(statusOptions), JSON.stringify(replaceStatusOptions));
+	L.chooseOption(L.selectAt(L.replaceBox(), 2), 'open');
+	// The select's own onChange has already set replaceState.value = 'open' -- the same write
+	// pressing "Replace" then "Change them" performs, in the two calls sections 1-5 above already
+	// exercise directly (runReplacePreview()/applyReplace()).
+	L.preview();
+	L.apply();
+	ok('choosing "Abierto" and pressing Replace reopens the pipe',
+		linkOf(n.p2)._status === 'open', String(linkOf(n.p2)._status));
+
+	// ---- The mixing model select shows the popup's own four words ----
+	L.setFindState('tank', 'mixingModel', 'equals', '');
+	L.buildPanel();
+	const mixOptions = L.selectOptions(L.selectAt(L.findControlsBox(), 4));
+	ok('the mixing model select is the popup\'s own four words, in the same order',
+		JSON.stringify(mixOptions) === JSON.stringify([
+			['MIXED', es.lpn_mixing_mixed], ['2COMP', es.lpn_mixing_2comp],
+			['FIFO', es.lpn_mixing_fifo], ['LIFO', es.lpn_mixing_lifo]]),
+		JSON.stringify(mixOptions));
+	// The find select is left on "MIXED" -- the fresh tank's own default -- so the query still
+	// matches it; choosing a DIFFERENT one here would only prove the select's own onChange runs,
+	// which the status case above already proved, and would leave nothing for Replace to find.
+	L.buildPanel();
+	const replaceMixOptions = L.selectOptions(L.selectAt(L.replaceBox(), 2));
+	ok('Replace\'s mixing model select is the identical list',
+		JSON.stringify(replaceMixOptions) === JSON.stringify(mixOptions), JSON.stringify(replaceMixOptions));
+	L.chooseOption(L.selectAt(L.replaceBox(), 2), 'FIFO');
+	L.preview();
+	L.apply();
+	ok('choosing a word from the select writes the code underneath', nodeOf(n.t).mixingModel === 'FIFO');
+
+	// Restore English so nothing below (or in a later run sharing this process) reads Spanish.
+	Object.keys(es).forEach(function (k) { L.setWord(k, PC_EN[k]); });
+}
+
+// ---- 7. THE "NEW ASSETS" PUSH GUARD (pre-review: Perry found no automated coverage) ---------------
+//
+// **THE BUG THIS GUARDS AGAINST.** "Apply these new-asset values to every existing asset" seeds
+// each property from `settings.defaults[s.key]`; before this fix its filter was `pushFieldShown`
+// alone, which answers "is this shown on the map," not "does a New-asset default exist for it."
+// `length` and `status` are shown on the map by default OPTION and neither has a New-asset
+// default (`length` deliberately -- `lenAuto` would overwrite it immediately -- and `status` was
+// simply never given one), so turning either label on and pressing the button would have pushed
+// `settings.defaults.length`/`.status`, both `undefined`, onto every pipe. Diameter is the
+// control: it DOES have a default, and turning its label on must still let the button work.
+{
+	console.log('\n--- the New-assets push guard (a property shown but with no seeded default) ---');
+	const n = build();
+	L.setProp(linkOf(n.p1), 'length', 111);
+	L.setProp(linkOf(n.p1), 'status', 'closed');
+	const beforeDiameter = L.effective(linkOf(n.p1), 'diameter');
+	ok('the fixture starts with neither property at its would-be pushed value',
+		L.settingsDefaults().length === undefined && L.settingsDefaults().status === undefined,
+		JSON.stringify([L.settingsDefaults().length, L.settingsDefaults().status]));
+	// Turn on the map labels for all three, exactly what a visitor would do before reaching for
+	// this button -- length and status to see them printed, diameter along for the ride.
+	L.labelSettings().link.length = true;
+	L.labelSettings().link.status = true;
+	L.labelSettings().link.diameter = true;
+	L.settingsDefaults().diameter = 24;   // a real New-asset default, unlike length/status
+	L.rebuildSettings();
+	const btn = L.firstButtonIn(document.getElementById('lpn_set_default_fields'));
+	ok('the push button is on the box', !!btn);
+	L.click(btn);
+	ok('length is untouched -- pushing `undefined` onto it is exactly the bug this guards',
+		L.effective(linkOf(n.p1), 'length') === 111, String(L.effective(linkOf(n.p1), 'length')));
+	ok('status is untouched, for the same reason',
+		L.effective(linkOf(n.p1), 'status') === 'closed', String(L.effective(linkOf(n.p1), 'status')));
+	ok('...while diameter, which DOES have a seeded default, still pushes -- the guard is scoped, not a kill switch',
+		L.effective(linkOf(n.p1), 'diameter') === 24 && L.effective(linkOf(n.p1), 'diameter') !== beforeDiameter,
+		String(L.effective(linkOf(n.p1), 'diameter')));
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

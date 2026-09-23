@@ -86,7 +86,7 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[PIPES]`/`[TAGS]` |
 | Endpoints | ✓ | n/a *(a connectivity fact, asked through the "Connection" row instead)* | n/a | n/a | ✓ | `[PIPES]` |
-| Active / Shut | ✓ | ✓ *(Task 708, as `status`; the table's own `closed` checkbox key is a declared exemption in `property_venue_check.php`)* | ✓ *(Task 708, `choices: ['open','closed']`)* | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
+| Active / Shut | ✓ | ✓ *(Task 708, internal key `status`, labelled `lpn_field_closed`/"Shut"; the table's own `closed` checkbox key is a declared exemption in `property_venue_check.php`)* | ✓ *(Task 708, a `<select>` of the translated Open/Closed words, `choices: ['open','closed']` underneath)* | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
 | Pipe type | ✓ | n/a *(a type reference; a type's stated diameter/roughness are what Find offers)* | n/a | n/a *(categorical)* | n/a | n/a *(this suite's own concept; exports the resolved diameter/roughness)* |
 | Diameter | ✓ | ✓ | ✓ | ✓ | ✓ | `[PIPES]` |
 | Length | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | ✓ *(Task 708, own `set` -- not `prop` -- so `lenAuto` is cleared in Base, matching the table's own cell)* | n/a *(declared not colourable, `FIND_EXTRA_LINK_FIELDS`'s own comment)* | ✓ | `[PIPES]` |
@@ -165,12 +165,15 @@ report).** In flight on the unmerged `feat/zoom-scale-rules` branch (R-174), whi
 check go green without. Once that branch merges this row disappears from the matrix.
 
 **2. CLOSED (Task 708).** A closed/inactive pipe, pump or valve is now findable and replaceable
-under a new Find/Replace property, `status` (`'open'`/`'closed'`, matched case-insensitively
-through the new `choices` door in `replaceValueOf()`). It reads and writes the same
-`effective(l, 'status')` / `setProp(l, 'status', ...)` seam the table's own `closed` checkbox does
-(`paneColClosed()`), under Find's own name for it rather than the checkbox's inverted one --
+under a new Find/Replace property, internally `status` (`'open'`/`'closed'`, matched
+case-insensitively through the new `choices` door in `replaceValueOf()`). It reads and writes the
+same `effective(l, 'status')` / `setProp(l, 'status', ...)` seam the table's own `closed` checkbox
+does (`paneColClosed()`), under Find's own KEY for it rather than the checkbox's inverted one --
 `property_venue_check.php` declares `pipe/closed`, `pump/closed` and `valve/closed` as exemptions
-for exactly that key-name mismatch.
+for exactly that key-name mismatch. **Labelled `lpn_field_closed` ("Shut"), not `lpn_result_status`
+("Status")** -- pre-review fix: that word already names a different, run-dependent concept
+elsewhere on this page (the post-solve/EPS status the colour ramp and the Labels legend show), and
+using it here too would put "Status" on two different questions in one panel.
 
 **3. CLOSED (Task 708).** Emitter coefficient (junction) is now findable and replaceable. Its own
 `pushSpecList()` entry has no `prop` and goes through `emitterToDisplay()`/`emitterToStore()`
@@ -181,7 +184,21 @@ two-unit conversion on this page.
 **4. CLOSED (Task 708).** Tank level, min/max level, diameter, and mixing model/fraction all have
 Find and Replace rows now, gated to `d.type === 'tank'` in `findPropDefs()` exactly as the fire
 flow pair is gated to a junction. Mixing model is matched through the same `choices` door as
-`status`, against EPANET's own four tokens (`MIXED`/`2COMP`/`FIFO`/`LIFO`), never translated.
+`status`, against EPANET's own four tokens (`MIXED`/`2COMP`/`FIFO`/`LIFO`), never translated --
+the CODE is never translated and never has to be, because nobody now types it (see below).
+
+**A pre-review fix to 2 and 4: a choice property is picked from a `<select>`, never typed.** Tom's
+pre-reviewer caught what the first pass of 2 and 4 missed: `status` and `mixingModel` were given
+the ordinary text box every other Find/Replace property uses, so a Spanish reader had to type the
+English word `cerrado` to find a closed pipe, and a matched row printed the English word `closed`
+straight back regardless of the page's language -- and the same failure for `mixingModel`'s four
+EPANET tokens. `findChoiceDefs(prop)` is now the one list of `[code, translated label]` pairs a
+choice property offers (reusing existing keys throughout: `lpn_result_status_open`/`_closed` for
+`status`, and `mixingModel`'s own `paneColMixingModel().choices()` -- the popup's and the table's
+own four words, read rather than copied); `findPropIsChoice()`/`renderFindControls()` and
+`buildReplaceForm()` render it as a `<select>` in place of the text box, and `findResultRow()`
+prints the translated word for a matched value instead of the stored code. The codes themselves
+stay English EPANET tokens, unseen and untyped, exactly as a curve's kind is.
 
 **5. CLOSED (Task 708).** Pump relative speed and energy price/pattern are now findable and
 replaceable. Speed is base-owned (not in `LPN_OVERRIDABLE`), so its spec carries no `prop` and

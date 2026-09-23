@@ -4803,8 +4803,18 @@ var EngCalcs = EngCalcs || {};
 			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
 			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
 			// logic to bypass -- unlike `emitter` and `length` above.
-			{ key: 'status', group: 'link', field: 'status', prop: 'status', choices: ['open', 'closed'],
-				label: pc.lpn_result_status || 'Status',
+			//
+			// **LABELLED `lpn_field_closed` ("Shut"), THE TABLE COLUMN'S OWN KEY, NOT
+			// `lpn_result_status`** (pre-review, Task 708). `lpn_result_status` ("Status") already
+			// names a DIFFERENT concept elsewhere on this page -- the post-solve/EPS status the
+			// colour ramp and the Labels legend show (`linkFieldDefs()`, `COLOR_LINK_FIELDS`),
+			// which can differ from this stored input during a run a `[RULES]` control has closed.
+			// Reusing that word here would put "Status" on two different questions in one panel.
+			// `choices` is derived from findChoiceDefs() rather than spelled out again, so the
+			// codes here and the words a Find/Replace `<select>` shows can never drift apart.
+			{ key: 'status', group: 'link', field: 'status', prop: 'status',
+				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
+				label: pc.lpn_field_closed || 'Shut',
 				applies: function () { return true; },
 				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
 				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
@@ -4835,22 +4845,25 @@ var EngCalcs = EngCalcs || {};
 			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
 			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
 			// other three are base-owned geometry, written bare exactly as their table cells are.
-			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Tank level',
+			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
-			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Tank minimum level',
+			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
-			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Tank maximum level',
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
-			// above -- the internal EPANET tokens, never translated, so a saved query keeps
-			// reading in every language.
-			{ key: 'mixingModel', group: 'node', field: 'mixingModel', choices: ['MIXED', '2COMP', 'FIFO', 'LIFO'],
+			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
+			// query keeps reading in every language -- but the WORDS a person picks from are the
+			// popup's own four (paneColMixingModel()'s `choices()`, read through findChoiceDefs()
+			// so there is exactly one list of them, not a second copy to drift out of translation).
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel',
+				choices: findChoiceDefs('mixingModel').map(function (o) { return o[0]; }),
 				label: pc.lpn_mixing_model || 'Mixing model',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
@@ -15852,9 +15865,9 @@ var EngCalcs = EngCalcs || {};
 			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
 			// #4). A tank is the one node type with several scalar inputs of its own; gated to
 			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
-			['level', 'lpn_field_tank_level', 'Tank level'],
-			['minLevel', 'lpn_field_tank_minlevel', 'Tank minimum level'],
-			['maxLevel', 'lpn_field_tank_maxlevel', 'Tank maximum level'],
+			['level', 'lpn_field_tank_level', 'Water depth'],
+			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
+			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
 			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
 			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
 			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
@@ -15875,7 +15888,13 @@ var EngCalcs = EngCalcs || {};
 			// **ACTIVE/SHUT, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
 			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
 			// gate is needed below -- the generic test already offers it to every link.
-			['status', 'lpn_result_status', 'Status'],
+			//
+			// **LABELLED `lpn_field_closed` ("Shut"), NOT `lpn_result_status` ("Status")** --
+			// pre-review, Task 708: `lpn_result_status` already names the post-solve/EPS status
+			// the colour ramp and the Labels legend show (`COLOR_LINK_FIELDS`, `linkFieldDefs()`),
+			// a different, run-dependent reading of the same link. Reusing that word here would
+			// put "Status" on two different questions in this one panel.
+			['status', 'lpn_field_closed', 'Shut'],
 			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
 			// below exactly as the pipe reaction pair is gated to a pipe.
 			['speed', 'lpn_field_pump_speed', 'Relative speed'],
@@ -16125,6 +16144,45 @@ var EngCalcs = EngCalcs || {};
 			prop === 'tag' || prop === 'desc' ||
 			prop === 'link' || prop === 'atNode' ||
 			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
+	}
+	/**
+	 * **A CHOICE PROPERTY'S CODES AND THEIR TRANSLATED WORDS, IN EXACTLY ONE PLACE** (pre-review
+	 * fix, Task 708). The internal token (`'closed'`, `'MIXED'`) is what is stored, matched and
+	 * saved in a query -- so it stays English and untranslated, the same ruling a curve's kind
+	 * carries -- but nothing on screen should ever show it to a reader or ask a reader to type it.
+	 * Before this, `status` and `mixingModel` were `findPropIsText()` properties with a plain text
+	 * box: a Spanish reader typing "cerrado" found nothing (the stored word is English), and a
+	 * matched row printed the English word back regardless of the page's language.
+	 *
+	 * Returns `null` for every other property -- the caller's signal to fall back to the ordinary
+	 * text or number box -- or `[[code, translated label], ...]`, in the order Find's and Replace's
+	 * `<select>` should list them.
+	 *
+	 * **`mixingModel` READS paneColMixingModel()'S OWN `choices()`, RATHER THAN A SECOND COPY OF
+	 * ITS FOUR WORDS.** The popup, the table and now Find/Replace are one door for what those four
+	 * words are, so a translator (or a future fifth mixing model) changes one function and every
+	 * venue agrees. `status` has no `choices()` of its own to borrow -- its table cell is a
+	 * checkbox, not a picklist -- so its two words are the same ones linkStatusText() already
+	 * prints for a link's status everywhere else on this map (`lpn_result_status_open`/`_closed`).
+	 */
+	function findChoiceDefs(prop) {
+		var pc = EngCalcs.pageConfig || {};
+		if (prop === 'status') {
+			return [['open', pc.lpn_result_status_open || 'Open'],
+				['closed', pc.lpn_result_status_closed || 'Closed']];
+		}
+		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
+		return null;
+	}
+	function findPropIsChoice(prop) { return findChoiceDefs(prop) !== null; }
+	// The translated word for a stored code, or null where `prop` is not a choice property, or the
+	// code is not one of its choices (a document written by an older version, or hand-edited) --
+	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	function findChoiceLabelOf(prop, code) {
+		var defs = findChoiceDefs(prop), i;
+		if (!defs) { return null; }
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === code) { return defs[i][1]; } }
+		return null;
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -17251,6 +17309,27 @@ var EngCalcs = EngCalcs || {};
 		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
+		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
+		// `status`'s and `mixingModel`'s stored words are English EPANET tokens a reader is never
+		// shown and should never have to type or guess at -- the failure this replaces was a
+		// Spanish reader typing "cerrado" and finding nothing, because the box compared their
+		// typed word against the untranslated code. Only for the two conditions that actually
+		// compare against the property's OWN value: "n highest"/"n lowest" want a COUNT in this
+		// box and "empty" wants nothing at all, so both keep the plain text/number box below.
+		if (findPropIsChoice(findState.prop) && !findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op)) {
+			var choiceDefs = findChoiceDefs(findState.prop);
+			// A value left over from a different property (or from a document saved before this
+			// choice existed) is not one of these codes -- default to the first rather than
+			// leaving the select unable to show ANY option as chosen, which would silently search
+			// on the first one anyway without saying so.
+			if (!choiceDefs.some(function (o) { return o[0] === findState.value; })) {
+				findState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_find_value || 'Value', choiceDefs, findState.value, function (v) {
+				findState.value = v; updateFindQuery(); renderFindResults(null);
+			});
+			return;
+		}
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
 		valLab = document.createElement('label');
@@ -17509,7 +17588,12 @@ var EngCalcs = EngCalcs || {};
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
 			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
-				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
+				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
+					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
+					// fix, Task 708), not the stored English code -- the second half of the same
+					// failure the value box had: a Spanish reader who somehow matched a closed
+					// pipe must not be shown "closed" back.
+					: (findChoiceLabelOf(findState.prop, val) || findFmt(val))));
 		// **NO LIST OF THE LINKS THAT MEET HERE** (Tom, 2026-08-27, reading his own result rows:
 		// *"The results say 'Connected: nnn, nnn, nnn', and I don't know what that means... I think
 		// that it arose from tunnel vision on the Connected links task. Even though it's useful, I
@@ -18141,7 +18225,7 @@ var EngCalcs = EngCalcs || {};
 	// action, and a Replace dialog beside a Find dialog would ask for the same three pull-downs
 	// twice. `box` is already in the document, so renderReplace() can find its message div by id.
 	function buildReplaceForm(box) {
-		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg;
+		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg, curSpec, choiceDefs;
 		replaceBox = box;
 		box.textContent = '';
 		replaceNormalize();
@@ -18202,6 +18286,29 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(btn);
 			box.appendChild(msg);
 			renderReplace(null);
+			return;
+		}
+		// **A CHOICE PROPERTY GETS THE SAME PICKLIST ON THE WRITE SIDE** (pre-review fix, Task
+		// 708): typing the internal code to REPLACE with is exactly the failure the Find box had,
+		// and a picklist is also how a bulk write refuses a typo outright rather than silently
+		// leaving four hundred pipes unchanged (replaceValueOf()'s `choices` gate still runs
+		// underneath this, so a value this select could never produce is still refused).
+		curSpec = replaceSpec(replaceState.prop);
+		if (curSpec && curSpec.choices) {
+			choiceDefs = findChoiceDefs(replaceState.prop) ||
+				curSpec.choices.map(function (c) { return [c, c]; });
+			if (!choiceDefs.some(function (o) { return o[0] === replaceState.value; })) {
+				replaceState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_replace_value || 'New value', choiceDefs, replaceState.value, function (v) {
+				replaceState.value = v; replacePending = null; renderReplace(null);
+			});
+			btn = document.createElement('button');
+			btn.type = 'button';
+			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
+			btn.addEventListener('click', runReplacePreview);
+			box.appendChild(btn);
+			box.appendChild(msg);
 			return;
 		}
 		valWrap = document.createElement('div');
