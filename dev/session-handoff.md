@@ -93,7 +93,7 @@ lines rather than appending corrections.
   engine loads for a new browser). It also cancels a run an edit has made stale.
 - **8108 `feat/label-limit`** (his 2026-09-23 question): 0 in the labels width row means never show,
   blank means always, like the customer row; the Thematic map checkbox is retired and a project that
-  had it opens with 0. Being built; Perry reviews before he is asked.
+  had it opens with 0. Ready; Perry's two findings fixed at `c949316e`.
 - **8090 `feat/label-gang-search`**: unchanged; R-075..R-165 are his.
 
 ### Open with him
@@ -103,6 +103,13 @@ lines rather than appending corrections.
 3. R-004, R-043, R-062, R-154.
 4. Net3-Novato has no labeling threshold, so nothing hides there at any zoom. Should it have one?
    (Net3's 30 is his own R-169 number; a new project starts blank, meaning always.)
+
+### Known and not yet fixed
+
+- `dev/browser-pass/specs/visibility.js` fails two checks on master too (outside `check_all`): its
+  Settings sub-heading list lacks `lpn_set_sub_custLbl`/`lpn_set_sub_customProps`, and "Escape
+  closes it". `settings-select-lag-harness.js` has failed once under a full suite's load and passes
+  alone; watch it.
 
 ### Translation sprint
 
