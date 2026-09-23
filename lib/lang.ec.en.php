@@ -2878,8 +2878,20 @@ $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label 
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
 // on screen that says what a blank box means. The length unit is shown beside the box at run time.
 $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map width or less';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.';
+// **NO LONGER SAYS ANYTHING ABOUT SYMBOL SIZE** (Task 705, Tom, 2026-09-22: *"I'd prefer not to have
+// two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
+// growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.';
 $ec_lang['lpn_settings_label_always']='Always show labels';
+// **THE ONE MAXIMUM-SYMBOL-SIZE RULE** (Task 705, his own wording, 2026-09-22: *"Prevent nodes from
+// scaling larger than __ times the length of the __ percentile pipe"*). Split across three keys
+// because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
+// between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
+// reads as "20% percentile pipe").
+$ec_lang['lpn_settings_symbol_cap']='Prevent nodes from scaling larger than';
+$ec_lang['lpn_settings_symbol_cap_mid']='times the length of the';
+$ec_lang['lpn_settings_symbol_cap_post']='percentile pipe';
+$ec_lang['lpn_settings_symbol_cap_tip']='A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';

@@ -5214,15 +5214,25 @@ var EngCalcs = EngCalcs || {};
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-21 under Task 705). Generated
 			// labels are drawn only while the visible map is at most this many DISPLAY LENGTH UNITS
-			// wide, and the same number is what stops a map symbol growing on the ground
-			// (symbolCapScale()). null = always draw, which is the right default because no single
-			// number is meaningful across networks 400 ft and 40 miles wide -- the Settings row
-			// captures it from the current view rather than asking anyone to guess one.
+			// wide. null = always draw, which is the right default because no single number is
+			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
+			// from the current view rather than asking anyone to guess one.
+			//
+			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
+			// asked for the day before: *"I'd prefer not to have two rules."*). See
+			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
 			//
 			// **A TYPED NUMBER IN THE DISPLAY UNIT, NEVER SI, and it is REINTERPRETED rather than
 			// converted when the unit changes** -- the suite's own absolute rule. Converted to
 			// metres only where it is compared, in labelWidthLimitSI().
 			labelMaxWidth: null,
+			// **THE ONE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his wording, 2026-09-22):** "Prevent
+			// nodes from scaling larger than `symbolCapMultiple` times the length of the
+			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
+			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
+			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
+			symbolCapMultiple: 0.5,
+			symbolCapPercentile: 20,
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -6400,51 +6410,59 @@ var EngCalcs = EngCalcs || {};
 	// At a whole-county view a 7 px junction dot is a mile across on the map, and a drawing that is
 	// nothing but overlapping dots says less than one that is mostly pipe.
 	//
-	// **THE RULE IS DERIVED, AND THERE IS NO CONTROL FOR IT.** He offered two shapes -- a second
-	// number under Map and page > Appearance, or "the maximum symbol size is whatever it is at the
-	// maximum label zoom, so that once labels are hidden, symbols start shrinking on screen and stay
-	// constant on the ground as you zoom out". The second ships, and the reason is not only that it
-	// is free. The two rules answer the SAME question -- how far out is too far out to keep drawing
-	// at reading size -- and a second box lets a user set them to disagree, which produces a view
-	// with no lettering and mile-wide dots and no way to tell which of two numbers caused it. One
-	// threshold, one answer, and the tip on that one row says both things it does.
+	// **ONE RULE, NOT TWO** (Tom, 2026-09-22, closing his own two competing ideas -- the
+	// 10th-percentile link length and "piggyback on the labeling threshold": *"10th %-ile and 'same
+	// as label limit' were competing ideas for this limit; I'd prefer not to have two rules. I like
+	// 10th %-ile a lot, probably better than piggybacking on the labels limit."*). **The labeling
+	// threshold (`settings.labelMaxWidth`) no longer feeds this at all** -- it used to be tried
+	// first, with the percentile rule as its fallback when no threshold was typed, and that
+	// arrangement is exactly what he asked removed.
 	//
-	// **WHAT IT IS WHEN NO THRESHOLD IS SET, which is the default:** his own (1), the 10th-percentile
-	// link length as the maximum junction size on the map. It is the honest fallback because it is
-	// the same KIND of statement -- the network's own shortest ordinary pipe is the distance at which
-	// two junctions stop being separable, so a dot wider than that is drawing over the thing it
-	// marks.
+	// **HIS NEW SETTING, HIS OWN WORDING:** *"Let's try a new setting for %-ile: 'Prevent nodes from
+	// scaling larger than __ times the length of the __ percentile pipe' where we set the defaults
+	// at 0.5 and 20% for now."* Two numbers, both project data: `settings.symbolCapMultiple`
+	// (default 0.5) and `settings.symbolCapPercentile` (default 20 -- his new figure, not the old
+	// 10th). The maximum junction diameter on the ground is `multiple * that percentile's link
+	// length`, always on, no blank-means-off state to explain.
 	//
 	// **EXPRESSED AS A FLOOR ON THE SCALE, not as a cap on a size**, because every symbol on this
 	// map is already one number divided by `state.s`. Below this scale the drawing stops growing on
 	// the ground and starts shrinking on the screen, which is exactly his sentence.
 	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
-	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	var pctLinkLengthCache = null;   // world units, AT THE PERCENTILE LAST ASKED FOR; 0 for "no usable link"
+	var pctLinkLengthPctCache = null;
 	// **KEYED ON THE DOCUMENT AND ITS LINK COUNT AS WELL AS INVALIDATED BY NAME.** A cache keyed on
 	// the count alone survived a project switch on feat/label-gang-search and laid 119 of 216 labels
 	// out from the previous document's number, so the key is the `doc.links` ARRAY ITSELF plus its
 	// length -- a switch, an undo and a rebuild all replace the array -- and buildDom() and a node
 	// drag clear it outright. What neither catches is a node nudged by a hand-typed coordinate, and
-	// a 10th percentile of up to 512 lengths does not move measurably for one pipe.
+	// a percentile of up to 512 lengths does not move measurably for one pipe.
 	var p10LinkKeyArr = null, p10LinkKeyLen = -1;
 	function invalidateSymbolCap() { symbolCapCache = null; }
 	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
-	// they change only when the drawing does, while the cap also moves with the window and the
-	// settings.
-	function invalidateLinkLengths() { p10LinkLengthCache = null; symbolCapCache = null; }
+	// they change only when the drawing does, while the cap also moves with the settings.
+	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
+	function symbolCapMultiple() {
+		var v = settings.symbolCapMultiple;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+	}
+	function symbolCapPercentile() {
+		var v = settings.symbolCapPercentile;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
 	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
 	// left out rather than counted: a pump and a valve are zero-length by construction, and a
-	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	// network of two pumps would otherwise report a percentile of nothing at all.
 	var LPN_SYMBOL_CAP_SAMPLE = 512;
-	function p10LinkLengthWorld() {
+	function pLinkLengthWorld(pct) {
 		var list = doc.links || [], n = list.length, step, lens = [], i, l, a, b, d;
 		if (list !== p10LinkKeyArr || n !== p10LinkKeyLen) {
 			p10LinkKeyArr = list; p10LinkKeyLen = n;
-			p10LinkLengthCache = null; symbolCapCache = null;
+			pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null;
 		}
-		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
+		if (pctLinkLengthCache !== null && pctLinkLengthPctCache === pct) { return pctLinkLengthCache; }
 		step = Math.max(1, Math.ceil(n / LPN_SYMBOL_CAP_SAMPLE));
 		for (i = 0; i < n; i += step) {
 			l = list[i];
@@ -6453,27 +6471,18 @@ var EngCalcs = EngCalcs || {};
 			d = Math.hypot(b.x - a.x, b.y - a.y);
 			if (d > 0) { lens.push(d); }
 		}
-		if (!lens.length) { p10LinkLengthCache = 0; return 0; }
+		pctLinkLengthPctCache = pct;
+		if (!lens.length) { pctLinkLengthCache = 0; return 0; }
 		lens.sort(function (x, y) { return x - y; });
-		p10LinkLengthCache = lens[Math.floor(0.1 * (lens.length - 1))];
-		return p10LinkLengthCache;
+		pctLinkLengthCache = lens[Math.floor((pct / 100) * (lens.length - 1))];
+		return pctLinkLengthCache;
 	}
 	function computeSymbolCapScale() {
-		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
-		if (limSI > 0 && px > 0) {
-			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
-			v = currentView();
-			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-			wWorld = (mpu > 0) ? limSI / mpu : 0;
-			if (wWorld > 0 && isFinite(wWorld)) { return px / wWorld; }
-		}
-		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
-		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
-		l10 = p10LinkLengthWorld();
-		return (l10 > 0 && settings.symbolSize > 0) ? settings.symbolSize / l10 : 0;
+		var lp = pLinkLengthWorld(symbolCapPercentile()), capLen = symbolCapMultiple() * lp;
+		return (capLen > 0 && settings.symbolSize > 0) ? settings.symbolSize / capLen : 0;
 	}
 	function symbolCapScale() {
-		p10LinkLengthWorld();   // cheap when nothing moved; clears the cap when the document did
+		pLinkLengthWorld(symbolCapPercentile());   // cheap when nothing moved; clears the cap when the document did
 		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
 		return symbolCapCache;
 	}
@@ -6488,11 +6497,12 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
 	}
-	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
-	// the two things a reader is looking FOR on a wide view -- where does the water come from and
-	// where is it stored -- so they keep their size on the screen at every zoom while everything
-	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
-	// already branch on those two types.
+	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both, and
+	// confirmed 2026-09-22 while widening the rule to pipes: *"Yes. Everything shrinks except
+	// reservoirs and tanks."*). They are the two things a reader is looking FOR on a wide view --
+	// where does the water come from and where is it stored -- so they keep their size on the
+	// screen at every zoom while everything else settles onto the ground. Two call sites,
+	// nodeSymbolSize() and nodeRadius(), and both already branch on those two types.
 	//
 	// **AND THE EDITING FURNITURE, WHICH IS NOT A SYMBOL AT ALL:** a vertex grip, the selection
 	// ring, the pending-pipe ring, the rubber band and the marquee. They are the page talking to the
@@ -6505,8 +6515,12 @@ var EngCalcs = EngCalcs || {};
 	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
 	// --lpn-sym: a pipe network's PIPES are its primary content and their weight is a drawing
 	// decision of its own, not a consequence of how big the junction dots are.
+	//
+	// **DIVIDES BY THE CAPPED SCALE, NOT THE RAW ONE, since 2026-09-22** (Tom: *"Everything shrinks
+	// except reservoirs and tanks."*). A pipe is not one of the two declared exceptions, so past the
+	// cap its stroke stops growing on the ground exactly as a junction's does.
 	function linkStrokeWidth() {
-		return settings.linkWidth / (state.s || 1);
+		return settings.linkWidth / symbolScaleAt();
 	}
 	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
 	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
@@ -9110,11 +9124,12 @@ var EngCalcs = EngCalcs || {};
 	// degrees of longitude.
 	//
 	// **ONE CONCEPT, TWO LEVELS** (Task 705, reconciling this with Task 669's labeling threshold).
-	// `settings.labelMaxWidth` is the widest view that shows ANY generated label, and it also sets
-	// the symbol cap (symbolCapScale()); this one is a second, narrower gate for customers alone,
-	// read INSIDE the first -- customerLabelsAttempted() refuses whenever dataLabelsHidden, which the
-	// labeling threshold sets. Both are the same quantity in the same unit through the same three
-	// functions below, and both boxes are filled by the same captureViewWidth().
+	// `settings.labelMaxWidth` is the widest view that shows ANY generated label -- **no longer the
+	// symbol cap too, since Tom removed that piggyback 2026-09-22** (see symbolCapScale()); this one
+	// is a second, narrower gate for customers alone, read INSIDE the first --
+	// customerLabelsAttempted() refuses whenever dataLabelsHidden, which the labeling threshold
+	// sets. Both are the same quantity in the same unit through the same three functions below, and
+	// both boxes are filled by the same captureViewWidth().
 	function viewWidthLimitSI(v) {
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
@@ -33834,8 +33849,9 @@ var EngCalcs = EngCalcs || {};
 	// One redraw for either answer: the document's numbers or their meaning changed, so everything
 	// derived from them is stale -- the labels, the solve, and what is on disk.
 	function afterUnitChange() {
-		// On a geographic project the threshold's metres move with the unit while a world unit
-		// (a degree) does not, so the cap is re-derived (Task 705). On a grid it is unit-invariant.
+		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
+		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
+		// costs nothing and a future input to the cap might not be so lucky.
 		invalidateSymbolCap();
 		refreshAllFromDocument();
 		saveToStorage();
@@ -35277,11 +35293,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
-	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
-	// labels re-decided. Never on the zoom path: a zoom changes neither input.
+	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). **No longer an input to the symbol
+	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
+	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
+	// changes neither input.
 	function labelThresholdChanged() {
-		invalidateSymbolCap();
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
@@ -36160,8 +36176,9 @@ var EngCalcs = EngCalcs || {};
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
-		// captureViewWidth(), rounded UP -- and one number doing two jobs: it hides generated labels
-		// and it is where symbols stop growing on the ground (symbolCapScale()). The tip says both.
+		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
+		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
+		// generated labels and nothing else; the symbol-size cap is the separate row below.
 		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
 			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
 		lmwWrap.className = 'lpn-set-ctlgroup';
@@ -36199,6 +36216,49 @@ var EngCalcs = EngCalcs || {};
 		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
 			lmwWrap, pc.lpn_settings_label_max_width_tip);
+		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
+		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
+		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
+		// always on, no blank state to explain. Both numbers are plain dimensionless quantities (a
+		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
+		// unit change.
+		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
+			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
+			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+		capWrap.className = 'lpn-set-ctlgroup';
+		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
+		capMultInput.id = 'lpn_set_symbol_cap_mult';
+		capMultInput.style.width = '4em';
+		capMultInput.value = trimNum(symbolCapMultiple());
+		capMultInput.addEventListener('change', function () {
+			var v = +capMultInput.value;
+			if (isFinite(v) && v > 0) {
+				settings.symbolCapMultiple = v; invalidateSymbolCap(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capMultInput.value = trimNum(symbolCapMultiple());
+			}
+		});
+		capMid.className = 'lpn-set-note';
+		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
+		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
+		capPctInput.id = 'lpn_set_symbol_cap_pct';
+		capPctInput.style.width = '4em';
+		capPctInput.value = trimNum(symbolCapPercentile());
+		capPctInput.addEventListener('change', function () {
+			var v = +capPctInput.value;
+			if (isFinite(v) && v >= 0 && v <= 100) {
+				settings.symbolCapPercentile = v; invalidateLinkLengths(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capPctInput.value = trimNum(symbolCapPercentile());
+			}
+		});
+		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
+		capPost.className = 'lpn-set-note';
+		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
+		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
+		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
+		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
+			pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
