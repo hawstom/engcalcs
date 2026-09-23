@@ -484,6 +484,85 @@ is the one thing this instrument cannot do. Also confirmed by reading the live f
 entirely (R-140), and `lpn_pane_tab_tip` now reads *"This tab shows the assets of this kind as a
 spreadsheet-like table. Result columns cannot be edited."* (R-141), matching Tom's own quoted wording.
 
+## 2026-09-23 -- feat/zoom-scale-rules at 04b159fe, R-174 (Text "Show at all zoom levels"): READY, one gap on the file Tom will actually open
+
+OBSERVED, checked 2026-09-23. Mutation-confirmed the shipped harness
+(`dev/lpn-spike/text-all-zoom-property-harness.js`) is real: copied it unmodified into a worktree
+built from the branch point (`75689ea1`, before `34d4ee8d`) and it failed hard there (three
+assertions FAIL, then a `TypeError` on the very column this round adds), so the green it shows on
+the branch head is not decoration. Then drove the real feature through a real Chromium
+(`dev/browser-pass/lib/session.js` + `lib/env.js`, `flock /tmp/engcalcs-browser.lock`), not just
+the stub, for every venue Tom named.
+
+**CONFIRMED, the default and the three venues, all through real interaction:**
+- Default off: a freshly-drawn Text on a new project carries no `allZoom`, and Net3 (plain) opens
+  already past its own threshold (`labelMaxWidth: 30`) with `LAKE`/`RIVER` genuinely hidden
+  (`lpn-lbl-hidden` on both) and only `X3` "Zoom in to see labels" left showing -- read straight off
+  `getComputedStyle`/`classList`, not the stub.
+- Multi-properties: drew two Texts with the real toolbar, box-selected both with "Select a window",
+  and the popup read "2 selected" with a real `<label>Show at all zoom levels <input
+  type="checkbox"></label>` row, unchecked by default. Ticking it and firing a real `change` event
+  is the mechanism the harness already checks; not re-verified with a second read here beyond that.
+- Tables: the Text pane tab's own headers read `...,"Bold text","Show at all zoom levels","Angle
+  (degrees)"` with a live checkbox cell, matching the popup's row order.
+- Find and Replace: selecting the Text scope offers exactly `Text`, `Size multiplier`, `Show at all
+  zoom levels` as properties -- and separately, the Replace "Property to change" list for the same
+  scope offers `allZoom` ALONE. `id` and `text` are not there, confirmed by reading the live
+  rendered `<select>`, not the source comment that claims it.
+
+**MISSED, and it is the exact file the review brief named: Net3-**Novato**-CA-World.lwn has no
+labeling threshold at all (`settings.labelMaxWidth` is `null`, unchanged by this branch), so
+`labelsPastThreshold()` returns `false` at every scale and NOTHING in this file's Text layer ever
+hides -- `LAKE` and `RIVER` both read `lpn-lbl lpn-draglbl` (never `-hidden`) all the way from
+5354 px/degree down to 118 px/degree and back, measured with the real `transform="scale(...)"` on
+the SVG. The branch's own edit to this file only added `allZoom: true` to `X1` ("LAKE"); it did not
+notice, and nothing in its harness would have noticed, that the setting has no effect here because
+the gate it feeds is permanently off. Practically: opening Novato and zooming out, as the brief
+instructs, will show BOTH `LAKE` and `RIVER` staying on screen forever, which will read as the fix
+not working -- when what actually failed to ship is a threshold on this one example, a detail
+outside R-174's own wording but squarely inside what the round was supposed to make demonstrable.
+**Net3 (the plain, non-geo file) is the one where the mechanism is real and provably works**; that
+is the one to point Tom at if he wants to see it work before this is fixed.
+
+**A genuine judgment call, not a defect, worth putting to Tom because he asked "should it appear in
+Find/Replace" and got an honest partial answer**: the code's own comment admits it plainly --
+*"No boolean condition exists on this panel yet, so it rides the numeric ones already here... 1 for
+ticked, 0 for not."* Measured in the real Find UI: the condition list offered for `allZoom` is
+`equal to, above, below, n highest, n lowest, empty` -- four of those six are nonsense on a
+yes/no property (`above 1`? `n highest`?), and nothing on screen says 1 means ticked. It works
+(confirmed: typing `equal to 1` finds exactly the kept-on Text, and Replace does write it), but a
+reader with no memory of this ruling has no way to guess the vocabulary without trial and error.
+Not new to this round -- `active`/`closed` are the same shape elsewhere on the page and were not
+re-examined here -- but this is the first time Tom asked for a boolean specifically to land in
+Find, so it is the moment to decide whether a proper yes/no condition is now worth building rather
+than reusing the numeric one again.
+
+**Net1's tie-break, also a judgment call rather than a defect**: `Source`, `Pump` and `Tank` are all
+`sizeMult: 2` (a genuine three-way tie), and the rule ("first in the file") kept `Source`. Novato's
+`LAKE`/`RIVER` tie (both `sizeMult: 1`) went the same way. Neither is wrong by Tom's stated rule
+("the largest... in our examples"), but where sizes are exactly equal the rule is silent on
+*which* survives, and "first in the file" is an implementation detail nobody chose for its meaning
+-- worth a glance from Tom on whether `Source` (on Net1, a network about a reservoir, a pump and a
+tank, all named) is the label he would have picked by hand.
+
+**R-167/168/169/170 (earlier rounds on this branch), not re-litigated in depth but not skipped
+either**: ran `zoom-symbol-cap-harness.js` (all 15 mutations still kill), `examples-audit-harness.js`
+(307/307), `find-harness.js`, `switch-keep-harness.js`, `select-area-harness.js` -- all green against
+the live tree. R-170's fix (`5865871e`) is a three-line reorder of the label-threshold unit and the
+capture button, read directly and it does what it says.
+
+**Verdict: READY**, with the Novato gap flagged as the one thing Tom will hit first if he follows the
+brief's own instructions on that exact file, and the Find/Replace vocabulary named as his call to
+make, not a build defect.
+
+**Not checked**: ticking the checkbox from the Tables pane cell itself in the real browser (only the
+harness's stub exercises that door); an older saved project carrying `{"allZoom": false}` explicitly
+(argued to behave identically to absent by reading `=== true`, not independently re-measured in a
+browser); redo/undo interaction with an `allZoom` edit; and whether the Novato gap is itself on
+Tom's queue anywhere else under a different number (not searched).
+
+---
+
 **Not reached this round, for the record rather than by silence**: whether an EPS time-step change
 (scrubbing the run transport) has the same Recalculate-off gap the scenario switch does — `lpn-time.js`
 carries no reference to `refreshPaneIfOpen` or `lastSolveResult` at all, so the wiring is somewhere
