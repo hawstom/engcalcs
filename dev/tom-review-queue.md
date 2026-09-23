@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-182.
+**An ID is permanent and never reused.** Next free: R-183.
 
 ---
 
@@ -154,3 +154,4 @@ judgement and does not belong to a script.
 - [ ] R-179 feat/zoom-control | The + and - glyphs are not centered in their boxes. Fix that.
 - [ ] R-180 feat/zoom-control | It seems inconsistent for us to use click for selection, but drag for zoom. I think we should have a consistent idiom. Maybe Ida has insight.
 - [ ] R-181 feat/zoom-control | With Select area, the first time you click, it does not change modes. Changing the first time you click is confusing. I think that it should act like Select area. Click twice in a row to get mode change.
+- [ ] R-182 feat/convert-as | I didn't review, but I read the menu tip, and I like where it's headed.

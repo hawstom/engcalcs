@@ -86,7 +86,11 @@ const L = loadLoopedNetwork(
 );
 L.buildLayers();
 L.setCanvas(1400, 900);
-L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net3.lwn', 'utf8')));
+// Net3 ships a labeling threshold (30) and opens past it, where no label pass runs at all. This
+// harness counts passes, so it switches the threshold off on its own copy.
+const net3 = JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net3.lwn', 'utf8'));
+if (net3.settings) { net3.settings.labelMaxWidth = null; }
+L.applySaved(net3);
 L.buildDom();
 L.fit();
 L.noteMapSized();
