@@ -2490,7 +2490,8 @@
 			"x": 35.440246952096,
 			"y": 15.397639717135469,
 			"anchorNode": null,
-			"sizeMult": 4
+			"sizeMult": 4,
+			"allZoom": true
 		}
 	],
 	"nextId": {
