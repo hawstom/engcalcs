@@ -38276,13 +38276,11 @@ var EngCalcs = EngCalcs || {};
 	function setboxControlByKey(box, key) {
 		var parts, host, list, i, el;
 		if (!key) { return null; }
-		if (key.charAt(0) === '#') {
-			el = document.getElementById(key.slice(1));
-			return el && box.contains(el) ? el : null;
-		}
-		if (key.charAt(0) === '@') {
+		if (key.charAt(0) === '#' || key.charAt(0) === '@') {
 			list = setboxControlsOfTag(box, 'SELECT').concat(setboxControlsOfTag(box, 'INPUT'), setboxControlsOfTag(box, 'TEXTAREA'));
-			for (i = 0; i < list.length; i++) { if (list[i].name === key.slice(1)) { return list[i]; } }
+			for (i = 0; i < list.length; i++) {
+				if ((key.charAt(0) === '#' ? list[i].id : list[i].name) === key.slice(1)) { return list[i]; }
+			}
 			return null;
 		}
 		parts = key.split('|');
@@ -38330,7 +38328,7 @@ var EngCalcs = EngCalcs || {};
 				if (el.tagName === 'SELECT' && twin.tagName === 'SELECT' && sameSelectOptions(el, twin)) {
 					// The copy holds the state `settings` now implies; the old element takes it on
 					// and the copy, never shown, is dropped.
-					el.value = twin.value;
+					if (typeof twin.value === 'string') { el.value = twin.value; }
 					el.disabled = twin.disabled;
 					el.title = twin.title;
 					twin.parentNode.replaceChild(el, twin);
