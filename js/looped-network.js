@@ -31994,7 +31994,7 @@ var EngCalcs = EngCalcs || {};
 					// broken rather than that another projection over the same ground would work,
 					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
 					// the choice as well; this is the same sentence, after it.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.');
 				});
 			}
 		}
@@ -32199,7 +32199,7 @@ var EngCalcs = EngCalcs || {};
 			// the mark has to be short enough not to push a 50-character register name out of the
 			// select and the sentence has to be long enough to say what is lost.
 			if (crsCannotBePlaced(crsBox.code)) {
-				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.');
 			}
 		}
 	}

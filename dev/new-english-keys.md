@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**30 still to read on master**, of 194 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**32 still to read on master**, of 196 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (194, 30 to read @@ NEEDS RULING)
+## lpn_  (196, 32 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -186,6 +186,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_text_all_zoom_tip`**
   > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
   _Ruled 2026-09-23: Default needs to be off. I see that you turned it on by default, and that already has caused me grief. Only a few texts would be privileged to have this on. Otherwise ok._
+- **`lpn_file_convert_as`**
+  > Convert as…
+  @@ NEEDS RULING
+- **`lpn_file_convert_as_tip`**
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
@@ -614,7 +620,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**35 still to read**, of 64 new keys across 5 unmerged branch(es).
+**43 still to read**, of 72 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -625,7 +631,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`9889cfcc`) — adds no English strings
+### feat/convert-as (`4abcfb9e`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -780,6 +786,27 @@ build for that would be a gate nobody keeps. Refresh it with
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
 
+### feat/table-editing (`29fc3b42`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_pane_filldown`**
+  > Fill down
+  @@ NEEDS RULING
+- **`lpn_pane_filled`**
+  > Filled down {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
+- **`lpn_pane_hide_col`**
+  > Hide this column
+  @@ NEEDS RULING
+- **`lpn_pane_show_col`**
+  > Show {col}
+  @@ NEEDS RULING
+
 ### feat/zoom-control (`bcaa8319`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
@@ -829,4 +856,13 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
+  @@ NEEDS RULING
+
+### fix/settings-select-lag (`5f6e6559`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
