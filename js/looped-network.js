@@ -3134,16 +3134,30 @@ var EngCalcs = EngCalcs || {};
 		// labels' and the Text callouts', which the crossing shed below counts exactly as it counts
 		// a node leader. Without them a label moved nearer its node could sit on a link label's
 		// leader and the shed would then hide one of the two (measured: node 179 at 2x, Net3-World).
-		var fixedLeaders = [];
+		// **AND THEIR BOXES, WHICH WERE MISSING AND IT SHOWED** (2026-09-22). The ring pass places
+		// free link labels and dragged labels against a PRIVATE copy of the obstacle list, so their
+		// boxes exist nowhere the slide could see them -- only their leaders were handed over. A
+		// node label could therefore slide onto a link label's text and nothing in the pass knew.
+		// **NOTHING HAD EVER CAUGHT IT AND NOTHING HERE DOES EITHER**, which is worth saying: it was
+		// found by reading, while chasing a contact count in `label-slide-harness.js` that turned
+		// out to have a different cause (two runs drawing different numbers of labels). So this is
+		// a hole closed on the argument alone -- no measured defect moved when it was closed -- and
+		// the reason to close it is that a label sliding onto a pipe label's text is exactly the
+		// kind of thing no reader would report as anything but "the labels are a mess".
+		var fixedLeaders = [], slideBoxes = obs.boxes.slice();
 		placed.forEach(function (r) {
-			if (!r.dropped && r.leader && Math.hypot(r.leader.bx - r.leader.ax, r.leader.by - r.leader.ay) > leaderThreshold()) {
+			if (r.dropped) { return; }
+			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
+				slideBoxes.push(b);
+			});
+			if (r.leader && Math.hypot(r.leader.bx - r.leader.ax, r.leader.by - r.leader.ay) > leaderThreshold()) {
 				fixedLeaders.push(r.leader);
 			}
 		});
 		crossingForeigners(obs).forEach(function (f) { if (f.leader) { fixedLeaders.push(f.leader); } });
 		var slideT0 = (typeof performance !== 'undefined') ? performance.now() : 0;
 		var slide = Collide.slideTowardAnchors(nodeLabels, nodePlaced,
-			{ boxes: obs.boxes, segments: obs.segments },
+			{ boxes: slideBoxes, segments: obs.segments },
 			{ pad: pad, leaderMin: leaderThreshold(), leaders: fixedLeaders });
 		nodePlaced = slide.results;
 		lastLeaderSlide = slide.stats;
