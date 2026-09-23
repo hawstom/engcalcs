@@ -182,7 +182,10 @@ console.log('\n--- Home, End, Ctrl+Home, Ctrl+End ---');
 {
 	clickCell(ids[2], 'demand');
 	key('Home');
-	report(spec.sel.fKey === colKeys[1], 'Home goes to the FIRST DATA column, not to the ID button', spec.sel.fKey);
+	// **HOME IS COLUMN A, WHICH IS THE ID** (Tom, 2026-09-19: *"Home and Ctrl+Home take me to
+	// column B, not to the ID column A. Fix this."*). This asserted the opposite until then, on an
+	// argument that confused arriving at the ID button with pressing it.
+	report(spec.sel.fKey === colKeys[0], 'Home goes to column A, which is the ID', spec.sel.fKey);
 	report(spec.sel.fId === ids[2], '...staying on its own row');
 	key('End');
 	report(spec.sel.fKey === colKeys[colKeys.length - 1], 'End goes to the last column, read-only or not', spec.sel.fKey);
@@ -191,8 +194,8 @@ console.log('\n--- Home, End, Ctrl+Home, Ctrl+End ---');
 	report(spec.sel.fId === ids[3] && spec.sel.fKey === colKeys[colKeys.length - 1],
 		'Ctrl+End is the last cell of the last row');
 	key('Home', { ctrlKey: true });
-	report(spec.sel.fId === ids[0] && spec.sel.fKey === colKeys[1],
-		'Ctrl+Home is the first data cell of the first row');
+	report(spec.sel.fId === ids[0] && spec.sel.fKey === colKeys[0],
+		'Ctrl+Home is column A of the first row');
 	// Held against the RENDERED order, which is the point: a spreadsheet's Ctrl+End goes to the
 	// last cell you can see, and this table's order is whatever the last sort and filter left.
 	report(L.tableOrder('junctions')[0] === ids[0], 'and "first row" means the first row on screen');
@@ -292,7 +295,14 @@ console.log('\n--- the cells abut ---');
 {
 	report(/\.lpn-pane-table tbody td \{[^}]*padding: 0;/.test(css),
 		'a body cell has no padding of its own');
-	report(/\.lpn-pane-table tbody td \{[^}]*border: 1px/.test(css),
+	// **WAS a real `border: 1px`, now an equivalent `inset box-shadow`** (2026-09-23, the 1px
+	// heading/column divider misalignment fix): a `border` under abutting cells is resolved by the
+	// table's own collapsed-border grid, which rounds differently from the sticky heading's own
+	// `inset box-shadow` divider at a fractional device pixel ratio. Making both cells use the same
+	// box-shadow mechanism removed the mismatch; the STYLESHEET assertion below moved with it, but
+	// the thing it is checking -- the body cell draws its own edge, in the same #ddd, so two cells
+	// still share what reads as one rule -- has not.
+	report(/\.lpn-pane-table tbody td \{[^}]*box-shadow: inset[^}]*#ddd/.test(css),
 		'...and carries the grid line itself, so two cells share one rule between them');
 	report(/\.lpn-pane-table tbody td input \{[^}]*border: 0;/.test(css),
 		'the control inside it has no border, or the grid would be drawn twice with a gutter');

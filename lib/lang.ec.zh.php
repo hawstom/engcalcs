@@ -1682,7 +1682,6 @@ $ec_lang['lpn_tool_area_tip']='按照提示在地图上点击，以选中形状�
 $ec_lang['lpn_area_selected']='已选择 {n} 个。';
 $ec_lang['lpn_area_none']='该区域内未找到任何内容。';
 $ec_lang['lpn_georef_tab_locked']='请先用“保留此位置”按钮完成放置，或按取消，然后再切换项目。此放置属于当前项目，无法带到另一个项目中。';
-$ec_lang['lpn_pane_paste_note']='此表用于将电子表格中的数值粘贴到已有的行中。如果这不能满足您的需要，请使用“帮助”、“反馈问题”告诉我们。';
 $ec_lang['lpn_pane_filter_note']='已按 {q} 过滤，显示 {all} 项中的 {n} 项。';
 $ec_lang['lpn_pane_filter_clear']='显示全部';
 $ec_lang['lpn_pane_filter_none']='此表中没有与过滤条件匹配的内容。';

@@ -1680,7 +1680,6 @@ $ec_lang['lpn_tool_area_tip']='Faceți clic pe hartă conform instrucțiunilor p
 $ec_lang['lpn_area_selected']='{n} selectate.';
 $ec_lang['lpn_area_none']='Nu s-a găsit nimic în acea zonă.';
 $ec_lang['lpn_georef_tab_locked']='Terminați plasarea cu butonul „Păstrează această plasare” sau apăsați Anulare, înainte de a schimba proiectele. Plasarea aparține acestui proiect și nu vă poate urma către altul.';
-$ec_lang['lpn_pane_paste_note']='Acest tabel este destinat introducerii valorilor prin lipire dintr-un tabel de calcul în rânduri care există deja. Dacă nu vă satisface nevoile, folosiți Ajutor, Semnalează o problemă pentru a ne spune.';
 $ec_lang['lpn_pane_filter_note']='Filtrat după {q}. Se afișează {n} din {all}.';
 $ec_lang['lpn_pane_filter_clear']='Afișează tot';
 $ec_lang['lpn_pane_filter_none']='Nimic din acest tabel nu corespunde filtrului.';

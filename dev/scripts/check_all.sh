@@ -290,6 +290,19 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
 run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
+# Task 690, the spreadsheet-parity half. Every property in an element's property popup is also a
+# column in that element's table -- and, because multiGroups() derives its sections from
+# paneTables(), in the multi-properties box with it. Adding a popup field is a complete, working,
+# shippable change that nothing on this side of the wire can see the other half of; Tom found the
+# last one by opening the table looking for it (*"Initial quality is in no Table and no
+# multi-properties. Embarrassing"*). BOTH SIDES ARE DERIVED: the row builders are the functions
+# taking `fields` first and a `labelText` parameter, and the columns are buildPaneTables() with its
+# paneCol* helpers resolved. A RATCHET AT ZERO since 2026-09-19: it shipped advisory at 28 gaps, Tom
+# said "Fix all that was found", all 28 were closed and the flag turned over. The selftest is
+# blocking too, because every way this check can quietly stop working makes its count SMALLER, which
+# reads as progress on the very task it serves.
+run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
+run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE

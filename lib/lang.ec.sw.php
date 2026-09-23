@@ -1685,7 +1685,6 @@ $ec_lang['lpn_tool_area_tip']='Bofya kwenye ramani kama ilivyoelekezwa ili kucha
 $ec_lang['lpn_area_selected']='{n} zimechaguliwa.';
 $ec_lang['lpn_area_none']='Hakuna kilichopatikana katika eneo hilo.';
 $ec_lang['lpn_georef_tab_locked']='Maliza uwekaji kwa kitufe cha "Weka mahali hapa", au bonyeza Ghairi, kabla ya kubadilisha mradi. Uwekaji huu ni wa mradi huu na hauwezi kukufuata kwenda mwingine.';
-$ec_lang['lpn_pane_paste_note']='Jedwali hili limekusudiwa kwa kuingiza thamani kwa kubandika kutoka lahajedwali kwenye safu mlalo zilizopo tayari. Ikiwa halikidhi mahitaji yako, tumia Msaada, Rekebisha kitu kutuambia.';
 $ec_lang['lpn_pane_filter_note']='Imechujwa kwa {q}. Inaonyesha {n} kati ya {all}.';
 $ec_lang['lpn_pane_filter_clear']='Onyesha vyote';
 $ec_lang['lpn_pane_filter_none']='Hakuna kitu kwenye jedwali hili kinacholingana na kichujio.';

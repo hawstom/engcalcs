@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 170 untranslated keys, of 2021 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 172 untranslated keys, of 2022 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (170, 7 to read @@ NEEDS RULING)
+## lpn_  (172, 7 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -351,6 +351,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_node_customers_tip`**
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
+- **`lpn_pane_goto_tip`**
+  > Zoom & select
+  _Ruled OK 2026-09-23._
+- **`lpn_pane_not_used`**
+  > Not used
+  _Ruled OK 2026-09-23._
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
@@ -542,7 +548,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**49 still to read**, of 120 new keys across 6 unmerged branch(es).
+**52 still to read**, of 121 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -553,9 +559,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-99 (`f6b42a3b`) — adds no English strings
-
-### feat/label-gang-search (`34ea8376`) — 38 new, 15 to read @@ NEEDS RULING
+### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -590,6 +594,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_replace`**
   > This project already has the world map attached. Replace that georeferencing?
   _Ruled OK 2026-09-23._
+- **`lpn_pane_paste_note`**
+  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+  @@ NEEDS RULING
 - **`lpn_survey_column_n`**
   > column {n}
   _Ruled OK 2026-09-23._
@@ -672,7 +679,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/notice-log (`f5936ca4`) — 41 new, 15 to read @@ NEEDS RULING
+### feat/notice-log (`bc8da817`) — 42 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -716,6 +723,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_note`**
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
+- **`lpn_pane_paste_note`**
+  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+  @@ NEEDS RULING
 - **`lpn_survey_column_n`**
   > column {n}
   _Ruled OK 2026-09-23._
@@ -798,7 +808,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/tables-spreadsheet (`9597e941`) — 37 new, 15 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`17b90202`) — 35 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -824,12 +834,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_replace`**
   > This project already has the world map attached. Replace that georeferencing?
   _Ruled OK 2026-09-23._
-- **`lpn_pane_goto_tip`**
-  > Zoom & select
-  _Ruled OK 2026-09-23._
-- **`lpn_pane_not_used`**
-  > Not used
-  _Ruled OK 2026-09-23._
 - **`lpn_survey_column_n`**
   > column {n}
   _Ruled OK 2026-09-23._
@@ -912,8 +916,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/zoom-scale-rules (`040c59bf`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/zoom-scale-rules (`a4f4e8fa`) — 5 new, 5 to read @@ NEEDS RULING
 
+- **`lpn_pane_paste_note`**
+  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+  @@ NEEDS RULING
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
   @@ NEEDS RULING
@@ -926,5 +933,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   @@ NEEDS RULING
-
-### fix/time-step-day (`5dab74e1`) — adds no English strings

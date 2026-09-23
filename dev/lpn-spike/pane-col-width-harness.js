@@ -40,11 +40,17 @@ const DECLARED = {
 	level:        3.5,
 	minLevel:     3.5,
 	maxLevel:     3.5,
-	tankDiameter: 3.5
+	tankDiameter: 3.5,
+	// **THE ID GAINED A WIDTH THE DAY IT GAINED A WIDGET** (Task 690, 2026-09-19 -- "the ID is not
+	// editable, though it's editable in properties"). paneColId() went from a plain text-and-
+	// button cell with no declared width to an ordinary text input plus a pin, and an ordinary
+	// text input asks for the same thing every other typed cell does. 5em holds a typical id
+	// (`J123`) plus the pin without wrapping.
+	id: 5
 };
-// Columns that carry no width on purpose. id and the two link ends are text, not boxes; a valve's
-// setting is a different quantity per row, so no one width fits it.
-const NO_WIDTH = ['id', 'setting', 'valveType'];
+// Columns that carry no width on purpose. The two link ends are text, not boxes; a valve's setting
+// is a different quantity per row, so no one width fits it.
+const NO_WIDTH = ['setting', 'valveType'];
 
 let pass = 0, fail = 0;
 function report(ok, what, detail) {

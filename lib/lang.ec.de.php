@@ -1674,7 +1674,6 @@ $ec_lang['lpn_tool_area_tip']='Klicken Sie wie angegeben auf die Karte, um alles
 $ec_lang['lpn_area_selected']='{n} ausgewählt.';
 $ec_lang['lpn_area_none']='In diesem Bereich wurde nichts gefunden.';
 $ec_lang['lpn_georef_tab_locked']='Schließen Sie die Platzierung mit der Schaltfläche „Diese Platzierung beibehalten“ ab, oder drücken Sie Abbrechen, bevor Sie das Projekt wechseln. Die Platzierung gehört zu diesem Projekt und kann Sie nicht zu einem anderen begleiten.';
-$ec_lang['lpn_pane_paste_note']='Diese Tabelle ist dafür gedacht, Werte durch Einfügen aus einer Tabellenkalkulation in bereits vorhandene Zeilen einzutragen. Wenn dies Ihren Anforderungen nicht entspricht, nutzen Sie Hilfe, Etwas melden, um es uns mitzuteilen.';
 $ec_lang['lpn_pane_filter_note']='Gefiltert nach {q}. Zeigt {n} von {all}.';
 $ec_lang['lpn_pane_filter_clear']='Alle anzeigen';
 $ec_lang['lpn_pane_filter_none']='Nichts in dieser Tabelle entspricht dem Filter.';
