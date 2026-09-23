@@ -864,7 +864,9 @@ $ec_lang['lpn_multi_no_fields']='These have nothing that can be set together her
 $ec_lang['lpn_pane_pasted']='Pasted {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
+$ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
 $ec_lang['lpn_pane_hide_col']='Hide this column';
+$ec_lang['lpn_pane_hide_cols']='Hide these columns';
 $ec_lang['lpn_pane_show_col']='Show {col}';
 $ec_lang['lpn_tool_area_window']='Select a window';
 $ec_lang['lpn_tool_area_lasso']='Select a lasso';
@@ -2140,6 +2142,8 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // The invitation it used to carry lives in Help > Fix something.
 $ec_lang['lpn_notes_4_term']='Also on this page';
 $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
+$ec_lang['lpn_notes_6_term']='Table keyboard shortcuts';
+$ec_lang['lpn_notes_6_def']='Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

@@ -11,7 +11,9 @@
 //      keystroke or a paste, and the refusal is COUNTED rather than silently dropped.
 //   3. ONE undo snapshot for the whole rectangle, not one per row.
 //   4. A cell being typed in (Entry/Edit mode) keeps its own "d" -- Ctrl+D must not fire mid-edit.
-//      A single-row selection is not a fill and leaves the browser's own Ctrl+D alone.
+//      A single-row selection is not a fill, but the key is still CLAIMED (Tom: *"Ctrl+D on
+//      Pipes.From or To opens the browser Bookmark editing."*) -- inside the table grid, Ctrl+D
+//      never reaches the browser, filled or not, with a notice on the line when it declines.
 //   5. Inside a scenario it is an OVERRIDE: base does not move (the seam
 //      dev/scenario-seam-repair.md exists to keep, on the one door scenario_seam_check.php cannot
 //      see through a keyboard gesture).
@@ -55,6 +57,9 @@ const L = loadLoopedNetwork(
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
 	"\t\teffective: effective, baseValue: baseValue, hasOverride: hasOverride,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
+	"\t\tnotice: function () { return document.getElementById('lpn_map_notice').textContent || ''; },\n" +
+	"\t\theadCell: function (id, key) { return paneTableById(id).headCells[key]; },\n" +
+	"\t\ttd: function (id, elId, key) { return paneTableById(id).tds[elId][key]; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -117,7 +122,7 @@ console.log('\n--- a result column refuses it exactly as it refuses a keystroke,
 	report(L.undoDepth() === d0 + 1, '...and still just one snapshot for the range', d0 + ' -> ' + L.undoDepth());
 }
 
-console.log('\n--- a single row is not a fill, and the browser keeps its own Ctrl+D ---');
+console.log('\n--- a single row is not a fill, but Ctrl+D is still claimed, not left for the browser ---');
 {
 	const d0 = L.undoDepth();
 	L.selectBox('junctions', 'demand', 'demand', 1, 1);
@@ -125,7 +130,45 @@ console.log('\n--- a single row is not a fill, and the browser keeps its own Ctr
 	fire(tableEl('junctions'), 'keydown', { key: 'd', shiftKey: false, ctrlKey: true, metaKey: false,
 		altKey: false, preventDefault: function () { prevented = true; } });
 	report(L.undoDepth() === d0, 'a one-row selection takes no snapshot');
-	report(!prevented, '...and the key handler does not claim the keystroke, so the browser\'s own Ctrl+D stands');
+	report(prevented, '...but the key handler DOES claim the keystroke (Tom: "Ctrl+D on Pipes.From or ' +
+		'To opens the browser Bookmark editing" -- a decline must never fall through to the browser)');
+	report(L.notice().length > 0, '...and says so on the notice line', L.notice());
+}
+
+console.log('\n--- a column fill-down always skips (ID) still claims Ctrl+D ---');
+{
+	// ID is paneFillDown()'s own permanent exclusion (validateNewId() would alert-storm otherwise)
+	// -- the same shape as Pipes.From/To, an identifier column with nothing to fill, which is what
+	// Tom actually hit: *"Ctrl+D on Pipes.From or To opens the browser Bookmark editing."*
+	const d0 = L.undoDepth();
+	L.selectBox('junctions', 'id', 'id', 0, 3);
+	let prevented = false;
+	fire(tableEl('junctions'), 'keydown', { key: 'D', shiftKey: false, ctrlKey: true, metaKey: false,
+		altKey: false, preventDefault: function () { prevented = true; } });
+	report(L.undoDepth() === d0, 'nothing was written -- there was nothing settable in range');
+	report(prevented, 'Ctrl+D on an unfillable column is still claimed, exactly as Tom\'s report names');
+	report(L.notice().length > 0, '...with the same "nothing to fill" notice', L.notice());
+}
+
+console.log('\n--- the right-click menu names Ctrl+D and Ctrl+C beside their own rows ---');
+{
+	// Tom: *"It would be nice to have this documented somewhere somehow. I confess that I did not
+	// know about Ctrl+D."* The lightest discoverable form: the accelerator next to the item, the
+	// way a desktop app's own menu does.
+	function menuEl() { return global.document.body.children.filter((c) => c['class'] === 'lpn-pane-ctxmenu').slice(-1)[0]; }
+	L.selectBox('junctions', 'demand', 'demand', 0, 3);
+	const cellTd = L.td('junctions', ids[0], 'demand');
+	fire(tableEl('junctions'), 'mousedown', { target: cellTd, button: 2, shiftKey: false, preventDefault: function () {} });
+	fire(tableEl('junctions'), 'focusin', { target: cellTd });
+	fire(tableEl('junctions'), 'mouseup', {});
+	fire(tableEl('junctions'), 'contextmenu', { target: cellTd, clientX: 10, clientY: 20, preventDefault: function () {} });
+	const menu = menuEl();
+	report(!!menu, 'the cell menu opens');
+	const rows = menu ? menu.children.map((b) => b.textContent) : [];
+	report(rows.some((t) => t.indexOf('Copy') >= 0 && t.indexOf('Ctrl+C') >= 0),
+		'Copy names Ctrl+C on its own row', JSON.stringify(rows));
+	report(rows.some((t) => t.indexOf('Fill down') >= 0 && t.indexOf('Ctrl+D') >= 0),
+		'Fill down names Ctrl+D on its own row (offered because the selection spans 4 rows)', JSON.stringify(rows));
 }
 
 console.log('\n--- Ctrl+D does not fire while a cell is being typed in ---');

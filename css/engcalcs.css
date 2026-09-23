@@ -2293,17 +2293,15 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
-/* **THE AUTOFILL DOT, AND IT DOES NOTHING YET.** Tom named it as modern spreadsheet practice
-   beside the border highlight (2026-09-19): *"a dot at lower right of current cell or range/block
-   for Autofill."* It is drawn here as a mark on the current cell and is INERT -- there is no
-   handler on it, no cursor of its own, and dragging it does nothing, because fill-down is still an
-   open task under ROADMAP 690. Pure CSS on a pseudo-element, so there is no element to catch a
-   pointer and nothing to unhook. When fill-down is built this is the mark it attaches to. */
-.lpn-pane-table tbody td.lpn-pane-cur { position: relative; }
-.lpn-pane-table tbody td.lpn-pane-cur::after {
-	content: ""; position: absolute; inset-inline-end: 0; bottom: 0;
-	width: 5px; height: 5px; background: #0645ad; pointer-events: none;
-}
+/* **THE AUTOFILL DOT WAS REMOVED, NOT WIRED UP** (Tom: *"Autofill with the little square button is
+   yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once
+   implemented) where autofill is not offered, that would be nice."*). Fill-down shipped since the
+   dot was drawn -- Ctrl+D and the right-click menu's Fill down both do the same job the dot was
+   meant for -- but drag-to-fill from the dot is a different interaction, not a smaller version of
+   the same one: it needs its own drag state, row hit-testing as the pointer moves, autoscroll past
+   the pane's edge, and the same one-undo-step guarantee Ctrl+D already gives, none of which the
+   dot's CSS-only mark carries. Rather than leave a mark that promises a drag it cannot do, it is
+   gone; Ctrl+D and the menu are the affordance until dragging is built as its own piece of work. */
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
@@ -2368,6 +2366,11 @@ html[dir="rtl"] .lpn-pane-table thead th {
 html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	box-shadow: inset 1px 0 0 #ddd, inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
 }
+/* **SEVERAL HEADINGS, MARKED BEFORE THE RIGHT-CLICK THAT HIDES THEM** (Tom: *"can we select
+   multiple heading cells to hide multiple columns at once?"*). The same wash the body cells use
+   for their own selection (`.lpn-pane-table tbody td.lpn-pane-sel`), so a reader who already knows
+   what a selected cell looks like recognises a selected heading without being told twice. */
+.lpn-pane-table thead th.lpn-pane-head-sel { background: #e8f0fe; }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
    <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
@@ -2506,9 +2509,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; min-width: 9em;
 }
 .lpn-pane-ctxmenu button {
-	display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit;
+	display: flex; justify-content: space-between; align-items: center; gap: 1.5em; width: 100%;
+	text-align: left; background: none; border: 0; font: inherit;
 	padding: 5px 10px; cursor: pointer; color: inherit; border-radius: 2px;
 }
+/* The keyboard equivalent, named beside its row the way a desktop menu does (Tom: "I did not know
+   about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
+.lpn-pane-ctxmenu-accel { color: #888; font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: #eef1f4; outline: 0; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the

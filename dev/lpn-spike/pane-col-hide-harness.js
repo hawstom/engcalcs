@@ -15,6 +15,11 @@
 //      dragged width does.
 //   4. There is an obvious way back: the same right-click menu, opened on any remaining heading,
 //      lists a hidden column by name and un-hides it on a click -- no separate popover needed.
+//   5. SEVERAL HEADINGS CAN BE MARKED FIRST** (Tom: *"can we select multiple heading cells to hide
+//      multiple columns at once?"*): Ctrl/Cmd+click toggles one heading into a standing selection,
+//      Shift+click extends a range, and a right-click on any heading IN that selection hides all
+//      of it at once, in one write. ID is silently dropped from the targets rather than blocking
+//      the whole action. A right-click elsewhere is unchanged: the single-column case.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -39,6 +44,8 @@ const INJECT =
 	"\t\tcolKeys: function (id) { return paneCols(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\tallColKeys: function (id) { return paneColsAll(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\theadCell: function (id, key) { return paneTableById(id).headCells[key]; },\n" +
+	"\t\tsortBtn: function (id, key) { return paneTableById(id).headCells[key].children[0]; },\n" +
+	"\t\theadSel: function (id) { return (paneTableById(id).headSel || []).slice(); },\n" +
 	// **THROUGH paneColsAll(), NOT paneCols().** A test that needs to write a value into a
 	// currently-hidden column -- to prove hiding does not delete it -- would find nothing through
 	// the visible-only list.
@@ -177,6 +184,83 @@ console.log('\n--- it persists across a reload, exactly as a dragged width does 
 	report(L.colKeys('junctions').indexOf('demand') < 0,
 		'a fresh module over the SAME localStorage opens with Demand still hidden');
 	report(L.allColKeys('junctions').indexOf('demand') >= 0, '...Demand still exists, just hidden');
+	L.setColHidden('junctions', 'demand', false);   // bring it back, going into the next section
+}
+
+console.log('\n--- several headings can be marked first, and one right-click hides them all ---');
+{
+	// Tom: *"But can we select multiple heading cells to hide multiple columns at once?"*
+	function click(key, mod) {
+		fire(L.sortBtn('junctions', key), 'click', Object.assign({}, mod));
+	}
+	// Ctrl/Cmd+click TOGGLES a heading into the standing selection, without sorting it.
+	const sortBefore = JSON.stringify(L.colKeys('junctions'));
+	click('elev', { ctrlKey: true });
+	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['elev']),
+		'Ctrl+click marks Elevation', JSON.stringify(L.headSel('junctions')));
+	click('demand', { ctrlKey: true });
+	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['elev', 'demand']),
+		'Ctrl+click adds Demand to the standing selection', JSON.stringify(L.headSel('junctions')));
+	report(JSON.stringify(L.colKeys('junctions')) === sortBefore,
+		'...and neither click re-sorted the table -- a modifier click selects, it does not sort');
+
+	// A right-click on a heading that IS in that selection hides the whole selection, ID excluded,
+	// in one write -- and the menu says "these", not "this", because more than one is going.
+	const menu = rightClickHeading('junctions', 'demand');
+	const item = menuItem(menu, PC.lpn_pane_hide_cols);
+	report(!!item, 'the menu offers "Hide these columns" (plural) for a multi-heading selection',
+		menu && menu.children.map((b) => b.textContent).join(' | '));
+	fire(item, 'click', {});
+	const after = L.colKeys('junctions');
+	report(after.indexOf('elev') < 0 && after.indexOf('demand') < 0,
+		'both Elevation and Demand are hidden from one right-click', after.join(','));
+	report(L.allColKeys('junctions').indexOf('elev') >= 0 && L.allColKeys('junctions').indexOf('demand') >= 0,
+		'...hidden, not removed -- both still exist in the full list');
+
+	// Bring them back for the next check.
+	L.setColHidden('junctions', 'elev', false);
+	L.setColHidden('junctions', 'demand', false);
+}
+
+console.log('\n--- a right-click OUTSIDE the standing selection is still the single-column case ---');
+{
+	function click(key, mod) { fire(L.sortBtn('junctions', key), 'click', Object.assign({}, mod)); }
+	click('elev', { ctrlKey: true });
+	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['elev']), 'Elevation alone is marked');
+	// Right-clicking a DIFFERENT heading (Tag, never touched by the Ctrl+click above) must act on
+	// Tag alone, not silently drag Elevation along with it.
+	const menu = rightClickHeading('junctions', 'tag');
+	const item = menuItem(menu, PC.lpn_pane_hide_col);
+	report(!!item, 'the menu offers the SINGULAR "Hide this column" -- Tag was never selected',
+		menu && menu.children.map((b) => b.textContent).join(' | '));
+	fire(item, 'click', {});
+	const after = L.colKeys('junctions');
+	report(after.indexOf('tag') < 0, 'Tag alone is hidden');
+	report(after.indexOf('elev') >= 0, '...and Elevation, which was only Ctrl+clicked and never right-clicked, is untouched');
+	L.setColHidden('junctions', 'tag', false);
+}
+
+console.log('\n--- ID inside a multi-selection is dropped, not a reason to refuse the rest ---');
+{
+	function click(key, mod) { fire(L.sortBtn('junctions', key), 'click', Object.assign({}, mod)); }
+	click('id', { ctrlKey: true });
+	click('elev', { ctrlKey: true });
+	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['id', 'elev']), 'ID and Elevation are both marked');
+	const menu = rightClickHeading('junctions', 'elev');
+	fire(menuItem(menu, PC.lpn_pane_hide_col), 'click', {});
+	const after = L.colKeys('junctions');
+	report(after.indexOf('id') >= 0, 'ID stayed visible -- it is never a hide target, even inside a selection');
+	report(after.indexOf('elev') < 0, '...but Elevation, the rest of the same selection, was hidden');
+	L.setColHidden('junctions', 'elev', false);
+}
+
+console.log('\n--- a plain click on a heading clears any standing selection and sorts, as before ---');
+{
+	function click(key, mod) { fire(L.sortBtn('junctions', key), 'click', Object.assign({}, mod)); }
+	click('elev', { ctrlKey: true });
+	report(L.headSel('junctions').length === 1, 'a heading is marked going in');
+	click('elev', {});
+	report(L.headSel('junctions').length === 0, 'a plain click drops the selection');
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

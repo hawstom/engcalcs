@@ -20745,19 +20745,65 @@ var EngCalcs = EngCalcs || {};
 		var h = paneColPrefs[specId] && paneColPrefs[specId].hidden;
 		return !!(h && h.indexOf(key) !== -1);
 	}
-	function paneSetColHidden(spec, key, hidden) {
-		var pref, h, i;
-		if (key === 'id') { return; }
-		pref = paneColPrefFor(spec.id);
+	// **ONE OR MANY, THE SAME WRITE** (Tom: *"can we select multiple heading cells to hide
+	// multiple columns at once?"*). A single-column Hide is `paneSetColsHidden(spec, [key], true)`
+	// -- one save and one rebuild whichever way it is called, rather than one rebuild per column,
+	// which would show every intermediate width for a heartbeat each.
+	function paneSetColsHidden(spec, keys, hidden) {
+		var pref = paneColPrefFor(spec.id), h, changed = false;
 		if (!pref.hidden) { pref.hidden = []; }
 		h = pref.hidden;
-		i = h.indexOf(key);
-		if (hidden && i === -1) { h.push(key); }
-		else if (!hidden && i !== -1) { h.splice(i, 1); }
-		else { return; }
+		(keys || []).forEach(function (key) {
+			var i;
+			if (key === 'id') { return; }
+			i = h.indexOf(key);
+			if (hidden && i === -1) { h.push(key); changed = true; }
+			else if (!hidden && i !== -1) { h.splice(i, 1); changed = true; }
+		});
+		if (!changed) { return; }
 		savePaneColPrefs();
 		paneTableReset(spec);
 		renderPaneTable(spec);
+	}
+	function paneSetColHidden(spec, key, hidden) { paneSetColsHidden(spec, [key], hidden); }
+	// **HEADING SELECTION, FOR "HIDE THESE COLUMNS" -- WINDOW FURNITURE, LIKE THE COLUMN WIDTHS
+	// AND ORDER BESIDE IT.** Kept on the spec (one table's headings at a time) rather than
+	// `paneColPrefs`, because which headings are highlighted right now is not a fact worth a
+	// visitor's next visit -- it dies with the tab switch that already throws the DOM nodes away.
+	function paneHeadSel(spec) { return spec.headSel || (spec.headSel = []); }
+	function paneHeadSelPaint(spec) {
+		var sel = paneHeadSel(spec), cells = spec.headCells || {}, k;
+		for (k in cells) {
+			if (!Object.prototype.hasOwnProperty.call(cells, k) || !cells[k] || !cells[k].classList) { continue; }
+			if (sel.indexOf(k) !== -1) { cells[k].classList.add('lpn-pane-head-sel'); }
+			else { cells[k].classList.remove('lpn-pane-head-sel'); }
+		}
+	}
+	function paneHeadSelClear(spec) {
+		spec.headSel = [];
+		spec.headSelAnchor = null;
+		paneHeadSelPaint(spec);
+	}
+	// **CTRL/CMD+CLICK TOGGLES ONE HEADING; SHIFT+CLICK EXTENDS A RANGE FROM THE LAST ONE
+	// TOUCHED** -- the same two idioms the body cells already answer to (paneSelSet's `ext`), so a
+	// reader who has selected a row range with Shift+click already knows the heading gesture too.
+	function paneHeadSelRange(spec, key) {
+		var keys = paneCols(spec).map(function (c) { return c.key; }),
+			i0 = spec.headSelAnchor ? keys.indexOf(spec.headSelAnchor) : -1, i1 = keys.indexOf(key), lo, hi;
+		if (i0 < 0) { i0 = i1; }
+		if (i1 < 0) { return; }
+		lo = Math.min(i0, i1); hi = Math.max(i0, i1);
+		spec.headSel = keys.slice(lo, hi + 1);
+		paneHeadSelPaint(spec);
+	}
+	function paneHeadSelToggle(spec, key) {
+		var sel = paneHeadSel(spec), i = sel.indexOf(key);
+		if (i === -1) { sel.push(key); } else { sel.splice(i, 1); }
+		spec.headSelAnchor = key;
+		paneHeadSelPaint(spec);
+	}
+	function paneHeadSelClick(spec, key, ev) {
+		if (ev && ev.shiftKey) { paneHeadSelRange(spec, key); } else { paneHeadSelToggle(spec, key); }
 	}
 	// **THE FULL, ORDERED LIST, HIDDEN COLUMNS INCLUDED.** Everything that reads the table --
 	// tabbing, arrow-jump, Home/End, paste, fill-down, copy, print -- goes through `paneCols()`
@@ -21228,7 +21274,16 @@ var EngCalcs = EngCalcs || {};
 			b.textContent = paneHeadingText(c) +
 				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
-			b.addEventListener('click', function () { sortPaneTable(spec, c.key); });
+			// **CTRL/CMD OR SHIFT ON THE HEADING SELECTS IT INSTEAD OF SORTING** -- the same modifier
+			// convention a spreadsheet uses for its own column headers, so several can be marked
+			// before a right-click hides all of them at once (Tom: *"can we select multiple heading
+			// cells to hide multiple columns at once?"*). A plain click still sorts, and drops
+			// whatever was selected, exactly as a plain click on an unmodified cell would.
+			b.addEventListener('click', function (ev) {
+				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { paneHeadSelClick(spec, c.key, ev); return; }
+				if (paneHeadSel(spec).length) { paneHeadSelClear(spec); }
+				sortPaneTable(spec, c.key);
+			});
 			// **DRAGGING THE HEADING MOVES THE COLUMN** (Tom's point (e)). It is a mousedown on the
 			// heading rather than a drag handle of its own: the heading IS the handle, which is what
 			// he asked for and what every spreadsheet does. A click that never moves is still a
@@ -21259,8 +21314,17 @@ var EngCalcs = EngCalcs || {};
 			// drag above, so only hide is new); this menu is the whole of the affordance, and it is
 			// also the obvious way BACK -- a hidden column's own entry offers to show it again.
 			th.addEventListener('contextmenu', function (ev) {
+				var sel;
 				if (ev.preventDefault) { ev.preventDefault(); }
 				if (ev.stopPropagation) { ev.stopPropagation(); }
+				// A right-click ON the current multi-selection acts on all of it; anywhere else, it
+				// is the single-column case Tom already had, unchanged.
+				sel = paneHeadSel(spec);
+				if (sel.length <= 1 || sel.indexOf(c.key) === -1) {
+					spec.headSel = [c.key];
+					spec.headSelAnchor = c.key;
+					paneHeadSelPaint(spec);
+				}
 				paneOpenColMenu(spec, ev.clientX || 0, ev.clientY || 0, c.key);
 			});
 			tr.appendChild(th);
@@ -21284,6 +21348,14 @@ var EngCalcs = EngCalcs || {};
 		// here, which is also why there is nothing to unhook: they die with the table they are on.
 		paneWireTable(spec, table);
 		paneSelPaint(spec, rows, paneCols(spec));
+		// A column that left with a hide, or simply is not on THIS table, cannot still be selected.
+		if (spec.headSel && spec.headSel.length) {
+			(function () {
+				var keys = paneCols(spec).map(function (c) { return c.key; });
+				spec.headSel = spec.headSel.filter(function (k) { return keys.indexOf(k) !== -1; });
+			}());
+		}
+		paneHeadSelPaint(spec);
 		initTipsIn(host);
 	}
 	function sortPaneTable(spec, col) {
@@ -22174,7 +22246,7 @@ var EngCalcs = EngCalcs || {};
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), key = e && e.key,
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
-			active = activeElementSafe(), r, c, at;
+			pc = EngCalcs.pageConfig || {}, active = activeElementSafe(), r, c, at;
 		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
@@ -22211,6 +22283,21 @@ var EngCalcs = EngCalcs || {};
 			paneCommitCell(active);
 			return true;
 		}
+		// **CTRL+D NEVER REACHES THE BROWSER FROM INSIDE THIS TABLE** (Tom: *"Ctrl+D on
+		// Pipes.From or To opens the browser Bookmark editing."* and *"I did not know about
+		// Ctrl+D."*). Asked BEFORE the `!box` early return below -- that return answers false for
+		// every non-navigation key when nothing is selected yet, which used to hand Ctrl+D straight
+		// back to the browser the moment focus was in the table but no cell had been picked. Asked
+		// here, with `!editing` guarding it exactly like Ctrl+C, a typed "d" mid-entry is still an
+		// ordinary character. A selection that CANNOT be filled -- From, To, ID, a single row -- is
+		// not a reason to let the browser see the key: paneFillDown() already declines quietly, so
+		// this says so instead, on the same notice line every other "nothing to do" moment here uses.
+		if (jump && !editing && (key === 'd' || key === 'D')) {
+			if (!paneFillDown(spec)) {
+				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
+			}
+			return true;
+		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
 			// where a spreadsheet with no selection puts you.
@@ -22245,14 +22332,7 @@ var EngCalcs = EngCalcs || {};
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 			return true;
 		}
-		// **CTRL+D FILLS DOWN**, the spreadsheet convention (Excel allows it from an ordinary
-		// selection, with no cell in edit -- so `!editing` guards it exactly like Ctrl+C above, and
-		// a typed "d" while a cell is being entered stays an ordinary character). preventDefault is
-		// returned only when a fill actually ran, so the browser's own Ctrl+D bookmark shortcut is
-		// left alone on a single-row selection, which paneFillDown() itself declines.
-		if (jump && !editing && (key === 'd' || key === 'D')) {
-			return paneFillDown(spec);
-		}
+		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
@@ -22636,18 +22716,29 @@ var EngCalcs = EngCalcs || {};
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
-		mk = function (text, fn) {
-			var b = document.createElement('button');
+		// **THE ACCELERATOR IS WRITTEN NEXT TO ITS ROW, THE WAY A DESKTOP MENU DOES** (Tom: *"It
+		// would be nice to have this documented somewhere somehow. I confess that I did not know
+		// about Ctrl+D."*). Only the two rows that are also a keyboard shortcut carry one -- Delete
+		// and Zoom & select have no keyboard equivalent of their own in the grid, and a label that
+		// claimed one would be the thing somebody trusted and typed.
+		mk = function (text, fn, accel) {
+			var b = document.createElement('button'), acc;
 			b.type = 'button';
 			b.setAttribute('role', 'menuitem');
-			b.textContent = text;
+			b.appendChild(document.createTextNode(text));
+			if (accel) {
+				acc = document.createElement('span');
+				acc.className = 'lpn-pane-ctxmenu-accel';
+				acc.textContent = accel;
+				b.appendChild(acc);
+			}
 			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
 			menu.appendChild(b);
 			return b;
 		};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
-		});
+		}, 'Ctrl+C');
 		mk(pc.points_data_paste || 'Paste', function () {
 			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
 			// the clipboard directly -- and the one place it can be denied permission to. Silence
@@ -22669,7 +22760,7 @@ var EngCalcs = EngCalcs || {};
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
 		if (box.r1 > box.r0) {
-			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); });
+			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); }, 'Ctrl+D');
 		}
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
 		document.body.appendChild(menu);
@@ -22677,12 +22768,17 @@ var EngCalcs = EngCalcs || {};
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
 		paneClampMenu(menu, x, y);
 	}
-	// **THE HEADING'S OWN MENU: HIDE THIS COLUMN, AND SHOW ONE BACK.** A right-click (or long-press)
-	// on any heading but ID offers to hide it; whenever this table has a hidden column, the same
-	// menu lists each one by name so showing it again is never more than a right-click away -- the
-	// "obvious way back" Declan's design asks for, with no separate popover to build.
+	// **THE HEADING'S OWN MENU: HIDE THIS COLUMN (OR THESE COLUMNS), AND SHOW ONE BACK.** A
+	// right-click (or long-press) on any heading but ID offers to hide it; whenever this table has
+	// a hidden column, the same menu lists each one by name so showing it again is never more than
+	// a right-click away -- the "obvious way back" Declan's design asks for, with no separate
+	// popover to build. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can we select multiple
+	// heading cells to hide multiple columns at once?"*) -- when the right-clicked heading is part
+	// of a standing multi-selection, Hide acts on the whole selection in one write; otherwise it is
+	// exactly the single-column case this always was. ID is dropped from the targets rather than
+	// blocking the whole menu, so hiding a selection that happens to include ID still hides the rest.
 	function paneOpenColMenu(spec, x, y, key) {
-		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden;
+		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden, sel, targets;
 		paneCloseContextMenu();
 		menu = document.createElement('div');
 		menu.className = 'lpn-pane-ctxmenu';
@@ -22698,8 +22794,12 @@ var EngCalcs = EngCalcs || {};
 			menu.appendChild(b);
 			return b;
 		};
-		if (key !== 'id') {
-			mk(pc.lpn_pane_hide_col || 'Hide this column', function () { paneSetColHidden(spec, key, true); });
+		sel = paneHeadSel(spec);
+		targets = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key];
+		targets = targets.filter(function (k) { return k !== 'id'; });
+		if (targets.length) {
+			mk(targets.length > 1 ? (pc.lpn_pane_hide_cols || 'Hide these columns') : (pc.lpn_pane_hide_col || 'Hide this column'),
+				function () { paneSetColsHidden(spec, targets, true); paneHeadSelClear(spec); });
 		}
 		hidden = cols.filter(function (c) { return paneColHidden(spec.id, c.key); });
 		hidden.forEach(function (c) {

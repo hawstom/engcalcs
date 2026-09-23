@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 186 untranslated keys, of 2036 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 190 untranslated keys, of 2040 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (186, 4 to read @@ NEEDS RULING)
+## lpn_  (190, 8 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -369,6 +369,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_node_customers_tip`**
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
+- **`lpn_notes_6_def`**
+  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  @@ NEEDS RULING
 - **`lpn_pane_filldown`**
   > Fill down
   @@ NEEDS RULING
@@ -380,6 +389,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_pane_hide_col`**
   > Hide this column
+  @@ NEEDS RULING
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
@@ -590,7 +602,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**47 still to read**, of 70 new keys across 7 unmerged branch(es).
+**49 still to read**, of 72 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -601,7 +613,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`fcf23dd8`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`ab6ad007`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -619,7 +631,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
-  > This project: {crs}
+  > Current: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_label_col`**
+  > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
@@ -796,11 +814,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`c949316e`) — adds no English strings
+### feat/label-limit (`0053e241`) — adds no English strings
 
-### feat/property-venue (`de2ef299`) — adds no English strings
+### feat/property-venue (`1066860e`) — adds no English strings
 
-### feat/table-editing (`ab33c6fc`) — adds no English strings
+### feat/table-editing (`388e56c6`) — adds no English strings
 
 ### feat/zoom-control (`7ac181c1`) — 7 new, 7 to read @@ NEEDS RULING
 
