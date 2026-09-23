@@ -259,3 +259,89 @@ inheriting the first review's now-decayed OBSERVED finding as if it still descri
 
 **Verdict: NOT READY.** The flash he explicitly asked to stop still happens; "all messages" still
 excludes one; and the outside-click dismissal has a real, unflagged side effect on the drawing.
+
+## 2026-09-22 -- feat/notice-log, fourth review at `1f2e4819`/`bb51995e`
+
+Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, `dev/browser-pass` infra (own
+PHP server + real Chromium via playwright-core), plus a one-off probe script written for this
+round. Reviewing on top of `f02da0be`, which my own third review (2026-09-22, logged above) found
+NOT READY on the flash, the incomplete "all messages," and the outside-click side effect -- all
+three are addressed by `f02da0be` itself (a commit that landed between my third review and this
+one) and are RE-CONFIRMED here, live, rather than trusted: ran `dev/browser-pass/specs/msglogpos.js`
+in full (68/68 checks passed) -- dismiss-no-side-effect and glyph-on-fresh-project sections, both
+written in response to my prior findings, pass against real pointer/click events and a real
+`elementFromPoint` hit-test.
+
+**CONFIRMED -- (1) and (3), read together as the build agent claimed they were one defect, and
+independently re-measured rather than trusted.** `.lpn-msglog-panel` gained `flex-direction:
+column` and a solid `background:#fff`. Live probe (three simultaneous notices from Ctrl+Z, Ctrl+Y,
+Delete-with-nothing-selected): the two panel children (`.lpn-msglog-panel-row` and
+`.lpn-msglog-panel-note`, the "Newest first..." help text) stack top-to-bottom with a real gap
+(previous row bottom 195.19px, next row top 199.19px -- no overlap, no shared line), answering the
+part of his sentence ("the simultaneous messages on open **and** the 'Newest first' help text
+appear on one line instead of on three") that the build report's own account never explicitly
+named. `elementFromPoint()` at three points -- inside the top row, in the gap between the row and
+the note, and at the panel's bottom edge -- all three resolve to `#lpn_msglog_panel` itself with
+`background-color: rgb(255, 255, 255)` and `opacity: 1`, i.e. the fix is a property of the
+CONTAINER and therefore holds regardless of message count or position, not just at the specific
+case ("RIVER") Tom happened to see. Did not re-load the actual Net3 project with a live "RIVER"
+text object underneath (not needed: opacity=1 solid white at every sampled point, including the
+gap, is a stronger and scene-independent guarantee than one screenshot of one project would be).
+`dev/lpn-spike/notice-log-harness.js` §7f's CSS-source assertions match what the rendered page
+actually does.
+
+**CONFIRMED -- the hover/long-press tip is gone, and the deleted key is genuinely dead.** No
+`title` attribute, no `.ec-help` class on `#lpn_msglog_btn` (grep + harness agree); no live read of
+`lpn_msglog_tip` anywhere in `js/*.js` or `*.php` (only in comments and the change log,
+`dev/new-english-keys.md`); confirmed the key was NEVER in any of the 26 translated `lang.ec.??.php`
+files even before this commit (`git show bb51995e^:lib/lang.ec.<x>.php | grep` on all 26, none),
+so the commit message's own claim -- "it and its 26 translations were deleted with this change" --
+overstates what happened; there were no translations to delete. A harmless inaccuracy in commit
+prose, not a functional defect, but exactly the kind of confident-and-wrong sentence this seat
+exists to catch, so noted.
+
+**MISSED -- not one of Tom's four, but a real leak from how (4) was built, and the one finding
+worth the most of his attention this round.** Every OTHER icon-only toolbar/strip button
+(`undo`, `save`, `open`, `find`, `settings`, `zoom-extent`, `pane-toggle`, the mode buttons, the
+area-select tool) is wired through the file's own `setIconLabel()` wrapper, which does two things
+at once: sets the tip AND pushes `{el, icon, name, tip}` into `toolbarIconIndex`, the array
+`iconGuideRows()` reads to build Help > "Toolbar key" (`js/looped-network.js` ~30473,
+~31927 -- "DERIVED from the strip itself... so a button added later is in it already"). The commit
+under review does not call `setIconLabel()` at all for the message-log button -- it now builds the
+button by hand (`btn.textContent=''; ic=iconEl('history'); btn.appendChild(ic);
+btn.setAttribute('aria-label', ...)`) specifically to skip the tip, but that also skips the
+registration, silently. Verified live: opened the real Help menu, hovered "Toolbar key," read the
+submenu's rendered text -- it does not mention "Messages." Before this commit the button DID call
+`setIconLabel()` (confirmed via `git show bb51995e^`) and so WAS listed there. Tom asked only that
+the hover tip go away ("more trouble than help"); he did not ask for the button to disappear from
+the one deliberately-non-hover discovery path this same file's comments describe as existing
+*because* "a first-time user who does not think to hover -- and a touch user, for whom a tip needs
+a deliberate press-and-hold -- has no way to read the strip." The message-log glyph is now in
+exactly that position and is the one button on the page not covered by its own answer. Not caught
+by any harness on this branch -- `notice-log-harness.js` asserts the absence of title/.ec-help but
+never touches `toolbarIconIndex` or the Help menu.
+
+**Verdict: this round's two commits do what he asked on all four items and hold up under
+independent re-measurement -- but they introduce one new, unrequested regression** (Help >
+"Toolbar key" silently loses its one entry for this button, at the same moment its tip goes away,
+leaving a first-time or touch user with no way at all to learn what the glyph does). This is small
+enough not to block a browser pass on its own -- nothing he asked for is broken -- but it should be
+named to him rather than fixed silently, since a reviewer here reports rather than repairs.
+
+## 2026-09-22 -- feat/notice-log, follow-up: the Help-menu regression fixed same day, re-verified
+
+After delivering the review above, a further commit landed on the branch, `38592ea7` ("Keep the
+message-log glyph in Help > Toolbar key, still tipless"), responding directly to the one finding in
+that review. **CONFIRMED, independently, not just read.** Re-ran the live browser probe against the
+Help menu: hovering "Toolbar key" now shows "Messages" in the fly-out (it did not, before this
+commit). The fix splits `setIconLabel()`'s two jobs -- writing the tip and registering into
+`toolbarIconIndex` -- into a standalone `registerToolbarIcon()`, and `wireMessageLogButton()` now
+calls that alone with an empty `tip` string; `iconGuideRows()` already treats a falsy tip as "no
+tip on this row," so the list entry carries a name and no tip, matching what was asked. The
+harness's new group 10 mutation (removing the `registerToolbarIcon()` call) reproduces the exact
+regression and is killed. The same commit also quietly corrected the "26 translations" overstatement
+I flagged in the prior comment (now: "never translated into any of the other 26 languages"),
+without being asked to -- read the wording precisely rather than skimming past a now-familiar phrase.
+
+**Verdict unchanged and now stronger: ready for a browser pass, nothing outstanding from this
+review.**
