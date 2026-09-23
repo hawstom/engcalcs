@@ -253,7 +253,15 @@ which no longer exists as a branch -- ask him what he wants that host on.
 3. **The two "step 2" controls.** Still unanswered and still the same question: **ask him which
    menu row he pressed.** One of them rewrites every coordinate by design.
 4. **R-062**, his own: how to spend real resources on a deep code review against AI techno-slop.
-5. **The 1 px heading misalignment:** what browser and zoom level, and was the scrollbar showing?
+5. **The 1 px heading misalignment:** re-measured 2026-09-22 against his own screenshot, in real
+   Chromium (not the DOM stub) on Elm Street's and Net3's own tables. `getBoundingClientRect` shows
+   0px difference between every thead/tbody column boundary at device pixel ratios 1, 1.25, 1.5, 2;
+   at CSS zoom 80-150%; and with a vertical scrollbar forced (many rows, `scrollTop` 0/100/400).
+   Pixel-level crops of the rendered PNG at 8x also show a continuous, unbroken divider line through
+   the heading and every row below it. **Still not reproduced. The standing question is unchanged:
+   what browser and zoom level, and was the scrollbar showing?** -- add whether Windows display
+   scaling was in play, since that is the one variable this environment cannot exercise (Linux
+   headless Chromium's scrollbar reserves no layout width even with classic scrollbars forced).
 6. **Row 3 of Ida's list** -- the 57 raw `alert()`/`confirm()` calls. Deliberately not started. The
    first pass is a page of prose sorting them into must-block / could-be-a-notice / merely-informs,
    and that sorting is HIS ruling to make, not an agent's.
