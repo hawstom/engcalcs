@@ -96,6 +96,20 @@
             "words": "feat/tables-spreadsheet\n- Done. Merge and delete branch.",
             "context": "Said after his pass over the fixes for R-110 (unreasonable column widths), R-161 (the 1px divider misalignment) and R-162 (print not respecting on-screen widths), in the same message as his rulings on feat/zoom-scale-rules, feat/notice-log and Settings undo.",
             "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words. The branch was 94 commits behind master and was deliberately not re-merged from master first, which would have moved the head and lapsed the approval."
+        },
+        "feat/notice-log": {
+            "head": "80bc539e649db2042c5d6f4714ee03b08cb3d3bf",
+            "date": "2026-09-23",
+            "words": "feat/notice-log\n- Done. Close, merge, and delete branch.",
+            "context": "Said after his pass over R-175 (the glyph drawn as a plain selector-style down triangle), R-157 (the RIVER text showing through the button, now opaque) and R-160 (no tip), in the same message as his all-clear for feat/zoom-scale-rules and three findings on feat/zoom-control.",
+            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after the R-175 round."
+        },
+        "feat/zoom-scale-rules": {
+            "head": "53ae1a15423b348f3f713c7d6bc9f1c5fe8b0736",
+            "date": "2026-09-23",
+            "words": "feat/zoom-scale-rules\n- Done. Close, merge, and delete branch.",
+            "context": "Said after his pass over R-174 (Show at all zoom levels off by default, on only for the largest text in each example, and present in multi-properties, Tables and Find/Replace), with R-167 to R-170 from the earlier round.",
+            "pin_note": "Pinned to 53ae1a15, one commit past the R-174 build: that commit is the pre-reviewer's journal entry and touches nothing the page renders."
         }
     }
 }
