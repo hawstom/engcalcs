@@ -57,7 +57,9 @@
         "feat/zoom-symbol-size",
         "feat/map-menu",
         "tables-interface",
-        "feat/zoom-scale-rules"
+        "feat/zoom-scale-rules",
+        "feat/zoom-control",
+        "feat/convert-as"
     ],
     "feature_freeze": {
         "active": false,
