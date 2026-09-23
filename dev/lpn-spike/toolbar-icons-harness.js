@@ -146,8 +146,16 @@ console.log('\n-- the time transport on the strip --');
 
 console.log('\n-- the Help list is DERIVED from the strip --');
 {
-	report(/toolbarIconIndex\.push/.test(fnBody(src, 'setIconLabel')),
-		'setIconLabel() records each button, so the list cannot drift from the strip');
+	// **THE RECORDING HALF SPLIT OUT 2026-09-22** (Perry's second review): a button dropping its
+	// tip by building itself by hand instead of calling setIconLabel() was silently falling out of
+	// this list too, because the push lived only inside setIconLabel() with no other door to it.
+	// registerToolbarIcon() is that door now, callable on its own with an empty tip; setIconLabel()
+	// still reaches the list, just through the shared function rather than a literal push of its
+	// own.
+	report(/toolbarIconIndex\.push/.test(fnBody(src, 'registerToolbarIcon')),
+		'registerToolbarIcon() records each button, so the list cannot drift from the strip');
+	report(/registerToolbarIcon\(/.test(fnBody(src, 'setIconLabel')),
+		'and setIconLabel() reaches the list through that same door, not a push of its own');
 	const guide = strip(fnBody(src, 'iconGuideRows'));
 	report(/toolbarIconIndex\.map/.test(guide), 'the guide is built from that record, not from a second list');
 	report(/lpn_help_icons/.test(src), 'and Help carries a row for it');

@@ -2491,7 +2491,8 @@
 			"x": 35.440246952096,
 			"y": 15.397639717135469,
 			"anchorNode": null,
-			"sizeMult": 4
+			"sizeMult": 4,
+			"allZoom": true
 		}
 	],
 	"nextId": {
@@ -2638,6 +2639,7 @@
 		"textSize": 8,
 		"symbolSize": 8,
 		"linkWidth": 2,
+		"labelMaxWidth": 30,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.8,
 		"alignPipeLabels": true,

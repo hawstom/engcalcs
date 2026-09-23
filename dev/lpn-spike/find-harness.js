@@ -273,8 +273,11 @@ function build(unitSet) {
 	// offered it anyway, so the menu carried a condition that could not match in any wording. The
 	// assertion here used `indexOf('text') > 0`, which was quietly ASSERTING that something came
 	// before it; that something was the id.
+	// **AND "Show at all zoom levels" (R-174), RIGHT AFTER SIZE** -- the Tables/multi-properties
+	// column's own neighbour (paneTextCols()), and Find offers the identical two the same way it
+	// always has beside it.
 	ok('a Text scope offers its words and its size, and no ID it cannot search',
-		JSON.stringify(L.propKeys('text')) === JSON.stringify(['text', 'sizeMult']),
+		JSON.stringify(L.propKeys('text')) === JSON.stringify(['text', 'sizeMult', 'allZoom']),
 		JSON.stringify(L.propKeys('text')));
 	// **AND SINCE TASK 598 A TEXT PROPERTY GETS above AND below TOO** (Tom, 2026-09-06: *"ID, Tag,
 	// and Text should also allow Below and Above for a localized alphanumeric order (dictionary

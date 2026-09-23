@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**32 still to read on master**, of 196 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**25 still to read on master**, of 206 untranslated keys, of 2054 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (196, 32 to read @@ NEEDS RULING)
+## lpn_  (206, 25 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -288,6 +288,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
   _Ruled OK 2026-09-17._
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  _Ruled OK 2026-09-23._
 - **`lpn_lock_open_care`**
   > To avoid data loss, choose carefully from the options below.
   _Ruled OK 2026-09-17._
@@ -383,7 +386,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_mapgeo_readjust_intro`**
   > Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_mapgeo_step1`**
   > Step 1 of 2: find your place in the world
   _Ruled OK 2026-09-23._
@@ -404,6 +407,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_ago`**
+  > {x} ago
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_heading`**
+  > Recent messages
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_name`**
+  > Messages
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
 - **`lpn_node_customers`**
   > Customer demands
@@ -430,13 +448,25 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
-  _Ruled 2026-09-23: Should we offer the same hint here as for customer labels (0 to hide always) and remove the Thematic map toggle? Otherwise okay._
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
+  _Ruled OK 2026-09-23._
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
 - **`lpn_settings_sym_customer`**
   > Customer
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_symbol_cap`**
+  > Prevent nodes from scaling larger than
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_symbol_cap_mid`**
+  > times the length of the
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_symbol_cap_post`**
+  > percentile pipe
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_symbol_cap_tip`**
+  > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   _Ruled OK 2026-09-23._
 - **`lpn_survey_axis_east`**
   > Easting
@@ -473,19 +503,19 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_survey_format_internal`**
   > specified internally
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_format_label`**
   > File format:
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_ambiguous_elev`**
   > More than one column could be the elevation, so none of them was read.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_bad_coord`**
   > The {axis} does not read as a number.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_bad_elev`**
   > Non-numeric elevation. Imported without elevation.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_survey_note_blank_rows`**
   > Blank lines skipped: {detail}.
   _Ruled OK 2026-09-23._
@@ -551,7 +581,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_time_clock_day`**
   > Day {day}, {clock}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-23._
 - **`lpn_tool_add_meter`**
   > Customer
   _Ruled OK 2026-09-23._
@@ -620,7 +650,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**43 still to read**, of 72 new keys across 7 unmerged branch(es).
+**37 still to read**, of 60 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -631,7 +661,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`4abcfb9e`) — adds no English strings
+### feat/convert-as (`23de4dfd`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -759,7 +789,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/notice-log (`80bc539e`) — 8 new, 2 to read @@ NEEDS RULING
+### feat/label-limit (`c949316e`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -767,26 +797,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_file_import_geo_tip`**
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
-- **`lpn_lock_open_cancelled`**
-  > That file was not opened, and nothing here changed. Somebody else still has it open.
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_ago`**
-  > {x} ago
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_empty`**
-  > No messages yet.
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_heading`**
-  > Recent messages
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_name`**
-  > Messages
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_note`**
-  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
-  _Ruled OK 2026-09-23._
 
-### feat/table-editing (`29fc3b42`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/property-venue (`de2ef299`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+
+### feat/table-editing (`ab33c6fc`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -807,7 +828,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`bcaa8319`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`83eeb139`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -816,13 +837,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 - **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Drag a box on the map to zoom in on it.
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window`**
   > Zoom Window
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window_tip`**
-  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
   @@ NEEDS RULING
 - **`lpn_zoom_in`**
   > Zoom in
@@ -835,34 +856,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
-
-### feat/zoom-scale-rules (`53ae1a15`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_file_import_geo`**
-  > Convert coordinates as…
-  @@ NEEDS RULING
-- **`lpn_file_import_geo_tip`**
-  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  @@ NEEDS RULING
-- **`lpn_settings_symbol_cap`**
-  > Prevent nodes from scaling larger than
-  @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_mid`**
-  > times the length of the
-  @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_post`**
-  > percentile pipe
-  @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_tip`**
-  > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
-  @@ NEEDS RULING
-
-### fix/settings-select-lag (`5f6e6559`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_file_import_geo`**
-  > Convert coordinates as…
-  @@ NEEDS RULING
-- **`lpn_file_import_geo_tip`**
-  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
