@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 181 untranslated keys, of 2029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, all ruled)
+## lpn_  (181, 3 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -147,12 +147,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
-  > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
-  _Ruled OK 2026-09-23._
+  > Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
+  @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -379,14 +376,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Customers
   _Ruled OK 2026-09-17._
 - **`lpn_settings_label_always`**
-  > Always show labels
-  _Ruled OK 2026-09-23._
+  > Always show
+  @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
-  _Ruled OK 2026-09-23._
+  > Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
+  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -578,7 +575,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 6 unmerged branch(es).
+**65 still to read**, of 94 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +586,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`fcf23dd8`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`ab6ad007`) — 29 new, 28 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -607,7 +604,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
-  > This project: {crs}
+  > Current: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_label_col`**
+  > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
@@ -654,6 +657,15 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
   @@ NEEDS RULING
@@ -664,7 +676,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
+### feat/label-gang-search (`0346dc5d`) — 42 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -690,6 +702,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
 - **`lpn_labels_restore`**
   > Restore label defaults
   _Ruled OK 2026-09-23._
@@ -701,6 +716,12 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 - **`lpn_survey_column_n`**
   > column {n}
@@ -784,12 +805,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`c949316e`) — adds no English strings
+### feat/label-limit (`865d75f2`) — adds no English strings
 
-### feat/property-venue (`de2ef299`) — adds no English strings
+### feat/property-venue (`1066860e`) — 3 new, 2 to read @@ NEEDS RULING
 
-### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 
+### feat/table-editing (`388e56c6`) — 7 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
 - **`lpn_pane_filldown`**
   > Fill down
   @@ NEEDS RULING
@@ -802,11 +836,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_show_col`**
   > Show {col}
   @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 
-### feat/zoom-control (`83eeb139`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`7ac181c1`) — 10 new, 9 to read @@ NEEDS RULING
 
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window`**
   > Zoom Window
@@ -825,4 +874,16 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING
+
+### fix/table-print (`b2126819`) — 3 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
