@@ -381,61 +381,78 @@ console.log('7d. Highlighted while a message shows, cleared the moment it is not
 	ok('and clears when that warning resolves', !active());
 }
 
-console.log('7e. The clock reads as a clock, not a chevron, at real button size');
-// Perry's review, 2026-09-22: the first drawing put both hands within about 20 degrees of
-// straight up, which at 14-16px fuses into a single bent line -- a chevron or checkmark, not two
-// hands. This is a STATIC geometry check on the icon definition itself (lib/Icons.lib.php), not a
-// rendered-pixel one: it parses the two <path> "d" strings for the 'history' icon into vectors
-// from their shared start point and asserts they are close to perpendicular and clearly unequal
-// in length, which is what keeps them visually separable at small size regardless of how any one
-// browser rasterises a 2px stroke.
+console.log('7e. The glyph is a DOWN ARROW, at real button size');
+// **TOM CHOSE THE DOWN ARROW, 2026-09-23** (*"OK. Down arrow."*), which retires the whole
+// clock-hands question this section used to hold. The old assertions parsed two hand vectors and
+// demanded they be near-perpendicular and unequal in length, because two strokes that close
+// together fuse into one bent line at 14-16px -- and Tom READ that bent line as an arrow and
+// preferred it. So what was a failure mode is now the design.
+//
+// **THE INVARIANT MOVED, IT DID NOT SOFTEN.** An arrow is only an arrow if the head is a head: two
+// barbs of similar length coming off the shaft's END, each angled well away from the shaft, and
+// the shaft itself clearly vertical. A "head" whose barbs are tiny reads as a plain line; one
+// whose barbs are shallow reads as the chevron this section was written about in the first place.
+// Still a STATIC check on lib/Icons.lib.php rather than a rendered-pixel one, for the same reason:
+// it holds regardless of how any one browser rasterises a 2px stroke.
 {
 	const iconsSrc = fs.readFileSync(path.join(ROOT, 'lib/Icons.lib.php'), 'utf8');
 	const m = iconsSrc.match(/'history'\s*=>\s*'((?:[^'\\]|\\.)*)'/);
 	if (!m) { throw new Error("'history' icon not found in lib/Icons.lib.php"); }
 	const markup = m[1];
 	const dAttrs = [...markup.matchAll(/<path d="([^"]+)"/g)].map(x => x[1]);
-	ok('the clock face has exactly two hands', dAttrs.length === 2, dAttrs.join(' | '));
-	// A tiny absolute-path parser: M/L/H/V, all the commands this suite's stroke icons use
-	// (dev/scripts/icon_name_check.php's own corpus never needed more). Each "d" is one hand: a
-	// move to the pivot, then one line command to the tip.
-	function parseHand(d) {
+	ok('the arrow is drawn as a shaft and a head', dAttrs.length === 2, dAttrs.join(' | '));
+
+	// Absolute-path points: M/L/H/V, all the commands this suite's stroke icons use.
+	function pts(d) {
 		const toks = d.match(/[MLHV][-\d.]+(?:\s+[-\d.]+)?/gi);
-		if (!toks || toks.length !== 2) { throw new Error('unexpected hand path shape: ' + d); }
-		const start = toks[0].slice(1).trim().split(/\s+/).map(Number);
-		if (toks[0][0].toUpperCase() !== 'M' || start.length !== 2) { throw new Error('hand does not start with M x y: ' + d); }
-		const cmd = toks[1][0].toUpperCase(), rest = toks[1].slice(1).trim().split(/\s+/).map(Number);
-		let end;
-		if (cmd === 'L') { end = rest; }
-		else if (cmd === 'H') { end = [rest[0], start[1]]; }
-		else if (cmd === 'V') { end = [start[0], rest[0]]; }
-		else { throw new Error('unsupported hand command: ' + cmd); }
-		return { start, end, dx: end[0] - start[0], dy: end[1] - start[1] };
+		if (!toks || !toks.length) { throw new Error('unexpected path shape: ' + d); }
+		const out = [];
+		let cur = null;
+		toks.forEach((tk) => {
+			const cmd = tk[0].toUpperCase(), n = tk.slice(1).trim().split(/\s+/).map(Number);
+			if (cmd === 'M' || cmd === 'L') { cur = [n[0], n[1]]; }
+			else if (cmd === 'H') { cur = [n[0], cur[1]]; }
+			else if (cmd === 'V') { cur = [cur[0], n[0]]; }
+			else { throw new Error('unsupported command: ' + cmd); }
+			out.push(cur);
+		});
+		return out;
 	}
-	const hands = dAttrs.map(parseHand);
-	ok('both hands pivot at the same point', hands[0].start[0] === hands[1].start[0] && hands[0].start[1] === hands[1].start[1]);
-	const lens = hands.map(h => Math.hypot(h.dx, h.dy));
-	ok('the two hands are clearly unequal in length -- an hour hand and a minute hand, not two of the same',
-		Math.max(...lens) / Math.min(...lens) >= 1.15, 'lengths=' + lens.join(','));
-	// **RAW ANGLE ALONE DOES NOT CATCH THE CHEVRON**, and the mutation below is why this is written
-	// as an axis test instead of a bare acos() threshold: the FIRST drawing (hands to roughly 10 and
-	// roughly 2, both pointing mostly UP and mostly sideways by nearly the same amount) measures
-	// close to 120 degrees between the vectors -- wide enough to slip past a 60-120 degree gate --
-	// and still reads as a chevron, because both hands share the same dominant direction (mostly
-	// horizontal, tipped up) and are near mirror images of each other. What actually reads as a
-	// clock rather than a checkmark is one hand running close to a pure axis and the other running
-	// close to the OTHER axis: an hour hand within about 17 degrees of straight up (its horizontal
-	// share of its own length under 0.3) and a minute hand within about 17 degrees of level (its
-	// vertical share under 0.3), one of each, not two of the same kind.
-	function axisShare(h) { return { horiz: Math.abs(h.dx) / Math.hypot(h.dx, h.dy), vert: Math.abs(h.dy) / Math.hypot(h.dx, h.dy) }; }
-	const shares = hands.map(axisShare);
-	const AXIS_TOL = 0.3;
-	const hasVertical = shares.some(s => s.horiz < AXIS_TOL);
-	const hasHorizontal = shares.some(s => s.vert < AXIS_TOL);
-	ok('one hand runs close to straight up or down (an hour hand near 12 or 6)', hasVertical,
-		shares.map(s => s.horiz.toFixed(2)).join(','));
-	ok('and the OTHER hand runs close to level (a minute hand near 3 or 9), not a second near-vertical one',
-		hasHorizontal, shares.map(s => s.vert.toFixed(2)).join(','));
+	// The SHAFT is the two-point path; the HEAD is the three-point one. Told apart by shape rather
+	// than by order, so re-ordering the two <path> elements cannot silently swap the assertions.
+	const paths = dAttrs.map(pts);
+	const shaft = paths.filter(p => p.length === 2)[0];
+	const head = paths.filter(p => p.length === 3)[0];
+	ok('one path is a straight shaft and the other is a two-barb head',
+		!!shaft && !!head, dAttrs.join(' | '));
+
+	// THE SHAFT POINTS DOWN, and is mostly vertical rather than mostly sideways.
+	const sdx = shaft[1][0] - shaft[0][0], sdy = shaft[1][1] - shaft[0][1];
+	ok('the shaft runs DOWN the glyph -- y grows downward in SVG', sdy > 0, 'dy=' + sdy);
+	ok('...and is clearly vertical, not a diagonal', Math.abs(sdy) >= 3 * Math.abs(sdx),
+		'dx=' + sdx + ' dy=' + sdy);
+
+	// THE HEAD SITS AT THE SHAFT'S FOOT, not part-way up it: an arrowhead half-way along the line
+	// is a different mark entirely.
+	const tipIdx = 1, apex = head[tipIdx];
+	ok('the head apexes at the bottom of the shaft, not part-way along it',
+		Math.abs(apex[0] - shaft[1][0]) <= 1 && apex[1] >= shaft[1][1] - 1,
+		'apex=' + apex.join(',') + ' shaft foot=' + shaft[1].join(','));
+
+	// BOTH BARBS ARE REAL AND ARE A MATCHED PAIR. A head with one long barb and one stub is a tick.
+	const b1 = head[0], b2 = head[2];
+	const l1 = Math.hypot(b1[0] - apex[0], b1[1] - apex[1]);
+	const l2 = Math.hypot(b2[0] - apex[0], b2[1] - apex[1]);
+	ok('both barbs are long enough to read as a head, not as a kink',
+		Math.min(l1, l2) >= 3, 'lengths=' + l1.toFixed(2) + ',' + l2.toFixed(2));
+	ok('...and they are a matched pair, so the head is not a tick',
+		Math.max(l1, l2) / Math.min(l1, l2) <= 1.25, 'lengths=' + l1.toFixed(2) + ',' + l2.toFixed(2));
+	ok('...one to each side of the shaft', (b1[0] - apex[0]) * (b2[0] - apex[0]) < 0,
+		'b1=' + b1.join(',') + ' apex=' + apex.join(',') + ' b2=' + b2.join(','));
+	// AND THEY SWEEP BACK UP, away from the tip. Barbs level with the apex read as a T.
+	ok('...and both sweep back up the shaft, which is what makes it an arrow and not a T',
+		b1[1] < apex[1] - 1 && b2[1] < apex[1] - 1,
+		'b1y=' + b1[1] + ' b2y=' + b2[1] + ' apexy=' + apex[1]);
 }
 
 console.log('7f. The panel stacks messages top-to-bottom, and paints an opaque backing behind '

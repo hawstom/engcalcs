@@ -794,34 +794,44 @@ $ec_icons = array(
 	// where position disambiguates them, and the label is right there.
 	'info'       => '<circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4"/><path d="M12 7.6v.4"/>',
 	'mail'       => '<path d="M3 6h18v12H3z"/><path d="M3.6 6.6l8.4 5.9 8.4-5.9"/>',
-	// A PLAIN CLOCK FACE, for the message log (ROADMAP Task 704; Ida, 2026-09-21, after Tom asked
-	// *"The i info glyph doesn't seem quite right to me... How about a + expand glyph or a history
-	// glyph?"*). Circle, a short hour hand straight up to 12 and a longer minute hand straight
-	// right to 3 -- a right angle between two unequal strokes, not a watchmaker's ten-past-ten pose.
+	// **A DOWN ARROW, FOR THE MESSAGE LOG -- TOM'S OWN CALL, TWICE, AND THE SECOND TIME IS THE ONE
+	// THAT COUNTS** (2026-09-23: *"OK. Down arrow."*).
 	//
-	// **CORRECTED 2026-09-22 (Perry's review).** The first drawing put both hands within about 20
-	// degrees of straight up (to roughly 10 and roughly 2), which is the classic clock-icon pose on
-	// paper but at this suite's real button size (14-16px) reads as a chevron or checkmark in a
-	// circle: two strokes that close together fuse into what looks like one bent line rather than
-	// two hands of different lengths. A right angle keeps the two strokes visually separate at that
-	// size in a way the shallow ten-past-ten pose does not; it costs some of that pose's
-	// familiarity and buys the legibility this glyph exists for.
+	// **HE WAS READING THE CLOCK AS A DOWN ARROW AND LIKED IT BETTER THAN THE CLOCK.** The previous
+	// drawing here was a plain clock face, and its two hands had been widened to a right angle to
+	// stop them fusing into what looked like one bent line -- which is exactly what he then saw:
+	// *"I like the down arrow glyph."* Told it was meant to be a clock, he said *"The clock was
+	// fine. If that's the right paradigm, I cave."* **He was not overruled; he was right, and
+	// caving is what this file exists to stop happening quietly.**
 	//
-	// **THREE OTHER MARKS WERE AVAILABLE AND EACH IS ALREADY SPOKEN FOR ON THIS PAGE**, which is the
-	// whole reason this one is drawn new rather than borrowed:
-	//   'info'    names Welcome, Privacy notice, Terms of use, About and the Reports menu -- every
-	//             one a standing reference fact about the software. A personal, growing, timestamped
-	//             feed of what just happened is not that, and one mark cannot hold both jobs.
-	//   'restore' / 'revert' (the circular arrow) already means "go back to an earlier saved state"
-	//             here. On a log it would read as an offer to UNDO, which is the opposite of a
-	//             record of states that have already passed.
-	//   a bell    imports an unread-and-urgent category. This page has exactly two severities and a
-	//             third arriving by the back door is how a colour stops meaning anything.
-	//   '+'       means "create" everywhere else in this suite and is close to the new-project mark.
+	// **THE ARGUMENT AGAINST IT WAS THAT THE PAGE ALREADY DRAWS DOWN-POINTING MARKS, AND THAT
+	// ARGUMENT WAS WRONG.** It is true that a down triangle opens the pane-tab and project-tab
+	// menus and that a filled triangle marks a table column's sort direction. Tom's answer:
+	// *"Ida is wrong to split hairs among all the down arrows, and I find that the similarity is a
+	// cohesion, not a confusion: 'See more' is what they all give you."* **A shape shared by
+	// several controls that all mean ONE thing is a system, not a collision** -- and pressing this
+	// glyph does exactly what pressing those does: something opens below it. An objection from
+	// "this shape is already used" has to ask what it already MEANS, and here the meaning matches.
 	//
-	// NO SURROUNDING ARROW: an arrow curling around the face is the standard "revert to this point
-	// in time" glyph, which is the 'restore' confusion again with extra strokes.
-	'history'    => '<circle cx="12" cy="12" r="9"/><path d="M12 12V8"/><path d="M12 12H17"/>',
+	// **IT IS A DIFFERENT DRAWING FROM THOSE OTHER MARKS, WHICH IS WHY IT IS NOT LITERALLY THEM**
+	// (his own point: *"it's a different look than any of the other down arrows"*). Those are small
+	// solid triangles, typed as the characters `▾` and `▼`; this is a stroked outline arrow in a
+	// ring, drawn in currentColor like every other icon in this set, and it stands alone on the map
+	// overlay rather than tucked against a label. Same family, own voice.
+	//
+	// **AND IT CARRIES NO TOOLTIP** (Tom, 2026-09-22: *"I don't think we need a tip on the down
+	// arrow glyph. I think it's more trouble than help."*), so the drawing is the only thing naming
+	// this control. That is a further argument for a familiar shape over an unfamiliar one, and it
+	// is the reverse of the advice given while the clock was being defended.
+	//
+	// The ring keeps it the same weight and footprint as the rest of the set at 16px; the shaft
+	// starts high enough that the head reads as a head rather than a chevron.
+	//
+	// **NAME KEPT AS `history`.** The icon is referenced by name in js/looped-network.js and in
+	// dev/lpn-spike/notice-log-harness.js, icon_name_check.php holds every naming site against this
+	// table, and renaming it would be ~6 edits to change nothing anybody sees. What the glyph names
+	// is still the message history; only the drawing moved.
+	'history'    => '<circle cx="12" cy="12" r="9"/><path d="M12 7V16"/><path d="M8 12.5L12 16.5L16 12.5"/>',
 	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
 	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
 	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a
