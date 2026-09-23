@@ -1808,6 +1808,23 @@ EngCalcs.lpnCollide = (function () {
 				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null,
 				room: claimedW > 0 ? claimedW : undefined });
 		}
+		// **AND THE RESCUE IS NOT OFFERED AT ALL ON A DRAWING THAT IS SIMPLY FULL** (2026-09-22).
+		// A longer leader is the answer when a few labels cannot find a place on a drawing that has
+		// room elsewhere. When a QUARTER of the labels could not be placed, that is not what is
+		// happening: there is no elsewhere, every rescued label stands a long way out, crosses
+		// somebody, and the crossing shed at the end of the pass hides one of the pair -- measured
+		// on Net3-World with every node field on, 26 labels hidden against 14 with no rescue at all.
+		// **It is also where the rescue costs the most**: the same drawing took 53 seconds through
+		// dev/lpn-spike/node-shed-harness.js with the rescue off and over 900 with it on, because
+		// every one of forty-odd deferred labels re-searches hundreds of points against a widened
+		// neighbourhood. Both halves of that say the same thing, so the bound is one test.
+		if (deferred.length * 4 > labels.length) {
+			deferred.forEach(function (lbl) {
+				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
+					dropped: true, side: -1, box: null, leader: null });
+			});
+			deferred.length = 0;
+		}
 		deferred.forEach(rescue);
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one

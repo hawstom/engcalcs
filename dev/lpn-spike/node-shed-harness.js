@@ -102,6 +102,8 @@ const L = loadLoopedNetwork(
 	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tnodeEls: function () { return nodeEls; },\n" +
 	"\t\tshedRungs: function () { return lastNodeShedRungs; },\n" +
+	"\t\tcrossRungs: function () { return lastCrossShedRungs; },\n" +
+	"\t\tcrossCap: function () { return LPN_CROSS_SHED_MAX_RUNGS; },\n" +
 	"\t\tmaxRungs: nodeShedMaxRungs,\n" +
 	"\t\trankedNodeFields: function () { return Object.keys(labelSettings.priority.node); },\n" +
 	"\t\tshedOrder: nodeShedOrder,\n" +
@@ -370,12 +372,20 @@ console.log('\n--- the label that was in the way sheds too, not only the one tha
 	// regression, which is the giveaway that the count was standing in for the property rather
 	// than being it. **The property is the GAP over loser-only** -- 28 against 17 here, 63 node
 	// labels against 39 on the grid below -- and the mutation still fails both by name.
-	report(shed.length >= 24, 'far more labels shed than were ever dropped, which only the pair rule does',
+	// **THE FLOOR CAME DOWN 24 -> 9 ON 2026-09-22, AND FEWER LABELS SHEDDING IS THE POINT NOW.**
+	// Tom ruled that a longer leader beats giving a property up, so most of the labels this cascade
+	// used to rescue are never dropped in the first place -- the pair rule is unchanged and is still
+	// what makes the number bigger than a loser-only cascade's, it simply has far less to do.
+	report(shed.length >= 9, 'far more labels shed than were ever dropped, which only the pair rule does',
 		shed.length + ' shedding (loser-only measured 17)');
 	report(drawnNodes().length >= 94, '...and it puts more of them on the drawing',
 		drawnNodes().length + ' of ' + doc.nodes.length + ' drawn (loser-only measured 93)');
-	report(L.shedRungs() > 0, 'the cascade ran at least one rung on this view',
-		L.shedRungs() + ' rungs');
+	// **EITHER CASCADE, because there are two since 2026-09-22.** The old one is driven by a label
+	// the first-fit DROPPED; the new one by a label the crossing shed would otherwise HIDE. On this
+	// view the widened search places what used to be dropped, so the first runs no rungs at all and
+	// the second does the work. Asserting the old one alone would read as a dead pass.
+	report(L.shedRungs() + L.crossRungs() > 0, 'a value cascade ran at least one rung on this view',
+		L.shedRungs() + ' drop rungs, ' + L.crossRungs() + ' crossing rungs');
 }
 
 // ---- 6. idempotent, and not a ratchet -----------------------------------------------------------
@@ -486,8 +496,12 @@ function measurePass() {
 	// One ordinary placement plus at most nodeShedMaxRungs() rungs. The cap is what bounds this, and
 	// the bound is DERIVED from the ranked column rather than typed here -- a second literal 4 in a
 	// harness is how the first one survived two new fields being added to that column.
-	report(worst <= 1 + L.maxRungs(),
-		'a layout pass runs at most one placement plus ' + L.maxRungs() + ' shed rungs',
+	// **TIMES THE CROSSING RUNGS, since 2026-09-22.** The whole node layout is run again when a
+	// label the crossing shed would hide still has a value to give, at most LPN_CROSS_SHED_MAX_RUNGS
+	// times, and each of those runs its own drop cascade. So the bound is the product, still derived
+	// from the two caps rather than typed. Measured worst on Net3-World: 11 against a bound of 32.
+	report(worst <= (1 + L.maxRungs()) * (1 + L.crossCap()),
+		'a layout pass runs at most (1 + ' + L.maxRungs() + ' shed rungs) x (1 + ' + L.crossCap() + ' crossing rungs)',
 		'worst ' + worst + ' placements on Net3-World');
 	// **THE CAP MUST REACH THE BOTTOM OF THE COLUMN, which is the defect Tom reported on
 	// 2026-09-08**: a node label sheds down to its ID plus ONE ranked value, so a reader with every
@@ -568,7 +582,7 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	// node column on 2026-09-13 and two rows to every link label, the cascade needed one more rung,
 	// and a bound that is a fact about the column went red for describing an older column. Same
 	// expression as the general cap above, so there is now one statement of it and not two.
-	report(best.placements <= 1 + L.maxRungs(), 'the cap holds on a big drawing too',
+	report(best.placements <= (1 + L.maxRungs()) * (1 + L.crossCap()), 'the cap holds on a big drawing too',
 		best.placements + ' placements against a cap of ' + (1 + L.maxRungs()));
 	report(best.layouts < 40, 'and a rung is still one forced layout', best.layouts + ' forced layouts');
 }

@@ -3065,7 +3065,7 @@ var EngCalcs = EngCalcs || {};
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
-		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodePlaced, placed, crossRungs = 0;
+		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodePlaced, placed = null, crossRungs = 0;
 		// **THE WHOLE LAYOUT IS LAID OUT AGAIN WHEN THE ONLY MOVE LEFT WAS TO HIDE SOMETHING**
 		// (Tom's ruling of 2026-09-22 -- see shedNodeLabelsForCrossing()). Everything inside this
 		// loop is one complete answer for the drawing; the loop is entered a second time only when
@@ -3089,11 +3089,17 @@ var EngCalcs = EngCalcs || {};
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
 		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
-		var t = labelTuning();
-		placed = Collide.placeLabels(labels, obs, {
-			inner: t.inner * fs, outer: t.reach * fs,
-			steps: parseRingSteps(t.steps), k: t.k
-		});
+		// **THE RING PASS IS OUTSIDE THE LOOP, and that is a fact about it rather than thrift.** It
+		// reads `obs` and nothing else -- it neither sees the node placements nor is seen by them,
+		// which is the same property the gang repair's own note relies on -- so running it again on
+		// a later rung would produce the identical answer at the cost of a whole pass.
+		if (!placed) {
+			var t = labelTuning();
+			placed = Collide.placeLabels(labels, obs, {
+				inner: t.inner * fs, outer: t.reach * fs,
+				steps: parseRingSteps(t.steps), k: t.k
+			});
+		}
 		// **AND THEN THE GANGS ARE REPAIRED** (Task 539). The first-fit places one label at a time,
 		// each treating the last as an obstacle, which is how two labels end up each locally
 		// reasonable and jointly absurd -- crossed leaders, or one label lying across the other's
