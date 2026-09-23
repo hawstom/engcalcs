@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2021,
-        "delta_key_count": 170,
+        "expected_key_count": 2022,
+        "delta_key_count": 172,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -555,6 +555,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -727,6 +729,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -1391,6 +1395,38 @@
                     "key": "lpn_file_import_geo_tip",
                     "value": "Відкриває файл проєкту або файл EPANET у новій вкладці проєкту на цій сторінці, на карті вулиць. Ви розміщуєте креслення на світі вручну: панорамуйте й масштабуйте до потрібної ділянки, тоді змінюйте розмір і повертайте, щоб підігнати. Якщо x та y у файлі вже є довготою та широтою, натисніть кнопку «Це вже lat\/lon», і мережа одразу переміститься туди, куди належить. Кожне введене вами число лишається таким, як є.",
                     "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                }
+            }
+        },
+        "lpn_pane_not_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_text_attached",
+                    "value": "Прикріплено",
+                    "english": "Attached"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_filter_note",
+                    "value": "Відфільтровано за {q}. Показано {n} з {all}.",
+                    "english": "Filtered by {q}. Showing {n} of {all}."
+                }
+            }
+        },
+        "lpn_pane_goto_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Сортувати за цим стовпцем. Клацніть ще раз, щоб змінити порядок на зворотний.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Надрукувати таблицю",
+                    "english": "Print table"
                 }
             }
         },
