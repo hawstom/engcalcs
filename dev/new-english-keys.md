@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 172 untranslated keys, of 2022 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 194 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,62 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (172, 7 to read @@ NEEDS RULING)
+## lpn_  (194, 29 to read @@ NEEDS RULING)
 
+- **`lpn_convas_cancelled`**
+  > Nothing was converted. The copy is closed, and the original project is unchanged.
+  @@ NEEDS RULING
+- **`lpn_convas_coordsys_tip`**
+  > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
+  @@ NEEDS RULING
+- **`lpn_convas_done`**
+  > The converted copy is {name}. The original project is unchanged.
+  @@ NEEDS RULING
+- **`lpn_convas_epsg`**
+  > EPSG coordinate system
+  @@ NEEDS RULING
+- **`lpn_convas_epsg_tip`**
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
+  @@ NEEDS RULING
+- **`lpn_convas_from`**
+  > This project: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_no_transform`**
+  > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
+  @@ NEEDS RULING
+- **`lpn_convas_none_tip`**
+  > Local coordinates in the length unit, with no world map.
+  @@ NEEDS RULING
+- **`lpn_convas_ok`**
+  > Convert
+  @@ NEEDS RULING
+- **`lpn_convas_oneway`**
+  > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
+  @@ NEEDS RULING
+- **`lpn_convas_round`**
+  > Round converted values
+  @@ NEEDS RULING
+- **`lpn_convas_round_flow`**
+  > Demand and flow
+  @@ NEEDS RULING
+- **`lpn_convas_round_none`**
+  > No rounding
+  @@ NEEDS RULING
+- **`lpn_convas_round_tip`**
+  > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
+  @@ NEEDS RULING
+- **`lpn_convas_title`**
+  > Convert as
+  @@ NEEDS RULING
+- **`lpn_convas_units_tip`**
+  > The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.
+  @@ NEEDS RULING
+- **`lpn_convas_unnamed`**
+  > Unnamed (local) georeference
+  @@ NEEDS RULING
+- **`lpn_convas_unnamed_tip`**
+  > Local coordinates in the length unit, with the world map attached at the place the project is.
+  @@ NEEDS RULING
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
@@ -138,6 +192,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_file_import_survey_tip`**
   > Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.
   _Ruled OK 2026-09-23._
+- **`lpn_georef_answered`**
+  > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
@@ -543,12 +600,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
+- **`lpn_units_mapcoords`**
+  > Map coordinates
+  @@ NEEDS RULING
+- **`lpn_units_mapcoords_deg`**
+  > degrees
+  @@ NEEDS RULING
+- **`lpn_units_usft`**
+  > US survey ft
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**52 still to read**, of 121 new keys across 4 unmerged branch(es).
+**35 still to read**, of 64 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -559,7 +625,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
+### feat/convert-as (`508dc9dd`) — adds no English strings
+
+### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -585,6 +653,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
 - **`lpn_labels_restore`**
   > Restore label defaults
   _Ruled OK 2026-09-23._
@@ -679,34 +753,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/notice-log (`bc8da817`) — 42 new, 16 to read @@ NEEDS RULING
+### feat/notice-log (`80bc539e`) — 8 new, 2 to read @@ NEEDS RULING
 
-- **`lpn_basemap_hide`**
-  > Hide street map
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
   @@ NEEDS RULING
-- **`lpn_basemap_satellite_hide`**
-  > Hide satellite images
-  @@ NEEDS RULING
-- **`lpn_basemap_satellite_tip`**
-  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
-  @@ NEEDS RULING
-- **`lpn_basemap_tip`**
-  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
-  @@ NEEDS RULING
-- **`lpn_clean_map`**
-  > Hide map readouts
-  @@ NEEDS RULING
-- **`lpn_clean_map_off`**
-  > Show map readouts
-  @@ NEEDS RULING
-- **`lpn_clean_map_tip`**
-  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 - **`lpn_lock_open_cancelled`**
   > That file was not opened, and nothing here changed. Somebody else still has it open.
-  _Ruled OK 2026-09-23._
-- **`lpn_mapgeo_replace`**
-  > This project already has the world map attached. Replace that georeferencing?
   _Ruled OK 2026-09-23._
 - **`lpn_msglog_ago`**
   > {x} ago
@@ -723,203 +779,44 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_note`**
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
-- **`lpn_pane_paste_note`**
-  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
-  @@ NEEDS RULING
-- **`lpn_survey_column_n`**
-  > column {n}
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_confirm_pipes`**
-  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_ambiguous_lon`**
-  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_err_gpx_no_wpt`**
-  > That GPX file holds no waypoints, so there is nothing to make junctions from.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_no_coords`**
-  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
-  @@ NEEDS RULING
-- **`lpn_survey_err_plane`**
-  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_fmt_enz`**
-  > Easting, northing, elevation (ENZ, also written XYZ)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_enzd`**
-  > Easting, northing, elevation, description (ENZD)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_nez`**
-  > Northing, easting, elevation (NEZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_nezd`**
-  > Northing, easting, elevation, description (NEZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penz`**
-  > Point name, easting, northing, elevation (PENZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penzd`**
-  > Point name, easting, northing, elevation, description (PENZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnez`**
-  > Point name, northing, easting, elevation (PNEZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnezd`**
-  > Point name, northing, easting, elevation, description (PNEZD)
-  @@ NEEDS RULING
-- **`lpn_survey_from_header`**
-  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  @@ NEEDS RULING
-- **`lpn_survey_map_gpx`**
-  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_map_none`**
-  > not used
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_not_geo`**
-  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_bad_lon`**
-  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_elev_converted`**
-  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_note_gpx_rtept`**
-  > The file also holds {detail} route point(s), which were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_gpx_trkpt`**
-  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_lon_missing`**
-  > The longitude column is empty on this row, so no junction was made for it.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_lon_range`**
-  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_row`**
-  > row {n}
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_ft`**
-  > feet
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_m`**
-  > meters
-  _Ruled OK 2026-09-17._
 
-### feat/tables-spreadsheet (`17b90202`) — 35 new, 15 to read @@ NEEDS RULING
+### feat/zoom-control (`3eadfd61`) — 9 new, 9 to read @@ NEEDS RULING
 
-- **`lpn_basemap_hide`**
-  > Hide street map
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
   @@ NEEDS RULING
-- **`lpn_basemap_satellite_hide`**
-  > Hide satellite images
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
-- **`lpn_basemap_satellite_tip`**
-  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Drag a box on the map to zoom in on it.
   @@ NEEDS RULING
-- **`lpn_basemap_tip`**
-  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
   @@ NEEDS RULING
-- **`lpn_clean_map`**
-  > Hide map readouts
+- **`lpn_tool_zoom_window_tip`**
+  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
   @@ NEEDS RULING
-- **`lpn_clean_map_off`**
-  > Show map readouts
+- **`lpn_zoom_in`**
+  > Zoom in
   @@ NEEDS RULING
-- **`lpn_clean_map_tip`**
-  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
   @@ NEEDS RULING
-- **`lpn_mapgeo_replace`**
-  > This project already has the world map attached. Replace that georeferencing?
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_column_n`**
-  > column {n}
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_confirm_pipes`**
-  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_ambiguous_lon`**
-  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_err_gpx_no_wpt`**
-  > That GPX file holds no waypoints, so there is nothing to make junctions from.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_no_coords`**
-  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+- **`lpn_zoom_out`**
+  > Zoom out
   @@ NEEDS RULING
-- **`lpn_survey_err_plane`**
-  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_fmt_enz`**
-  > Easting, northing, elevation (ENZ, also written XYZ)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_enzd`**
-  > Easting, northing, elevation, description (ENZD)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_nez`**
-  > Northing, easting, elevation (NEZ)
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
-- **`lpn_survey_fmt_nezd`**
-  > Northing, easting, elevation, description (NEZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penz`**
-  > Point name, easting, northing, elevation (PENZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penzd`**
-  > Point name, easting, northing, elevation, description (PENZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnez`**
-  > Point name, northing, easting, elevation (PNEZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnezd`**
-  > Point name, northing, easting, elevation, description (PNEZD)
-  @@ NEEDS RULING
-- **`lpn_survey_from_header`**
-  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  @@ NEEDS RULING
-- **`lpn_survey_map_gpx`**
-  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_map_none`**
-  > not used
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_not_geo`**
-  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_bad_lon`**
-  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_elev_converted`**
-  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_note_gpx_rtept`**
-  > The file also holds {detail} route point(s), which were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_gpx_trkpt`**
-  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_lon_missing`**
-  > The longitude column is empty on this row, so no junction was made for it.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_lon_range`**
-  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_row`**
-  > row {n}
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_ft`**
-  > feet
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_m`**
-  > meters
-  _Ruled OK 2026-09-17._
 
-### feat/zoom-scale-rules (`a4f4e8fa`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/zoom-scale-rules (`e937735c`) — 6 new, 6 to read @@ NEEDS RULING
 
-- **`lpn_pane_paste_note`**
-  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
