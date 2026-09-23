@@ -4022,6 +4022,13 @@ tr.lpn-ff-error { background: #f2f2f2; }
 		max-height: 33svh;
 		overflow-y: auto;
 	}
+
+	/* 9. THE ON-MAP ZOOM CHIP GOES BELOW ITS OWN BREAKPOINT (ROADMAP Task 682; Ida, 2026-09-17):
+	   the whole reason it exists is a visitor with no wheel and no pinch surface, and a
+	   touchscreen supplies one of its own -- Tom, 2026-08-22: "on a phone, zoom in is the answer.
+	   You can't see through your finger... A finger is not a mouse!" Hidden at the same width the
+	   toolbar's non-transport groups already collapse at, not a new figure. */
+	html:has(#lpn_canvas) #lpn_zoom_control { display: none; }
 }
 
 /* ---- The profile's path chooser (Tasks 433, 504) ---------------------------------------------

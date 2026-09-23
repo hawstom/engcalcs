@@ -12386,6 +12386,35 @@ var EngCalcs = EngCalcs || {};
 		setTransform();
 		onZoomChanged();
 	}
+	// **THE ONE STEP EVERY NON-GESTURE ZOOM CONTROL TAKES** (ROADMAP Task 682). The wheel moves the
+	// point under the cursor by 1.1x/notch (`wirePointerEvents()`'s wheel listener); a keyboard or a
+	// button has no cursor position to hold still, so it zooms about the view's own centre instead,
+	// through the SAME `wheelZoom()` the wheel and the pinch already call -- one door, so the +/-
+	// keys, the on-map chip and the toolbar's own zoom cannot come to a different idea of what a
+	// "step" is, and so mapgeo's step-2 camera rule (see wheelZoom()'s own comment) covers them too.
+	function keyZoom(factor) {
+		if (!svg) { return; }
+		var r = svg.getBoundingClientRect();
+		wheelZoom(r.left + r.width / 2, r.top + r.height / 2, factor);
+	}
+	// **THE ON-MAP +/- CHIP** (ROADMAP Task 682) -- markup is the empty shell in Looped-Network.php;
+	// this fills it through the same icon+aria-label+tip door every toolbar icon button already
+	// uses. `EngCalcs.setIconLabel()` DIRECTLY, not the local `setIconLabel()` wrapper a few
+	// thousand lines down: that wrapper also feeds Help > "What the toolbar icons mean"
+	// (toolbarIconIndex), and this chip is not a toolbar button.
+	function wireZoomControl() {
+		var pc = EngCalcs.pageConfig || {},
+			inBtn = document.getElementById('lpn_zoom_in'),
+			outBtn = document.getElementById('lpn_zoom_out');
+		if (inBtn) {
+			EngCalcs.setIconLabel(inBtn, 'zoom-in', pc.lpn_zoom_in || 'Zoom in', pc.lpn_zoom_in_tip);
+			inBtn.addEventListener('click', function () { keyZoom(1.1); });
+		}
+		if (outBtn) {
+			EngCalcs.setIconLabel(outBtn, 'zoom-out', pc.lpn_zoom_out || 'Zoom out', pc.lpn_zoom_out_tip);
+			outBtn.addEventListener('click', function () { keyZoom(1 / 1.1); });
+		}
+	}
 
 	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A LAT/LON ONE (ROADMAP Task 145) -----------
 	//
@@ -13312,6 +13341,79 @@ var EngCalcs = EngCalcs || {};
 		s = Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity) * SEARCH_FIT_PAD;
 		if (!isFinite(s) || s <= 0) { return 0; }
 		return Math.min(s, w / (SEARCH_FIT_FLOOR_M * DEG_PER_M));
+	}
+
+	// ---- ZOOM WINDOW: Tom's own second half of Task 682, "drag a box and zoom to it" -------------
+	// This is NOT fitScaleForBox() above: that helper's floor is stated in DEGREES
+	// (`SEARCH_FIT_FLOOR_M * DEG_PER_M`), which is only ever a correct unit for a geographic
+	// project, and it is only ever called with a box built that way (goToLatLon()'s `xg` branch
+	// passes no box at all). A Zoom Window box is drawn in WHATEVER FRAME `screenToWorld()` already
+	// reads -- degrees, a projected plane, or a plain XY grid -- so its scale is the plain
+	// pixels-per-drawing-unit ratio, with min/maxScale()'s own per-frame clamp (applyView() applies
+	// it) doing the only bounding this needs.
+	function zoomWindowScale(box) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0, dx, dy;
+		if (!w || !h || !box) { return 0; }
+		dx = Math.abs(box.x2 - box.x1);
+		dy = Math.abs(box.y2 - box.y1);
+		if (!(dx > 0) && !(dy > 0)) { return 0; }
+		return Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity);
+	}
+	function zoomToBox(box) {
+		var s = zoomWindowScale(box);
+		if (!(s > 0) || !isFinite(s)) { return; }
+		applyView({ cx: (box.x1 + box.x2) / 2, cy: (box.y1 + box.y2) / 2, s: s });
+	}
+	// **ONE MARQUEE, DRAWN IN WORLD COORDINATES LIKE select-area's** (so a pan mid-drag moves the
+	// box with the map, though nothing here allows panning while it is open), built in init()
+	// beside selectAreaEl. Its own small state rather than sharing select-area's `areaRing` --
+	// select-area remembers its shape (window/lasso/polygon) ACROSS mode switches, and folding a
+	// second tool into that memory would mean a Zoom Window drag could silently change what
+	// select-area draws next, or vice versa.
+	var zoomWinEl = null;
+	var zoomWinDrag = null;   // { id: pointerId, start: {x,y}, live: {x,y} } in WORLD coords, or null
+	function zoomWinPoints() {
+		if (!zoomWinDrag) { return []; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live || a;
+		return EngCalcs.lpnGeom.rectRing(a.x, a.y, b.x, b.y);
+	}
+	function paintZoomWin() {
+		var pts = zoomWinPoints();
+		if (!zoomWinEl) { return; }
+		if (!pts.length) { zoomWinEl.style.display = 'none'; return; }
+		zoomWinEl.style.display = '';
+		zoomWinEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
+	}
+	function zoomWinBegin(w, pointerId) {
+		zoomWinDrag = { id: pointerId, start: { x: w.x, y: w.y }, live: { x: w.x, y: w.y } };
+		paintZoomWin();
+	}
+	function zoomWinMove(w) {
+		if (!zoomWinDrag) { return; }
+		zoomWinDrag.live = { x: w.x, y: w.y };
+		paintZoomWin();
+	}
+	// Leaving the mode mid-drag (Escape, another tool, undo's own snapshot) drops the box rather
+	// than zooming to a rectangle the user never finished asking for -- the same rule Task 266's
+	// half-drawn marquee follows.
+	function zoomWinCancel() { zoomWinDrag = null; paintZoomWin(); }
+	function zoomWinFinish() {
+		if (!zoomWinDrag) { return; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live;
+		zoomWinDrag = null;
+		paintZoomWin();
+		// A press that never travelled is a click, not a box, and has nothing to zoom to -- stay in
+		// the mode so the same press-drag-release can be retried, exactly as a mis-aimed
+		// select-area click leaves that tool armed.
+		if (Math.abs(b.x - a.x) < 1e-9 && Math.abs(b.y - a.y) < 1e-9) { return; }
+		zoomToBox({ x1: Math.min(a.x, b.x), y1: Math.min(a.y, b.y),
+			x2: Math.max(a.x, b.x), y2: Math.max(a.y, b.y) });
+		// **A COMPLETED DRAG IS A ONE-SHOT COMMAND, LIKE ZOOM TO FIT, NOT A LINGERING TOOL** -- the
+		// same reading of Tom's "second time you click it" that makes `zoomToolShape` reset to
+		// 'fit' rather than a remembered preference (see its own comment). setMode()'s own
+		// zoom-window exit hook does that reset and repaints the toolbar button.
+		setMode('select');
 	}
 
 	// ---- Task 497: elevations read from the land surface ------------------------------------------
@@ -15377,6 +15479,15 @@ var EngCalcs = EngCalcs || {};
 	// it builds its button; before that (and in a harness that builds no toolbar) there is simply
 	// nothing to repaint.
 	var repaintAreaTool = null;
+	// **THE ZOOM TO FIT / ZOOM WINDOW DOUBLE DUTY'S OWN SHOWN SHAPE** (ROADMAP Task 682; Tom,
+	// 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select area button.
+	// ... The second time you click it, it changes to Zoom Window."). Unlike `selectAreaShape`,
+	// which is a standing PREFERENCE remembered across mode switches, this is a one-shot disclosure:
+	// leaving the tool (`setMode()`'s cancel block) always drops it back to 'fit', because the
+	// default and by far the more common press is Zoom to fit, and Zoom Window is reached by
+	// pressing it a second time rather than by a memory of what was last used.
+	var zoomToolShape = 'fit';   // 'fit' | 'window'
+	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
 	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
 	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
 	// simply nothing to fade.
@@ -24382,7 +24493,8 @@ var EngCalcs = EngCalcs || {};
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text',
-		'vertices': 'lpn_mode_vertices'
+		'vertices': 'lpn_mode_vertices',
+		'zoom-window': 'lpn_mode_zoom_window'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
@@ -24405,6 +24517,14 @@ var EngCalcs = EngCalcs || {};
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// **ZOOM WINDOW IS THE SAME SHAPE OF HALF-DRAWN MARQUEE** (ROADMAP Task 682) -- and it also
+		// drops the toolbar button back to showing Zoom to fit, because the disclosure is one-shot
+		// rather than a remembered preference (see `zoomToolShape`'s own comment).
+		if (mode === 'zoom-window' && newMode !== 'zoom-window') {
+			zoomWinCancel();
+			zoomToolShape = 'fit';
+			if (repaintZoomTool) { repaintZoomTool(); }
+		}
 		// A half-placed meter dies with the tool, exactly as a half-drawn link does one line down:
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
@@ -24426,7 +24546,7 @@ var EngCalcs = EngCalcs || {};
 		// from sticking the way `lpn-panning` once did.
 		if (svg) {
 			svg.classList.toggle('lpn-placemode',
-				newMode.indexOf('add-') === 0 || newMode === 'select-area');
+				newMode.indexOf('add-') === 0 || newMode === 'select-area' || newMode === 'zoom-window');
 		}
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
@@ -33075,6 +33195,10 @@ var EngCalcs = EngCalcs || {};
 		// IN WORLD COORDINATES, like everything else in `world`: the ring is a shape on the
 		// drawing, so a pan mid-drag moves the map under it exactly as it moves the pipes.
 		selectAreaEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
+		// The Zoom Window box (ROADMAP Task 682) -- its own element rather than sharing
+		// selectAreaEl, because the two tools' state is deliberately not shared (see zoomWinDrag's
+		// own comment) and painting one over the other's element would race whichever tool last drew.
+		zoomWinEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
 		// The bends already picked (Task 567), in the same layer and the same red dash as the band:
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
@@ -33083,6 +33207,7 @@ var EngCalcs = EngCalcs || {};
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
+		wireZoomControl();
 		georefWireBar();
 		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
@@ -33540,11 +33665,47 @@ var EngCalcs = EngCalcs || {};
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
-		// **`zoomExtent` BY REFERENCE, so the click event arrives as its `auto` argument.** Left
-		// exactly as it was -- changing it is a behaviour change to the fit and belongs in its own
-		// task, not in a tooltip fix.
-		extentBtn.addEventListener('click', zoomExtent);
+		// **ZOOM TO FIT / ZOOM WINDOW: THE SAME DISCLOSURE IDIOM AS SELECT-AREA** (ROADMAP Task
+		// 682; Tom, 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select
+		// area button. Give it a little triangle indicator. The second time you click it, it
+		// changes to Zoom Window."). `.lpn-tool-more` is the same class that draws select-area's
+		// corner triangle purely in CSS (`::after`, css/engcalcs.css) -- nothing new in the DOM for
+		// a screen reader to mistake for a second control.
+		extentBtn.className = 'lpn-tool-more';
+		extentBtn.dataset.tool = 'zoom-window';   // so setModeUI()'s generic aria-pressed sweep finds it
+		function paintZoomToolButton() {
+			if (zoomToolShape === 'window') {
+				setIconLabel(extentBtn, 'zoom-window', pc.lpn_tool_zoom_window || 'Zoom Window', pc.lpn_tool_zoom_window_tip);
+			} else {
+				setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
+			}
+			// ASSIGNED, not appended -- setIconLabel() adds .ec-help to whatever is already there,
+			// so a `+=` on a button repainted on every shape change would grow the class list
+			// without bound (the exact bug paintAreaButton()'s own comment names).
+			if (extentBtn.className.indexOf('lpn-tool-more') < 0) { extentBtn.className += ' lpn-tool-more'; }
+			extentBtn.dataset.tool = 'zoom-window';
+			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
+		}
+		extentBtn.addEventListener('click', function () {
+			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
+			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
+			// come back to, because Zoom to fit is what the button shows by default.
+			if (mode === 'zoom-window') { setMode('select'); return; }
+			// **`zoomExtent` BY REFERENCE, so the click event would arrive as its `auto` argument if
+			// called directly** -- wrapped rather than passed, now that this handler does more than
+			// one thing. Left equivalent to before: a plain call with no `auto` flag, exactly what
+			// the toolbar always sent.
+			if (zoomToolShape === 'fit') {
+				zoomExtent();
+				zoomToolShape = 'window';
+				paintZoomToolButton();
+				return;
+			}
+			setMode('zoom-window');
+			paintZoomToolButton();
+		});
+		repaintZoomTool = paintZoomToolButton;
+		paintZoomToolButton();
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
@@ -33764,6 +33925,13 @@ var EngCalcs = EngCalcs || {};
 			if (mode !== 'select-area') { return; }
 			areaMove(screenToWorld(e.clientX, e.clientY));
 		});
+		// The Zoom Window box, tracking only the ONE pointer that opened it (ROADMAP Task 682) --
+		// unlike the ring above, this gesture is a press-drag-release, so a hover with no button
+		// down must not move a box nobody is drawing.
+		svg.addEventListener('pointermove', function (e) {
+			if (mode !== 'zoom-window' || !zoomWinDrag || zoomWinDrag.id !== e.pointerId) { return; }
+			zoomWinMove(screenToWorld(e.clientX, e.clientY));
+		});
 		// The profile path chooser's hover (Task 433) -- the same shape as the rubber band above and
 		// for the same reason: between clicks the user must see what the next click would commit.
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
@@ -33836,6 +34004,13 @@ var EngCalcs = EngCalcs || {};
 					drag = { type: 'pan', tx0: state.tx, ty0: state.ty };
 				}
 				Object.assign(drag, common);
+				return;
+			}
+			// **ZOOM WINDOW IS ALSO ITS OWN MODE, FOR THE SAME REASON** (ROADMAP Task 682): the
+			// whole gesture is a press-drag-release box, on a mouse or a finger alike, so `drag`
+			// (the pan/node/vertex/label state machine below) never arms while it is open.
+			if (mode === 'zoom-window') {
+				zoomWinBegin(screenToWorld(e.clientX, e.clientY), e.pointerId);
 				return;
 			}
 			// **SELECT AREA IS ITS OWN MODE AND NOTHING ELSE HAPPENS IN IT** (Task 266). No node
@@ -33972,6 +34147,12 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
+			// The Zoom Window release (ROADMAP Task 682) -- a cancelled pointer drops the box
+			// rather than zooming to wherever the browser happened to take the gesture away, the
+			// same rule select-area's own cancel follows two lines down.
+			if (mode === 'zoom-window' && zoomWinDrag && zoomWinDrag.id === e.pointerId) {
+				if (cancelled) { zoomWinCancel(); } else { zoomWinFinish(); }
+			}
 			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
 			// because nothing else on this page owns that finger: select-area arms no `drag`.
 			if (mode === 'select-area') {
@@ -36478,6 +36659,9 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < host.childNodes.length; i++) { add(host.childNodes[i]); }
 		});
 		add(document.getElementById('lpn_basemap_credit'));
+		// The on-map zoom chip (ROADMAP Task 682) -- fixed top-right, the labels legend's own
+		// default corner, so a legend parked there dodges under it rather than through it.
+		add(document.getElementById('lpn_zoom_control'));
 		return out;
 	}
 	// **ONE FUNCTION PLACES BOTH LEGENDS**, in a fixed order, and each one placed becomes an occupant
@@ -46133,6 +46317,30 @@ var EngCalcs = EngCalcs || {};
 		if (!m) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		setMode(m);
+	});
+
+	/**
+	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
+	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
+	 * entry's own citations for why not Ctrl/Cmd+`+`/`-`: every browser already claims that chord
+	 * for its own page zoom, and taking it back would surprise a visitor who has learned it.
+	 *
+	 * `=` IS BOUND TOO, because it is the unshifted key under `+` on a US layout and a QGIS-style
+	 * tool binds both -- a visitor should not have to hold Shift to zoom in.
+	 *
+	 * **THE GUARD IS THE ONE Ctrl+Z AND THE DIGIT PICKER ALREADY USE**, for the reason stated
+	 * beside the digit picker above: a bare `-` reaching a field would zoom the map out every time
+	 * somebody typed a negative elevation.
+	 *
+	 * The factor is `wheelZoom()`'s own 1.1 per notch (`wirePointerEvents()`'s wheel listener), so
+	 * a keyboard press is exactly one wheel notch -- through `keyZoom()`, the same door the wheel,
+	 * the pinch and the on-map chip all use, so none of them can disagree about what a "step" is.
+	 */
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key === '+' || e.key === '=') { e.preventDefault(); keyZoom(1.1); return; }
+		if (e.key === '-') { e.preventDefault(); keyZoom(1 / 1.1); }
 	});
 
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
