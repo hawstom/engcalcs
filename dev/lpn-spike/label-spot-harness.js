@@ -48,7 +48,16 @@ const SHED_CEILING_ALL = 34;   // was 38; SPOT.reachFactor 2 -> 1.25 bought four
 // as Net3-World went this way, which is what says this is the drawing rearranging rather than the
 // placement getting worse. The ratchet rule stands for every change that is not a deliberate
 // restatement of what the user wants to see: lower it when it falls.
-const SHED_CEILING_HEADLINE = 14;      // 6 / 3 / 4 / 1 over Net3-World's four views
+// **RAISED 14 -> 26 ON 2026-09-22, AND THIS IS THE VIEW OF THE DAY'S RULING THAT COSTS THE MOST.**
+// Tom ruled that a longer leader beats giving a property up, so the search widens before the value
+// shed is reached (`labelWidenSearch`). **This harness measures the drawing with EVERY node and
+// link field switched on** -- the most crowded thing a user can ask for -- and there a widened
+// label is a big box standing a long way out, which crosses somebody, and the crossing shed hides
+// one of the pair. At his own three properties the same change goes the other way (18 labels giving
+// a value up where 51 did, 5 hidden where 8 were: `label-drop-order-harness.js`), so the two
+// harnesses together say the cost is a function of how many fields are on. Named here rather than
+// buried, because 12 more hidden labels is a thing he can see and may not want.
+const SHED_CEILING_HEADLINE = 26;      // was 14 (6/3/4/1); every field on, Net3-World's four views
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
