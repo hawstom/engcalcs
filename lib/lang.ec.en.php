@@ -2005,7 +2005,6 @@ $ec_lang['lpn_ago_unknown']='an unknown time';
 // A notice is on screen for eight seconds and is then gone; these name the place it went. Kept in
 // memory only, for as long as the page is open.
 $ec_lang['lpn_msglog_name']='Messages';
-$ec_lang['lpn_msglog_tip']='Read the recent messages again. They are kept only while this page is open.';
 $ec_lang['lpn_msglog_heading']='Recent messages';
 $ec_lang['lpn_msglog_empty']='No messages yet.';
 // The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"

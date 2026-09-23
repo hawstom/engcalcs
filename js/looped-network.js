@@ -45169,11 +45169,19 @@ var EngCalcs = EngCalcs || {};
 	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
 	// mark cannot hold both jobs. See lib/Icons.lib.php for the drawing itself and Tom's own
 	// ruling on it, 2026-09-22.
+	// **NO TIP** (Tom, 2026-09-22: *"I don't think we need a tip on the down arrow glyph. I think
+	// it's more trouble than help."*). setIconLabel() always writes a `title` and adds `.ec-help`,
+	// which is the one selector initTips() wires a hover popup onto -- so this button is built by
+	// hand rather than through that door: the icon, and an `aria-label` so a screen reader still
+	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
+	// therefore unread; it and its 26 translations were deleted with this change.
 	function wireMessageLogButton() {
 		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }
-		setIconLabel(btn, 'history', pc.lpn_msglog_name || 'Messages',
-			pc.lpn_msglog_tip || 'Read the recent messages again. They are kept only while this page is open.');
+		btn.textContent = '';
+		var ic = iconEl('history');
+		if (ic) { btn.appendChild(ic); }
+		btn.setAttribute('aria-label', pc.lpn_msglog_name || 'Messages');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
 		btn.addEventListener('click', function (e) {

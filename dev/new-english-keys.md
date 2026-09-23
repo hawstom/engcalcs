@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**119 still to read on master**, of 191 untranslated keys, of 2049 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**125 still to read on master**, of 197 untranslated keys, of 2055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (191, 119 to read @@ NEEDS RULING)
+## lpn_  (197, 125 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -219,6 +219,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
   _Ruled OK 2026-09-17._
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  @@ NEEDS RULING
 - **`lpn_lock_open_care`**
   > To avoid data loss, choose carefully from the options below.
   _Ruled OK 2026-09-17._
@@ -335,6 +338,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.
+  @@ NEEDS RULING
+- **`lpn_msglog_ago`**
+  > {x} ago
+  @@ NEEDS RULING
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  @@ NEEDS RULING
+- **`lpn_msglog_heading`**
+  > Recent messages
+  @@ NEEDS RULING
+- **`lpn_msglog_name`**
+  > Messages
+  @@ NEEDS RULING
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   @@ NEEDS RULING
 - **`lpn_node_customers`**
   > Customer demands
@@ -605,7 +623,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**28 still to read**, of 34 new keys across 3 unmerged branch(es).
+**21 still to read**, of 21 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -616,17 +634,35 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`ae48c735`) — 13 new, 11 to read @@ NEEDS RULING
+### chore/roadmap-0922 (`fb489c82`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
+  @@ NEEDS RULING
+- **`lpn_settings_label_always`**
+  > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width`**
+  > Show labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`6bcc23a0`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   @@ NEEDS RULING
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
+  @@ NEEDS RULING
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
+  @@ NEEDS RULING
 - **`lpn_labels_restore`**
   > Restore label defaults
   @@ NEEDS RULING
@@ -636,93 +672,42 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_always`**
   > Always show labels
   @@ NEEDS RULING
-- **`lpn_settings_label_auto`**
-  > Automatic: {width}
-  @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
-  > Widest view that shows labels (map units)
+  > Show labels when zoomed to this map width or less
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
-  @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
   @@ NEEDS RULING
 
-### feat/notice-log (`5191e8d3`) — 13 new, 11 to read @@ NEEDS RULING
+### feat/notice-log (`f02da0be`) — 1 new, 1 to read @@ NEEDS RULING
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
-- **`lpn_lock_open_cancelled`**
-  > That file was not opened, and nothing here changed. Somebody else still has it open.
-  @@ NEEDS RULING
-- **`lpn_msglog_ago`**
-  > {x} ago
-  @@ NEEDS RULING
-- **`lpn_msglog_empty`**
-  > No messages yet.
-  @@ NEEDS RULING
-- **`lpn_msglog_heading`**
-  > Recent messages
-  @@ NEEDS RULING
-- **`lpn_msglog_name`**
-  > Messages
-  @@ NEEDS RULING
-- **`lpn_msglog_note`**
-  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
-  @@ NEEDS RULING
 - **`lpn_msglog_tip`**
   > Read the recent messages again. They are kept only while this page is open.
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`64b1a0e0`) — 8 new, 6 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`bc2365d0`) — 2 new, 2 to read @@ NEEDS RULING
 
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
 - **`lpn_pane_goto_tip`**
-  > Show this on the map.
+  > Zoom & select
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
+
+### feat/zoom-scale-rules (`a7627feb`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_field_text_all_zoom`**
+  > Show at all zoom levels
   @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
+- **`lpn_field_text_all_zoom_tip`**
+  > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
   @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
+- **`lpn_settings_label_always`**
+  > Always show labels
   @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
+- **`lpn_settings_label_max_width`**
+  > Show labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
   @@ NEEDS RULING

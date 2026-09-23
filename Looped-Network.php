@@ -2582,7 +2582,6 @@ EngCalcs.pageConfig = {
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
 	lpn_dialog_ok: <?=json_encode($ec_lang['lpn_dialog_ok'])?>,
 	lpn_msglog_name: <?=json_encode($ec_lang['lpn_msglog_name'])?>,
-	lpn_msglog_tip: <?=json_encode($ec_lang['lpn_msglog_tip'])?>,
 	lpn_msglog_heading: <?=json_encode($ec_lang['lpn_msglog_heading'])?>,
 	lpn_msglog_empty: <?=json_encode($ec_lang['lpn_msglog_empty'])?>,
 	lpn_msglog_ago: <?=json_encode($ec_lang['lpn_msglog_ago'])?>,

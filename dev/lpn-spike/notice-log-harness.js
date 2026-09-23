@@ -269,9 +269,14 @@ const btn = byId.lpn_msglog_btn;
 ok('the control exists', !!btn);
 ok('it has an accessible name, which an icon-only button does not get for free',
 	btn.getAttribute('aria-label') === PC.lpn_msglog_name);
-ok('it carries a tip', String(btn.title || '').indexOf(PC.lpn_msglog_tip) >= 0);
-ok('and .ec-help, which is the only selector initTips() wires',
-	String(btn.className || '').indexOf('ec-help') >= 0);
+// **NO TIP** (Tom, 2026-09-22: "I don't think we need a tip on the down arrow glyph. I think
+// it's more trouble than help."). `lpn_msglog_tip` and its English string were deleted along with
+// this: the button carries an aria-label (asserted above) but no title text and no `.ec-help`
+// class, so initTips() -- which wires a hover popup on `.ec-help[title]` alone -- has nothing to
+// find here.
+ok('it carries no title text -- no tip to show on hover', !btn.title);
+ok('and no .ec-help class -- initTips() must not wire a popup onto this button',
+	String(btn.className || '').indexOf('ec-help') < 0);
 ok('it draws a real icon -- a misspelt name renders nothing at all',
 	(btn.children || []).some(c => String(c.tagName || '').toLowerCase() === 'svg'));
 ok('it names the panel it discloses, for a screen reader that cannot see the arrow key otherwise',
