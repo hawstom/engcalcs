@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 2021,
-        "delta_key_count": 172,
+        "expected_key_count": 2022,
+        "delta_key_count": 174,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -557,6 +557,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -731,6 +733,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -1397,6 +1401,38 @@
                     "key": "lpn_file_import_geo_tip",
                     "value": "បើកឯកសារគម្រោង ឬឯកសារ EPANET នៅក្នុងផ្ទាំងគម្រោងថ្មីនៅលើទំព័រនេះ លើផែនទីផ្លូវ។ អ្នកដាក់គំនូរនៅលើពិភពលោកដោយដៃ៖ អូស និងពង្រីក\/បង្រួមទៅកន្លែងនោះ រួចប្ដូរទំហំ និងបង្វិលវាឲ្យសមទៅនឹងវា។ ប្រសិនបើ x និង y នៅក្នុងឯកសាររួចហើយជាបណ្ដោយ និងទទឹងភូមិសាស្ត្រ សូមចុចប៊ូតុង តម្លៃទាំងនេះជា lat\/lon រួចហើយ ហើយបណ្ដាញនឹងលោតទៅត្រង់កន្លែងដែលវាជាកម្មសិទ្ធិភ្លាមៗ។ រាល់លេខដែលអ្នកបានវាយបញ្ចូល នៅតែដដែល។",
                     "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                }
+            }
+        },
+        "lpn_pane_not_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_text_attached",
+                    "value": "បានភ្ជាប់",
+                    "english": "Attached"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_filter_note",
+                    "value": "បានត្រងដោយ {q}។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។",
+                    "english": "Filtered by {q}. Showing {n} of {all}."
+                }
+            }
+        },
+        "lpn_pane_goto_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "តម្រៀបតាមជួរឈរនេះ។ ចុចម្ដងទៀតដើម្បីបញ្ច្រាស។",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "បោះពុម្ពតារាង",
+                    "english": "Print table"
                 }
             }
         },

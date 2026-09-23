@@ -95,6 +95,9 @@ const EC_TABLE_PARITY_ADVISORY = false;
  * A declaration matching nothing FAILS: see the docblock.
  */
 const EC_TABLE_PARITY_EXEMPT = [
+    // (f) TEMPORARY: the column is being built on feat/zoom-scale-rules (R-174). That merge must
+    // delete this line, and the check fails until it does, since a declaration matching nothing fails.
+    'text/lpn_field_text_all_zoom' => 'f. column in flight on feat/zoom-scale-rules (R-174)',
     // (a) the scenario override marker: a statement about a row, drawn under it in the popup and
     // painted onto the cell in the table. Every type carries it, so every type declares it.
     'junction/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
