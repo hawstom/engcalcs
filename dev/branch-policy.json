@@ -55,7 +55,8 @@
         "feat/notice-log",
         "feat/zoom-symbol-size",
         "feat/map-menu",
-        "tables-interface"
+        "tables-interface",
+        "feat/zoom-scale-rules"
     ],
     "feature_freeze": {
         "active": false,
