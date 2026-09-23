@@ -278,18 +278,17 @@ ok('it has an accessible name, which an icon-only button does not get for free',
 ok('it carries no title text -- no tip to show on hover', !btn.title);
 ok('and no .ec-help class -- initTips() must not wire a popup onto this button',
 	String(btn.className || '').indexOf('ec-help') < 0);
-// **AND THE OTHER HALF OF THE SAME INVARIANT** (Perry's second review, 2026-09-22: dropping the
-// tip by building this button by hand instead of through setIconLabel() silently dropped it out
-// of Help > "Toolbar key" too -- the one NON-hover way a first-time or touch user learns what the
-// glyph does, which Tom never asked to lose along with the tip). Asserted TOGETHER with the no-tip
-// checks above, on purpose: a fix that restores one half and re-breaks the other must fail here,
-// not pass two separate, disconnected assertions in two separate files.
+// **AND IT IS DELIBERATELY ABSENT FROM HELP > "TOOLBAR KEY"** (Tom's ruling, 2026-09-23). Perry
+// found that dropping the tip had silently dropped the button out of that list too; it was put
+// back, and Tom then struck the whole idea -- *"that makes 'Toolbar' a lie since the 'Messages'
+// glyph is not really on the Toolbar"* -- which is factually right: the button is written into the
+// map's own overlay row in Looped-Network.php, not into the toolbar. **Asserted rather than merely
+// not-asserted, because the accident this replaces went both ways**: the row appearing again would
+// mean somebody had wired this button through setIconLabel() and given it a tip along with it.
 {
 	const guideRow = L.iconGuideRows().filter(r => r.icon === 'history')[0];
-	ok('it is still in the Toolbar key list', !!guideRow, JSON.stringify(L.iconGuideRows().map(r => r.icon)));
-	ok('under its own name', guideRow && guideRow.label === PC.lpn_msglog_name);
-	ok('but the list row carries no tip either -- the whole point was to drop the tip, not hide it',
-		guideRow && !guideRow.tip);
+	ok('it is NOT in the Toolbar key list -- that list names the toolbar, and this button is not on it',
+		!guideRow, JSON.stringify(L.iconGuideRows().map(r => r.icon)));
 }
 ok('it draws a real icon -- a misspelt name renders nothing at all',
 	(btn.children || []).some(c => String(c.tagName || '').toLowerCase() === 'svg'));
@@ -701,20 +700,19 @@ console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and grou
 		unknown.indexOf('aNewUndeclaredWriter') >= 0, JSON.stringify(unknown));
 }
 
-console.log('10. THE LIVE MUTATION: dropping registerToolbarIcon() reproduces the exact regression '
-	+ '(Perry\'s second review, 2026-09-22) -- no tip is correct, but disappearing from Help > '
-	+ '"Toolbar key" along with it is not, and group 7 must catch that on its own');
+console.log('10. THE LIVE MUTATION: wiring this button through setIconLabel() would give it BOTH a '
+	+ 'tip and a Toolbar key row, which is the accident Tom struck -- group 7 must catch it');
 {
 	const M6 = load(src => {
-		const mark = "\t\tregisterToolbarIcon(btn, 'history', name, '');\n";
-		if (src.indexOf(mark) < 0) { throw new Error("wireMessageLogButton()'s registerToolbarIcon() call has moved"); }
-		return src.replace(mark, '');
+		const mark = "\t\tbtn.setAttribute('aria-label', name);\n";
+		if (src.indexOf(mark) < 0) { throw new Error("wireMessageLogButton()'s aria-label line has moved"); }
+		return src.replace(mark, mark + "\t\tregisterToolbarIcon(btn, 'history', name, '');\n");
 	});
 	M6.wireMessageLogButton();
 	const guideRow = M6.iconGuideRows().filter(r => r.icon === 'history')[0];
-	ok('without the registration call, the button vanishes from the Toolbar key list -- '
-		+ 'restoring the exact regression this section exists to catch',
-		!guideRow, JSON.stringify(M6.iconGuideRows().map(r => r.icon)));
+	ok('registering it again puts it back in the Toolbar key list -- so the assertion in group 7 '
+		+ 'is live and would catch a future re-wiring through setIconLabel()',
+		!!guideRow, JSON.stringify(M6.iconGuideRows().map(r => r.icon)));
 }
 
 global.setTimeout = realSetTimeout;

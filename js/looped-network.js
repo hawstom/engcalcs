@@ -45189,12 +45189,18 @@ var EngCalcs = EngCalcs || {};
 	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
 	// therefore unread; it (never translated into any of the other 26 languages) was deleted with
 	// this change.
-	// **AND STILL REGISTERED IN HELP > "TOOLBAR KEY"** (Perry's second review, 2026-09-22: building
-	// this button by hand instead of through setIconLabel() silently dropped it out of that list
-	// too, which is the one non-hover way a first-time or touch user learns what the glyph does --
-	// Tom asked only for the hover tip to go, not for that). `registerToolbarIcon()` is the
-	// bookkeeping half of setIconLabel() split out for exactly this: called here alone, with an
-	// empty tip, so the row appears with a name and no tip of its own.
+	// **AND DELIBERATELY NOT IN HELP > "TOOLBAR KEY", ON TOM'S OWN RULING** (2026-09-23). Perry
+	// found that building this button by hand had silently dropped it out of that list, it was put
+	// back, and Tom then struck the whole idea: *"If we are putting 'Messages' under Help, Toolbar,
+	// that makes 'Toolbar' a lie since the 'Messages' glyph is not really on the Toolbar. My
+	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
+	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
+	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
+	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// name stays; the drawing carries the rest.
+	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
+	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
+	// accident. It simply is not called here.
 	function wireMessageLogButton() {
 		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }
@@ -45203,7 +45209,6 @@ var EngCalcs = EngCalcs || {};
 		var ic = iconEl('history');
 		if (ic) { btn.appendChild(ic); }
 		btn.setAttribute('aria-label', name);
-		registerToolbarIcon(btn, 'history', name, '');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
 		btn.addEventListener('click', function (e) {
