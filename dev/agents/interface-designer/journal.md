@@ -2785,3 +2785,156 @@ drawing's own Ctrl+Z — never mix "I changed how the map is colored" onto the s
 pipe," because pressing Ctrl+Z then stops reliably undoing the last thing you actually did.
 
 No shipped file touched.
+
+---
+
+## Task 682 follow-up: Zoom Window's gesture, and the toolbar button's first-click behavior
+
+Tom, 2026-09-23, testing branch `feat/zoom-control`: *"It seems inconsistent for us to use click
+for selection, but drag for zoom. I think we should have a consistent idiom. Maybe Ida has
+insight."* And: *"With Select area, the first time you click, it does not change modes. Changing
+the first time you click is confusing. I think that it should act like Select area. Click twice in
+a row to get mode change."*
+
+### What Select area actually does (OBSERVED)
+
+Select area's window shape is **click-a-corner, move, click-the-opposite-corner — but a
+press-drag-release also works**, because both gestures are read by the same handlers:
+`areaPress()` opens the ring on pointer-down (`js/looped-network.js:15547`); `areaMove()` just
+follows the pointer; a **second ordinary click** commits it (`areaPress()`'s second call falls
+through to `commitArea()`, `:15567-15569`), and separately `areaPointerUp()` (`:15612-15621`)
+commits it on release **only if the pointer travelled past the tap threshold**, so a plain
+click-release-click-release sequence and a press-hold-drag-release sequence both draw the same
+box. This is deliberate and dated: *"Instead of dragging, make all three of them click and
+rubber band"* (Tom, 2026-09-07, quoted at `:13340`), with the press-drag-release path added
+afterward as a second door onto the same commit, not a replacement (`:15605-15611`).
+
+The toolbar button (`js/looped-network.js:33613-33636`) is a single click handler:
+```
+areaBtn.addEventListener('click', function () {
+    setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
+});
+```
+Read exactly: **if you are not already in the tool, one click enters it, showing whichever of
+window/lasso/polygon it was already showing** (no cycling). **If you are already in the tool,
+that same click cycles the shown shape** and re-enters with the new one. So the button's outward
+face — which of the two/three things it will do — changes only on a click that lands while the
+tool is already active: i.e., "twice in a row." The very first click never changes what the
+button shows; it just does what it already showed.
+
+### What Zoom Window currently does, and where it breaks that pattern (OBSERVED)
+
+`extentBtn`'s handler (`:33689-33707`):
+```
+if (mode === 'zoom-window') { setMode('select'); return; }
+if (zoomToolShape === 'fit') {
+    zoomExtent(false);
+    zoomToolShape = 'window';
+    paintZoomToolButton();   // <-- flips the icon to "Zoom Window" right here
+    return;
+}
+setMode('zoom-window');
+```
+**The first click already changes what the button shows** — it fires Zoom to fit *and*
+repaints the icon to Zoom Window in the same click, before the user has done anything to ask for
+that second thing. That is the one concrete difference from Select area's button, and it is
+exactly what produces the "changing on the first click is confusing" complaint: two outwardly
+identical disclosure-triangle buttons sit side by side, and only one of them visibly changes on
+a single press.
+
+The canvas gesture is also a real inconsistency, separately from the button: `zoomWinBegin()` is
+called straight from `pointerdown` in `zoom-window` mode (`:34013-34014`) with no click-click
+door at all. A plain click (down, no movement, up) does not commit anything —
+`zoomWinFinish()`'s zero-distance guard (`:15352... `at `13405-13406`) just discards it and
+leaves the mode armed — so a user who tries the exact click-click gesture that works for Select
+area gets nothing, silently, on Zoom Window.
+
+### External idiom, cited
+
+- **EPANET's own Zoom-In tool is click-click, not drag**: "move the mouse... to where you want a
+  corner of the zoom window to begin, then click... Next move the mouse until the outline box...
+  encompasses the area... Then click... once again." CITED,
+  [EPANET 2.2 documentation, §7 Working with the Map](https://epanet22.readthedocs.io/en/latest/7_map.html).
+  This matters more than the others here because the suite already defers to EPANET's vocabulary
+  and conventions everywhere it can (CLAUDE.md, `lpn_` section).
+- **AutoCAD's ZOOM Window option is also two picks**: "pick one corner... pick the opposite
+  corner." CITED, [AutoCAD 2022 Help, ZOOM (Command)](https://help.autodesk.com/view/ACD/2022/ENU/?guid=GUID-66E7DB72-B2A7-4166-9970-9E19CC06F739).
+  (AutoCAD's *selection* window, a different command, accepts both a press-drag and two picks —
+  I did not find that stated for ZOOM Window specifically, so I am not citing it for ZOOM.)
+- **QGIS's zoom tool is drag-only**: "left-click and hold, then drag the mouse to create a
+  rectangle... release." CITED, [QGIS Documentation, General Tools](https://docs.qgis.org/3.10/en/docs/user_manual/introduction/general_tools.html).
+- **Web maps use shift-drag**, not a dedicated tool: Leaflet's `boxZoom`, OpenLayers' shift-drag
+  rectangle, ArcGIS's Shift+drag all key the gesture off a held modifier rather than a toolbar
+  mode. CITED, [Leaflet reference](https://leafletjs.com/reference.html) and search-summarized
+  OpenLayers/ArcGIS behavior above. Not directly applicable here — `lpn_` has no held-modifier
+  zoom gesture and Shift is already spoken for (it toggles Select area's keep-selection).
+
+So the field splits: EPANET and AutoCAD (click-click), QGIS (drag), web maps (modifier-drag). No
+single external authority settles it. What does settle it is what already sits on this
+toolbar.
+
+### Answer 1 — ranked
+
+**Do this: make Zoom Window accept both click-click and press-drag-release, by reusing exactly
+the gesture-handling shape Select area's window already uses (down opens the box, move follows
+it, a click-release-click-release OR a press-drag-release both commit it).** Reasoning: a reader
+who has just used the click-click idiom on the button to its left (Select area) and reaches for
+the button to its right (Zoom Window, same `.lpn-tool-more` triangle styling) has every reason to
+expect the same gesture to work, because nothing on the toolbar tells them otherwise — Tom's own
+"inconsistent" is the correct read of two adjacent, visually identical controls answering to
+different physical actions. This also happens to match EPANET's own zoom tool (click-click),
+which is the stronger of the two citable precedents here since the suite already defers to
+EPANET terminology and behavior wherever it can, and it does not cost the drag gesture anything:
+`areaPointerUp()`'s pattern (commit on release only past the tap threshold, else this is a
+"clicked open" ring waiting for its second click) covers both without asking the user to choose.
+Cost: a build agent needs to either extract Select area's press/move/commit trio into a shared
+helper or duplicate it against `zoomWinDrag`'s own state (the code already argues, at
+`:13369-13373`, for keeping the two states separate, which I read as still correct — a Zoom
+Window drag should not be able to bleed into what Select area draws next). Estimate: small, a
+few hours, no new strings, no translation cost.
+
+Second-ranked, if the first is judged too much for before 2026-09-16 — wait, that demonstration
+already passed; if judged too much for whatever the next freeze is: **leave Zoom Window as
+drag-only, but say so once**, e.g. a hover tip that already exists (`lpn_tool_zoom_window_tip`)
+could earn a sentence contrasting it from Select area. This is strictly worse: it spends a
+translated string to explain an inconsistency instead of removing it, which is exactly backwards
+from "a proposal that adds words has a real price; one that removes a bar does not" — the same
+principle, applied to a gesture instead of a bar. I would not do this.
+
+Not recommended at all: matching Select area to Zoom Window's drag-only instead (i.e., making
+Select area drag-only) — this breaks the already-shipped, already-explained rubber-band idiom
+that exists specifically because a held drag was unusable for tracing a lasso (Tom, 2026-09-07,
+quoted above), and would be a regression on a settled decision, not a fix.
+
+### Answer 2 — the precise button rule, for a build agent
+
+**Select area's rule, stated exactly enough to copy:** the button shows one of a fixed list of
+sub-choices (for Select area: window/lasso/polygon). A click, while the tool the button belongs
+to is **not currently active, performs whatever sub-choice is currently shown and enters the
+tool — the shown sub-choice never changes on this click.** A click **while the tool is already
+active** advances to the next sub-choice in the list and re-enters with it. There is no other
+state to track — `mode === 'select-area'` at the moment of the click is the entire test
+(`:33635`).
+
+**Zoom to fit / Zoom Window does not yet follow that rule, because 'fit' is a one-shot action
+and not a mode you can "already be in."** To make it follow the identical rule: the button must
+not repaint its icon to "Zoom Window" as a side effect of firing "Zoom to fit" — that repaint is
+the one visible thing happening on a first click that Select area's button never does. The
+fix is to gate the icon flip (and the `setMode('zoom-window')` call) on the click being a
+**second, consecutive** press of this same button, tracked the same way Select area tracks it —
+by whether the tool is presently active — except here the tool being "active" has to be a
+new one-shot flag (e.g. `zoomToolArmed`), since "fit" leaves no mode behind to test. Concretely:
+first press with `zoomToolArmed` false → fire `zoomExtent(false)`, set `zoomToolArmed = true`,
+**leave the icon showing "Zoom to fit."** Second press with `zoomToolArmed` true and nothing else
+having intervened → **now** flip the icon to "Zoom Window" and call `setMode('zoom-window')`,
+clearing `zoomToolArmed`. Any other toolbar action, mode change, or menu use in between clears
+`zoomToolArmed` back to false, the same way `zoomToolShape` already resets to `'fit'` on exit
+(`:15486-15488`) — reuse that same reset hook rather than adding a second one.
+
+Net effect for the person at the mouse: press once — the view fits, nothing about the button
+changes. Press again, right after — now you're in Zoom Window, and the icon says so. That is
+"click twice in a row to get mode change," read the way I believe Tom meant "mode" — the
+button's outward face, not the internal `mode` variable, which already changes on Select area's
+very first click and is not what he was describing.
+
+No shipped file touched.
