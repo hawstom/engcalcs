@@ -83,6 +83,16 @@ const EC_VENUE_EXEMPT = [
     // silently matches nothing (Tom, 2026-08-29: *"Text.ID 2 highest finds nothing... Is this a UI
     // bug?"* -- it was, and findPropDefs() was rebuilt to stop seeding `id` for a label's scope).
     'text/id' => 'a Text has no id reachable from any screen; findPropDefs() deliberately does not offer one',
+    // **A KEY-NAME MISMATCH, NOT A GAP** (Task 708, ranked gap #2, closed). The table's checkbox
+    // column is keyed `closed` (paneColClosed()); Find and Replace offer the identical underlying
+    // property -- `effective(l, 'status')`, written through the same `setProp(l, 'status', ...)`
+    // -- under the name `status`, matching linkStatusOf()'s and the Labels panel's own name for
+    // it rather than the checkbox's inverted one. This script's identity match is on the literal
+    // `key:`, so it cannot see that `closed` and `status` are two names for one property; a person
+    // typing `Pipe.Status equal to closed` gets exactly what `pipe/closed` asks for.
+    'pipe/closed' => "findable and replaceable under Find's own name for it, 'status' -- see the note above",
+    'pump/closed' => "findable and replaceable under Find's own name for it, 'status' -- see the note above",
+    'valve/closed' => "findable and replaceable under Find's own name for it, 'status' -- see the note above",
 ];
 
 define('EC_TABLE_PARITY_LIB_ONLY', 1);

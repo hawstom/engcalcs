@@ -4776,7 +4776,90 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// ---- TASK 708: THE RANKED GAPS FROM dev/property-venue-matrix.md, CLOSED BELOW -------
+			//
+			// **THE EMITTER COEFFICIENT (gap #3).** Overridable, but its own `set` -- not a plain
+			// `prop` -- because it crosses the one two-unit boundary on this page (Task 638's own
+			// pair, flow per pressure^gamma): replaceWrite() calls setProp() directly for any spec
+			// carrying a `prop`, which would store the DISPLAYED number raw and skip
+			// emitterToStore() entirely. No `prop` here routes the write through this `set`
+			// instead, exactly the way paneColEmitter()'s own cell does.
+			{ key: 'emitter', group: 'node', field: 'emitter', label: pc.lpn_field_emitter || 'Emitter coefficient',
+				applies: function (n) { return n.type === 'junction'; },
+				get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+				set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } },
+			// **PIPE LENGTH (gap #6): FINDABLE SINCE FIND_EXTRA_LINK_FIELDS, NOW WRITABLE TOO.**
+			// Overridable, and again no `prop`: a Base-side write must also clear `lenAuto`
+			// (`paneColClosed()`'s neighbour `paneColLength`-shaped cell does this inline), or the
+			// next geometry pass silently throws the typed length away and re-derives it from the
+			// drawing (line 9862). Inside a scenario `lenAuto` is never consulted, so `setProp()`
+			// alone is correct there; only Base needs the extra line.
+			{ key: 'length', group: 'link', field: 'length', label: pc.lpn_field_length || 'Length',
+				applies: function (l) { return l.type === 'pipe'; },
+				get: function (l) { return effective(l, 'length'); },
+				set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+			// **A LINK'S OPEN/CLOSED STATUS (gap #2, ranked highest).** Overridable, and a `prop`
+			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
+			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
+			// logic to bypass -- unlike `emitter` and `length` above.
+			{ key: 'status', group: 'link', field: 'status', prop: 'status', choices: ['open', 'closed'],
+				label: pc.lpn_result_status || 'Status',
+				applies: function () { return true; },
+				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is base-owned (not in
+			// LPN_OVERRIDABLE), so no `prop`, and the write is the same clamp
+			// paneColPumpSpeed() applies: a blank, a zero or a negative all mean 1 rather than a
+			// pump switched off, which has its own property (`status`, above).
+			{ key: 'speed', group: 'link', field: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },
+			{ key: 'energyPrice', group: 'link', field: 'energyPrice', prop: 'energyPrice', label: pc.lpn_energy_price || 'Price of power',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPrice'); }, set: function (l, v) { l._energyPrice = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE ENERGY PRICE PATTERN, AN ID RATHER THAN A QUANTITY** -- the same shape as a
+			// customer's demand pattern in customerReplaceSpecs() below: `str` so a bulk write
+			// carries the exact bytes typed, and no `prop` so the write can refuse a name nothing
+			// in the library answers to rather than filling four hundred pumps with a dangling
+			// reference.
+			{ key: 'energyPattern', group: 'link', field: 'energyPattern', str: true, label: pc.lpn_energy_price_pattern || 'Price pattern',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPattern') || ''; },
+				set: function (l, v) {
+					var id = String(v === undefined || v === null ? '' : v).trim();
+					if (!id || !libPatternsRead().some(function (pp) { return pp.id === id; })) { return; }
+					setProp(l, 'energyPattern', id);
+				} },
+			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
+			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
+			// other three are base-owned geometry, written bare exactly as their table cells are.
+			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Tank level',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Tank minimum level',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Tank maximum level',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
+			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
+			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
+			// above -- the internal EPANET tokens, never translated, so a saved query keeps
+			// reading in every language.
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel', choices: ['MIXED', '2COMP', 'FIFO', 'LIFO'],
+				label: pc.lpn_mixing_model || 'Mixing model',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
+			// **THE MIXING FRACTION, GATED EXACTLY AS THE TABLE CELL GATES IT** -- only a
+			// two-compartment tank has one, so `applies` refuses the rest rather than writing a
+			// number nothing reads.
+			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
+				applies: function (n) { return n.type === 'tank' && (n.mixingModel || 'MIXED') === '2COMP'; },
+				get: function (n) { return n.mixingFraction; }, set: function (n, v) { n.mixingFraction = v; } }
 		].concat(customPushSpecs());
 	}
 	/**
@@ -15756,12 +15839,25 @@ var EngCalcs = EngCalcs || {};
 			['demand', 'lpn_field_base_demand', 'Base demand'],
 			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
+			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
+			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
+			// row and table column that Find had simply never been given a row for.
+			['emitter', 'lpn_field_emitter', 'Emitter coefficient'],
 			// **LAST IN BAND 2, BESIDE THE OTHER THINGS YOU TYPE** (Tom, 2026-09-14). It is an
 			// INPUT -- the concentration a node starts a run holding -- so it belongs here and
 			// not with the results, even though its only reader is a chemical run. The result it
 			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
 			// Tables pane both make.
-			['initQuality', 'lpn_quality_initial', 'Initial quality']
+			['initQuality', 'lpn_quality_initial', 'Initial quality'],
+			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
+			// #4). A tank is the one node type with several scalar inputs of its own; gated to
+			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
+			['level', 'lpn_field_tank_level', 'Tank level'],
+			['minLevel', 'lpn_field_tank_minlevel', 'Tank minimum level'],
+			['maxLevel', 'lpn_field_tank_maxlevel', 'Tank maximum level'],
+			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
+			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
@@ -15775,7 +15871,16 @@ var EngCalcs = EngCalcs || {};
 			['roughness', null, 'Roughness'],
 			['km', 'lpn_field_km_short', 'Minor loss, k'],
 			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
-			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient']
+			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient'],
+			// **ACTIVE/SHUT, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
+			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
+			// gate is needed below -- the generic test already offers it to every link.
+			['status', 'lpn_result_status', 'Status'],
+			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
+			// below exactly as the pipe reaction pair is gated to a pipe.
+			['speed', 'lpn_field_pump_speed', 'Relative speed'],
+			['energyPrice', 'lpn_energy_price', 'Price of power'],
+			['energyPattern', 'lpn_energy_price_pattern', 'Price pattern']
 		];
 		var RESULT_LINK = [
 			['flow', 'lpn_result_flow', 'Flow'],
@@ -15801,6 +15906,13 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
+				} else if (key === 'emitter') {
+					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
+				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
+					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
 				} else {
 					// Everything else is offered where the Labels list and the colour ramp agree it
 					// exists, which is the same test this function has always applied.
@@ -16002,9 +16114,17 @@ var EngCalcs = EngCalcs || {};
 		// the junction it lumps at. Both are ids, so they take the text conditions and sort in the
 		// reader's own alphabet exactly as an id does. Its description and its tag are already on
 		// this list, being the same two properties a node and a link carry.
+		// **A LINK'S OPEN/CLOSED STATUS AND A TANK'S MIXING MODEL ARE CHOICES, NOT NUMBERS** (Task
+		// 708, gaps #2 and #4). Neither has a colour ramp or a unit; each is one of a short, fixed
+		// set of internal tokens (`open`/`closed`, `MIXED`/`2COMP`/`FIFO`/`LIFO`), stated in
+		// EPANET's own vocabulary rather than translated, exactly as a curve's kind is -- so
+		// `contains` and `equals` are the right questions and there is no numeric reading of
+		// either. A pump's energy price PATTERN is the same shape of thing as a demand pattern
+		// reference: an id, not a quantity.
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
-			prop === 'link' || prop === 'atNode';
+			prop === 'link' || prop === 'atNode' ||
+			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -16302,6 +16422,57 @@ var EngCalcs = EngCalcs || {};
 		// carry one rather than every junction in the drawing.
 		if (prop === 'fireFlow') {
 			return cand.group === 'node' ? fireFlowOwn(cand.el) : undefined;
+		}
+		// **THE EMITTER COEFFICIENT CROSSES A UNIT BOUNDARY EFFECTIVE() DOES NOT**, exactly as the
+		// popup and the table read it: it is the one field on this page whose unit is two units
+		// (flow per pressure^gamma), so emitterToDisplay() is the one door, here as everywhere
+		// else (Task 708, gap #3).
+		if (prop === 'emitter') {
+			return cand.group === 'node' ? emitterToDisplay(effective(cand.el, 'emitter')) : undefined;
+		}
+		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
+		// is read through effective() like every other overridable input; the other three are
+		// base-owned geometry, read straight off the node exactly as their table cells do.
+		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
+			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
+			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
+		// default, exactly as the table's own get() answers it.
+		if (prop === 'mixingModel') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? (cand.el.mixingModel || 'MIXED') : undefined;
+		}
+		// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, the same gate the popup and the table
+		// draw the row under (paneColMixingFraction()'s own `plainFor`).
+		if (prop === 'mixingFraction') {
+			return (cand.group === 'node' && cand.el.type === 'tank'
+				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
+				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
+				? cand.el.mixingFraction : undefined;
+		}
+		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
+		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
+		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
+		if (prop === 'status') {
+			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+		}
+		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5). Speed is base-owned (not in
+		// LPN_OVERRIDABLE) and read bare with the same "blank/zero/negative means 1" rule
+		// paneColPumpSpeed() states; the price and its pattern are overridable, read through
+		// effective() like every other input here.
+		if (prop === 'speed') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return (typeof cand.el.speed === 'number' && isFinite(cand.el.speed)) ? cand.el.speed : 1;
+		}
+		if (prop === 'energyPrice') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			var priceVal = effective(cand.el, 'energyPrice');
+			return (typeof priceVal === 'number' && isFinite(priceVal)) ? priceVal : undefined;
+		}
+		if (prop === 'energyPattern') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return effective(cand.el, 'energyPattern') || undefined;
 		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
@@ -17775,6 +17946,19 @@ var EngCalcs = EngCalcs || {};
 		// it is flagged where it is READ rather than refused here -- Tom's own ruling, and the
 		// reason an empty box still refuses, since erasing a property on 400 assets is a real
 		// action that must not be spelled the same way as leaving a box alone.
+		// **A CHOICE PROPERTY (Task 708): status's open/closed, a tank's mixing model.** The value
+		// box is still plain text -- there is no dropdown here, only the Table pane has one -- so
+		// the typed word is matched case-insensitively against the fixed list of internal EPANET
+		// tokens `spec.choices` names, and normalized to the exact stored spelling. Anything else
+		// is refused exactly as an empty box is: `undefined` here is "type a valid value," not "no
+		// change," so a typo cannot be read as leaving four hundred pipes alone on purpose.
+		if (spec && spec.choices) {
+			var lc = raw.toLowerCase(), ci;
+			for (ci = 0; ci < spec.choices.length; ci++) {
+				if (String(spec.choices[ci]).toLowerCase() === lc) { return spec.choices[ci]; }
+			}
+			return undefined;
+		}
 		if (spec && spec.str) { return raw === '' ? undefined : raw; }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
@@ -37399,7 +37583,18 @@ var EngCalcs = EngCalcs || {};
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
-			var active = pushSpecs.filter(pushFieldShown);
+			// **A SECOND GATE, BESIDE pushFieldShown()** (Task 708). This button seeds each
+			// property from `settings.defaults[s.key]`, and pushFieldShown() alone answers "is
+			// this shown on the map", not "does a New-asset default exist for it" -- the two used
+			// to be the same question for every entry in pushSpecList(), because every property
+			// with a map-label toggle also had a defaultRow() above. `length` and `status` break
+			// that: both are shown on the map by default option and NEITHER has a New-asset
+			// default (deliberately, for `length` -- see the comment above defaultRow's absence --
+			// and never given one for `status`). Without this second test, turning the Length or
+			// Status label on and pressing this button would push `undefined` onto every pipe.
+			var active = pushSpecs.filter(function (s) {
+				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(settings.defaults, s.key);
+			});
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
