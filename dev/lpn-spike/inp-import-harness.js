@@ -111,7 +111,13 @@ const L = loadLoopedNetwork(
 	// Task 447: File > Import xy to lat/lon…, and the wizard it can end in. serialize() is how this
 	// harness gets a real project FILE to hand back through that row -- writing one by hand would be
 	// a second opinion about our own format.
-	"\t\topenAsGeo: openAsGeoFile, serialize: serializeProject,\n" +
+	// The file route of File, Convert as (Task 696) lands the file and then offers the Convert as
+	// box; this answers it the way this section means, lat/lon (EPSG:3857), and presses Convert.
+	"\t\topenAsGeo: function (f) { openAsGeoFile(f);\n" +
+	"\t\t\tvar box = document.getElementById('lpn_convas_panel');\n" +
+	"\t\t\tif (box && box.style.display === 'block') { closeConvasBox();\n" +
+	"\t\t\t\tif (!isLatLonProject()) { runConvertAs({ kind: 'epsg', crs: LPN_CRS_WEBMERC, units: {}, rounding: {} }); } } },\n" +
+	"\t\tserialize: serializeProject,\n" +
 	"\t\tgeorefState: function () { return georef; }, georefCancel: georefCancel,\n" +
 	"\t\tgeorefFinish: georefFinish, georefSetTransform: georefSetTransform,\n" +
 	// Task 447, revised 2026-08-21: the reinterpret arm is a BUTTON now, not a guess, so the

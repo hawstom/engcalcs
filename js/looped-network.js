@@ -29013,11 +29013,15 @@ var EngCalcs = EngCalcs || {};
 			if (!q || !isFinite(q.x) || !isFinite(q.y)) { failed = true; return null; }
 			return q;
 		}
+		// The two Mercator sites of File, Convert as (dev/lpn-spike/mercator-harness.js counts them):
+		// a lat/lon document's drawing y is Mercator and its position y is latitude, in the saved file
+		// exactly as outwardY()/inwardY() have it in memory.
+		function toMerc(p) { return { x: p.x, y: Geom.mercY(p.y) }; }
 		function drawToPos(d) { return srcGeo ? { x: d.x, y: Geom.mercLat(d.y) } : d; }
-		function posToDraw(p) { return dstGeo ? { x: p.x, y: Geom.mercY(p.y) } : p; }
+		function posToDraw(p) { return dstGeo ? toMerc(p) : p; }
 		function mapDraw(d) { var q = mapPos(drawToPos(d)); return q ? posToDraw(q) : null; }
 		function absPos(p) { return { x: p.x + org.x, y: p.y + org.y }; }
-		function drawOfPos(p) { var a = absPos(p); return srcGeo ? { x: a.x, y: Geom.mercY(a.y) } : a; }
+		function drawOfPos(p) { var a = absPos(p); return srcGeo ? toMerc(a) : a; }
 		// The derivative, read off the map itself, applied to one vector anchored at drawing point d.
 		function mapVec(d, v) {
 			var a = mapDraw(d), bx = mapDraw({ x: d.x + eps, y: d.y }), by = mapDraw({ x: d.x, y: d.y + eps });
@@ -29247,8 +29251,9 @@ var EngCalcs = EngCalcs || {};
 		convasApplyUnits(a);
 		saveToStorage();
 		renderTabs();
+		// No zoomExtent() here or below: a converted copy carries no saved view, so opening it fits
+		// through restoreViewOrFit() like any document without one (view-memory-harness.js).
 		if (!step) {
-			zoomExtent(true);
 			setNotice(String(pc.lpn_convas_done || 'The converted copy is {name}. The original project is unchanged.')
 				.replace('{name}', name));
 			return;
@@ -29292,7 +29297,6 @@ var EngCalcs = EngCalcs || {};
 		clearUndo();
 		saveToStorage();
 		refreshAllFromDocument();
-		zoomExtent(true);
 		renderTabs();
 		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
 	}
