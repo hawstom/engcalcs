@@ -2034,18 +2034,36 @@ labels gone to spare seventeen others a line is the wrong side of his order. Wit
 3 is marginally the better of the two (93 against 92), which is what says the bound is about
 crowding rather than about the geometry.
 
-### 21d. What it costs, stated rather than buried
+### 21d. TWO BOUNDS, BOTH MEASURED, AND WITHOUT THEM IT COULD NOT SHIP
 
-**His R-075 test is worse at the fit view and at 2x, and the widening is the whole of it** -- each
-half was switched off separately and the crossing rung accounted for none. The fit view of
-Net3-World now draws **91 node labels where it drew 69** with the node ID alone (the sweep's hidden
-count falls 29 -> 10 at every prefix length). More labels on the drawing is more labels in each
-other's way, so adding `12345678` moves 43 where it moved 10. At 4x and 8x it still moves and hides
-exactly nothing. The `had-to-move` floor beside it rises 33 -> 45 on Net3-World and the pass moves
-43, fewer than have to; Net3 does not read that cleanly (46 against a floor of 30) and that is said
-here rather than averaged away. **R-156 puts the choice to him.**
+- **The longer leader is offered only to a label that has a property to lose** (`nodeFirstFitSpec()`).
+  Offered to every label it took his R-075 test from 10 labels moving to 43 and made the drawing
+  restless at the fit view. His ruling is about giving a PROPERTY up; a label showing the node ID
+  alone has none to give, so it is not what the ruling is about. With the gate, R-075 is back to 10
+  and `label-width-stability-harness.js` FELL from 27/20/2/0 to 8/9/0/0.
+- **And it is not offered at all when a quarter of the labels could not be placed**
+  (`placeLabelsFirstFit()`). A longer leader is the answer when a few labels cannot find a place on
+  a drawing that has room elsewhere; when the drawing is full there is no elsewhere, and every
+  rescued label stands far out, crosses somebody and is hidden for it -- 26 hidden against 14 with
+  every node field on. **It is also where it costs the most:** `node-shed-harness.js` took 47 s
+  before any of this work, over 900 s with the rescue unbounded, and 69 s with the bound.
 
-### 21e. R-136 answered: why one more character moves anything
+### 21e. What it costs, stated rather than buried
+
+**A content pass is slower, and that is the honest cost.** On Net3-World at 2x with his three
+properties, medians of five samples on a machine running three other suites: 2.1 s with no longer
+leader, 2.5 s with the leader and no shed-before-hide, 6.1 s as first built. The ring pass was then
+hoisted out of the rung loop (it reads only the static obstacles, so a second run returns the same
+answer) and the two bounds above landed; `node-shed-harness.js`, the heaviest label harness, reads
+47 s before any of this work and 69 s after it. **The absolute numbers are not a benchmark** -- the
+machine was shared -- but a third more work on the crowded case is the shape of it.
+
+**With every node field on, 12 more labels are hidden** (`label-spot-harness.js`, 14 -> 26 over
+Net3-World's four views). That is the case the crowding bound already refuses to widen, so what is
+left is the crossing shed hiding one of a pair after the labels that DID widen crossed. It is the
+one number on the branch that went the wrong way and he may not want it.
+
+### 21f. R-136 answered: why one more character moves anything
 
 - The places a label may stand are a fixed list that does not move when the text widens. The BOX
   grows into them. (Section 20 is the same finding for the stack.)
