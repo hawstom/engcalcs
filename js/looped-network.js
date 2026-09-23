@@ -35906,8 +35906,8 @@ var EngCalcs = EngCalcs || {};
 	// host before this function runs, with trailingCols trimmed to ['decimals'] because a customer
 	// label has no Drop column to head (see customerFieldDefs()'s own comment).
 	function buildCustomerLabelSection(host) {
-		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'),
-			name = document.createElement('span'), input = document.createElement('input'),
+		var pc = EngCalcs.pageConfig || {}, line = document.createElement('label'),
+			text = document.createElement('span'), input = document.createElement('input'),
 			unit = document.createElement('span'), note = document.createElement('div'),
 			wrap = document.createElement('span'), useBtn = document.createElement('button'),
 			cur = labelSettings.customerMaxWidth;
@@ -35936,17 +35936,28 @@ var EngCalcs = EngCalcs || {};
 		note.textContent = pc.lpn_labels_customer_note ||
 			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
-		name.className = 'lpn-set-name ec-help';
-		name.style.flex = '1 1 auto';
-		name.textContent = pc.lpn_labels_customer_width ||
-			'Widest view that attempts to display customer labels';
-		name.title = pc.lpn_labels_customer_width_tip ||
-			'How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
+		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS** (Tom, 2026-09-23: "Make
+		// the Customer labels and All labels zoom limits settings interfaces identical"). This
+		// function cannot reach rebuildSettingsFieldsNow()'s own nested row() helper -- a different
+		// top-level function -- so the same `.lpn-set-row` label/setFieldLabel() shape it builds is
+		// reproduced here by hand rather than duplicated with different markup. Same wording, too:
+		// the row NAME is shared with lpn_settings_label_max_width (the all-labels row's own key)
+		// rather than a second key carrying an identical string, per CLAUDE.md's "reuse whole
+		// labels" rule -- these two rows now say exactly the same thing about what they gate.
+		line.className = 'lpn-set-row';
+		setFieldLabel(text, pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
+			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		input.type = 'number'; input.step = 'any'; input.min = '0';
 		input.style.width = LPN_LABEL_AFFIX_W; input.style.flex = '0 0 auto';
 		input.style.boxSizing = 'border-box';
-		input.setAttribute('aria-label', name.textContent);
+		// **"ALWAYS SHOW", THE SAME PLACEHOLDER THE ALL-LABELS ROW USES** (Tom, 2026-09-23 (a)) --
+		// this row has no such state (0 is customer-only "never"; the all-labels row's own limit
+		// still governs, see the tip above), but the placeholder is read the same way a blank box
+		// on the row below it is, so the two rows must say the same thing about a blank box.
+		input.placeholder = pc.lpn_settings_label_always || 'Always show';
+		input.setAttribute('aria-label', pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less');
 		input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
 		// **A REFUSED ENTRY PUTS THE OLD NUMBER BACK RATHER THAN STANDING**, which is the energy
 		// rows' own rule: a box showing a value the document does not hold is the one state a
@@ -35976,12 +35987,15 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 			requestLabelRefresh();
 		});
-		wrap.className = 'lpn-set-ctlgroup';
-		wrap.appendChild(input); wrap.appendChild(useBtn);
 		unit.className = 'lpn-set-note';
 		unit.textContent = unitLabel('lpn_u_length');
-		row.appendChild(name); row.appendChild(wrap); row.appendChild(unit);
-		host.appendChild(row);
+		// **THE UNIT SITS BEFORE THE BUTTON, THE SAME ORDER THE ALL-LABELS ROW USES** (Tom,
+		// 2026-09-22 on that row, now applied here too (d): "'ft' is in the wrong place. It should
+		// be before the button.").
+		wrap.className = 'lpn-set-ctlgroup';
+		wrap.appendChild(input); wrap.appendChild(unit); wrap.appendChild(useBtn);
+		line.appendChild(text); line.appendChild(wrap);
+		host.appendChild(line);
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
@@ -38706,17 +38720,26 @@ var EngCalcs = EngCalcs || {};
 		if (setboxTextCache) { setboxTextCache.set(el, text); }
 		return text;
 	}
+	// **AN AND OF WORDS, NOT ONE SUBSTRING** (Tom, 2026-09-23 (g): "can Settings filter work as an
+	// AND word search? I think it currently works as an entire string search."). `words` is already
+	// lower-cased and split on whitespace by the one caller that builds it (applySetboxFilter());
+	// every function below just threads the array through, so there is exactly one place that reads
+	// what the user typed.
+	function setboxWordsMatch(text, words) {
+		for (var i = 0; i < words.length; i++) { if (text.indexOf(words[i]) < 0) { return false; } }
+		return true;
+	}
 	// Hide/show the units of one container and report how many survived. A SUB-HEADING is decided
 	// by its body, except when the heading itself matches -- somebody searching "units" means the
 	// Units section, not the four rows inside it that happen to contain the word.
-	function filterSetboxContainer(container, q) {
+	function filterSetboxContainer(container, words) {
 		var shown = 0, pendingSub = null;
 		[].forEach.call(container.children, function (kid) {
 			var n, headMatch;
 			if (kid.classList.contains('lpn-set-sub')) { pendingSub = kid; return; }
 			if (kid.classList.contains('lpn-set-subbody')) {
-				headMatch = pendingSub && q && setboxUnitText(pendingSub).indexOf(q) >= 0;
-				n = filterSetboxContainer(kid, headMatch ? '' : q);
+				headMatch = pendingSub && words.length && setboxWordsMatch(setboxUnitText(pendingSub), words);
+				n = filterSetboxContainer(kid, headMatch ? [] : words);
 				if (headMatch) { n = Math.max(n, 1); }
 				kid.style.display = n ? '' : 'none';
 				if (pendingSub) { pendingSub.style.display = n ? '' : 'none'; }
@@ -38729,15 +38752,15 @@ var EngCalcs = EngCalcs || {};
 			// div. Recursing through it keeps the filter working ROW BY ROW; treating the host as
 			// one unit would make a search for "opacity" show everything either builder wrote.
 			if (kid.classList.contains('lpn-set-part')) {
-				n = filterSetboxContainer(kid, q);
+				n = filterSetboxContainer(kid, words);
 				kid.style.display = n ? '' : 'none';
 				shown += n;
 				return;
 			}
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
-			if (kid.classList.contains('lpn-set-group')) { kid.style.display = q ? 'none' : ''; return; }
-			var m = !q || setboxUnitText(kid).indexOf(q) >= 0;
+			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			kid.style.display = m ? '' : 'none';
 			if (m) { shown++; }
 		});
@@ -38746,14 +38769,18 @@ var EngCalcs = EngCalcs || {};
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
-			index = document.getElementById('lpn_setbox_index'), q, total = 0, live = {};
+			index = document.getElementById('lpn_setbox_index'), q, words, total = 0, live = {};
 		if (!box) { return; }
 		q = (input && input.value || '').trim().toLowerCase();
+		// Every whitespace-separated word must appear SOMEWHERE in a row's own text -- an AND, not
+		// the single substring this used to be -- so "zoom label" finds the row without either word
+		// sitting next to the other.
+		words = q ? q.split(/\s+/).filter(function (w) { return w !== ''; }) : [];
 		[].forEach.call(box.querySelectorAll('.lpn-set-sec'), function (sec) {
 			var body = sec.querySelector('.lpn-set-secbody'),
-				headMatch = q && sec.querySelector('.lpn-set-head') &&
-					setboxUnitText(sec.querySelector('.lpn-set-head')).indexOf(q) >= 0,
-				n = body ? filterSetboxContainer(body, headMatch ? '' : q) : 0;
+				headMatch = words.length && sec.querySelector('.lpn-set-head') &&
+					setboxWordsMatch(setboxUnitText(sec.querySelector('.lpn-set-head')), words),
+				n = body ? filterSetboxContainer(body, headMatch ? [] : words) : 0;
 			if (headMatch) { n = Math.max(n, 1); }
 			// **A SECTION MAY DECLARE ITSELF UNFILTERABLE, AND EXACTLY ONE DOES** (Task 591).
 			// Credits became a section of its own on 2026-09-06; as a bare footer it sat outside

@@ -2902,9 +2902,15 @@ $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map wi
 // two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
 // growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
 // **0 IS NEVER, IN THE CUSTOMER TIP'S OWN WORDING** (2026-09-23, replacing "Thematic map
-// (colors only)"). See lpn_labels_customer_width_tip below for the pattern this follows.
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom. Text you placed yourself stays, and your label choices are kept either way.';
-$ec_lang['lpn_settings_label_always']='Always show labels';
+// (colors only)"). See lpn_labels_customer_width_tip above for the pattern this follows.
+// **LAST SENTENCE REMOVED** (Tom, 2026-09-23 (c): "similar to the all labels tip, but with the
+// last sentence removed since it's misleading") -- "Text you placed yourself stays, and your label
+// choices are kept either way" implied this row decides what survives, which it does not.
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.';
+// **"ALWAYS SHOW", NOT "ALWAYS SHOW LABELS"** (Tom, 2026-09-23 (a)) -- shared as the placeholder
+// for both the all-labels row above and the customer row (lpn_labels_customer_width_tip's row),
+// so a word this generic does not need "labels" or "customer labels" to say what a blank box means.
+$ec_lang['lpn_settings_label_always']='Always show';
 // **THE ONE MAXIMUM-SYMBOL-SIZE RULE** (Task 705, his own wording, 2026-09-22: *"Prevent nodes from
 // scaling larger than __ times the length of the __ percentile pipe"*). Split across three keys
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
@@ -3055,7 +3061,13 @@ $ec_lang['lpn_time_speed_tip']='Playback speed';
 // each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Search settings';
-$ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that mention it. The explanations are searched too, not just the names.';
+// **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
+// search? I think it currently works as an entire string search."). It did -- filterSetboxContainer()
+// tested the whole typed string as one substring. It now splits on whitespace and requires every
+// word somewhere in a row's own searchable text (setboxUnitText()'s name+tip+aria-label+placeholder
+// join), so "zoom label" finds a row without either word next to the other. His own sentence is the
+// tip, verbatim.
+$ec_lang['lpn_settings_search_tip']='Type a word or multiple words to see settings that mention all of them.';
 $ec_lang['lpn_settings_no_match']='No setting mentions that word.';
 // The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
 // than an instruction: what the control adjusts, not how to operate it.
@@ -3083,8 +3095,13 @@ $ec_lang['lpn_settings_sym_link']='Link';
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='Customer';
 $ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
-$ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
-$ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
+// **THE ROW NAME IS lpn_settings_label_max_width NOW, NOT A KEY OF ITS OWN** (Tom, 2026-09-23:
+// "Make the Customer labels and All labels zoom limits settings interfaces identical... Both to
+// say 'Show labels when zoomed to this map width or less'"). KEY DELETED: lpn_labels_customer_width
+// -- nothing renders it and nothing checks it; it was untranslated in every other language, so
+// deleting it costs no translation. The tip stays its own key, since its WORDS differ from the
+// all-labels tip (this row's own gate, plus the (e) qualifier that the all-labels limit wins).
+$ec_lang['lpn_labels_customer_width_tip']='Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.';
 // ROADMAP Task 247. The capture button beside the width above (Tom, 2026-09-19: "Widest view: Add a
 // 'Use current view' button like the other one we restored in a different branch."). The SAME key
 // name and the same words as that control, deliberately: it is one idea and a reader who has met it

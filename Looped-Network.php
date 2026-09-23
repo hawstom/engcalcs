@@ -2113,7 +2113,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
-	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
 	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
