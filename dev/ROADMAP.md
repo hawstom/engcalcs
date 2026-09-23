@@ -286,20 +286,6 @@ the block.
     - **Shares the bottom pane's tab strip** with anything else that writes it, so name that seam in
       any brief or sequence the tracks.
 
-- 100|691| **Create a better error and notice messaging system.**
-  Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
-  'Something wrong here?' just because I wanted to dismiss a banner. The QGIS paradigm would be
-  nice. They show lots of error messages."*
-  - **USER MUST HAVE CONTROL OVER MESSAGES.** A message that dismisses itself is bound to leave too soon for one user and to late for another.
-  - **THE QGIS PARADIGM HE NAMES IS A MESSAGE LOG**, not a banner: messages accumulate in a panel a
-    person opens when they want them, with the newest surfaced briefly and then filed rather than
-    held on screen awaiting a click. That also answers a second thing this page needs -- a refused
-    DEM, a skipped survey row and an import difference are all things worth KEEPING, and a banner
-    that clears itself keeps nothing.
-  - Read with `dev/ROADMAP.md` Task 616 (a prompt history in the banner area, parked at 5 by Tom)
-    and Task 622. **616 is the same idea arriving from the other direction** and should probably be
-    folded in here rather than left parked separately; that is his call, not ours.
-
 - 50|694| **Export a map animation as an animated picture.**
   Tom, 2026-09-18: *"It would be very fun to export a map animation to a gif. And I bet it would not
   be hard for you. That could be another export item for the file menu. And if we get a lot of export
@@ -1843,6 +1829,10 @@ the block.
   - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
     translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
 
+- 75|710| **Audit the 57 raw alert and confirm dialogs.**
+  Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
+  block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
+  OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
   Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
   panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have
@@ -1886,48 +1876,6 @@ the block.
   - The mission scope is a 300 km system span (`dev/geographic-projects.md` §2b), so a drawing that
     genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
     world-wide first screen**, which every geographic project passes through.
-
-- 100|704| **An error and notice messaging system, because a banner that vanishes is a defect.**
-  Tom, 2026-09-18, testing the lock work: *"The banner message about 'We asked your colleague to
-  close the file' disappeared too fast and unrecoverable. 'Help! What did I miss!' We need a better
-  messaging system."* And again on 2026-09-21: *"peripheral and pervasive."*
-  - **HE HAS NAMED THE REFERENCE HIMSELF: QGIS.** Its message bar holds a notice until it is
-    dismissed or superseded, ranks by severity, and keeps a log a reader can open afterwards -- so
-    nothing a person needed to read is destroyed by a timer. **Go and study it rather than
-    designing from our own premises.**
-  - **IT IS IDA'S TO DIAGNOSE FIRST.** His words: *"But we need Ida's input."* The question is not
-    what a banner should look like; it is how many kinds of message this page actually has, which
-    of them a reader must be able to get back, and where a persistent one can live without becoming
-    a fifth line of chrome -- the worry he has stated about this page more than once.
-  - **PERVASIVE is the word that sizes it.** Notices are written in many places today with no shared
-    door, which is the same shape as Task 701's forty invisible show/hide sites. Expect a seam, not
-    a widget.
-  - **IDA ANSWERED IT 2026-09-21, AND THE COUNT IS WORSE THAN TASK 701's.** QGIS runs **two**
-    mechanisms and not one: `QgsMessageBar`, transient and colour-coded, and `QgsMessageLog`, a
-    PERSISTENT store the bar only mirrors, opened from one icon at the end of the status bar.
-    AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
-    own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
-    look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
-  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (one door, 8-second
-    expiry, **a later message silently replaces an earlier one**, **83 sites** -- the 66 first
-    written here was an undercount Perry re-derived on 2026-09-21, which changes nothing about the
-    fix, since one door is one door, but a number restated as fact that nobody re-checked is
-    exactly the shape that seat watches for), `setStatus()` (19
-    sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
-    `renderBanner()` (one render door, five kinds, dismissable and not restorable),
-    `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
-    all**. That last group is WORSE than Task 701's finding rather than merely the same shape: 701
-    found writers blind to an existing guard, and here there was never a door to be blind to.
-  - **THE DIALOG BEHIND HIS COMPLAINT IS PROBABLY `presentOpenChoice()`**, whose Cancel branch
-    leaves no residue at all -- nothing to reopen, which is exactly *"Help! What did I miss!"*
-  - **HER RANKING, cheapest first, and the first row is the whole of his complaint:** (1) teach
-    `setNotice()` -- already one function -- to keep a small in-memory history, and put one modest
-    icon near the existing status box to read it back. **A log behind a control, not a fifth bar of
-    chrome.** No new storage, no new severities. (2) Fold the lock/file banner into the same log,
-    since it carries real decisions and has no way back once dismissed. (3) Audit the 57 raw
-    dialogs for which must genuinely block and which are merely information -- that is the
-    feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
-    already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
 
 - 50|707| **Five minutes of a real browser on the Task 706 repair.** The Performance tab open, ten
   cells typed down a column of the biggest real project. The repair shipped on Tom's ruling without

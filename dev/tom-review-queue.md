@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-177.
+**An ID is permanent and never reused.** Next free: R-182.
 
 ---
 
@@ -71,7 +71,7 @@ judgement and does not belong to a script.
 
 ### feat/notice-log -- his four
 
-- [ ] R-116 feat/notice-log | This will need some finesse before it's done.
+- [x] R-116 feat/notice-log | This will need some finesse before it's done. -- merged 2026-09-23 on his all-clear (R-177/R-178)
 - [ ] R-119 feat/notice-log | The i info glyph doesn't seem quite right to me. Is it what Ida recommended? How about a + expand glyph or a history glyph? Show me something creative. We need to evolve on this. -- **IT WAS NOT HERS AND SHE SAYS IT IS WRONG**: the circled-i already names five other rows on this page (Welcome, Privacy, Terms, About, Reports), every one a reference fact about the software, where this is a personal growing feed. **Her recommendation is a PLAIN CLOCK FACE, no surrounding arrow**, drawn new in `lib/Icons.lib.php` as `history`. She argues AGAINST the circular arrow (already means Revert and Restore on this page, the opposite job), against a bell (imports an unread-and-urgent category this page's two severities do not have), and against his `+` (means "create" everywhere else, and is close to this suite's own `new` glyph)
 
 ### The daily mail
@@ -108,7 +108,7 @@ judgement and does not belong to a script.
 
 - [x] R-157 feat/notice-log | I discovered what is appearing behind the glyph. It is the text "RIVER" from the model. I consider that a bug, but I don't know what kind of bug. It's a Text object, not a label. -- 80bc539e on feat/notice-log: the button was 80% opaque, so map Text showed through; now solid white
 - [?] R-158 feat/notice-log | I like the down arrow or a + better than the clock. What does Ida say? -- **SHE SAYS NEITHER, AND SHE CHECKED THIS PAGE RATHER THAN ARGUING FROM TASTE.** A down triangle already means "a menu opens below" twice on this page (the pane tab caret and the project tab caret) and marks a table column's sort direction a third time; the `+` already means "make a new one" twice (New scenario, New saved path) and the message log makes nothing. Her recommendation is to repair the same clock rather than replace it: a dot at the center and the two hands spread further apart, which is what made it read as a bent arrow. His call
-- [ ] R-159 feat/notice-log | We are getting closer. But the simultaneous messages on open and the "Newest first" help text appear on one line instead of on three. This is a bug.
+- [x] R-159 feat/notice-log | We are getting closer. But the simultaneous messages on open and the "Newest first" help text appear on one line instead of on three. This is a bug. -- merged 2026-09-23 on his all-clear (R-177/R-178)
 - [x] R-160 feat/notice-log | I don't think we need a tip on the down arrow glyph. I think it's more trouble than help. -- already so on feat/notice-log: no tip, only a screen-reader name
 
 ### feat/tables-spreadsheet
@@ -125,10 +125,10 @@ judgement and does not belong to a script.
 ### Zoom and scaling -- his four rulings and one defect
 
 - [x] R-166 -- | On the Novato example, junctions already draw smaller at the opening view. Is that right? -- his own answer: "Junctions are about half as large as pumps, reservoirs, and tanks. Yes. That is intentional." Nothing to do
-- [ ] R-167 -- | I am torn. 10th %-ile and "same as label limit" were competing ideas for this limit; I'd prefer not to have two rules. I like 10th %-ile a lot, probably better than piggybacking on the labels limit. Let's try a new setting for %-ile: "Prevent nodes from scaling larger than __ times the length of the __ percentile pipe" where we set the defaults at 0.5 and 20% for now. And remove the piggyback limit.
-- [ ] R-168 -- | Should pipe widths shrink past the threshold too? Today they don't. Yes. Everything shrinks except reservoirs and tanks.
-- [ ] R-169 -- | Should Net3 get a threshold back? Its "Zoom in to see labels" note is untrue without one. Yes. 30
-- [ ] R-170 -- | I found a little peripheral bug. "ft" is in the wrong place. It should be before the button.
+- [x] R-167 -- | I am torn. 10th %-ile and "same as label limit" were competing ideas for this limit; I'd prefer not to have two rules. I like 10th %-ile a lot, probably better than piggybacking on the labels limit. Let's try a new setting for %-ile: "Prevent nodes from scaling larger than __ times the length of the __ percentile pipe" where we set the defaults at 0.5 and 20% for now. And remove the piggyback limit. -- merged 2026-09-23 on his all-clear (R-177/R-178)
+- [x] R-168 -- | Should pipe widths shrink past the threshold too? Today they don't. Yes. Everything shrinks except reservoirs and tanks. -- merged 2026-09-23 on his all-clear (R-177/R-178)
+- [x] R-169 -- | Should Net3 get a threshold back? Its "Zoom in to see labels" note is untrue without one. Yes. 30 -- merged 2026-09-23 on his all-clear (R-177/R-178)
+- [x] R-170 -- | I found a little peripheral bug. "ft" is in the wrong place. It should be before the button. -- merged 2026-09-23 on his all-clear (R-177/R-178)
 
 ### Calculation and time steps
 
@@ -141,6 +141,14 @@ judgement and does not belong to a script.
 ## Round of 2026-09-23 -- his rulings on three branches and Settings undo
 
 - [x] R-173 feat/tables-spreadsheet | Done. Merge and delete branch. -- merged to master 2026-09-23; R-110, R-161 and R-162 go with it
-- [ ] R-174 feat/zoom-scale-rules | (Text, Show at all zoom levels) This property should be off for all but the largest text object in our examples and for all projects with no previous settings. This property should appear in multi-properties, Tables, and Find/Replace.
+- [x] R-174 feat/zoom-scale-rules | (Text, Show at all zoom levels) This property should be off for all but the largest text object in our examples and for all projects with no previous settings. This property should appear in multi-properties, Tables, and Find/Replace. -- merged 2026-09-23 on his all-clear (R-177/R-178)
 - [x] R-175 feat/notice-log | (Messenger) I liked the down arrow that was initially used for the messenger. I don't like the one we have now. I don't recommend heroics to make it unique. Something very much like a selector (probably perfect) or a tab menu is fine. -- 80bc539e on feat/notice-log: a plain filled down triangle, the same shape as the tab-menu carets
 - [x] R-176 -- | (Settings Undo) Ida is right and wrong. Right that it does not edit the network. Wrong that it doesn't not do anything you can see at the moment you make it, for over half the settings including Symbology, most of Appearance, and Calculation when recalculate is on. We can leave it as is. -- Task 709 closed; Settings stay out of undo
+
+## Round of 2026-09-23b -- two all-clears and the zoom-control pass
+
+- [x] R-177 feat/notice-log | Done. Close, merge, and delete branch. -- merged to master 2026-09-23
+- [x] R-178 feat/zoom-scale-rules | Done. Close, merge, and delete branch. -- merged to master 2026-09-23
+- [ ] R-179 feat/zoom-control | The + and - glyphs are not centered in their boxes. Fix that.
+- [ ] R-180 feat/zoom-control | It seems inconsistent for us to use click for selection, but drag for zoom. I think we should have a consistent idiom. Maybe Ida has insight.
+- [ ] R-181 feat/zoom-control | With Select area, the first time you click, it does not change modes. Changing the first time you click is confusing. I think that it should act like Select area. Click twice in a row to get mode change.
