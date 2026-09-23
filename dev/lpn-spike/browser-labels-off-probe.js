@@ -1,5 +1,5 @@
 // ONE PROBE FOR dev/lpn-spike/browser-drive.js: how much LABEL WORK a project switch does with
-// generated labels off (the labeling threshold typed as 0 -- Task 712 retired the separate
+// generated labels off (the labeling threshold typed as 0 -- 2026-09-23 retired the separate
 // "Thematic map" switch that used to do this), in a real Chrome, read off the page's own
 // ?debug=perf line.
 //

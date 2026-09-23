@@ -146,7 +146,7 @@ const sTest = L.createScenario('Test');
 
 const note = L.addText(cx, cy, null);
 
-// Task 712: "Thematic map (colors only)" is retired in favour of the labeling threshold read as 0.
+// 2026-09-23: "Thematic map (colors only)" is retired in favour of the labeling threshold read as 0.
 function setThematic(on) { L.settings().labelMaxWidth = on ? 0 : null; L.refreshValueColors(); }
 
 async function main() {

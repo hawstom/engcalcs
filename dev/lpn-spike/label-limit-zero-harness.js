@@ -1,4 +1,4 @@
-// THE LABELING THRESHOLD'S 0 CASE (Task 712), retiring "Thematic map (colors only)". Run with:
+// THE LABELING THRESHOLD'S 0 CASE (2026-09-23), retiring "Thematic map (colors only)". Run with:
 //   node dev/lpn-spike/label-limit-zero-harness.js
 //
 // Tom, 2026-09-23: *"I noticed that we have a tip saying that 0 is never for Customer labels.

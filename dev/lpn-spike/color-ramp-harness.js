@@ -447,7 +447,7 @@ console.log('== pinned breaks ==');
 	ok('painting was stable across the two reads under one preset', usBands.join(',') === usAfter.join(','));
 }
 
-// ---- 8. "thematic" via the labeling threshold at 0 (Task 712, retiring colorThematic) --------
+// ---- 8. "thematic" via the labeling threshold at 0 (2026-09-23, retiring colorThematic) --------
 console.log('== thematic mode (labelMaxWidth: 0) ==');
 {
 	fresh('us');
@@ -459,7 +459,7 @@ console.log('== thematic mode (labelMaxWidth: 0) ==');
 	// not a member of by construction. dev/lpn-spike/label-visibility-harness.js section 4 is where
 	// that is asserted against the real stylesheet; this is the colour side of the same fact.
 	//
-	// **"Thematic map (colors only)" IS RETIRED** (Task 712, 2026-09-23): a threshold of 0 is now
+	// **"Thematic map (colors only)" IS RETIRED** (2026-09-23): a threshold of 0 is now
 	// what colour-only reads, in place of a second switch that did the same thing a different way.
 	ok('the default threshold is null -- labels are never off by default',
 		s.labelMaxWidth === null && !L.svgClasses().contains('lpn-labels-hidden'));

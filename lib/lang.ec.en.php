@@ -2901,7 +2901,7 @@ $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map wi
 // **NO LONGER SAYS ANYTHING ABOUT SYMBOL SIZE** (Task 705, Tom, 2026-09-22: *"I'd prefer not to have
 // two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
 // growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
-// **0 IS NEVER, IN THE CUSTOMER TIP'S OWN WORDING** (Task 712, 2026-09-23, replacing "Thematic map
+// **0 IS NEVER, IN THE CUSTOMER TIP'S OWN WORDING** (2026-09-23, replacing "Thematic map
 // (colors only)"). See lpn_labels_customer_width_tip below for the pattern this follows.
 $ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom. Text you placed yourself stays, and your label choices are kept either way.';
 $ec_lang['lpn_settings_label_always']='Always show labels';

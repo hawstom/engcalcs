@@ -5228,7 +5228,7 @@ var EngCalcs = EngCalcs || {};
 			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
 			// from the current view rather than asking anyone to guess one.
 			//
-			// **0 = NEVER draw a generated label, at any zoom** (Task 712, 2026-09-23, replacing
+			// **0 = NEVER draw a generated label, at any zoom** (2026-09-23, replacing
 			// "Thematic map (colors only)" -- Tom: *"Should we do the same for all labels and use
 			// that to replace the 'Thematic map, no labels' setting?"*). Mirrors the customer row's
 			// own 0 ("Type 0 to leave customers unlabelled."). null and 0 are DIFFERENT stored
@@ -26695,8 +26695,8 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		delete settings.colorFrozenBreaks;
-		// **A PROJECT SAVED WITH "Thematic map (colors only)" ON OPENS WITH LABELS OFF** (Task 712,
-		// 2026-09-23, retiring that checkbox in favour of the labeling threshold read as 0). **0
+		// **A PROJECT SAVED WITH "Thematic map (colors only)" ON OPENS WITH LABELS OFF** (2026-09-23,
+		// retiring that checkbox in favour of the labeling threshold read as 0). **0
 		// WINS over a saved positive threshold**: the last thing that project's reader saw was no
 		// labels at all, not labels past some particular width, so the state that reproduces the
 		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
@@ -36214,7 +36214,7 @@ var EngCalcs = EngCalcs || {};
 		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
 		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
 		// **THE LABELING THRESHOLD HIDES THIS LEGEND WHEN IT HIDES EVERY LABEL** (Tom, 2026-08-20,
-		// on the retired "Thematic map" checkbox; folded into the threshold at Task 712). A
+		// on the retired "Thematic map" checkbox; folded into the threshold on 2026-09-23). A
 		// threshold of 0, or any view wider than it, already switches the data labels off, so a key
 		// naming the label fields is a key to lettering nobody can see. The colour legend is the one
 		// that belongs on a map with no labels and it is a different element (colorLegendBox), so
@@ -36756,7 +36756,7 @@ var EngCalcs = EngCalcs || {};
 	// buttons read, so a captured view cannot disagree with the gate it feeds (R-090).
 	// **A GENUINE POSITIVE THRESHOLD, EXCEEDED -- 0 IS DELIBERATELY NOT READ HERE.** This feeds the
 	// per-label "Show at all zoom levels" rule below, which is meant to go with a real width the
-	// reader typed and captured, exactly as before Task 712. 0 is unconditional rather than a width
+	// reader typed and captured, exactly as before 2026-09-23. 0 is unconditional rather than a width
 	// to be "past", and Tom's ruling on it (*"Should we do the same for all labels and use that to
 	// replace the 'Thematic map, no labels' setting?"*) keeps the old thematic checkbox's own
 	// promise that a Text label survives -- see labelsFullyHidden() for the unconditional case.
@@ -36767,7 +36767,7 @@ var EngCalcs = EngCalcs || {};
 		// A view we cannot measure is not one we refuse to label -- customerLabelsAttempted()'s rule.
 		return wide > 0 && wide > lim;
 	}
-	// **UNCONDITIONAL: GENERATED ANNOTATION IS HIDDEN, at 0 or past a real threshold.** Task 712
+	// **UNCONDITIONAL: GENERATED ANNOTATION IS HIDDEN, at 0 or past a real threshold.** 2026-09-23
 	// folded "Thematic map (colors only)" into a labelMaxWidth of 0, which must reach
 	// `dataLabelsHidden` (so node and link labels come off) and the labels legend (so its key
 	// vanishes with them) -- but must NOT reach labelsPastThreshold() above, or a Text label with
@@ -36814,7 +36814,7 @@ var EngCalcs = EngCalcs || {};
 	// Two suppressors:
 	//   * generated annotation is off while the project is being placed on the map;
 	//   * the view is wider than the labeling threshold -- and a threshold of 0 is past at every
-	//     zoom, which is how "Thematic map (colors only)" was retired (Task 712): colour the
+	//     zoom, which is how "Thematic map (colors only)" was retired (2026-09-23): colour the
 	//     message by typing 0 into the one threshold rather than a second switch.
 	// And two per-label rules:
 	//   * a Text label switched off in this scenario is not there at all (the MODEL, not the view);
@@ -36832,7 +36832,7 @@ var EngCalcs = EngCalcs || {};
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
 		// **AND THE SECOND SUPPRESSOR IS THE LABELING THRESHOLD, 0 INCLUDED** (Tasks 669 and 705;
-		// Task 712 folded thematic mode into it). `dataLabelsHidden` reads the UNCONDITIONAL
+		// 2026-09-23 folded thematic mode into it). `dataLabelsHidden` reads the UNCONDITIONAL
 		// labelsFullyHidden() (0 or a real threshold exceeded); the per-label loop below reads
 		// `past` -- labelsPastThreshold() alone, a real threshold only -- because a Text label's
 		// own "Show at all zoom levels" rule must not fire on 0 (see labelsFullyHidden()'s comment).
@@ -37747,7 +37747,7 @@ var EngCalcs = EngCalcs || {};
 		// worth, presses the button, and the view's width becomes the number. Blank is "always",
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
-		// **0 IS "NEVER"** (Task 712, 2026-09-23), mirroring the customer row's own 0 -- the tip
+		// **0 IS "NEVER"** (2026-09-23), mirroring the customer row's own 0 -- the tip
 		// says so, in the customer tip's own wording. This is what replaced "Thematic map (colors
 		// only)": type 0 here for colour with no lettering, instead of a second switch that did the
 		// same thing a different way.
