@@ -22658,31 +22658,31 @@ var EngCalcs = EngCalcs || {};
 	var PANE_PRINT_BUDGET_EM = 60;
 	var PANE_PRINT_BASE_PT = 9;
 	/**
-	 * **THE SHEET USES THE COLUMN WIDTHS THE READER DRAGGED, AND THE TEXT SHRINKS WITH THEM RATHER
-	 * THAN STAYING BEHIND** (Tom, 2026-09-21: *"I think that 'Print table' has not been revisited
-	 * since we added column resizing. And I think that it's important to use the column widths
-	 * adjusted by the user."* And 2026-09-22, on the result: *"Print is not respecting on-screen
-	 * column widths."*). He was right twice. The first pass gave every column its screen `em`
-	 * width, correctly -- but then fit a table wider than the sheet by capping its CSS width at
-	 * `max-width: 100%` while leaving each column's share a PERCENTAGE of that capped width. The
-	 * percentages stayed proportional to each other; the FONT stayed fixed at 9pt regardless, so a
-	 * fourteen-column network table (the ordinary case -- Junctions on Net3 has thirteen) had its
-	 * columns physically squeezed to a fraction of their `em` width while their text did not
-	 * shrink, and a heading that read on two lines on screen came back broken to single characters.
+	 * **THE SHEET USES THE COLUMN WIDTHS THE READER SEES, ALWAYS -- NOT ONLY THE ONES DRAGGED --
+	 * AND THE TEXT SHRINKS WITH THEM RATHER THAN THE SHEET STRETCHING PAST THE PAGE** (Tom,
+	 * 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
+	 * resizing. And I think that it's important to use the column widths adjusted by the user."*
+	 * 2026-09-22, on the result: *"Print is not respecting on-screen column widths."* And again:
+	 * *"Print table does not respect column widths. It expands to 100% of printable area."*). Three
+	 * rounds, because the first two fixes still had an escape hatch: a table NOBODY had dragged took
+	 * none of this and printed at the browser's own auto-layout content width, which is exactly the
+	 * case that "expands to 100%" describes on a wide network table -- no budget, no scaling, nothing
+	 * holding it to a sheet. Undragged is no longer special: every column, dragged or not, is read
+	 * off the live heading's drawn width (paneColDrawnEm()), so the sheet's ratios are always the
+	 * screen's ratios, and the budget/scale step below always runs.
 	 *
-	 * A table nobody has resized prints exactly as before, at its content's width. Once ANY column
-	 * has been dragged, every column is given the width it has on screen -- the dragged ones their
-	 * stored em, the rest the width they are drawn at -- as a literal `em`, so the table's true
-	 * width is the sum of what the reader actually sees. When that sum is wider than a printed page
-	 * can hold, the SHEET'S OWN FONT-SIZE is reduced instead of the columns' share of it: every
-	 * column's `em` width is unchanged, so it shrinks in lockstep with the text inside it, at
-	 * exactly the ratio the screen already had -- smaller paper, not a different layout.
+	 * Every column is given the width it has on screen -- the dragged ones their stored em, the rest
+	 * the width they are drawn at -- as a literal `em`, so the table's true width is the sum of what
+	 * the reader actually sees. When that sum is wider than a printed page can hold, the SHEET'S OWN
+	 * FONT-SIZE is reduced instead of the columns' share of it: every column's `em` width is
+	 * unchanged, so it shrinks in lockstep with the text inside it, at exactly the ratio the screen
+	 * already had -- smaller paper, not a different layout, and never a stretch past the sheet.
 	 * `max-width: 100%` stays on as the belt for a sheet narrower than the assumed budget.
-	 * Returns the em widths it applied, or null when it left the table alone.
+	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
 	function panePrintWidths(spec, table) {
 		var cols = paneCols(spec), unit, ems, sum = 0, cg, scale;
-		if (!cols.some(function (c) { return paneColUserWidth(spec.id, c) > 0; })) { return null; }
+		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) {
 			return paneColUserWidth(spec.id, c) || paneColDrawnEm(spec, c, unit);
