@@ -2557,3 +2557,117 @@ unclaimed shape in the current 61-name table) is the correct new mark for "a lis
 precisely because it does not borrow either taken shape.
 
 No shipped file touched; nothing in the worktree touched either.
+
+---
+
+## 2026-09-22 — The "clock" is being read as a down arrow, and the read is not baseless
+
+Tom, twice: *"I like the down arrow glyph"* (R-144) and today, *"I like the down arrow or a +
+better than the clock."* He is looking at `'history'` after Perry's 2026-09-22 redraw and reading
+it as something it was never drawn to be. Worktree `feat/notice-log`, read only, at `cd98ae4e`.
+
+**A. What is actually drawn, and why a down-arrow reading is not a stray misread.** OBSERVED
+`lib/Icons.lib.php:824`: `<circle/><path d="M12 12V8"/><path d="M12 12H17"/>` — one stroke from the
+circle's center straight UP, one stroke from the same center straight RIGHT, a bare right angle
+with no arrowhead drawn on either end. OBSERVED, the same file's own comment directly above it
+(`:804-808`, Perry's review note): the shallow-angle version that preceded this one already
+"reads as a chevron or checkmark in a circle" at 14-16px — Perry's fix widened the angle to 90° to
+stop the two strokes fusing into one bent line, and a bare bent line with no hands-of-different-
+length cue left in it *is* the generic shape of a chevron. **The interaction makes the same read
+functionally apt, not just visually plausible**: OBSERVED `js/looped-network.js:45161`
+(`toggleMessageLogPanel`) — pressing this glyph opens a panel that appears below it, which is
+structurally identical to what this exact page's own disclosure caret already does at two other
+sites: OBSERVED `js/looped-network.js:18258` and `:28836`, both `m.textContent = '▾'`, both "click
+this glyph, a panel/menu appears below" (the pane-tab-menu caret and the project-tab caret). A
+third site, OBSERVED `js/looped-network.js:20183`, uses `▼` as a state indicator ("this column is
+sorted descending") rather than a button, but it is the identical shape carrying the identical
+directional idea one more time on the same page. **So a down-arrow reading of the message-log
+glyph is not confusion about clock hands — it is Tom correctly recognizing "press this, something
+appears below" and reaching for the mark this page already uses twice for exactly that gesture.**
+Building the glyph to actually be a down arrow/chevron would put a THIRD, different meaning
+("read my history") on a shape that already means "there is a menu here" and "this is how this
+column is sorted" — the one-shape-one-job collision this seat has flagged before on this same page
+(`select` vs `select-area`, `info` vs this control, both above in this file). **Recommendation: do
+not build a literal down arrow/chevron for this control.** The read is legitimate; the shape is
+already spoken for.
+
+**B. The `+`, re-argued from scratch rather than cited.** A plus sign on this page means "make a
+new one," checked directly rather than assumed: OBSERVED `lib/Icons.lib.php:53`, `'insert'` IS a
+plain plus sign (`M12 5v14M5 12h14`), and OBSERVED `js/looped-network.js:4646` and `:21693` — it is
+the icon on "New scenario…" and "New saved path…", i.e. it already carries "create a fresh one" as
+its live job on THIS page, not merely in the abstract. OBSERVED `js/looped-network.js:28871`, a
+second, independent `+`: a literal typed plus-character button for a new project tab, drawn the way
+Chrome's own new-tab `+` is (comment at `:28862` cites Chrome's placement directly). **The message
+log is the opposite kind of thing from either of those: it creates nothing, it is a read-only
+window onto things that already happened.** A `+` on it would tell a reader "press here to add a
+message," which is not what the control does and contradicts a live, load-bearing convention two
+call sites deep on the very same page. This is not a wording nuance to weigh against the down-arrow
+option — it is a plainer collision than the down-arrow one, because the down-arrow's problem is
+that its shape says the same true thing ("a panel opens below") that two other controls say for a
+different job, while the `+`'s problem is that its shape says something actively FALSE about this
+control's job. **Recommendation: do not build a `+` either, and more confidently than the
+down-arrow refusal above.**
+
+**C. Does removing the tooltip change which glyph is right?** Tom: *"I don't think we need a tip on
+the down arrow glyph... more trouble than help."* Yes, it changes the calculus, and in the direction
+of MORE caution about shape, not less. OBSERVED `js/looped-network.js:45174-45176`
+(`wireMessageLogButton`) currently still calls `setIconLabel(btn, 'history', ..., tip)`, so the tip
+is drawn but not yet removed in this worktree — the removal is Tom's instruction, not yet built.
+With no tooltip, the drawing is the ONLY thing naming the control: there is no hover text and no
+adjacent label to arrive at once a reader is already confused, so a shape that already has a claimed
+meaning elsewhere on the page (a down arrow, a plus) will resolve to THAT meaning with nothing left
+to correct it. A shape that is merely unfamiliar (a clock nobody has learned to name yet) costs a
+moment of "what is that," which a first click answers for good; a shape that is familiar but WRONG
+(a down arrow that isn't a menu, a plus that isn't a create) costs a *wrong* first click, or worse,
+a reader who never clicks because they've already filed it under "sort control" or "add row" and
+moved on. **Removing the tip raises the bar for shape correctness — it does not lower it — and is
+an argument for a mark whose only competing readings are "unfamiliar" rather than "familiar and
+wrong."**
+
+**D. Three candidate drawings, in words, ranked.**
+
+1. **Redraw the clock's hands, not its idea — fix what Perry's note diagnosed, without abandoning
+   the shape.** Put a small filled dot at the center pivot and separate the two hands to roughly a
+   50-60° spread (say, hour hand leaning left of noon, minute hand leaning right past 2) rather than
+   the 20° that fused into a checkmark or the 90° that reads as a bent line/arrow. The dot at the
+   hub breaks the two strokes into two visibly separate spokes radiating from a point, which is what
+   a clock face needs to read as hands-and-not-a-single-bent-line even at 14-16px; the wider, more
+   even spread keeps it a two-thing composition instead of a corner. **Cost: smallest of the three —
+   one more edit to a shape already drawn for this exact job, no new name, no new string, nothing
+   for `icon_name_check.php` to learn.** This is the one I would build first: it repairs the actual
+   defect (two strokes fusing into a false shape) at its source instead of trading it for a
+   different false shape.
+2. **A short stack of three ragged bars — a compact "list/feed" mark**, like three horizontal dashes
+   of decreasing length (top longest, bottom shortest, or vice versa), inside or beside the same
+   circle frame the toolbar's round buttons already use. This reads as "a list of short entries,"
+   which is literally what the panel holds, and is more literal than a clock about the CONTENT
+   rather than the act of logging it. OBSERVED: no existing icon in `lib/Icons.lib.php` draws three
+   stacked bars, so it collides with nothing drawn on this page. **Cost: real but moderate** — new
+   geometry to draw and check at 14-32px, and a caution rather than a blocker: three horizontal bars
+   is the web's own well-worn "hamburger menu" shape everywhere OUTSIDE this suite, so a visitor
+   arriving with that habit may read "menu" rather than "list of messages" on first sight, even
+   though nothing on THIS page currently uses that shape for a menu. Worth building only if the
+   clock repair (candidate 1) is tried and still reads wrong to him.
+3. **An open envelope or speech-bubble outline** — the generic "notification/message" family used
+   by mail and chat apps generally. Ruled last, not first, because this suite already has a real
+   envelope (`lib/Icons.lib.php:796`, `'mail'`) drawn for actual outbound contact/feedback ("Fix
+   something"), so reusing that family would put "read my own machine-generated log" and "send Tom a
+   message" under kin shapes on the same page — a softer version of the same one-shape-many-jobs
+   problem this whole diagnosis is about. **Cost: same order as candidate 2 (new geometry, new
+   render checks), bought for a shape that has to be drawn carefully unlike `mail`'s to avoid that
+   kinship.** Not recommended unless both above are tried and rejected.
+
+**E. The one paragraph.** The clock is not what Tom is seeing — the shape Perry widened into a
+right angle to fix a checkmark problem now reads, correctly for what the control DOES, as a down
+arrow, and that is a real collision: this exact page already uses a down-triangle twice to mean "a
+menu opens below" and once more to mean "this column sorts this way," so a third meaning on the
+same shape is the wrong fix even though the impulse ("it looks like it opens something below") is
+right. The `+` is a clearer no — this page already spends `+` twice on "make something new," and
+the message log makes nothing; it reads. Since the tooltip is being dropped, the drawing carries
+the whole job alone, which is a reason to want a shape that is at worst unfamiliar rather than one
+that is familiar and wrong. My recommendation is not "keep what you have" and not "build a real
+arrow or a plus" — it is a small further repair to the same clock: separate the two hands more and
+add a dot at the pivot so it reads as two hands from a hub rather than one bent line, which costs a
+few more path edits and no new name or string, before reaching for a different picture entirely.
+
+No shipped file touched; nothing in the worktree touched.
