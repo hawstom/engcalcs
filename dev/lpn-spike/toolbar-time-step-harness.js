@@ -69,6 +69,30 @@ function stepRows(times) {
 	// THE CLOCK READING SURVIVES IN THE TIP, AND IT IS ALSO ONE INSTANT NOW (it may still wrap,
 	// because EC.lpnTimeClockText() wrapping at 24:00 is what makes it a CLOCK reading at all).
 	ok(rows[24].tip.indexOf(' - ') === -1, 'the tip at hour 24 is one clock reading, not a range');
+
+	// **AND THE TIP NAMES THE DAY** (Tom, 2026-09-23). A wrapped clock alone cannot say which
+	// morning `01:00` is, which is the whole reason the day number is there.
+	eq(rows[0].tip, 'Day 1, 00:00', 'the first row is day 1');
+	eq(rows[23].tip, 'Day 1, 23:00', 'the last hour before midnight is still day 1');
+	eq(rows[24].tip, 'Day 2, 00:00', 'midnight rolls the day over');
+	eq(rows[25].tip, 'Day 2, 01:00', 'and the hour after it is day 2, not a bare 01:00');
+}
+
+// **THE DAY BOUNDARY IS MIDNIGHT ON THE CLOCK, NOT 24 HOURS OF ELAPSED TIME**, and the two differ
+// on any run that does not start at midnight. This is the case that separates the two rules: with
+// a 06:00 start, day 2 arrives after 18 elapsed hours. Counting elapsed days instead would print
+// "Day 1" against a clock reading of tomorrow morning, which is the ambiguity the day number was
+// added to remove -- so this assertion is the one that matters most here.
+{
+	const t = EngCalcs.lpnTimesDefaults();
+	t.duration = 30 * 3600;
+	t.reportStep = 3600;
+	t.startClock = 6 * 3600;
+	const rows = stepRows(t);
+	eq(rows[0].tip, 'Day 1, 06:00', 'the run starts at 6 in the morning of day 1');
+	eq(rows[17].tip, 'Day 1, 23:00', '17 hours in is still the first day');
+	eq(rows[18].tip, 'Day 2, 00:00', 'day 2 arrives after EIGHTEEN elapsed hours, not 24');
+	eq(rows[18].label, '18:00', 'while the LABEL is still elapsed time and knows nothing of days');
 }
 
 // A single-instant network (no [TIMES] block at all) must still render one option.

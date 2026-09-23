@@ -14514,7 +14514,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		mapgeo = {
-			step: MAPGEO_STEP_FINE,
+			step: MAPGEO_STEP_WORLD,
 			openId: library ? library.openId : null,
 			prev: {
 				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
@@ -14525,12 +14525,23 @@ var EngCalcs = EngCalcs || {};
 		setMode('select');
 		mapgeoSet(project.georef);
 		refreshMapStatus();
-		// **ONE SENTENCE, BECAUSE THERE IS ONE ROW.** Move and Scale by picking used to name two
-		// HANDLES of the blue rectangle; deleting the rectangle left both rows opening the
-		// identical step 2, and Tom closed the loose end on 2026-09-19 by replacing them with a
-		// single Re-adjust. The `kind` argument went with them -- it distinguished two things that
-		// had stopped being two things.
-		setNotice(pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+		// **RE-ADJUST OPENS AT STEP 1, NOT STEP 2** (Tom, 2026-09-23: *"I am okay changing Re-adjust
+		// to go to Step 1. I think that is kind, and that it solves your valid concern."*).
+		//
+		// **THE CONCERN IT SOLVES: NOTHING COULD REACH STEP 1 A SECOND TIME.** Step 1 is the "where
+		// in the world is this" question and step 2 is the fine placement, so a grid project placed
+		// in the WRONG TOWN had no way back: Detach keeps the placement, Attach puts the same one
+		// back, and Re-adjust could only nudge it from where it already was. The alternative on the
+		// table was a Discard row that threw the placement away and restarted the wizard from the
+		// Gulf of Guinea; he chose this instead, and it is the kinder of the two because nothing is
+		// thrown away -- the reader passes through step 1 and on to step 2, and a reader who only
+		// wanted to nudge simply carries on.
+		//
+		// **SO THE PLACEMENT IS KEPT, WHICH IS WHAT MAKES THIS DIFFERENT FROM mapgeoStart().** That
+		// one overwrites project.georef with the whole world at 0 N 0 E, because a drawing nobody
+		// has placed honestly sits nowhere. Here the existing placement stays and the map opens on
+		// it; Cancel still restores `prev` exactly as before.
+		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.

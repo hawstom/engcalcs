@@ -737,18 +737,27 @@ ok('a map is attached again, so the fine adjustments have something to adjust',
 	L.xyGeorefOk() === true);
 ok('ATTACHING AGAIN CHANGED NOT ONE STORED BYTE', snapshot() === before);
 {
-	// RE-ADJUST: step 2 on the placement already on file, never a fresh one. The old transform has
-	// to still be there -- a Re-adjust that threw the map back to 0 N 0 E would be a new placement
-	// wearing the word, and the reader would lose what they came to correct.
+	// **RE-ADJUST OPENS AT STEP 1, ON THE PLACEMENT ALREADY ON FILE** (Tom, 2026-09-23: *"I am okay
+	// changing Re-adjust to go to Step 1. I think that is kind, and that it solves your valid
+	// concern."*). It used to open at step 2, which meant NOTHING could ever reach step 1 twice --
+	// a grid project placed in the wrong town could only be nudged from where it already was.
+	//
+	// **THE TWO HALVES ARE ASSERTED TOGETHER ON PURPOSE**, because each without the other is a
+	// different defect: opening at step 1 while throwing the transform back to 0 N 0 E would be a
+	// fresh placement wearing the word Re-adjust, and the reader would lose the very thing they
+	// came to correct; keeping the transform but opening at step 2 is the state he just struck.
 	L.mapgeoAdjust();
-	ok('Re-adjust opens the wizard at step 2', L.mapgeoActive() === true && L.mapgeoStep() === 2);
+	ok('Re-adjust opens the wizard at step 1', L.mapgeoActive() === true && L.mapgeoStep() === 1);
 	ok('...on the placement that was already on file, not a fresh one',
 		JSON.stringify(L.xyGeoref()) === attached, L.xyGeoref() && JSON.stringify(L.xyGeoref()));
+	L.mapgeoPlace();
+	ok('...and step 1 still leads on to step 2, so a reader who only wanted to nudge carries on',
+		L.mapgeoStep() === 2);
 	L.mapgeoCancel();
 	ok('...and Cancel puts it back exactly', JSON.stringify(L.xyGeoref()) === attached);
 	L.mapgeoAdjust();
-	ok('...and a second Re-adjust opens the same step 2, which is the same two sliders',
-		L.mapgeoStep() === 2 && JSON.stringify(L.xyGeoref()) === attached);
+	ok('...and a second Re-adjust opens step 1 again, on the same placement',
+		L.mapgeoStep() === 1 && JSON.stringify(L.xyGeoref()) === attached);
 	L.mapgeoCancel();
 	ok('RE-ADJUST CHANGED NOT ONE STORED BYTE', snapshot() === before);
 }

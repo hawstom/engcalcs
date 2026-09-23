@@ -2520,6 +2520,7 @@ $ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in th
 $ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
 $ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
 $ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
+$ec_lang['lpn_mapgeo_readjust_intro']='Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.';
 $ec_lang['lpn_mapgeo_hint2']='Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
 $ec_lang['lpn_mapgeo_gestures']='Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.';
 // ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
@@ -2972,6 +2973,7 @@ $ec_lang['lpn_time_pattern_start']='Pattern start time';
 $ec_lang['lpn_time_report_step']='Report time step';
 $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
+$ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the extended period simulation.';
 $ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.';
