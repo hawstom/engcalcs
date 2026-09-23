@@ -360,6 +360,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
+  // The message log's icon button and its on-map panel (ROADMAP Task 704).
+  'lpn_msglog_btn', 'lpn_msglog_panel',
   // The lock/warning banner (Task 195), which is page chrome in FLOW above the canvas -- so its
   // appearing changes the map's height (Task 552). A stub without it made renderBanner() return at
   // its first line and every banner rule untestable.

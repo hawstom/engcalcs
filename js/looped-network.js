@@ -29648,7 +29648,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
 		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
-		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
+		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
+		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
+		if (initials === null) {
+			setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.');
+			return;
+		}
 		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
 		setNotice((r && r.ok && r.requested)
 			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
@@ -29688,7 +29693,11 @@ var EngCalcs = EngCalcs || {};
 			// answer from the rest. It licenses exactly that much and no colour.
 			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
 			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
+			// **CANCEL LEAVES A RESIDUE** (ROADMAP Task 704). It used to leave nothing at all: the
+			// dialog closed, the file did not open, and there was no trace anywhere of what had
+			// just been offered or why the file did not appear. That is exactly "Help! What did I
+			// miss!", and it costs one sentence to fix.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.'); } },
 			{
 				// **THE GLYPH IS THE VERDICT STRINGS' OWN, AND IT IS PREPENDED HERE RATHER THAN
 				// WRITTEN INTO THE LANGUAGE FILE.** `⚠` is decorative, international and RTL-safe,
@@ -29952,6 +29961,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		banner.innerHTML = '';
 		if (!state) { banner.style.display = 'none'; settle(); return; }
+		// **THE BANNER'S MESSAGES LAND IN THE MESSAGE LOG TOO** (ROADMAP Task 704, row 2 of Ida's
+		// ranking). This bar carries real decisions -- who has the file, what you may still do
+		// about it -- and once dismissed there is no way back to the words. logMessage() keeps one
+		// row per distinct message, so a repaint on every tab switch does not fill the log.
+		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
 		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
 		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
@@ -30692,6 +30706,27 @@ var EngCalcs = EngCalcs || {};
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
+	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
+	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
+	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
+	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
+	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
+	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
+	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
+	// jobs from the one call it always made; a button built by hand because it must carry no tip
+	// calls this alone.
+	function registerToolbarIcon(el, iconName, name, tip) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === el) {
+				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
+				return;
+			}
+		}
+		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+	}
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
 		// when I hover on the toolbar icon, one is our styled tip. The other is the browser tip.
@@ -30715,17 +30750,9 @@ var EngCalcs = EngCalcs || {};
 		if (prior) { prior.dispose(); }
 		EngCalcs.setIconLabel(el, iconName, name, tip);
 		if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
-		// **THE INDEX IS KEYED ON THE BUTTON, so a repaint replaces its row rather than adding
-		// one.** Help, What the toolbar icons mean is DERIVED from this list; before this, cycling
-		// the area tool three times listed the area button four times.
-		var i;
-		for (i = 0; i < toolbarIconIndex.length; i++) {
-			if (toolbarIconIndex[i].el === el) {
-				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
-				return;
-			}
-		}
-		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+		// Help, What the toolbar icons mean is DERIVED from this list; before this, cycling the
+		// area tool three times listed the area button four times.
+		registerToolbarIcon(el, iconName, name, tip);
 	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
@@ -33209,6 +33236,7 @@ var EngCalcs = EngCalcs || {};
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
+		wireMessageLogButton();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -46970,13 +46998,282 @@ var EngCalcs = EngCalcs || {};
 	// same element is wiped just slowly enough for the user not to see it. Separate slots dissolve
 	// that -- both can be on screen at once and nothing has to arbitrate.
 
+	// ---- THE MESSAGE LOG (ROADMAP Task 704, rows 1 and 2 of Ida's ranking) ----
+	//
+	// **A BANNER THAT VANISHES IS A DEFECT** (Tom, 2026-09-18, testing the lock work: *"The banner
+	// message about 'We asked your colleague to close the file' disappeared too fast and
+	// unrecoverable. 'Help! What did I miss!' We need a better messaging system."*).
+	//
+	// setNotice() is already ONE DOOR with 83 call sites and an eight-second expiry, and a later
+	// message silently REPLACES an earlier one. **THE COUNT IS RE-DERIVED, NOT INHERITED**: the
+	// figure carried into this task was 66, which was an undercount nobody had re-checked. 83 is
+	// this file with comments stripped, on the day the log was built and before the two Cancel
+	// notices below made it 85. Re-derive it rather than quoting this line. That replacement is the whole of the complaint, and
+	// the answer is not a longer timer -- it is a place the message went. QGIS splits exactly here:
+	// QgsMessageBar is transient, QgsMessageLog is the store behind it, reached from one icon at
+	// the end of the status bar. This is that split and nothing more.
+	//
+	// **IN MEMORY ONLY, AND THAT IS A RULING RATHER THAN A SHORTCUT.** Anything written to a
+	// visitor's device makes a sentence in consent_body false, which is a banner rewrite, 26
+	// retranslations and an EC_CONSENT_VERSION bump that re-asks everybody. A log that lives as
+	// long as the page answers "what did I miss", and that is a question about the last few
+	// minutes, not about last Tuesday.
+	//
+	// **THIRTY, AND THE BOUND IS CHOSEN FOR THE READER RATHER THAN FOR THE MEMORY.** Thirty rows is
+	// about one long working session of opens, saves, lock answers and unit changes. It fits the
+	// dialog at a glance, which is the point at which a log is still a way BACK to something rather
+	// than a second document to search. The storage cost of any bound here is nil; the reading cost
+	// is not.
+	//
+	// **ONE ROW PER DISTINCT MESSAGE, AND A REPEAT MOVES TO THE TOP RATHER THAN ADDING A ROW.**
+	// renderBanner() repaints on every tab switch and every lock answer, so an append-only log
+	// would bury the one thing somebody missed under forty identical read-only banners. The time
+	// shown is therefore the LAST time that message was on screen, which is what the reader is
+	// asking about.
+	var NOTICE_LOG_MAX = 30;
+	var noticeLog = [];   // newest FIRST: { text, severity, at }
+	// **TWO LEVELS, AND THE SECOND IS THE ONE THE BANNER ALREADY DRAWS.** renderBanner() paints
+	// amber for "you may work through this" and red for "this has taken editing away"; everything
+	// setNotice() carries is a completed action. That is two honest kinds of event and this page
+	// does not have four, so QGIS's four severities are deliberately not imported -- a level
+	// nobody can assign consistently is a colour that means nothing by the third week.
+	// **THE LIMITATION, WRITTEN DOWN AT THE PLACE IT WOULD BITE.** Dedupe is an exact match on the
+	// pair (text, severity), which is right for the case that matters -- a message carrying a
+	// changing number ("Saved Net3.lwn", "Saved Net2.lwn") stays distinct, because the numbers and
+	// names are substituted before this sees the string. What it cannot tell apart is TWO DIFFERENT
+	// LANGUAGE KEYS THAT RENDER BYTE-IDENTICAL ENGLISH: they would collapse into one row, and the
+	// reader would be shown one event where two happened. No such collision exists in the current
+	// strings -- checked, not assumed. Comparing the KEY instead would fix it and cost more than it
+	// buys: every caller would have to pass one, and renderBanner() composes its sentence from a
+	// key plus a name, so there is no single key to pass. If a collision ever does ship, the cheap
+	// repair is to reword one of the two strings, which is a translation edit and not a design
+	// change.
+	function logMessage(text, severity) {
+		var t = String(text == null ? '' : text).trim(), kind, i;
+		if (!t) { return; }
+		kind = severity === 'warning' ? 'warning' : 'notice';
+		for (i = 0; i < noticeLog.length; i++) {
+			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
+		}
+		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
+		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
+	}
+	// "{x} ago" as its own key rather than an English concatenation: agoText() already solves the
+	// plural problem (n is never 1), and this wrapper lets a language put its word for "ago"
+	// wherever its own grammar wants it.
+	function messageAgeText(at) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_msglog_ago || '{x} ago').replace('{x}', agoText(Math.max(1, Date.now() - at)));
+	}
+	// **AN ON-MAP LIST, NOT A DIALOG** (ROADMAP Task 704; superseded Ida's 2026-09-21 dialog design
+	// the next day, Tom having actually used it: *"The alert paradigm is not a good UX for showing
+	// past messages. User expects them to descend below the glyph, below the Mode status in
+	// similar appearance that they originally had... fill the map below the Mode status line with
+	// old messages with oldest at the bottom."*). #lpn_msglog_panel is a child of the same
+	// top-left column the mode hint and the notice sit in, directly under that slot, so opening it
+	// reads as the next line down rather than as a separate control landing somewhere else on the
+	// page.
+	var msglogPanelOpen = false;
+	// **THE NOTICE'S HEIGHT IS INVISIBLE TO FLOW, AND USUALLY THAT DOES NOT MATTER.** #lpn_map_notice
+	// is `position:absolute` on purpose ("a transient must not change the fit, or every save would
+	// re-zoom the map") and #lpn_mode_hint beside it is an ordinary flow element, so on a normal
+	// window the panel's own flow position already falls below whichever of the two is showing,
+	// because mode_hint's real height is what flow sees either way.
+	//
+	// **AT 640px AND UNDER, #lpn_mode_hint IS display:none BY DESIGN** ("no mouse verbs on a
+	// phone" -- see the small-screen rule in css/engcalcs.css). With it gone, flow has NOTHING
+	// contributing height to that slot any more, so if the notice happens to be showing at that
+	// moment, the panel's ordinary flow position lands at the very top of the column, squarely on
+	// top of the notice it was supposed to appear below (measured: a browser pass caught the panel
+	// starting 15px above the notice's own bottom edge at 390px). This is a targeted compensation
+	// for exactly that combination, computed fresh each time the panel opens rather than assumed:
+	// zero everywhere the mode hint is doing its ordinary job.
+	function msglogPanelTopCompensation() {
+		var modeHint = document.getElementById('lpn_mode_hint'), notice = document.getElementById('lpn_map_notice');
+		var cs = modeHint && window.getComputedStyle ? window.getComputedStyle(modeHint) : null;
+		var modeHintInFlow = !!(cs && cs.display !== 'none');
+		var noticeShowing = !!(notice && notice.style.display !== 'none');
+		if (noticeShowing && !modeHintInFlow) { return notice.offsetHeight + 4; }
+		return 0;
+	}
+	function fitMsglogPanelHeight(panel) {
+		// **MEASURED AGAINST THE MAP, NEVER A BARE CSS PERCENTAGE.** A percentage `max-height` on
+		// an absolutely positioned ancestor whose own height is auto measures that ancestor's own
+		// content -- which is this panel -- and caps nothing. The map's own canvas is the thing
+		// with a real, laid-out height, so the panel's available room is read from it directly:
+		// however far down the canvas the panel starts, minus a little breathing room above the
+		// canvas's own bottom edge.
+		var canvas = document.getElementById('lpn_canvas'), canvasBox, panelBox, avail;
+		if (!canvas) { return; }
+		canvasBox = canvas.getBoundingClientRect();
+		panelBox = panel.getBoundingClientRect();
+		avail = canvasBox.bottom - panelBox.top - 8;
+		panel.style.maxHeight = Math.max(40, avail) + 'px';
+	}
+	function renderMsglogPanel() {
+		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
+		if (!panel) { return; }
+		panel.innerHTML = '';
+		if (!noticeLog.length) {
+			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
+			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
+			var none = document.createElement('div');
+			none.className = 'lpn-msglog-panel-empty';
+			none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
+			panel.appendChild(none);
+			return;
+		}
+		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
+		// re-sorting at render time, so the panel can never disagree with the log it is reading.
+		noticeLog.forEach(function (row) {
+			var pill = document.createElement('div');
+			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
+			var when = document.createElement('span');
+			when.className = 'lpn-msglog-panel-when';
+			when.textContent = messageAgeText(row.at);
+			pill.appendChild(when);
+			var what = document.createElement('span');
+			what.className = 'lpn-msglog-panel-text';
+			what.textContent = row.text;
+			pill.appendChild(what);
+			panel.appendChild(pill);
+		});
+		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
+		// paragraph of Ida's dialog design; it says something none of the pills above it do --
+		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
+		// as the last row rather than dropped along with the dialog chrome around it.
+		var note = document.createElement('div');
+		note.className = 'lpn-msglog-panel-note';
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+			.replace('{n}', NOTICE_LOG_MAX);
+		panel.appendChild(note);
+	}
+	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
+	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
+	// without hunting for a close button the panel does not have (it is a readout, not a form).
+	// **CAPTURED ON pointerdown, NOT click, AND CONSUMED** (Perry's review, 2026-09-22: dismissing
+	// the panel by clicking the map also did whatever that click would otherwise have done -- the
+	// canvas wires its own selection/tool handling on `pointerdown`
+	// (`svg.addEventListener('pointerdown', ...)`), which fires and finishes BEFORE a `click`
+	// listener ever sees the gesture, so listening for `click` here could never have intercepted
+	// anything). Registered with `capture: true` on `document`, which runs before the canvas's own
+	// listener on the `svg` element sees the event at all, so `stopPropagation()` here genuinely
+	// stops it from reaching the map -- and `preventDefault()` alongside it, since a canvas built
+	// on pointer events reads default-prevention as "this gesture is somebody else's" the same way
+	// a native control does.
+	function msglogOutsidePointerDown(e) {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (panel && panel.contains(e.target)) { return; }
+		if (btn && btn.contains(e.target)) { return; }
+		e.stopPropagation();
+		if (e.preventDefault) { e.preventDefault(); }
+		closeMessageLogPanel();
+	}
+	function msglogKeyHandler(e) {
+		if (e.key === 'Escape' || e.key === 'Esc') { closeMessageLogPanel(); }
+	}
+	function openMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!panel) { return; }
+		renderMsglogPanel();
+		panel.style.display = 'flex';
+		panel.style.marginTop = msglogPanelTopCompensation() + 'px';
+		fitMsglogPanelHeight(panel);
+		msglogPanelOpen = true;
+		if (btn) { btn.setAttribute('aria-expanded', 'true'); }
+		// Deferred one tick so the pointerdown that opened the panel (the press on the glyph
+		// itself) is not the same pointerdown the outside-dismiss listener sees and immediately
+		// closes the panel again on.
+		setTimeout(function () {
+			document.addEventListener('pointerdown', msglogOutsidePointerDown, true);
+			document.addEventListener('keydown', msglogKeyHandler, true);
+		}, 0);
+	}
+	function closeMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!msglogPanelOpen) { return; }
+		msglogPanelOpen = false;
+		// **hidePanel(), NOT A HAND-WRITTEN display:'none'** (ROADMAP Task 562;
+		// dev/lpn-spike/panel-touch-harness.js). It also sweeps any `.ec-help` tip this panel
+		// raised -- this panel's rows carry none today, but a per-box checklist for that rule is
+		// exactly what that harness exists to make unnecessary.
+		hidePanel(panel);
+		if (btn) { btn.setAttribute('aria-expanded', 'false'); }
+		document.removeEventListener('pointerdown', msglogOutsidePointerDown, true);
+		document.removeEventListener('keydown', msglogKeyHandler, true);
+	}
+	function toggleMessageLogPanel() {
+		if (msglogPanelOpen) { closeMessageLogPanel(); } else { openMessageLogPanel(); }
+	}
+	// **STANDING RATHER THAN CONDITIONAL, for the reason the grievance button beside it is.** A
+	// control that appears only once there is something to read is one nobody learns, and it would
+	// reflow the strip under the hand every time a notice landed. It is one icon in a strip that
+	// already exists, already wraps, and is already reserved against by zoomExtent().
+	// **HISTORY, NOT INFO** (Ida, 2026-09-21, after Tom: *"The i info glyph doesn't seem quite right
+	// to me."*). 'info' names standing reference facts elsewhere on this page (Welcome, Privacy
+	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
+	// mark cannot hold both jobs. See lib/Icons.lib.php for the drawing itself and Tom's own
+	// ruling on it, 2026-09-22.
+	// **NO TIP** (Tom, 2026-09-22: *"I don't think we need a tip on the down arrow glyph. I think
+	// it's more trouble than help."*). setIconLabel() always writes a `title` and adds `.ec-help`,
+	// which is the one selector initTips() wires a hover popup onto -- so this button is built by
+	// hand rather than through that door: the icon, and an `aria-label` so a screen reader still
+	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
+	// therefore unread; it (never translated into any of the other 26 languages) was deleted with
+	// this change.
+	// **AND DELIBERATELY NOT IN HELP > "TOOLBAR KEY", ON TOM'S OWN RULING** (2026-09-23). Perry
+	// found that building this button by hand had silently dropped it out of that list, it was put
+	// back, and Tom then struck the whole idea: *"If we are putting 'Messages' under Help, Toolbar,
+	// that makes 'Toolbar' a lie since the 'Messages' glyph is not really on the Toolbar. My
+	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
+	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
+	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
+	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// name stays; the drawing carries the rest.
+	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
+	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
+	// accident. It simply is not called here.
+	function wireMessageLogButton() {
+		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		var name = pc.lpn_msglog_name || 'Messages';
+		btn.textContent = '';
+		var ic = iconEl('history');
+		if (ic) { btn.appendChild(ic); }
+		btn.setAttribute('aria-label', name);
+		btn.setAttribute('aria-expanded', 'false');
+		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleMessageLogPanel();
+		});
+	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
+	// **HIGHLIGHTED WHILE IT SHOWS, NEVER OTHERWISE** (ROADMAP Task 704; Tom: "it must appear and
+	// possibly highlight while a message displays"). This is the ONE place #lpn_map_notice's text is
+	// written, so it is the one place that can know whether a message is currently on screen --
+	// noteMapUnmeasurable() and setNotice() both funnel through here, and neither needs its own
+	// copy of this rule.
+	//
+	// **THE LOCK BANNER (renderBanner(), #lpn_lock_banner) DOES NOT LIGHT THE GLYPH** (Perry's
+	// review, 2026-09-22, asked to make it do so or say why). It is logged into the same message
+	// log through logMessage() directly, but it is not this column: #lpn_lock_banner is a standing
+	// bar of its own, in normal document flow above the map, not a child of #lpn_map_overlay_tl_col.
+	// Lighting a glyph in the top-left map overlay for a message showing in a completely different
+	// part of the page would point the reader at the wrong spot -- the highlight's whole job is
+	// "the thing beside me is what just changed", and here it would not be.
+	function markMsglogActive(on) {
+		var btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		btn.classList[on ? 'add' : 'remove']('lpn-msglog-active');
+	}
 	function showNotice(text) {
 		var el = document.getElementById('lpn_map_notice');
 		if (!el) { return; }
 		el.textContent = text || '';
 		el.style.display = text ? 'block' : 'none';
+		markMsglogActive(!!text);
 	}
 	// **WHEN THIS PAGE CANNOT MEASURE ITSELF, IT SAYS SO** (MJH, 2026-09-09). A map that is silently
 	// unusable cost one user a whole session: the drawing was intact, the menus worked, and nothing
@@ -46999,6 +47296,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		// Logged on the TRANSITION only, not on every re-show: this message is re-shown whenever an
+		// ordinary notice has covered it, and each of those is the same standing fact said again.
+		if (!mapUnmeasurable) { logMessage(words, 'warning'); }
 		mapUnmeasurable = true;
 		el = document.getElementById('lpn_map_notice');
 		if (el && el.textContent === words) { return; }
@@ -47006,6 +47306,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
+		// sites already go through, which is why the log needed no second seam: teaching the door
+		// teaches all of them at once.
+		logMessage(text, 'notice');
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
@@ -47032,6 +47336,14 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = text || '';
+		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
+		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
+		// progress box writes through (`host.status`) -- "Working out the extended period
+		// simulation." on the way in, the run summary on the way out -- so hooking it here logs
+		// both without lpn-time.js knowing the log exists. logMessage()'s own dedupe (identical
+		// text+severity moves to the top rather than duplicating) is what stops an unchanged
+		// diagnostic re-logging itself on every ordinary solve.
+		if (text) { logMessage(text, 'notice'); }
 		var next = text ? (code || 'status') : '';
 		// A NEW COMPLAINT IS A NEW THING TO REPORT. The button stays thanked while the same message
 		// stands -- a second press posts nothing -- but a different diagnostic is a different
@@ -47107,6 +47419,12 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
+		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
+		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
+		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
+		// logged the moment it is set, same as setStatus() beside it.
+		if (text) { logMessage(text, 'notice'); }
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
@@ -48316,10 +48634,52 @@ var EngCalcs = EngCalcs || {};
 	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
 	// choice and a page that reports a wait the reader is already in are different pages. The words
 	// are Tom's own, 2026-09-06.
+	//
+	// **NEVER A FLASH** (Perry's review, 2026-09-22, live on port 8099: opening an example showed
+	// this exact banner for ~300ms then cleared it -- "SOLVER" and "POWER" share four of six
+	// letters in the same positions, which is a good match for the word Tom saw and could not
+	// read, "similar to POWER", and asked to stop happening. Naming the string was not fixing it).
+	// Most solves finish inside a second, so most of the time nobody should see this banner at
+	// all; a banner on screen for less time than a human can read a sentence is worse than no
+	// banner. Two rules, both against WALL TIME rather than against the fetch's own progress
+	// events, because the flash was never about bytes:
+	//   1. NOT SHOWN until the wait has lasted ENGINE_BANNER_SHOW_DELAY_MS. If the wait ends before
+	//      then, nothing was ever shown and nothing is logged -- there is no message to keep.
+	//   2. ONCE SHOWN, held at least ENGINE_BANNER_MIN_SHOWN_MS even if the wait ends sooner, so a
+	//      genuinely fast finish still leaves something readable rather than a second flash.
+	var ENGINE_BANNER_SHOW_DELAY_MS = 1000;
+	var ENGINE_BANNER_MIN_SHOWN_MS = 1500;
+	var engineBannerShowTimer = null;     // pending "show" timeout id, or null
+	var engineBannerHideTimer = null;     // pending "hide" timeout id (deferred by rule 2), or null
+	var engineBannerPendingBase = '';     // base sentence waiting out the show delay
+	var engineBannerPendingFull = '';     // its full text (base + progress), refreshed every tick
+	var engineBannerShownBase = '';       // base sentence actually on screen, '' if none
+	var engineBannerShownAt = 0;          // Date.now() of the actual (not scheduled) show
+	function paintEngineBanner(el, full) {
+		el.textContent = full;
+		el.style.display = full ? 'block' : 'none';
+		refreshEpanetBar(!!full);
+	}
+	// **LOGGED HERE, AND ONLY HERE** (Task 704: "log it only if it was actually shown"). This is
+	// the one place text actually reaches the screen, so it is the one place that can honestly say
+	// a message was shown.
+	function showEngineBannerNow(el, base, full) {
+		if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+		engineBannerShownBase = base;
+		engineBannerShownAt = Date.now();
+		logMessage(base, 'notice');
+		paintEngineBanner(el, full);
+	}
+	function hideEngineBannerNow(el) {
+		if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+		engineBannerShownBase = '';
+		engineBannerShownAt = 0;
+		paintEngineBanner(el, '');
+	}
 	function refreshEpanetBanner() {
 		var el = document.getElementById('lpn_engine_banner'),
 			pc = EngCalcs.pageConfig || {},
-			text = '';
+			base = '', full, elapsed;
 		if (!el) { return; }
 		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
 		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
@@ -48335,25 +48695,76 @@ var EngCalcs = EngCalcs || {};
 		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
 		// anything modal.
 		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
-			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+			base = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
 		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
-				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
+				base = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
 			} else if (epanetWarmState === 'unavailable') {
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
+				base = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
-		if (text && epanetWarmState === 'warming') {
+		full = base;
+		if (base && epanetWarmState === 'warming') {
 			var prog = epanetProgressText();
-			if (prog) { text += ' ' + prog; }
+			if (prog) { full = base + ' ' + prog; }
 		}
-		el.textContent = text;
-		el.style.display = text ? 'block' : 'none';
-		refreshEpanetBar(!!text);
+		if (base) {
+			if (engineBannerShownBase === base) {
+				// Already on screen with this exact sentence -- just refresh the ticking progress
+				// text underneath it. No re-log (logMessage() would dedupe it anyway, but there is
+				// no new SHOW event here either) and no timer to touch.
+				paintEngineBanner(el, full);
+				return;
+			}
+			if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+			if (engineBannerShownBase) {
+				// Something else is already visible and the reader is already looking at this
+				// slot -- replace it immediately. The flash guard is for the FIRST appearance
+				// only; a mid-read swap is not the defect Perry measured.
+				showEngineBannerNow(el, base, full);
+				return;
+			}
+			if (engineBannerPendingBase === base && engineBannerShowTimer) {
+				// Already waiting out the delay for this exact sentence -- keep the text current
+				// for whenever the timer fires, but do not restart the wall-clock wait.
+				engineBannerPendingFull = full;
+				return;
+			}
+			if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+			// ENGINE_BANNER_SHOW_DELAY_MS <= 0 means "no guard" -- the harness knob
+			// (dev/lpn-spike/engine-progress-harness.js) uses exactly this to test the byte/percent
+			// arithmetic synchronously; the shipped page never sets it below 1000.
+			if (ENGINE_BANNER_SHOW_DELAY_MS <= 0) { showEngineBannerNow(el, base, full); return; }
+			engineBannerPendingBase = base;
+			engineBannerPendingFull = full;
+			engineBannerShowTimer = setTimeout(function () {
+				engineBannerShowTimer = null;
+				showEngineBannerNow(el, engineBannerPendingBase, engineBannerPendingFull);
+			}, ENGINE_BANNER_SHOW_DELAY_MS);
+			return;
+		}
+		// base is empty: nothing left to report right now.
+		if (engineBannerShowTimer) {
+			// Never shown -- the wait ended inside the delay, which is the whole point of rule 1.
+			clearTimeout(engineBannerShowTimer);
+			engineBannerShowTimer = null;
+		}
+		engineBannerPendingBase = '';
+		if (!engineBannerShownBase) { return; }
+		elapsed = Date.now() - engineBannerShownAt;
+		if (elapsed >= ENGINE_BANNER_MIN_SHOWN_MS) {
+			hideEngineBannerNow(el);
+			return;
+		}
+		if (engineBannerHideTimer) { return; }
+		engineBannerHideTimer = setTimeout(function () {
+			engineBannerHideTimer = null;
+			hideEngineBannerNow(el);
+		}, ENGINE_BANNER_MIN_SHOWN_MS - elapsed);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:
