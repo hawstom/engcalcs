@@ -231,12 +231,12 @@ foreach (EC_ANCHOR_PROSE_FILES as $rel) {
     $usedExceptions += $f['used'];
 }
 
+// An exception matching nothing is a NOTE, not a failure: failing would force a history sentence to
+// stay in a document just to keep the build green, which is the appended-changelog habit CLAUDE.md
+// forbids. A changed anchor set still fails above, because the new codes match no exception.
+$staleExceptions = [];
 foreach (EC_ANCHOR_PROSE_EXCEPTIONS as $key => $e) {
-    if (!isset($usedExceptions[$key])) {
-        $problems[] = "the declared exception '$key' matches nothing any more. Either the sentence "
-            . 'was rewritten -- in which case delete the entry -- or the codes on it changed, which '
-            . 'is the thing this check exists to notice.';
-    }
+    if (!isset($usedExceptions[$key])) { $staleExceptions[] = $key; }
 }
 
 if ($problems) {
@@ -252,4 +252,7 @@ echo 'Anchor languages OK -- ' . implode(', ', $anchors) . ' declared in glossar
     . 'all served; ' . count($matched) . ' agreeing restatement(s) in '
     . count(EC_ANCHOR_PROSE_FILES) . ' current-state document(s), '
     . count(EC_ANCHOR_PROSE_EXCEPTIONS) . " declared historical.\n";
+foreach ($staleExceptions as $key) {
+    echo "  note: the exception '$key' matches nothing any more; delete its entry.\n";
+}
 exit(0);

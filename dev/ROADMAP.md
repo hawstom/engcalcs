@@ -7,11 +7,17 @@ standing prose that is not a task.
 | Priority | Means |
 |---|---|
 | **100** | **Next.** Being worked, or the thing to pick up on finishing something. |
+| **99** | **Next, second rank.** In Next, not being worked this week. Narrows what 100 means. |
 | **75** | **Soon.** Real, wanted, queued behind Next. |
 | **50** | **Someday.** Agreed worth doing; nothing is waiting on it. |
 | **25** | **Maybe.** Worth keeping; not obviously worth doing. |
 | **5** | **Parked.** Alive only so it is not re-proposed from scratch. |
 | **0** | **Closed** — the block moves to `dev/roadmap-closed-ids.md` in the same edit. |
+
+**99 IS TOM'S OWN SIXTH TIER, ADDED 2026-09-23** (*"Demote to 99 (to narrow our priorities)"*). It
+is NOT the retired 95: 95 was a dated holding pen for work parked past one event, where 99 is a
+permanent second rank INSIDE Next, so that "what am I working on" has a short answer and nothing
+falls out of Next to be forgotten. Both live under one heading below.
 
 **NO TASK MAY SIT AT ANY OTHER NUMBER** (Tom, 2026-09-12: *"the system has been completely lost.
 Restore it... No tasks are allowed at any other priority tiers."*). **Five values again: the
@@ -59,6 +65,8 @@ the block.
 
 # Tasks
 
+## 100 and 99 — Next.
+
 - 25|672| **The placement wizard degrades and then crashes after a few pans.**
   **DROPPED TO 25 BY TOM, 2026-09-15: *"This is not manifesting. If it does, I will report."*** Kept
   rather than closed because the instrument built for it is the valuable part and should not be
@@ -73,7 +81,7 @@ the block.
     SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
-- 100|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
+- 99|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
   **PHASE 1 SHIPPED 2026-09-16: the solve and the label layout are kept, and the switch is 38%
   faster.** Measured in real Chrome on the geographic Net3 at his own zoom: **636 ms to 395 ms
   median**, `lblPlace` 210 ms and `fontSizes` 65 ms gone entirely, **label passes 1 -> 0 and label
@@ -116,7 +124,7 @@ the block.
     changed" already exists for the dirty asterisk. That alone does not fix the delay -- Tom
     measured that turning auto-run off changes nothing -- but it is waste with a cheap remedy.
 
-- 100|681| **Economize the label layout: it is half the cost of a project switch.**
+- 99|681| **Economize the label layout: it is half the cost of a project switch.**
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
     switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
@@ -231,7 +239,7 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 100|685| **Name every unit dropdown for a screen reader.**
+- 99|685| **Name every unit dropdown for a screen reader.**
   **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
   survey's finding.
   - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
@@ -246,6 +254,9 @@ the block.
     out to need new words, stop -- that is a different decision and a different price.
 
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
+  undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,
+  fill-down, multi-cell selection.
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not
@@ -288,51 +299,6 @@ the block.
   - Read with `dev/ROADMAP.md` Task 616 (a prompt history in the banner area, parked at 5 by Tom)
     and Task 622. **616 is the same idea arriving from the other direction** and should probably be
     folded in here rather than left parked separately; that is his call, not ours.
-
-- 100|688| **File, Convert units as: US to work in, SI to hand over.**
-  Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
-  are done, we want to convert to SI for the community."* Put to him that this collides with a rule
-  he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
-  - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
-    knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
-    SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
-    the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
-    authority on the other side.
-  - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
-    There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
-    happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
-    does not: the original project is untouched and a new one is produced. So this row joins the
-    **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
-    and behave alike -- a file picker, or a duplicate tab named for the original.
-  - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
-    what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
-    the project because declarative storage makes a bare number meaningless without it. So a
-    conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
-  - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
-    `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
-    be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
-  - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
-    original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
-  - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
-
-- 100|693| **Separate Length and Map coordinates units**
-  Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
-  Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
-  Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
-  is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
-  - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
-    project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
-    geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
-    unit, which need not be the one pipes are measured in.
-  - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
-    'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
-    an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
-    rest of this page treats a number it knows rather than one the user states.
-  - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
-    convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
-    DISPLAY of what the coordinate system already says, never an input that rewrites anything.
-  - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
-    Save-as side.
 
 - 50|694| **Export a map animation as an animated picture.**
   Tom, 2026-09-18: *"It would be very fun to export a map animation to a gif. And I bet it would not
@@ -399,12 +365,90 @@ the block.
       georeferencing means attaching the world map rather than converting a coordinate system.
       Claiming to have documented his edits and then not implementing them is the failure to own
       here.
+  - **HIS THIRD ROUND, 2026-09-22, AND POINT (3) IS THE ONE THAT MATTERS:** *"I completely missed
+    this until now, but this wizard is out of date with our current CRS paradigm. The first thing it
+    needs to do is ask what coordinate system we are going to. And I am vaguely recalling that we
+    possibly already worked on this. Do what you can or let me know if you want me to try to give you
+    detailed specs. I think we already went down this road. (a) Project and units (maybe this one menu
+    row as 'Convert as...' can handle both units and coordinates), (b) step 1 (if CRS changed),
+    (c) step 2 (if CRS changed)."* **So he is proposing ONE menu row, `Convert as...`, carrying both
+    the unit conversion of Task 688 and the coordinate conversion of this task**, with the placement
+    steps shown only when the CRS actually changed. That merges this task with 688 at the interface,
+    and the answer owed him is whether that is right.
+  - **AND TWO DEFECTS HE FOUND IN WHAT SHIPPED:** *"(1) In Step 1, a background image gets dragged
+    around with the map (then snaps back on release of drag) instead of always staying with the
+    project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center
+    example, the world map worked, but the satellite view didn't."*
     - **(2) A PROJECT THAT ALREADY HAS A WORLD MAP ATTACHED ALREADY KNOWS WHERE IT IS.** His words:
       *"If a project already has an attached World map (custom or unnamed georeference), the next
       step (placement step 1) uses our current georeferencing. In fact, we could just convert the
       project to their selected CRS without further question. But we step them through Steps 1 and 2
       in case they want to make any changes."* So the steps stay, and they open ALREADY ANSWERED
       from the existing attachment rather than asking again from nothing.
+  - **TOM MERGED 688 AND 693 INTO THIS ONE, 2026-09-23** (*"Combine: 693 and 688 with 696 as a
+    single wizard"*), and his shape for the merged row is: *"(a) Project and units (maybe this one
+    menu row as 'Convert as...' can handle both units and coordinates), (b) step 1 (if CRS changed),
+    (c) step 2 (if CRS changed)."* **So there is ONE menu row, `File, Convert as...`, and the
+    placement steps appear only when the coordinate system actually changed.** Units alone is then
+    the cheap path through the same door, which is what made the two separate rows look wrong to him.
+  - **AND THE DEFECT THAT PROMPTED IT, WHICH IS THE BUG TO FIX FIRST** (his words, 2026-09-23): the
+    wizard *"is out of date with our current CRS paradigm, because for a 'lat/lon' (EPSG?) project,
+    it exits with the message 'This project is already on lat/lon'"*. That refusal is
+    `mapgeoStart()`'s `lpn_georef_on_map`, and under his own settled vocabulary it is simply wrong:
+    lat/lon is EPSG:4326, one coordinate system among hundreds, so "you are already on lat/lon" is
+    not a reason to refuse to convert TO something else. **The first thing the wizard must ask is
+    which coordinate system we are going to.**
+  - **HE SUSPECTS HE MET THIS IN HIS OWN WORDING PASS** (*"I think I pressed the problem here in my
+    lang edits"*) -- and he did: `lpn_crs_unplaceable` and `lpn_crs_unplaceable_mark` are the two
+    keys he answered with *"Please explain to me what this is in response to."* Answer those when
+    this is built; they are the same paradigm gap seen from the string side.
+
+### ABSORBED: Task 688, File, Convert units as (his agreement on file)
+
+    Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
+    are done, we want to convert to SI for the community."* Put to him that this collides with a rule
+    he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
+    - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
+      knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
+      SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
+      the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
+      authority on the other side.
+    - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
+      There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
+      happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
+      does not: the original project is untouched and a new one is produced. So this row joins the
+      **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
+      and behave alike -- a file picker, or a duplicate tab named for the original.
+    - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
+      what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
+      the project because declarative storage makes a bare number meaningless without it. So a
+      conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
+    - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
+      `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
+      be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
+    - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
+      original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
+    - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
+
+### ABSORBED: Task 693, Separate Length and Map coordinates units
+
+    Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
+    Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
+    Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
+    is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
+    - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
+      project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
+      geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
+      unit, which need not be the one pipes are measured in.
+    - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
+      'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
+      an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
+      rest of this page treats a number it knows rather than one the user states.
+    - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
+      convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
+      DISPLAY of what the coordinate system already says, never an input that rewrites anything.
+    - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
+      Save-as side.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -426,7 +470,7 @@ the block.
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
 
-- 100|679| **Narrower strokes on the About mark, and more pixels used.**
+- 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
   the outlines."*
@@ -446,7 +490,7 @@ the block.
     where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
     elements, not a line -- that is the drawing note, and it is his, not ours.
   - **Part of the one water-tower piece of work with Tasks 645 and 648** (Tom, 2026-09-21).
-- 100|676| **Watch the sites, and send a derived weekly report.**
+- 99|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
   diagnosis, and the things deliberately NOT to do: `dev/reputation-and-practice.md`.
@@ -502,26 +546,6 @@ the block.
   - Priority 50 rather than 100 on its own merits: it is a reading aid for a coordinate system
     Task 674 would let people type into, so 674 lands first and may change what this needs.
 
-- 100|669| **Show labels at this zoom or closer.**
-  Tom, 2026-09-15: *"We previously had a 'Show labels at this zoom or closer' in settings. I guess
-  it was a bad idea to remove that."*
-  - **IT DID SHIP, AND THE SEARCH THAT SAID OTHERWISE WAS INCOMPLETE.** This block used to read
-    "I CANNOT FIND THAT IT EVER SHIPPED". Tom, 2026-09-15: *"This was an original feature. You can
-    see its vestige in a 'Zoom in to see labels' text in some version of some project file."* He is
-    right: `examples/Net3.lwn` carries a Text object `X3` reading exactly **"Zoom in to see
-    labels"**. The earlier pass searched `js/looped-network.js`, the language files, `dev/*.md` and
-    `git log -S` across all refs -- **and never searched `examples/`**, which is where the evidence
-    was. A negative finding is only as wide as the places it looked, and this one did not say where
-    it had not looked.
-  - **THE VESTIGE IS AN ANNOTATION, NOT A SETTING**, so it proves the BEHAVIOUR existed and says
-    nothing about the control's name, its units or its default. Somebody typed that sentence onto
-    the drawing to tell a reader what to do. Design from his sentence, not from the Text object.
-  - **What needs deciding before code:** the threshold's unit. A zoom level, a scale, or a
-    percentage of the fit zoom? A stored absolute is meaningless across two projects of different
-    extents, which argues for something relative to the drawing's own fit.
-  - `gridLayer`'s neighbour: the thematic toggle hides labels outright and label SHEDDING drops
-    label CONTENT when the drawing is crowded. This is a third thing and must not be folded into
-    either.
 - 50|667| **Tom's reflections on saving, locking and who can see your work.**
   **DROPPED TO 50 BY TOM, 2026-09-18.** Its urgent leg shipped -- (b), asking for initials only when
   a colleague wants in, is built on `feat/lock-initials-later` -- and (f) was extracted to Task 696
@@ -721,81 +745,7 @@ the block.
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
-- 100|247| **Customers: metered demands, lumped to the nearest node.**
-  Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
-  EPANET does not. **Design, his rulings, and what is built against what is not:
-  `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
-  left is his call.**
-  - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
-    connector, the two-click gesture and its one-click door, the **Count** (so
-    forty-two residential services are one symbol), the draggable attachment, the derived junction,
-    the detached state, a Customers tab, and the `.inp` answer.
-    `dev/lpn-spike/customer-harness.js`, 66 assertions.
-  - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
-    labels, the ramp, the Tables column, the popup's resolved Demand and both solvers pick a meter up
-    without knowing what one is. **The junction is DERIVED** -- the nearest end measured ALONG the
-    pipe, a different end from the nearest in a straight line on a bent one. **Additive: nothing a
-    meter does rewrites a number the user typed on a junction.**
-  - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
-    row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
-  - **THE ACCOUNT NUMBER IS GONE, AND A CUSTOMER CARRIES DESCRIPTION AND TAG INSTEAD** (2026-09-19,
-    his own two sentences): *"Didn't I say to trash Account number since they can just make a Custom
-    property for that or anything else?"* and *"Since Customer is a pseudo-node, what if we provide
-    existing properties like Description and Tag instead of Account number? Then we aren't inventing
-    something, and we incur no language debt."* The field, its two language keys and its column are
-    deleted; the popup, the Customers table, Find and Replace all use the two identity properties
-    every node and link already has. **A saved project's account number is CARRIED into the tag**
-    (into the description where a tag is already there), because a number that came out of a file is
-    the user's -- `customer-node-harness.js` §5 asserts all four cases. The `[DEMANDS]` CATEGORY
-    slot now carries the TAG, which is a better map than the old one: it is EPANET's own join key.
-  - **`feat/customer-find-labels` (2026-09-18) adds four things**, all from his message of that
-    day: custom properties respected in a customer's Properties box and Customers table; a Customer
-    scope in Find and replace; a demand PATTERN on a customer, reaching both solvers and the `.inp`;
-    and customer LABELS. Their placement is his own two fixed locations along the service line with
-    a drop if both are taken -- *"This much simpler than general node label placement."*
-  - **HIS BROWSER PASS OF 2026-09-19 REWROTE THE LABEL HALF OF THAT.** A customer label no longer
-    follows the node checkboxes: **Settings > Customer symbology** is a third section of its own
-    (*"since we may want only demand or only demand and description"*), the values are laid out on
-    ONE LINE the way a link label's are (*"Can we make labels one-line concats like link labels?"*),
-    and there is deliberately **no separate text size**. **THE SIZE WAS STILL WRONG AND THE
-    "it was only the stacking" ANSWER IS WITHDRAWN** (his screenshot, 2026-09-19): the zoom path
-    rewrote node, link and Text label sizes and not customers, so a customer label carried the size
-    of whatever scale it was last composed at -- 11 px beside a node label's 2.75 px at 4x.
-    Measured and guarded in `dev/lpn-spike/customer-label-size-harness.js`. The **symbol is 0.25 of
-    a junction and follows Symbol scale**,
-    replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
-    and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
-    rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
-    current view** capture button. **It does NOT match `feat/label-gang-search`'s, and copying that
-    one verbatim was the defect** (his 2026-09-21 pass): that branch's threshold IS `mapSpan('min')`
-    and this one is the view WIDTH in METRES, so the copy captured the height of a landscape window
-    (1,000 ft of a 2,000 ft view) and, on a geographic project, degrees into a box read as feet
-    (0.005 against 2,880). `dev/lpn-spike/customer-view-capture-harness.js`. The service line's
-    1 px floor is in the same harness; the rest of his service-line sentence -- shrinking BELOW a
-    pixel once the drawing stops growing -- is Task 705 and is deliberately not invented here.
-  - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
-    property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
-    selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
-    labelled and neither colourable; the largest is that a custom property can be searched,
-    replaced and typed and cannot be printed on the map or coloured by.
-  - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
-    customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
-    `customer-geometry` difference. A junction that never had one writes the same row either way.
-  - **THE LABEL PLACEMENT MYSTERY IS MEASURED, AND TOM WAS RIGHT** (2026-09-19,
-    `dev/lpn-spike/customer-label-cause-harness.js`). He guessed a LINK label was the conflict, was
-    first told it is not, and **that answer is withdrawn**: the fixture stood its customers at round
-    numbers on a main whose label repeats somewhere else, so the case was never on the drawing. A
-    neighbouring customer's label is the commonest blocker and that outcome is a shuffle; a link
-    label blocks too, and **that outcome is a SILENT DROP -- 2.4% of services on the pipe label's
-    own side, 1.2% on the far side**, measured on a random street.
-    **AWAITING HIS CALL:** a third position, letting a customer displace a link label, or making
-    the drop visible -- each spends something he chose. `dev/customer-demands.md` §6a.
-  - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
-    label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
-    so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
-    here is a pointer gesture no harness can hold.
-
-- 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+- 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
   recommendations."* Record, ranked list, per-runner audit: `dev/enforceable-rules-survey.md`.
   - **HALF A IS DONE.** 78 enforced, 4 left (rows 13, 14, 22, 23), each stating why no blocking
@@ -812,7 +762,7 @@ the block.
     29 keys reaching the tip helpers' `title=""` were unbound by rule B.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
-- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
+- 99|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
   `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
   write up** -- so the branch waits on his reading, not on more building.
@@ -1286,7 +1236,7 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 100|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+- 99|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
   performance win read as the bigger story: it is his top item *"because the network has to exist
   first."*
@@ -1904,6 +1854,13 @@ the block.
     has already passed in the browser. The limitation is now written at the top of the harness so it
     no longer implies coverage it does not have.
 
+- 100|708| **Every property in every venue: an audit, then a check.**
+  Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
+  multi-properties. Should we do an audit to ensure that all properties are represented in all
+  venues?"* Yes. Venues: the Properties box (single and multi-select), the Tables pane, Find and
+  replace, Settings symbology, labels, `.inp` export. Produce the element-by-venue matrix first, then
+  hold it with a check so a new property cannot ship in one venue only. Task 690 already asks the
+  popup-vs-table half.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
@@ -1918,40 +1875,6 @@ the block.
   - The mission scope is a 300 km system span (`dev/geographic-projects.md` §2b), so a drawing that
     genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
     world-wide first screen**, which every geographic project passes through.
-
-- 100|703| **The satellite tiles: still blank patches after everything measured so far.**
-  Tom, 2026-09-21, on a screenshot showing six large white rectangles across a satellite mosaic he
-  had left alone: *"Still missing some tiles. Usable, but frustrating. Not good for my reputation."*
-  - **SPLIT OUT OF TASK 646 ON HIS OWN WORDS** -- *"We are just fighting the Satellite tiles now,
-    and that's peripheral to this task."* 646 is closed; this carries the fight.
-  - **THREE CAUSES HAVE ALREADY BEEN FOUND AND FIXED AND THE SYMPTOM SURVIVES ALL THREE**, which is
-    the fact that should shape the next attempt. (1) Tiles were requested west-edge-across, so the
-    middle of the screen sat about 35th in a queue of up to 192. (2) Every wheel nudge deleted the
-    whole picture and threw away everything in flight. (3) **A tile whose request FAILED was never
-    asked for again** -- 33 knocked out of 105 stayed white after 30 seconds. Each was measured, each
-    was real, and none of them was the whole of it.
-  - **PERRY'S FOURTH IS NOW FIXED TOO, and it is the fifth cause rather than the last one**: a
-    direction-REVERSED gesture -- an ordinary overshoot-and-correct -- discarded a tile that had
-    already loaded and re-fetched it, because the "do we already have this" test read two buckets
-    and never the third one a tile sits in while a view is still loading. Every gesture the
-    earlier fixing rounds tested was one-directional. `basemap-cache-harness.js` section 5 is the
-    guard, mutation-tested, and it includes the half that bites: a reclaimed tile must LEAVE the
-    carry, or the release at the end of a still-pending paint takes it straight back off screen.
-  - **THE INSTRUMENT IS BUILT AND IT IS `?debug=tiles`** (feat/xy-world-map). Add `?debug=tiles`
-    to the page URL and a panel sits in the lower right saying, for the CURRENT view: wanted, from
-    cache, requested, arrived, drawn, failed, retried, still outstanding -- plus the source, the
-    zoom and whether a token is present -- and it names every failed tile with the reason the
-    network gave. It updates on every arrival and on a one-second tick, so a number that STAYS put
-    is the reading. `dev/lpn-spike/basemap-debug-readout-harness.js` grades the counts against
-    hand-worked outcomes and is mutation-tested. **The next report is his, not ours.**
-  - **A REASON NEEDS A SECOND REQUEST AND THAT IS WHY THE SWITCH EXISTS.** An SVG `<image>` error
-    event is one bit -- no status, no headers, no body -- so under the switch a failed tile's URL
-    is fetched once more and the answer is printed as given. **THE BYTE COUNT IS PART OF THE
-    ANSWER**: a URL-restricted token can refuse in 23 bytes, which looks like a delivered tile to
-    anything counting only success.
-  - Remember the token is URL-restricted: a satellite tile fetched from anywhere but hawsedc.com or
-    librewaternet.org is a 23-byte Forbidden reply that **looks like a delivered tile to anything
-    counting bytes**, and that has already cost one agent a whole wrong measurement.
 
 - 100|704| **An error and notice messaging system, because a banner that vanishes is a defect.**
   Tom, 2026-09-18, testing the lock work: *"The banner message about 'We asked your colleague to
@@ -2007,28 +1930,6 @@ the block.
   (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
-
-- 100|705| **Limit zoom symbol mapwise size growth.**
-  **HIS OWN TITLE, 2026-09-21**, replacing "New zoom rules: a symbol may not grow past a size the
-  network itself sets." **And he gave the go-ahead the same day:** *"New zoom rules: If you have no
-  questions or objections, you can proceed to implement this in a branch for me to test."* It is
-  building on `feat/zoom-symbol-size`. What follows was his discussion brief and stands as the
-  design.
-  - **(1) EVERY SYMBOL BUT A DECLARED EXCEPTION HAS A MAXIMUM MAP SIZE.** His starting proposal,
-    offered as a starting point and not a ruling: the junction is the reference, and **the maximum
-    junction map size is the 10th-percentile link length**. Reservoir and tank are the exceptions he
-    named.
-  - **(2) WHERE THE CONTROL LIVES, and he offered two shapes.** Either user settings under **Map and
-    page > Appearance**, near the maximum zoom for labels -- *"I love our user settings system"* --
-    or a derived rule with no control at all: the maximum symbol size is whatever it is at the
-    maximum label zoom, **so that once labels are hidden, symbols start shrinking on screen and stay
-    constant on the ground as you zoom out.** The second is the more elegant and costs no setting;
-    weigh it honestly rather than defaulting to a control.
-  - **(3) AND THIS TASK CARRIES THE RESTORATIONS, which must not be lost in the design:** *"Show
-    labels when zoomed to this map width or less"*, **Use current view**, and the Text object's
-    **Show at all zoom levels** toggle.
-  - Read with Tasks 669, 681 and 683. **This is a plan first** -- he asked to discuss.
-
 
 # Reference
 

@@ -42,6 +42,7 @@
         "projection",
         "custom-property",
         "674-coordinate-entry",
+        "tables-interface",
         "feat/customer-demands",
         "feat/time-series-graph",
         "feat/label-gang-search",
@@ -53,7 +54,10 @@
         "feat/lock-initials-later",
         "feat/engine-fetch-wait",
         "feat/notice-log",
-        "tables-interface"
+        "feat/zoom-symbol-size",
+        "feat/map-menu",
+        "tables-interface",
+        "feat/zoom-scale-rules"
     ],
     "feature_freeze": {
         "active": false,

@@ -7,37 +7,35 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 22 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
+**90 open tasks.** Next (100): 9 · Soon (75): 17 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 7
 
-## 100 — Next (22)
+## 100 — Next (9)
 
-- Task 247 — Customers: metered demands, lumped to the nearest node.
-- ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
-- Task 669 — Show labels at this zoom or closer.
+- Task 682 — Zoom on a PC with no wheel, and from the keyboard.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
+- Task 691 — Create a better error and notice messaging system.
+- Task 696 — File, Convert coordinates as: a working menu item, as a new project.
+- Task 697 — EPANET++ as a competing front door, on its own two domains.
+- ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
+- Task 708 — Every property in every venue: an audit, then a check.
+
+## 99 — Priority 99 (7)
+
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
-- Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 - Task 685 — Name every unit dropdown for a screen reader.
-- Task 688 — File, Convert units as: US to work in, SI to hand over.
-- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
-- Task 691 — Create a better error and notice messaging system.
-- Task 693 — Separate Length and Map coordinates units
-- Task 696 — File, Convert coordinates as: a working menu item, as a new project.
-- Task 697 — EPANET++ as a competing front door, on its own two domains.
-- Task 703 — The satellite tiles: still blank patches after everything measured so far.
-- ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
-- Task 705 — Limit zoom symbol mapwise size growth.
 
-## 75 — Soon (16)
+## 75 — Soon (17)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
+- ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
@@ -123,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-86 of 95 titles are within 4–12 words. `!` marks the rest;
+81 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

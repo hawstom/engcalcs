@@ -139,6 +139,10 @@ run_check "log format selftest"          blocking php dev/scripts/log_format_sel
 # looks fine -- plus the leg that matters most: the page must carry no total of the two consent
 # buckets, because one counts people and the other counts page loads.
 run_check "usage report selftest"        blocking php dev/scripts/usage_report_selftest.php
+# 2026-09-22, R-121/122/123: the mailed rank-by-shopping table had no heading and Tom guessed wrong
+# about what "people" and "page loads" meant. A fixture through the real dev/scripts/daily_report.sh
+# extraction, because the failure is a good-looking table with the wrong or missing heading.
+run_check "daily report selftest"        blocking php dev/scripts/daily_report_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
@@ -286,6 +290,19 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
 run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
+# Task 690, the spreadsheet-parity half. Every property in an element's property popup is also a
+# column in that element's table -- and, because multiGroups() derives its sections from
+# paneTables(), in the multi-properties box with it. Adding a popup field is a complete, working,
+# shippable change that nothing on this side of the wire can see the other half of; Tom found the
+# last one by opening the table looking for it (*"Initial quality is in no Table and no
+# multi-properties. Embarrassing"*). BOTH SIDES ARE DERIVED: the row builders are the functions
+# taking `fields` first and a `labelText` parameter, and the columns are buildPaneTables() with its
+# paneCol* helpers resolved. A RATCHET AT ZERO since 2026-09-19: it shipped advisory at 28 gaps, Tom
+# said "Fix all that was found", all 28 were closed and the flag turned over. The selftest is
+# blocking too, because every way this check can quietly stop working makes its count SMALLER, which
+# reads as progress on the very task it serves.
+run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
+run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
@@ -407,7 +424,7 @@ run_check "review queue selftest"        blocking php dev/scripts/review_queue_s
 # to that file, because dev/*.md's 31 dead citations are nearly all legitimate history.
 run_check "check table parity"           blocking php dev/scripts/check_table_parity_check.php
 run_check "check table selftest"         blocking php dev/scripts/check_table_parity_selftest.php
-run_check "CLAUDE.md paths resolve"      blocking php dev/scripts/doc_path_check.php
+run_check "start-of-session doc paths"  blocking php dev/scripts/doc_path_check.php
 run_check "doc path selftest"            blocking php dev/scripts/doc_path_selftest.php
 # The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
 # one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
@@ -521,7 +538,7 @@ if [ -n "$FAILED" ]; then
 fi
 if [ -n "$ADVISORY" ]; then
 	echo "Advisory findings above:$ADVISORY"
-	echo "Not blocking. Worth a look when convenient; see CLAUDE.md for what each one means."
+	echo "Not blocking. Worth a look when convenient; see dev/automated-checks.md for what each one means."
 fi
 echo "All blocking checks pass."
 

@@ -31,6 +31,11 @@ const { ROOT, byId, ensure, loadLoopedNetwork, setUnitSet } = require('./lpn-dom
 // at all -- a harness passing while the page it is testing is dead. Same note as terrain-harness.
 global.window.EngCalcs = global.EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-crs.js'));
+// The place-name search module, so section 13b can hold its Map-menu row to the same rule as Go to
+// (Tom, 2026-09-22). It registers through the page's lpnSearchInit() seam; nothing here sends.
+require(path.join(ROOT, 'js', 'lpn-search.js'));
+// And the attached-map arithmetic, which Go to on a georeferenced grid project travels through.
+require(path.join(ROOT, 'js', 'lpn-georef.js'));
 
 // **THE REAL proj4 AND THE REAL DEFINITIONS.** The point of this harness is the arithmetic that
 // puts a square on a plane, so stubbing the transform would remove the only thing being tested --
@@ -84,6 +89,9 @@ const L = loadLoopedNetwork(
 	// the gates that were left on isLatLonProject() when the basemap painter and the DEM controls
 	// were widened.
 	"\t\tmapRows: mapMenuRows, refreshTeaser: refreshBasemapTeaser,\n" +
+	"\t\tworldMapUsable: worldMapUsable, worldMapAttach: worldMapAttach,\n" +
+	"\t\tworldMapDetach: worldMapDetach, worldMapAttached: worldMapAttached,\n" +
+	"\t\tundo: undo, teaserPress: toggleBasemapTeaser, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tgoToLatLon: goToLatLon, satAvailable: satelliteAvailable,\n" +
 	// Task 692's audit: the last gate that asked the narrow question and meant the wide one.
 	"\t\tviewLonLat: viewLonLat,\n" +
@@ -556,45 +564,101 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 	// was refused the satellite it could perfectly well have drawn. **This is the third time the
 	// same word has been the defect** -- the DEM controls were section 10 -- so the gates are
 	// asserted here rather than left to be found on the page.
+	//
+	// **THE STREET-MAP AND SATELLITE MENU ROWS ARE RETIRED, 2026-09-22.** World map, Attach/Detach is
+	// now the on/off switch for every project kind and the corner teaser is still the street/satellite
+	// swap, so this section asks those two instead of the two rows they replaced.
 	{
 		const PC = global.EngCalcs.pageConfig;
 		PC.lpn_mapbox_token = 'pk.test';
 		const rowsFor = () => L.mapRows().filter((r) => r && !r.separator && !r.hidden);
 		const labels = () => rowsFor().map((r) => String(r.label || ''));
 		const has = (key) => labels().some((t) => t.indexOf(PC[key]) >= 0);
+		const teaserShown = () => { L.refreshTeaser(); return byId.lpn_basemap_teaser.style.display !== 'none'; };
 
 		// A lat/lon project is the reference: everything below must be true of it too, or the
 		// widening has moved a row rather than added one.
 		L.newProject('geo', '');
 		L.setCanvas(W, H); L.setMapSized();
-		ok('a lat/lon project offers the street map row', has('lpn_basemap_hide') || has('lpn_basemap_show'));
-		ok('...the satellite row', has('lpn_basemap_satellite_show') || has('lpn_basemap_satellite_hide'));
+		ok('a lat/lon project offers the World map row, enabled', (function () {
+			const row = rowsFor().find((r) => r.label === PC.lpn_map_attach_menu);
+			return !!row && row.disabled !== true;
+		}()));
+		ok('...the corner teaser (street/satellite swap)', teaserShown());
 		ok('...and Go to', has('lpn_goto_menu'));
+		// **RE-ADJUST/SCALE MAKE NO SENSE HERE** (Tom, 2026-09-22: "we align the streets with the
+		// project, never the project with the streets") -- a lat/lon project's coordinates already
+		// say where and how big it is, so there is nothing of ours to nudge.
+		ok('...and Re-adjust/Scale are disabled on a lat/lon project',
+			L.mapRows().find((r) => r.label === PC.lpn_map_attach_menu).submenu()
+				.filter((r) => r.label === PC.lpn_map_attach_readjust || r.label === PC.lpn_map_attach_scale_from)
+				.every((r) => r.disabled === true));
+
+		// **FROM THE STATE A NEW PROJECT OPENS IN -- THE MAP ALREADY SHOWING** (Perry's review,
+		// 2026-09-22, point 1). Attach there used to go through a setter that toggled OFF on the
+		// style already showing, so it turned the map off while its notice said it had attached it.
+		// Now Attach is greyed while attached, and does nothing if called anyway.
+		{
+			const sub = () => L.mapRows().find((r) => r.label === PC.lpn_map_attach_menu).submenu();
+			ok('set up: a new lat/lon project opens with the map showing', L.worldMapAttached() === true);
+			ok('...so Attach is GREYED and Detach is live', sub()[0].disabled === true
+				&& sub()[sub().length - 1].disabled !== true);
+			L.worldMapAttach();
+			ok('**Attach on a map already showing LEAVES IT SHOWING**', L.worldMapAttached() === true
+				&& L.basemapOn() === true);
+			L.setBasemapStyle('satellite');
+			L.worldMapDetach();
+			ok('Detach hides it', L.worldMapAttached() === false);
+			ok('...then Attach is live and Detach greyed', sub()[0].disabled !== true
+				&& sub()[sub().length - 1].disabled === true);
+			L.worldMapAttach();
+			ok('...and Attach brings back SATELLITE, the style that was showing', L.basemapOn()
+				&& L.getProject().basemap === 'satellite', L.getProject().basemap);
+			L.setBasemapStyle('osm');
+		}
 
 		L.newProject(null, ZONE12N);
 		L.setCanvas(W, H); L.setMapSized();
 		ok('a projected project can be located at all', L.locatable());
-		ok('**the satellite row is offered on a projected project**',
-			has('lpn_basemap_satellite_show') || has('lpn_basemap_satellite_hide'), labels().join(' | '));
-		ok('...and so is the street map row',
-			has('lpn_basemap_hide') || has('lpn_basemap_show'), labels().join(' | '));
-		ok('...and the corner teaser is not hidden', (function () {
-			byId.lpn_basemap_teaser.style.display = 'none';
-			L.refreshTeaser();
-			return byId.lpn_basemap_teaser.style.display !== 'none';
-		}()), byId.lpn_basemap_teaser.style.display);
+		ok('**the World map row is offered on a projected project, enabled**', (function () {
+			const row = rowsFor().find((r) => r.label === PC.lpn_map_attach_menu);
+			return !!row && row.disabled !== true;
+		}()), labels().join(' | '));
+		ok('...and the corner teaser is not hidden', teaserShown());
+		ok('a new EPSG project opens attached, and Attach there leaves it attached', (function () {
+			const was = L.worldMapAttached();
+			L.worldMapAttach();
+			return was === true && L.worldMapAttached() === true;
+		}()));
 		// The row has to WORK, not merely appear -- section 10b's lesson, where a widened gate met
-		// a second copy of the old question inside the command.
-		ok('...and pressing it actually paints satellite tiles', (function () {
-			const row = L.mapRows().filter((r) => r && !r.hidden && r.label
-				&& String(r.label).indexOf(PC.lpn_basemap_satellite_show) >= 0)[0];
-			if (!row) { return false; }
+		// a second copy of the old question inside the command. Attach on an EPSG project skips the
+		// wizard entirely (Tom: "when they attach, they don't have to do the wizard") -- it is only
+		// the tile switch, same as the retired Show-street-map row.
+		ok('...and Attach turns the tiles on with no wizard', (function () {
 			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
 			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
-			row.fn();
+			L.setBasemapStyle('off');
+			L.worldMapAttach();
+			return L.worldMapAttached() === true && L.tiles().length > 0;
+		}()), L.tiles().length + ' tiles');
+		ok('...and Detach turns them off again', (function () {
+			L.worldMapDetach();
+			return L.worldMapAttached() === false;
+		}()));
+		ok('...while pressing it actually paints satellite tiles once switched', (function () {
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+			L.setBasemapStyle('satellite');
 			return L.tiles().length > 0
 				&& L.tiles().every((t) => /mapbox/.test(String(t.href)));
 		}()), L.tiles().length + ' tiles');
+		// **AND EPSG DISABLES Re-adjust/Scale UNCONDITIONALLY** (Tom: "For EPSG projects, Re-adjust
+		// and Scale should be disabled unless there's user demand to expose them"). Even attached,
+		// there is no placement of ours to nudge -- the CRS transform already says where it is.
+		ok('...and Re-adjust/Scale stay disabled on an EPSG project even while attached',
+			L.mapRows().find((r) => r.label === PC.lpn_map_attach_menu).submenu()
+				.filter((r) => r.label === PC.lpn_map_attach_readjust || r.label === PC.lpn_map_attach_scale_from)
+				.every((r) => r.disabled === true));
 
 		// **GO TO IS THE ONE FOUND BY LOOKING RATHER THAN BY BEING TOLD.** Its menu row already
 		// read projectLocatable() -- widened on 2026-09-14 with the search row beside it -- while
@@ -614,21 +678,179 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 				v ? v.cx.toFixed(1) + ', ' + v.cy.toFixed(1) : 'no view');
 		}
 
-		// **AND A PROJECT THAT CANNOT BE LOCATED KEEPS EVERY ONE OF THEM SHUT.** A widening that
-		// also offers a dead row on a grid project has traded one defect for the same defect.
+		// **AND A PROJECT THAT CANNOT BE LOCATED IS DIFFERENT FOR World map, WHICH IS NEVER HIDDEN.**
+		// A widening that offers a dead row on a grid project has traded one defect for the same
+		// defect for Go to and the corner teaser; World map itself stays enabled on a grid project
+		// because that is the one kind it was ALWAYS offered to, through its own wizard.
 		L.newProject(null, '');
 		L.setCanvas(W, H); L.setMapSized();
 		ok('a grid project is not locatable', L.locatable() === false);
-		ok('...so it is offered no satellite row',
-			!has('lpn_basemap_satellite_show') && !has('lpn_basemap_satellite_hide'), labels().join(' | '));
-		ok('...no street map row', !has('lpn_basemap_show') && !has('lpn_basemap_hide'));
-		ok('...no Go to row', !has('lpn_goto_menu'));
+		ok('...but World map is still offered and enabled -- it has its own wizard', (function () {
+			const row = rowsFor().find((r) => r.label === PC.lpn_map_attach_menu);
+			return !!row && row.disabled !== true;
+		}()));
+		// Since 2026-09-22 the Go to row is SHOWN here and greyed, not hidden (Tom: "can show for
+		// unnamed CRS projects, but disabled when a world map is not attached").
+		ok('...the Go to row is present but disabled', (function () {
+			const row = rowsFor().find((r) => r.label === PC.lpn_goto_menu);
+			return !!row && row.disabled === true;
+		}()));
 		byId.lpn_basemap_teaser.style.display = '';
 		L.refreshTeaser();
 		ok('...and no corner teaser', byId.lpn_basemap_teaser.style.display === 'none');
 		asked = 0;
 		L.goToLatLon();
 		ok('...and Go to, called anyway, still refuses', asked === 0);
+	}
+
+	head('13b. EXACTLY THREE TOP ROWS, ON EVERY PROJECT KIND -- Tom, 2026-09-22');
+	// *"Keep all rows visible always. But disable what's not applicable... That got tidy. Only three
+	// rows left. Zoom to fit, Background image, and World map."* This is the assertion that the CORE
+	// three are always there, never hidden, on a grid, a lat/lon and a projected project alike --
+	// and that the four retired rows (Hide/Show street map, Hide/Show satellite images, Hide map
+	// readouts) are gone from all three.
+	//
+	// **AND GO TO AND SEARCH, ON TOM'S LATER WORD THE SAME DAY:** *"The last two menu rows showing
+	// for EPSG projects, Goto and Search, were not requested, but are nice, and can show for unnamed
+	// CRS projects, but disabled when a world map is not attached (no georeference)."* So both are
+	// present on all three kinds, enabled on lat/lon and EPSG, disabled on a bare grid -- and
+	// enabled again on that grid once its world map is attached.
+	{
+		const PC = global.EngCalcs.pageConfig;
+		// **THE FOUR RETIRED KEYS ARE DELETED, so this checks the actual English words rather than a
+		// pageConfig lookup that would just come back undefined and pass by accident.** If one of
+		// these phrases is ever the label of a live Map-menu row again, that is the regression.
+		const RETIRED = ['Hide street map', 'Hide satellite images', 'Hide map readouts',
+			'Show map readouts'];
+		function coreRows(kind, crs) {
+			L.newProject(kind, crs || '');
+			L.setCanvas(W, H); L.setMapSized();
+			const top = L.mapRows().filter((r) => r && !r.hidden && !r.separator);
+			return top;
+		}
+		[['grid', null, ''], ['lat/lon', 'geo', ''], ['EPSG', null, ZONE12N]].forEach(function (c) {
+			const top = coreRows(c[1], c[2]);
+			const labels = top.map((r) => r.label);
+			ok('the ' + c[0] + ' project offers Zoom to fit', labels.indexOf(PC.lpn_tool_zoom_extent) >= 0,
+				labels.join(' | '));
+			ok('...Background image', labels.indexOf(PC.lpn_backdrop_menu) >= 0, labels.join(' | '));
+			ok('...and World map, enabled', (function () {
+				const row = top.find((r) => r.label === PC.lpn_map_attach_menu);
+				return !!row && row.disabled !== true;
+			}()), labels.join(' | '));
+			ok('...and none of the four retired rows', RETIRED.every((r) => labels.indexOf(r) < 0),
+				labels.join(' | '));
+			const wantOn = c[0] !== 'grid';
+			const findRows = [PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()];
+			findRows.forEach(function (lab, i) {
+				const row = top.find((r) => r.label === lab);
+				ok('...' + (i ? 'Search' : 'Go to') + ' is present and ' + (wantOn ? 'enabled' : 'disabled'),
+					!!row && (row.disabled === true) === !wantOn,
+					row ? lab + ' disabled=' + !!row.disabled : 'missing: ' + lab);
+			});
+		});
+		// The grid case the other way: attach a world map and both come alive, because goToPoint()
+		// now travels through the attached map's transform.
+		L.newProject(null, '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.getProject().georef = { anchor: { x: 0, y: 0 }, origin: { lon: PHOENIX.lon, lat: PHOENIX.lat },
+			metersPerUnit: 0.3048, rotDeg: 0 };
+		{
+			const top = L.mapRows().filter((r) => r && !r.hidden && !r.separator);
+			[PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()].forEach(function (lab, i) {
+				const row = top.find((r) => r.label === lab);
+				ok('a grid project WITH the world map attached enables ' + (i ? 'Search' : 'Go to'),
+					!!row && row.disabled !== true, row ? String(row.disabled) : 'missing');
+			});
+			// And Go to must LAND on the right drawing coordinate, not treat x/y as degrees. 1000 ft
+			// east and 500 ft north of the anchor, through the map's own arithmetic.
+			const mpd = global.EngCalcs.lpnGeorefMetersPerDegree(PHOENIX.lat);
+			const target = { lat: PHOENIX.lat + 500 * 0.3048 / mpd.lat, lon: PHOENIX.lon + 1000 * 0.3048 / mpd.lon };
+			global.window.prompt = global.prompt = function () { return target.lat + ',' + target.lon; };
+			L.goToLatLon();
+			const v = L.currentView();
+			ok('...and Go to lands on the drawing point that latitude names',
+				!!v && Math.abs(v.cx - L.inwardX(1000)) < 1e-6 && Math.abs(v.cy - L.inwardY(500)) < 1e-6,
+				v ? v.cx.toFixed(3) + ', ' + v.cy.toFixed(3) : 'no view');
+			// Kept placement, map DETACHED: greyed again (Tom: "disabled when a world map is not
+			// attached").
+			L.getProject().basemap = 'off';
+			const top2 = L.mapRows().filter((r) => r && !r.hidden && !r.separator);
+			ok('...and a grid project with its placement kept but the map DETACHED greys both again',
+				[PC.lpn_goto_menu, global.EngCalcs.lpnSearchMenuLabel()].every(function (lab) {
+					const row = top2.find((r) => r.label === lab);
+					return !!row && row.disabled === true;
+				}));
+			delete L.getProject().basemap;
+			delete L.getProject().georef;
+		}
+	}
+
+	head('13c. UNDO PUTS THE MAP BACK ON THE CANVAS, NOT ONLY IN THE MENU -- Perry, 2026-09-22');
+	// undo() restored `project.basemap` but repainted only when `coords` changed, and Detach/Attach
+	// never change coords: after Ctrl+Z the submenu read attached over a canvas with no tiles. So
+	// every assertion here is a TILE COUNT -- what is painted -- and never the menu's opinion.
+	// (There is no redo command on this page, so there is no redo to assert.)
+	{
+		const PC = global.EngCalcs.pageConfig;
+		PC.lpn_mapbox_token = 'pk.test';
+		const n = () => L.tiles().length;
+		function kind(label, setup) {
+			setup();
+			L.setCanvas(W, H); L.setMapSized();
+			L.refreshBasemap();
+			const shown = n();
+			ok(label + ': set up, the map is painted', shown > 0 && L.worldMapAttached(), shown + ' tiles');
+			L.worldMapDetach();
+			ok('...Detach clears the canvas', n() === 0, n() + ' tiles');
+			L.undo();
+			ok('...**Ctrl+Z after Detach PAINTS THE TILES AGAIN**', n() > 0 && L.worldMapAttached(),
+				n() + ' tiles');
+			L.worldMapDetach();
+			L.worldMapAttach();
+			ok('...Attach paints them', n() > 0, n() + ' tiles');
+			L.undo();
+			ok('...**Ctrl+Z after Attach CLEARS THEM AGAIN**', n() === 0 && !L.worldMapAttached(),
+				n() + ' tiles');
+			L.worldMapAttach();
+			// The corner toggle: a style switch is its own undo step, and it is gone while detached.
+			const before = L.getProject().basemap || 'osm';
+			const depth = L.undoDepth();
+			L.teaserPress();
+			ok('...a corner-toggle switch takes exactly ONE undo step', L.undoDepth() === depth + 1);
+			ok('...and paints the other source', n() > 0 && L.getProject().basemap !== before,
+				String(L.getProject().basemap));
+			L.undo();
+			ok('...and Ctrl+Z puts the first source back ON THE CANVAS',
+				(L.getProject().basemap || 'osm') === before && n() > 0 &&
+				L.tiles().every((t) => /mapbox/.test(String(t.href)) === (before === 'satellite')),
+				String(L.getProject().basemap));
+			L.worldMapDetach();
+			byId.lpn_basemap_teaser.style.display = '';
+			L.refreshTeaser();
+			ok('...while DETACHED the corner toggle is hidden', byId.lpn_basemap_teaser.style.display === 'none');
+			const d2 = L.undoDepth();
+			L.teaserPress();
+			ok('...and a press that reaches it anyway re-attaches nothing and records nothing',
+				!L.worldMapAttached() && n() === 0 && L.undoDepth() === d2);
+			L.worldMapAttach();
+		}
+		kind('lat/lon', function () {
+			L.newProject('geo', '');
+			L.applyView({ cx: L.inwardX(PHOENIX.lon), cy: L.inwardY(PHOENIX.lat), s: 200 });
+		});
+		kind('EPSG', function () {
+			L.newProject(null, ZONE12N);
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+		});
+		kind('attached grid', function () {
+			L.newProject(null, '');
+			L.getProject().georef = { anchor: { x: 0, y: 0 }, origin: { lon: PHOENIX.lon, lat: PHOENIX.lat },
+				metersPerUnit: 0.3048, rotDeg: 0 };
+			L.applyView({ cx: L.inwardX(0), cy: L.inwardY(0), s: 0.5 });
+		});
+		delete L.getProject().georef;
 	}
 
 	head('14. The last reader the audit turned up -- where the New project box opens');

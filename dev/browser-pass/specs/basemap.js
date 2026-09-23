@@ -149,30 +149,34 @@ exports.run = async function ({ browser, report }) {
 		const dismissible = await a.page.$$('#lpn_basemap_credit button, #lpn_basemap_credit [aria-label*="lose"]');
 		report.eq(dismissible.length, 0, '...with nothing on it that closes it');
 
-		// ---- the toggle, and what it leaves behind ---------------------------------------------
+		// ---- the toggle, and what it leaves behind -----------------------------------------------
+		// **Hide/Show street map is RETIRED, 2026-09-22** -- World map, Detach turns the same tiles
+		// off now (Tom: "Detach and attach provide the same functionality").
+		const worldLabel = await a.lang('lpn_map_attach_menu');
+		const detachLabel = await a.lang('lpn_map_attach_remove');
 		const viewRows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(viewRows.includes('Hide street map'), 'View offers to hide the street map', viewRows.join(' | '));
-		await a.menuClick('Hide street map', 'map');
+		report.ok(viewRows.includes(worldLabel), 'Map offers the World map row', viewRows.join(' | '));
+		await a.menuClickSub(worldLabel, detachLabel, 'map');
 		await a.settle(400);
 		const afterHide = await a.page.evaluate(() => ({
 			tiles: document.querySelectorAll('.lpn-basemap image').length,
 			credit: document.getElementById('lpn_basemap_credit').style.display
 		}));
-		report.eq(afterHide.tiles, 0, 'hiding it removes every tile');
+		report.eq(afterHide.tiles, 0, 'World map, Detach removes every tile');
 		report.eq(afterHide.credit, 'none', '...and the attribution goes with them');
 
-		// ---- a grid project is untouched by all of it -------------------------------------------
+		// ---- a grid project still offers World map, but through its own wizard --------------------
 		await a.newProject();
 		await a.settle(500);
 		const gridRows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(!gridRows.some(l => /street map/i.test(l)),
-			'a grid project is offered no street map at all', gridRows.join(' | '));
+		report.ok(gridRows.includes(worldLabel),
+			'a grid project is offered World map too, never hidden', gridRows.join(' | '));
 		const gridState = await a.page.evaluate(() => ({
 			tiles: document.querySelectorAll('.lpn-basemap image').length,
 			credit: document.getElementById('lpn_basemap_credit').style.display
 		}));
-		report.eq(gridState.tiles, 0, '...and draws none');
-		report.eq(gridState.credit, 'none', '...and shows no attribution');
+		report.eq(gridState.tiles, 0, '...but draws no tiles until its own wizard attaches one');
+		report.eq(gridState.credit, 'none', '...and shows no attribution yet');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

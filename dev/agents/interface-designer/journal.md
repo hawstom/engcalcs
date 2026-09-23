@@ -2557,3 +2557,231 @@ unclaimed shape in the current 61-name table) is the correct new mark for "a lis
 precisely because it does not borrow either taken shape.
 
 No shipped file touched; nothing in the worktree touched either.
+
+---
+
+## 2026-09-22 — The "clock" is being read as a down arrow, and the read is not baseless
+
+Tom, twice: *"I like the down arrow glyph"* (R-144) and today, *"I like the down arrow or a +
+better than the clock."* He is looking at `'history'` after Perry's 2026-09-22 redraw and reading
+it as something it was never drawn to be. Worktree `feat/notice-log`, read only, at `cd98ae4e`.
+
+**A. What is actually drawn, and why a down-arrow reading is not a stray misread.** OBSERVED
+`lib/Icons.lib.php:824`: `<circle/><path d="M12 12V8"/><path d="M12 12H17"/>` — one stroke from the
+circle's center straight UP, one stroke from the same center straight RIGHT, a bare right angle
+with no arrowhead drawn on either end. OBSERVED, the same file's own comment directly above it
+(`:804-808`, Perry's review note): the shallow-angle version that preceded this one already
+"reads as a chevron or checkmark in a circle" at 14-16px — Perry's fix widened the angle to 90° to
+stop the two strokes fusing into one bent line, and a bare bent line with no hands-of-different-
+length cue left in it *is* the generic shape of a chevron. **The interaction makes the same read
+functionally apt, not just visually plausible**: OBSERVED `js/looped-network.js:45161`
+(`toggleMessageLogPanel`) — pressing this glyph opens a panel that appears below it, which is
+structurally identical to what this exact page's own disclosure caret already does at two other
+sites: OBSERVED `js/looped-network.js:18258` and `:28836`, both `m.textContent = '▾'`, both "click
+this glyph, a panel/menu appears below" (the pane-tab-menu caret and the project-tab caret). A
+third site, OBSERVED `js/looped-network.js:20183`, uses `▼` as a state indicator ("this column is
+sorted descending") rather than a button, but it is the identical shape carrying the identical
+directional idea one more time on the same page. **So a down-arrow reading of the message-log
+glyph is not confusion about clock hands — it is Tom correctly recognizing "press this, something
+appears below" and reaching for the mark this page already uses twice for exactly that gesture.**
+Building the glyph to actually be a down arrow/chevron would put a THIRD, different meaning
+("read my history") on a shape that already means "there is a menu here" and "this is how this
+column is sorted" — the one-shape-one-job collision this seat has flagged before on this same page
+(`select` vs `select-area`, `info` vs this control, both above in this file). **Recommendation: do
+not build a literal down arrow/chevron for this control.** The read is legitimate; the shape is
+already spoken for.
+
+**B. The `+`, re-argued from scratch rather than cited.** A plus sign on this page means "make a
+new one," checked directly rather than assumed: OBSERVED `lib/Icons.lib.php:53`, `'insert'` IS a
+plain plus sign (`M12 5v14M5 12h14`), and OBSERVED `js/looped-network.js:4646` and `:21693` — it is
+the icon on "New scenario…" and "New saved path…", i.e. it already carries "create a fresh one" as
+its live job on THIS page, not merely in the abstract. OBSERVED `js/looped-network.js:28871`, a
+second, independent `+`: a literal typed plus-character button for a new project tab, drawn the way
+Chrome's own new-tab `+` is (comment at `:28862` cites Chrome's placement directly). **The message
+log is the opposite kind of thing from either of those: it creates nothing, it is a read-only
+window onto things that already happened.** A `+` on it would tell a reader "press here to add a
+message," which is not what the control does and contradicts a live, load-bearing convention two
+call sites deep on the very same page. This is not a wording nuance to weigh against the down-arrow
+option — it is a plainer collision than the down-arrow one, because the down-arrow's problem is
+that its shape says the same true thing ("a panel opens below") that two other controls say for a
+different job, while the `+`'s problem is that its shape says something actively FALSE about this
+control's job. **Recommendation: do not build a `+` either, and more confidently than the
+down-arrow refusal above.**
+
+**C. Does removing the tooltip change which glyph is right?** Tom: *"I don't think we need a tip on
+the down arrow glyph... more trouble than help."* Yes, it changes the calculus, and in the direction
+of MORE caution about shape, not less. OBSERVED `js/looped-network.js:45174-45176`
+(`wireMessageLogButton`) currently still calls `setIconLabel(btn, 'history', ..., tip)`, so the tip
+is drawn but not yet removed in this worktree — the removal is Tom's instruction, not yet built.
+With no tooltip, the drawing is the ONLY thing naming the control: there is no hover text and no
+adjacent label to arrive at once a reader is already confused, so a shape that already has a claimed
+meaning elsewhere on the page (a down arrow, a plus) will resolve to THAT meaning with nothing left
+to correct it. A shape that is merely unfamiliar (a clock nobody has learned to name yet) costs a
+moment of "what is that," which a first click answers for good; a shape that is familiar but WRONG
+(a down arrow that isn't a menu, a plus that isn't a create) costs a *wrong* first click, or worse,
+a reader who never clicks because they've already filed it under "sort control" or "add row" and
+moved on. **Removing the tip raises the bar for shape correctness — it does not lower it — and is
+an argument for a mark whose only competing readings are "unfamiliar" rather than "familiar and
+wrong."**
+
+**D. Three candidate drawings, in words, ranked.**
+
+1. **Redraw the clock's hands, not its idea — fix what Perry's note diagnosed, without abandoning
+   the shape.** Put a small filled dot at the center pivot and separate the two hands to roughly a
+   50-60° spread (say, hour hand leaning left of noon, minute hand leaning right past 2) rather than
+   the 20° that fused into a checkmark or the 90° that reads as a bent line/arrow. The dot at the
+   hub breaks the two strokes into two visibly separate spokes radiating from a point, which is what
+   a clock face needs to read as hands-and-not-a-single-bent-line even at 14-16px; the wider, more
+   even spread keeps it a two-thing composition instead of a corner. **Cost: smallest of the three —
+   one more edit to a shape already drawn for this exact job, no new name, no new string, nothing
+   for `icon_name_check.php` to learn.** This is the one I would build first: it repairs the actual
+   defect (two strokes fusing into a false shape) at its source instead of trading it for a
+   different false shape.
+2. **A short stack of three ragged bars — a compact "list/feed" mark**, like three horizontal dashes
+   of decreasing length (top longest, bottom shortest, or vice versa), inside or beside the same
+   circle frame the toolbar's round buttons already use. This reads as "a list of short entries,"
+   which is literally what the panel holds, and is more literal than a clock about the CONTENT
+   rather than the act of logging it. OBSERVED: no existing icon in `lib/Icons.lib.php` draws three
+   stacked bars, so it collides with nothing drawn on this page. **Cost: real but moderate** — new
+   geometry to draw and check at 14-32px, and a caution rather than a blocker: three horizontal bars
+   is the web's own well-worn "hamburger menu" shape everywhere OUTSIDE this suite, so a visitor
+   arriving with that habit may read "menu" rather than "list of messages" on first sight, even
+   though nothing on THIS page currently uses that shape for a menu. Worth building only if the
+   clock repair (candidate 1) is tried and still reads wrong to him.
+3. **An open envelope or speech-bubble outline** — the generic "notification/message" family used
+   by mail and chat apps generally. Ruled last, not first, because this suite already has a real
+   envelope (`lib/Icons.lib.php:796`, `'mail'`) drawn for actual outbound contact/feedback ("Fix
+   something"), so reusing that family would put "read my own machine-generated log" and "send Tom a
+   message" under kin shapes on the same page — a softer version of the same one-shape-many-jobs
+   problem this whole diagnosis is about. **Cost: same order as candidate 2 (new geometry, new
+   render checks), bought for a shape that has to be drawn carefully unlike `mail`'s to avoid that
+   kinship.** Not recommended unless both above are tried and rejected.
+
+**E. The one paragraph.** The clock is not what Tom is seeing — the shape Perry widened into a
+right angle to fix a checkmark problem now reads, correctly for what the control DOES, as a down
+arrow, and that is a real collision: this exact page already uses a down-triangle twice to mean "a
+menu opens below" and once more to mean "this column sorts this way," so a third meaning on the
+same shape is the wrong fix even though the impulse ("it looks like it opens something below") is
+right. The `+` is a clearer no — this page already spends `+` twice on "make something new," and
+the message log makes nothing; it reads. Since the tooltip is being dropped, the drawing carries
+the whole job alone, which is a reason to want a shape that is at worst unfamiliar rather than one
+that is familiar and wrong. My recommendation is not "keep what you have" and not "build a real
+arrow or a plus" — it is a small further repair to the same clock: separate the two hands more and
+add a dot at the pivot so it reads as two hands from a hub rather than one bent line, which costs a
+few more path edits and no new name or string, before reaching for a different picture entirely.
+
+No shipped file touched; nothing in the worktree touched.
+
+---
+
+## 2026-09-23 — Undo for Settings: should the stack hold preference changes at all
+
+Tom asked me and the build seat together, off `dev/undo-audit.md`'s findings #3 and #4 (new-asset
+defaults + ID prefixes, and map-coloring: both save immediately with no undo snapshot). His question
+in his own words: *"I'd like your and Ida's advice about undo for Settings. It sounds nice."*
+
+### First check: is this actually a project-vs-furniture question? No — both sides are project data
+
+OBSERVED (`js/looped-network.js:24067`, `serializeProject()`): the entire `settings` object —
+`idPrefixes`, `defaults`, `colorNodeField`/`colorLinkField`, units, hydraulics, quality, energy,
+custom property designs, everything the Settings box edits except the one `Page` sub-heading it
+labels as excluded — rides in the saved file. CLAUDE.md's `lpn_` furniture rule (window position,
+pane width — the browser's business) does not apply here at all; every Settings row this audit is
+about is modelling data, same axis as a pipe's diameter. **So "is it project data" cannot be the
+test that separates the sections, because the answer is yes for all of them.** I went in expecting
+this to settle it and it does the opposite — it removes the one clean dividing line CLAUDE.md
+supplies and leaves the actual product judgment fully open.
+
+### The dividing line that actually exists in the code today: visible effect at the moment of the edit
+
+OBSERVED (`js/looped-network.js:35608`, `defaultRow()`; `:35645`, the ID-prefix `input`): typing a
+new default diameter or a new ID prefix changes `settings.defaults[key]` / `settings.idPrefixes[key]`
+and calls `saveToStorage()`. **Nothing on screen moves.** No element redraws, no label changes,
+because nothing existing reads these values — they are read once, later, at the moment a NEW element
+is created (`seedDefaultInputs()`, `niceDefault()`). Pressing Ctrl+Z the instant after typing one
+would have nothing visible to restore even if it worked.
+
+OBSERVED (`js/looped-network.js:19011-19070`, `buildColoringSection()`, the `fieldSelect()` handler
+at `:19063`): choosing a thematic color field calls `refreshValueColors()` before `saveToStorage()`
+— **every existing node or link on the map recolors immediately.** This is the one Settings control
+in the audit's scope whose edit has an on-canvas, visible-right-now effect, which is exactly the
+property every genuinely-undoable action in this app already shares (`snapshotDragOnce()` for a
+drag, `saveUndoSnapshot()` before a delete or an add). Colouring is architecturally closer to those
+than to the defaults/prefix boxes sitting one section over from it.
+
+OBSERVED (`js/looped-network.js:42185-42237`, `applyIdPrefixToAll()`): the "Apply to all" button
+beside each ID-prefix box — which actually RENAMES every matching element's id — already calls
+`saveUndoSnapshot()` at `:42221`, correctly, because it is a real document rewrite with a visible
+result (every affected element's printed ID changes). **The audit's #3 finding is precise: the
+PREFERENCE (what a *future* element will be called) has no snapshot; the one operation in that same
+section that actually touches *existing* elements already has one.** The gap is exactly at the
+boundary this section argues for, not evidence the boundary is wrong.
+
+### Precedent: does established software put preference changes on the main undo stack
+
+CITED (Autodesk, "UNDO (Command)," help.autodesk.com, read 2026-09-23 — the official command
+reference, fetched directly): *"UNDO has no effect on some commands and system variables, including
+those that open, close, or save a window or a drawing, display information, change the graphics
+display, regenerate the drawing, or export the drawing in a different format."* Community threads
+confirm this by naming the concrete cases: `CLAYER` (current layer) and `CECOLOR` (current color) —
+the settings that decide what a *newly drawn* entity gets — are excluded from `U`/`UNDO` by design.
+**That is the exact shape of our new-asset defaults and ID prefixes**: a value read only at the
+moment something new is created, not a property of anything already on the sheet. AutoCAD's own
+documented answer to "should changing a new-entity default be undoable" is no.
+
+CITED (QGIS issue tracker, `github.com/qgis/QGIS` issue #50110, read 2026-09-23, and the Layer
+Styling panel documentation it references): a QGIS layer's SYMBOLOGY — its thematic coloring, the
+closest existing-software analog to this page's map-coloring section — has *"a History tab available
+in the Layer Styling panel"* that is a **separate undo history scoped to the styling panel itself**,
+distinct from the map canvas's own edit undo/redo. QGIS did not decide between "on the main stack" or
+"no undo at all" for this exact category of thing; it built a **third, local history** the audit's
+brief asked me to weigh and that is real, shipping precedent for it rather than an invention.
+
+### Weighed against Tom's own worry, and against mine
+
+Tom's brief already names the danger correctly: a stack mixing "I moved a pipe" with "I changed the
+default diameter for new junctions" makes Ctrl+Z unpredictable, because a press restores whatever is
+NEXT on the stack, not whatever the reader is looking at. For the defaults/prefix boxes this is worse
+than unpredictable — it is invisible: even if undone correctly, nothing on screen would change, so a
+reader who pressed Ctrl+Z expecting to see something happen would see nothing and reasonably conclude
+undo is broken again, which is the exact complaint this whole audit started from. **An invisible undo
+is a worse defect than no undo**, not a smaller version of the same feature.
+
+For coloring the danger is smaller but not zero: it is visible, but it would still sit on the same
+stack as ordinary drawing edits, so a reader who changes the color field and then edits a pipe and
+then presses Ctrl+Z twice gets the pipe edit back first and the recoloring back second (or the
+reverse), in an order that has nothing to do with which one they meant to undo. Joining the main
+stack buys visibility at the cost of the same interleaving problem, for a control that is used rarely
+compared to drawing edits.
+
+### The recommendation
+
+**Do not put any Settings section on the main Ctrl+Z stack. Leave findings #3 and #4 exactly as they
+are.** Both are consistent with how the rest of the Settings box already behaves — units, hydraulics,
+energy, quality, custom-property design all save immediately with no snapshot too, and #3/#4 are not
+outliers against that pattern, they are the pattern. Making colouring undoable while every other
+Settings row stays immediate-save would be the actual new inconsistency, not a fix for one.
+
+**If Tom wants a safety net specifically for map-coloring** — the one section where the argument for
+it is real, because the effect is visible — the right shape, on QGIS's own precedent, is a small
+**local control scoped to that section alone** ("Reset color settings," reverting `colorNodeField` /
+`colorLinkField` / the ramp to what they were when the Settings box was last opened), never a join
+onto the global stack. That is a few hours of work, one new string, and it cannot collide with a
+drawing edit's own Ctrl+Z the way a shared stack would. Not urgent, and not recommended as more than
+an option — nobody has reported losing a color scheme by accident the way Tom reported losing a Base
+demand value.
+
+**One paragraph for Tom, in his language, as asked:** Leave Settings out of Undo — it sounds nicer
+than it would feel. Everything in the Settings box already saves the moment you change it, on
+purpose and consistently, and that is correct: a "default diameter for new junctions" or an ID
+prefix has no effect on anything already drawn, so pressing Ctrl+Z after changing one would show you
+nothing happening even if it worked — which reads as "undo is broken" again, the exact complaint
+that started this. AutoCAD draws this same line in its own official documentation: the "what a new
+entity gets" settings are explicitly excluded from Undo, by design, industry-wide. The one Settings
+control that's genuinely different is map-coloring, because it repaints the whole drawing the moment
+you touch it — if you ever want a safety net there, the right shape (borrowed from how QGIS handles
+the same kind of control) is a small "Reset" link local to that one section, not a join onto the
+drawing's own Ctrl+Z — never mix "I changed how the map is colored" onto the same stack as "I moved a
+pipe," because pressing Ctrl+Z then stops reliably undoing the last thing you actually did.
+
+No shipped file touched.

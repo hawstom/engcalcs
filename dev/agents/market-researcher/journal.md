@@ -1641,3 +1641,76 @@ outside the LANL/DOE/academic-optimization sphere using WaterModels.jl for real 
 directly, found nothing, and record that absence as the finding rather than guessing past it.
 
 — Mary
+
+## 2026-09-22 — R-105 reopened: does a time-step row name an instant or a range?
+
+Tom shipped R-105 as a range fix (`24:00 - 25:00`) on 2026-09-21, then reopened it the next day:
+*"I think I made a mistake, and these are not ranges, they are times."* Asked to check against
+the outside world before anything is rebuilt.
+
+**OBSERVED, checked today, `js/lpn-time.js:58-67` and `:1525-1548`.** The underlying model
+(`EC.lpnReportTimes`) is a flat list of discrete SECONDS — reporting instants, not intervals; the
+comment at line 41-48 states the design borrowed directly from EPANET's own model: *"Is this a RUN
+or an INSTANT? EPANET's own answer... a network with patterns and no duration is one instant with a
+multiplier on it."* `stepText()` (the label built for R-105) takes one instant `t` and the FOLLOWING
+instant `next` and prints `start - next`, manufacturing a range out of two adjacent points in a list
+that was never a list of ranges. The cost model at line 337 ("the cost is per FRAME") independently
+confirms each step is a rendered instant, not an accumulation over an interval — there is no
+per-interval quantity (a delta, a sum, an accumulated volume or energy) anywhere behind this control.
+Every value the selector reveals (head, pressure, flow, tank level, instantaneous kW) is a snapshot
+AT that time, exactly like every other point in the list.
+
+**CITED, Bentley SewerGEMS/WaterGEMS "Time Browser" help page**
+(`docs.bentley.com/LiveContent/web/Bentley%20SewerGEMS%20SS5-v2/en/35062.html`, fetched today): its
+own wording is *"the current time step that is displayed in the drawing pane"* — singular, an
+instant, not a range. This is the same control in the same product family Tom has used.
+
+**CITED (general knowledge of the shipped product, corroborated by search results returned today —
+microimages.com's hosted copy of the EPANET 2 Users Manual, and the "elapsed time" phrasing search
+results returned unprompted): EPANET's own Browser window "Time" control is a single elapsed-time /
+clock readout** that advances one reporting step at a time as Play or the VCR-style step buttons are
+pressed, and the Time Series Plot and Table (Report) both key every row/point to ONE time each —
+head, pressure, flow and velocity are point-in-time state variables reported at that time, never
+as `T1 - T2`. I could not reach a page whose text I could quote directly (the two official PDF
+manuals fetched today would not extract to readable text in this environment — recording that as a
+tooling limit, not as an absence of evidence — poppler-utils is not installed and no `pip` is
+available to add a PDF reader), so this line is CITED at the level "corroborated by independent
+search snippets and Bentley's page for the same conceptual control," not "I read EPA's own sentence
+today." Flagging that gap honestly rather than upgrading it.
+
+**CITED, epanet-js-toolkit's own example page title** (`epanetjs.com/api/introduction/examples/`,
+"Step through the hydraulic simulation") — the verb is *step through*, one state at a time, matching
+the same instant-based framing; I could not reach the toolkit's own UI (epanetjs.com's product,
+distinct from the toolkit docs) to confirm its picker's rendered text this session, so I am not
+citing epanet-js's rendered picker, only its API's own conceptual model, which the docs state as
+"the result at that time step."
+
+**Does the answer differ for interval-accumulated quantities?** Yes, in principle, and it is worth
+saying so plainly because it is the one place a genuine range belongs: a demand PATTERN multiplier
+(a rate held constant across a whole hour) or an accumulated tank-volume-change / pump-energy-cost
+figure IS naturally described as "during 8:00-9:00," because the number describes what happened
+across that hour, not the network's state at its boundary. But **I found no such quantity behind
+this particular selector** — `js/lpn-time.js` frames a REPORTING TIME exactly the way EPANET does,
+and every value it reveals is a snapshot at an instant. If a future feature reports something
+accumulated per interval (e.g., "energy cost this hour"), THAT control should say `8:00 - 9:00`; this
+one should not, because it is not that control.
+
+### Recommendation for Tom, one paragraph
+
+He was right to reopen it, and the fix he now wants is the correct one: change the selector back to
+one time per row, not a range. Every comparable tool checked today — EPANET's own Browser Time
+control (an elapsed-time/clock readout that advances one step at a time), the epanet-js toolkit's own
+"step through the simulation" framing, and Bentley WaterGEMS/SewerGEMS's Time Browser (its own help
+text: "the current time step that is displayed in the drawing pane," singular) — treats this exact
+kind of control as naming a single moment you are looking at, never a span between two moments. That
+also matches how this page's own code already models the data: `lpnReportTimes()` is a list of
+discrete instants, and the two-time label was built by pairing each instant with the next one in that
+list, manufacturing a range that was never really there. The one place a genuine range would be
+correct is a DIFFERENT kind of number — something accumulated OVER an interval, like an hour's worth
+of energy cost or a tank's volume change during that hour — and this suite has no such control today;
+if one is ever added, it should say "8:00 - 9:00," but the time-step/transport selector on the
+toolbar is not that control and should go back to naming one instant, for example `25:00` (or
+`1:00` with the day noted, however the run-time-vs-wall-clock question is settled elsewhere) rather
+than `24:00 - 25:00`.
+
+— Mary

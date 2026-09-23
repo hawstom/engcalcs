@@ -118,15 +118,20 @@ exports.run = async function ({ browser, report }) {
 		GOTO_ROW = await a.lang('lpn_goto_menu');
 
 		// ---- 1. where the row is, and is not ---------------------------------------------------
-		let rows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(!rows.includes(SEARCH_ROW),
-			'an XY project has no Search row — its x and y have no place on the Earth',
-			'hidden rather than greyed, exactly as the Go to… row is');
+		// **GREYED, NOT HIDDEN, SINCE 2026-09-22**, exactly as the Go to… row is (Tom: "can show
+		// for unnamed CRS projects, but disabled when a world map is not attached").
+		let full = await a.menuRows('map');
+		let srow = full.find(r => r.label === SEARCH_ROW);
+		report.ok(!!srow && srow.disabled,
+			'an XY project with no world map shows Search greyed — its x and y have no place on the Earth yet',
+			srow ? 'disabled=' + srow.disabled : full.map(r => r.label).join(' | '));
 
 		await a.newGeoProject();
 		await a.settle(500);
-		rows = (await a.menuRows('map')).map(r => r.label);
-		report.ok(rows.includes(SEARCH_ROW), 'a lat/lon project offers it on the View menu');
+		full = await a.menuRows('map');
+		srow = full.find(r => r.label === SEARCH_ROW);
+		report.ok(!!srow && !srow.disabled, 'a lat/lon project offers it, live, on the Map menu');
+		let rows = full.map(r => r.label);
 		report.ok(rows.includes(GOTO_ROW),
 			'...beside Go to a latitude and longitude, not merged with it',
 			'two commands, two kinds of input, two ways of failing');
