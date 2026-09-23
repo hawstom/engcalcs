@@ -5228,6 +5228,13 @@ var EngCalcs = EngCalcs || {};
 			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
 			// from the current view rather than asking anyone to guess one.
 			//
+			// **0 = NEVER draw a generated label, at any zoom** (Task 712, 2026-09-23, replacing
+			// "Thematic map (colors only)" -- Tom: *"Should we do the same for all labels and use
+			// that to replace the 'Thematic map, no labels' setting?"*). Mirrors the customer row's
+			// own 0 ("Type 0 to leave customers unlabelled."). null and 0 are DIFFERENT stored
+			// values read differently in labelWidthLimitSI() -- null is "no threshold", 0 is a real
+			// threshold nothing is ever narrower than.
+			//
 			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
 			// asked for the day before: *"I'd prefer not to have two rules."*). See
 			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
@@ -5321,10 +5328,6 @@ var EngCalcs = EngCalcs || {};
 			colorClassesLink: 7,
 			colorReverseNode: false,
 			colorReverseLink: false,
-			// Task 327's thematic map: colour is the whole message, so the GENERATED labels come
-			// off. It never touches labelSettings, and it is one of three suppressors read by
-			// applyLabelVisibility() -- see there. It does NOT hide the user's own Text (Task 428).
-			colorThematic: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
 			//
@@ -9162,10 +9165,18 @@ var EngCalcs = EngCalcs || {};
 		return toSI(v, 'lpn_u_length');
 	}
 	function customerLabelWidthLimitSI() { return viewWidthLimitSI(labelSettings.customerMaxWidth); }
-	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
-	// project's own length unit, so a project in feet keeps the number its reader typed and changing
-	// the unit REINTERPRETS it, exactly as every other typed number on this page.
-	function labelWidthLimitSI() { return viewWidthLimitSI(settings.labelMaxWidth); }
+	// **THE LABELING THRESHOLD IN METRES, `null` for "no threshold" (always draw), or 0 for a real
+	// threshold nothing is ever narrower than (never draw).** `viewWidthLimitSI()` collapses both
+	// "blank" and "0" to the same 0, which is right for the customer row (it has no "always" state)
+	// but wrong here, where blank and 0 are Tom's two different answers -- so this reads
+	// `settings.labelMaxWidth` directly rather than going through that shared converter. The stored
+	// number is in the project's own length unit, so a project in feet keeps the number its reader
+	// typed and changing the unit REINTERPRETS it, exactly as every other typed number on this page.
+	function labelWidthLimitSI() {
+		if (settings.labelMaxWidth === 0) { return 0; }
+		var lim = viewWidthLimitSI(settings.labelMaxWidth);
+		return lim > 0 ? lim : null;
+	}
 	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
 	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
 	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
@@ -19440,27 +19451,14 @@ var EngCalcs = EngCalcs || {};
 
 		// ---- WHAT IS TRUE OF NODE LABELS AND LINK LABELS ALIKE ----------------------------------
 		//
-		// **THEMATIC MAP STANDS UNDER "Node and link"** (Tom, 2026-08-19: "Move Thematic map to the
-		// Node and link section"). It hides EVERY label so that only the colours are left, which is
-		// as true of a node's label as of a link's -- filed inside either colouring group it read as
-		// belonging to that one kind of element, which is the same misreading the high/low mark and
-		// the separator were moved out of.
-		//
-		// **STILL A MODE, NOT A DEFAULT** (Task 327): it suppresses the labels and does not touch
-		// labelSettings, so switching it off brings the user's own choices back untouched -- which is
-		// what the tip promises, and why the tip travels with the row rather than staying behind.
-		// Moving where a control is DRAWN changes nothing about what it does.
-		var them = document.createElement('input');
-		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
-		them.addEventListener('change', function () {
-			// renderLabelsLegend() too: the labels key is hidden in thematic mode (Tom, 2026-08-20),
-			// so the checkbox that turns the mode on is one of the two things that change whether it
-			// is on screen. Without this the key stays until the next solve repaints it.
-			settings.colorThematic = them.checked; refreshValueColors(); renderLabelsLegend();
-			saveToStorage(); syncColorControls();
-		});
-		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map (colors only)', them,
-			pc.lpn_settings_color_thematic_tip);
+		// **"Thematic map (colors only)" IS RETIRED** (Tom, 2026-09-23: *"I noticed that we have a
+		// tip saying that 0 is never for Customer labels. Should we do the same for all labels and
+		// use that to replace the 'Thematic map, no labels' setting?"*). Everything the checkbox did
+		// -- labels off, the user's own Text stays, label choices are kept, the legend hides --
+		// now follows from the labeling threshold (below, in Map display) being typed as 0. A row
+		// that only duplicated a state the threshold already reaches is one fewer thing to explain.
+		// See applyLabelVisibility() and renderLabelsLegend() for where the 0 case is read, and the
+		// migration in applySaved() for a project that still carries the old flag.
 
 		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
 		//
@@ -26697,6 +26695,14 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		delete settings.colorFrozenBreaks;
+		// **A PROJECT SAVED WITH "Thematic map (colors only)" ON OPENS WITH LABELS OFF** (Task 712,
+		// 2026-09-23, retiring that checkbox in favour of the labeling threshold read as 0). **0
+		// WINS over a saved positive threshold**: the last thing that project's reader saw was no
+		// labels at all, not labels past some particular width, so the state that reproduces the
+		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
+		// read a stale one and disagree with the map.
+		if (savedSettings.colorThematic) { settings.labelMaxWidth = 0; }
+		delete settings.colorThematic;
 		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
 		// count and the reverse flag were one each for the whole map until they split per element
 		// class; a document written then carries the single key, and both groups take its value,
@@ -36207,15 +36213,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
 		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
-		// **THEMATIC MODE HIDES THIS LEGEND** (Tom, 2026-08-20). Thematic is the mode that
-		// strips the drawing back to colour alone -- it already switches the data labels off
-		// -- so a key naming the label fields is a key to lettering nobody can see. The colour
-		// legend is the one that belongs on a thematic map and it is a different element
-		// (colorLegendBox), so this hides without touching that one.
+		// **THE LABELING THRESHOLD HIDES THIS LEGEND WHEN IT HIDES EVERY LABEL** (Tom, 2026-08-20,
+		// on the retired "Thematic map" checkbox; folded into the threshold at Task 712). A
+		// threshold of 0, or any view wider than it, already switches the data labels off, so a key
+		// naming the label fields is a key to lettering nobody can see. The colour legend is the one
+		// that belongs on a map with no labels and it is a different element (colorLegendBox), so
+		// this hides without touching that one.
 		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
-		// chrome the placement never touches.
-		box.style.display = (any && !galleryIsUp() && !settings.colorThematic && !legendIsOff(settings.legendPosition))
-			? '' : 'none';
+		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
+		// the read that keeps that exclusion true.
+		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
+			!legendIsOff(settings.legendPosition)) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -36746,12 +36754,27 @@ var EngCalcs = EngCalcs || {};
 	// `atScale` is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in
 	// force. The quantity is visibleMapMetres(), the one the customer-label gate and both capture
 	// buttons read, so a captured view cannot disagree with the gate it feeds (R-090).
+	// **A GENUINE POSITIVE THRESHOLD, EXCEEDED -- 0 IS DELIBERATELY NOT READ HERE.** This feeds the
+	// per-label "Show at all zoom levels" rule below, which is meant to go with a real width the
+	// reader typed and captured, exactly as before Task 712. 0 is unconditional rather than a width
+	// to be "past", and Tom's ruling on it (*"Should we do the same for all labels and use that to
+	// replace the 'Thematic map, no labels' setting?"*) keeps the old thematic checkbox's own
+	// promise that a Text label survives -- see labelsFullyHidden() for the unconditional case.
 	function labelsPastThreshold(atScale) {
 		var lim = labelWidthLimitSI(), wide;
-		if (!(lim > 0)) { return false; }
+		if (!(lim > 0)) { return false; }   // null (no threshold) or 0 (unconditional, see below)
 		wide = visibleMapMetres(atScale);
 		// A view we cannot measure is not one we refuse to label -- customerLabelsAttempted()'s rule.
 		return wide > 0 && wide > lim;
+	}
+	// **UNCONDITIONAL: GENERATED ANNOTATION IS HIDDEN, at 0 or past a real threshold.** Task 712
+	// folded "Thematic map (colors only)" into a labelMaxWidth of 0, which must reach
+	// `dataLabelsHidden` (so node and link labels come off) and the labels legend (so its key
+	// vanishes with them) -- but must NOT reach labelsPastThreshold() above, or a Text label with
+	// "Show at all zoom levels" off would disappear too, which is the one thing Tom's ruling did
+	// not ask for and the old checkbox never did either.
+	function labelsFullyHidden(atScale) {
+		return settings.labelMaxWidth === 0 || labelsPastThreshold(atScale);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -36788,10 +36811,11 @@ var EngCalcs = EngCalcs || {};
 	// a rule of its own. What the OR governs is `.lpn-annotation`, so no suppressor can ever reach
 	// authored content again by construction.
 	//
-	// Three suppressors:
+	// Two suppressors:
 	//   * generated annotation is off while the project is being placed on the map;
-	//   * thematic mode: colour is the message, so the lettering comes off;
-	//   * the view is wider than the labeling threshold.
+	//   * the view is wider than the labeling threshold -- and a threshold of 0 is past at every
+	//     zoom, which is how "Thematic map (colors only)" was retired (Task 712): colour the
+	//     message by typing 0 into the one threshold rather than a second switch.
 	// And two per-label rules:
 	//   * a Text label switched off in this scenario is not there at all (the MODEL, not the view);
 	//   * a Text label whose "Show at all zoom levels" is UNticked goes with the threshold.
@@ -36807,9 +36831,13 @@ var EngCalcs = EngCalcs || {};
 		// the rule for the georef case: "only elements including text". A Text object is a note
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
-		// **AND THE THIRD SUPPRESSOR IS THE LABELING THRESHOLD** (Tasks 669 and 705).
+		// **AND THE SECOND SUPPRESSOR IS THE LABELING THRESHOLD, 0 INCLUDED** (Tasks 669 and 705;
+		// Task 712 folded thematic mode into it). `dataLabelsHidden` reads the UNCONDITIONAL
+		// labelsFullyHidden() (0 or a real threshold exceeded); the per-label loop below reads
+		// `past` -- labelsPastThreshold() alone, a real threshold only -- because a Text label's
+		// own "Show at all zoom levels" rule must not fire on 0 (see labelsFullyHidden()'s comment).
 		var past = labelsPastThreshold(state.s);
-		dataLabelsHidden = !!(georefActive() || settings.colorThematic || past);
+		dataLabelsHidden = !!(georefActive() || labelsFullyHidden(state.s));
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
 		// labels only, typically a handful, so the loop is cheap.
@@ -37719,6 +37747,11 @@ var EngCalcs = EngCalcs || {};
 		// worth, presses the button, and the view's width becomes the number. Blank is "always",
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
+		// **0 IS "NEVER"** (Task 712, 2026-09-23), mirroring the customer row's own 0 -- the tip
+		// says so, in the customer tip's own wording. This is what replaced "Thematic map (colors
+		// only)": type 0 here for colour with no lettering, instead of a second switch that did the
+		// same thing a different way.
+		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
 		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
 		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
@@ -37730,11 +37763,15 @@ var EngCalcs = EngCalcs || {};
 		lmwInput.id = 'lpn_set_label_max_width';
 		lmwInput.style.width = '7em';
 		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
-		lmwInput.value = labelWidthLimitSI() > 0 ? String(settings.labelMaxWidth) : '';
-		// Blank, zero or anything unreadable is "no threshold", stored as null -- the value a
-		// project that has never been asked carries, so there is exactly one way to say it.
+		lmwInput.value = (typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth) &&
+			settings.labelMaxWidth >= 0) ? String(settings.labelMaxWidth) : '';
+		// Blank or anything unreadable is "no threshold", stored as null -- the value a project that
+		// has never been asked carries, so there is exactly one way to say it. **0 IS A REAL ANSWER
+		// here ("never show a label"), so this is a type test and never a truthiness one** --
+		// `v || null` would silently turn the one setting that says NEVER back into "always",
+		// exactly the trap `labelSettings.customerMaxWidth`'s own comment names.
 		function setLabelMaxWidth(v) {
-			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v > 0) ? v : null;
+			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v >= 0) ? v : null;
 			lmwInput.value = settings.labelMaxWidth === null ? '' : String(settings.labelMaxWidth);
 			labelThresholdChanged();
 			saveToStorage();

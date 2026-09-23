@@ -2901,7 +2901,9 @@ $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map wi
 // **NO LONGER SAYS ANYTHING ABOUT SYMBOL SIZE** (Task 705, Tom, 2026-09-22: *"I'd prefer not to have
 // two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
 // growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.';
+// **0 IS NEVER, IN THE CUSTOMER TIP'S OWN WORDING** (Task 712, 2026-09-23, replacing "Thematic map
+// (colors only)"). See lpn_labels_customer_width_tip below for the pattern this follows.
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom. Text you placed yourself stays, and your label choices are kept either way.';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // **THE ONE MAXIMUM-SYMBOL-SIZE RULE** (Task 705, his own wording, 2026-09-22: *"Prevent nodes from
 // scaling larger than __ times the length of the __ percentile pipe"*). Split across three keys
@@ -2960,8 +2962,6 @@ $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color f
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
 $ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
-$ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
-$ec_lang['lpn_settings_color_thematic_tip']='Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band boundaries';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
