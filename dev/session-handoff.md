@@ -132,7 +132,7 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
   at all** -- elevation, tank levels, reservoir head, diameter, roughness, minor-loss k, reaction
   coefficients, valve type -- nor did typing into a single Tables cell. Every other kind of edit
   did, which is why it had never been noticed. Fixed at the seven shared field builders, so ~55
-  sites were repaired at once. `dev/undo-audit.md` is the full inventory; **the Settings panel's
+  sites were repaired at once. Task 709 carries what is left; **the Settings panel's
   own edits are still not undoable and that is his product call, not a defect to fix quietly.**
 - **THE HARNESSES RUN THREE AT A TIME NOW** (`run_harnesses.sh`). 241 harnesses ran strictly
   serially on a four-core box, which is the phase every other worker waits behind. Measured on 24
@@ -183,7 +183,7 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
    overruled; he was told so.** Nothing has been redrawn.
 2. **The `%` sign** added after his percentile box, which was not in his sentence.
 3. **The label branch's two costs** above, and whether the Restore-defaults button stays.
-4. **Settings-panel undo**, from `dev/undo-audit.md`.
+4. **Settings-panel undo** -- Task 709, and Ida was asked on 2026-09-23.
 5. **R-004, R-043, R-062** -- open only because they wait on him.
 
 ### THE SPRINT
