@@ -14,7 +14,7 @@ lines rather than appending corrections.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
 - Run `check_all.sh` and headless browser runs under their `flock` locks, and run no more than
-  three agent tracks at once. The box has 7 GB; six queued tracks on 2026-09-22 took an hour.
+  four agent tracks at once. WSL has 12 GB and 4 processors since 2026-09-23 (it was 7 GB, and six queued tracks on 2026-09-22 took an hour).
 
 ## RULINGS
 
@@ -43,6 +43,12 @@ lines rather than appending corrections.
 - **Never `git worktree remove --force`** without reading its `git status` first; it once destroyed
   an agent's uncommitted work.
 - **Check that no agent is already working in a worktree before sending another in.**
+- **An orphaned probe can hold `/tmp/engcalcs-browser.lock` for hours**, and every browser harness in
+  every suite then times out (2026-09-23: a pre-reviewer's hung phone test). Find the holder with
+  `for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && echo $p; done`.
+  The divider harness now prints `NOT RUN` when this happens instead of failing silently.
+- **An agent's report of "committed" is a claim.** Run `git status` in its worktree before you
+  merge; one branch's two harnesses were reported committed and were untracked.
 - **A usage limit kills every running agent at once**; only their commits survive. Brief agents to
   commit as they go, and relaunch with "read `git log master..HEAD` first".
 - **Preview ports:** `ports.conf`, the loaded Apache config, and the panel's `index.html` must

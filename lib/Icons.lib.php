@@ -804,6 +804,20 @@ $ec_icons = array(
 	// where position disambiguates them, and the label is right there.
 	'info'       => '<circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4"/><path d="M12 7.6v.4"/>',
 	'mail'       => '<path d="M3 6h18v12H3z"/><path d="M3.6 6.6l8.4 5.9 8.4-5.9"/>',
+	// A PLAIN SELECTOR-STYLE CARET, FOR THE MESSAGE LOG (Tom, 2026-09-23, R-175, overruling the
+	// ringed arrow this held before): *"I liked the down arrow that was initially used for the
+	// messenger. I don't like the one we have now. I don't recommend heroics to make it unique.
+	// Something very much like a selector (probably perfect) or a tab menu is fine."* So: the same
+	// small solid triangle this page's own pane-tab and project-tab menu carets draw (there, typed
+	// as the character `▾`), redrawn once here as a filled path so it inherits `currentColor` like
+	// every other icon in this set. No ring, no shaft, no barbs -- pressing it opens something
+	// below it, exactly what a selector caret already means.
+	//
+	// **NAME KEPT AS `history`.** The icon is referenced by name in js/looped-network.js and in
+	// dev/lpn-spike/notice-log-harness.js, icon_name_check.php holds every naming site against this
+	// table, and renaming it would be ~6 edits to change nothing anybody sees. What the glyph names
+	// is still the message history; only the drawing moved.
+	'history'    => '<path d="M7 9L17 9L12 16Z" fill="currentColor" stroke="none"/>',
 	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
 	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
 	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a

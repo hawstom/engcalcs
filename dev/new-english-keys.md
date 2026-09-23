@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**14 still to read on master**, of 179 untranslated keys, of 2029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (179, 14 to read @@ NEEDS RULING)
+## lpn_  (182, 12 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -225,6 +225,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
   _Ruled OK 2026-09-17._
+- **`lpn_lock_open_cancelled`**
+  > That file was not opened, and nothing here changed. Somebody else still has it open.
+  _Ruled OK 2026-09-23._
 - **`lpn_lock_open_care`**
   > To avoid data loss, choose carefully from the options below.
   _Ruled OK 2026-09-17._
@@ -342,9 +345,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Drag a box on the map to zoom in on it.
-  @@ NEEDS RULING
+- **`lpn_msglog_ago`**
+  > {x} ago
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_empty`**
+  > No messages yet.
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_heading`**
+  > Recent messages
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_name`**
+  > Messages
+  _Ruled OK 2026-09-23._
+- **`lpn_msglog_note`**
+  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
+  _Ruled OK 2026-09-23._
 - **`lpn_node_customers`**
   > Customer demands
   _Ruled OK 2026-09-23._
@@ -370,14 +385,26 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.
-  _Ruled 2026-09-23: Should we offer the same hint here as for customer labels (0 to hide always) and remove the Thematic map toggle? Otherwise okay._
+  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
+  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
 - **`lpn_settings_sym_customer`**
   > Customer
   _Ruled OK 2026-09-23._
+- **`lpn_settings_symbol_cap`**
+  > Prevent nodes from scaling larger than
+  @@ NEEDS RULING
+- **`lpn_settings_symbol_cap_mid`**
+  > times the length of the
+  @@ NEEDS RULING
+- **`lpn_settings_symbol_cap_post`**
+  > percentile pipe
+  @@ NEEDS RULING
+- **`lpn_settings_symbol_cap_tip`**
+  > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
+  @@ NEEDS RULING
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -498,12 +525,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window_tip`**
-  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
-  @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -552,24 +573,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
-- **`lpn_zoom_in`**
-  > Zoom in
-  @@ NEEDS RULING
-- **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
-- **`lpn_zoom_out`**
-  > Zoom out
-  @@ NEEDS RULING
-- **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**20 still to read**, of 49 new keys across 3 unmerged branch(es).
+**51 still to read**, of 74 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -579,6 +588,81 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### feat/convert-as (`23de4dfd`) — 24 new, 24 to read @@ NEEDS RULING
+
+- **`lpn_convas_cancelled`**
+  > Nothing was converted. The copy is closed, and the original project is unchanged.
+  @@ NEEDS RULING
+- **`lpn_convas_coordsys_tip`**
+  > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
+  @@ NEEDS RULING
+- **`lpn_convas_done`**
+  > The converted copy is {name}. The original project is unchanged.
+  @@ NEEDS RULING
+- **`lpn_convas_epsg`**
+  > EPSG coordinate system
+  @@ NEEDS RULING
+- **`lpn_convas_epsg_tip`**
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
+  @@ NEEDS RULING
+- **`lpn_convas_from`**
+  > This project: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_no_transform`**
+  > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
+  @@ NEEDS RULING
+- **`lpn_convas_none_tip`**
+  > Local coordinates in the length unit, with no world map.
+  @@ NEEDS RULING
+- **`lpn_convas_ok`**
+  > Convert
+  @@ NEEDS RULING
+- **`lpn_convas_oneway`**
+  > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
+  @@ NEEDS RULING
+- **`lpn_convas_round`**
+  > Round converted values
+  @@ NEEDS RULING
+- **`lpn_convas_round_flow`**
+  > Demand and flow
+  @@ NEEDS RULING
+- **`lpn_convas_round_none`**
+  > No rounding
+  @@ NEEDS RULING
+- **`lpn_convas_round_tip`**
+  > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
+  @@ NEEDS RULING
+- **`lpn_convas_title`**
+  > Convert as
+  @@ NEEDS RULING
+- **`lpn_convas_units_tip`**
+  > The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.
+  @@ NEEDS RULING
+- **`lpn_convas_unnamed`**
+  > Unnamed (local) georeference
+  @@ NEEDS RULING
+- **`lpn_convas_unnamed_tip`**
+  > Local coordinates in the length unit, with the world map attached at the place the project is.
+  @@ NEEDS RULING
+- **`lpn_file_convert_as`**
+  > Convert as…
+  @@ NEEDS RULING
+- **`lpn_file_convert_as_tip`**
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_georef_answered`**
+  > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  @@ NEEDS RULING
+- **`lpn_units_mapcoords`**
+  > Map coordinates
+  @@ NEEDS RULING
+- **`lpn_units_mapcoords_deg`**
+  > degrees
+  @@ NEEDS RULING
+- **`lpn_units_usft`**
+  > US survey ft
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
@@ -700,38 +784,43 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/notice-log (`80bc539e`) — 6 new, all ruled
+### feat/property-venue (`50ce4e93`) — adds no English strings
 
-- **`lpn_lock_open_cancelled`**
-  > That file was not opened, and nothing here changed. Somebody else still has it open.
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_ago`**
-  > {x} ago
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_empty`**
-  > No messages yet.
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_heading`**
-  > Recent messages
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_name`**
-  > Messages
-  _Ruled OK 2026-09-23._
-- **`lpn_msglog_note`**
-  > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
-  _Ruled OK 2026-09-23._
+### feat/table-editing (`e157bb40`) — 4 new, 4 to read @@ NEEDS RULING
 
-### feat/zoom-scale-rules (`f1f6310a`) — 4 new, 4 to read @@ NEEDS RULING
+- **`lpn_pane_filldown`**
+  > Fill down
+  @@ NEEDS RULING
+- **`lpn_pane_filled`**
+  > Filled down {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
+- **`lpn_pane_hide_col`**
+  > Hide this column
+  @@ NEEDS RULING
+- **`lpn_pane_show_col`**
+  > Show {col}
+  @@ NEEDS RULING
 
-- **`lpn_settings_symbol_cap`**
-  > Prevent nodes from scaling larger than
+### feat/zoom-control (`bcaa8319`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Drag a box on the map to zoom in on it.
   @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_mid`**
-  > times the length of the
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
   @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_post`**
-  > percentile pipe
+- **`lpn_tool_zoom_window_tip`**
+  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
   @@ NEEDS RULING
-- **`lpn_settings_symbol_cap_tip`**
-  > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
+- **`lpn_zoom_in`**
+  > Zoom in
+  @@ NEEDS RULING
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
+  @@ NEEDS RULING
+- **`lpn_zoom_out`**
+  > Zoom out
+  @@ NEEDS RULING
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING

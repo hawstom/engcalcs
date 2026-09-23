@@ -59,11 +59,18 @@ if (process.env[LOCK_ENV] !== '1') {
 	let hasFlock = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); hasFlock = true; } catch (e) { /* no flock binary */ }
 	if (hasFlock) {
-		const r = spawnSync('flock', ['-w', '280', LOCK_FILE, process.execPath, __filename], {
+		// -E 75 gives a lock timeout its own exit status, so it can say so. It used to exit 1 with no
+		// output at all, which read as a layout failure three times on 2026-09-23 while other
+		// sessions held the browser lock. A timeout still FAILS: nothing was measured.
+		const r = spawnSync('flock', ['-E', '75', '-w', '280', LOCK_FILE, process.execPath, __filename], {
 			stdio: 'inherit',
 			env: Object.assign({}, process.env, { [LOCK_ENV]: '1' })
 		});
 		if (r.error) { console.error('table-divider-align-harness: flock re-exec failed: ' + r.error.message); process.exit(1); }
+		if (r.status === 75) {
+			console.error('table-divider-align-harness: NOT RUN -- another session held ' + LOCK_FILE + ' for 280 s. This is lock contention, not a divider misalignment; re-run it alone.');
+			process.exit(1);
+		}
 		process.exit(r.status === null ? 1 : r.status);
 	}
 	// No flock binary at all (unusual): proceed unlocked rather than skip the check entirely.

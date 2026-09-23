@@ -3247,6 +3247,83 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
+/* ---- The message log button and list (ROADMAP Task 704) ----
+   Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
+   button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the
+   mode text next to it carries** (Tom, R-157: "I discovered what is appearing behind the glyph. It
+   is the text 'RIVER' from the model... It's a Text object, not a label."). A partial-alpha
+   background over the map canvas lets whatever is drawn underneath bleed through the glyph itself,
+   the same defect .lpn-msglog-panel was already given a solid background to avoid -- this button
+   gets the same remedy. pointer-events:auto because the row it sits in is otherwise inert like
+   every map overlay. */
+.lpn-msglog-btn {
+	pointer-events: auto;
+	display: inline-flex; align-items: center;
+	background: #fff;
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 1px 4px; font: inherit; font-size: 11px; line-height: 1;
+	color: #555; cursor: pointer;
+}
+.lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: #222; border-color: #888; }
+/* HIGHLIGHTED WHILE A MESSAGE IS ON SCREEN (Tom: "it must appear and possibly highlight while a
+   message displays"), toggled by markMsglogActive() in js/looped-network.js. Blue rather than
+   amber or red -- both of those already mean "something is wrong" on this page (the diagnostic
+   box, the warning banner), and this says only "something is being shown," which is also true of
+   an ordinary save confirmation. */
+.lpn-msglog-btn.lpn-msglog-active { background: #05a; border-color: #05a; color: #fff; }
+.lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: #fff; border-color: #037; }
+/* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
+   short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
+   takes the Close button with it. */
+/* ---- The on-map message list (superseded the dialog above, Tom 2026-09-22, live on port 8099:
+   "The alert paradigm is not a good UX ... User expects them to descend below the glyph, below
+   the Mode status, in similar appearance that they originally had.") ----
+   **CORRECTED 2026-09-22: this used to say "no rule for the panel itself here," relying on JS
+   setting bare `display:flex`.** `display:flex` alone defaults to `flex-direction:row`, so the
+   rows laid out SIDE BY SIDE and ran off the right edge of the map (Tom: "the simultaneous
+   messages on open ... appear on one line instead of on three. This is a bug."). `flex-direction:
+   column` belongs on the container that draws the list, not on the display toggle that only opens
+   and closes it, so it is a CSS rule rather than one more thing openMessageLogPanel() has to set.
+   **AND THE GAPS BETWEEN ROWS PAINTED NOTHING**, so a Text object on the map underneath (Tom: "I
+   discovered what is appearing behind the glyph. It is the text 'RIVER' from the model.") showed
+   through those gaps at full strength -- each row is its own translucent
+   `rgba(255,255,255,.8)` pill, which is fine for ONE isolated readout but leaves the space BETWEEN
+   pills fully transparent once there is more than one. `#lpn_msglog_panel` now paints a solid,
+   fully opaque backing behind the whole stack, so nothing on the canvas can ever show through any
+   part of this box, gaps included -- the same reasoning `background-color` gets on
+   `.lpn-basemap-teaser` two rules up, applied to a list instead of a single tile. */
+.lpn-msglog-panel {
+	box-sizing: border-box;
+	flex-direction: column;
+	gap: 4px;
+	background: #fff;
+	border-radius: 3px;
+	padding: 4px;
+}
+.lpn-msglog-panel-row {
+	display: flex; gap: 8px; align-items: baseline;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px;
+}
+/* The age leads the row and is a fixed column, so thirty rows read as a column of times against a
+   column of sentences rather than as ragged prose. It is the quieter of the two: the message is
+   what the reader came back for. */
+.lpn-msglog-panel-when { flex: none; color: #666; }
+.lpn-msglog-panel-text { flex: 1 1 auto; min-width: 0; }
+/* THE SECOND OF EXACTLY TWO LEVELS, painted the same amber #lpn_map_notice and #lpn_status
+   already use for a warning -- the log says the same thing the map said; a marker WORD would be a
+   word to translate and one more thing to get wrong in five right-to-left languages. */
+.lpn-msglog-panel-warn { background: #fffbe6; border-color: #a80; }
+/* The empty state, deliberately NOT .lpn-msglog-panel-row -- it is not itself a kept message. */
+.lpn-msglog-panel-empty {
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px; color: #666;
+}
+/* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
+   on why. No background of its own: it is a caption under the pills, not one more of them. */
+.lpn-msglog-panel-note { font-size: 0.85em; color: #666; padding: 2px 6px; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;
