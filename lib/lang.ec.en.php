@@ -799,7 +799,7 @@ $ec_lang['lpn_tool_vertices']='Vertices';
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Customer';
 $ec_lang['lpn_tool_add_meter_tip']='Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.';
-$ec_lang['lpn_mode_add_meter']='Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.';
+$ec_lang['lpn_mode_add_meter']='Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
 $ec_lang['lpn_customer_heading']='Customer {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
@@ -810,7 +810,7 @@ $ec_lang['lpn_customer_heading']='Customer {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Demand per service';
-$ec_lang['lpn_field_meter_demand_tip']='What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.';
+$ec_lang['lpn_field_meter_demand_tip']='What each service at this customer requires. Find and replace can leverage the distinction between blank and 0.';
 $ec_lang['lpn_field_meter_count']='Number of services';
 $ec_lang['lpn_field_meter_count_tip']='How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
 $ec_lang['lpn_field_meter_total']='Total demand';
@@ -821,22 +821,22 @@ $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so th
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.';
+$ec_lang['lpn_field_meter_pattern_tip']='How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.';
 $ec_lang['lpn_meter_pattern_unknown']='No pattern in this project is named {id}, so the customer was left as it was.';
 $ec_lang['lpn_meter_placed']='Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.';
-$ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.';
+$ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, or drag the connection point to a different asset.';
 $ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
 $ec_lang['lpn_field_meter_station_tip']='How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
 $ec_lang['lpn_field_meter_offset']='Offset from the pipe';
-$ec_lang['lpn_field_meter_offset_tip']='How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.';
+$ec_lang['lpn_field_meter_offset_tip']='Positive is to the right of the pipe looking from its first node toward its second. Typing a value here can move the customer to the other side of the main, and it always squares the service line to the main.';
 $ec_lang['lpn_field_meter_lumped']='Added to node';
-$ec_lang['lpn_field_meter_lumped_tip']='The node that this customer\'s demands are added to through, on top of whatever the junction states itself. It\'s the node closest to this connection.';
+$ec_lang['lpn_field_meter_lumped_tip']='Nearest node; this customer\'s demands are added there.';
 $ec_lang['lpn_node_customers']='Customer demands';
-$ec_lang['lpn_node_customers_tip']='Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.';
+$ec_lang['lpn_node_customers_tip']='List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
 $ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
-$ec_lang['lpn_customer_detached_count']='{n} customers are no longer connected to a pipe. Their demand is not in the answers.';
+$ec_lang['lpn_customer_detached_count']='{n} customers are not connected to a pipe. Their demand is not accounted for.';
 $ec_lang['lpn_meter_pick_pipe']='Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
 $ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.';
 
@@ -2163,7 +2163,7 @@ $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Re
 $ec_lang['lpn_engine_bar_label']='Solver loading progress';
 $ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
 $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
-$ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.';
+$ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
@@ -2507,7 +2507,7 @@ $ec_lang['lpn_map_attach_readjust']='Re-adjust';
 $ec_lang['lpn_map_attach_readjust_tip']='Return to Step 2 of the map attachment process.';
 $ec_lang['lpn_map_attach_scale_from']='Scale from the current size…';
 $ec_lang['lpn_map_attach_scale_from_prompt']='Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
-$ec_lang['lpn_map_attach_scale_from_bad']='Type one number greater than zero.';
+$ec_lang['lpn_map_attach_scale_from_bad']='Type a single number greater than zero.';
 $ec_lang['lpn_map_attach_scale_from_done']='The map is resized, and your drawing and every coordinate in it are exactly as they were.';
 $ec_lang['lpn_map_attach_none']='There is no world map attached to this project yet. Use Map, World map, Attach first.';
 $ec_lang['lpn_map_attach_remove']='Detach';
@@ -2538,11 +2538,11 @@ $ec_lang['lpn_mapgeo_gestures']='Zoom moves your drawing and the map together, s
 // smaller the ground is than the fit already agreed, which is the only quantity a person can judge
 // by looking. The band is narrow on purpose and a wider move is the rectangle's job, or Map, World
 // map, Move, which is the pick-it-up-again door.
-$ec_lang['lpn_mapgeo_dial_turn']='Turn the map';
+$ec_lang['lpn_mapgeo_dial_turn']='Rotate the map';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
 $ec_lang['lpn_mapgeo_dial_size']='Map size';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
-$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
@@ -3052,7 +3052,7 @@ $ec_lang['lpn_settings_sym_link']='Link';
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='Customer';
-$ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
+$ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 $ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
 $ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
 // ROADMAP Task 247. The capture button beside the width above (Tom, 2026-09-19: "Widest view: Add a
@@ -3401,7 +3401,7 @@ $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} p
 // buttons except at the File menu.'). The label and its tip name no particular library, because
 // the FILE decides what is on offer rather than whatever section anybody was looking at.
 $ec_lang['lpn_library_import']='Import libraries…';
-$ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
+$ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
 // beside each name is the only thing on that screen that says what the file actually has in it.
 $ec_lang['lpn_library_import_choose']='Choose what to copy from {file}';
@@ -3805,7 +3805,7 @@ $ec_lang['lpn_survey_axis_east']='Easting';
 $ec_lang['lpn_survey_column_n']='column {n}';
 $ec_lang['lpn_survey_err_empty']='That file has nothing in it.';
 $ec_lang['lpn_survey_err_unreadable']='That file could not be read as a surveyed point list.';
-$ec_lang['lpn_survey_err_no_coords']='This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}';
+$ec_lang['lpn_survey_err_no_coords']='Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}';
 $ec_lang['lpn_survey_err_ambiguous_coord']='More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.';
 $ec_lang['lpn_survey_err_ambiguous_lon']='More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.';
 $ec_lang['lpn_survey_err_plane']='That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.';
@@ -3835,7 +3835,7 @@ $ec_lang['lpn_survey_fmt_enz']='Easting, northing, elevation (ENZ, also written 
 // Which of the two answered for THIS file, said out loud, so the reader can see that a header beat
 // the chooser rather than taking it on trust.
 $ec_lang['lpn_survey_from_header']='The first line of your file names its own columns, so those names were used and the column order below was not needed.';
-$ec_lang['lpn_survey_note_header_unread']='The first line was passed over: it names no columns this page knows.';
+$ec_lang['lpn_survey_note_header_unread']='The first line was skipped: it names no columns this page knows.';
 $ec_lang['lpn_survey_type_label']='Asset type:';
 $ec_lang['lpn_survey_confirm_junction']='{n} junction(s) found. Proceed?';
 $ec_lang['lpn_survey_confirm_reservoir']='{n} reservoir(s) found. Proceed?';
@@ -3862,7 +3862,7 @@ $ec_lang['lpn_survey_note_coord_range']='The {axis} is outside the range this pr
 $ec_lang['lpn_survey_note_lon_range']='This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.';
 $ec_lang['lpn_survey_note_bad_elev']='Non-numeric elevation. Imported without elevation.';
 $ec_lang['lpn_survey_note_ambiguous_elev']='More than one column could be the elevation, so none of them was read.';
-$ec_lang['lpn_survey_note_blank_rows']='Blank lines passed over: {detail}.';
+$ec_lang['lpn_survey_note_blank_rows']='Blank lines skipped: {detail}.';
 $ec_lang['lpn_survey_note_id_duplicate']='Name already used earlier in this file, new name assigned.';
 $ec_lang['lpn_survey_note_id_taken']='Name already in project, new name assigned.';
 $ec_lang['lpn_survey_note_id_invalid']='Name cannot be used here, new name assigned.';
