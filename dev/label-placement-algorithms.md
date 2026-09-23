@@ -1979,3 +1979,85 @@ Net3 78 / 26 -> **9 / 22**; zero and zero at 4x and 8x on both.
 - **The fit-view cascade is still greedy.** A label that genuinely has to move takes ground a later
   one wanted. A tiered pass (every label tries its four corners before any label tries the raster)
   was measured at 279 -> 228 moves over the old nine-view sample and is not built.
+
+## 21. HIS ORDER OF PREFERENCE, AND THE WIDENING SHIPS ON (2026-09-22)
+
+**Tom, on his fourth pass over this branch:** *"I am seeing dropping when I would have preferred to
+see longer leaders."* And, on one label of his own screenshot (`_label-mystery.PNG`) reading
+`P=55.70` alone at the end of a long leader with open ground beside it: *"a strange example where
+(a) we could have had all requested properties and (b) we could have had a shorter leader."*
+
+### 21a. What that one label was doing, measured
+
+Net3-Novato-CA-World, his three node properties (ID, Demand, Pressure), the southwest of the
+drawing at 2x, through the page's own content pass (`dev/lpn-spike/label-mystery-probe.js`):
+
+    first-fit call 1: 23 labels dropped
+    shed rung 2:      23 dropped     rung 3: 10     rung 4: 4     rung 5: 4
+    result: 89 of 97 drawn, 8 hidden, and 50 of the 97 giving up two of their three values
+
+**The label he circled had not run out of room.** `shedNodeLabelsForCrowding()` enlists the labels
+that failed to place AND every label standing on ground one of them could have used, so most of the
+50 gave up their ID and their demand for somebody else's failure. Four labels were still dropped
+when the cascade ran out of rungs, so the drawing paid 100 values for nothing.
+
+### 21b. The order, and where each rung now sits
+
+Best first: **the whole label near its node; the whole label on a LONGER LEADER; the label with a
+value given up; the label gone.** The middle two were the wrong way round -- the value shed was
+triggered by a first-fit DROP, which happens before the search is allowed to look further out -- and
+the bottom two had no rung between them, because the crossing shed at the end of the pass could only
+hide. Two changes, both small:
+
+- `labelWidenSearch` ships **on**. Section 19 turned it off on a real measurement -- it traded a drop
+  for a hide -- and the two things that answer that measurement both landed after it was taken: the
+  leader slide, which pulls a widened label back in, and the rung below.
+- `shedNodeLabelsForCrossing()`: a node label the crossing shed would hide gives up a value and the
+  whole node layout is run again, at most `LPN_CROSS_SHED_MAX_RUNGS` times.
+
+Net3-Novato, his three properties, of 97 node labels (`label-drop-order-harness.js`, which mutates
+each rung away in turn):
+
+| view | giving a value up | hidden | value rows drawn |
+|---|---|---|---|
+| 2x, before | 51 | 8 | |
+| 2x, now | **18** | **5** | |
+| 3x, before | 32 | 2 | |
+| 3x, now | **3** | **1** | |
+| both views | | | 408 -> **524** of 568 asked for |
+
+### 21c. The widening is bounded at level 2, and that is a measurement
+
+`WIDEN_SHIPPED_LEVELS = 2` -- nine resting offsets, not the twenty-four level 3 reaches. At 2x with
+FOUR node fields on, level 3 draws 81 labels and sheds 18; level 2 draws 88 and sheds 35. Seven
+labels gone to spare seventeen others a line is the wrong side of his order. With three fields level
+3 is marginally the better of the two (93 against 92), which is what says the bound is about
+crowding rather than about the geometry.
+
+### 21d. What it costs, stated rather than buried
+
+**His R-075 test is worse at the fit view and at 2x, and the widening is the whole of it** -- each
+half was switched off separately and the crossing rung accounted for none. The fit view of
+Net3-World now draws **91 node labels where it drew 69** with the node ID alone (the sweep's hidden
+count falls 29 -> 10 at every prefix length). More labels on the drawing is more labels in each
+other's way, so adding `12345678` moves 43 where it moved 10. At 4x and 8x it still moves and hides
+exactly nothing. The `had-to-move` floor beside it rises 33 -> 45 on Net3-World and the pass moves
+43, fewer than have to; Net3 does not read that cleanly (46 against a floor of 30) and that is said
+here rather than averaged away. **R-156 puts the choice to him.**
+
+### 21e. R-136 answered: why one more character moves anything
+
+- The places a label may stand are a fixed list that does not move when the text widens. The BOX
+  grows into them. (Section 20 is the same finding for the stack.)
+- The endless stack is a COLUMN -- rows one box height apart. Widening every row widens the column
+  and does not lengthen it, which is why the first character costs nothing.
+- The oscillation is a greedy placer crossing a threshold. Labels are placed one at a time in a
+  fixed order, each treating the placed ones as walls; the character that tips one pair from fits to
+  does not fit re-deals that label, which changes the walls for every label after it. Deterministic,
+  not noise, and not removable without making the layout global instead of greedy.
+- The trend is area: every character widens all 97 boxes.
+- **The reserve stops protecting anything past eight characters**, because it is a fixed six rows
+  sized to his own eight-digit test. In the sweep, lengths 9 and 10 read identically with room to
+  grow switched on and off (9.2 and 6.9 text heights). That is a real defect and is not fixed.
+- The twenty-text-height leader was a real defect and is bounded: at 2x the worst top-of-column
+  leader is 1.7 to 3.5 text heights across all eleven prefix lengths.
