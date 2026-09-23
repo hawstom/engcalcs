@@ -20881,6 +20881,11 @@ var EngCalcs = EngCalcs || {};
 			paneLeaveEdit(input);
 			return false;
 		}
+		// **THE SAME MISSING SNAPSHOT, IN THE TABLES PANE** (same cause as the Base demand row in
+		// the popup, Tom 2026-09-22): panePasteAt() already takes one for a paste, but a single
+		// cell typed and committed here never did, so undoing a Tables-pane edit had nothing to
+		// pop. Taken before the write, like every other commit path.
+		saveUndoSnapshot();
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
 		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
@@ -41032,7 +41037,14 @@ var EngCalcs = EngCalcs || {};
 		// scheduleSolve() here, not just inside set callbacks, centralizes it for every current
 		// and future use of this helper (elev/demand/head's set already also calls updateNode(),
 		// which itself schedules a solve -- calling it twice is harmless, debounced).
-		input.addEventListener('change', function () { set(+input.value); completeEdit(ov); });
+		// **AND THE UNDO SNAPSHOT IS HERE TOO** (Tom, 2026-09-22: "Ctrl+Z or the Undo button don't
+		// put it back" after editing Base demand). Every OTHER commit path in this popup --
+		// closedField's checkbox, curveChooser's select, customPropFields, the override marker, a
+		// row's delete button -- calls saveUndoSnapshot() itself; this shared helper alone forgot
+		// to, so every elevation, tank level, reservoir head, diameter, roughness, k and fire-flow
+		// edit that goes through it was silently unrecorded. One snapshot per commit, taken BEFORE
+		// the write, exactly where every other field's own handler takes its.
+		input.addEventListener('change', function () { saveUndoSnapshot(); set(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -41053,6 +41065,7 @@ var EngCalcs = EngCalcs || {};
 		input.placeholder = (placeholder === undefined || placeholder === null || placeholder === '')
 			? '' : String(+(+placeholder).toFixed(6));
 		input.addEventListener('change', function () {
+			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
 			set(input.value === '' ? undefined : +input.value);
 			completeEdit(ov);
 		});
@@ -41069,7 +41082,7 @@ var EngCalcs = EngCalcs || {};
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'text';
 		input.value = get() || '';
-		input.addEventListener('change', function () { set(input.value.trim()); });
+		input.addEventListener('change', function () { saveUndoSnapshot(); set(input.value.trim()); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -41118,7 +41131,7 @@ var EngCalcs = EngCalcs || {};
 	function patternField(fields, labelText, get, set, tip) {
 		var label = document.createElement('label'), sel = document.createElement('select');
 		libFillPatternOptions(sel, get());
-		sel.addEventListener('change', function () { set(sel.value); });
+		sel.addEventListener('change', function () { saveUndoSnapshot(); set(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
@@ -42822,13 +42835,20 @@ var EngCalcs = EngCalcs || {};
 		// **THE TYPED NUMBER, STORED AS TYPED.** No factor here in either direction: a demand's
 		// base is in the flow unit the column heading names, exactly like the Base demand box on a
 		// junction that has only one, and the solver does its own converting at its own boundary.
+		// **THE MISSING SNAPSHOT** (Tom, 2026-09-22: editing Base demand and pressing Ctrl+Z or
+		// Undo "don't put it back to what it was"). Every other commit in this popup takes one --
+		// the override marker's checkbox, the curve chooser, a custom property, this very row's own
+		// delete button three lines below -- but this row's three EDITS never did, so a Base demand
+		// (or its pattern or its description) typed here left nothing on the undo stack to pop.
 		bInput.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
 		libFillPatternOptions(sel, acc.getPattern());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setPattern(sel.value);
 			afterPropertyEdit(n);
 		});
@@ -42836,6 +42856,7 @@ var EngCalcs = EngCalcs || {};
 		cInput.value = acc.getCategory() || '';
 		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setCategory(cInput.value.trim());
 			afterPropertyEdit(n);
 		});
@@ -44313,7 +44334,7 @@ var EngCalcs = EngCalcs || {};
 			if (options[i][0] === current) { o.selected = true; }
 			sel.appendChild(o);
 		}
-		sel.addEventListener('change', function () { onChange(sel.value); });
+		sel.addEventListener('change', function () { saveUndoSnapshot(); onChange(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
@@ -44329,6 +44350,7 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'number'; input.step = 'any';
 		input.value = (value === undefined || value === null || value === '') ? '' : String(value);
 		input.addEventListener('change', function () {
+			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
 			onChange(input.value === '' ? undefined : +input.value);
 			completeEdit(ov);
 		});
@@ -44341,7 +44363,7 @@ var EngCalcs = EngCalcs || {};
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any'; input.value = value;
-		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
+		input.addEventListener('change', function () { saveUndoSnapshot(); onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
 		fields.appendChild(label);
