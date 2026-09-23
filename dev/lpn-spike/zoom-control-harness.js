@@ -55,6 +55,7 @@ const L = stub.loadLoopedNetwork(
 	"\t\tgetZoomToolArmed: function () { return zoomToolArmed; },\n" +
 	"\t\tsetZoomToolArmed: function (v) { zoomToolArmed = v; },\n" +
 	"\t\tzoomWindowOpen: function () { return !!zoomWinDrag; },\n" +
+	"\t\tclearPointers: function () { pointers.clear(); },\n" +
 	"\t\twireToolbar: wireToolbar,\n" +
 	"\t\tnoteMapSized: noteMapSized,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -83,6 +84,12 @@ function reset() {
 	// (its own reset only fires `if (newMode !== mode)`), so a test block left armed by the one
 	// before it would otherwise start the next block with a stale "second press" already loaded.
 	L.setZoomToolArmed(false);
+	// A section that leaves the mode mid-drag (3e) never fires a matching pointerup -- its whole
+	// point is testing what happens when the pointer is never released -- so the module's own
+	// `pointers` Map (the multi-touch/pinch tracker) can carry a stale entry into the next block.
+	// Left alone, a later section's first real press would misread `pointers.size === 2` as a
+	// pinch and skip its own pointerdown handling entirely.
+	L.clearPointers();
 }
 function fire(type, ev) { stub.setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
 function keydown(props) {
@@ -457,6 +464,57 @@ console.log('\n--- 6d. a keydown that is not this button\'s own activation un-ar
 	// the button as target, then the browser's own synthesized 'click'.
 	keydown({ key: 'Enter', target: btn });
 	ok('...but a keydown ON THE BUTTON ITSELF leaves it armed', L.getZoomToolArmed());
+}
+
+// ---------------------------------------------------------------------------
+// 7. TOM'S OWN VERBATIM SEQUENCE, 2026-09-23: "When I click twice, then zoom to a window with two
+// map clicks, then click Zoom to Fit, it doesn't work... Note that all the worse with this bug,
+// when I fail to get Zoom to Fit and I click the button a second time, it gives me Zoom Window."
+// Driven end to end through the REAL button and the REAL document-capture listener
+// `wireZoomArmReset()` installs -- a map pointerdown is delivered to `document`'s capture-phase
+// listener FIRST, exactly as a real browser's capturing phase runs before the target's own
+// listener, and only then to the canvas's own handler, so a defect in that ordering (the "map
+// clicks that define the window are not counted as a map click for the reset" half of the brief)
+// would show up here, not just in the internal-primitive drives sections 3-3e already do.
+// ---------------------------------------------------------------------------
+console.log('\n--- 7. Tom\'s sequence: press, press, click, click, press => fitted; press => armed ---');
+{
+	reset();
+	const btn = buildZoomToolButton();
+	function mapDown(props) { docPointerdown(svg); fire('pointerdown', props); }
+	function mapUp(props) { fire('pointerup', props); }
+	function pressBtn() { docPointerdown(btn); clickBtn(btn); }
+
+	pressBtn();
+	ok('first press fits, and stays on Zoom to fit', L.getMode() !== 'zoom-window' && L.getZoomToolArmed());
+	const fitS = L.getState().s;
+
+	pressBtn();
+	ok('second, consecutive press arms Zoom Window', L.getMode() === 'zoom-window');
+
+	// The two map clicks that draw the window -- click a corner, click the opposite corner.
+	mapDown({ pointerId: 21, clientX: 150, clientY: 120, pointerType: 'mouse', button: 0 });
+	mapUp({ pointerId: 21, clientX: 150, clientY: 120, pointerType: 'mouse' });
+	ok('the first map click opens the box, not yet committed', L.zoomWindowOpen());
+	mapDown({ pointerId: 21, clientX: 650, clientY: 420, pointerType: 'mouse', button: 0 });
+	mapUp({ pointerId: 21, clientX: 650, clientY: 420, pointerType: 'mouse' });
+	ok('the second map click commits the window and returns to Select',
+		L.getMode() === 'select' && !L.zoomWindowOpen());
+	ok('...and the button face falls back to Zoom to fit', L.getZoomToolShape() === 'fit');
+	const windowS = L.getState().s;
+	ok('the window actually changed the view (a real zoom happened)', windowS !== fitS);
+
+	// Tom's defect: the VERY NEXT press of the button, right after the window completes.
+	pressBtn();
+	ok('the next press fits the whole network again, not a no-op and not blank',
+		Math.abs(L.getState().s - fitS) < 1e-6, 'got s=' + L.getState().s + ' want ' + fitS);
+	ok('...it did NOT jump straight into Zoom Window', L.getMode() !== 'zoom-window');
+	ok('...and it is now armed for a genuine second press', L.getZoomToolArmed());
+
+	// A press right after THAT, in a row, is what arms Zoom Window -- never a dead end.
+	pressBtn();
+	ok('a press after that, in a row, arms Zoom Window (no sequence is ever a no-op)',
+		L.getMode() === 'zoom-window');
 }
 
 console.log('\n' + checks + ' checks, ' + failures + ' failed');
