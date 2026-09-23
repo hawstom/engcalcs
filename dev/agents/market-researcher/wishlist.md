@@ -368,3 +368,21 @@ surfaced — a "candidate/not-yet-built pipe" concept (`des_pipe`) that `lpn_` h
 recorded as SPECULATION only, not a task, because nobody has asked for it. Full citations, licence
 (modified BSD), and activity numbers (77 stars, last push 2025-04-11): journal, 2026-09-21 entry.
 Ranked at the bottom on purpose: this is a complete, useful "no," not a lead to chase further.
+
+## 0l. R-105 time-step selector should name an instant, not a range — every comparable tool does
+
+2026-09-22: checked Tom's reopened R-105 against EPANET's own Browser Time control (an elapsed-
+time/clock readout advancing one step at a time), epanet-js-toolkit's own "step through the
+simulation" framing, and Bentley WaterGEMS/SewerGEMS's Time Browser, whose own help text says "the
+current time step that is displayed in the drawing pane" — singular. All three treat this exact
+control as naming one moment, never a span. This suite's own data model already agrees:
+`EC.lpnReportTimes()` (`js/lpn-time.js:58`) is a flat list of discrete instants, and the R-105 range
+label was built by pairing each instant with the next one in that list — a range manufactured from
+data that was never a range. **Recommendation: revert the row label to one time, e.g. `25:00`
+(elapsed) with the clock reading kept in the tip as it already is** — not a build I'm sizing, since
+it is a straightforward revert of the 2026-09-21 change; recorded here because it reverses my own
+seat's prior silence on that ship and because a future invocation should not re-litigate it without
+reading this first. The one place a genuine `8:00 - 9:00` range would be correct is a quantity
+accumulated OVER an interval (hourly energy cost, tank volume change that hour) — this suite has no
+such control today, and if one is ever built, it should keep the range framing; the toolbar transport
+is not that control. Full citations: journal, 2026-09-22 entry.

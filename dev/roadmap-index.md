@@ -7,17 +7,15 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 21 · Soon (75): 17 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
+**92 open tasks.** Next (100): 19 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 12 · Parked (5): 18
 
-## 100 — Next (21)
+## 100 — Next (19)
 
-- Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
-- Task 669 — Show labels at this zoom or closer.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
@@ -31,9 +29,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
 - ! Task 704 — An error and notice messaging system, because a banner that vanishes is a defect.
-- Task 705 — Limit zoom symbol mapwise size growth.
+- Task 708 — Every property in every venue: an audit, then a check.
 
-## 75 — Soon (17)
+## 75 — Soon (16)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -51,7 +49,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
-- Task 708 — Every property in every venue: an audit, then a check.
 
 ## 50 — Someday (27)
 
@@ -123,5 +120,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-86 of 95 titles are within 4–12 words. `!` marks the rest;
+83 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
