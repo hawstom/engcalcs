@@ -2477,7 +2477,8 @@
 			"valign": "top",
 			"tok": {
 				"x": "8.00"
-			}
+			},
+			"allZoom": true
 		},
 		{
 			"id": "X2",

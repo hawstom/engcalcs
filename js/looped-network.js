@@ -84,8 +84,12 @@ var EngCalcs = EngCalcs || {};
 	// label keeps the exact offset it was dropped at (n.lx/n.ly are absolute world units).
 
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
-	function defaultLabelOffset() {
-		var k = symbolFactor();
+	// `full`: fitItems() alone passes true, for the same reason nodeRadiusFull() exists -- the fit
+	// multiplies a world size back out by the LIVE scale to recover a scale-independent pixel
+	// figure, and that only cancels when this offset's own division uses that SAME scale
+	// unconditionally, which the capped symbolFactor() stops doing once the cap is in force.
+	function defaultLabelOffset(full) {
+		var k = full ? symbolFactorFull() : symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
 	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
@@ -95,8 +99,8 @@ var EngCalcs = EngCalcs || {};
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
-	function nodeLabelBase(n) {
-		var d = defaultLabelOffset();
+	function nodeLabelBase(n, full) {
+		var d = defaultLabelOffset(full);
 		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
 			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
 	}
@@ -5220,15 +5224,25 @@ var EngCalcs = EngCalcs || {};
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-21 under Task 705). Generated
 			// labels are drawn only while the visible map is at most this many DISPLAY LENGTH UNITS
-			// wide, and the same number is what stops a map symbol growing on the ground
-			// (symbolCapScale()). null = always draw, which is the right default because no single
-			// number is meaningful across networks 400 ft and 40 miles wide -- the Settings row
-			// captures it from the current view rather than asking anyone to guess one.
+			// wide. null = always draw, which is the right default because no single number is
+			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
+			// from the current view rather than asking anyone to guess one.
+			//
+			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
+			// asked for the day before: *"I'd prefer not to have two rules."*). See
+			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
 			//
 			// **A TYPED NUMBER IN THE DISPLAY UNIT, NEVER SI, and it is REINTERPRETED rather than
 			// converted when the unit changes** -- the suite's own absolute rule. Converted to
 			// metres only where it is compared, in labelWidthLimitSI().
 			labelMaxWidth: null,
+			// **THE ONE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his wording, 2026-09-22):** "Prevent
+			// nodes from scaling larger than `symbolCapMultiple` times the length of the
+			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
+			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
+			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
+			symbolCapMultiple: 0.5,
+			symbolCapPercentile: 20,
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -6406,51 +6420,59 @@ var EngCalcs = EngCalcs || {};
 	// At a whole-county view a 7 px junction dot is a mile across on the map, and a drawing that is
 	// nothing but overlapping dots says less than one that is mostly pipe.
 	//
-	// **THE RULE IS DERIVED, AND THERE IS NO CONTROL FOR IT.** He offered two shapes -- a second
-	// number under Map and page > Appearance, or "the maximum symbol size is whatever it is at the
-	// maximum label zoom, so that once labels are hidden, symbols start shrinking on screen and stay
-	// constant on the ground as you zoom out". The second ships, and the reason is not only that it
-	// is free. The two rules answer the SAME question -- how far out is too far out to keep drawing
-	// at reading size -- and a second box lets a user set them to disagree, which produces a view
-	// with no lettering and mile-wide dots and no way to tell which of two numbers caused it. One
-	// threshold, one answer, and the tip on that one row says both things it does.
+	// **ONE RULE, NOT TWO** (Tom, 2026-09-22, closing his own two competing ideas -- the
+	// 10th-percentile link length and "piggyback on the labeling threshold": *"10th %-ile and 'same
+	// as label limit' were competing ideas for this limit; I'd prefer not to have two rules. I like
+	// 10th %-ile a lot, probably better than piggybacking on the labels limit."*). **The labeling
+	// threshold (`settings.labelMaxWidth`) no longer feeds this at all** -- it used to be tried
+	// first, with the percentile rule as its fallback when no threshold was typed, and that
+	// arrangement is exactly what he asked removed.
 	//
-	// **WHAT IT IS WHEN NO THRESHOLD IS SET, which is the default:** his own (1), the 10th-percentile
-	// link length as the maximum junction size on the map. It is the honest fallback because it is
-	// the same KIND of statement -- the network's own shortest ordinary pipe is the distance at which
-	// two junctions stop being separable, so a dot wider than that is drawing over the thing it
-	// marks.
+	// **HIS NEW SETTING, HIS OWN WORDING:** *"Let's try a new setting for %-ile: 'Prevent nodes from
+	// scaling larger than __ times the length of the __ percentile pipe' where we set the defaults
+	// at 0.5 and 20% for now."* Two numbers, both project data: `settings.symbolCapMultiple`
+	// (default 0.5) and `settings.symbolCapPercentile` (default 20 -- his new figure, not the old
+	// 10th). The maximum junction diameter on the ground is `multiple * that percentile's link
+	// length`, always on, no blank-means-off state to explain.
 	//
 	// **EXPRESSED AS A FLOOR ON THE SCALE, not as a cap on a size**, because every symbol on this
 	// map is already one number divided by `state.s`. Below this scale the drawing stops growing on
 	// the ground and starts shrinking on the screen, which is exactly his sentence.
 	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
-	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	var pctLinkLengthCache = null;   // world units, AT THE PERCENTILE LAST ASKED FOR; 0 for "no usable link"
+	var pctLinkLengthPctCache = null;
 	// **KEYED ON THE DOCUMENT AND ITS LINK COUNT AS WELL AS INVALIDATED BY NAME.** A cache keyed on
 	// the count alone survived a project switch on feat/label-gang-search and laid 119 of 216 labels
 	// out from the previous document's number, so the key is the `doc.links` ARRAY ITSELF plus its
 	// length -- a switch, an undo and a rebuild all replace the array -- and buildDom() and a node
 	// drag clear it outright. What neither catches is a node nudged by a hand-typed coordinate, and
-	// a 10th percentile of up to 512 lengths does not move measurably for one pipe.
+	// a percentile of up to 512 lengths does not move measurably for one pipe.
 	var p10LinkKeyArr = null, p10LinkKeyLen = -1;
 	function invalidateSymbolCap() { symbolCapCache = null; }
 	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
-	// they change only when the drawing does, while the cap also moves with the window and the
-	// settings.
-	function invalidateLinkLengths() { p10LinkLengthCache = null; symbolCapCache = null; }
+	// they change only when the drawing does, while the cap also moves with the settings.
+	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
+	function symbolCapMultiple() {
+		var v = settings.symbolCapMultiple;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+	}
+	function symbolCapPercentile() {
+		var v = settings.symbolCapPercentile;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
 	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
 	// left out rather than counted: a pump and a valve are zero-length by construction, and a
-	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	// network of two pumps would otherwise report a percentile of nothing at all.
 	var LPN_SYMBOL_CAP_SAMPLE = 512;
-	function p10LinkLengthWorld() {
+	function pLinkLengthWorld(pct) {
 		var list = doc.links || [], n = list.length, step, lens = [], i, l, a, b, d;
 		if (list !== p10LinkKeyArr || n !== p10LinkKeyLen) {
 			p10LinkKeyArr = list; p10LinkKeyLen = n;
-			p10LinkLengthCache = null; symbolCapCache = null;
+			pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null;
 		}
-		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
+		if (pctLinkLengthCache !== null && pctLinkLengthPctCache === pct) { return pctLinkLengthCache; }
 		step = Math.max(1, Math.ceil(n / LPN_SYMBOL_CAP_SAMPLE));
 		for (i = 0; i < n; i += step) {
 			l = list[i];
@@ -6459,27 +6481,18 @@ var EngCalcs = EngCalcs || {};
 			d = Math.hypot(b.x - a.x, b.y - a.y);
 			if (d > 0) { lens.push(d); }
 		}
-		if (!lens.length) { p10LinkLengthCache = 0; return 0; }
+		pctLinkLengthPctCache = pct;
+		if (!lens.length) { pctLinkLengthCache = 0; return 0; }
 		lens.sort(function (x, y) { return x - y; });
-		p10LinkLengthCache = lens[Math.floor(0.1 * (lens.length - 1))];
-		return p10LinkLengthCache;
+		pctLinkLengthCache = lens[Math.floor((pct / 100) * (lens.length - 1))];
+		return pctLinkLengthCache;
 	}
 	function computeSymbolCapScale() {
-		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
-		if (limSI > 0 && px > 0) {
-			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
-			v = currentView();
-			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-			wWorld = (mpu > 0) ? limSI / mpu : 0;
-			if (wWorld > 0 && isFinite(wWorld)) { return px / wWorld; }
-		}
-		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
-		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
-		l10 = p10LinkLengthWorld();
-		return (l10 > 0 && settings.symbolSize > 0) ? settings.symbolSize / l10 : 0;
+		var lp = pLinkLengthWorld(symbolCapPercentile()), capLen = symbolCapMultiple() * lp;
+		return (capLen > 0 && settings.symbolSize > 0) ? settings.symbolSize / capLen : 0;
 	}
 	function symbolCapScale() {
-		p10LinkLengthWorld();   // cheap when nothing moved; clears the cap when the document did
+		pLinkLengthWorld(symbolCapPercentile());   // cheap when nothing moved; clears the cap when the document did
 		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
 		return symbolCapCache;
 	}
@@ -6494,11 +6507,12 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
 	}
-	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
-	// the two things a reader is looking FOR on a wide view -- where does the water come from and
-	// where is it stored -- so they keep their size on the screen at every zoom while everything
-	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
-	// already branch on those two types.
+	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both, and
+	// confirmed 2026-09-22 while widening the rule to pipes: *"Yes. Everything shrinks except
+	// reservoirs and tanks."*). They are the two things a reader is looking FOR on a wide view --
+	// where does the water come from and where is it stored -- so they keep their size on the
+	// screen at every zoom while everything else settles onto the ground. Two call sites,
+	// nodeSymbolSize() and nodeRadius(), and both already branch on those two types.
 	//
 	// **AND THE EDITING FURNITURE, WHICH IS NOT A SYMBOL AT ALL:** a vertex grip, the selection
 	// ring, the pending-pipe ring, the rubber band and the marquee. They are the page talking to the
@@ -6511,8 +6525,12 @@ var EngCalcs = EngCalcs || {};
 	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
 	// --lpn-sym: a pipe network's PIPES are its primary content and their weight is a drawing
 	// decision of its own, not a consequence of how big the junction dots are.
+	//
+	// **DIVIDES BY THE CAPPED SCALE, NOT THE RAW ONE, since 2026-09-22** (Tom: *"Everything shrinks
+	// except reservoirs and tanks."*). A pipe is not one of the two declared exceptions, so past the
+	// cap its stroke stops growing on the ground exactly as a junction's does.
 	function linkStrokeWidth() {
-		return settings.linkWidth / (state.s || 1);
+		return settings.linkWidth / symbolScaleAt();
 	}
 	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
 	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
@@ -6647,6 +6665,22 @@ var EngCalcs = EngCalcs || {};
 		// The two declared exceptions to the maximum map size (Task 705) -- symbolFactorFull().
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
+	}
+	// **THE FIT-ONLY, UNCAPPED TWIN OF nodeRadius() -- always symbolFactorFull(), never the cap.**
+	// fitItems() multiplies a world size by the LIVE scale to recover a scale-INDEPENDENT pixel
+	// figure, and that cancellation only holds when the division inside the world size and the
+	// multiplication outside it use the SAME scale unconditionally -- which symbolFactorFull() does
+	// and the capped symbolFactor() does not, once the view is far enough out that the cap (rather
+	// than the live scale) decides the divisor. A fit started at 0.02x and one started at 1x then
+	// disagreed on where the SAME candidate scale would put a junction, because the capped radius
+	// baked in whichever scale happened to be live when the fit was ASKED for, not the candidate
+	// scale being tested (`zoom-fit-harness.js`, section 2, caught it the day the cap's own default
+	// moved enough to cross this network's fit window). The fit reserves room as though every
+	// symbol were still at its full, unshrunk screen size -- conservative rather than wrong, since
+	// the true capped size past the fitted scale can only be smaller than what was reserved.
+	function nodeRadiusFull(n) {
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
+		return JUNCTION_R * symbolFactorFull();
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
 	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
@@ -9117,11 +9151,12 @@ var EngCalcs = EngCalcs || {};
 	// degrees of longitude.
 	//
 	// **ONE CONCEPT, TWO LEVELS** (Task 705, reconciling this with Task 669's labeling threshold).
-	// `settings.labelMaxWidth` is the widest view that shows ANY generated label, and it also sets
-	// the symbol cap (symbolCapScale()); this one is a second, narrower gate for customers alone,
-	// read INSIDE the first -- customerLabelsAttempted() refuses whenever dataLabelsHidden, which the
-	// labeling threshold sets. Both are the same quantity in the same unit through the same three
-	// functions below, and both boxes are filled by the same captureViewWidth().
+	// `settings.labelMaxWidth` is the widest view that shows ANY generated label -- **no longer the
+	// symbol cap too, since Tom removed that piggyback 2026-09-22** (see symbolCapScale()); this one
+	// is a second, narrower gate for customers alone, read INSIDE the first --
+	// customerLabelsAttempted() refuses whenever dataLabelsHidden, which the labeling threshold
+	// sets. Both are the same quantity in the same unit through the same three functions below, and
+	// both boxes are filled by the same captureViewWidth().
 	function viewWidthLimitSI(v) {
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
@@ -10374,19 +10409,25 @@ var EngCalcs = EngCalcs || {};
 
 
 		doc.nodes.forEach(function (n) {
-			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
+			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
+			// whichever scale happened to be live when it was asked for.
+			var rad = nodeRadiusFull(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
 			fitItem(out, nat.x, nat.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
 			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
 			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
 			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
-			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
+			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
+			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
+			// fit was asked for, not the candidate scale being tested.
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
 				lx = (base.x >= nat.x) ? base.x : base.x - tw;
 			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
+			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
+			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactorFull() * sc;
 			for (j = 0; j < l.verts.length; j++) {
 				v = l.verts[j];
 				fitItem(out, v.x, v.y, vr, vr, vr, vr);
@@ -10396,8 +10437,9 @@ var EngCalcs = EngCalcs || {};
 			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
 			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
 			// pipe by a world distance derived from the arrow's pixel size.
+			// defaultLabelOffset(true): uncapped, same reason as the node loop above.
 			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
-				d = defaultLabelOffset(),
+				d = defaultLabelOffset(true),
 				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
 				ex = mid.x + (l.lx !== undefined ? l.lx : d.x),
 				ey = mid.y + (l.ly !== undefined ? l.ly : d.y),
@@ -15662,6 +15704,13 @@ var EngCalcs = EngCalcs || {};
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
+			// **"Show at all zoom levels", SEARCHABLE AND WRITABLE** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*). No boolean condition exists on this panel yet, so it rides the
+			// numeric ones already here for `sizeMult` -- 1 for ticked, 0 for not, through
+			// findValueOf() below -- rather than inventing a yes/no vocabulary this panel has never
+			// needed before. `equal to 1` finds every note kept on past the threshold.
+			out.push(['allZoom', pc.lpn_field_text_all_zoom || 'Show at all zoom levels', 'Show at all zoom levels']);
 			findOfferCustom(out, d);
 			return out;
 		}
@@ -16298,6 +16347,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
+		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
@@ -17666,6 +17716,27 @@ var EngCalcs = EngCalcs || {};
 				set: function (c, v) { setCustomerCustomProp(c, def, v); } };   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 		});
 	}
+	// **A TEXT OBJECT'S ONE REPLACE-WRITABLE PROPERTY** (Tom, review-queue R-174, 2026-09-23: *"This
+	// property should appear in multi-properties, Tables, and Find/Replace."*). `id` and `text`
+	// stay out of Replace on purpose (see the comment above replaceExtraSpecs()) -- an id is
+	// unreachable and a note's words are a one-at-a-time popup edit -- but `allZoom` is neither: it
+	// is a plain yes/no, base-write like size and position, on the identical terms `bold` and
+	// `sizeMult` already have in paneTextCols(). No `str`/`text` flag, so replaceValueOf() parses
+	// the value box as a number and `1`/`0` is how the box says "ticked"/"unticked", the same
+	// vocabulary findValueOf() already reads it in above.
+	function labelReplaceSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'allZoom', group: 'label', field: 'allZoom',
+				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
+				applies: function () { return true; },
+				get: function (lb) { return lb.allZoom === true ? 1 : 0; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+				} }
+		];
+	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
 	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
 	// carries neither, so "everything" here means every NODE and every LINK, exactly as it does in
@@ -17700,11 +17771,18 @@ var EngCalcs = EngCalcs || {};
 		if (findQueryAst) { cands = replaceFoundSet(); }
 		else {
 			var d = findScopeDef(findState.scope);
-			if (d.key === 'all' || d.group === 'label') { return []; }
+			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
+			// property here applies to every group at once. **A Text scope is no longer blanket
+			// refused** -- it used to be, because a Text carried nothing writable (its words are a
+			// one-at-a-time popup edit and its id is unreachable, see the comments on both above).
+			// `labelReplaceSpecs()` now gives it one real spec (`allZoom`, R-174), and the filter
+			// below still leaves `text` and `id` out because no spec answers to them.
+			if (d.key === 'all') { return []; }
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
-		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs()).filter(function (s) {
+		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
+			.concat(labelReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
@@ -17831,7 +17909,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id)
-			: (ref.group === 'customer' ? customerById(ref.id) : linkById(ref.id));
+			: (ref.group === 'customer' ? customerById(ref.id)
+			: (ref.group === 'label' ? labelById(ref.id) : linkById(ref.id)));
 	}
 	// **NOTHING IS WRITTEN UNTIL THE COUNT HAS BEEN SEEN.** A bulk write is the one action on this
 	// page whose blast radius the user cannot see coming -- the matched pipes are spread over a map
@@ -20164,6 +20243,20 @@ var EngCalcs = EngCalcs || {};
 				set: function (lb, v) {
 					lb.bold = !!v;   // base-write: Base-owned, as in the popup
 					textLabelRelayout(lb.id);
+				} },
+			// **THE POPUP'S OWN "Show at all zoom levels" ROW, RE-KEYED** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*), on the `bold` row's exact pattern -- `bool: true` for the checkbox
+			// cell, and this Table's own list is what feeds the multi-properties box (see
+			// multiGroups()/multiSection() above), so one column earns both venues at once. Off by
+			// default, like the popup's own row; a scenario visibility change is a redraw, not a
+			// re-solve, so applyLabelVisibility() stands in for textLabelRelayout()'s afterPropertyEdit().
+			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2,
+				get: function (lb) { return lb.allZoom === true; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+					saveToStorage();
 				} },
 			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
 				get: function (lb) { return textLabelRotation(lb); },
@@ -35293,8 +35386,9 @@ var EngCalcs = EngCalcs || {};
 	// One redraw for either answer: the document's numbers or their meaning changed, so everything
 	// derived from them is stale -- the labels, the solve, and what is on disk.
 	function afterUnitChange() {
-		// On a geographic project the threshold's metres move with the unit while a world unit
-		// (a degree) does not, so the cap is re-derived (Task 705). On a grid it is unit-invariant.
+		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
+		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
+		// costs nothing and a future input to the cap might not be so lucky.
 		invalidateSymbolCap();
 		refreshAllFromDocument();
 		saveToStorage();
@@ -36724,11 +36818,15 @@ var EngCalcs = EngCalcs || {};
 			if (!le) { return; }
 			// MEMBERSHIP FIRST, and it beats everything else here: a label switched OFF in this
 			// scenario is not there at all (Task 407). Then the label's OWN answer to the zoom:
-			// **a Text object is authored content and ships exempt from the threshold** -- the rule
-			// this page has always had, and what makes the shipped Net3 note reading "Zoom in to
-			// see labels" still readable when the labels have gone. `!== false` rather than a
-			// truthiness test, so a note written before this switch existed keeps showing.
-			var gone = !isActive(lb) || (past && lb.allZoom === false);
+			// **DEFAULT OFF** (Tom, review-queue R-174, 2026-09-23: *"This property should be off
+			// for all but the largest text object in our examples and for all projects with no
+			// previous settings."*), reversing the launch ruling -- a Text object is no longer
+			// exempt from the threshold unless it says so. `=== true` rather than a truthiness
+			// test, so `allZoom: false` (every note stored under the old default) and an absent
+			// property both read as off. Each shipped example now states `allZoom: true` on
+			// whichever of its own Text objects is the largest, which is what keeps a note like
+			// Net3's "Zoom in to see labels" readable when the labels have gone.
+			var gone = !isActive(lb) || (past && lb.allZoom !== true);
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
@@ -36736,11 +36834,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
-	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
-	// labels re-decided. Never on the zoom path: a zoom changes neither input.
+	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). **No longer an input to the symbol
+	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
+	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
+	// changes neither input.
 	function labelThresholdChanged() {
-		invalidateSymbolCap();
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
@@ -37622,8 +37720,9 @@ var EngCalcs = EngCalcs || {};
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
-		// captureViewWidth(), rounded UP -- and one number doing two jobs: it hides generated labels
-		// and it is where symbols stop growing on the ground (symbolCapScale()). The tip says both.
+		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
+		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
+		// generated labels and nothing else; the symbol-size cap is the separate row below.
 		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
 			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
 		lmwWrap.className = 'lpn-set-ctlgroup';
@@ -37654,9 +37753,56 @@ var EngCalcs = EngCalcs || {};
 		});
 		lmwUnit.className = 'lpn-set-note';
 		lmwUnit.textContent = unitLabel('lpn_u_length');
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwBtn); lmwWrap.appendChild(lmwUnit);
+		// **THE UNIT NAMES THE NUMBER, SO IT SITS RIGHT AFTER IT** (Tom, 2026-09-22, on a screenshot
+		// showing "ft" trailing the button: *"'ft' is in the wrong place. It should be before the
+		// button."*). It used to read "[box] [Use current view] ft", which reads as though the
+		// BUTTON took the unit.
+		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
 			lmwWrap, pc.lpn_settings_label_max_width_tip);
+		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
+		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
+		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
+		// always on, no blank state to explain. Both numbers are plain dimensionless quantities (a
+		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
+		// unit change.
+		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
+			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
+			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+		capWrap.className = 'lpn-set-ctlgroup';
+		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
+		capMultInput.id = 'lpn_set_symbol_cap_mult';
+		capMultInput.style.width = '4em';
+		capMultInput.value = trimNum(symbolCapMultiple());
+		capMultInput.addEventListener('change', function () {
+			var v = +capMultInput.value;
+			if (isFinite(v) && v > 0) {
+				settings.symbolCapMultiple = v; invalidateSymbolCap(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capMultInput.value = trimNum(symbolCapMultiple());
+			}
+		});
+		capMid.className = 'lpn-set-note';
+		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
+		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
+		capPctInput.id = 'lpn_set_symbol_cap_pct';
+		capPctInput.style.width = '4em';
+		capPctInput.value = trimNum(symbolCapPercentile());
+		capPctInput.addEventListener('change', function () {
+			var v = +capPctInput.value;
+			if (isFinite(v) && v >= 0 && v <= 100) {
+				settings.symbolCapPercentile = v; invalidateLinkLengths(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capPctInput.value = trimNum(symbolCapPercentile());
+			}
+		});
+		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
+		capPost.className = 'lpn-set-note';
+		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
+		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
+		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
+		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
+			pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -45499,20 +45645,22 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed). With the
-		// labeling threshold back, a note needs its own answer to it. **TICKED BY DEFAULT**: a Text
-		// object is authored content and has always stayed on the drawing, and the shipped Net3 note
-		// reading "Zoom in to see labels" only makes sense if it outlives the labels it speaks of.
-		// Stored only when UNticked (`allZoom: false`), so every note written before this switch
-		// existed keeps showing. BASE-WIDE like size and position, and for the same reason.
+		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed).
+		// **UNTICKED BY DEFAULT** (Tom, review-queue R-174, 2026-09-23: *"This property should be
+		// off for all but the largest text object in our examples and for all projects with no
+		// previous settings."*) -- reversing the launch ruling recorded above until this ruling. A
+		// note keeps its old on-screen behaviour only if it explicitly says so; a project saved
+		// before this property existed, or a fresh Text, is off and goes with the threshold like
+		// generated annotation. Stored only when TICKED (`allZoom: true`), so absence keeps meaning
+		// the default. BASE-WIDE like size and position, and for the same reason.
 		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
 		allZoomInput.type = 'checkbox';
-		allZoomInput.checked = lb.allZoom !== false;
+		allZoomInput.checked = lb.allZoom === true;
 		allZoomInput.addEventListener('change', function () {
-			if (allZoomInput.checked === (lb.allZoom !== false)) { return; }
+			if (allZoomInput.checked === (lb.allZoom === true)) { return; }
 			saveUndoSnapshot();
-			if (allZoomInput.checked) { delete lb.allZoom; }
-			else { lb.allZoom = false; }   // base-write: zoom visibility is Base-owned, exactly as size is
+			if (allZoomInput.checked) { lb.allZoom = true; }
+			else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 			applyLabelVisibility();
 			saveToStorage();
 		});
