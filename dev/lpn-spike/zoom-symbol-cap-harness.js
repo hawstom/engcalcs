@@ -26,8 +26,10 @@
 //   4. A geographic project, where a world unit is a degree: the cap needs no metres conversion at
 //      all any more, because it never compares against a view width in a display unit.
 //   5. The service line: 1 px until the drawing stops growing, then below a pixel (R-051 (2)).
-//   6. A Text object's "Show at all zoom levels": ticked by default, and unticked it goes with the
-//      labels.
+//   6. A Text object's "Show at all zoom levels": OFF by default (Tom, review-queue R-174,
+//      2026-09-23, reversing the launch ruling above -- "off for all but the largest text object
+//      in our examples and for all projects with no previous settings"), and only an explicit
+//      `allZoom: true` keeps a note off the labeling threshold.
 //   6b. A resize alone still re-decides the labeling threshold (labels only -- the symbol cap does
 //      not depend on the window at all any more).
 //   7. The Settings row -- the label-threshold box, and the two new number boxes for the multiple
@@ -134,9 +136,13 @@ function chainDoc(extraSettings) {
 	return {
 		version: 10, project: { coords: 'xy', units: { lpn_u_length: 'ft' } },
 		nodes: nodes, links: links,
+		// X1 is explicitly kept ON (allZoom: true); X2 carries no property at all, which is the
+		// default -- OFF -- since R-174 reversed the launch ruling above. `allZoom: false` (the
+		// old explicit-off spelling, from before the default flipped) is checked separately below.
 		labels: [
-			{ id: 'X1', text: 'Kept note', x: 50, y: 50, anchorNode: null, sizeMult: 1 },
-			{ id: 'X2', text: 'Fading note', x: 80, y: 50, anchorNode: null, sizeMult: 1, allZoom: false }
+			{ id: 'X1', text: 'Kept note', x: 50, y: 50, anchorNode: null, sizeMult: 1, allZoom: true },
+			{ id: 'X2', text: 'Fading note', x: 80, y: 50, anchorNode: null, sizeMult: 1 },
+			{ id: 'X3', text: 'Old-style off note', x: 90, y: 50, anchorNode: null, sizeMult: 1, allZoom: false }
 		],
 		settings: Object.assign({}, extraSettings || {}), view: null
 	};
@@ -281,12 +287,14 @@ function suite(mutate, quiet) {
 	L.applyLabelVisibility();
 	const els = L.labelEls();
 	const hid = function (id) { return !!(els[id] && els[id].text.classList.contains('lpn-lbl-hidden')); };
-	check(els.X1 && els.X2 && !hid('X1') && !hid('X2'), '6.1 inside the threshold both notes show');
+	check(els.X1 && els.X2 && els.X3 && !hid('X1') && !hid('X2') && !hid('X3'),
+		'6.1 inside the threshold every note shows');
 	setS(1200 / 2000);
 	L.applyLabelVisibility();
 	check(L.dataLabelsHidden(), '6.2 past it the generated labels go');
-	check(!hid('X1'), '6.3 ...a note left at its default (ticked) stays');
-	check(hid('X2'), '6.4 ...and a note with the box UNticked goes with the labels');
+	check(!hid('X1'), '6.3 ...a note explicitly kept ON (allZoom: true) stays');
+	check(hid('X2'), '6.4 ...and a note left at its default (no property at all) goes with the labels');
+	check(hid('X3'), '6.5 ...and the old explicit-off spelling (allZoom: false) still means off');
 
 	// ============================================================================================
 	head('--- 6b. a resize alone still re-decides the labeling threshold (labels only, not the cap) ---');
@@ -460,8 +468,8 @@ const MUTATIONS = [
 			"if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactor(); }")],
 	['the tank\'s drawn box loses its exception',
 		swap('\t\tvar k = symbolFactorFull();   // reservoir and tank only', '\t\tvar k = symbolFactor();   // reservoir and tank only')],
-	['a Text object hides with the labels unless ticked (the default reversed)',
-		swap('(past && lb.allZoom === false)', '(past && lb.allZoom !== true)')],
+	['the old default comes back: a Text object shows unless explicitly UNticked',
+		swap('(past && lb.allZoom !== true)', '(past && lb.allZoom === false)')],
 	['the wrong percentile used (always the 50th, ignoring the setting)',
 		swap('\t\tpctLinkLengthCache = lens[Math.floor((pct / 100) * (lens.length - 1))];',
 			'\t\tpctLinkLengthCache = lens[Math.floor(0.5 * (lens.length - 1))];')],
@@ -474,8 +482,8 @@ const MUTATIONS = [
 	['the service line divides by the scale, never below a pixel',
 		swap('Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / symbolScaleAt();',
 			'Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / (state.s || 1);')],
-	['an unticked Text object stays',
-		swap('var gone = !isActive(lb) || (past && lb.allZoom === false);', 'var gone = !isActive(lb);')],
+	['a Text object never goes with the labels regardless of the property',
+		swap('var gone = !isActive(lb) || (past && lb.allZoom !== true);', 'var gone = !isActive(lb);')],
 	['the multiple box does not invalidate the cap',
 		swap('settings.symbolCapMultiple = v; invalidateSymbolCap(); refreshSymbolSizes(); saveToStorage();',
 			'settings.symbolCapMultiple = v; refreshSymbolSizes(); saveToStorage();')],
