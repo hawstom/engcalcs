@@ -1206,7 +1206,6 @@
 		"colorLinkField": "",
 		"colorRamp": "epanet",
 		"colorReverse": false,
-		"colorThematic": false,
 		"colorLegendPosition": "bottom-right",
 		"colorBreaks": {},
 		"labelReadabilityBias": 110,
