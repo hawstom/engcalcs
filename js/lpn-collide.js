@@ -534,6 +534,17 @@ EngCalcs.lpnCollide = (function () {
 		return out;
 	}
 	var WIDEN_MAX_LEVEL = WIDEN_LEVELS.length;
+	// **HOW FAR THE RESCUE ACTUALLY GOES, AND IT IS NOT THE LAST LEVEL** (2026-09-22). A longer
+	// leader is preferred to giving a value up (Tom's ruling -- see `labelWidenSearch` in
+	// js/looped-network.js), but that is a preference between two rungs, not a licence, and the rung
+	// below them both is the label disappearing altogether. Measured on Net3-World at 2x with four
+	// node fields on, of 97 labels: at level 2, 88 are drawn and 35 give a value up; at level 3 --
+	// past twenty resting offsets -- 81 are drawn and only 18 give anything up, because a leader
+	// that long crosses somebody and the crossing shed at the end of the pass hides one of the pair.
+	// Seven more labels gone to spare seventeen others a line is the wrong side of his order of
+	// preference. With three fields on, level 3 is the better of the two (93 drawn against 92),
+	// which is what says this is a bound on CROWDING and not a fact about the geometry.
+	var WIDEN_SHIPPED_LEVELS = Math.min(2, WIDEN_MAX_LEVEL);
 	// **POLAR, NOT RECTANGULAR, AND THAT FOLLOWS FROM THE SHAPE OF WHAT IS BEING SAMPLED.** A sector
 	// is bounded by two angles and a radius, so a polar grid needs no rejection step at all, where a
 	// rectangular one samples a square and throws most of it away. Radii are geometric inner->outer
@@ -1739,14 +1750,14 @@ EngCalcs.lpnCollide = (function () {
 		// Net3-Novato-CA-World: inline, the rescue moved 22 labels that already had places; last, it
 		// moves none, and draws the same ones.
 		//
-		// A label that is STILL beaten here is genuinely enclosed as far as level 3 reaches -- past
-		// twenty resting offsets, which is further than any measured case needed -- and only then is
-		// it dropped.
+		// A label that is STILL beaten here is enclosed as far as WIDEN_SHIPPED_LEVELS reaches --
+		// nine resting offsets as it ships, and that bound is a measurement; see the constant --
+		// and only then is it dropped, which is the rung where it gives a value up instead.
 		function rescue(lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
 				chosen = null, chosenBox = null, level, more, far, i, b,
 				wide = { boxes: [], segments: [] };
-			for (level = 1; level <= WIDEN_MAX_LEVEL && !chosen; level++) {
+			for (level = 1; level <= WIDEN_SHIPPED_LEVELS && !chosen; level++) {
 				more = widenSides(lbl.anchor, lbl.widen.offset, lbl.widen.arcs,
 					lbl.widen.outer, level);
 				if (!more || !more.length) { break; }
