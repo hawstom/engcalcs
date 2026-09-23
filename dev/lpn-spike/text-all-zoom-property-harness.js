@@ -164,9 +164,10 @@ head('--- 3b. the multi-properties box: the SAME column, built through openMulti
 	L.toggleInSelection('label', b.id);
 	const opened = L.openMulti();
 	ok('3b.1 selecting both Text objects opens the multi box (not the single popup)', opened === true);
-	// Walk the popup for the checkbox beside the shared "Show at all zoom levels" label.
+	// Walk the popup for the checkbox beside the shared all-zoom label -- read off the real
+	// language file the DOM stub loads, never a literal, so a rewording cannot redden this file.
 	const pc = global.EngCalcs.pageConfig;
-	const wantLabel = pc.lpn_field_text_all_zoom || 'Show at all zoom levels';
+	const wantLabel = pc.lpn_field_text_all_zoom;
 	let input = null;
 	(function walk(el) {
 		if (input) { return; }
