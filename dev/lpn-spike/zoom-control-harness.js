@@ -237,6 +237,12 @@ console.log('\n--- 4. the +/- chip is hidden at the phone breakpoint, and only t
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
 	ok('the chip is not itself hidden inline by default',
 		!/id="lpn_zoom_control"[^>]*display:\s*none/.test(php));
+	// An inline display of ANY value beats the stylesheet's hide rule, so the phone never hid it
+	// (Perry, 2026-09-23, measured in a real touch-emulated Chromium: computed display "flex").
+	ok('the chip carries no inline display, so the hide rule can win',
+		!/id="lpn_zoom_control"[^>]*style="[^"]*display:/.test(php));
+	ok('its flex layout lives in the stylesheet instead',
+		css.indexOf('#lpn_zoom_control { display: flex;') >= 0);
 }
 
 console.log('\n' + checks + ' checks, ' + failures + ' failed');
