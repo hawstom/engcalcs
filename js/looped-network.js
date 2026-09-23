@@ -36192,7 +36192,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		lmwUnit.className = 'lpn-set-note';
 		lmwUnit.textContent = unitLabel('lpn_u_length');
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwBtn); lmwWrap.appendChild(lmwUnit);
+		// **THE UNIT NAMES THE NUMBER, SO IT SITS RIGHT AFTER IT** (Tom, 2026-09-22, on a screenshot
+		// showing "ft" trailing the button: *"'ft' is in the wrong place. It should be before the
+		// button."*). It used to read "[box] [Use current view] ft", which reads as though the
+		// BUTTON took the unit.
+		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
 			lmwWrap, pc.lpn_settings_label_max_width_tip);
 		var opacityInput = document.createElement('input');
