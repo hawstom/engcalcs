@@ -320,8 +320,10 @@
 	var state = {
 		t: 0, run: null, token: 0, playing: false, timer: null, speed: 1,
 		// ---- the four fields that make a period run cheap enough to leave automatic (2026-08-19) ----
-		// `lastRunMs` is how long the LAST run of THIS network took, measured; it is what decides
-		// whether the page may run the period by itself (see EC.LPN_TIME_AUTO).
+		// `lastRunMs` is how long the LAST run of THIS network took, measured on the wall clock; it
+		// is what the slow-run advice quotes (see EC.LPN_TIME_SLOW_MS).
+		// `lastBusyMs` is what that run cost the THREAD, its slices summed without the waits between
+		// them; it decides whether an edit's live answer can be the run itself (see editRunsNow()).
 		// `wanted` is "a run has been asked for", set by the Run button, by a document arriving and
 		// by the transport, and consumed by the next solve.
 		// `busy` is a run in flight, so a second request queues instead of piling up.
@@ -332,7 +334,7 @@
 		// appears (Task 450). A run somebody pressed Run for owes them a sign that it started; an
 		// automatic run after a quiet moment owes them silence, or the page grows a box that pops
 		// up every time the mouse stops moving.
-		lastRunMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
+		lastRunMs: null, lastBusyMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
 	};
 
 	/**
@@ -620,9 +622,13 @@
 	 * particular solve is a run rather than an edit. Returns false otherwise, and
 	 * js/looped-network.js carries on to the ordinary steady solve.
 	 *
-	 * **A HYDRAULIC EDIT RECALCULATES THE FIRST REPORTING TIME AND NOTHING ELSE** (Tom, 2026-08-19:
-	 * "On any edit, only the first time step should be recalculated"). Two things follow, and the
-	 * second is the whole point of the change:
+	 * **A HYDRAULIC EDIT ON A SLOW NETWORK SHOWS THE FIRST REPORTING TIME FIRST.** This answers Tom's
+	 * "multiplied burden of recalculating every time step at every value change" (2026-08-19, quoted
+	 * above LPN_TIME_AUTO). It is NOT a ruling of his that an edit recalculates only the first step:
+	 * a sentence to that effect was cited here as his, cannot be found in any transcript, and he
+	 * struck it on 2026-09-23 -- the one place first-step-only makes sense is while the EPANET engine
+	 * is still loading for a new browser. On a fast network an edit runs the period at once (see
+	 * editRunsNow()). Where the preview does run, two things follow:
 	 *
 	 *   1. The page stays LIVE. Returning false here hands the solve back, and what gets drawn is
 	 *      the steady solve of the document as it now stands -- the same as-you-type behaviour
@@ -630,9 +636,8 @@
 	 *   2. **THE FRAMES GO.** They describe a network that no longer exists, and a result that no
 	 *      longer matches the document must never be on screen as if it did. Dropping them rather
 	 *      than labelling them stale is EPANET's own answer, it keeps EC.lpnTimeCurrentFrame()
-	 *      honest for free, and it is what gives "only the first time step" a literal meaning on
-	 *      screen: the transport goes back to the start, because the start is the one moment that
-	 *      has actually been worked out.
+	 *      honest for free, and it is why the transport goes back to the start: the start is the
+	 *      one moment that has actually been worked out.
 	 *
 	 * The period comes back either by itself, after a quiet moment, or on the Run button -- see
 	 * EC.LPN_TIME_AUTO for which, and why that is a measurement rather than a preference.
@@ -647,6 +652,7 @@
 			// would leave the transport showing a run that is no longer being computed.
 			cancelIdleRun();
 			state.lastRunMs = null;
+			state.lastBusyMs = null;
 			state.runSig = null;
 			state.wantedByUser = false;
 			if (state.run) { state.run = null; state.t = 0; renderPanel(); }
@@ -671,9 +677,47 @@
 		}
 		dropFrames();
 		state.runSig = null;
+		// **A RUN STILL IN FLIGHT IS ANSWERING THE NETWORK THIS EDIT JUST REPLACED.** Its frames
+		// may not land on top of whatever this edit draws, so it is superseded here, exactly as a
+		// newer run supersedes it. runFinished() still fires when it ends, so a queued run is not lost.
+		if (state.busy) { state.token++; }
+		// **ONE CHANGE, ONE RESULT, ONE LABEL PASS** (Task 653). When the run that is coming anyway
+		// is cheap, the steady preview is pure cost: it is solved, drawn and labelled, and a second
+		// later the run replaces it with the same instant -- t is back at the first reporting time
+		// either way. So the run goes now, in its place. A run already in flight owns the engine;
+		// the request queues behind it and runFinished() starts it.
+		if (editRunsNow()) {
+			cancelIdleRun();
+			if (state.busy) { state.wanted = true; return true; }
+			startRun(model);
+			return true;
+		}
 		if (autoRunAllowed()) { scheduleIdleRun(); }
 		return false;
 	};
+
+	/**
+	 * **MAY THIS EDIT'S LIVE ANSWER BE THE RUN ITSELF?** Only with the switch on (off means off,
+	 * and that path never reaches here anyway), and only for a network whose last run was measured
+	 * and cost its thread no more than EC.LPN_TIME_SLOW_MS.
+	 *
+	 * **WHY THAT LINE.** With the switch on the run happens anyway, a moment later, so running it
+	 * now instead of the preview is strictly LESS work: one run and one label pass, against a
+	 * steady solve, a label pass, the run and a second label pass. The label pass is the expensive
+	 * part (hundreds of ms on Net3, measured). The one thing the preview buys is an EARLIER first
+	 * answer, and that is worth something only where the run itself is slow -- which is exactly
+	 * where the page already tells the user so. Below that line the preview is pure cost; above it
+	 * the preview keeps data entry live, which is Tom's "multiplied burden" concern (2026-08-19).
+	 *
+	 * **THREAD TIME, NOT WALL CLOCK.** `lastBusyMs` is the run's slices summed; the wall clock also
+	 * counts whatever the page did while the run yielded, and on opening a project that is the
+	 * whole label pass -- measured at 3.6-6 s of wall clock for a run whose slices cost 0.4-0.7 s.
+	 * Unmeasured counts as slow, so the preview is what an unknown network gets.
+	 */
+	function editRunsNow() {
+		return autoRunAllowed() && state.lastBusyMs !== null &&
+			state.lastBusyMs <= EC.LPN_TIME_SLOW_MS;
+	}
 
 	/**
 	 * Everything the solver reads, as one string. Same string, same answers.
@@ -793,6 +837,7 @@
 			// exactly as much wall clock as a kept one, and it is the cost this network's next
 			// automatic run is judged by.
 			state.lastRunMs = nowMs() - t0;
+			if (run && typeof run.busyMs === 'number') { state.lastBusyMs = run.busyMs; }
 			runFinished();
 			if (token !== state.token) {
 				// The box belonged to this run and this run no longer belongs to the page. It goes
@@ -910,6 +955,7 @@
 	EC.lpnTimeArrived = function () {
 		cancelIdleRun();
 		state.lastRunMs = null;
+		state.lastBusyMs = null;
 		state.run = null;
 		state.runSig = null;
 		state.t = 0;
@@ -942,6 +988,7 @@
 		state.wanted = false;
 		state.wantedByUser = false;
 		state.lastRunMs = null;
+		state.lastBusyMs = null;
 	};
 
 	/**
@@ -961,7 +1008,7 @@
 	EC.lpnTimeRunState = function () {
 		return {
 			frames: state.run ? state.run.frames.length : 0,
-			t: state.t, lastRunMs: state.lastRunMs,
+			t: state.t, lastRunMs: state.lastRunMs, lastBusyMs: state.lastBusyMs,
 			auto: autoRunAllowed(), wanted: state.wanted, busy: state.busy,
 			idle: !!state.idle
 		};

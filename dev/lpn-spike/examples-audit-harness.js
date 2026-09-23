@@ -114,6 +114,11 @@ const CURATED_SETTING = {
 	linkWidth: 'line weight',
 	textSize: 'label size', symbolSize: 'symbol size', mapHeight: 'pane height',
 	backdropOpacity: 'how strongly the site plan shows through',
+	// **CURATED ON Net3.lwn, 2026-09-22, SO ITS OWN "Zoom in to see labels" NOTE IS TRUE** (Tom,
+	// asked whether it should get a threshold back for exactly that reason: *"Yes. 30."*). EPA's
+	// Net3.inp has no notion of this setting at all, so a raw import carries none -- this is a
+	// presentation choice about the gallery copy, not a fact the source states.
+	labelMaxWidth: 'a curated presentation choice (Task 705); the source .inp has no such concept',
 	// **THE SECOND MODEL FIELD A SHIPPED EXAMPLE MAY STATE MORE OF THAN ITS SOURCE**, and it is
 	// exempted here for the same reason `rules` is: so that section 6 below can be STRICTER than
 	// the blanket compare rather than weaker. EPA's Net3.inp has no notion of a custom property,

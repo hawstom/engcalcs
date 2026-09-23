@@ -1997,6 +1997,10 @@ $ec_lang['lpn_lock_ask']='Ask';
 $ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
 $ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
 $ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
+// **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
+// out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
+// reflex had no way to learn what had just been offered. It says what did not happen, and why.
+$ec_lang['lpn_lock_open_cancelled']='That file was not opened, and nothing here changed. Somebody else still has it open.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
@@ -2004,6 +2008,16 @@ $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
 $ec_lang['lpn_ago_days']='{n} days';
 $ec_lang['lpn_ago_unknown']='an unknown time';
+// ---- The message log (ROADMAP Task 704) ----
+// A notice is on screen for eight seconds and is then gone; these name the place it went. Kept in
+// memory only, for as long as the page is open.
+$ec_lang['lpn_msglog_name']='Messages';
+$ec_lang['lpn_msglog_heading']='Recent messages';
+$ec_lang['lpn_msglog_empty']='No messages yet.';
+// The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"
+// wherever its own grammar wants it.
+$ec_lang['lpn_msglog_ago']='{x} ago';
+$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
@@ -2888,8 +2902,20 @@ $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label 
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
 // on screen that says what a blank box means. The length unit is shown beside the box at run time.
 $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map width or less';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.';
+// **NO LONGER SAYS ANYTHING ABOUT SYMBOL SIZE** (Task 705, Tom, 2026-09-22: *"I'd prefer not to have
+// two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
+// growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.';
 $ec_lang['lpn_settings_label_always']='Always show labels';
+// **THE ONE MAXIMUM-SYMBOL-SIZE RULE** (Task 705, his own wording, 2026-09-22: *"Prevent nodes from
+// scaling larger than __ times the length of the __ percentile pipe"*). Split across three keys
+// because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
+// between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
+// reads as "20% percentile pipe").
+$ec_lang['lpn_settings_symbol_cap']='Prevent nodes from scaling larger than';
+$ec_lang['lpn_settings_symbol_cap_mid']='times the length of the';
+$ec_lang['lpn_settings_symbol_cap_post']='percentile pipe';
+$ec_lang['lpn_settings_symbol_cap_tip']='A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';

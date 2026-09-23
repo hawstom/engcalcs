@@ -285,9 +285,119 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // Only the mode hint is reserved against by zoomExtent() (overlayReserve). The
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
-		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js).
+		      //
+		      // **z-index:6, MATCHING #lpn_georef_bar** (Perry's review, 2026-09-22, reported
+		      // twice: at 390px on a fresh project, #lpn_examples_pane intercepted every press
+		      // meant for the glyph). `.lpn-examples` is `margin:0 auto;max-width:68rem` -- at
+		      // 1280px that centres it narrower than the viewport, clear of this row's left edge,
+		      // but at 390px the max-width does nothing and the block spans the canvas, painting
+		      // OVER this row because #lpn_empty_hint comes later in the DOM and neither had a
+		      // z-index. `pointer-events:auto` on `.lpn-examples` covers its whole padding box, not
+		      // just its buttons, so the glyph was hit-tested underneath rather than on top. A
+		      // stacking context on this row, not a change to the examples pane, because every
+		      // other reader of #lpn_map_overlay_tl already assumes plain DOM-order painting for
+		      // its own children. ?>
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:6;display:flex;flex-direction:row;align-items:flex-start;gap:4px;pointer-events:none">
+			<?php // **THE MESSAGE LOG BUTTON LIVES WHERE THE MESSAGES DO** (ROADMAP Task 704; Tom,
+			      // 2026-09-21, having used it: *"the button/glyph must be where the messages appear,
+			      // and it must appear and possibly highlight while a message displays."*). It shipped
+			      // in the bottom strip beside the scenario button and the coordinate readout, which
+			      // is the opposite corner of the map from the thing it recalls. Ida, agreeing: *"That
+			      // is a real defect, not a matter of taste, and I should have caught it before you
+			      // did."*
+			      //
+			      // **THE FIXED START EDGE OF THE WHOLE COLUMN, OUTSIDE THE PART THE NOTICE COVERS.**
+			      // #lpn_map_notice covers #lpn_mode_hint exactly while it shows, so a control placed
+			      // inside that stack would be underneath a message half the time it was wanted. This
+			      // overlay is therefore a ROW: the button, then everything that comes and goes. It
+			      // reads [glyph] [whatever the map is currently saying] in reading order, in both
+			      // states -- mode line showing and notice showing alike -- and in RTL too, because
+			      // the row is plain `flex-direction:row` with no direction override, so the browser
+			      // itself reverses the visual order under `dir="rtl"` and the glyph still leads.
+			      // **#lpn_map_notice moved INTO #lpn_map_overlay_tl_col in this same change** (Perry's
+			      // review, 2026-09-22): it used to be a sibling of this whole row, absolutely
+			      // positioned at the MAP's own top-left corner with a physical `left:4px` -- which is
+			      // where the glyph now sits, so the notice sat exactly on top of the glyph and its
+			      // highlight for the whole time a message showed, in every language, and doubly so in
+			      // RTL where the glyph is at the physical right and the notice was still nailed to the
+			      // physical left. It is now a child of the column below, positioned with
+			      // `inset-inline-start:0` rather than `left`, so it starts at the column's own start
+			      // edge -- immediately after the glyph -- in either direction.
+			      //
+			      // **AND THE MESSAGE TEXT IS NEVER PUT ON THIS LINE.** Folding the sentence into the
+			      // mode line is the obvious next step and is wrong: the mode hint already wraps to
+			      // two lines in several languages, and a row that must fit a glyph and a sentence
+			      // side by side at 320px in a language 40% longer than English fits neither. The two
+			      // stay stacked, one covering the other, exactly as they were.
+			      //
+			      // Same size, font-size and translucent pill as the mode text beside it, so the row
+			      // reads as one readout rather than as a control parked next to one.
+			      //
+			      // **HIGHLIGHTED WHILE A MESSAGE SHOWS** (Ida's ruling, and Tom's own words above:
+			      // "possibly highlight while a message displays"). showNotice() in
+			      // js/looped-network.js is the one door every notice and the standing
+			      // map-unmeasurable warning already go through, so it is the one place that adds
+			      // and removes .lpn-msglog-active -- on while #lpn_map_notice is showing text, off
+			      // the moment it is cleared, whether by the eight-second timer or by a later
+			      // message replacing it. pointer-events:auto on the button alone, because the row
+			      // it sits in is otherwise inert like every overlay here, and it is one keyboard
+			      // stop like every other icon button on this page. ?>
+			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
+			<?php // Everything that comes and goes, in the stack it has always been in. `position:
+			      // relative` is load-bearing: #lpn_map_notice is absolutely positioned at THIS box's
+			      // top-left, which is how it goes on covering the mode hint now that the column no
+			      // longer starts at the map's own corner. One number to get right, not two that have
+			      // to be kept in step. ?>
+			<div id="lpn_map_overlay_tl_col" style="position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
+			      // saving a project put a line of text above the canvas and "moves the map down past the
+			      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
+			      // the mode status temporarily"). Same move the mode hint itself made, for the same
+			      // reason: a readout that comes and goes must not be in the page's FLOW, because
+			      // everything below it moves when it arrives.
+			      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
+			      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
+			      // uncovers it. It is not measured by overlayReserve(), which is the point -- a
+			      // transient must not change the fit, or every save would re-zoom the map.
+			      //
+			      // **A CHILD OF THIS COLUMN, NOT A SIBLING OF THE WHOLE ROW** (Perry's review,
+			      // 2026-09-22, catching a defect the glyph move introduced). It used to sit outside
+			      // #lpn_map_overlay_tl entirely, positioned with a physical `left:4px` against the
+			      // MAP's own corner -- which is exactly where the glyph now lives, so the notice sat
+			      // on top of the glyph and its highlight for the whole time a message showed, making
+			      // both invisible and the highlight pointless. `inset-inline-start:0` rather than
+			      // `left:0`, and `top:0` rather than `top:4px`, because this box's own position:relative
+			      // origin -- inherited from the column, whose own top-left corner is already past the
+			      // glyph and the 4px inset -- is the coordinate system now, not the map's. The logical
+			      // property is what keeps this correct in RTL: the column's own start edge is its
+			      // right edge under `dir="rtl"`, and `inset-inline-start` follows that automatically
+			      // where a physical `left` would not. ?>
+			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
+			<?php // **THE MESSAGE LOG IS AN ON-MAP LIST NOW, NOT A DIALOG** (ROADMAP Task 704, Tom
+			      // 2026-09-22, live on port 8099: *"The alert paradigm is not a good UX for showing
+			      // past messages. User expects them to descend below the glyph, below the Mode status
+			      // in similar appearance that they originally had... fill the map below the Mode
+			      // status line with old messages with oldest at the bottom."*). This supersedes
+			      // Ida's 2026-09-21 dialog design, which his own use of the page overruled the next
+			      // day -- a live browser pass outranks a design note nobody has used yet.
+			      //
+			      // A CHILD OF THIS COLUMN, directly under the mode-hint/notice slot, so it reads as
+			      // the next line down rather than as a separate control. Newest row FIRST, matching
+			      // `noticeLog`'s own order (newest first), so no re-sorting happens at render time.
+			      // Hidden by default; toggleMessageLogPanel() in js/looped-network.js shows and fills
+			      // it, sets `aria-expanded` on the button, and closes it again on a second press, on
+			      // Escape, or on a click outside either the panel or the button. `max-height` is set
+			      // in JS against the map's own measured height (never a bare CSS percentage, which
+			      // would measure the OVERLAY's own auto height and cap nothing) so a long history
+			      // scrolls inside the map instead of running off the bottom of it.
+			      //
+			      // pointer-events:auto because unlike the readouts above it this one is scrollable
+			      // content, not a passive overlay; role="region" plus an aria-label from the same
+			      // heading key the old dialog used, because a list with no name is unannounced to a
+			      // screen reader even though it is visually obvious to a sighted user. ?>
+			<div id="lpn_msglog_panel" class="lpn-msglog-panel d-print-none" role="region" aria-label="<?=htmlspecialchars($ec_lang['lpn_msglog_heading'])?>" style="display:none;position:relative;pointer-events:auto;overflow-y:auto;width:100%"></div>
 			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
 			      // instructions popup bubble for how to continue and end the current mode."*). A
 			      // box of its own rather than more text in the mode line, because it says
@@ -345,19 +455,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // states no size the bar runs INDETERMINATE -- it still exists and still moves, because
 			      // his ruling is that the unknown belongs in the bar rather than out of it. ?>
 			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
+			</div>
 		</div>
-		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
-		      // saving a project put a line of text above the canvas and "moves the map down past the
-		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
-		      // the mode status temporarily"). Same move the mode hint itself made, for the same
-		      // reason: a readout that comes and goes must not be in the page's FLOW, because
-		      // everything below it moves when it arrives.
-		      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
-		      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
-		      // uncovers it. Same top-left origin, higher z-index, opaque background. It is not
-		      // measured by overlayReserve(), which is the point -- a transient must not change the
-		      // fit, or every save would re-zoom the map. ?>
-		<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:4px;left:4px;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
 		<?php // THE PLACEMENT BAR (ROADMAP Task 145). Top-CENTRE of the map, not the top-left stack:
 		      // it is a modal-for-the-duration control rather than a readout, and it must not cover
 		      // the mode hint or the solver's diagnostic. pointer-events on -- unlike every other
@@ -589,6 +688,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      //
 			      // LAST IN THE STRIP so it never pushes a live readout, and quiet by design -- it must
 			      // not compete with the drawing. ?>
+			<?php // THE MESSAGE LOG BUTTON MOVED (ROADMAP Task 704, Tom 2026-09-21) to
+			      // #lpn_map_overlay_tl, beside the mode hint and the notice it recalls -- see the
+			      // comment there. It is not a cell of this strip any more. ?>
 			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
@@ -2484,6 +2586,11 @@ EngCalcs.pageConfig = {
 	lpn_tab_unsaved: <?=json_encode($ec_lang['lpn_tab_unsaved'])?>,
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
 	lpn_dialog_ok: <?=json_encode($ec_lang['lpn_dialog_ok'])?>,
+	lpn_msglog_name: <?=json_encode($ec_lang['lpn_msglog_name'])?>,
+	lpn_msglog_heading: <?=json_encode($ec_lang['lpn_msglog_heading'])?>,
+	lpn_msglog_empty: <?=json_encode($ec_lang['lpn_msglog_empty'])?>,
+	lpn_msglog_ago: <?=json_encode($ec_lang['lpn_msglog_ago'])?>,
+	lpn_msglog_note: <?=json_encode($ec_lang['lpn_msglog_note'])?>,
 	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
 	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
 	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
@@ -2560,6 +2667,7 @@ EngCalcs.pageConfig = {
 	lpn_lock_ask_prompt: <?=json_encode($ec_lang['lpn_lock_ask_prompt'])?>,
 	lpn_lock_ask_sent: <?=json_encode($ec_lang['lpn_lock_ask_sent'])?>,
 	lpn_lock_ask_failed: <?=json_encode($ec_lang['lpn_lock_ask_failed'])?>,
+	lpn_lock_open_cancelled: <?=json_encode($ec_lang['lpn_lock_open_cancelled'])?>,
 	lpn_lock_requested: <?=json_encode($ec_lang['lpn_lock_requested'])?>,
 	lpn_ago_seconds: <?=json_encode($ec_lang['lpn_ago_seconds'])?>,
 	lpn_ago_minutes: <?=json_encode($ec_lang['lpn_ago_minutes'])?>,
@@ -2835,6 +2943,10 @@ EngCalcs.pageConfig = {
 	lpn_settings_label_max_width: <?=json_encode($ec_lang['lpn_settings_label_max_width'])?>,
 	lpn_settings_label_max_width_tip: <?=json_encode($ec_lang['lpn_settings_label_max_width_tip'])?>,
 	lpn_settings_label_always: <?=json_encode($ec_lang['lpn_settings_label_always'])?>,
+	lpn_settings_symbol_cap: <?=json_encode($ec_lang['lpn_settings_symbol_cap'])?>,
+	lpn_settings_symbol_cap_mid: <?=json_encode($ec_lang['lpn_settings_symbol_cap_mid'])?>,
+	lpn_settings_symbol_cap_post: <?=json_encode($ec_lang['lpn_settings_symbol_cap_post'])?>,
+	lpn_settings_symbol_cap_tip: <?=json_encode($ec_lang['lpn_settings_symbol_cap_tip'])?>,
 	lpn_settings_leader_snap: <?=json_encode($ec_lang['lpn_settings_leader_snap'])?>,
 	lpn_settings_leader_snap_tip: <?=json_encode($ec_lang['lpn_settings_leader_snap_tip'])?>,
 	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,

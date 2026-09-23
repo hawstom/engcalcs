@@ -150,8 +150,16 @@ console.log('\n--- a restored layout equals a computed one, label by label ---')
 	// different questions and the comparison would be about that rather than about the restore.
 	L.setSolve(null);
 	// A real drawing, because the interesting decisions (shedding, crowding, leaders) need a crowd.
-	L.applySaved(JSON.parse(fs2.readFileSync(
-		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
+	// **THE SHIPPED FILE'S OWN labelMaxWidth (Task 705, set to 30 ft 2026-09-22) IS CLEARED HERE.**
+	// That threshold is a fact about the LABELING FEATURE and has nothing to do with what this
+	// harness is testing -- whether a restored layout matches a computed one -- and at 30 ft on a
+	// network this size it hides every label outright, which would make every position compare
+	// equal for the wrong reason (nothing drawn, not "restored correctly"). A shared example file is
+	// a shared fixture; this harness needs "always show labels", not whatever Net3.lwn ships today.
+	const net3Doc = JSON.parse(fs2.readFileSync(
+		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8'));
+	if (net3Doc.settings) { net3Doc.settings.labelMaxWidth = null; }
+	L.applySaved(net3Doc);
 	L.refreshAll();
 	const ls = L.labelSettings();
 	Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });

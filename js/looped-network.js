@@ -84,8 +84,12 @@ var EngCalcs = EngCalcs || {};
 	// label keeps the exact offset it was dropped at (n.lx/n.ly are absolute world units).
 
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
-	function defaultLabelOffset() {
-		var k = symbolFactor();
+	// `full`: fitItems() alone passes true, for the same reason nodeRadiusFull() exists -- the fit
+	// multiplies a world size back out by the LIVE scale to recover a scale-independent pixel
+	// figure, and that only cancels when this offset's own division uses that SAME scale
+	// unconditionally, which the capped symbolFactor() stops doing once the cap is in force.
+	function defaultLabelOffset(full) {
+		var k = full ? symbolFactorFull() : symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
 	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
@@ -95,8 +99,8 @@ var EngCalcs = EngCalcs || {};
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
-	function nodeLabelBase(n) {
-		var d = defaultLabelOffset();
+	function nodeLabelBase(n, full) {
+		var d = defaultLabelOffset(full);
 		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
 			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
 	}
@@ -5220,15 +5224,25 @@ var EngCalcs = EngCalcs || {};
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-21 under Task 705). Generated
 			// labels are drawn only while the visible map is at most this many DISPLAY LENGTH UNITS
-			// wide, and the same number is what stops a map symbol growing on the ground
-			// (symbolCapScale()). null = always draw, which is the right default because no single
-			// number is meaningful across networks 400 ft and 40 miles wide -- the Settings row
-			// captures it from the current view rather than asking anyone to guess one.
+			// wide. null = always draw, which is the right default because no single number is
+			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
+			// from the current view rather than asking anyone to guess one.
+			//
+			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
+			// asked for the day before: *"I'd prefer not to have two rules."*). See
+			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
 			//
 			// **A TYPED NUMBER IN THE DISPLAY UNIT, NEVER SI, and it is REINTERPRETED rather than
 			// converted when the unit changes** -- the suite's own absolute rule. Converted to
 			// metres only where it is compared, in labelWidthLimitSI().
 			labelMaxWidth: null,
+			// **THE ONE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his wording, 2026-09-22):** "Prevent
+			// nodes from scaling larger than `symbolCapMultiple` times the length of the
+			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
+			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
+			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
+			symbolCapMultiple: 0.5,
+			symbolCapPercentile: 20,
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -6406,51 +6420,59 @@ var EngCalcs = EngCalcs || {};
 	// At a whole-county view a 7 px junction dot is a mile across on the map, and a drawing that is
 	// nothing but overlapping dots says less than one that is mostly pipe.
 	//
-	// **THE RULE IS DERIVED, AND THERE IS NO CONTROL FOR IT.** He offered two shapes -- a second
-	// number under Map and page > Appearance, or "the maximum symbol size is whatever it is at the
-	// maximum label zoom, so that once labels are hidden, symbols start shrinking on screen and stay
-	// constant on the ground as you zoom out". The second ships, and the reason is not only that it
-	// is free. The two rules answer the SAME question -- how far out is too far out to keep drawing
-	// at reading size -- and a second box lets a user set them to disagree, which produces a view
-	// with no lettering and mile-wide dots and no way to tell which of two numbers caused it. One
-	// threshold, one answer, and the tip on that one row says both things it does.
+	// **ONE RULE, NOT TWO** (Tom, 2026-09-22, closing his own two competing ideas -- the
+	// 10th-percentile link length and "piggyback on the labeling threshold": *"10th %-ile and 'same
+	// as label limit' were competing ideas for this limit; I'd prefer not to have two rules. I like
+	// 10th %-ile a lot, probably better than piggybacking on the labels limit."*). **The labeling
+	// threshold (`settings.labelMaxWidth`) no longer feeds this at all** -- it used to be tried
+	// first, with the percentile rule as its fallback when no threshold was typed, and that
+	// arrangement is exactly what he asked removed.
 	//
-	// **WHAT IT IS WHEN NO THRESHOLD IS SET, which is the default:** his own (1), the 10th-percentile
-	// link length as the maximum junction size on the map. It is the honest fallback because it is
-	// the same KIND of statement -- the network's own shortest ordinary pipe is the distance at which
-	// two junctions stop being separable, so a dot wider than that is drawing over the thing it
-	// marks.
+	// **HIS NEW SETTING, HIS OWN WORDING:** *"Let's try a new setting for %-ile: 'Prevent nodes from
+	// scaling larger than __ times the length of the __ percentile pipe' where we set the defaults
+	// at 0.5 and 20% for now."* Two numbers, both project data: `settings.symbolCapMultiple`
+	// (default 0.5) and `settings.symbolCapPercentile` (default 20 -- his new figure, not the old
+	// 10th). The maximum junction diameter on the ground is `multiple * that percentile's link
+	// length`, always on, no blank-means-off state to explain.
 	//
 	// **EXPRESSED AS A FLOOR ON THE SCALE, not as a cap on a size**, because every symbol on this
 	// map is already one number divided by `state.s`. Below this scale the drawing stops growing on
 	// the ground and starts shrinking on the screen, which is exactly his sentence.
 	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
-	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	var pctLinkLengthCache = null;   // world units, AT THE PERCENTILE LAST ASKED FOR; 0 for "no usable link"
+	var pctLinkLengthPctCache = null;
 	// **KEYED ON THE DOCUMENT AND ITS LINK COUNT AS WELL AS INVALIDATED BY NAME.** A cache keyed on
 	// the count alone survived a project switch on feat/label-gang-search and laid 119 of 216 labels
 	// out from the previous document's number, so the key is the `doc.links` ARRAY ITSELF plus its
 	// length -- a switch, an undo and a rebuild all replace the array -- and buildDom() and a node
 	// drag clear it outright. What neither catches is a node nudged by a hand-typed coordinate, and
-	// a 10th percentile of up to 512 lengths does not move measurably for one pipe.
+	// a percentile of up to 512 lengths does not move measurably for one pipe.
 	var p10LinkKeyArr = null, p10LinkKeyLen = -1;
 	function invalidateSymbolCap() { symbolCapCache = null; }
 	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
-	// they change only when the drawing does, while the cap also moves with the window and the
-	// settings.
-	function invalidateLinkLengths() { p10LinkLengthCache = null; symbolCapCache = null; }
+	// they change only when the drawing does, while the cap also moves with the settings.
+	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
+	function symbolCapMultiple() {
+		var v = settings.symbolCapMultiple;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+	}
+	function symbolCapPercentile() {
+		var v = settings.symbolCapPercentile;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
 	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
 	// left out rather than counted: a pump and a valve are zero-length by construction, and a
-	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	// network of two pumps would otherwise report a percentile of nothing at all.
 	var LPN_SYMBOL_CAP_SAMPLE = 512;
-	function p10LinkLengthWorld() {
+	function pLinkLengthWorld(pct) {
 		var list = doc.links || [], n = list.length, step, lens = [], i, l, a, b, d;
 		if (list !== p10LinkKeyArr || n !== p10LinkKeyLen) {
 			p10LinkKeyArr = list; p10LinkKeyLen = n;
-			p10LinkLengthCache = null; symbolCapCache = null;
+			pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null;
 		}
-		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
+		if (pctLinkLengthCache !== null && pctLinkLengthPctCache === pct) { return pctLinkLengthCache; }
 		step = Math.max(1, Math.ceil(n / LPN_SYMBOL_CAP_SAMPLE));
 		for (i = 0; i < n; i += step) {
 			l = list[i];
@@ -6459,27 +6481,18 @@ var EngCalcs = EngCalcs || {};
 			d = Math.hypot(b.x - a.x, b.y - a.y);
 			if (d > 0) { lens.push(d); }
 		}
-		if (!lens.length) { p10LinkLengthCache = 0; return 0; }
+		pctLinkLengthPctCache = pct;
+		if (!lens.length) { pctLinkLengthCache = 0; return 0; }
 		lens.sort(function (x, y) { return x - y; });
-		p10LinkLengthCache = lens[Math.floor(0.1 * (lens.length - 1))];
-		return p10LinkLengthCache;
+		pctLinkLengthCache = lens[Math.floor((pct / 100) * (lens.length - 1))];
+		return pctLinkLengthCache;
 	}
 	function computeSymbolCapScale() {
-		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
-		if (limSI > 0 && px > 0) {
-			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
-			v = currentView();
-			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-			wWorld = (mpu > 0) ? limSI / mpu : 0;
-			if (wWorld > 0 && isFinite(wWorld)) { return px / wWorld; }
-		}
-		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
-		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
-		l10 = p10LinkLengthWorld();
-		return (l10 > 0 && settings.symbolSize > 0) ? settings.symbolSize / l10 : 0;
+		var lp = pLinkLengthWorld(symbolCapPercentile()), capLen = symbolCapMultiple() * lp;
+		return (capLen > 0 && settings.symbolSize > 0) ? settings.symbolSize / capLen : 0;
 	}
 	function symbolCapScale() {
-		p10LinkLengthWorld();   // cheap when nothing moved; clears the cap when the document did
+		pLinkLengthWorld(symbolCapPercentile());   // cheap when nothing moved; clears the cap when the document did
 		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
 		return symbolCapCache;
 	}
@@ -6494,11 +6507,12 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
 	}
-	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
-	// the two things a reader is looking FOR on a wide view -- where does the water come from and
-	// where is it stored -- so they keep their size on the screen at every zoom while everything
-	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
-	// already branch on those two types.
+	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both, and
+	// confirmed 2026-09-22 while widening the rule to pipes: *"Yes. Everything shrinks except
+	// reservoirs and tanks."*). They are the two things a reader is looking FOR on a wide view --
+	// where does the water come from and where is it stored -- so they keep their size on the
+	// screen at every zoom while everything else settles onto the ground. Two call sites,
+	// nodeSymbolSize() and nodeRadius(), and both already branch on those two types.
 	//
 	// **AND THE EDITING FURNITURE, WHICH IS NOT A SYMBOL AT ALL:** a vertex grip, the selection
 	// ring, the pending-pipe ring, the rubber band and the marquee. They are the page talking to the
@@ -6511,8 +6525,12 @@ var EngCalcs = EngCalcs || {};
 	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
 	// --lpn-sym: a pipe network's PIPES are its primary content and their weight is a drawing
 	// decision of its own, not a consequence of how big the junction dots are.
+	//
+	// **DIVIDES BY THE CAPPED SCALE, NOT THE RAW ONE, since 2026-09-22** (Tom: *"Everything shrinks
+	// except reservoirs and tanks."*). A pipe is not one of the two declared exceptions, so past the
+	// cap its stroke stops growing on the ground exactly as a junction's does.
 	function linkStrokeWidth() {
-		return settings.linkWidth / (state.s || 1);
+		return settings.linkWidth / symbolScaleAt();
 	}
 	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
 	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
@@ -6647,6 +6665,22 @@ var EngCalcs = EngCalcs || {};
 		// The two declared exceptions to the maximum map size (Task 705) -- symbolFactorFull().
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
+	}
+	// **THE FIT-ONLY, UNCAPPED TWIN OF nodeRadius() -- always symbolFactorFull(), never the cap.**
+	// fitItems() multiplies a world size by the LIVE scale to recover a scale-INDEPENDENT pixel
+	// figure, and that cancellation only holds when the division inside the world size and the
+	// multiplication outside it use the SAME scale unconditionally -- which symbolFactorFull() does
+	// and the capped symbolFactor() does not, once the view is far enough out that the cap (rather
+	// than the live scale) decides the divisor. A fit started at 0.02x and one started at 1x then
+	// disagreed on where the SAME candidate scale would put a junction, because the capped radius
+	// baked in whichever scale happened to be live when the fit was ASKED for, not the candidate
+	// scale being tested (`zoom-fit-harness.js`, section 2, caught it the day the cap's own default
+	// moved enough to cross this network's fit window). The fit reserves room as though every
+	// symbol were still at its full, unshrunk screen size -- conservative rather than wrong, since
+	// the true capped size past the fitted scale can only be smaller than what was reserved.
+	function nodeRadiusFull(n) {
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
+		return JUNCTION_R * symbolFactorFull();
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
 	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
@@ -7443,7 +7477,8 @@ var EngCalcs = EngCalcs || {};
 	// inlined: a second view of a colour setting has appeared twice already, and when it appears
 	// again this is the one line it has to be added to.
 	function syncColorControls() {
-		buildColoringSection();
+		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
+		keepSetboxControl(buildColoringSection);
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -9116,11 +9151,12 @@ var EngCalcs = EngCalcs || {};
 	// degrees of longitude.
 	//
 	// **ONE CONCEPT, TWO LEVELS** (Task 705, reconciling this with Task 669's labeling threshold).
-	// `settings.labelMaxWidth` is the widest view that shows ANY generated label, and it also sets
-	// the symbol cap (symbolCapScale()); this one is a second, narrower gate for customers alone,
-	// read INSIDE the first -- customerLabelsAttempted() refuses whenever dataLabelsHidden, which the
-	// labeling threshold sets. Both are the same quantity in the same unit through the same three
-	// functions below, and both boxes are filled by the same captureViewWidth().
+	// `settings.labelMaxWidth` is the widest view that shows ANY generated label -- **no longer the
+	// symbol cap too, since Tom removed that piggyback 2026-09-22** (see symbolCapScale()); this one
+	// is a second, narrower gate for customers alone, read INSIDE the first --
+	// customerLabelsAttempted() refuses whenever dataLabelsHidden, which the labeling threshold
+	// sets. Both are the same quantity in the same unit through the same three functions below, and
+	// both boxes are filled by the same captureViewWidth().
 	function viewWidthLimitSI(v) {
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
@@ -10124,6 +10160,10 @@ var EngCalcs = EngCalcs || {};
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
+		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
+		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
+		// this edit triggers: with nothing owed this is a no-op.
+		flushLabelRefresh();
 		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			fsNow = effectiveFontSize() + 'px', lines;
 		if (group === 'node') {
@@ -10369,19 +10409,25 @@ var EngCalcs = EngCalcs || {};
 
 
 		doc.nodes.forEach(function (n) {
-			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
+			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
+			// whichever scale happened to be live when it was asked for.
+			var rad = nodeRadiusFull(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
 			fitItem(out, nat.x, nat.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
 			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
 			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
 			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
-			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
+			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
+			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
+			// fit was asked for, not the candidate scale being tested.
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
 				lx = (base.x >= nat.x) ? base.x : base.x - tw;
 			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
+			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
+			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactorFull() * sc;
 			for (j = 0; j < l.verts.length; j++) {
 				v = l.verts[j];
 				fitItem(out, v.x, v.y, vr, vr, vr, vr);
@@ -10391,8 +10437,9 @@ var EngCalcs = EngCalcs || {};
 			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
 			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
 			// pipe by a world distance derived from the arrow's pixel size.
+			// defaultLabelOffset(true): uncapped, same reason as the node loop above.
 			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
-				d = defaultLabelOffset(),
+				d = defaultLabelOffset(true),
 				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
 				ex = mid.x + (l.lx !== undefined ? l.lx : d.x),
 				ey = mid.y + (l.ly !== undefined ? l.ly : d.y),
@@ -15657,6 +15704,13 @@ var EngCalcs = EngCalcs || {};
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
+			// **"Show at all zoom levels", SEARCHABLE AND WRITABLE** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*). No boolean condition exists on this panel yet, so it rides the
+			// numeric ones already here for `sizeMult` -- 1 for ticked, 0 for not, through
+			// findValueOf() below -- rather than inventing a yes/no vocabulary this panel has never
+			// needed before. `equal to 1` finds every note kept on past the threshold.
+			out.push(['allZoom', pc.lpn_field_text_all_zoom || 'Show at all zoom levels', 'Show at all zoom levels']);
 			findOfferCustom(out, d);
 			return out;
 		}
@@ -16293,6 +16347,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
+		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
@@ -17661,6 +17716,27 @@ var EngCalcs = EngCalcs || {};
 				set: function (c, v) { setCustomerCustomProp(c, def, v); } };   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 		});
 	}
+	// **A TEXT OBJECT'S ONE REPLACE-WRITABLE PROPERTY** (Tom, review-queue R-174, 2026-09-23: *"This
+	// property should appear in multi-properties, Tables, and Find/Replace."*). `id` and `text`
+	// stay out of Replace on purpose (see the comment above replaceExtraSpecs()) -- an id is
+	// unreachable and a note's words are a one-at-a-time popup edit -- but `allZoom` is neither: it
+	// is a plain yes/no, base-write like size and position, on the identical terms `bold` and
+	// `sizeMult` already have in paneTextCols(). No `str`/`text` flag, so replaceValueOf() parses
+	// the value box as a number and `1`/`0` is how the box says "ticked"/"unticked", the same
+	// vocabulary findValueOf() already reads it in above.
+	function labelReplaceSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'allZoom', group: 'label', field: 'allZoom',
+				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
+				applies: function () { return true; },
+				get: function (lb) { return lb.allZoom === true ? 1 : 0; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+				} }
+		];
+	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
 	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
 	// carries neither, so "everything" here means every NODE and every LINK, exactly as it does in
@@ -17695,11 +17771,18 @@ var EngCalcs = EngCalcs || {};
 		if (findQueryAst) { cands = replaceFoundSet(); }
 		else {
 			var d = findScopeDef(findState.scope);
-			if (d.key === 'all' || d.group === 'label') { return []; }
+			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
+			// property here applies to every group at once. **A Text scope is no longer blanket
+			// refused** -- it used to be, because a Text carried nothing writable (its words are a
+			// one-at-a-time popup edit and its id is unreachable, see the comments on both above).
+			// `labelReplaceSpecs()` now gives it one real spec (`allZoom`, R-174), and the filter
+			// below still leaves `text` and `id` out because no spec answers to them.
+			if (d.key === 'all') { return []; }
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
-		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs()).filter(function (s) {
+		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
+			.concat(labelReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
@@ -17826,7 +17909,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id)
-			: (ref.group === 'customer' ? customerById(ref.id) : linkById(ref.id));
+			: (ref.group === 'customer' ? customerById(ref.id)
+			: (ref.group === 'label' ? labelById(ref.id) : linkById(ref.id)));
 	}
 	// **NOTHING IS WRITTEN UNTIL THE COUNT HAS BEEN SEEN.** A bulk write is the one action on this
 	// page whose blast radius the user cannot see coming -- the matched pipes are spread over a map
@@ -20159,6 +20243,20 @@ var EngCalcs = EngCalcs || {};
 				set: function (lb, v) {
 					lb.bold = !!v;   // base-write: Base-owned, as in the popup
 					textLabelRelayout(lb.id);
+				} },
+			// **THE POPUP'S OWN "Show at all zoom levels" ROW, RE-KEYED** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*), on the `bold` row's exact pattern -- `bool: true` for the checkbox
+			// cell, and this Table's own list is what feeds the multi-properties box (see
+			// multiGroups()/multiSection() above), so one column earns both venues at once. Off by
+			// default, like the popup's own row; a scenario visibility change is a redraw, not a
+			// re-solve, so applyLabelVisibility() stands in for textLabelRelayout()'s afterPropertyEdit().
+			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2,
+				get: function (lb) { return lb.allZoom === true; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+					saveToStorage();
 				} },
 			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
 				get: function (lb) { return textLabelRotation(lb); },
@@ -25785,6 +25883,9 @@ var EngCalcs = EngCalcs || {};
 	 * the label choices too, since both are serialized.
 	 */
 	function captureLabelLayout() {
+		// The kept layout must be the settled one: a pass owed and not yet run would otherwise be
+		// kept as the answer and restored on the way back (Task 653).
+		flushLabelRefresh();
 		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
 		function grab(h) {
 			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
@@ -26935,6 +27036,9 @@ var EngCalcs = EngCalcs || {};
 		lastSolveResult = (kept && kept.solve) || null;
 		// The labels wait for the camera -- see buildDom() and the restore below.
 		labelPassDeferred = true;
+		// And a pass requested for the OUTGOING document is not owed to this one, which is laid out
+		// once below (Task 653). Left set, it would run a second full pass a frame after arrival.
+		labelRefreshPending = false;
 		closePopup();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
@@ -26989,8 +27093,8 @@ var EngCalcs = EngCalcs || {};
 			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
 		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
-		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
-		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
+		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
+		// not an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
 		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is
@@ -29773,7 +29877,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
 		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
-		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
+		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
+		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
+		if (initials === null) {
+			setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.');
+			return;
+		}
 		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
 		setNotice((r && r.ok && r.requested)
 			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
@@ -29813,7 +29922,11 @@ var EngCalcs = EngCalcs || {};
 			// answer from the rest. It licenses exactly that much and no colour.
 			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
 			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
+			// **CANCEL LEAVES A RESIDUE** (ROADMAP Task 704). It used to leave nothing at all: the
+			// dialog closed, the file did not open, and there was no trace anywhere of what had
+			// just been offered or why the file did not appear. That is exactly "Help! What did I
+			// miss!", and it costs one sentence to fix.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.'); } },
 			{
 				// **THE GLYPH IS THE VERDICT STRINGS' OWN, AND IT IS PREPENDED HERE RATHER THAN
 				// WRITTEN INTO THE LANGUAGE FILE.** `⚠` is decorative, international and RTL-safe,
@@ -30077,6 +30190,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		banner.innerHTML = '';
 		if (!state) { banner.style.display = 'none'; settle(); return; }
+		// **THE BANNER'S MESSAGES LAND IN THE MESSAGE LOG TOO** (ROADMAP Task 704, row 2 of Ida's
+		// ranking). This bar carries real decisions -- who has the file, what you may still do
+		// about it -- and once dismissed there is no way back to the words. logMessage() keeps one
+		// row per distinct message, so a repaint on every tab switch does not fill the log.
+		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
 		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
 		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
@@ -30817,6 +30935,27 @@ var EngCalcs = EngCalcs || {};
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
+	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
+	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
+	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
+	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
+	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
+	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
+	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
+	// jobs from the one call it always made; a button built by hand because it must carry no tip
+	// calls this alone.
+	function registerToolbarIcon(el, iconName, name, tip) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === el) {
+				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
+				return;
+			}
+		}
+		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+	}
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
 		// when I hover on the toolbar icon, one is our styled tip. The other is the browser tip.
@@ -30840,17 +30979,9 @@ var EngCalcs = EngCalcs || {};
 		if (prior) { prior.dispose(); }
 		EngCalcs.setIconLabel(el, iconName, name, tip);
 		if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
-		// **THE INDEX IS KEYED ON THE BUTTON, so a repaint replaces its row rather than adding
-		// one.** Help, What the toolbar icons mean is DERIVED from this list; before this, cycling
-		// the area tool three times listed the area button four times.
-		var i;
-		for (i = 0; i < toolbarIconIndex.length; i++) {
-			if (toolbarIconIndex[i].el === el) {
-				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
-				return;
-			}
-		}
-		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+		// Help, What the toolbar icons mean is DERIVED from this list; before this, cycling the
+		// area tool three times listed the area button four times.
+		registerToolbarIcon(el, iconName, name, tip);
 	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
@@ -33334,6 +33465,7 @@ var EngCalcs = EngCalcs || {};
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
+		wireMessageLogButton();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -35390,8 +35522,9 @@ var EngCalcs = EngCalcs || {};
 	// One redraw for either answer: the document's numbers or their meaning changed, so everything
 	// derived from them is stale -- the labels, the solve, and what is on disk.
 	function afterUnitChange() {
-		// On a geographic project the threshold's metres move with the unit while a world unit
-		// (a degree) does not, so the cap is re-derived (Task 705). On a grid it is unit-invariant.
+		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
+		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
+		// costs nothing and a future input to the cap might not be so lucky.
 		invalidateSymbolCap();
 		refreshAllFromDocument();
 		saveToStorage();
@@ -35709,7 +35842,7 @@ var EngCalcs = EngCalcs || {};
 		// below it, which is the same rule .lpn-set-row carries in css/engcalcs.css.
 		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
-		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
+		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
 		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
 		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
@@ -35795,7 +35928,7 @@ var EngCalcs = EngCalcs || {};
 			spec.value = v;
 			spec.onChange(v);
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		return box;
 	}
@@ -35812,7 +35945,7 @@ var EngCalcs = EngCalcs || {};
 		box.setAttribute('aria-label', spec.title);
 		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
 		box.style.boxSizing = 'border-box';
-		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); refreshLabelText(); });
+		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); requestLabelRefresh(); });
 		return box;
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
@@ -35953,7 +36086,7 @@ var EngCalcs = EngCalcs || {};
 			if (isFinite(v) && v >= 0) { labelSettings.customerMaxWidth = v; }
 			else { input.value = String(labelSettings.customerMaxWidth); return; }
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
 		// view' button like the other one we restored in a different branch."*). Same words and the
@@ -35971,7 +36104,7 @@ var EngCalcs = EngCalcs || {};
 			labelSettings.customerMaxWidth = w;
 			input.value = String(labelSettings.customerMaxWidth);
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		wrap.className = 'lpn-set-ctlgroup';
 		wrap.appendChild(input); wrap.appendChild(useBtn);
@@ -36821,11 +36954,15 @@ var EngCalcs = EngCalcs || {};
 			if (!le) { return; }
 			// MEMBERSHIP FIRST, and it beats everything else here: a label switched OFF in this
 			// scenario is not there at all (Task 407). Then the label's OWN answer to the zoom:
-			// **a Text object is authored content and ships exempt from the threshold** -- the rule
-			// this page has always had, and what makes the shipped Net3 note reading "Zoom in to
-			// see labels" still readable when the labels have gone. `!== false` rather than a
-			// truthiness test, so a note written before this switch existed keeps showing.
-			var gone = !isActive(lb) || (past && lb.allZoom === false);
+			// **DEFAULT OFF** (Tom, review-queue R-174, 2026-09-23: *"This property should be off
+			// for all but the largest text object in our examples and for all projects with no
+			// previous settings."*), reversing the launch ruling -- a Text object is no longer
+			// exempt from the threshold unless it says so. `=== true` rather than a truthiness
+			// test, so `allZoom: false` (every note stored under the old default) and an absent
+			// property both read as off. Each shipped example now states `allZoom: true` on
+			// whichever of its own Text objects is the largest, which is what keeps a note like
+			// Net3's "Zoom in to see labels" readable when the labels have gone.
+			var gone = !isActive(lb) || (past && lb.allZoom !== true);
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
@@ -36833,11 +36970,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
-	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
-	// labels re-decided. Never on the zoom path: a zoom changes neither input.
+	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). **No longer an input to the symbol
+	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
+	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
+	// changes neither input.
 	function labelThresholdChanged() {
-		invalidateSymbolCap();
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
@@ -37080,6 +37217,9 @@ var EngCalcs = EngCalcs || {};
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
 	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
+		return keepSetboxControl(rebuildSettingsFieldsNow);
+	}
+	function rebuildSettingsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {};
 		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
 		// option values) and MOVED in and out of this panel, never rebuilt. Park it back in its holder
@@ -37591,7 +37731,7 @@ var EngCalcs = EngCalcs || {};
 			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
 			// the very element that just changed under it.
 			refreshPopupIfOpen();
-			refreshLabelText();
+			requestLabelRefresh();
 			scheduleSolve();
 			saveToStorage();
 		});
@@ -37716,8 +37856,9 @@ var EngCalcs = EngCalcs || {};
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
-		// captureViewWidth(), rounded UP -- and one number doing two jobs: it hides generated labels
-		// and it is where symbols stop growing on the ground (symbolCapScale()). The tip says both.
+		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
+		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
+		// generated labels and nothing else; the symbol-size cap is the separate row below.
 		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
 			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
 		lmwWrap.className = 'lpn-set-ctlgroup';
@@ -37748,9 +37889,56 @@ var EngCalcs = EngCalcs || {};
 		});
 		lmwUnit.className = 'lpn-set-note';
 		lmwUnit.textContent = unitLabel('lpn_u_length');
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwBtn); lmwWrap.appendChild(lmwUnit);
+		// **THE UNIT NAMES THE NUMBER, SO IT SITS RIGHT AFTER IT** (Tom, 2026-09-22, on a screenshot
+		// showing "ft" trailing the button: *"'ft' is in the wrong place. It should be before the
+		// button."*). It used to read "[box] [Use current view] ft", which reads as though the
+		// BUTTON took the unit.
+		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
 			lmwWrap, pc.lpn_settings_label_max_width_tip);
+		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
+		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
+		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
+		// always on, no blank state to explain. Both numbers are plain dimensionless quantities (a
+		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
+		// unit change.
+		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
+			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
+			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+		capWrap.className = 'lpn-set-ctlgroup';
+		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
+		capMultInput.id = 'lpn_set_symbol_cap_mult';
+		capMultInput.style.width = '4em';
+		capMultInput.value = trimNum(symbolCapMultiple());
+		capMultInput.addEventListener('change', function () {
+			var v = +capMultInput.value;
+			if (isFinite(v) && v > 0) {
+				settings.symbolCapMultiple = v; invalidateSymbolCap(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capMultInput.value = trimNum(symbolCapMultiple());
+			}
+		});
+		capMid.className = 'lpn-set-note';
+		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
+		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
+		capPctInput.id = 'lpn_set_symbol_cap_pct';
+		capPctInput.style.width = '4em';
+		capPctInput.value = trimNum(symbolCapPercentile());
+		capPctInput.addEventListener('change', function () {
+			var v = +capPctInput.value;
+			if (isFinite(v) && v >= 0 && v <= 100) {
+				settings.symbolCapPercentile = v; invalidateLinkLengths(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capPctInput.value = trimNum(symbolCapPercentile());
+			}
+		});
+		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
+		capPost.className = 'lpn-set-note';
+		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
+		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
+		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
+		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
+			pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -38204,7 +38392,7 @@ var EngCalcs = EngCalcs || {};
 			// fields are printed and what prefix each carries, so the labels themselves have to be
 			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
 			// used to redraw only the legend, which left the map showing the old label set.
-			refreshLabelText();
+			requestLabelRefresh();
 			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
 			// positions too, and the colour controls were showing the old ones.
 			rebuildSettingsBox();
@@ -38361,11 +38549,128 @@ var EngCalcs = EngCalcs || {};
 		var b = setboxEl();
 		return !!b && b.style.display === 'flex';
 	}
+	// ---- THE CONTROL IN THE USER'S HAND SURVIVES A REBUILD OF THE BOX (Task 653) ----------------
+	//
+	// A rebuild replaces every control it builds, so "the same control" after it can only mean
+	// "the copy built in the same place". A KEY names that place: an id or a form name where the
+	// control has one, and otherwise the id'd host it sits in, the words on its row and its
+	// position among its kind in that host. **THE ROW'S WORDS ARE IN THE KEY ON PURPOSE:** two
+	// selects offering the same three options sit side by side in Water quality (bulk and wall
+	// reaction order), and a key by position alone would put one's handler under the other's name
+	// the day a row above them appeared.
+	function setboxControlKey(el, box) {
+		if (el.id) { return '#' + el.id; }
+		if (el.name) { return '@' + el.name; }
+		var host = el.parentNode, row = el.parentNode, words = '', list, i;
+		while (host && host !== box && !host.id) { host = host.parentNode; }
+		if (!host || host === box || !host.id) { return null; }
+		while (row && row !== host && !(row.classList && row.classList.contains('lpn-set-row'))) { row = row.parentNode; }
+		if (row && row !== host && row.firstChild) { words = row.firstChild.textContent || ''; }
+		list = setboxControlsOfTag(host, el.tagName);
+		for (i = 0; i < list.length; i++) { if (list[i] === el) { break; } }
+		return host.id + '|' + words + '|' + el.tagName + '|' + i;
+	}
+	// Document order, walked by hand over `children` rather than asked of querySelectorAll(), so
+	// the harness's DOM stub (which answers [] to every selector) walks the same tree.
+	function setboxControlsOfTag(root, tag) {
+		var out = [];
+		(function walk(e) {
+			var kids = e.children || [], i;
+			for (i = 0; i < kids.length; i++) {
+				if (kids[i].tagName === tag) { out.push(kids[i]); }
+				walk(kids[i]);
+			}
+		}(root));
+		return out;
+	}
+	function setboxControlByKey(box, key) {
+		var parts, host, list, i, el;
+		if (!key) { return null; }
+		if (key.charAt(0) === '#' || key.charAt(0) === '@') {
+			list = setboxControlsOfTag(box, 'SELECT').concat(setboxControlsOfTag(box, 'INPUT'), setboxControlsOfTag(box, 'TEXTAREA'));
+			for (i = 0; i < list.length; i++) {
+				if ((key.charAt(0) === '#' ? list[i].id : list[i].name) === key.slice(1)) { return list[i]; }
+			}
+			return null;
+		}
+		parts = key.split('|');
+		host = document.getElementById(parts[0]);
+		if (!host || !box.contains(host)) { return null; }
+		el = setboxControlsOfTag(host, parts[2])[+parts[3]] || null;
+		return el && setboxControlKey(el, box) === key ? el : null;
+	}
+	// The same list of choices, in the same words. A select whose options were rebuilt DIFFERENTLY
+	// (a unit in a field name, a method list that follows the field) is not kept: the copy is the
+	// truth and the old one would offer choices that no longer exist.
+	function sameSelectOptions(a, b) {
+		var oa = a.options || a.children || [], ob = b.options || b.children || [], i;
+		if (oa.length !== ob.length) { return false; }
+		for (i = 0; i < oa.length; i++) {
+			if (oa[i].value !== ob[i].value || oa[i].textContent !== ob[i].textContent) { return false; }
+		}
+		return true;
+	}
+	var setboxKeeping = false;
+	function keepSetboxControl(rebuild) {
+		// Only the outermost rebuild does this: rebuildSettingsBox() runs rebuildSettingsFields()
+		// and buildColoringSection(), and each can also be called alone.
+		if (setboxKeeping) { return rebuild(); }
+		var box = setboxEl(), ev = (typeof window !== 'undefined') ? window.event : null,
+			focused = (typeof document !== 'undefined') ? document.activeElement : null,
+			held = [], out;
+		// TWO CONTROLS CAN BE IN THE HAND AT ONCE: the one whose own change event is running, and
+		// the one focus has already moved to -- a text box commits on blur, so its change arrives
+		// while the control just clicked is focused. Safari does not focus a select on a click at
+		// all, which is why the event is asked as well as the focus.
+		[ev && (ev.type === 'change' || ev.type === 'input') ? ev.target : null, focused].forEach(function (el) {
+			if (!el || !box || !box.contains || !box.contains(el) || held.some(function (h) { return h.el === el; })) { return; }
+			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
+			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
+		});
+		if (!held.length) { return rebuild(); }
+		setboxKeeping = true;
+		try { out = rebuild(); } finally { setboxKeeping = false; }
+		held.forEach(function (h) {
+			var el = h.el, twin;
+			if (!box.contains(el)) {
+				twin = setboxControlByKey(box, h.key);
+				if (!twin) { return; }
+				if (el.tagName === 'SELECT' && twin.tagName === 'SELECT' && sameSelectOptions(el, twin)) {
+					// The copy holds the state `settings` now implies; the old element takes it on
+					// and the copy, never shown, is dropped.
+					if (typeof twin.value === 'string') { el.value = twin.value; }
+					el.disabled = twin.disabled;
+					el.title = twin.title;
+					twin.parentNode.replaceChild(el, twin);
+				} else {
+					el = twin;
+				}
+			}
+			// A move out of the page and back (the units block is parked during a rebuild) drops
+			// focus even though the element survived, so it is handed back either way.
+			if (h.focus && document.activeElement !== el && el.focus) {
+				try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+			}
+		});
+		return out;
+	}
 	// Rebuild EVERY section on every open. Built once at init and repainted only by the paths that
 	// remember, the box would show page-load values for every setting anything else wrote -- and a
 	// writer has to remember to repaint, and one will not. Rebuilding makes the box a VIEW of
 	// `settings` rather than a copy. Cheap: a few dozen form controls, only when it is opened.
+	//
+	// **BUT NEVER THE CONTROL IN THE USER'S HAND** (Task 653). Tom, 2026-09-13: *"the Settings
+	// Quality selector ... doesn't work (change) once it responds. All selectors are the same that
+	// way."* A select whose own change rebuilds the box was thrown away by that rebuild and a copy
+	// put in its place: the focus went with it, the next arrow key went nowhere, and a dropdown
+	// reopened on the old element opened on something no longer in the page. So the rebuild still
+	// happens -- the box stays a view of `settings` -- and afterwards the one control the user is
+	// working is put back where its fresh copy was built, carrying the copy's value and state. Any
+	// other control keeps its focus by moving it to the copy. See keepSetboxControl().
 	function rebuildSettingsBox() {
+		keepSetboxControl(rebuildSettingsBoxNow);
+	}
+	function rebuildSettingsBoxNow() {
 		rebuildSettingsFields();
 		rebuildLabelsFields();
 		buildColoringSection();
@@ -40273,6 +40578,16 @@ var EngCalcs = EngCalcs || {};
 	// says it is carried rather than worked out. A file stating `Quality Chlorine mg/L` must be able
 	// to keep saying so through an open-and-save, which means the mode has to be reachable; but the
 	// page cannot produce that state itself, because it would be offering an analysis it does not run.
+	// **WHETHER A QUALITY SETTING CAN CHANGE A SINGLE LETTER ON THE MAP** (Task 653). The mode, the
+	// trace node and the chemical reach the labels only through a field that prints quality -- its
+	// value, its decimals, its heading in the legend. With none of them ticked, which is how every
+	// project ships, a quality change owes the labels nothing until the run it schedules lands, and
+	// that run lays them out itself. Measured before this: one full label pass of the three a
+	// Quality change cost, spent redrawing identical text.
+	function qualityFieldsLabelled() {
+		var n = labelSettings.node || {}, l = labelSettings.link || {};
+		return !!(n.quality || n.initQuality || l.quality || l.rate);
+	}
 	function settingsQualityRows(host, rowFn, noteFn) {
 		var pc = EngCalcs.pageConfig || {}, q = qualitySetting(),
 			sel = document.createElement('select'), opts = [
@@ -40319,7 +40634,7 @@ var EngCalcs = EngCalcs || {};
 			if (backTo) {
 				requestAnimationFrame(function () { scrollSetboxTo(backTo); });
 			}
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -40345,7 +40660,7 @@ var EngCalcs = EngCalcs || {};
 			src.addEventListener('change', function () {
 				settings.quality.traceNode = src.value;
 				saveToStorage();
-				refreshLabelText();
+				if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 				refreshPopupIfOpen();
 				scheduleSolve();
 			});
@@ -40384,7 +40699,7 @@ var EngCalcs = EngCalcs || {};
 			settings.quality.chemical = name.value;
 			saveToStorage();
 			rebuildSettingsBox();
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -43798,7 +44113,7 @@ var EngCalcs = EngCalcs || {};
 		// The next element drawn must not land on a number now in use.
 		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
 		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
-		refreshLabelText();
+		requestLabelRefresh();
 		scheduleSolve();
 		saveToStorage();
 		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
@@ -45466,20 +45781,22 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed). With the
-		// labeling threshold back, a note needs its own answer to it. **TICKED BY DEFAULT**: a Text
-		// object is authored content and has always stayed on the drawing, and the shipped Net3 note
-		// reading "Zoom in to see labels" only makes sense if it outlives the labels it speaks of.
-		// Stored only when UNticked (`allZoom: false`), so every note written before this switch
-		// existed keeps showing. BASE-WIDE like size and position, and for the same reason.
+		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed).
+		// **UNTICKED BY DEFAULT** (Tom, review-queue R-174, 2026-09-23: *"This property should be
+		// off for all but the largest text object in our examples and for all projects with no
+		// previous settings."*) -- reversing the launch ruling recorded above until this ruling. A
+		// note keeps its old on-screen behaviour only if it explicitly says so; a project saved
+		// before this property existed, or a fresh Text, is off and goes with the threshold like
+		// generated annotation. Stored only when TICKED (`allZoom: true`), so absence keeps meaning
+		// the default. BASE-WIDE like size and position, and for the same reason.
 		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
 		allZoomInput.type = 'checkbox';
-		allZoomInput.checked = lb.allZoom !== false;
+		allZoomInput.checked = lb.allZoom === true;
 		allZoomInput.addEventListener('change', function () {
-			if (allZoomInput.checked === (lb.allZoom !== false)) { return; }
+			if (allZoomInput.checked === (lb.allZoom === true)) { return; }
 			saveUndoSnapshot();
-			if (allZoomInput.checked) { delete lb.allZoom; }
-			else { lb.allZoom = false; }   // base-write: zoom visibility is Base-owned, exactly as size is
+			if (allZoomInput.checked) { lb.allZoom = true; }
+			else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 			applyLabelVisibility();
 			saveToStorage();
 		});
@@ -46965,13 +47282,282 @@ var EngCalcs = EngCalcs || {};
 	// same element is wiped just slowly enough for the user not to see it. Separate slots dissolve
 	// that -- both can be on screen at once and nothing has to arbitrate.
 
+	// ---- THE MESSAGE LOG (ROADMAP Task 704, rows 1 and 2 of Ida's ranking) ----
+	//
+	// **A BANNER THAT VANISHES IS A DEFECT** (Tom, 2026-09-18, testing the lock work: *"The banner
+	// message about 'We asked your colleague to close the file' disappeared too fast and
+	// unrecoverable. 'Help! What did I miss!' We need a better messaging system."*).
+	//
+	// setNotice() is already ONE DOOR with 83 call sites and an eight-second expiry, and a later
+	// message silently REPLACES an earlier one. **THE COUNT IS RE-DERIVED, NOT INHERITED**: the
+	// figure carried into this task was 66, which was an undercount nobody had re-checked. 83 is
+	// this file with comments stripped, on the day the log was built and before the two Cancel
+	// notices below made it 85. Re-derive it rather than quoting this line. That replacement is the whole of the complaint, and
+	// the answer is not a longer timer -- it is a place the message went. QGIS splits exactly here:
+	// QgsMessageBar is transient, QgsMessageLog is the store behind it, reached from one icon at
+	// the end of the status bar. This is that split and nothing more.
+	//
+	// **IN MEMORY ONLY, AND THAT IS A RULING RATHER THAN A SHORTCUT.** Anything written to a
+	// visitor's device makes a sentence in consent_body false, which is a banner rewrite, 26
+	// retranslations and an EC_CONSENT_VERSION bump that re-asks everybody. A log that lives as
+	// long as the page answers "what did I miss", and that is a question about the last few
+	// minutes, not about last Tuesday.
+	//
+	// **THIRTY, AND THE BOUND IS CHOSEN FOR THE READER RATHER THAN FOR THE MEMORY.** Thirty rows is
+	// about one long working session of opens, saves, lock answers and unit changes. It fits the
+	// dialog at a glance, which is the point at which a log is still a way BACK to something rather
+	// than a second document to search. The storage cost of any bound here is nil; the reading cost
+	// is not.
+	//
+	// **ONE ROW PER DISTINCT MESSAGE, AND A REPEAT MOVES TO THE TOP RATHER THAN ADDING A ROW.**
+	// renderBanner() repaints on every tab switch and every lock answer, so an append-only log
+	// would bury the one thing somebody missed under forty identical read-only banners. The time
+	// shown is therefore the LAST time that message was on screen, which is what the reader is
+	// asking about.
+	var NOTICE_LOG_MAX = 30;
+	var noticeLog = [];   // newest FIRST: { text, severity, at }
+	// **TWO LEVELS, AND THE SECOND IS THE ONE THE BANNER ALREADY DRAWS.** renderBanner() paints
+	// amber for "you may work through this" and red for "this has taken editing away"; everything
+	// setNotice() carries is a completed action. That is two honest kinds of event and this page
+	// does not have four, so QGIS's four severities are deliberately not imported -- a level
+	// nobody can assign consistently is a colour that means nothing by the third week.
+	// **THE LIMITATION, WRITTEN DOWN AT THE PLACE IT WOULD BITE.** Dedupe is an exact match on the
+	// pair (text, severity), which is right for the case that matters -- a message carrying a
+	// changing number ("Saved Net3.lwn", "Saved Net2.lwn") stays distinct, because the numbers and
+	// names are substituted before this sees the string. What it cannot tell apart is TWO DIFFERENT
+	// LANGUAGE KEYS THAT RENDER BYTE-IDENTICAL ENGLISH: they would collapse into one row, and the
+	// reader would be shown one event where two happened. No such collision exists in the current
+	// strings -- checked, not assumed. Comparing the KEY instead would fix it and cost more than it
+	// buys: every caller would have to pass one, and renderBanner() composes its sentence from a
+	// key plus a name, so there is no single key to pass. If a collision ever does ship, the cheap
+	// repair is to reword one of the two strings, which is a translation edit and not a design
+	// change.
+	function logMessage(text, severity) {
+		var t = String(text == null ? '' : text).trim(), kind, i;
+		if (!t) { return; }
+		kind = severity === 'warning' ? 'warning' : 'notice';
+		for (i = 0; i < noticeLog.length; i++) {
+			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
+		}
+		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
+		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
+	}
+	// "{x} ago" as its own key rather than an English concatenation: agoText() already solves the
+	// plural problem (n is never 1), and this wrapper lets a language put its word for "ago"
+	// wherever its own grammar wants it.
+	function messageAgeText(at) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_msglog_ago || '{x} ago').replace('{x}', agoText(Math.max(1, Date.now() - at)));
+	}
+	// **AN ON-MAP LIST, NOT A DIALOG** (ROADMAP Task 704; superseded Ida's 2026-09-21 dialog design
+	// the next day, Tom having actually used it: *"The alert paradigm is not a good UX for showing
+	// past messages. User expects them to descend below the glyph, below the Mode status in
+	// similar appearance that they originally had... fill the map below the Mode status line with
+	// old messages with oldest at the bottom."*). #lpn_msglog_panel is a child of the same
+	// top-left column the mode hint and the notice sit in, directly under that slot, so opening it
+	// reads as the next line down rather than as a separate control landing somewhere else on the
+	// page.
+	var msglogPanelOpen = false;
+	// **THE NOTICE'S HEIGHT IS INVISIBLE TO FLOW, AND USUALLY THAT DOES NOT MATTER.** #lpn_map_notice
+	// is `position:absolute` on purpose ("a transient must not change the fit, or every save would
+	// re-zoom the map") and #lpn_mode_hint beside it is an ordinary flow element, so on a normal
+	// window the panel's own flow position already falls below whichever of the two is showing,
+	// because mode_hint's real height is what flow sees either way.
+	//
+	// **AT 640px AND UNDER, #lpn_mode_hint IS display:none BY DESIGN** ("no mouse verbs on a
+	// phone" -- see the small-screen rule in css/engcalcs.css). With it gone, flow has NOTHING
+	// contributing height to that slot any more, so if the notice happens to be showing at that
+	// moment, the panel's ordinary flow position lands at the very top of the column, squarely on
+	// top of the notice it was supposed to appear below (measured: a browser pass caught the panel
+	// starting 15px above the notice's own bottom edge at 390px). This is a targeted compensation
+	// for exactly that combination, computed fresh each time the panel opens rather than assumed:
+	// zero everywhere the mode hint is doing its ordinary job.
+	function msglogPanelTopCompensation() {
+		var modeHint = document.getElementById('lpn_mode_hint'), notice = document.getElementById('lpn_map_notice');
+		var cs = modeHint && window.getComputedStyle ? window.getComputedStyle(modeHint) : null;
+		var modeHintInFlow = !!(cs && cs.display !== 'none');
+		var noticeShowing = !!(notice && notice.style.display !== 'none');
+		if (noticeShowing && !modeHintInFlow) { return notice.offsetHeight + 4; }
+		return 0;
+	}
+	function fitMsglogPanelHeight(panel) {
+		// **MEASURED AGAINST THE MAP, NEVER A BARE CSS PERCENTAGE.** A percentage `max-height` on
+		// an absolutely positioned ancestor whose own height is auto measures that ancestor's own
+		// content -- which is this panel -- and caps nothing. The map's own canvas is the thing
+		// with a real, laid-out height, so the panel's available room is read from it directly:
+		// however far down the canvas the panel starts, minus a little breathing room above the
+		// canvas's own bottom edge.
+		var canvas = document.getElementById('lpn_canvas'), canvasBox, panelBox, avail;
+		if (!canvas) { return; }
+		canvasBox = canvas.getBoundingClientRect();
+		panelBox = panel.getBoundingClientRect();
+		avail = canvasBox.bottom - panelBox.top - 8;
+		panel.style.maxHeight = Math.max(40, avail) + 'px';
+	}
+	function renderMsglogPanel() {
+		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
+		if (!panel) { return; }
+		panel.innerHTML = '';
+		if (!noticeLog.length) {
+			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
+			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
+			var none = document.createElement('div');
+			none.className = 'lpn-msglog-panel-empty';
+			none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
+			panel.appendChild(none);
+			return;
+		}
+		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
+		// re-sorting at render time, so the panel can never disagree with the log it is reading.
+		noticeLog.forEach(function (row) {
+			var pill = document.createElement('div');
+			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
+			var when = document.createElement('span');
+			when.className = 'lpn-msglog-panel-when';
+			when.textContent = messageAgeText(row.at);
+			pill.appendChild(when);
+			var what = document.createElement('span');
+			what.className = 'lpn-msglog-panel-text';
+			what.textContent = row.text;
+			pill.appendChild(what);
+			panel.appendChild(pill);
+		});
+		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
+		// paragraph of Ida's dialog design; it says something none of the pills above it do --
+		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
+		// as the last row rather than dropped along with the dialog chrome around it.
+		var note = document.createElement('div');
+		note.className = 'lpn-msglog-panel-note';
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+			.replace('{n}', NOTICE_LOG_MAX);
+		panel.appendChild(note);
+	}
+	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
+	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
+	// without hunting for a close button the panel does not have (it is a readout, not a form).
+	// **CAPTURED ON pointerdown, NOT click, AND CONSUMED** (Perry's review, 2026-09-22: dismissing
+	// the panel by clicking the map also did whatever that click would otherwise have done -- the
+	// canvas wires its own selection/tool handling on `pointerdown`
+	// (`svg.addEventListener('pointerdown', ...)`), which fires and finishes BEFORE a `click`
+	// listener ever sees the gesture, so listening for `click` here could never have intercepted
+	// anything). Registered with `capture: true` on `document`, which runs before the canvas's own
+	// listener on the `svg` element sees the event at all, so `stopPropagation()` here genuinely
+	// stops it from reaching the map -- and `preventDefault()` alongside it, since a canvas built
+	// on pointer events reads default-prevention as "this gesture is somebody else's" the same way
+	// a native control does.
+	function msglogOutsidePointerDown(e) {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (panel && panel.contains(e.target)) { return; }
+		if (btn && btn.contains(e.target)) { return; }
+		e.stopPropagation();
+		if (e.preventDefault) { e.preventDefault(); }
+		closeMessageLogPanel();
+	}
+	function msglogKeyHandler(e) {
+		if (e.key === 'Escape' || e.key === 'Esc') { closeMessageLogPanel(); }
+	}
+	function openMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!panel) { return; }
+		renderMsglogPanel();
+		panel.style.display = 'flex';
+		panel.style.marginTop = msglogPanelTopCompensation() + 'px';
+		fitMsglogPanelHeight(panel);
+		msglogPanelOpen = true;
+		if (btn) { btn.setAttribute('aria-expanded', 'true'); }
+		// Deferred one tick so the pointerdown that opened the panel (the press on the glyph
+		// itself) is not the same pointerdown the outside-dismiss listener sees and immediately
+		// closes the panel again on.
+		setTimeout(function () {
+			document.addEventListener('pointerdown', msglogOutsidePointerDown, true);
+			document.addEventListener('keydown', msglogKeyHandler, true);
+		}, 0);
+	}
+	function closeMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!msglogPanelOpen) { return; }
+		msglogPanelOpen = false;
+		// **hidePanel(), NOT A HAND-WRITTEN display:'none'** (ROADMAP Task 562;
+		// dev/lpn-spike/panel-touch-harness.js). It also sweeps any `.ec-help` tip this panel
+		// raised -- this panel's rows carry none today, but a per-box checklist for that rule is
+		// exactly what that harness exists to make unnecessary.
+		hidePanel(panel);
+		if (btn) { btn.setAttribute('aria-expanded', 'false'); }
+		document.removeEventListener('pointerdown', msglogOutsidePointerDown, true);
+		document.removeEventListener('keydown', msglogKeyHandler, true);
+	}
+	function toggleMessageLogPanel() {
+		if (msglogPanelOpen) { closeMessageLogPanel(); } else { openMessageLogPanel(); }
+	}
+	// **STANDING RATHER THAN CONDITIONAL, for the reason the grievance button beside it is.** A
+	// control that appears only once there is something to read is one nobody learns, and it would
+	// reflow the strip under the hand every time a notice landed. It is one icon in a strip that
+	// already exists, already wraps, and is already reserved against by zoomExtent().
+	// **HISTORY, NOT INFO** (Ida, 2026-09-21, after Tom: *"The i info glyph doesn't seem quite right
+	// to me."*). 'info' names standing reference facts elsewhere on this page (Welcome, Privacy
+	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
+	// mark cannot hold both jobs. See lib/Icons.lib.php for the drawing itself and Tom's own
+	// ruling on it, 2026-09-22.
+	// **NO TIP** (Tom, 2026-09-22: *"I don't think we need a tip on the down arrow glyph. I think
+	// it's more trouble than help."*). setIconLabel() always writes a `title` and adds `.ec-help`,
+	// which is the one selector initTips() wires a hover popup onto -- so this button is built by
+	// hand rather than through that door: the icon, and an `aria-label` so a screen reader still
+	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
+	// therefore unread; it (never translated into any of the other 26 languages) was deleted with
+	// this change.
+	// **AND DELIBERATELY NOT IN HELP > "TOOLBAR KEY", ON TOM'S OWN RULING** (2026-09-23). Perry
+	// found that building this button by hand had silently dropped it out of that list, it was put
+	// back, and Tom then struck the whole idea: *"If we are putting 'Messages' under Help, Toolbar,
+	// that makes 'Toolbar' a lie since the 'Messages' glyph is not really on the Toolbar. My
+	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
+	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
+	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
+	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// name stays; the drawing carries the rest.
+	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
+	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
+	// accident. It simply is not called here.
+	function wireMessageLogButton() {
+		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		var name = pc.lpn_msglog_name || 'Messages';
+		btn.textContent = '';
+		var ic = iconEl('history');
+		if (ic) { btn.appendChild(ic); }
+		btn.setAttribute('aria-label', name);
+		btn.setAttribute('aria-expanded', 'false');
+		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleMessageLogPanel();
+		});
+	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
+	// **HIGHLIGHTED WHILE IT SHOWS, NEVER OTHERWISE** (ROADMAP Task 704; Tom: "it must appear and
+	// possibly highlight while a message displays"). This is the ONE place #lpn_map_notice's text is
+	// written, so it is the one place that can know whether a message is currently on screen --
+	// noteMapUnmeasurable() and setNotice() both funnel through here, and neither needs its own
+	// copy of this rule.
+	//
+	// **THE LOCK BANNER (renderBanner(), #lpn_lock_banner) DOES NOT LIGHT THE GLYPH** (Perry's
+	// review, 2026-09-22, asked to make it do so or say why). It is logged into the same message
+	// log through logMessage() directly, but it is not this column: #lpn_lock_banner is a standing
+	// bar of its own, in normal document flow above the map, not a child of #lpn_map_overlay_tl_col.
+	// Lighting a glyph in the top-left map overlay for a message showing in a completely different
+	// part of the page would point the reader at the wrong spot -- the highlight's whole job is
+	// "the thing beside me is what just changed", and here it would not be.
+	function markMsglogActive(on) {
+		var btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		btn.classList[on ? 'add' : 'remove']('lpn-msglog-active');
+	}
 	function showNotice(text) {
 		var el = document.getElementById('lpn_map_notice');
 		if (!el) { return; }
 		el.textContent = text || '';
 		el.style.display = text ? 'block' : 'none';
+		markMsglogActive(!!text);
 	}
 	// **WHEN THIS PAGE CANNOT MEASURE ITSELF, IT SAYS SO** (MJH, 2026-09-09). A map that is silently
 	// unusable cost one user a whole session: the drawing was intact, the menus worked, and nothing
@@ -46994,6 +47580,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		// Logged on the TRANSITION only, not on every re-show: this message is re-shown whenever an
+		// ordinary notice has covered it, and each of those is the same standing fact said again.
+		if (!mapUnmeasurable) { logMessage(words, 'warning'); }
 		mapUnmeasurable = true;
 		el = document.getElementById('lpn_map_notice');
 		if (el && el.textContent === words) { return; }
@@ -47001,6 +47590,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
+		// sites already go through, which is why the log needed no second seam: teaching the door
+		// teaches all of them at once.
+		logMessage(text, 'notice');
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
@@ -47027,6 +47620,14 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = text || '';
+		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
+		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
+		// progress box writes through (`host.status`) -- "Working out the extended period
+		// simulation." on the way in, the run summary on the way out -- so hooking it here logs
+		// both without lpn-time.js knowing the log exists. logMessage()'s own dedupe (identical
+		// text+severity moves to the top rather than duplicating) is what stops an unchanged
+		// diagnostic re-logging itself on every ordinary solve.
+		if (text) { logMessage(text, 'notice'); }
 		var next = text ? (code || 'status') : '';
 		// A NEW COMPLAINT IS A NEW THING TO REPORT. The button stays thanked while the same message
 		// stands -- a second press posts nothing -- but a different diagnostic is a different
@@ -47102,6 +47703,12 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
+		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
+		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
+		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
+		// logged the moment it is set, same as setStatus() beside it.
+		if (text) { logMessage(text, 'notice'); }
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
@@ -47441,6 +48048,45 @@ var EngCalcs = EngCalcs || {};
 	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
+	//
+	// **SYNCHRONOUS, AND THE PATHS THAT NEED IT SO STILL CALL IT** -- building the drawing, a
+	// project arriving, a solve landing, and every harness. A control that only CHANGES something
+	// the labels print calls requestLabelRefresh() below instead (Task 653).
+	//
+	// **ONE PASS PER BURST, AFTER THE PAINT** (Task 653). Tom, 2026-09-13: *"the Settings Quality
+	// selector is very sluggish and doesn't work (change) once it responds."* Measured then: 89%
+	// of a 2.5 s select was this pass, run inside the select's own change handler, so the select
+	// could not even show its new value until every label had been re-measured. A request marks
+	// the pass owed and schedules it for after the next frame has painted; any number of requests
+	// before then cost one pass, and a synchronous refreshLabelText() in between pays the debt.
+	//
+	// **ANYTHING THAT READS THE LAYOUT FLUSHES FIRST** -- relayoutLabels(), refreshOneLabelInPlace(),
+	// captureLabelLayout() (the tab-switch keep) and the browser's own print -- so no reader can see
+	// the layout from before a change it has already been told about. A new document arriving
+	// cancels the debt instead: refreshAllFromDocument() lays its labels out itself.
+	var labelRefreshPending = false, labelRefreshScheduled = false;
+	function requestLabelRefresh() {
+		labelRefreshPending = true;
+		if (labelRefreshScheduled) { return; }
+		labelRefreshScheduled = true;
+		// rAF then a task: the rAF callback runs BEFORE its frame paints, so doing the pass there
+		// would hold the paint exactly as the synchronous call did. The task after it runs once
+		// the frame is on screen. Without rAF (a background tab, the node stub) a plain task.
+		var run = function () { labelRefreshScheduled = false; flushLabelRefresh(); };
+		if (typeof requestAnimationFrame === 'function') {
+			requestAnimationFrame(function () { setTimeout(run, 0); });
+		} else {
+			setTimeout(run, 0);
+		}
+	}
+	function flushLabelRefresh() {
+		if (labelRefreshPending) { refreshLabelText(); }
+	}
+	// Printing is a reader too, and it reads between tasks: Ctrl+P inside the owed frame would put
+	// the old lettering on paper.
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('beforeprint', function () { flushLabelRefresh(); });
+	}
 	function refreshLabelText() {
 		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
 		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
@@ -47452,6 +48098,8 @@ var EngCalcs = EngCalcs || {};
 		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
 		// elements and the legend is chrome; both are visible under a thematic map, so they are the
 		// part of this pass a suppressor has no business cancelling.
+		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
+		labelRefreshPending = false;
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -47926,6 +48574,9 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		// Placing text that a requested content pass is about to rewrite would place the old text
+		// (Task 653). Inside the pass itself nothing is owed, so this is a no-op there.
+		flushLabelRefresh();
 		// **OFF MEANS OFF: THE COLLISION RELAXATION IS THE SINGLE MOST EXPENSIVE THING ON THIS PAGE**
 		// (Tom, 2026-09-17), and running it over annotation `.lpn-labels-hidden` is not drawing
 		// decides where to put lettering nobody will see. This is the one place it is entered, which
@@ -48267,10 +48918,52 @@ var EngCalcs = EngCalcs || {};
 	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
 	// choice and a page that reports a wait the reader is already in are different pages. The words
 	// are Tom's own, 2026-09-06.
+	//
+	// **NEVER A FLASH** (Perry's review, 2026-09-22, live on port 8099: opening an example showed
+	// this exact banner for ~300ms then cleared it -- "SOLVER" and "POWER" share four of six
+	// letters in the same positions, which is a good match for the word Tom saw and could not
+	// read, "similar to POWER", and asked to stop happening. Naming the string was not fixing it).
+	// Most solves finish inside a second, so most of the time nobody should see this banner at
+	// all; a banner on screen for less time than a human can read a sentence is worse than no
+	// banner. Two rules, both against WALL TIME rather than against the fetch's own progress
+	// events, because the flash was never about bytes:
+	//   1. NOT SHOWN until the wait has lasted ENGINE_BANNER_SHOW_DELAY_MS. If the wait ends before
+	//      then, nothing was ever shown and nothing is logged -- there is no message to keep.
+	//   2. ONCE SHOWN, held at least ENGINE_BANNER_MIN_SHOWN_MS even if the wait ends sooner, so a
+	//      genuinely fast finish still leaves something readable rather than a second flash.
+	var ENGINE_BANNER_SHOW_DELAY_MS = 1000;
+	var ENGINE_BANNER_MIN_SHOWN_MS = 1500;
+	var engineBannerShowTimer = null;     // pending "show" timeout id, or null
+	var engineBannerHideTimer = null;     // pending "hide" timeout id (deferred by rule 2), or null
+	var engineBannerPendingBase = '';     // base sentence waiting out the show delay
+	var engineBannerPendingFull = '';     // its full text (base + progress), refreshed every tick
+	var engineBannerShownBase = '';       // base sentence actually on screen, '' if none
+	var engineBannerShownAt = 0;          // Date.now() of the actual (not scheduled) show
+	function paintEngineBanner(el, full) {
+		el.textContent = full;
+		el.style.display = full ? 'block' : 'none';
+		refreshEpanetBar(!!full);
+	}
+	// **LOGGED HERE, AND ONLY HERE** (Task 704: "log it only if it was actually shown"). This is
+	// the one place text actually reaches the screen, so it is the one place that can honestly say
+	// a message was shown.
+	function showEngineBannerNow(el, base, full) {
+		if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+		engineBannerShownBase = base;
+		engineBannerShownAt = Date.now();
+		logMessage(base, 'notice');
+		paintEngineBanner(el, full);
+	}
+	function hideEngineBannerNow(el) {
+		if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+		engineBannerShownBase = '';
+		engineBannerShownAt = 0;
+		paintEngineBanner(el, '');
+	}
 	function refreshEpanetBanner() {
 		var el = document.getElementById('lpn_engine_banner'),
 			pc = EngCalcs.pageConfig || {},
-			text = '';
+			base = '', full, elapsed;
 		if (!el) { return; }
 		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
 		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
@@ -48286,25 +48979,76 @@ var EngCalcs = EngCalcs || {};
 		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
 		// anything modal.
 		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
-			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+			base = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
 		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
-				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
+				base = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
 			} else if (epanetWarmState === 'unavailable') {
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
+				base = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
-		if (text && epanetWarmState === 'warming') {
+		full = base;
+		if (base && epanetWarmState === 'warming') {
 			var prog = epanetProgressText();
-			if (prog) { text += ' ' + prog; }
+			if (prog) { full = base + ' ' + prog; }
 		}
-		el.textContent = text;
-		el.style.display = text ? 'block' : 'none';
-		refreshEpanetBar(!!text);
+		if (base) {
+			if (engineBannerShownBase === base) {
+				// Already on screen with this exact sentence -- just refresh the ticking progress
+				// text underneath it. No re-log (logMessage() would dedupe it anyway, but there is
+				// no new SHOW event here either) and no timer to touch.
+				paintEngineBanner(el, full);
+				return;
+			}
+			if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+			if (engineBannerShownBase) {
+				// Something else is already visible and the reader is already looking at this
+				// slot -- replace it immediately. The flash guard is for the FIRST appearance
+				// only; a mid-read swap is not the defect Perry measured.
+				showEngineBannerNow(el, base, full);
+				return;
+			}
+			if (engineBannerPendingBase === base && engineBannerShowTimer) {
+				// Already waiting out the delay for this exact sentence -- keep the text current
+				// for whenever the timer fires, but do not restart the wall-clock wait.
+				engineBannerPendingFull = full;
+				return;
+			}
+			if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+			// ENGINE_BANNER_SHOW_DELAY_MS <= 0 means "no guard" -- the harness knob
+			// (dev/lpn-spike/engine-progress-harness.js) uses exactly this to test the byte/percent
+			// arithmetic synchronously; the shipped page never sets it below 1000.
+			if (ENGINE_BANNER_SHOW_DELAY_MS <= 0) { showEngineBannerNow(el, base, full); return; }
+			engineBannerPendingBase = base;
+			engineBannerPendingFull = full;
+			engineBannerShowTimer = setTimeout(function () {
+				engineBannerShowTimer = null;
+				showEngineBannerNow(el, engineBannerPendingBase, engineBannerPendingFull);
+			}, ENGINE_BANNER_SHOW_DELAY_MS);
+			return;
+		}
+		// base is empty: nothing left to report right now.
+		if (engineBannerShowTimer) {
+			// Never shown -- the wait ended inside the delay, which is the whole point of rule 1.
+			clearTimeout(engineBannerShowTimer);
+			engineBannerShowTimer = null;
+		}
+		engineBannerPendingBase = '';
+		if (!engineBannerShownBase) { return; }
+		elapsed = Date.now() - engineBannerShownAt;
+		if (elapsed >= ENGINE_BANNER_MIN_SHOWN_MS) {
+			hideEngineBannerNow(el);
+			return;
+		}
+		if (engineBannerHideTimer) { return; }
+		engineBannerHideTimer = setTimeout(function () {
+			engineBannerHideTimer = null;
+			hideEngineBannerNow(el);
+		}, ENGINE_BANNER_MIN_SHOWN_MS - elapsed);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:
@@ -50245,7 +50989,7 @@ var EngCalcs = EngCalcs || {};
 		// The pane's tabs carry their units in their headings and axis titles, so a switch has to
 		// redraw the open one for exactly the reason the popup is rebuilt.
 		refreshPaneIfOpen();
-		refreshLabelText();
+		requestLabelRefresh();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup
 		// does -- otherwise a US number sits under an SI label. THE WHOLE BOX: Coloring's field

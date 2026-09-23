@@ -8,13 +8,15 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Three feature branches await Tom's browser pass and may not merge without his all-clear:**
-  `feat/notice-log`, `feat/label-gang-search`, `feat/zoom-scale-rules`.
-  All are in `protected` in `dev/branch-policy.json`. `feature_freeze` is currently OFF.
+- **Six branches may not merge without Tom's all-clear** (all in `protected` in
+  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
+  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/label-limit`.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
+- **Merge master into a branch before merging it to master**, then run the suite on the merge:
+  2026-09-23 twice showed a clean merge breaking a harness (the lag harness and Net3's threshold).
 - Run `check_all.sh` and headless browser runs under their `flock` locks, and run no more than
-  three agent tracks at once. The box has 7 GB; six queued tracks on 2026-09-22 took an hour.
+  four agent tracks at once. WSL has 12 GB and 4 processors since 2026-09-23.
 
 ## RULINGS
 
@@ -43,6 +45,12 @@ lines rather than appending corrections.
 - **Never `git worktree remove --force`** without reading its `git status` first; it once destroyed
   an agent's uncommitted work.
 - **Check that no agent is already working in a worktree before sending another in.**
+- **An orphaned probe can hold `/tmp/engcalcs-browser.lock` for hours**, and every browser harness in
+  every suite then times out (2026-09-23: a pre-reviewer's hung phone test). Find the holder with
+  `for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && echo $p; done`.
+  The divider harness now prints `NOT RUN` when this happens instead of failing silently.
+- **An agent's report of "committed" is a claim.** Run `git status` in its worktree before you
+  merge; one branch's two harnesses were reported committed and were untracked.
 - **A usage limit kills every running agent at once**; only their commits survive. Brief agents to
   commit as they go, and relaunch with "read `git log master..HEAD` first".
 - **Preview ports:** `ports.conf`, the loaded Apache config, and the panel's `index.html` must
@@ -52,39 +60,60 @@ lines rather than appending corrections.
 
 ---
 
-## STATE — 2026-09-23
+## STATE — 2026-09-23, evening
 
-### On master, not yet pulled
+### On master (pushed), not yet pulled by him
 
-- **Undo now works for Properties fields and Tables cells**, fixed at the seven shared field
-  builders. Settings stay out of undo on his word (Task 709 closed).
-- `run_harnesses.sh` runs three at a time (`ENGCALCS_HARNESS_JOBS=1` restores serial); the 11
-  browser harnesses still run alone.
-- **Priority 99 is a real tier**, a second rank inside Next.
-- Tasks 688 and 693 are folded into 696 (`File, Convert as...`, units and coordinates together).
-- Re-adjust opens at step 1 and keeps the placement.
-- The time-step tip shows `Day 2, 01:00`; the day changes at midnight on the clock.
-- `dev/language-strings.md` has his ruling against "Do X and Y happens" for a conditional.
+- Merged on his all-clear: `feat/tables-spreadsheet`, `feat/notice-log` (Tasks 704 and 691 closed;
+  the 57-dialog audit is Task 710), `feat/zoom-scale-rules` (R-174: Text "Show at all zoom levels"
+  off by default, in multi-properties, Tables and Find/Replace).
+- Task 653 half fixed: no Settings select is rebuilt under the hand; Quality 3-5x faster. Unit
+  selects still redraw the whole project (left in 653).
+- Task 708's audit: `dev/property-venue-matrix.md` and the advisory `property_venue_check.php`.
+- Settings undo stays out, on his word (709 closed). A spent migration that duplicated two keys in
+  27 files when rerun is deleted.
 
-### The branches awaiting his pass
+### Awaiting his pass (preview ports)
 
-- **`feat/label-gang-search`:** dropping labels is now the last resort. Two trade-offs are his to
-  weigh: with every node field on, 26 labels hidden instead of 14, and the crowded view is about 50%
-  slower. The unrequested "Restore label defaults" button is the easiest thing to withdraw.
-- **`feat/zoom-scale-rules`:** his shrinking problem did not reproduce after `d039bb13`; ask him to
-  hard-reload and look again before hunting.
-- **`feat/notice-log`:** the bleed-through and one-line messages were one defect, fixed. "Messages"
-  is deliberately not in Help > Toolbar key.
+- **8103 `feat/zoom-control`** (682): ready. R-179..R-181 built, and Perry's round-2 finding (a map
+  click did not reset the twice-in-a-row rule) fixed at `83eeb139`.
+- **8104 `feat/convert-as`** (696): ready. He liked the menu tip (R-182). Open question for him:
+  the chooser offers EPSG:3857 as "lat/lon", per his own 2026-09-16 tip, while the stored numbers
+  are EPSG:4326 degrees. The `$ec_lang_syn` for `lpn_units_length` still says "Pipe lengths and
+  map coordinates" and needs his word. The "These are already lat/lon" button he called obsolete
+  is still there. R-172(2), satellite after the wizard, needs his eye on a real host.
+- **8105 `feat/table-editing`** (690): ready. Hidden columns ride in the existing `lpn_panecols`
+  browser key. His call: Declan's design also had a visible column-chooser button; only the
+  right-click shipped. An iPhone long-press on a heading needs a real phone.
+- **8106 `feat/property-venue`** (708): ready. Shut and mixing model are chosen from a list in
+  the reader's language.
+- **One solve per change is on master** (653): a fast network runs the whole period once per edit,
+  a slow one still shows the first step first. The "only the first time step" sentence it had been
+  weighed against was never his; he struck it 2026-09-23 (the one sensible case is while the EPANET
+  engine loads for a new browser). It also cancels a run an edit has made stale.
+- **8108 `feat/label-limit`** (his 2026-09-23 question): 0 in the labels width row means never show,
+  blank means always, like the customer row; the Thematic map checkbox is retired and a project that
+  had it opens with 0. Ready; Perry's two findings fixed at `c949316e`.
+- **8090 `feat/label-gang-search`**: unchanged; R-075..R-165 are his.
 
 ### Open with him
 
-2. The `%` sign added after his percentile box, which he did not ask for.
-3. The label branch's trade-offs and the Restore-defaults button.
-5. R-004, R-043, R-062.
+1. The `%` sign added after his percentile box, which he did not ask for.
+2. The label branch's trade-offs and the Restore-defaults button.
+3. R-004, R-043, R-062, R-154.
+4. Net3-Novato has no labeling threshold, so nothing hides there at any zoom. Should it have one?
+   (Net3's 30 is his own R-169 number; a new project starts blank, meaning always.)
+
+### Known and not yet fixed
+
+- `dev/browser-pass/specs/visibility.js` fails two checks on master too (outside `check_all`): its
+  Settings sub-heading list lacks `lpn_set_sub_custLbl`/`lpn_set_sub_customProps`, and "Escape
+  closes it". `settings-select-lag-harness.js` has failed once under a full suite's load and passes
+  alone; watch it.
 
 ### Translation sprint
 
-Not launched: he is still rewording strings, and four branches are open. Launch after they merge.
+Not launched: six branches are open and he is still ruling on English. Launch after they merge.
 
 ## Commands to hand Tom with any panel change
 
