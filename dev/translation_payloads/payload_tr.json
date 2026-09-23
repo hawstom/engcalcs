@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 2022,
-        "delta_key_count": 172,
+        "expected_key_count": 2032,
+        "delta_key_count": 182,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -588,7 +588,13 @@
         "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_msglog_name": "Messages",
+        "lpn_msglog_heading": "Recent messages",
+        "lpn_msglog_empty": "No messages yet.",
+        "lpn_msglog_ago": "{x} ago",
+        "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -630,8 +636,12 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
+        "lpn_settings_symbol_cap_mid": "times the length of the",
+        "lpn_settings_symbol_cap_post": "percentile pipe",
+        "lpn_settings_symbol_cap_tip": "A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
@@ -762,7 +772,13 @@
         "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_msglog_name": "Messages",
+        "lpn_msglog_heading": "Recent messages",
+        "lpn_msglog_empty": "No messages yet.",
+        "lpn_msglog_ago": "{x} ago",
+        "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -804,8 +820,12 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
+        "lpn_settings_symbol_cap_mid": "times the length of the",
+        "lpn_settings_symbol_cap_post": "percentile pipe",
+        "lpn_settings_symbol_cap_tip": "A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
@@ -1926,6 +1946,22 @@
                 }
             }
         },
+        "lpn_lock_open_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Kilidini kaldır",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} saniye",
+                    "english": "{n} seconds"
+                }
+            }
+        },
         "lpn_lock_requested": {
             "reason": "missing",
             "current_value": null,
@@ -1939,6 +1975,86 @@
                     "key": "lpn_ago_seconds",
                     "value": "{n} saniye",
                     "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_msglog_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "bilinmeyen bir süre",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet'i kullanın.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "bilinmeyen bir süre",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet'i kullanın.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "bilinmeyen bir süre",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet'i kullanın.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_ago": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "bilinmeyen bir süre",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet'i kullanın.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "bilinmeyen bir süre",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet'i kullanın.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
                 }
             }
         },
@@ -2615,6 +2731,70 @@
             }
         },
         "lpn_settings_label_always": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Bir etiketi adlandırdığı şeyden uzağa sürüklediğinizde, belirli açılardan birine yakın sürüklerseniz ona geri dönen çizgi en yakın açıya çekilir. Sürüklemeye devam ederseniz yaslama bırakır, böylece her açı hâlâ kullanılabilir. Kapalıyken serbestçe sürüklenir, bu sayfanın her zaman yaptığı budur.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Sembol opaklığı (0 ile 1 arası)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Bir etiketi adlandırdığı şeyden uzağa sürüklediğinizde, belirli açılardan birine yakın sürüklerseniz ona geri dönen çizgi en yakın açıya çekilir. Sürüklemeye devam ederseniz yaslama bırakır, böylece her açı hâlâ kullanılabilir. Kapalıyken serbestçe sürüklenir, bu sayfanın her zaman yaptığı budur.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Sembol opaklığı (0 ile 1 arası)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_mid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Bir etiketi adlandırdığı şeyden uzağa sürüklediğinizde, belirli açılardan birine yakın sürüklerseniz ona geri dönen çizgi en yakın açıya çekilir. Sürüklemeye devam ederseniz yaslama bırakır, böylece her açı hâlâ kullanılabilir. Kapalıyken serbestçe sürüklenir, bu sayfanın her zaman yaptığı budur.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Sembol opaklığı (0 ile 1 arası)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_post": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Bir etiketi adlandırdığı şeyden uzağa sürüklediğinizde, belirli açılardan birine yakın sürüklerseniz ona geri dönen çizgi en yakın açıya çekilir. Sürüklemeye devam ederseniz yaslama bırakır, böylece her açı hâlâ kullanılabilir. Kapalıyken serbestçe sürüklenir, bu sayfanın her zaman yaptığı budur.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Sembol opaklığı (0 ile 1 arası)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
