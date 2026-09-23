@@ -1,15 +1,17 @@
-// ONE PROBE FOR dev/lpn-spike/browser-drive.js: how much LABEL WORK a project switch does with the
-// thematic map ON, in a real Chrome, read off the page's own ?debug=perf line.
+// ONE PROBE FOR dev/lpn-spike/browser-drive.js: how much LABEL WORK a project switch does with
+// generated labels off (the labeling threshold typed as 0 -- Task 712 retired the separate
+// "Thematic map" switch that used to do this), in a real Chrome, read off the page's own
+// ?debug=perf line.
 //
 //   SCRIPT=dev/lpn-spike/browser-labels-off-probe.js \
 //     PAGE='http://127.0.0.1:8110/engcalcs/Looped-Network.php?debug=perf' \
 //     node dev/lpn-spike/browser-drive.js
 //
 // Two projects are written straight into localStorage (adoptOrphans picks up a project key no index
-// mentions), the big one in two copies -- one ordinary, one with settings.colorThematic set. Then
-// each is switched into from Net1 and the perf line for that switch is printed. The numbers that
-// matter are `label passes` and `label measurements`: a measurement is a forced synchronous layout,
-// which is the cost node cannot feel and this can.
+// mentions), the big one in two copies -- one ordinary, one with settings.labelMaxWidth set to 0.
+// Then each is switched into from Net1 and the perf line for that switch is printed. The numbers
+// that matter are `label passes` and `label measurements`: a measurement is a forced synchronous
+// layout, which is the cost node cannot feel and this can.
 const fs = require('fs');
 module.exports = async function ({ send, evaluate, logs, sleep }) {
   const URL_ = process.env.PAGE;
@@ -19,7 +21,7 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
   big.project = Object.assign({}, big.project, { name: 'PlainMap' });
   const plain = JSON.stringify(big);
   big.project = Object.assign({}, big.project, { name: 'ThematicMap' });
-  big.settings = Object.assign({}, big.settings, { colorThematic: true });
+  big.settings = Object.assign({}, big.settings, { labelMaxWidth: 0 });
   const thematic = JSON.stringify(big);
 
   await send('Page.navigate', { url: URL_ });

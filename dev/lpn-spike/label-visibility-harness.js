@@ -50,7 +50,9 @@ const L = loadLoopedNetwork(
 	// The WHOLE class string, not a membership test: section 4 asks css/engcalcs.css which of its
 	// own rules would fire, and that question cannot be asked one guessed class at a time.
 	"\t\tsvgClasses: function () { return svg.getAttribute('class') || ''; },\n" +
-	"\t\tsetThematic: function (on) { settings.colorThematic = !!on; refreshValueColors(); },\n" +
+	// Task 712: "Thematic map (colors only)" is retired -- a threshold of 0 reads as colour-only,
+	// so the stub's setThematic(true) is now "type 0 into the labeling threshold".
+	"\t\tsetThematic: function (on) { settings.labelMaxWidth = on ? 0 : null; refreshValueColors(); },\n" +
 	"\t\tnodeEl: function (id) { return nodeEls[id]; },\n" +
 	"\t\tlinkEl: function (id) { return linkEls[id]; },\n" +
 	"\t\tlabelEl: function (id) { return labelEls[id]; },\n" +
