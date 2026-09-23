@@ -755,8 +755,26 @@ the block.
     `serializeProject()`, which argues they belong; against it, a stack mixing "I moved a pipe" with
     "I changed the default diameter for new junctions" makes Ctrl+Z unpredictable, because the
     reader presses it expecting the last thing they SAW to come back. **A third shape nobody has
-    costed: a Revert local to the Settings box instead of the global stack.** Ida was asked
-    2026-09-23 and her answer goes here.
+    costed: a Revert local to the Settings box instead of the global stack.**
+  - **IDA ANSWERED 2026-09-23 AND HER ANSWER IS NO -- LEAVE SETTINGS OUT OF UNDO.** Three findings,
+    each measured against the tree rather than reasoned from outside:
+    - **The project-versus-furniture axis does NOT decide this**, which is the first thing everybody
+      reaches for. `serializeProject()` carries the whole `settings` object, so ID prefixes,
+      new-asset defaults and colouring are project data on exactly the same footing as a pipe's
+      diameter. That clean line is simply not available here.
+    - **The line that decides it is whether the edit does anything you can SEE at the moment you
+      make it.** A default diameter or an ID prefix changes nothing already drawn, so Ctrl+Z after
+      one would appear to do nothing even when it worked -- which reads as "undo is broken", the
+      exact complaint that started this. Colouring is the one section that repaints at once.
+    - **AND THE TREE ALREADY DRAWS THAT LINE CORRECTLY IN ONE PLACE:** `applyIdPrefixToAll()`, the
+      button that actually renames existing elements, DOES take a snapshot, while the preference
+      beside it does not. The gap sits exactly where it should.
+    - **Precedent, cited rather than asserted:** AutoCAD's own UNDO documentation excludes the
+      "what a new entity gets" settings (`CLAYER`, `CECOLOR`) by design; QGIS gives a layer's
+      symbology panel its OWN local undo history, separate from the map canvas's.
+    - **So: change nothing, and if colouring ever wants a safety net, give that one section a local
+      Reset rather than joining the global stack.** Making only colouring undoable would be the new
+      inconsistency, not a fix -- units, hydraulics, energy and quality all save immediately too.
   - **AND COLOURING MAY BE A CASE OF ITS OWN**, because it changes what the drawing LOOKS like at
     once, so undoing it is visible in a way undoing a new-asset default is not.
   - **THREE CORNERS THE AUDIT NEVER DROVE END TO END**, listed so a later pass does not rediscover
