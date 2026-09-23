@@ -57,7 +57,7 @@ judgement and does not belong to a script.
 
 ### Misc, from his own browser passes
 
-- [ ] R-105 -- | **SHIPPED on master (`faf7216b` + `a10e5894`).** A step now reads `24:00 - 25:00` and keeps climbing past a day; nothing wraps, however many days the run covers. **The clock reading did not vanish, it moved into the row's tip** -- the old label was `elapsed  ·  clock`, two readings of ONE instant, which you read as a range and were right to. | The time step selector on the toolbar (need the transport) lists time ranges. Starting at 24:00, the step end time is normalized back to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say 24:00 - 25:00, and fix all subsequent steps.
+- [x] R-105 fix/time-step-instant | "R-105: I opened this (unchecked). I think I made a mistake, and these are not ranges, they are times. Please ask Mary to check this and then, if I was wrong, change the selector to have only one time per option." -- Mary confirmed: every comparable tool (EPANET's own Browser Time, epanet-js's step model, WaterGEMS/SewerGEMS's Time Browser) names one instant per step, never a range. A row now reads a single elapsed time (`25:00`, still climbing past 24:00, never wrapping to the wall clock); the clock reading stays in the row's tip, also as one instant.
 
 ## Round of 2026-09-21c -- his pass over the reloaded preview panel
 

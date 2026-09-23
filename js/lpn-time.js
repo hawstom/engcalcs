@@ -1523,28 +1523,25 @@
 	var ui = null;
 
 	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
-	// **THE LABEL IS THE STEP'S RUN-TIME RANGE, NEVER THE WALL CLOCK.** `next` is the following
-	// reporting time, so a step reads `24:00 - 25:00` and keeps climbing past a day -- it must
-	// never fall back to `EC.lpnTimeClockText()`, whose whole job is to WRAP at 24:00 for a
-	// CLOCKTIME control, and which read as `24:00 - 0:00` here before this was written. The last
-	// step has no following stop, so it shows one bare elapsed time.
-	function stepText(t, next) {
-		var start = EC.lpnTimeElapsedText(t);
-		return (next === undefined || next === null) ? start
-			: start + ' - ' + EC.lpnTimeElapsedText(next);
+	// **THE LABEL IS ONE INSTANT, NEVER A RANGE.** `EC.lpnReportTimes()` is a flat list of discrete
+	// reporting INSTANTS; it was never a list of intervals, so pairing one with the next one to
+	// manufacture a span was inventing a quantity this page does not compute. Every comparable
+	// tool (EPANET's own Browser Time, epanet-js's step model, WaterGEMS's Time Browser) names one
+	// instant per step, singular. **AND IT MUST STILL NOT WRAP** -- `EC.lpnTimeElapsedText()`
+	// keeps climbing past a day (`24:00`, `25:00`, ...) rather than falling back to a wall clock
+	// that resets at midnight. R-105 was reopened, 2026-09-22: "these are not ranges, they are
+	// times... change the selector to have only one time per option."
+	function stepText(t) {
+		return EC.lpnTimeElapsedText(t);
 	}
-	// **THE CLOCK READING DID NOT GO AWAY; IT MOVED INTO THE ROW'S TIP.** The label used to be
-	// `elapsed  ·  clock` -- two readings of ONE instant side by side -- and Tom read it as a
-	// range and was right to: two times separated by a mark is a range to everybody. His
-	// instruction, 2026-09-21: *"Fix it to say 24:00 - 25:00, and fix all subsequent steps."*
-	// So the LABEL is now a genuine run-time range and cannot wrap. The clock is still the thing
-	// a pattern is keyed on, so it is kept where it costs no width, and it is the reason the
-	// signature below still has to notice a project that states the SAME grid from a different
-	// hour -- every row would otherwise keep the clock of the project before it.
-	function stepClockText(t, next) {
-		var times = docTimes(), start = EC.lpnTimeClockText(times, t);
-		return (next === undefined || next === null) ? start
-			: start + ' - ' + EC.lpnTimeClockText(times, next);
+	// **THE CLOCK READING LIVES IN THE ROW'S TIP, AND IT TOO IS NOW ONE INSTANT.** It used to
+	// pair with the label as `elapsed  ·  clock`, which read as a range and was the first defect
+	// R-105 fixed; the label then became a genuine range, which is the second defect this one
+	// undoes. `EC.lpnTimeClockText()` is the one that WRAPS at 24:00 -- that is its whole job, for
+	// a CLOCKTIME control -- so a single elapsed instant is paired with a single, possibly wrapped,
+	// clock instant here.
+	function stepClockText(t) {
+		return EC.lpnTimeClockText(docTimes(), t);
 	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
@@ -1666,8 +1663,8 @@
 		var stops, labels, clocks, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
-		labels = stops.map(function (t, i) { return stepText(t, stops[i + 1]); });
-		clocks = stops.map(function (t, i) { return stepClockText(t, stops[i + 1]); });
+		labels = stops.map(function (t) { return stepText(t); });
+		clocks = stops.map(function (t) { return stepClockText(t); });
 		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
 		// the rows themselves changed -- an edit to the duration, to the report step, or to the
 		// clock time at the start; rebuilding on every solve would close the list under a user who

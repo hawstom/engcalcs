@@ -1,17 +1,19 @@
-// The toolbar's time-step selector: each option must read as a RUN-TIME range, never wrapping
-// back to a wall clock past 24 hours. Run with:
+// The toolbar's time-step selector: each row is ONE INSTANT, never a range, and elapsed time
+// keeps climbing past 24:00 rather than wrapping to the wall clock. Run with:
 //   node dev/lpn-spike/toolbar-time-step-harness.js
 //
-// Tom, 2026-09-21, on a run past a day: "Starting at 24:00, the step end time is normalized back
-// to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say
-// 24:00 - 25:00, and fix all subsequent steps." EC.lpnTimeClockText() wraps at 24:00 on purpose --
-// that is what a CLOCKTIME control fires on -- but the transport's step selector was pairing an
-// elapsed start with a WRAPPED clock reading of that same instant, so the option at hour 24 of a
-// longer run read "24:00  ·  00:00" instead of describing the step that runs from 24:00 to 25:00.
+// R-105 first asked for a run-time RANGE ("Fix it to say 24:00 - 25:00"), which shipped
+// 2026-09-21. Tom reopened it 2026-09-22: "I think I made a mistake, and these are not ranges,
+// they are times... change the selector to have only one time per option." Mary (market-researcher)
+// confirmed every comparable tool -- EPANET's own Browser Time, epanet-js's step model,
+// WaterGEMS/SewerGEMS's Time Browser -- names one instant per step, and every quantity this
+// control reveals is a snapshot at an instant. So the range framing is gone; the two things the
+// FIRST fix correctly won are kept: elapsed time never wraps back to clock time, and the wall-clock
+// reading survives in the row's tip.
 //
 // This drives EC.lpnTimeMountToolbar() itself through the real DOM stub, rather than re-deriving
 // the label text by hand -- a harness that reimplements the fix would pass even if the mount
-// function still called the wrong formatter.
+// function still built a range.
 
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
@@ -26,8 +28,12 @@ function eq(a, b, msg) {
 	console.log((ok ? '  ok   ' : '  FAIL ') + msg + '  (' + JSON.stringify(a) + ')');
 	if (!ok) { failures++; }
 }
+function ok(cond, msg) {
+	console.log((cond ? '  ok   ' : '  FAIL ') + msg);
+	if (!cond) { failures++; }
+}
 
-function stepLabels(times) {
+function stepRows(times) {
 	const doc = { times: times };
 	const host = { doc: function () { return doc; }, status: function () {} };
 	EngCalcs.lpnTimeInit(host);
@@ -37,27 +43,40 @@ function stepLabels(times) {
 		if (tip) { el.title = tip; }
 	});
 	const sel = container.children.filter(function (c) { return c.id === 'lpn_time_step'; })[0];
-	return sel.children.map(function (o) { return o.textContent; });
+	return sel.children.map(function (o) { return { label: o.textContent, tip: o.title }; });
 }
 
 // A run past 24 hours: EPANET's own hourly grid, three hours past midnight.
 {
 	const t = Object.assign(EngCalcs.lpnTimesDefaults(), { duration: 27 * 3600, reportStep: 3600 });
-	const labels = stepLabels(t);
-	eq(labels[23], '23:00 - 24:00', 'the step ending the first day stays in run time');
-	eq(labels[24], '24:00 - 25:00', 'crossing midnight does not fall back to the wall clock');
-	eq(labels[25], '25:00 - 26:00', 'and every step after it keeps climbing');
-	eq(labels[26], '26:00 - 27:00', 'three days would read the same way -- nothing wraps');
-	eq(labels[27], '27:00', 'the final report time has no following step, so it is a bare instant');
-	eq(labels[0], '0:00 - 1:00', 'an ordinary early step is a run-time range too, not a special case');
+	const rows = stepRows(t);
+	const labels = rows.map(function (r) { return r.label; });
+
+	// THE INVARIANT: one bare instant per row, never two times joined by a separator.
+	labels.forEach(function (text, i) {
+		ok(text.indexOf(' - ') === -1,
+			'row ' + i + ' (' + JSON.stringify(text) + ') is a single instant, not a range');
+	});
+
+	eq(labels[0], '0:00', 'the first row is a bare instant');
+	eq(labels[23], '23:00', 'the step ending the first day is a bare instant');
+	eq(labels[24], '24:00', 'crossing midnight does not fall back to the wall clock');
+	eq(labels[25], '25:00', 'and every row after it keeps climbing');
+	eq(labels[26], '26:00', 'three days would read the same way -- nothing wraps');
+	eq(labels[27], '27:00', 'the final report time reads exactly like every other row');
+	eq(labels.length, 28, 'one row per reporting instant, 0:00 through 27:00');
+
+	// THE CLOCK READING SURVIVES IN THE TIP, AND IT IS ALSO ONE INSTANT NOW (it may still wrap,
+	// because EC.lpnTimeClockText() wrapping at 24:00 is what makes it a CLOCK reading at all).
+	ok(rows[24].tip.indexOf(' - ') === -1, 'the tip at hour 24 is one clock reading, not a range');
 }
 
 // A single-instant network (no [TIMES] block at all) must still render one option.
 {
 	const t = EngCalcs.lpnTimesDefaults();
-	const labels = stepLabels(t);
-	eq(labels.length, 1, 'a network with no duration has exactly one step');
-	eq(labels[0], '0:00', 'and it is a bare instant, not a zero-length range');
+	const rows = stepRows(t);
+	eq(rows.length, 1, 'a network with no duration has exactly one step');
+	eq(rows[0].label, '0:00', 'and it is a bare instant, exactly like every other row');
 }
 
 console.log(failures ? ('\n' + failures + ' FAILURE(S)') : '\nall ok');
