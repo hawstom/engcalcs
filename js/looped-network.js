@@ -28872,6 +28872,7 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		closeViewPopovers();
 		wireConvasBox();
+		convasFor = library.openId;
 		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
 		convasSetKind(from.kind);
 		fromEl = document.getElementById('lpn_convas_from');
@@ -28912,9 +28913,13 @@ var EngCalcs = EngCalcs || {};
 		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
 			units: units, rounding: rounding };
 	}
+	// The box is not modal, so a tab switch can happen under it; its answers were read off the
+	// project it opened on, so a different project gets the box again rather than those answers.
+	var convasFor = null;
 	function convasOk() {
 		var a = convasAnswers();
 		closeConvasBox();
+		if (convasFor !== library.openId) { convertAs(); return; }
 		runConvertAs(a);
 	}
 	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
