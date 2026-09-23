@@ -80,23 +80,12 @@ language. `lib/config.inc.php` reads `APP_ENV`: `development` → `DEBUG_MODE=tr
 |------|---------|
 | `lib/base.inc.php` | Master bootstrap — include this and nothing else |
 | `lib/Calculators.lib.php` | `echoCalculatorForm()`, `ecTipLabel()`, `ecLinkTipLabel()` |
-| `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
-| `lib/Units.lib.php` | Unit families, presets, conversion factors |
 | `lib/Canonical.lib.php` | `ecCanonicalPaths()` — the one place a pretty URL is declared |
-| `lib/Language.lib.php` | Language detection and switching |
 | `lib/Language.Settings.php` | Per-language `QUALITY` weight used in Accept-Language negotiation |
-| `lib/lang.ec.??.php` | Localized string arrays (27 files) |
-| `js/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
-| `js/Manning.lib.js` | Shared Manning/irregular geometry and sketch rendering |
 | `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` |
 | `js/lpn-geom.js` | `lpn_` pure geometry. No DOM |
 | `js/lpn-collide.js` | `lpn_` label collision avoidance. No DOM |
-| `js/lpn-solver.js` | Looped-network global gradient algorithm |
-| `js/lpn-epanet.js` | Bridge to the vendored EPANET engine |
-| `js/lpn-inp.js` | EPANET `.inp` import and export |
 | `js/lpn-rules.js` | `lpn_` EPANET `[RULES]` grammar. No DOM |
-| `js/looped-network.js` | `lpn_` map editor |
-| `css/engcalcs.css` | App-wide styles |
 
 Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
 
@@ -221,25 +210,7 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
 
 ## How to Add a New Calculator
 
-1. Copy an existing calculator (e.g. `Manning-Pipe-Flow.php`).
-2. Choose a short prefix and add it to the table above.
-3. Define `$arrayInputs` and `$arrayResults` referencing `$ec_lang['prefix_key']`. Declare each
-   field's units as a **family name** (`'units' => 'distance_small'`), never an inline array.
-4. **Add language keys to `lib/lang.ec.en.php` ONLY.** An absent key falls back to English; a key
-   byte-identical to English in another file blocks the build. Then regenerate the payloads.
-5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the page's `<script>` block.
-6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, `echoFooter`.
-7. Add it to `lib/Menus.lib.php`.
-8. Set `$html_desc = $ec_lang['<prefix>_main_desc'];` before `echoHeader()`. Reuse `_main_desc`;
-   never add a meta-description key, and never point `$html_desc` at a title. It also feeds
-   `og:description`.
-9. Include the JS with `filemtime()` cache-busting, never a hardcoded `?v=N`:
-   `<script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>`
-10. **Add a worked example to `dev/calc-spike/`** anchored against the source method
-    (`mpf-harness.js` is the model; recipe in `dev/calc-spike/README.md`).
-11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`.**
-    A missing prefix silently falls back to three default terms; verify by reading
-    `glossary_terms_by_prefix.<prefix>` out of a generated payload.
+Follow the `add-calculator` skill (`.claude/skills/add-calculator/SKILL.md`) — every step is required.
 
 ---
 
