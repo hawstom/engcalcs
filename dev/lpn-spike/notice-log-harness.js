@@ -420,6 +420,43 @@ console.log('7e. The clock reads as a clock, not a chevron, at real button size'
 		hasHorizontal, shares.map(s => s.vert.toFixed(2)).join(','));
 }
 
+console.log('7f. The panel stacks messages top-to-bottom, and paints an opaque backing behind '
+	+ 'them (Tom, 2026-09-22: "the simultaneous messages ... appear on one line instead of on '
+	+ 'three. This is a bug." And: "I discovered what is appearing behind the glyph. It is the '
+	+ 'text \'RIVER\' from the model.")');
+{
+	// **A CSS-SOURCE CHECK, not a rendered-pixel one** -- this file's DOM stub has no real layout
+	// engine, so `display:flex` with no `flex-direction` cannot be told apart from a real column
+	// here. What CAN be measured directly is the declaration itself: `display:flex` alone defaults
+	// to `flex-direction:row`, which is exactly how three simultaneous messages ran off the right
+	// edge in one line instead of stacking, and a container with no background of its own paints
+	// nothing in the gaps BETWEEN rows, which is how a Text object on the map (his "RIVER") showed
+	// through those gaps at full strength once there was more than one row to leave a gap between.
+	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
+	const m = css.match(/\.lpn-msglog-panel\s*\{([^}]*)\}/);
+	if (!m) { throw new Error('.lpn-msglog-panel has no rule of its own'); }
+	const decl = m[1];
+	ok('the panel is declared as a column, not the flex default of a row',
+		/flex-direction\s*:\s*column\b/.test(decl), decl.trim());
+	// The background must be fully opaque -- rgba(...,0.8) is exactly what let the map bleed
+	// through the individual message pills before the rows were given any backing of their own,
+	// and a container using the same partial alpha would only move the same defect one level up.
+	const bgMatch = decl.match(/background(?:-color)?\s*:\s*([^;]+);/);
+	ok('the panel declares its own background', !!bgMatch, decl.trim());
+	if (bgMatch) {
+		const bg = bgMatch[1].trim();
+		const rgbaAlpha = bg.match(/rgba\([^)]*,\s*([\d.]+)\s*\)/);
+		const isFullyOpaque = !rgbaAlpha ? !/transparent|\brgba\(/i.test(bg) : Number(rgbaAlpha[1]) >= 1;
+		ok('and it is fully opaque -- nothing on the canvas can show through any part of this box',
+			isFullyOpaque, bg);
+	}
+	// This is also the live mutation: strip the declaration back to what shipped in round three
+	// and confirm THIS check is what would have caught it.
+	const stripped = decl.replace(/flex-direction\s*:\s*column;?/, '').replace(/background\s*:\s*#fff;?/, '');
+	ok('the live mutation: removing both declarations reproduces the exact defect this check exists for',
+		!/flex-direction\s*:\s*column\b/.test(stripped) && !/background\s*:\s*#fff/.test(stripped));
+}
+
 console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 8099: '
 	+ '"On load I see two messages ... But when I click the expando button, I get \'No messages '
 	+ 'yet.\' **All** messages now need to go through this messenger system.")');

@@ -2975,12 +2975,28 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* ---- The on-map message list (superseded the dialog above, Tom 2026-09-22, live on port 8099:
    "The alert paradigm is not a good UX ... User expects them to descend below the glyph, below
    the Mode status, in similar appearance that they originally had.") ----
-   #lpn_msglog_panel itself is a plain flex column (`display:flex` is set in JS alongside
-   `display:none`, so there is no rule for the panel itself here); each row is its own translucent
-   pill, the same paint as the mode hint and the notice above it, so the list reads as more lines
-   of the same readout rather than a different kind of box appearing under it. max-height is set
-   in JS (fitMsglogPanelHeight()), never here -- see that function for why a CSS percentage cannot
-   work on this box. */
+   **CORRECTED 2026-09-22: this used to say "no rule for the panel itself here," relying on JS
+   setting bare `display:flex`.** `display:flex` alone defaults to `flex-direction:row`, so the
+   rows laid out SIDE BY SIDE and ran off the right edge of the map (Tom: "the simultaneous
+   messages on open ... appear on one line instead of on three. This is a bug."). `flex-direction:
+   column` belongs on the container that draws the list, not on the display toggle that only opens
+   and closes it, so it is a CSS rule rather than one more thing openMessageLogPanel() has to set.
+   **AND THE GAPS BETWEEN ROWS PAINTED NOTHING**, so a Text object on the map underneath (Tom: "I
+   discovered what is appearing behind the glyph. It is the text 'RIVER' from the model.") showed
+   through those gaps at full strength -- each row is its own translucent
+   `rgba(255,255,255,.8)` pill, which is fine for ONE isolated readout but leaves the space BETWEEN
+   pills fully transparent once there is more than one. `#lpn_msglog_panel` now paints a solid,
+   fully opaque backing behind the whole stack, so nothing on the canvas can ever show through any
+   part of this box, gaps included -- the same reasoning `background-color` gets on
+   `.lpn-basemap-teaser` two rules up, applied to a list instead of a single tile. */
+.lpn-msglog-panel {
+	box-sizing: border-box;
+	flex-direction: column;
+	gap: 4px;
+	background: #fff;
+	border-radius: 3px;
+	padding: 4px;
+}
 .lpn-msglog-panel-row {
 	display: flex; gap: 8px; align-items: baseline;
 	background: rgba(255, 255, 255, .8);
