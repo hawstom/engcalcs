@@ -323,7 +323,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_mapgeo_readjust_intro`**
   > Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mapgeo_step1`**
   > Step 1 of 2: find your place in the world
   _Ruled OK 2026-09-23._
@@ -386,7 +386,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
   > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -395,16 +395,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_symbol_cap_mid`**
   > times the length of the
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_symbol_cap_post`**
   > percentile pipe
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -440,19 +440,19 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_survey_format_internal`**
   > specified internally
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_format_label`**
   > File format:
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_note_ambiguous_elev`**
   > More than one column could be the elevation, so none of them was read.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_note_bad_coord`**
   > The {axis} does not read as a number.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_note_bad_elev`**
   > Non-numeric elevation. Imported without elevation.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_note_blank_rows`**
   > Blank lines skipped: {detail}.
   _Ruled OK 2026-09-23._
@@ -518,7 +518,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_time_clock_day`**
   > Day {day}, {clock}
-  @@ NEEDS RULING
+  OK.
 - **`lpn_tool_add_meter`**
   > Customer
   _Ruled OK 2026-09-23._
