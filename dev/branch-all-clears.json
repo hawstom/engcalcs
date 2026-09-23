@@ -82,6 +82,13 @@
             "words": "I think this feature works for now and can be closed, merged, and the branch deleted. Good work.",
             "context": "Said after testing port 8100, in the same message as his peripheral question (now Task 708): \"Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?\"",
             "pin_note": "HE TESTED THE LIVE PREVIEW WHILE THE BUILD AGENT WAS STILL FINISHING, so the exact commit he saw is not knowable: the preview serves the worktree as it stands. The pin is the agent's final head, whose only additions after his pass are the harness, the Settings-row wording and the merge of master. Extended by a judgement, not by him; if that judgement was wrong, this line is where to catch it."
+        },
+        "feat/map-menu": {
+            "head": "2cdc639750d160a45987e148b0a72d6d8824b728",
+            "date": "2026-09-22",
+            "words": "feat/map-menu: (1) I believe this is done now. Great decisions and great execution. Merge and delete branch.",
+            "context": "Cleared in his 2026-09-22 message, after his R-126/R-127/R-128 round. In the same breath he asked two questions that do NOT gate the merge and are being answered separately: what the missing 'discard a grid placement' case actually is, and a terminology synchronisation (EPSG, unnamed local georeference, not georeferenced -- lat/lon retired as a label). He also confirmed 'Only three rows left. Zoom to fit, Background image, and World map.'",
+            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words."
         }
     }
 }
