@@ -491,3 +491,100 @@ in the `EngCalcs.lpnTime*` bridge functions inside `looped-network.js` and traci
 finished in this pass; and whether a UNITS change or an UNDO while a scenario other than the one the
 snapshot was taken in is active shows the same class of gap (undo calls `refreshPaneIfOpen()`
 directly and unconditionally, so it is very likely fine, but not independently re-measured here).
+
+## 2026-09-23 — eighth outing: feat/table-editing (Task 690, column hide + Ctrl+D), review at `29fc3b42`: READY, with one design-scope gap and one phone question to name
+
+Asked: Declan's column-hide design (`dev/agents/data-entry-clerk/journal.md`, "Column hide and
+reorder") and spreadsheet fill-down. Build agent's claims, taken as hypotheses:
+right-click a heading (not ID) hides it; right-clicking any remaining heading lists "Show {col}"
+per hidden column; hidden columns are absent from render, tab/arrow order, paste and copy;
+state lives in `lpn_panecols`, never the project file; Ctrl+D fills the top row down through
+validated writes, refuses/counts read-only cells, skips ID, one undo step, works as a scenario
+override; Ctrl+D no-ops on one row or while typing.
+
+**CONFIRMED, both harnesses, run as delivered, not just read.** `node
+dev/lpn-spike/pane-col-hide-harness.js` (18/18) and `pane-filldown-harness.js` (19/19) both pass
+against the tree as it stands.
+
+**MUTATION-TESTED one claim and it exposed a real (currently harmless) gap.** Deleting the
+`if (key === 'id') { return; }` guard inside `paneSetColHidden()` (js/looped-network.js:20652,
+tested on a scratch copy, never in the reviewed worktree) left the hide-harness at 18/18 — the
+harness only proves the MENU never offers to hide ID (`paneOpenColMenu`'s own `if (key !== 'id')`),
+not that the underlying setter refuses one directly. `grep` shows `paneSetColHidden(spec, key,
+true)` has exactly one call site, gated by that same menu check, so nothing reachable today can hide
+ID — but the "ID cannot be hidden" claim is enforced once, at the UI, not at the data layer the
+harness's own name implies it tests. Worth a second guard line and a harness case that calls the
+setter directly, cheap either way.
+
+**CONFIRMED, in real Chromium (`flock /tmp/engcalcs-browser.lock`, Net3's Junctions table),
+the specific worry this round was asked to chase: un-hiding survives even the worst case.**
+Right-clicked column[3] (Description), hid it, confirmed the rendered `<th>` count dropped by one
+and `lpn_panecols` held `{"hidden":["desc"]}`. Then hid every other column one at a time down to ID
+alone, and right-clicked ID itself: its menu listed all 13 "Show {col}" entries, not just the one
+hidden most recently — the hidden list `paneOpenColMenu()` builds is independent of which heading
+you clicked, so a person who has hidden themselves down to one column can always get every one back
+from that column's own menu. Clicking each "Show" restored the full original heading row exactly.
+
+**CONFIRMED, real Chromium, Ctrl+D and undo on Base demand.** Selected junction rows 1 and 3 in
+Base demand (values `0` and `1`), pressed Ctrl+D: row 2 (the one between) read `0` afterward, the
+notice read "Filled down 2 cells. 0 were not changed.", and one Ctrl+Z restored `1`. (Read via
+`input.value`, not `textContent` — these cells are `<input>` elements and the first pass of this
+probe read empty strings from `textContent` for every cell, editable or not; noted here so the next
+person testing this table does not mistake that harness mistake for a product defect.)
+
+**CONFIRMED by real-browser copy, not just the harness's synthetic DOM.** Selected the whole
+Junctions table after hiding Description and copied it: the clipboard's heading row and every data
+row skip Description entirely — matches the harness's own "absent, not merely CSS-hidden" claim.
+
+**NOT independently re-driven in a real browser: fill-down refusing a computed result column, and
+persistence across a PROJECT switch (only a page RELOAD was driven live).** The result-column
+attempt in a real browser was blocked by this session's own test friction (the post-Calculate
+"running" overlay intercepting a click, not a page defect), and the project-switch attempt hung on
+`openExampleCard()` needing the examples wall re-opened through a menu this probe did not chase
+down in the time available. Both rest on the harness (which passed 19/19 on the result-column
+refusal) and on code inspection for persistence: `lpn_panecols` is keyed only on `spec.id`
+(`'junctions'`, `'pipes'`, ...), never on a project id, exactly mirroring the already-shipped
+column-width state in the same key — so a hidden column is BROWSER furniture, not PROJECT data, and
+carries into every project exactly as a dragged width already does. This is the design Declan
+asked for and the harness itself asserts it (`serializeProject() has never heard of the preferences
+key`), but a live project-switch was not the thing I drove by hand this round.
+
+**DEPARTS from Declan's own design, and Tom should know the shape of what shipped versus what he
+"agreed to in principle."** Declan's design named TWO things together: a small per-table button
+opening a popover (checkbox + up/down arrows, "the obvious, discoverable control") AND the
+right-click shortcut as a *free extra* on top of it, explicitly because a keyboard-first user or a
+first-time visitor with no reason to suspect a spreadsheet gesture needs the visible button. **Only
+the shortcut shipped.** The code's own comment says as much ("There is no popover in this build").
+Mechanically the shortcut is complete and well-built — this is not a claim that anything is broken —
+but there is currently no on-screen affordance anywhere in the table that hints a heading can be
+right-clicked at all. Someone who does not already know the Sheets/Excel gesture has no way to
+discover column hide exists, and no visible way back in either, until they stumble onto a
+right-click. That is a scope call for Tom, not a defect: does he want to ship the popover before
+telling anyone this exists, or is the shortcut-only version fine for now with the popover as
+follow-up work?
+
+**UNVERIFIABLE FROM HERE, and worth a specific phone check rather than a general "test on
+mobile": whether a long-press on a table heading opens the Hide menu on an iPhone specifically.**
+A CDP-simulated long touch-and-hold on a heading in a headless mobile-emulated Chromium produced no
+context menu at all, but that negative is not trustworthy either way — headless touch simulation is
+a known-weak proxy for a real long-press gesture. The more concrete, checkable-by-code reason to
+worry about iOS in particular: this page already has one other place that had to fight exactly this
+battle — `#lpn_canvas { -webkit-touch-callout: none; }` (`css/engcalcs.css:4165`) was needed
+because Safari's own long-press produces its OS text-selection callout instead of a JS `contextmenu`
+event unless that CSS suppresses it. The new heading `contextmenu` listener (js/looped-network.js,
+`paneWireTable`) has no matching `-webkit-touch-callout: none` on `.lpn-pane-table thead th`, and
+Android Chrome (which does fire `contextmenu` on long-press by default) would not surface this gap
+even if it exists. **The one-sentence check for a browser pass: on an iPhone in Safari, long-press
+a table column heading — does the Hide/Show menu open, or does the phone's own copy/select-all
+bubble appear instead?**
+
+**Verdict: READY.** Both harnesses pass as delivered, both mutation- and real-browser-confirmed on
+the claims that matter most (recoverability with everything hidden; copy and Ctrl+D correctness;
+undo; state scoped to browser furniture, not the project). Nothing here blocks a browser pass — the
+two items above are for Tom to weigh and one thing for him to check with his own thumb, not evidence
+of a broken build.
+
+Scripts used, not committed (this machine's temp paths, gone with the session): browser probes at
+`/tmp/copytest.js`, `/tmp/filltest.js`/`filltest2.js`, `/tmp/touchtest.js`, `/tmp/switchtest.js`;
+mutation copy at `/tmp/claude-*/scratchpad/mutcopy` — all deleted after use, the finding is what to
+keep.
