@@ -106,10 +106,10 @@ judgement and does not belong to a script.
 
 ### feat/notice-log -- "Messenger"
 
-- [ ] R-157 feat/notice-log | I discovered what is appearing behind the glyph. It is the text "RIVER" from the model. I consider that a bug, but I don't know what kind of bug. It's a Text object, not a label.
+- [x] R-157 feat/notice-log | I discovered what is appearing behind the glyph. It is the text "RIVER" from the model. I consider that a bug, but I don't know what kind of bug. It's a Text object, not a label. -- 80bc539e on feat/notice-log: the button was 80% opaque, so map Text showed through; now solid white
 - [?] R-158 feat/notice-log | I like the down arrow or a + better than the clock. What does Ida say? -- **SHE SAYS NEITHER, AND SHE CHECKED THIS PAGE RATHER THAN ARGUING FROM TASTE.** A down triangle already means "a menu opens below" twice on this page (the pane tab caret and the project tab caret) and marks a table column's sort direction a third time; the `+` already means "make a new one" twice (New scenario, New saved path) and the message log makes nothing. Her recommendation is to repair the same clock rather than replace it: a dot at the center and the two hands spread further apart, which is what made it read as a bent arrow. His call
 - [ ] R-159 feat/notice-log | We are getting closer. But the simultaneous messages on open and the "Newest first" help text appear on one line instead of on three. This is a bug.
-- [ ] R-160 feat/notice-log | I don't think we need a tip on the down arrow glyph. I think it's more trouble than help.
+- [x] R-160 feat/notice-log | I don't think we need a tip on the down arrow glyph. I think it's more trouble than help. -- already so on feat/notice-log: no tip, only a screen-reader name
 
 ### feat/tables-spreadsheet
 
@@ -142,5 +142,5 @@ judgement and does not belong to a script.
 
 - [x] R-173 feat/tables-spreadsheet | Done. Merge and delete branch. -- merged to master 2026-09-23; R-110, R-161 and R-162 go with it
 - [ ] R-174 feat/zoom-scale-rules | (Text, Show at all zoom levels) This property should be off for all but the largest text object in our examples and for all projects with no previous settings. This property should appear in multi-properties, Tables, and Find/Replace.
-- [ ] R-175 feat/notice-log | (Messenger) I liked the down arrow that was initially used for the messenger. I don't like the one we have now. I don't recommend heroics to make it unique. Something very much like a selector (probably perfect) or a tab menu is fine.
+- [x] R-175 feat/notice-log | (Messenger) I liked the down arrow that was initially used for the messenger. I don't like the one we have now. I don't recommend heroics to make it unique. Something very much like a selector (probably perfect) or a tab menu is fine. -- 80bc539e on feat/notice-log: a plain filled down triangle, the same shape as the tab-menu carets
 - [x] R-176 -- | (Settings Undo) Ida is right and wrong. Right that it does not edit the network. Wrong that it doesn't not do anything you can see at the moment you make it, for over half the settings including Symbology, most of Appearance, and Calculation when recalculate is on. We can leave it as is. -- Task 709 closed; Settings stay out of undo
