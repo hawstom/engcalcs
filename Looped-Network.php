@@ -1739,6 +1739,7 @@ EngCalcs.pageConfig = {
 	lpn_time_report_step: <?=json_encode($ec_lang['lpn_time_report_step'])?>,
 	lpn_time_report_start: <?=json_encode($ec_lang['lpn_time_report_start'])?>,
 	lpn_time_clock_start: <?=json_encode($ec_lang['lpn_time_clock_start'])?>,
+	lpn_time_clock_day: <?=json_encode($ec_lang['lpn_time_clock_day'])?>,
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
 	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,

@@ -86,6 +86,23 @@
 	};
 
 	/**
+	 * **WHICH DAY OF THE RUN A CLOCK READING FALLS ON, COUNTING FROM 1.**
+	 *
+	 * A wall clock wraps at midnight, which is its whole job, and that is exactly what makes a bare
+	 * `01:00` ambiguous on a run of several days. Tom, 2026-09-23: *"if we are putting clock time in
+	 * the tip (which is of questionable value), we should put Day {i}, {j}:00."*
+	 *
+	 * **THE BOUNDARY IS MIDNIGHT ON THE CLOCK, NOT 24 HOURS OF ELAPSED TIME**, and the two differ
+	 * whenever the run does not start at midnight: a project whose `startClock` is 06:00 reaches
+	 * Day 2 after 18 elapsed hours, not 24. Counting elapsed days instead would print Day 1 for a
+	 * reading the clock says is tomorrow morning, which is the ambiguity this exists to remove.
+	 */
+	EC.lpnTimeClockDay = function (times, t) {
+		var start = (times && times.startClock) || 0;
+		return Math.floor((start + (t || 0)) / SEC_PER_DAY) + 1;
+	};
+
+	/**
 	 * Which frame shows time `t`: the last one at or before it, so a slider that lands between two
 	 * reporting times shows the state that was true then rather than one that has not happened.
 	 * -1 for an empty run.
@@ -1539,9 +1556,14 @@
 	// R-105 fixed; the label then became a genuine range, which is the second defect this one
 	// undoes. `EC.lpnTimeClockText()` is the one that WRAPS at 24:00 -- that is its whole job, for
 	// a CLOCKTIME control -- so a single elapsed instant is paired with a single, possibly wrapped,
-	// clock instant here.
+	// clock instant here. **AND THE DAY NUMBER RIDES WITH IT** (Tom, 2026-09-23: *"if we are putting
+	// clock time in the tip (which is of questionable value), we should put Day {i}, {j}:00"*),
+	// because a wrapped clock alone cannot say which morning `01:00` is.
 	function stepClockText(t) {
-		return EC.lpnTimeClockText(docTimes(), t);
+		var pc = EngCalcs.pageConfig || {}, times = docTimes();
+		return (pc.lpn_time_clock_day || 'Day {day}, {clock}')
+			.replace(/\{day\}/g, String(EC.lpnTimeClockDay(times, t)))
+			.replace(/\{clock\}/g, EC.lpnTimeClockText(times, t));
 	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
