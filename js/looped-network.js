@@ -22286,23 +22286,38 @@ var EngCalcs = EngCalcs || {};
 		wrap.appendChild(table);
 		return wrap;
 	}
+	// **THE PORTRAIT-PAGE BUDGET, IN `em` AT THE SHEET'S OWN 9pt** (`.lpn-print-table`'s declared
+	// font-size). Nothing in JS can read the paper a visitor's printer is about to use, so this is
+	// the conservative floor rather than a measurement: 7.5in of usable width -- an 8.5in letter
+	// page less a half-inch margin each side -- at 9pt is 60em. Landscape or a larger sheet only
+	// gives MORE room than this, never less.
+	var PANE_PRINT_BUDGET_EM = 60;
+	var PANE_PRINT_BASE_PT = 9;
 	/**
-	 * **THE SHEET USES THE COLUMN WIDTHS THE READER DRAGGED** (Tom, 2026-09-21: *"I think that 'Print
-	 * table' has not been revisited since we added column resizing. And I think that it's important
-	 * to use the column widths adjusted by the user."*). He was right: the printed copy is built from
-	 * the spec, and it knew nothing about the widths the screen had been given.
+	 * **THE SHEET USES THE COLUMN WIDTHS THE READER DRAGGED, AND THE TEXT SHRINKS WITH THEM RATHER
+	 * THAN STAYING BEHIND** (Tom, 2026-09-21: *"I think that 'Print table' has not been revisited
+	 * since we added column resizing. And I think that it's important to use the column widths
+	 * adjusted by the user."* And 2026-09-22, on the result: *"Print is not respecting on-screen
+	 * column widths."*). He was right twice. The first pass gave every column its screen `em`
+	 * width, correctly -- but then fit a table wider than the sheet by capping its CSS width at
+	 * `max-width: 100%` while leaving each column's share a PERCENTAGE of that capped width. The
+	 * percentages stayed proportional to each other; the FONT stayed fixed at 9pt regardless, so a
+	 * fourteen-column network table (the ordinary case -- Junctions on Net3 has thirteen) had its
+	 * columns physically squeezed to a fraction of their `em` width while their text did not
+	 * shrink, and a heading that read on two lines on screen came back broken to single characters.
 	 *
 	 * A table nobody has resized prints exactly as before, at its content's width. Once ANY column
 	 * has been dragged, every column is given the width it has on screen -- the dragged ones their
-	 * stored em, the rest the width they are drawn at -- in `em`, so the proportions to the text
-	 * travel to the paper's own font size. The widths are written as PERCENTAGES of a table whose
-	 * width is their sum with `max-width: 100%`, under `table-layout: fixed`: a table narrower than
-	 * the sheet prints at its screen proportions and no wider, and one wider than the sheet is scaled
-	 * down to fit, every column by the same factor, rather than running off the right-hand edge.
+	 * stored em, the rest the width they are drawn at -- as a literal `em`, so the table's true
+	 * width is the sum of what the reader actually sees. When that sum is wider than a printed page
+	 * can hold, the SHEET'S OWN FONT-SIZE is reduced instead of the columns' share of it: every
+	 * column's `em` width is unchanged, so it shrinks in lockstep with the text inside it, at
+	 * exactly the ratio the screen already had -- smaller paper, not a different layout.
+	 * `max-width: 100%` stays on as the belt for a sheet narrower than the assumed budget.
 	 * Returns the em widths it applied, or null when it left the table alone.
 	 */
 	function panePrintWidths(spec, table) {
-		var cols = paneCols(spec), unit, ems, sum = 0, cg;
+		var cols = paneCols(spec), unit, ems, sum = 0, cg, scale;
 		if (!cols.some(function (c) { return paneColUserWidth(spec.id, c) > 0; })) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) {
@@ -22313,12 +22328,14 @@ var EngCalcs = EngCalcs || {};
 		cg = document.createElement('colgroup');
 		ems.forEach(function (e) {
 			var col = document.createElement('col');
-			col.style.width = (Math.round((e / sum) * 10000) / 100) + '%';
+			col.style.width = (Math.round(e * 100) / 100) + 'em';
 			cg.appendChild(col);
 		});
 		table.appendChild(cg);
 		table.className += ' lpn-print-fixed';
 		table.style.width = (Math.round(sum * 100) / 100) + 'em';
+		scale = sum > PANE_PRINT_BUDGET_EM ? (PANE_PRINT_BUDGET_EM / sum) : 1;
+		if (scale < 1) { table.style.fontSize = (Math.round(PANE_PRINT_BASE_PT * scale * 100) / 100) + 'pt'; }
 		return ems;
 	}
 	// Taken down on afterprint where the browser has one, so nothing is removed while the print

@@ -425,22 +425,51 @@ console.log('\n--- the sheet uses the column widths the reader dragged ---');
 	const keys = L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).map((c) => c.key);
 	L.setUserWidth('junctions', keys[1], 20);
 	L.renderTable('junctions');
-	// The stub draws every box 1000 px wide; a heading is drawn at 5 em here (80 px at the stub's
-	// 16 px em), which is the one relationship an undragged column's printed width reads.
+	// The stub draws every box 1000 px wide; a heading is drawn at 2 em here (32 px at the stub's
+	// 16 px em) so this scenario's sum stays comfortably under the 60em print budget -- the second
+	// scenario below is the one that tests going past it.
 	const heads = L.headCells('junctions');
-	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 80, bottom: 20, width: 80, height: 20 }); });
+	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 32, bottom: 20, width: 32, height: 20 }); });
 	got = cg(L.buildPrintable('junctions'));
-	const pct = got.cols.map((c) => parseFloat(c.style.width));
-	const total = pct.reduce((a, b) => a + b, 0);
+	// **LITERAL `em`, NOT A PERCENTAGE OF THE TABLE'S OWN CAPPED WIDTH** (Tom, 2026-09-22: "Print
+	// is not respecting on-screen column widths"). A percentage share stayed proportional even
+	// when `max-width: 100%` squeezed the table narrower than its declared width, while the 9pt
+	// font did not shrink with it — see panePrintWidths()'s own comment for the failure this
+	// replaced.
+	const ems = got.cols.map((c) => parseFloat(c.style.width));
+	const total = ems.reduce((a, b) => a + b, 0);
 	report(got.cols.length === keys.length, 'once a column is dragged, every printed column is given a width',
 		got.cols.length + ' / ' + keys.length);
-	report(Math.abs(total - 100) < 0.2, '...as shares of the table, which add up to the whole', total.toFixed(2) + '%');
-	report(Math.abs(pct[1] / pct[0] - 4) < 0.02, '...in the screen’s proportions: the column dragged to 20 em is four times a 5 em one',
-		pct[1] + '% / ' + pct[0] + '%');
+	report(got.cols.every((c) => /em$/.test(c.style.width)), '...each one a literal em, not a share of the page');
+	report(Math.abs(ems[1] / ems[0] - 10) < 0.02, '...in the screen’s proportions: the column dragged to 20 em is ten times a 2 em one',
+		ems[1] + 'em / ' + ems[0] + 'em');
 	report(/em$/.test(got.t.style.width) && String(got.t.className).indexOf('lpn-print-fixed') >= 0,
 		'the table is the sum of the widths in em, fixed layout, so the widths are obeyed', got.t.style.width);
+	report(!got.t.style.fontSize, '...and a table under the page budget keeps the sheet’s own font size',
+		JSON.stringify(got.t.style.fontSize));
 	report(/\.lpn-print-table\.lpn-print-fixed \{ table-layout: fixed; max-width: 100%; \}/.test(css),
-		'...and never wider than the sheet: a wide one is scaled down, every column by the same factor');
+		'...never wider than the sheet, as a safety net for a page narrower than assumed');
+	L.forgetWidths('junctions');
+
+	// **A TABLE WIDER THAN THE ASSUMED PAGE SHRINKS ITS OWN FONT, NOT ITS COLUMNS' SHARE OF IT.**
+	// Fourteen ordinary columns (Net3's own Junctions table has thirteen) at a generous drawn width
+	// is the everyday case this was written for, not an edge case: the fix has to hold with no
+	// column dragged to an extreme, just enough of them to add past the budget.
+	L.setUserWidth('junctions', keys[1], 20);
+	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 80, bottom: 20, width: 80, height: 20 }); });
+	L.renderTable('junctions');
+	got = cg(L.buildPrintable('junctions'));
+	const ems2 = got.cols.map((c) => parseFloat(c.style.width));
+	const sum2 = ems2.reduce((a, b) => a + b, 0);
+	report(sum2 > 60, 'this scenario really is past the 60em budget', sum2.toFixed(2) + 'em');
+	report(Math.abs(ems2[1] / ems2[0] - 4) < 0.02,
+		'...the columns keep the screen’s proportions regardless', ems2[1] + 'em / ' + ems2[0] + 'em');
+	const wantScale = 60 / sum2, wantPt = Math.round(9 * wantScale * 100) / 100;
+	report(got.t.style.fontSize === wantPt + 'pt',
+		'...and the SHEET’S FONT shrinks by the same factor a column would have been squeezed by',
+		got.t.style.fontSize + ' vs expected ' + wantPt + 'pt');
+	report(parseFloat(got.t.style.width) === Math.round(sum2 * 100) / 100,
+		'...while every column keeps its true em width, so text and box shrink together');
 	L.forgetWidths('junctions');
 }
 
