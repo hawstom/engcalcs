@@ -14570,7 +14570,7 @@ var EngCalcs = EngCalcs || {};
 		if (answer === null) { return; }
 		f = parseFloat(String(answer).replace(',', '.'));
 		if (!(f > 0) || !isFinite(f)) {
-			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type one number greater than zero.');
+			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
 			return;
 		}
 		ext = mapgeoExtent();
@@ -14730,7 +14730,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -34391,7 +34391,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
+			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
 		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		name.className = 'lpn-set-name ec-help';
@@ -46542,7 +46542,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{percent}', String(Math.round(epanetBarFraction() * 100)));
 		}
 		if (epanetWarmLoaded > 0) {
-			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.')
+			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.')
 				.replace('{kb}', String(Math.round(epanetWarmLoaded / 1024)));
 		}
 		return '';

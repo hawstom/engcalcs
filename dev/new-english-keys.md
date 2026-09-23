@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read on master**, of 195 untranslated keys, of 2046 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 168 untranslated keys, of 2019 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (195, 12 to read @@ NEEDS RULING)
+## lpn_  (168, 5 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -375,15 +375,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_cancelled`**
   > Nothing was created and nothing was changed.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_column_n`**
-  > column {n}
-  _Ruled OK 2026-09-23._
 - **`lpn_survey_confirm_junction`**
   > {n} junction(s) found. Proceed?
   _Ruled OK 2026-09-23._
-- **`lpn_survey_confirm_pipes`**
-  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
-  _Ruled OK 2026-09-17._
 - **`lpn_survey_confirm_reservoir`**
   > {n} reservoir(s) found. Proceed?
   _Ruled OK 2026-09-23._
@@ -396,69 +390,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_err_ambiguous_coord`**
   > More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.
   _Ruled OK 2026-09-23._
-- **`lpn_survey_err_ambiguous_lon`**
-  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_err_empty`**
   > That file has nothing in it.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_err_gpx_no_wpt`**
-  > That GPX file holds no waypoints, so there is nothing to make junctions from.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_no_coords`**
-  > Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
-  _Ruled OK 2026-09-23._
 - **`lpn_survey_err_no_points`**
   > Not one row of that file could be read as a surveyed point. Rows read: {detail}
   _Ruled OK 2026-09-17._
-- **`lpn_survey_err_plane`**
-  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_err_unreadable`**
   > That file could not be read as a surveyed point list.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_fmt_enz`**
-  > Easting, northing, elevation (ENZ, also written XYZ)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_enzd`**
-  > Easting, northing, elevation, description (ENZD)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_nez`**
-  > Northing, easting, elevation (NEZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_nezd`**
-  > Northing, easting, elevation, description (NEZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penz`**
-  > Point name, easting, northing, elevation (PENZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_penzd`**
-  > Point name, easting, northing, elevation, description (PENZD)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnez`**
-  > Point name, northing, easting, elevation (PNEZ)
-  @@ NEEDS RULING
-- **`lpn_survey_fmt_pnezd`**
-  > Point name, northing, easting, elevation, description (PNEZD)
-  @@ NEEDS RULING
 - **`lpn_survey_format_internal`**
   > specified internally
   @@ NEEDS RULING
 - **`lpn_survey_format_label`**
   > File format:
   @@ NEEDS RULING
-- **`lpn_survey_from_header`**
-  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  @@ NEEDS RULING
-- **`lpn_survey_map_gpx`**
-  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_map_none`**
-  > not used
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_not_geo`**
-  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_ambiguous_elev`**
   > More than one column could be the elevation, so none of them was read.
   @@ NEEDS RULING
@@ -468,9 +414,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_note_bad_elev`**
   > Non-numeric elevation. Imported without elevation.
   @@ NEEDS RULING
-- **`lpn_survey_note_bad_lon`**
-  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_blank_rows`**
   > Blank lines skipped: {detail}.
   _Ruled OK 2026-09-23._
@@ -480,15 +423,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_note_coord_range`**
   > The {axis} is outside the range this project allows.
   _Ruled OK 2026-09-23._
-- **`lpn_survey_note_elev_converted`**
-  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_note_gpx_rtept`**
-  > The file also holds {detail} route point(s), which were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_gpx_trkpt`**
-  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
-  _Ruled OK 2026-09-17._
 - **`lpn_survey_note_header_unread`**
   > The first line was skipped: it names no columns this page knows.
   _Ruled OK 2026-09-23._
@@ -504,12 +438,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_note_line`**
   > Line {line}: {sev}: {code}: {text}
   _Ruled OK 2026-09-23._
-- **`lpn_survey_note_lon_missing`**
-  > The longitude column is empty on this row, so no junction was made for it.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_lon_range`**
-  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
-  _Ruled OK 2026-09-17._
 - **`lpn_survey_note_row_short`**
   > Too few columns for the file format above.
   _Ruled OK 2026-09-23._
@@ -531,9 +459,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_report_tank`**
   > {n} tank(s) imported, {m} with elevation.
   _Ruled OK 2026-09-23._
-- **`lpn_survey_row`**
-  > row {n}
-  _Ruled OK 2026-09-17._
 - **`lpn_survey_sev_error`**
   > error
   _Ruled OK 2026-09-23._
@@ -543,12 +468,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_survey_type_label`**
   > Asset type:
   _Ruled OK 2026-09-23._
-- **`lpn_survey_unit_ft`**
-  > feet
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_m`**
-  > meters
-  _Ruled OK 2026-09-17._
 - **`lpn_terrain_http`**
   > The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.
   _Ruled OK 2026-09-23._
@@ -617,7 +536,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**21 still to read**, of 36 new keys across 3 unmerged branch(es).
+**88 still to read**, of 259 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -628,7 +547,175 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`6bcc23a0`) — 11 new, 7 to read @@ NEEDS RULING
+### chore/queue-0922 (`86dddd0f`) — 27 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
+
+### chore/retire-dead-survey-keys (`86dddd0f`) — 27 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
+
+### feat/label-gang-search (`6bcc23a0`) — 38 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -663,8 +750,89 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_replace`**
   > This project already has the world map attached. Replace that georeferencing?
   _Ruled OK 2026-09-23._
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
 
-### feat/notice-log (`f02da0be`) — 15 new, 7 to read @@ NEEDS RULING
+### feat/notice-log (`bb51995e`) — 41 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -708,11 +876,89 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msglog_note`**
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
-- **`lpn_msglog_tip`**
-  > Read the recent messages again. They are kept only while this page is open.
+- **`lpn_survey_column_n`**
+  > column {n}
   _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
 
-### feat/tables-spreadsheet (`bc2365d0`) — 10 new, 7 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`bc2365d0`) — 37 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -744,3 +990,360 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_not_used`**
   > Not used
   _Ruled OK 2026-09-23._
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
+
+### feat/zoom-scale-rules (`5865871e`) — 27 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
+
+### fix/property-echo (`1dbc095b`) — 35 new, 15 to read @@ NEEDS RULING
+
+- **`lpn_basemap_hide`**
+  > Hide street map
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_hide`**
+  > Hide satellite images
+  @@ NEEDS RULING
+- **`lpn_basemap_satellite_tip`**
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
+- **`lpn_basemap_tip`**
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Hide map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_off`**
+  > Show map readouts
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_replace`**
+  > This project already has the world map attached. Replace that georeferencing?
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
+
+### fix/time-step-instant (`1e63ff39`) — 27 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_survey_column_n`**
+  > column {n}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_confirm_pipes`**
+  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_ambiguous_lon`**
+  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_gpx_no_wpt`**
+  > That GPX file holds no waypoints, so there is nothing to make junctions from.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_err_no_coords`**
+  > Could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_err_plane`**
+  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_fmt_enz`**
+  > Easting, northing, elevation (ENZ, also written XYZ)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_enzd`**
+  > Easting, northing, elevation, description (ENZD)
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_fmt_nez`**
+  > Northing, easting, elevation (NEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_nezd`**
+  > Northing, easting, elevation, description (NEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penz`**
+  > Point name, easting, northing, elevation (PENZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_penzd`**
+  > Point name, easting, northing, elevation, description (PENZD)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnez`**
+  > Point name, northing, easting, elevation (PNEZ)
+  @@ NEEDS RULING
+- **`lpn_survey_fmt_pnezd`**
+  > Point name, northing, easting, elevation, description (PNEZD)
+  @@ NEEDS RULING
+- **`lpn_survey_from_header`**
+  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
+  @@ NEEDS RULING
+- **`lpn_survey_map_gpx`**
+  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_map_none`**
+  > not used
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_not_geo`**
+  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_bad_lon`**
+  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_elev_converted`**
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  _Ruled OK 2026-09-23._
+- **`lpn_survey_note_gpx_rtept`**
+  > The file also holds {detail} route point(s), which were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_gpx_trkpt`**
+  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_note_lon_missing`**
+  > The longitude column is empty on this row, so no junction was made for it.
+  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_note_lon_range`**
+  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_row`**
+  > row {n}
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_ft`**
+  > feet
+  _Ruled OK 2026-09-17._
+- **`lpn_survey_unit_m`**
+  > meters
+  _Ruled OK 2026-09-17._
