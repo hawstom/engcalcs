@@ -381,6 +381,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_convas_kind_none', 'lpn_convas_crs_pick', 'lpn_convas_crs_name', 'lpn_convas_from',
   'lpn_convas_ok', 'lpn_convas_cancel', 'lpn_convas_close', 'lpn_convas_si', 'lpn_convas_us',
   'lpn_u_mapcoords', 'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
+  // The Label column beside the rounding selects (Task 696 part 2): one suffix box per row.
+  'lpn_convas_suffix_diameter', 'lpn_convas_suffix_depth', 'lpn_convas_suffix_flow', 'lpn_convas_suffix_head',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span

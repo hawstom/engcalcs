@@ -28948,11 +28948,17 @@ var EngCalcs = EngCalcs || {};
 		if (ok) { ok.addEventListener('click', convasOk); }
 		if (cancel) { cancel.addEventListener('click', closeConvasBox); }
 		if (close) { close.addEventListener('click', closeConvasBox); }
-		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); }); }
-		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); }); }
+		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); }); }
+		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); }); }
 		['epsg', 'unnamed', 'none'].forEach(function (k) {
 			var r = document.getElementById('lpn_convas_kind_' + k);
 			if (r) { r.addEventListener('change', syncConvasCrs); }
+		});
+		// Once each: the four suffix boxes are static markup, never re-cloned on open, so a typed
+		// edit is remembered for the life of the page rather than only until the next open.
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var el = document.getElementById('lpn_convas_suffix_' + k);
+			if (el) { el.addEventListener('input', function () { convasSuffixDirty[k] = true; }); }
 		});
 		if (pick) {
 			pick.addEventListener('click', function () {
@@ -28992,6 +28998,15 @@ var EngCalcs = EngCalcs || {};
 			var s = document.getElementById('lpn_convas_round_' + k);
 			if (s) { s.value = ''; }
 		});
+		// The Label column (Task 696): fresh every open, pre-filled from this box's own units, and
+		// repainted as those units change -- until a row is typed into, see convasSuffixDirty.
+		convasSuffixDirty = {};
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_diameter' || u.name === 'lpn_u_elevhead' || u.name === 'lpn_u_flow') {
+				u.sel.addEventListener('change', refreshConvasSuffixPrefill);
+			}
+		});
+		refreshConvasSuffixPrefill();
 		syncConvasCrs();
 		box.style.display = 'block';
 		raisePanel(box);
@@ -29005,17 +29020,44 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
 	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
+	// **THE LABEL COLUMN (Task 696), ONE UNIT FAMILY PER ROUNDING ROW.** Read to pre-fill the box
+	// (' ' + the unit's own display text, matching a shipped quality suffix's own leading space --
+	// labelDefaultSuffix()) and to know which cloned select's change should refresh which row.
+	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', depth: 'lpn_u_elevhead',
+		flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
+	// Sees an edit that started from the user, not from a pre-fill, so a row they typed into is
+	// never overwritten by a later unit change. Reset each time the box opens.
+	var convasSuffixDirty = {};
+	function convasSuffixUnitClone(famName) {
+		var i;
+		for (i = 0; i < convasUnits.length; i++) {
+			if (convasUnits[i].name === famName) { return convasUnits[i]; }
+		}
+		return null;
+	}
+	// **ONLY A ROW THE USER HAS NOT TOUCHED YET REPAINTS**, so a preset click or a per-field unit
+	// change keeps every box in step with what it would say fresh, without clobbering a suffix
+	// somebody already typed.
+	function refreshConvasSuffixPrefill() {
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			if (convasSuffixDirty[k]) { return; }
+			var el = document.getElementById('lpn_convas_suffix_' + k), u = convasSuffixUnitClone(LPN_CONVAS_SUFFIX_UNIT[k]);
+			if (!el || !u || !u.sel || !u.sel.options.length) { return; }
+			el.value = ' ' + u.sel.options[u.sel.selectedIndex].textContent;
+		});
+	}
 	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
 	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
 	function convasAnswers() {
-		var kind = convasKind(), units = {}, rounding = {};
+		var kind = convasKind(), units = {}, rounding = {}, suffix = {};
 		convasUnits.forEach(function (u) { units[u.name] = u.sel.value; });
 		LPN_CONVAS_ROUND.forEach(function (k) {
-			var s = document.getElementById('lpn_convas_round_' + k);
+			var s = document.getElementById('lpn_convas_round_' + k), sf = document.getElementById('lpn_convas_suffix_' + k);
 			rounding[k] = s ? String(s.value || '') : '';
+			suffix[k] = sf ? String(sf.value || '') : '';
 		});
 		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
-			units: units, rounding: rounding };
+			units: units, rounding: rounding, suffix: suffix };
 	}
 	// The box is not modal, so a tab switch can happen under it; its answers were read off the
 	// project it opened on, so a different project gets the box again rather than those answers.
@@ -29286,6 +29328,23 @@ var EngCalcs = EngCalcs || {};
 			ovs('demand', s);
 		}
 	}
+	// **THE LABEL COLUMN, INTO THE ONE SETTING THAT ALREADY DOES THIS JOB** (Task 333's
+	// labelSettings.suffix, read by labelSuffixFor() and written by setLabelAffix() -- the same seam
+	// a Labels row uses). Diameter and Head land straight on the field the rounding above just
+	// rewrote; Flow lands on both typed demand fields the rounding touches, junction and customer.
+	// **DEPTH (TANK LEVEL) HAS NO SUCH FIELD.** `level` is not one of nodeFieldDefs()'s rows, so
+	// there is nothing in labelSettings to write it into -- inventing one is Tom's call, not this
+	// wizard's, so that box is filled in and legible and simply goes nowhere yet. Runs on the COPY,
+	// after importProject() has switched context onto it, exactly as convasApplyUnits() already does.
+	function convasApplyLabelSuffixes(a) {
+		var s = a.suffix || {};
+		if (typeof s.diameter === 'string') { setLabelAffix('suffix', 'link', 'diameter', s.diameter); }
+		if (typeof s.head === 'string') { setLabelAffix('suffix', 'node', 'head', s.head); }
+		if (typeof s.flow === 'string') {
+			setLabelAffix('suffix', 'node', 'demand', s.flow);
+			setLabelAffix('suffix', 'customer', 'demand', s.flow);
+		}
+	}
 	/**
 	 * **THE COPY, CONVERTED IN THE ORDER THE TWO HALVES NEED.**
 	 *
@@ -29353,6 +29412,7 @@ var EngCalcs = EngCalcs || {};
 		id = importProject(saved);
 		if (!id) { return; }
 		convasApplyUnits(a);
+		convasApplyLabelSuffixes(a);
 		saveToStorage();
 		renderTabs();
 		// No zoomExtent() here or below: a converted copy carries no saved view, so opening it fits

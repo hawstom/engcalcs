@@ -1481,9 +1481,21 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<?php // Tom's rounding request (Task 688): "Diameter, Depth, Demand and Flow, Head", each a
 		      // selector of nearest 100, 10, 1, 0.1, 0.01, 0.001. The steps are numbers, not words, so
 		      // they are not language keys. "No rounding" is the default: rounding changes a number
-		      // beyond what the conversion itself does, so it is something a person asks for. ?>
+		      // beyond what the conversion itself does, so it is something a person asks for.
+		      //
+		      // Two columns (Tom, 2026-09-23): Round converted values, unchanged, and Label -- a
+		      // suffix appended after that quantity on the copy's own map labels, through the same
+		      // per-field labelSettings.suffix a Labels row already writes (js/looped-network.js
+		      // setLabelAffix()), pre-filled from the unit chosen above. Depth (tank level) has no
+		      // such field to write into -- see dev/lpn-spike/convert-as-harness.js's note on it --
+		      // so that one box is filled and readable but goes nowhere yet. ?>
 		<fieldset class="lpn-new-block">
 			<legend><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></legend>
+			<div class="lpn-convas-round-head">
+				<span></span>
+				<span class="lpn-convas-round-col"><?=$ec_lang['lpn_convas_round']?></span>
+				<span class="lpn-convas-round-col"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></span>
+			</div>
 			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
 				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
 			<div class="lpn-convas-round-row">
@@ -1492,6 +1504,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
 					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
 				</select>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
 			</div>
 			<?php } ?>
 		</fieldset>

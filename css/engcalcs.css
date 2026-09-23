@@ -2742,6 +2742,15 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 #lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
 #lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
 .lpn-convas-round-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 2px 0; }
+.lpn-convas-round-row select { flex: 0 0 auto; width: 6.5rem; }
+.lpn-convas-suffix { flex: 0 0 auto; width: 5rem; box-sizing: border-box; padding: 2px 4px; }
+/* The two column headings over the rounding selects and the label-suffix boxes (Tom, 2026-09-23):
+   same widths as the row cells below them, so the two columns line up. */
+.lpn-convas-round-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px;
+	font-size: .85em; margin: 2px 0; }
+.lpn-convas-round-head span:first-child { flex: 1 1 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(2) { width: 6.5rem; flex: 0 0 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: #f2f2f2; color: #777; cursor: not-allowed; }

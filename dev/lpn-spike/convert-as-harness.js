@@ -45,6 +45,7 @@ const L = loadLoopedNetwork(
 	"\t\tlibrary: function () { return library; }, unitKey: unitKey,\n" +
 	"\t\topenFileMenu: openFileMenu, openConvertAsBox: openConvertAsBox,\n" +
 	"\t\tconvasAnswers: convasAnswers, runConvertAs: runConvertAs, coordKind: projectCoordKind,\n" +
+	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tgeoref: function () { return georef; }, georefAttach: georefAttach,\n" +
 	"\t\tgeorefFinish: georefFinish, georefCancel: georefCancel,\n" +
 	"\t\toutwardX: outwardX, outwardY: outwardY, applyView: applyView, currentView: currentView,\n" +
@@ -283,6 +284,63 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			!L.georef() && lib.openId === here && lib.projects.length === tabs, lib.openId + ' vs ' + here);
 		ok('...and says nothing was converted', L.notice() === PC.lpn_convas_cancelled, L.notice());
 		ok('the earlier lat/lon copy is still there', !!stored(latlonId));
+	}
+
+	console.log('\n--- 7. "Current:" plain text, and the Label column (Task 696 part 2) ---');
+	{
+		function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({ target: el }); }); }
+		setUnitSet('us');
+		L.newProject(null, '');
+		const R = L.addNode('reservoir', 0, 0);
+		const A = L.addNode('junction', 1000, -500);
+		R._head = 250; A.elev = 100; A._demand = 50;
+		const p1 = L.addLink('pipe', R.id, A.id);
+		p1._diameter = 8;
+		L.saveToStorage();
+
+		L.openConvertAsBox();
+		ok('"Current:" replaces "This project:"',
+			String(byId.lpn_convas_from.textContent || '').indexOf('Current:') === 0,
+			byId.lpn_convas_from.textContent);
+		ok('...and is plain text, not the muted lpn-dim style',
+			String(byId.lpn_convas_from.className || '').indexOf('lpn-dim') < 0,
+			JSON.stringify(byId.lpn_convas_from.className));
+
+		// The stub's option text IS the unit key (mkUnitSelect in lpn-dom-stub.js), so the pre-fill
+		// is checked against the same keys setUnitSet('us') chose: in, fth2o (twice), gpm.
+		ok('the Label column pre-fills from this project\'s own (US) units',
+			byId.lpn_convas_suffix_diameter.value === ' in' &&
+			byId.lpn_convas_suffix_head.value === ' fth2o' &&
+			byId.lpn_convas_suffix_depth.value === ' fth2o' &&
+			byId.lpn_convas_suffix_flow.value === ' gpm',
+			JSON.stringify({ diameter: byId.lpn_convas_suffix_diameter.value, head: byId.lpn_convas_suffix_head.value,
+				depth: byId.lpn_convas_suffix_depth.value, flow: byId.lpn_convas_suffix_flow.value }));
+
+		// Typing into one row marks it dirty; a preset click afterward must leave that row alone
+		// while still repainting the untouched ones.
+		byId.lpn_convas_suffix_diameter.value = ' custom';
+		fire(byId.lpn_convas_suffix_diameter, 'input');
+		fire(byId.lpn_convas_si, 'click');
+		ok('a typed row survives a unit preset click', byId.lpn_convas_suffix_diameter.value === ' custom',
+			byId.lpn_convas_suffix_diameter.value);
+		ok('...and an untouched row repaints to the new (SI) unit',
+			byId.lpn_convas_suffix_flow.value === ' lps', byId.lpn_convas_suffix_flow.value);
+
+		const a = L.convasAnswers();
+		ok('convasAnswers() carries the four suffix boxes', a.suffix.diameter === ' custom' &&
+			a.suffix.flow === ' lps', JSON.stringify(a.suffix));
+
+		L.runConvertAs(a);
+		const ls = L.labelSettings();
+		ok('diameter\'s suffix lands on the link field the rounding above shares (Task 333\'s own seam)',
+			ls.suffix.link.diameter === ' custom', JSON.stringify(ls.suffix.link));
+		ok('head\'s suffix lands on the node field',
+			ls.suffix.node.head === a.suffix.head, JSON.stringify(ls.suffix.node));
+		ok('flow\'s suffix lands on BOTH typed demand fields the rounding touches: junction and customer',
+			ls.suffix.node.demand === a.suffix.flow && ls.suffix.customer.demand === a.suffix.flow,
+			JSON.stringify({ node: ls.suffix.node.demand, customer: ls.suffix.customer.demand }));
+		ok('depth (tank level) has no per-field label suffix to write into, so nothing was invented',
+			ls.suffix.node.level === undefined, JSON.stringify(ls.suffix.node));
 	}
 
 	console.log('');

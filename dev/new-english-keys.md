@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 206 untranslated keys, of 2054 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**27 still to read on master**, of 208 untranslated keys, of 2056 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (206, 25 to read @@ NEEDS RULING)
+## lpn_  (208, 27 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -43,7 +43,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
-  > This project: {crs}
+  > Current: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_label_col`**
+  > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
@@ -650,7 +656,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**37 still to read**, of 60 new keys across 6 unmerged branch(es).
+**39 still to read**, of 62 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -661,7 +667,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`23de4dfd`) — adds no English strings
+### feat/convert-as (`fcf23dd8`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -798,7 +804,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 
-### feat/property-venue (`de2ef299`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/property-venue (`1066860e`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -807,7 +813,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 
-### feat/table-editing (`ab33c6fc`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/table-editing (`388e56c6`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -828,7 +834,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`83eeb139`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`7ac181c1`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -856,4 +862,13 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING
+
+### fix/table-print (`b2126819`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
