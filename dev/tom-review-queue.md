@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-153.
+**An ID is permanent and never reused.** Next free: R-173.
 
 ---
 
@@ -57,7 +57,7 @@ judgement and does not belong to a script.
 
 ### Misc, from his own browser passes
 
-- [ ] R-105 -- | **SHIPPED on master (`faf7216b` + `a10e5894`).** A step now reads `24:00 - 25:00` and keeps climbing past a day; nothing wraps, however many days the run covers. **The clock reading did not vanish, it moved into the row's tip** -- the old label was `elapsed  ·  clock`, two readings of ONE instant, which you read as a range and were right to. | The time step selector on the toolbar (need the transport) lists time ranges. Starting at 24:00, the step end time is normalized back to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say 24:00 - 25:00, and fix all subsequent steps.
+- [?] R-105 -- | **SHIPPED on master (`faf7216b` + `a10e5894`).** A step now reads `24:00 - 25:00` and keeps climbing past a day; nothing wraps, however many days the run covers. **The clock reading did not vanish, it moved into the row's tip** -- the old label was `elapsed  ·  clock`, two readings of ONE instant, which you read as a range and were right to. | The time step selector on the toolbar (need the transport) lists time ranges. Starting at 24:00, the step end time is normalized back to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say 24:00 - 25:00, and fix all subsequent steps.
 
 ## Round of 2026-09-21c -- his pass over the reloaded preview panel
 
@@ -84,13 +84,56 @@ judgement and does not belong to a script.
 
 ### Map menu
 
-- [ ] R-126 feat/map-menu | Keep all rows visible always. But disable what's not applicable. (1) Maybe 'World map...' should be enabled for all projects. Even an EPSG project should have the option to detach and reattach the world map, I think. But when they attach, they don't have to do the wizard. And for EPSG projects, Re-adjust and Scale should be disabled unless there's user demand to expose them. (2) I think we can retire the Hide/Show street map and satellite images rows. Detach and attach provide the same functionality. (3) Hide map readouts was a print prep command. But it isn't very useful any more. Let's remove it. -- **SUPERSEDES his R-120 question** about whether a context-sensitive menu is good: his answer is always visible, disabled when not applicable
-- [ ] R-127 feat/map-menu | That got tidy. Only three rows left. Zoom to fit, Background image, and World map.
-- [ ] R-128 feat/map-menu | georeference xy: I don't see this work merged to master. The map menu should have parallel Background image and attach world map rows. But I don't see that. -- **IT DID MERGE** (`feat/xy-world-map`, on his all-clear of 2026-09-21); the World map row was offered only on a plain grid project, so it was not on the map he was looking at. R-126 makes it always visible, which answers this by construction
+- [x] R-126 feat/map-menu | Keep all rows visible always. But disable what's not applicable. (1) Maybe 'World map...' should be enabled for all projects. Even an EPSG project should have the option to detach and reattach the world map, I think. But when they attach, they don't have to do the wizard. And for EPSG projects, Re-adjust and Scale should be disabled unless there's user demand to expose them. (2) I think we can retire the Hide/Show street map and satellite images rows. Detach and attach provide the same functionality. (3) Hide map readouts was a print prep command. But it isn't very useful any more. Let's remove it. -- **SUPERSEDES his R-120 question** about whether a context-sensitive menu is good: his answer is always visible, disabled when not applicable
+- [x] R-127 feat/map-menu | That got tidy. Only three rows left. Zoom to fit, Background image, and World map.
+- [x] R-128 feat/map-menu | georeference xy: I don't see this work merged to master. The map menu should have parallel Background image and attach world map rows. But I don't see that. -- **IT DID MERGE** (`feat/xy-world-map`, on his all-clear of 2026-09-21); the World map row was offered only on a plain grid project, so it was not on the map he was looking at. R-126 makes it always visible, which answers this by construction
 
 ## Round of 2026-09-22b -- his pass over the six branches
 
 - [ ] R-135 feat/label-gang-search | I am incredulous. You made huge progress. Long strings now barely perturb the endless stacked gang of leaders. Before moving on, I want to pick at this.
 - [ ] R-136 feat/label-gang-search | While the results are very good, I still want to push on why additional string length makes any difference at all. The fact that it does leads me to suspect or at least ask for a good insight into our model since, again, there is free space all the way to Japan and beyond. I notice that with 1 character added, there is no significant additional vertical spacing in the gang. But when I add a second character, a noticeable amount of additional gaps appear in the vertical stack. As I add more characters, results oscillate, but the general trend is that the gang's leader trend longer and longer, meaning that the top label of this descending gang is eventually gratuitously 20 text heights away from its node. While I am tempted to rationalize that this is an artifact of keeping the leaders near parallel, that's wrong because with no characters or 1 character, the top label is only gratuitously about 8 text heights below (south of) its node. That said, to say this is partly to quibble since our placements are quite good now, and we really should be focusing on efficiency and performance.
 - [ ] R-137 feat/label-gang-search | Moving to a different test case than that notorious southwest area, let's look at the northwest area with three properties turned on and we are zoomed in closer. [his screenshot: labels for nodes 120 and 25x at A, well away from their nodes; empty ground at B, nearer them] A human would have slid the two labels at A toward B, shortening the leaders without any bad effects. Could our algorithm be smart enough not to be gratuitously distant like this?
-- [ ] R-144 feat/notice-log | I like the down arrow glyph. -- the clock drawing reads to him as a down arrow / Expand glyph, and he likes it: KEEP IT, do not redraw the hands
+- [x] R-144 feat/notice-log | I like the down arrow glyph. -- the clock drawing reads to him as a down arrow / Expand glyph, and he likes it: KEEP IT, do not redraw the hands
+
+## Round of 2026-09-22c -- his pass after the map-menu, zoom and Messenger work
+
+### feat/map-menu -- CLEARED AND MERGED
+
+- [x] R-153 feat/map-menu | I believe this is done now. Great decisions and great execution. Merge and delete branch. -- merged to master 2026-09-22 on this all-clear; R-126, R-127 and R-128 go with it
+- [?] R-154 feat/map-menu | You asked "Nothing can now throw a grid placement away and start the wizard over. Do you want a row for that, and in what words?" I am not clear on what can't be done. Can you more carefully describe the case and the missing functionality? -- **DESCRIBED FOR HIM.** Re-adjust opens the wizard's STEP 2 only, on the placement already on file, so it can nudge, turn and scale a grid drawing but can never reopen step 1, which is the "where in the world is this" question. A grid project placed in the wrong town therefore has no way back: Detach keeps the placement, Attach puts the same one back, and only the session's own undo can throw it away. The missing thing is one row meaning "forget this placement and ask me where it is again." His wording needed
+- [x] R-155 feat/map-menu | Let's synchronize our terminology: EPSG, unnamed (local) georeference, and not georeferenced. If I am thinking straight, we now have only those three cases. lat/lon is now a deprecated label since it merely refers to one of hundreds of EPSG CRSes. -- **HE IS THINKING STRAIGHT AND THOSE ARE THE THREE.** Adopted
+- [x] R-156 feat/map-menu | You asked "I greyed Re-adjust and Scale on lat/lon projects as well as EPSG. You only said EPSG." Does this question go away if we get precise about terms? Is lat/lon just a type of EPSG, or did you mean something else? -- **YES, IT GOES AWAY.** lat/lon is EPSG:4326, so greying both is ONE rule, not two, and the code already draws the line where he wants it
+
+### feat/notice-log -- "Messenger"
+
+- [ ] R-157 feat/notice-log | I discovered what is appearing behind the glyph. It is the text "RIVER" from the model. I consider that a bug, but I don't know what kind of bug. It's a Text object, not a label.
+- [?] R-158 feat/notice-log | I like the down arrow or a + better than the clock. What does Ida say? -- **SHE SAYS NEITHER, AND SHE CHECKED THIS PAGE RATHER THAN ARGUING FROM TASTE.** A down triangle already means "a menu opens below" twice on this page (the pane tab caret and the project tab caret) and marks a table column's sort direction a third time; the `+` already means "make a new one" twice (New scenario, New saved path) and the message log makes nothing. Her recommendation is to repair the same clock rather than replace it: a dot at the center and the two hands spread further apart, which is what made it read as a bent arrow. His call
+- [ ] R-159 feat/notice-log | We are getting closer. But the simultaneous messages on open and the "Newest first" help text appear on one line instead of on three. This is a bug.
+- [ ] R-160 feat/notice-log | I don't think we need a tip on the down arrow glyph. I think it's more trouble than help.
+
+### feat/tables-spreadsheet
+
+- [ ] R-161 feat/tables-spreadsheet | Some of the column and heading divider vertical borders are misaligned by 1 px.
+- [ ] R-162 feat/tables-spreadsheet | Print is not respecting on-screen column widths.
+
+### feat/label-gang-search
+
+- [ ] R-163 feat/label-gang-search | Things have changed so much that I am disoriented. This may be good to undo.
+- [ ] R-164 feat/label-gang-search | I am seeing dropping when I would have preferred to see longer leaders.
+- [ ] R-165 feat/label-gang-search | Here is a strange example where (a) we could have had all requested properties and (b) we could have had a shorter leader.
+
+### Zoom and scaling -- his four rulings and one defect
+
+- [x] R-166 -- | On the Novato example, junctions already draw smaller at the opening view. Is that right? -- his own answer: "Junctions are about half as large as pumps, reservoirs, and tanks. Yes. That is intentional." Nothing to do
+- [ ] R-167 -- | I am torn. 10th %-ile and "same as label limit" were competing ideas for this limit; I'd prefer not to have two rules. I like 10th %-ile a lot, probably better than piggybacking on the labels limit. Let's try a new setting for %-ile: "Prevent nodes from scaling larger than __ times the length of the __ percentile pipe" where we set the defaults at 0.5 and 20% for now. And remove the piggyback limit.
+- [ ] R-168 -- | Should pipe widths shrink past the threshold too? Today they don't. Yes. Everything shrinks except reservoirs and tanks.
+- [ ] R-169 -- | Should Net3 get a threshold back? Its "Zoom in to see labels" note is untrue without one. Yes. 30
+- [ ] R-170 -- | I found a little peripheral bug. "ft" is in the wrong place. It should be before the button.
+
+### Calculation and time steps
+
+- [ ] R-171 -- | When I change Base demand in Properties, Demand, Pressure etc. change on the node label, but not in Properties.
+
+### Task 696, the coordinate conversion wizard
+
+- [ ] R-172 -- | (1) In Step 1, a background image gets dragged around with the map (then snaps back on release of drag) instead of always staying with the project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center example, the world map worked, but the satellite view didn't. (3) I completely missed this until now, but this wizard is out of date with our current CRS paradigm. The first thing it needs to do is ask what coordinate system we are going to. -- folded into Task 696, which stays OPEN at 100 rather than closing, because his point (3) reopens the paradigm
