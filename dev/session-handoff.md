@@ -8,8 +8,8 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Four feature branches await Tom's browser pass and may not merge without his all-clear:**
-  `feat/tables-spreadsheet`, `feat/notice-log`, `feat/label-gang-search`, `feat/zoom-scale-rules`.
+- **Three feature branches await Tom's browser pass and may not merge without his all-clear:**
+  `feat/notice-log`, `feat/label-gang-search`, `feat/zoom-scale-rules`.
   All are in `protected` in `dev/branch-policy.json`. `feature_freeze` is currently OFF.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
@@ -57,7 +57,7 @@ lines rather than appending corrections.
 ### On master, not yet pulled
 
 - **Undo now works for Properties fields and Tables cells**, fixed at the seven shared field
-  builders. Settings-panel edits are still not undoable; that is Tom's product call (Task 709).
+  builders. Settings stay out of undo on his word (Task 709 closed).
 - `run_harnesses.sh` runs three at a time (`ENGCALCS_HARNESS_JOBS=1` restores serial); the 11
   browser harnesses still run alone.
 - **Priority 99 is a real tier**, a second rank inside Next.
@@ -66,10 +66,8 @@ lines rather than appending corrections.
 - The time-step tip shows `Day 2, 01:00`; the day changes at midnight on the clock.
 - `dev/language-strings.md` has his ruling against "Do X and Y happens" for a conditional.
 
-### The four branches awaiting his pass
+### The branches awaiting his pass
 
-- **`feat/tables-spreadsheet`:** the 1px divider mismatch is fixed (Chromium's sticky header under
-  Windows 125% scaling). The harness compares screenshot pixels. Print widths fixed.
 - **`feat/label-gang-search`:** dropping labels is now the last resort. Two trade-offs are his to
   weigh: with every node field on, 26 labels hidden instead of 14, and the crowded view is about 50%
   slower. The unrequested "Restore label defaults" button is the easiest thing to withdraw.
@@ -80,10 +78,8 @@ lines rather than appending corrections.
 
 ### Open with him
 
-1. The Messenger glyph. He said "I cave" while making the better argument; nothing redrawn.
 2. The `%` sign added after his percentile box, which he did not ask for.
 3. The label branch's trade-offs and the Restore-defaults button.
-4. Settings-panel undo (Task 709; Ida was asked).
 5. R-004, R-043, R-062.
 
 ### Translation sprint

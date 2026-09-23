@@ -254,6 +254,9 @@ the block.
     out to need new words, stop -- that is a different decision and a different price.
 
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
+  undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,
+  fill-down, multi-cell selection.
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not
@@ -741,53 +744,6 @@ the block.
   then-click-targets tool: that is the right shape when you are drawing 15 pipes and want this one
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
-
-- 75|709| **Undo for the Settings panel, and the corners the audit did not reach.**
-  **WHAT IS ALREADY DONE AND MUST NOT BE RE-OPENED:** every plain number, text and dropdown field in
-  the Properties popup, and a single-cell edit in the Tables pane, take an undo snapshot as of
-  2026-09-23. None of them did before -- Tom found it with a throwaway test on Base demand
-  (*"Ctrl+Z or the Undo button don't put it back"*) and it turned out to be elevation, tank levels,
-  reservoir head, diameter, roughness, minor-loss k, reaction coefficients and valve type as well.
-  Fixed at the seven shared field builders, so ~55 sites at once. `undo-property-edit-harness.js`.
-  - **THE OPEN QUESTION IS A PRODUCT ONE AND IT IS TOM'S:** should a SETTINGS change join the undo
-    stack at all? The new-asset starting values, the six ID-prefix boxes and the map-colouring
-    section all save immediately with no snapshot. They ARE project data and ride in
-    `serializeProject()`, which argues they belong; against it, a stack mixing "I moved a pipe" with
-    "I changed the default diameter for new junctions" makes Ctrl+Z unpredictable, because the
-    reader presses it expecting the last thing they SAW to come back. **A third shape nobody has
-    costed: a Revert local to the Settings box instead of the global stack.**
-  - **IDA ANSWERED 2026-09-23 AND HER ANSWER IS NO -- LEAVE SETTINGS OUT OF UNDO.** Three findings,
-    each measured against the tree rather than reasoned from outside:
-    - **The project-versus-furniture axis does NOT decide this**, which is the first thing everybody
-      reaches for. `serializeProject()` carries the whole `settings` object, so ID prefixes,
-      new-asset defaults and colouring are project data on exactly the same footing as a pipe's
-      diameter. That clean line is simply not available here.
-    - **The line that decides it is whether the edit does anything you can SEE at the moment you
-      make it.** A default diameter or an ID prefix changes nothing already drawn, so Ctrl+Z after
-      one would appear to do nothing even when it worked -- which reads as "undo is broken", the
-      exact complaint that started this. Colouring is the one section that repaints at once.
-    - **AND THE TREE ALREADY DRAWS THAT LINE CORRECTLY IN ONE PLACE:** `applyIdPrefixToAll()`, the
-      button that actually renames existing elements, DOES take a snapshot, while the preference
-      beside it does not. The gap sits exactly where it should.
-    - **Precedent, cited rather than asserted:** AutoCAD's own UNDO documentation excludes the
-      "what a new entity gets" settings (`CLAYER`, `CECOLOR`) by design; QGIS gives a layer's
-      symbology panel its OWN local undo history, separate from the map canvas's.
-    - **So: change nothing, and if colouring ever wants a safety net, give that one section a local
-      Reset rather than joining the global stack.** Making only colouring undoable would be the new
-      inconsistency, not a fix -- units, hydraulics, energy and quality all save immediately too.
-  - **AND COLOURING MAY BE A CASE OF ITS OWN**, because it changes what the drawing LOOKS like at
-    once, so undoing it is visible in a way undoing a new-asset default is not.
-  - **THREE CORNERS THE AUDIT NEVER DROVE END TO END**, listed so a later pass does not rediscover
-    them: the Library box's add, rename and delete-curve buttons (only point editing was checked);
-    the world-map wizard's Re-adjust step specifically (Finish was checked, and Re-adjust has since
-    moved to open at step 1); and the Settings sections beyond starting values, ID prefixes and
-    colouring, all built the same way and all sharing the same likely gap.
-  - **ONE THING THAT IS NOT A DEFECT, so nobody files it again:** pressing Undo always closes the
-    open Properties box, even for an ordinary edit where the element still exists. That is
-    deliberate and commented -- the box's subject may not exist after an undo -- but it reads as
-    "the box did not come back" while the document underneath is correct.
-  - `dev/undo-audit.md` was this task's working document and is DELETED; its fixed half shipped and
-    its open half is the text above. The full inventory stays in git at the commit that added it.
 
 - 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
