@@ -15660,6 +15660,13 @@ var EngCalcs = EngCalcs || {};
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
+			// **"Show at all zoom levels", SEARCHABLE AND WRITABLE** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*). No boolean condition exists on this panel yet, so it rides the
+			// numeric ones already here for `sizeMult` -- 1 for ticked, 0 for not, through
+			// findValueOf() below -- rather than inventing a yes/no vocabulary this panel has never
+			// needed before. `equal to 1` finds every note kept on past the threshold.
+			out.push(['allZoom', pc.lpn_field_text_all_zoom || 'Show at all zoom levels', 'Show at all zoom levels']);
 			findOfferCustom(out, d);
 			return out;
 		}
@@ -16296,6 +16303,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
+		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
@@ -17664,6 +17672,27 @@ var EngCalcs = EngCalcs || {};
 				set: function (c, v) { setCustomerCustomProp(c, def, v); } };   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 		});
 	}
+	// **A TEXT OBJECT'S ONE REPLACE-WRITABLE PROPERTY** (Tom, review-queue R-174, 2026-09-23: *"This
+	// property should appear in multi-properties, Tables, and Find/Replace."*). `id` and `text`
+	// stay out of Replace on purpose (see the comment above replaceExtraSpecs()) -- an id is
+	// unreachable and a note's words are a one-at-a-time popup edit -- but `allZoom` is neither: it
+	// is a plain yes/no, base-write like size and position, on the identical terms `bold` and
+	// `sizeMult` already have in paneTextCols(). No `str`/`text` flag, so replaceValueOf() parses
+	// the value box as a number and `1`/`0` is how the box says "ticked"/"unticked", the same
+	// vocabulary findValueOf() already reads it in above.
+	function labelReplaceSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'allZoom', group: 'label', field: 'allZoom',
+				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
+				applies: function () { return true; },
+				get: function (lb) { return lb.allZoom === true ? 1 : 0; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+				} }
+		];
+	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
 	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
 	// carries neither, so "everything" here means every NODE and every LINK, exactly as it does in
@@ -17698,11 +17727,18 @@ var EngCalcs = EngCalcs || {};
 		if (findQueryAst) { cands = replaceFoundSet(); }
 		else {
 			var d = findScopeDef(findState.scope);
-			if (d.key === 'all' || d.group === 'label') { return []; }
+			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
+			// property here applies to every group at once. **A Text scope is no longer blanket
+			// refused** -- it used to be, because a Text carried nothing writable (its words are a
+			// one-at-a-time popup edit and its id is unreachable, see the comments on both above).
+			// `labelReplaceSpecs()` now gives it one real spec (`allZoom`, R-174), and the filter
+			// below still leaves `text` and `id` out because no spec answers to them.
+			if (d.key === 'all') { return []; }
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
-		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs()).filter(function (s) {
+		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
+			.concat(labelReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
@@ -17829,7 +17865,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id)
-			: (ref.group === 'customer' ? customerById(ref.id) : linkById(ref.id));
+			: (ref.group === 'customer' ? customerById(ref.id)
+			: (ref.group === 'label' ? labelById(ref.id) : linkById(ref.id)));
 	}
 	// **NOTHING IS WRITTEN UNTIL THE COUNT HAS BEEN SEEN.** A bulk write is the one action on this
 	// page whose blast radius the user cannot see coming -- the matched pipes are spread over a map
@@ -19881,6 +19918,20 @@ var EngCalcs = EngCalcs || {};
 				set: function (lb, v) {
 					lb.bold = !!v;   // base-write: Base-owned, as in the popup
 					textLabelRelayout(lb.id);
+				} },
+			// **THE POPUP'S OWN "Show at all zoom levels" ROW, RE-KEYED** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*), on the `bold` row's exact pattern -- `bool: true` for the checkbox
+			// cell, and this Table's own list is what feeds the multi-properties box (see
+			// multiGroups()/multiSection() above), so one column earns both venues at once. Off by
+			// default, like the popup's own row; a scenario visibility change is a redraw, not a
+			// re-solve, so applyLabelVisibility() stands in for textLabelRelayout()'s afterPropertyEdit().
+			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2,
+				get: function (lb) { return lb.allZoom === true; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+					saveToStorage();
 				} },
 			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
 				get: function (lb) { return textLabelRotation(lb); },
@@ -35308,11 +35359,15 @@ var EngCalcs = EngCalcs || {};
 			if (!le) { return; }
 			// MEMBERSHIP FIRST, and it beats everything else here: a label switched OFF in this
 			// scenario is not there at all (Task 407). Then the label's OWN answer to the zoom:
-			// **a Text object is authored content and ships exempt from the threshold** -- the rule
-			// this page has always had, and what makes the shipped Net3 note reading "Zoom in to
-			// see labels" still readable when the labels have gone. `!== false` rather than a
-			// truthiness test, so a note written before this switch existed keeps showing.
-			var gone = !isActive(lb) || (past && lb.allZoom === false);
+			// **DEFAULT OFF** (Tom, review-queue R-174, 2026-09-23: *"This property should be off
+			// for all but the largest text object in our examples and for all projects with no
+			// previous settings."*), reversing the launch ruling -- a Text object is no longer
+			// exempt from the threshold unless it says so. `=== true` rather than a truthiness
+			// test, so `allZoom: false` (every note stored under the old default) and an absent
+			// property both read as off. Each shipped example now states `allZoom: true` on
+			// whichever of its own Text objects is the largest, which is what keeps a note like
+			// Net3's "Zoom in to see labels" readable when the labels have gone.
+			var gone = !isActive(lb) || (past && lb.allZoom !== true);
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
@@ -43958,20 +44013,22 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed). With the
-		// labeling threshold back, a note needs its own answer to it. **TICKED BY DEFAULT**: a Text
-		// object is authored content and has always stayed on the drawing, and the shipped Net3 note
-		// reading "Zoom in to see labels" only makes sense if it outlives the labels it speaks of.
-		// Stored only when UNticked (`allZoom: false`), so every note written before this switch
-		// existed keeps showing. BASE-WIDE like size and position, and for the same reason.
+		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed).
+		// **UNTICKED BY DEFAULT** (Tom, review-queue R-174, 2026-09-23: *"This property should be
+		// off for all but the largest text object in our examples and for all projects with no
+		// previous settings."*) -- reversing the launch ruling recorded above until this ruling. A
+		// note keeps its old on-screen behaviour only if it explicitly says so; a project saved
+		// before this property existed, or a fresh Text, is off and goes with the threshold like
+		// generated annotation. Stored only when TICKED (`allZoom: true`), so absence keeps meaning
+		// the default. BASE-WIDE like size and position, and for the same reason.
 		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
 		allZoomInput.type = 'checkbox';
-		allZoomInput.checked = lb.allZoom !== false;
+		allZoomInput.checked = lb.allZoom === true;
 		allZoomInput.addEventListener('change', function () {
-			if (allZoomInput.checked === (lb.allZoom !== false)) { return; }
+			if (allZoomInput.checked === (lb.allZoom === true)) { return; }
 			saveUndoSnapshot();
-			if (allZoomInput.checked) { delete lb.allZoom; }
-			else { lb.allZoom = false; }   // base-write: zoom visibility is Base-owned, exactly as size is
+			if (allZoomInput.checked) { lb.allZoom = true; }
+			else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 			applyLabelVisibility();
 			saveToStorage();
 		});
