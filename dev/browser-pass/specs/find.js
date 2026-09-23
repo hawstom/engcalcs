@@ -103,20 +103,24 @@ exports.run = async function ({ browser, report }) {
 
 		// The three pull-downs and the value box are the whole QUERY control surface.
 		//
-		// **THE FILTER ROW IS EXCLUDED, and that is Task 597 rather than a regression.** A fourth
-		// `<select>` — "Table to filter" — was added to the foot of #lpn_find_form on 2026-09-06,
-		// beside a Filter button. It is not part of the query: it says which pane table the found
-		// set is applied TO. Counting every select in the popup made this read `got 4, wanted 3`,
-		// and (below) made "the pull-downs go away" read `got 1, wanted 0` — the filter row stays,
-		// correctly, because a compound query still has a set to filter a table with. So both
-		// counts name `.lpn-find-filter` and step over it.
+		// **THE FILTER ROW'S OWN SELECT IS EXCLUDED, and that is Task 597 rather than a
+		// regression.** A fourth `<select>` — "which table" — sits in `.lpn-find-filter` (Task 708:
+		// on the SAME row as the Find button since 2026-09-23, so a plain `.lpn-find-filter`
+		// exclusion would now take the Find button's own click target with it). It is not part of
+		// the query: it says which pane table the found set is applied TO. Counting every select in
+		// the popup made this read `got 4, wanted 3`, and (below) made "the pull-downs go away" read
+		// `got 1, wanted 0` — the filter row stays, correctly, because a compound query still has a
+		// set to filter a table with. The `selects` count still names `.lpn-find-filter` and steps
+		// over it; `buttons` names the filter button by its own id instead, so the Find button
+		// beside it is still counted.
 		const controls = await a.page.evaluate(() => {
 			const p = document.getElementById('lpn_find_popup');
 			const q = (sel) => [...p.querySelectorAll(sel)].filter(e => !e.closest('.lpn-find-filter'));
 			return {
 				selects: q('select').length,
 				texts: q('input[type=text]').length,
-				buttons: q('#lpn_find_form button').length
+				buttons: [...p.querySelectorAll('#lpn_find_form button')]
+					.filter(e => e.id !== 'lpn_find_filter_go').length
 			};
 		});
 		report.eq(controls.selects, 3, 'three pull-downs: what to search, which property, which condition');

@@ -1463,9 +1463,10 @@ $ec_lang['lpn_find_value']='Value';
 $ec_lang['lpn_find_btn']='Find';
 // THE TABLE FILTER (Task 597). {q} is the query line as the reader wrote it, {n} and {all} are
 // whole numbers. Tom, 2026-09-06: "Maybe Find could have next to the Find button a Filter in tables
-// button ... with a selector for which table."
-$ec_lang['lpn_find_filter_btn']='Filter in current table';
-$ec_lang['lpn_find_filter_table']='Table to filter';
+// button ... with a selector for which table." Task 708, 2026-09-23: the button now sits on the
+// same line as Find and the table selector, in his own words for the button, "Filter in Table."
+$ec_lang['lpn_find_filter_btn']='Filter in Table';
+$ec_lang['lpn_find_filter_table']='Table';
 $ec_lang['lpn_find_filter_tip']='Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
 // The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE

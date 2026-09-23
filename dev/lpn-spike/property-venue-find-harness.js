@@ -23,7 +23,14 @@ ensure('lpn_find_results');
 // The real lib/lang.ec.en.php the stub loads, read once so this file never pins English wording
 // as a literal (dev/scripts/harness_wording_check.php) -- and so the "restore English" step below
 // puts back the actual current string rather than a copy typed here that could drift from it.
-const PC_EN = global.EngCalcs.pageConfig;
+//
+// **A SHALLOW COPY, NOT THE LIVE OBJECT** (pre-review fix while extending this file for Task 708's
+// find-box UX pass). `global.EngCalcs.pageConfig` IS `pageConfig` -- the same object `setWord()`
+// mutates -- so `const PC_EN = pageConfig` pinned a reference, not a snapshot: the section 6
+// "restore English" step below was reading its own Spanish overwrite back at itself and writing
+// Spanish over Spanish. Nothing in section 6 asserts the restored word, so it went unnoticed, but
+// section 7 (built right after it) opened onto a still-Spanish page until this was a copy.
+const PC_EN = Object.assign({}, global.EngCalcs.pageConfig);
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -39,6 +46,27 @@ const L = loadLoopedNetwork(
 	"\t\t\tvar c = findCandidates().filter(function (x) { return x.el.id === id; })[0];\n" +
 	"\t\t\treturn c ? findValueOf(c, prop) : undefined; },\n" +
 	"\t\tsetReplace: function (prop, value) { replaceState.prop = prop; replaceState.value = value; },\n" +
+	// Read straight off the live state, for the Task 708 find-box UX assertions below: whether
+	// changing Find's Property clears a stale Value, and whether it pushes Replace's own Property.
+	"\t\tfindValue: function () { return findState.value; },\n" +
+	"\t\treplaceProp: function () { return replaceState.prop; },\n" +
+	"\t\treplaceValue: function () { return replaceState.value; },\n" +
+	"\t\tfilterTarget: function () { return findFilterTarget(); },\n" +
+	// The Nth <input> under one root, in document order -- the same walk as selectAt() but for the
+	// free-entry Value/New value boxes, which is what a Property switch away from a choice
+	// property leaves behind.
+	"\t\tinputAt: function (root, n) { var out = null, i = 0;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (c._tag === 'input') { i++; if (i === n) { out = c; } } walk(c); }); })(root);\n" +
+	"\t\t\treturn out; },\n" +
+	// **THE FIND BUTTON, THE FILTER BUTTON AND THE TABLE SELECTOR ARE ONE ROW** (Task 708, Tom
+	// 2026-09-23: "[Find][Filter in Table][tables_selector]"). Asserted structurally rather than
+	// visually -- the stub draws no layout -- as: do the Find button and the Filter button share a
+	// `.lpn-find-filter` parent, and does that same parent hold the table select.
+	"\t\tfilterRow: function () { var out = null;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (c.className === 'lpn-find-filter') { out = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\treturn out; },\n" +
 	"\t\tspecFields: function (scope) { findState.scope = scope; return replaceSpecs().map(function (s) { return s.field; }); },\n" +
 	"\t\tpreview: runReplacePreview, apply: applyReplace, cancel: cancelReplace,\n" +
 	"\t\tpressFind: function () { runFind(); },\n" +
@@ -401,7 +429,90 @@ function build(unitSet) {
 	Object.keys(es).forEach(function (k) { L.setWord(k, PC_EN[k]); });
 }
 
-// ---- 7. THE "NEW ASSETS" PUSH GUARD (pre-review: Perry found no automated coverage) ---------------
+// ---- 7. THE FIND-BOX UX PASS (Tom, 2026-09-23) -----------------------------------------------------
+//
+// Three complaints on the same Find > Pipes > Shut > equal to > Closed round trip:
+//
+//   1. Switching Property AWAY from a choice property (Shut) left the internal code ("closed")
+//      sitting in the free-entry box that replaced the picklist. Switching TO one already discarded
+//      a mismatched value (section 6 above proves that half); this proves the other direction, on
+//      both Find's own Property select and Replace's own "Property to change" select.
+//   2. The Filter row is now built as one row -- the Find button, the Filter in Table button, then
+//      the table selector -- rather than the Find button on its own line above a second "Table to
+//      filter" row. Asserted structurally, since the stub has no layout to measure.
+//   3. Changing Find's Property pushes Replace's "Property to change" to match, when the new
+//      property is one Replace can write; a property Replace cannot write leaves Replace's own
+//      choice alone.
+//
+// Driven through the real onChange handlers (L.chooseOption()), never by poking findState/
+// replaceState directly, because the bug was always in what the SELECT's own handler did.
+{
+	console.log('\n--- the find-box UX pass: value clearing, the filter row, the Property push ---');
+	const n = build();
+	L.setProp(linkOf(n.p2), 'status', 'closed');
+
+	// ---- 1a. Find: choice -> free-entry clears the Value ----
+	L.setFindState('pipe', 'status', 'equals', 'closed');
+	L.buildPanel();
+	ok('the fixture starts on the choice select with "closed" chosen',
+		L.findValue() === 'closed', String(L.findValue()));
+	L.chooseOption(L.selectAt(L.findControlsBox(), 2), 'diameter');
+	ok('switching Property away from Shut clears the Value, rather than leaving "closed" behind',
+		L.findValue() === '', JSON.stringify(L.findValue()));
+	const diameterInput = L.inputAt(L.findControlsBox(), 1);
+	ok('...and the free-entry box that replaced the select is itself empty',
+		!!diameterInput && diameterInput.value === '', diameterInput && diameterInput.value);
+
+	// ---- 1b. Find: free-entry -> choice still discards a value that is not one of the choices
+	// (locking in the pre-review fix from section 6, this time reached by the live select rather
+	// than by seeding findState directly) ----
+	L.chooseOption(L.selectAt(L.findControlsBox(), 2), 'status');
+	const afterBack = L.selectOptions(L.selectAt(L.findControlsBox(), 4));
+	ok('switching back to Shut shows the choice select again',
+		JSON.stringify(afterBack.map(function (o) { return o[0]; })) === JSON.stringify(['open', 'closed']),
+		JSON.stringify(afterBack));
+	ok('...defaulted to the first choice, not left on the empty string the diameter box left behind',
+		L.findValue() === 'open', JSON.stringify(L.findValue()));
+
+	// ---- 1c. Replace's own Property select clears its Value the same way ----
+	L.setFindState('pipe', 'status', 'equals', 'closed');
+	L.buildPanel();
+	L.chooseOption(L.selectAt(L.replaceBox(), 1), 'status');
+	L.chooseOption(L.selectAt(L.replaceBox(), 2), 'open');
+	ok('Replace is seeded on the choice select with "open" chosen',
+		L.replaceValue() === 'open', String(L.replaceValue()));
+	L.chooseOption(L.selectAt(L.replaceBox(), 1), 'diameter');
+	ok('switching Replace\'s own Property away from Shut clears its Value the same way',
+		L.replaceValue() === '', JSON.stringify(L.replaceValue()));
+
+	// ---- 2. One row: Find, Filter in Table, then which table ----
+	L.setFindState('pipe', 'id', 'contains', '');
+	L.buildPanel();
+	const row = L.filterRow();
+	ok('the filter row exists', !!row);
+	ok('the Find button is IN the filter row, not on a line of its own above it',
+		!!row && row.children.some(function (c) { return c.id === 'lpn_find_go'; }));
+	ok('...beside the Filter in Table button',
+		!!row && row.children.some(function (c) { return c.id === 'lpn_find_filter_go'; }));
+	ok('...beside the table selector, all three in one row',
+		!!row && !!L.selectAt(row, 1));
+
+	// ---- 3. Changing Find's Property pushes Replace's Property to change ----
+	L.setFindState('pipe', 'length', 'gt', '0');
+	L.buildPanel();
+	L.setReplace('length', '');   // a known starting Replace property, set directly rather than
+	// inherited from an earlier block, so this test does not depend on run order.
+	L.chooseOption(L.selectAt(L.findControlsBox(), 2), 'diameter');
+	ok('choosing Diameter in Find pushes Replace\'s own Property to Diameter too',
+		L.replaceProp() === 'diameter', L.replaceProp());
+	// A property Replace cannot write (ID) does not drag Replace along with it -- the push only
+	// ever names a property Replace could actually change.
+	L.chooseOption(L.selectAt(L.findControlsBox(), 2), 'id');
+	ok('...but switching Find on to ID leaves Replace on Diameter, since ID is not replaceable',
+		L.replaceProp() === 'diameter', L.replaceProp());
+}
+
+// ---- 8. THE "NEW ASSETS" PUSH GUARD (pre-review: Perry found no automated coverage) ---------------
 //
 // **THE BUG THIS GUARDS AGAINST.** "Apply these new-asset values to every existing asset" seeds
 // each property from `settings.defaults[s.key]`; before this fix its filter was `pushFieldShown`

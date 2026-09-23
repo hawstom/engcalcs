@@ -17357,8 +17357,28 @@ var EngCalcs = EngCalcs || {};
 		pair.className = 'lpn-find-pair';
 		box.appendChild(pair);
 		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
+			// **THE VALUE CONTROL IS REBUILT FOR THE NEW PROPERTY'S TYPE** (Tom, 2026-09-23, of
+			// Find > Pipes > Shut > equal to > Closed: *"Switching away from this leaves 'closed'
+			// in the Value field."*). Switching TO a choice property already discards a mismatched
+			// value, below -- this is the other direction: a choice property's own stored word is
+			// an EPANET code nobody should have to un-type out of the free-entry box that replaces
+			// the select, so it is cleared rather than carried over.
+			if (wasChoice && !findPropIsChoice(findState.prop)) { findState.value = ''; }
+			// **CHANGING FIND'S PROPERTY PUSHES REPLACE'S "PROPERTY TO CHANGE" TO MATCH** (Tom,
+			// 2026-09-23: *"normally that is what users want, and power users can learn"*), when
+			// the new property is one Replace can write at all. replaceNormalize() only falls back
+			// when the CURRENT Replace property has stopped applying -- it would leave Replace
+			// pointed at a still-valid but now-stale property, which is exactly what this pushes
+			// past.
+			if (replaceSpec(v)) {
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) {
+					replaceState.value = '';
+				}
+				replaceState.prop = v;
+			}
 			rebuildFindForm(); renderFindResults(null);
 		});
 		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
@@ -17472,11 +17492,12 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_find_go';
 		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
-		box.appendChild(btn);
-		// **NEXT TO THE FIND BUTTON, which on a 22rem box is the line under it** (Tom, 2026-09-06,
-		// Task 597). One select and one button: the whole of what filtering the tables costs the
-		// panel.
-		buildFilterRow(box);
+		// **ONE ROW: FIND, FILTER IN TABLE, THEN WHICH TABLE** (Tom, 2026-09-23: *"[Find][Filter in
+		// Table][tables_selector]"*). It used to be the Find button on its own line and a second,
+		// separate "Table to filter" row below it -- which read as two things being offered rather
+		// than one ("is this Filter in selected table, or Filter in active table?"). Built as one
+		// row here instead of appended to `box` twice.
+		buildFilterRow(box, btn);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
@@ -17563,12 +17584,13 @@ var EngCalcs = EngCalcs || {};
 		// different things about one filter.
 		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
 	}
-	function buildFilterRow(box) {
+	// **ONE ROW: [Find] [Filter in Table] [which table]** (Tom, 2026-09-23). `findBtn` is the Find
+	// button built in rebuildFindForm() -- passed in rather than built twice, so there is exactly
+	// one Find button and exactly one place that wires its click.
+	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
 		row.className = 'lpn-find-filter';
-		findSelect(row, pc.lpn_find_filter_table || 'Table to filter',
-			paneTables().map(function (s) { return [s.id, pc[s.label] || s.id]; }),
-			findFilterTarget(), function (v) { findFilterTable = v; });
+		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		btn.id = 'lpn_find_filter_go';
@@ -17578,9 +17600,18 @@ var EngCalcs = EngCalcs || {};
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
 			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
+		// Tom's own words -- not "Filter in current table" or "Filter in selected table", either of
+		// which answers a question the button was never asking (2026-09-23: *"is this offering two
+		// options or just one?"*). There is one table, the one named in the selector beside it.
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in Table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
+		// **THE SELECTOR FOLLOWS "WHAT TO SEARCH"** (findFilterTarget()) until the user overrides
+		// it, and sits right beside the button that reads it -- so "which table" is answered where
+		// it is asked, on the one line, rather than in a row of its own underneath.
+		findSelect(row, pc.lpn_find_filter_table || 'Table', paneTables().map(function (s) {
+			return [s.id, pc[s.label] || s.id];
+		}), findFilterTarget(), function (v) { findFilterTable = v; });
 		box.appendChild(row);
 	}
 	function runFind() {
@@ -18046,6 +18077,14 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < specs.length; i++) { if (specs[i].field === field) { return specs[i]; } }
 		return null;
 	}
+	// Whether Replace shows a picklist for this field, the same test buildReplaceForm() makes
+	// before it draws one -- named so a property change can tell whether it is crossing INTO or
+	// OUT OF a choice, without repeating `replaceSpec(field) && replaceSpec(field).choices` at
+	// every call site.
+	function replacePropIsChoice(field) {
+		var s = replaceSpec(field);
+		return !!(s && s.choices);
+	}
 	// **THE PROPERTY BEING SEARCHED IS OFFERED FIRST, when it is writable.** "Find every 6 inch main,
 	// make it 8" is the core case and it names one property twice, so the common job needs no second
 	// choice. A search on something unwritable (a pressure, or an ID) falls back to the first
@@ -18340,6 +18379,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
+				// Same rule as Find's own Property select: switching AWAY from a choice property
+				// (e.g. Shut) leaves its EPANET code sitting in the free-entry box that replaces
+				// the picklist, so it is cleared here instead of carried over.
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) { replaceState.value = ''; }
 				replaceState.prop = v; replacePending = null;
 				// Rebuilt, not just re-messaged: choosing Elevation is what makes the source select
 				// exist at all, and leaving it behind when the property moves off Elevation would
