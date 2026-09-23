@@ -666,8 +666,10 @@ console.log('\n--- the Text table ---');
 	const spec = L.paneTableById('text');
 	report(!!spec && spec.group === 'label', 'there is a Text table, on the label group');
 	const keys = spec.cols.map((c) => c.key);
-	report(keys.join(',') === 'id,active,text,sizeMult,align,valign,bold,rot',
-		'with the id, Active, the words, size, the two alignments, Bold and the angle', keys.join(','));
+	// `allZoom` ("Show at all zoom levels", R-174) rides in right after Bold, the same column
+	// order paneTextCols() declares it in.
+	report(keys.join(',') === 'id,active,text,sizeMult,align,valign,bold,allZoom,rot',
+		'with the id, Active, the words, size, the two alignments, Bold, all-zoom and the angle', keys.join(','));
 	L.renderPaneTable(spec);
 	const host = byId.lpn_pane_text;
 	const table = host.children.filter((c) => c._tag === 'table')[0];

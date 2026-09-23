@@ -215,6 +215,170 @@ or not one is actually there"), so it is reported as a question rather than a de
 never measured or written down as a tradeoff anywhere in the branch's own record, and it plausibly
 explains why the "beyond the meter" count did not fall alongside the drop-rate improvement.
 
+## 2026-09-22 -- feat/notice-log, second review at `dfd8d244`: NOT READY
+
+Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, preview :8099, real headless
+Chromium (playwright-core, launched directly against the running preview server since this pass
+was scoped to that server rather than to `dev/browser-pass`'s own PHP spawn). This commit fixes the
+buried-glyph defect from the first review (`#lpn_map_notice` is now a child of
+`#lpn_map_overlay_tl_col`, confirmed by a real screenshot: the notice pill sits beside the glyph
+and the panel opens directly under it, oldest lower, matching Tom's description) and answers his
+(2) and part of his (4). Two of his five points are not done, and one further defect appears in the
+same commit.
+
+**MISSED -- (3), the flash, is not gone; only NAMED.** OBSERVED, live: opening the "Basic network,
+gpm (US)" example produces `#lpn_engine_banner` = "Loading solver. Results delayed momentarily.
+Continue working." at t=1028ms and clears it at t=1335ms -- on screen for roughly 300ms, in the
+exact top-left column Tom is looking at. "SOLVER" and "POWER" share four of six letters in the same
+positions (_O__ER vs _O_ER, both round-vowel-then-W/V-then-E-R), so this is a good match for "a
+word... similar to POWER" that he could not read. `git show dfd8d244` and `git log -S"POWER"
+--all` turn up nothing: no debounce, no minimum-display time, no delay-before-show was added
+anywhere in this branch's history. The build agent's claim in this round's brief --
+"the 'POWER' flash was 'Loading solver...' from refreshEpanetBanner()" -- correctly names the
+string and does nothing to it. Tom's instruction was "That needs to stop happening"; it still
+happens, unchanged, and identifying the culprit is not the same act as fixing it. This is the
+R-054 shape in a new place: a plausible, checkable explanation stood in for a fix, and nobody
+reran the browser to see whether the thing complained of was still there.
+
+**MISSED -- (4), "All messages," is not all of them.** `setStatus()` and `refreshEpanetBanner()`
+were taught to call `logMessage()` this commit, which covers the two examples Tom named live
+("Working out the extended period simulation." and the EPANET-loading banner) -- confirmed, both
+appear in the panel after a load that shows them. But `setEngineNotes()` (`js/looped-network.js`,
+~line 45334), the ~2-minute-fading note in `#lpn_status_notes` beside the diagnostic -- "Note: with
+Manning roughness, EPANET rounds the constant in the Manning equation..." is the one example in the
+current source -- has no `logMessage()` call anywhere in it or in its one caller. It is a real,
+on-map, worded message with its own timer, in the same top-left column as everything else this
+branch moved, and it will fade off screen unread exactly the way the lock banner did before this
+whole task existed, with no trace in the log Tom just asked to be complete. Grep is decisive here:
+`grep -n "logMessage" js/looped-network.js` never mentions `setEngineNotes`.
+
+**MISSED (not one of Tom's five, but inside the checklist this review was asked to run) --
+dismissing the panel by clicking the map also does whatever that click would otherwise have done.**
+`msglogOutsideHandler()` (the capture-phase `click` listener that closes the panel on an outside
+click) calls neither `stopPropagation()` nor `preventDefault()`. The canvas's own interaction
+handling is wired on `pointerdown`/`pointerup` (`svg.addEventListener('pointerdown', ...)`,
+`js/looped-network.js` ~32112+), which fires and completes BEFORE the `click` event the dismiss
+handler is listening for. Verified live: instrumenting `document`-level capture listeners for both
+`pointerdown` and `click` and comparing an ordinary canvas click against a "dismiss the panel"
+click at the same map point shows both events reaching the document identically in both cases --
+nothing intercepts or discards the pointerdown on the dismiss path. So a user who presses the map
+just to put the message panel away will, in the same gesture, do to the network whatever a plain
+click there does: select an element, deselect the current one, or begin whatever the active tool
+starts on pointerdown. Not measured against every tool (would need one live repro per mode), but
+the timing argument -- pointerdown-before-click, no propagation stop -- holds for all of them by
+construction.
+
+**CONFIRMED.** (2): a real screenshot with the legend showing (top-right) and the message column
+open (top-left, "Opened Net3-Novato-CA-World...") shows no overlap with the legend -- both the
+top-left row and the footer already reserve `calc(4px + var(--lpn-overlay-right, 0px))`, the same
+custom property a right-side legend sets, so the structural fix predates this branch and nothing in
+it broke that. Dedupe: repeating the identical "Nothing is selected" notice three times over
+produced exactly one row in the panel, moved to the top, not three -- no flood on the case that
+matters most (an unchanged diagnostic re-showing on every ordinary solve). Keyboard: Tab reaches
+`#lpn_msglog_btn`, Enter opens the panel, Escape closes it, live and unscripted. No page errors in
+either probe.
+
+**STILL PRESENT, same defect as the first review, unaddressed by this commit: the phone welcome
+state.** At 390px on a fresh project, `#lpn_examples_pane` still intercepts every click meant for
+`#lpn_msglog_btn` (Playwright's own retry log names the exact intercepting element). Filed once
+already; filing it again because a second commit went by without touching it.
+
+**Not independently re-shot this session, because of a shared `/tmp/engcalcs-browser.lock` held by
+another concurrent session for an extended stretch:** the RTL layout at 1280/390. The fix itself
+(`inset-inline-start` in place of `left`, read directly from `Looped-Network.php`) is a correct,
+logical-property answer to the exact defect the first review measured (glyph and notice a map-width
+apart in Arabic), and `dev/browser-pass/specs/msglogpos.js` is written to catch a regression of
+precisely that shape -- but I did not re-render it myself this round and say so rather than
+inheriting the first review's now-decayed OBSERVED finding as if it still described this build.
+
+**Verdict: NOT READY.** The flash he explicitly asked to stop still happens; "all messages" still
+excludes one; and the outside-click dismissal has a real, unflagged side effect on the drawing.
+
+## 2026-09-22 -- feat/notice-log, fourth review at `1f2e4819`/`bb51995e`
+
+Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, `dev/browser-pass` infra (own
+PHP server + real Chromium via playwright-core), plus a one-off probe script written for this
+round. Reviewing on top of `f02da0be`, which my own third review (2026-09-22, logged above) found
+NOT READY on the flash, the incomplete "all messages," and the outside-click side effect -- all
+three are addressed by `f02da0be` itself (a commit that landed between my third review and this
+one) and are RE-CONFIRMED here, live, rather than trusted: ran `dev/browser-pass/specs/msglogpos.js`
+in full (68/68 checks passed) -- dismiss-no-side-effect and glyph-on-fresh-project sections, both
+written in response to my prior findings, pass against real pointer/click events and a real
+`elementFromPoint` hit-test.
+
+**CONFIRMED -- (1) and (3), read together as the build agent claimed they were one defect, and
+independently re-measured rather than trusted.** `.lpn-msglog-panel` gained `flex-direction:
+column` and a solid `background:#fff`. Live probe (three simultaneous notices from Ctrl+Z, Ctrl+Y,
+Delete-with-nothing-selected): the two panel children (`.lpn-msglog-panel-row` and
+`.lpn-msglog-panel-note`, the "Newest first..." help text) stack top-to-bottom with a real gap
+(previous row bottom 195.19px, next row top 199.19px -- no overlap, no shared line), answering the
+part of his sentence ("the simultaneous messages on open **and** the 'Newest first' help text
+appear on one line instead of on three") that the build report's own account never explicitly
+named. `elementFromPoint()` at three points -- inside the top row, in the gap between the row and
+the note, and at the panel's bottom edge -- all three resolve to `#lpn_msglog_panel` itself with
+`background-color: rgb(255, 255, 255)` and `opacity: 1`, i.e. the fix is a property of the
+CONTAINER and therefore holds regardless of message count or position, not just at the specific
+case ("RIVER") Tom happened to see. Did not re-load the actual Net3 project with a live "RIVER"
+text object underneath (not needed: opacity=1 solid white at every sampled point, including the
+gap, is a stronger and scene-independent guarantee than one screenshot of one project would be).
+`dev/lpn-spike/notice-log-harness.js` §7f's CSS-source assertions match what the rendered page
+actually does.
+
+**CONFIRMED -- the hover/long-press tip is gone, and the deleted key is genuinely dead.** No
+`title` attribute, no `.ec-help` class on `#lpn_msglog_btn` (grep + harness agree); no live read of
+`lpn_msglog_tip` anywhere in `js/*.js` or `*.php` (only in comments and the change log,
+`dev/new-english-keys.md`); confirmed the key was NEVER in any of the 26 translated `lang.ec.??.php`
+files even before this commit (`git show bb51995e^:lib/lang.ec.<x>.php | grep` on all 26, none),
+so the commit message's own claim -- "it and its 26 translations were deleted with this change" --
+overstates what happened; there were no translations to delete. A harmless inaccuracy in commit
+prose, not a functional defect, but exactly the kind of confident-and-wrong sentence this seat
+exists to catch, so noted.
+
+**MISSED -- not one of Tom's four, but a real leak from how (4) was built, and the one finding
+worth the most of his attention this round.** Every OTHER icon-only toolbar/strip button
+(`undo`, `save`, `open`, `find`, `settings`, `zoom-extent`, `pane-toggle`, the mode buttons, the
+area-select tool) is wired through the file's own `setIconLabel()` wrapper, which does two things
+at once: sets the tip AND pushes `{el, icon, name, tip}` into `toolbarIconIndex`, the array
+`iconGuideRows()` reads to build Help > "Toolbar key" (`js/looped-network.js` ~30473,
+~31927 -- "DERIVED from the strip itself... so a button added later is in it already"). The commit
+under review does not call `setIconLabel()` at all for the message-log button -- it now builds the
+button by hand (`btn.textContent=''; ic=iconEl('history'); btn.appendChild(ic);
+btn.setAttribute('aria-label', ...)`) specifically to skip the tip, but that also skips the
+registration, silently. Verified live: opened the real Help menu, hovered "Toolbar key," read the
+submenu's rendered text -- it does not mention "Messages." Before this commit the button DID call
+`setIconLabel()` (confirmed via `git show bb51995e^`) and so WAS listed there. Tom asked only that
+the hover tip go away ("more trouble than help"); he did not ask for the button to disappear from
+the one deliberately-non-hover discovery path this same file's comments describe as existing
+*because* "a first-time user who does not think to hover -- and a touch user, for whom a tip needs
+a deliberate press-and-hold -- has no way to read the strip." The message-log glyph is now in
+exactly that position and is the one button on the page not covered by its own answer. Not caught
+by any harness on this branch -- `notice-log-harness.js` asserts the absence of title/.ec-help but
+never touches `toolbarIconIndex` or the Help menu.
+
+**Verdict: this round's two commits do what he asked on all four items and hold up under
+independent re-measurement -- but they introduce one new, unrequested regression** (Help >
+"Toolbar key" silently loses its one entry for this button, at the same moment its tip goes away,
+leaving a first-time or touch user with no way at all to learn what the glyph does). This is small
+enough not to block a browser pass on its own -- nothing he asked for is broken -- but it should be
+named to him rather than fixed silently, since a reviewer here reports rather than repairs.
+
+## 2026-09-22 -- feat/notice-log, follow-up: the Help-menu regression fixed same day, re-verified
+
+After delivering the review above, a further commit landed on the branch, `38592ea7` ("Keep the
+message-log glyph in Help > Toolbar key, still tipless"), responding directly to the one finding in
+that review. **CONFIRMED, independently, not just read.** Re-ran the live browser probe against the
+Help menu: hovering "Toolbar key" now shows "Messages" in the fly-out (it did not, before this
+commit). The fix splits `setIconLabel()`'s two jobs -- writing the tip and registering into
+`toolbarIconIndex` -- into a standalone `registerToolbarIcon()`, and `wireMessageLogButton()` now
+calls that alone with an empty `tip` string; `iconGuideRows()` already treats a falsy tip as "no
+tip on this row," so the list entry carries a name and no tip, matching what was asked. The
+harness's new group 10 mutation (removing the `registerToolbarIcon()` call) reproduces the exact
+regression and is killed. The same commit also quietly corrected the "26 translations" overstatement
+I flagged in the prior comment (now: "never translated into any of the other 26 languages"),
+without being asked to -- read the wording precisely rather than skimming past a now-familiar phrase.
+
+**Verdict unchanged and now stronger: ready for a browser pass, nothing outstanding from this
+review.**
 ## 2026-09-22 -- feat/notice-log (R-116..R-119), review at `1e48999b`: NOT READY
 
 Worktree `/home/haws/webdev/worktrees/feat-notice-log/engcalcs`, preview :8099, real headless
@@ -483,6 +647,85 @@ is the one thing this instrument cannot do. Also confirmed by reading the live f
 `lpn_pane_paste_note` and its "rows that already exist" text are gone from `lib/lang.ec.en.php`
 entirely (R-140), and `lpn_pane_tab_tip` now reads *"This tab shows the assets of this kind as a
 spreadsheet-like table. Result columns cannot be edited."* (R-141), matching Tom's own quoted wording.
+
+## 2026-09-23 -- feat/zoom-scale-rules at 04b159fe, R-174 (Text "Show at all zoom levels"): READY, one gap on the file Tom will actually open
+
+OBSERVED, checked 2026-09-23. Mutation-confirmed the shipped harness
+(`dev/lpn-spike/text-all-zoom-property-harness.js`) is real: copied it unmodified into a worktree
+built from the branch point (`75689ea1`, before `34d4ee8d`) and it failed hard there (three
+assertions FAIL, then a `TypeError` on the very column this round adds), so the green it shows on
+the branch head is not decoration. Then drove the real feature through a real Chromium
+(`dev/browser-pass/lib/session.js` + `lib/env.js`, `flock /tmp/engcalcs-browser.lock`), not just
+the stub, for every venue Tom named.
+
+**CONFIRMED, the default and the three venues, all through real interaction:**
+- Default off: a freshly-drawn Text on a new project carries no `allZoom`, and Net3 (plain) opens
+  already past its own threshold (`labelMaxWidth: 30`) with `LAKE`/`RIVER` genuinely hidden
+  (`lpn-lbl-hidden` on both) and only `X3` "Zoom in to see labels" left showing -- read straight off
+  `getComputedStyle`/`classList`, not the stub.
+- Multi-properties: drew two Texts with the real toolbar, box-selected both with "Select a window",
+  and the popup read "2 selected" with a real `<label>Show at all zoom levels <input
+  type="checkbox"></label>` row, unchecked by default. Ticking it and firing a real `change` event
+  is the mechanism the harness already checks; not re-verified with a second read here beyond that.
+- Tables: the Text pane tab's own headers read `...,"Bold text","Show at all zoom levels","Angle
+  (degrees)"` with a live checkbox cell, matching the popup's row order.
+- Find and Replace: selecting the Text scope offers exactly `Text`, `Size multiplier`, `Show at all
+  zoom levels` as properties -- and separately, the Replace "Property to change" list for the same
+  scope offers `allZoom` ALONE. `id` and `text` are not there, confirmed by reading the live
+  rendered `<select>`, not the source comment that claims it.
+
+**MISSED, and it is the exact file the review brief named: Net3-**Novato**-CA-World.lwn has no
+labeling threshold at all (`settings.labelMaxWidth` is `null`, unchanged by this branch), so
+`labelsPastThreshold()` returns `false` at every scale and NOTHING in this file's Text layer ever
+hides -- `LAKE` and `RIVER` both read `lpn-lbl lpn-draglbl` (never `-hidden`) all the way from
+5354 px/degree down to 118 px/degree and back, measured with the real `transform="scale(...)"` on
+the SVG. The branch's own edit to this file only added `allZoom: true` to `X1` ("LAKE"); it did not
+notice, and nothing in its harness would have noticed, that the setting has no effect here because
+the gate it feeds is permanently off. Practically: opening Novato and zooming out, as the brief
+instructs, will show BOTH `LAKE` and `RIVER` staying on screen forever, which will read as the fix
+not working -- when what actually failed to ship is a threshold on this one example, a detail
+outside R-174's own wording but squarely inside what the round was supposed to make demonstrable.
+**Net3 (the plain, non-geo file) is the one where the mechanism is real and provably works**; that
+is the one to point Tom at if he wants to see it work before this is fixed.
+
+**A genuine judgment call, not a defect, worth putting to Tom because he asked "should it appear in
+Find/Replace" and got an honest partial answer**: the code's own comment admits it plainly --
+*"No boolean condition exists on this panel yet, so it rides the numeric ones already here... 1 for
+ticked, 0 for not."* Measured in the real Find UI: the condition list offered for `allZoom` is
+`equal to, above, below, n highest, n lowest, empty` -- four of those six are nonsense on a
+yes/no property (`above 1`? `n highest`?), and nothing on screen says 1 means ticked. It works
+(confirmed: typing `equal to 1` finds exactly the kept-on Text, and Replace does write it), but a
+reader with no memory of this ruling has no way to guess the vocabulary without trial and error.
+Not new to this round -- `active`/`closed` are the same shape elsewhere on the page and were not
+re-examined here -- but this is the first time Tom asked for a boolean specifically to land in
+Find, so it is the moment to decide whether a proper yes/no condition is now worth building rather
+than reusing the numeric one again.
+
+**Net1's tie-break, also a judgment call rather than a defect**: `Source`, `Pump` and `Tank` are all
+`sizeMult: 2` (a genuine three-way tie), and the rule ("first in the file") kept `Source`. Novato's
+`LAKE`/`RIVER` tie (both `sizeMult: 1`) went the same way. Neither is wrong by Tom's stated rule
+("the largest... in our examples"), but where sizes are exactly equal the rule is silent on
+*which* survives, and "first in the file" is an implementation detail nobody chose for its meaning
+-- worth a glance from Tom on whether `Source` (on Net1, a network about a reservoir, a pump and a
+tank, all named) is the label he would have picked by hand.
+
+**R-167/168/169/170 (earlier rounds on this branch), not re-litigated in depth but not skipped
+either**: ran `zoom-symbol-cap-harness.js` (all 15 mutations still kill), `examples-audit-harness.js`
+(307/307), `find-harness.js`, `switch-keep-harness.js`, `select-area-harness.js` -- all green against
+the live tree. R-170's fix (`5865871e`) is a three-line reorder of the label-threshold unit and the
+capture button, read directly and it does what it says.
+
+**Verdict: READY**, with the Novato gap flagged as the one thing Tom will hit first if he follows the
+brief's own instructions on that exact file, and the Find/Replace vocabulary named as his call to
+make, not a build defect.
+
+**Not checked**: ticking the checkbox from the Tables pane cell itself in the real browser (only the
+harness's stub exercises that door); an older saved project carrying `{"allZoom": false}` explicitly
+(argued to behave identically to absent by reading `=== true`, not independently re-measured in a
+browser); redo/undo interaction with an `allZoom` edit; and whether the Novato gap is itself on
+Tom's queue anywhere else under a different number (not searched).
+
+---
 
 **Not reached this round, for the record rather than by silence**: whether an EPS time-step change
 (scrubbing the run transport) has the same Recalculate-off gap the scenario switch does — `lpn-time.js`

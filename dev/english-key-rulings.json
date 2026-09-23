@@ -2146,6 +2146,11 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_mapgeo_readjust_intro": {
+            "on": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
         "lpn_mapgeo_replace": {
             "on": "This project already has the world map attached. Replace that georeferencing?",
             "ruled": "2026-09-23",
@@ -2864,9 +2869,9 @@
             "answer": "OK."
         },
         "lpn_settings_label_max_width_tip": {
-            "on": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
+            "on": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
             "ruled": "2026-09-23",
-            "answer": "Should we offer the same hint here as for customer labels (0 to hide always) and remove the Thematic map toggle? Otherwise okay."
+            "answer": "OK."
         },
         "lpn_settings_label_use_view": {
             "on": "Use current view",
@@ -2937,6 +2942,26 @@
         },
         "lpn_settings_sym_customer": {
             "on": "Customer",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_settings_symbol_cap": {
+            "on": "Prevent nodes from scaling larger than",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_settings_symbol_cap_mid": {
+            "on": "times the length of the",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_settings_symbol_cap_post": {
+            "on": "percentile pipe",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_settings_symbol_cap_tip": {
+            "on": "A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
             "ruled": "2026-09-23",
             "answer": "OK."
         },
@@ -3137,6 +3162,16 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_survey_format_internal": {
+            "on": "specified internally",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_survey_format_label": {
+            "on": "File format:",
+            "ruled": "2026-09-23",
+            "answer": "OK."
+        },
         "lpn_survey_map_gpx": {
             "on": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
             "ruled": "2026-09-17",
@@ -3158,18 +3193,18 @@
             "answer": "Needs discussion and design concept planning."
         },
         "lpn_survey_note_ambiguous_elev": {
-            "on": "More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.",
-            "ruled": "2026-09-17",
+            "on": "More than one column could be the elevation, so none of them was read.",
+            "ruled": "2026-09-23",
             "answer": "OK."
         },
         "lpn_survey_note_bad_coord": {
-            "on": "The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
-            "ruled": "2026-09-17",
-            "answer": "Needs discussion and design concept planning."
+            "on": "The {axis} does not read as a number.",
+            "ruled": "2026-09-23",
+            "answer": "OK."
         },
         "lpn_survey_note_bad_elev": {
-            "on": "The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.",
-            "ruled": "2026-09-17",
+            "on": "Non-numeric elevation. Imported without elevation.",
+            "ruled": "2026-09-23",
             "answer": "OK."
         },
         "lpn_survey_note_bad_lon": {
@@ -3366,6 +3401,11 @@
         "lpn_terrain_will_ids": {
             "on": "These are the nodes that will be filled in: {ids}",
             "ruled": "2026-08-29"
+        },
+        "lpn_time_clock_day": {
+            "on": "Day {day}, {clock}",
+            "ruled": "2026-09-23",
+            "answer": "OK."
         },
         "lpn_time_pause_tip": {
             "on": "Pause animation",

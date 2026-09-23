@@ -60,7 +60,9 @@
         "feat/zoom-scale-rules",
         "feat/zoom-control",
         "feat/convert-as",
-        "feat/table-editing"
+        "feat/table-editing",
+        "feat/property-venue",
+        "feat/label-limit"
     ],
     "feature_freeze": {
         "active": false,

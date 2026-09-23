@@ -546,7 +546,8 @@
 			"x": 579335.9317970247,
 			"y": 1304261.8907457609,
 			"anchorNode": null,
-			"sizeMult": 2
+			"sizeMult": 2,
+			"allZoom": true
 		},
 		{
 			"id": "X13",

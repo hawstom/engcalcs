@@ -1850,6 +1850,12 @@
 					// what a user comparing two runs actually wants.
 					var stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0,
 						convAccuracy = null, convUnknown = false;
+					// **WHAT THE RUN COST THE THREAD, WITHOUT THE WAITING BETWEEN SLICES** (Task
+					// 653). The wall clock js/lpn-time.js takes around a run also counts whatever
+					// else the page did while the run was yielding -- on opening a project that is
+					// the whole label pass, and it made a 100 ms run read as three seconds. This is
+					// the sum of the slices alone, which is the cost the next edit would pay again.
+					var busyMs = 0;
 					function noteStep(tNow, c) {
 						stepsRun++;
 						if (c.converged === null) { convUnknown = true; return; }
@@ -1932,8 +1938,9 @@
 						if (!rateOn) { finish(shutdown()); return; }
 						tell(runSpan);
 						setTimeout(function () {
-							var report = shutdown();
+							var read0 = nowMs(), report = shutdown();
 							fillReactionRates();
+							busyMs += nowMs() - read0;
 							finish(report);
 						}, 0);
 					}
@@ -1953,6 +1960,7 @@
 							firstUnconvergedTime: firstBadT,
 							relativeError: worstRelErr,
 							accuracy: convAccuracy,
+							busyMs: busyMs,
 							frames: frames,
 							duration: duration, reportStart: reportStart, reportStep: reportStep,
 							quality: qualOn ? (model.quality || null) : null,
@@ -2015,6 +2023,7 @@
 								if (nowMs() - slice0 >= sliceMs) { break; }
 							}
 						} catch (e) { failed(e); return; }
+						busyMs += nowMs() - slice0;
 						if (!finished) { tell(fractionNow()); setTimeout(qslice, 0); return; }
 						done();
 					}
@@ -2118,6 +2127,7 @@
 							failed(e);
 							return;
 						}
+						busyMs += nowMs() - slice0;
 						if (!finished) {
 							tell(fractionNow());
 							// setTimeout rather than a microtask ON PURPOSE: a microtask does not

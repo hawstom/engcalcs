@@ -1033,7 +1033,8 @@
 			"x": 37.18522150935664,
 			"y": 16.77663019270581,
 			"anchorNode": null,
-			"sizeMult": 4
+			"sizeMult": 4,
+			"allZoom": true
 		},
 		{
 			"id": "X7",
