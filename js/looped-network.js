@@ -33691,12 +33691,13 @@ var EngCalcs = EngCalcs || {};
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
 			if (mode === 'zoom-window') { setMode('select'); return; }
-			// **`zoomExtent` BY REFERENCE, so the click event would arrive as its `auto` argument if
-			// called directly** -- wrapped rather than passed, now that this handler does more than
-			// one thing. Left equivalent to before: a plain call with no `auto` flag, exactly what
-			// the toolbar always sent.
+			// **`zoomExtent(false)`, EXPLICITLY, never a bare call** -- view-memory-harness.js
+			// greps the whole file for an unmarked `zoomExtent()` on the argument that every real
+			// call site must SAY whether it is a fit nobody asked for (Tom, 2026-08-15: "there are
+			// no automatic zooms or pans... a fit that establishes a view the document never had is
+			// not a change to it"). This one is a press, which is an edit, so it says so.
 			if (zoomToolShape === 'fit') {
-				zoomExtent();
+				zoomExtent(false);
 				zoomToolShape = 'window';
 				paintZoomToolButton();
 				return;

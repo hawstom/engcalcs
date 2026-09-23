@@ -506,7 +506,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // EMPTY IN THE MARKUP: filled by wireZoomControl() in js/looped-network.js, through the
 		      // same icon+aria-label+tip door every toolbar icon button already uses
 		      // (EngCalcs.setIconLabel()), so this gets an accessible name and a touch-reachable tip
-		      // without a hand-written .ec-help. Registered in overlayOccupants() so a top-right
+		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
 		      // labels legend dodges under it instead of through it. ?>
 		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;display:flex;flex-direction:column;background:rgba(255,255,255,.85);border:1px solid #999">
 			<button type="button" id="lpn_zoom_in" style="display:block;width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
