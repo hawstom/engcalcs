@@ -273,8 +273,16 @@ function main() {
 				file + ' ' + a.tag + ': the drawing settles, it is not reshuffled',
 				mv.compared + ' drawn before, ' + mv.moved + ' of them settle elsewhere ('
 					+ (mv.compared ? (100 * mv.moved / mv.compared).toFixed(1) : '0') + '%)');
-			report(tn.byDrop === 0, file + ' ' + a.tag + ': NOT ONE label is hidden for want of a place',
-				to.byDrop + ' -> ' + tn.byDrop + '; ' + tn.byCross + ' still hidden by the crossing shed');
+			// **AND SINCE 2026-09-22 THIS IS AN EQUALITY, NOT A ZERO, AND THE CHANGE IS THE POINT.**
+			// Tom ruled that a longer leader beats giving a PROPERTY up -- so the widened search is
+			// offered only to a label that HAS a property to give, and a drawing showing the node ID
+			// alone, which is what these columns are, is deliberately placed as it always was. The
+			// assertion that says so is that the rescue-off and rescue-on counts are IDENTICAL: the
+			// gate in nodeFirstFitSpec() is holding, and an ID-only drawing did not move. The rescue
+			// itself is exercised by the fixtures at the head of this file and by
+			// label-drop-order-harness.js, which runs it on the three-property drawing it is for.
+			report(tn.byDrop === to.byDrop, file + ' ' + a.tag + ': one value on the label, so the rescue is not offered and nothing moves',
+				to.byDrop + ' -> ' + tn.byDrop + '; ' + tn.byCross + ' hidden by the crossing shed');
 		});
 	});
 	console.log('\n  ALL EXAMPLES, four views each');
@@ -294,9 +302,9 @@ function main() {
 	// different rule with a different reason (section 11a) and is untouched here; the count is
 	// printed rather than asserted, because lowering it is his decision and not this one's.
 	const his = grand['ID + 12345678'];
-	report(his.onDrop === 0, 'his test: NOT ONE label anywhere is hidden for want of a place',
-		his.offHidden + ' hidden before, ' + his.onHidden + ' now, and all ' + his.onCross
-			+ ' of those are the crossing shed');
+	report(his.onHidden === his.offHidden, 'his test: an ID-only drawing is placed as it always was',
+		his.offHidden + ' hidden before, ' + his.onHidden + ' now, of which ' + his.onCross
+			+ ' are the crossing shed and ' + his.onDrop + ' are for want of a place');
 	passLevelCheck();
 	// Determinism: the same drawing twice, byte for byte.
 	const a1 = child(FILES[0], 'on', '12345678'), a2 = child(FILES[0], 'on', '12345678');

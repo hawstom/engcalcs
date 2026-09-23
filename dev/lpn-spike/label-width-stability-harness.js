@@ -123,15 +123,12 @@ function partOne(Collide, quiet) {
 // go red on any placement change that did not make the drawing worse. Measured 2026-09-18 on
 // Net3-World with the node ID alone and every repair route on. The zooms are the fit scale and
 // three steps in; the count is node labels choosing a different candidate than they did at `1=`.
-// **RE-MEASURED 2026-09-22, AND THE FOUR ZOOMS MOVED IN OPPOSITE DIRECTIONS.** A label that cannot
-// fit near its node now takes a longer leader instead of giving a property up (Tom's ruling that
-// day; `labelWidenSearch` carries it), which puts 22 more labels on the FIT view of this example --
-// 69 drawn becomes 91 with the node ID alone. More labels on the drawing is more labels in each
-// other's way, so the fit-view column rises (27 -> 33, 44 -> 46) while every zoom in from it FALLS,
-// two of them to zero: x2 goes 20 -> 11, 25 -> 13, 28 -> 15, and x4 and x8 are 0 across the board
-// where they were allowed 2, 4, 8 and 2. Set to the measured numbers rather than left slack, so the
-// three that improved are now held there. May fall, may not rise.
-const CEILING = { '12=': [33, 11, 0, 0], '123=': [46, 13, 0, 0], '1234=': [47, 15, 0, 0] };
+// **LOWERED 2026-09-22, ON THE DAY'S LEADER WORK.** The slide can now see the free link labels'
+// boxes and a label about to be hidden gives a value up first, and between them the drawing settles
+// harder: x1 goes 27 -> 8, 44 -> 15 and 49 -> 11, x2 goes 20 -> 9, 25 -> 11 and 28 -> 14, and x4 and
+// x8 are 0 across the board where they were allowed 2, 4, 8 and 2. Set to the measured numbers, so
+// every one of those is now held there.
+const CEILING = { '12=': [8, 9, 0, 0], '123=': [15, 11, 0, 0], '1234=': [11, 14, 0, 0] };
 
 function measureChild(prefix) {
 	const r = spawnSync(process.execPath, [__filename, '--measure', prefix],
