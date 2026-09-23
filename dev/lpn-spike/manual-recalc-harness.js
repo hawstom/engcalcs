@@ -74,9 +74,10 @@ const ARRIVAL_GATE = "\t\tif (settings.autoRun === false) {\n" +
 // The line that KEEPS the old answers is an absence, and an absence cannot be deleted -- so this
 // mutation puts the clearing back instead, which is the page as it shipped earlier on 2026-09-19,
 // and the retention assertions are required to fail against it.
-const STAND_DOWN = "\t\tif (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }\n\t}\n";
+// (Anchored on the line after it since 2026-09-22, when afterManualEdit() gained the table refresh.)
+const STAND_DOWN = "\t\tif (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }\n\t\t// **AND THE TABLE ON SHOW";
 const STAND_DOWN_AND_CLEAR = "\t\tif (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }\n" +
-	"\t\tlastSolveResult = null;\n\t}\n";
+	"\t\tlastSolveResult = null;\n\t\t// **AND THE TABLE ON SHOW";
 
 let fails = 0;
 function ok(name, cond, extra) {

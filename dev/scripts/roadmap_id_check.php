@@ -79,7 +79,14 @@ $offTier = array();
 // ships when its branch is merged and not before, so a dated holding pen answers a question nobody
 // has. Removed from here and from ROADMAP.md's header table in the same edit, which is what its own
 // note said to do.
-$TIERS = array(0, 5, 25, 50, 75, 100);
+//
+// **99 IS A SIXTH TIER AND IT IS TOM'S, ADDED 2026-09-23 ON HIS OWN INSTRUCTION** (*"Demote to 99
+// (to narrow our priorities): 610, 676, 679, 680, 685, 539, 681. Make the heading ## 100 and 99 --
+// Next."*). It is NOT the retired 95 wearing a new number. 95 was a dated holding pen for work
+// deferred past one event; 99 is a permanent SECOND RANK INSIDE Next -- the same band, read in two
+// passes, so that "what am I working on" has a short answer while nothing is demoted out of Next
+// and quietly forgotten. Both sit under one heading in ROADMAP.md for that reason.
+$TIERS = array(0, 5, 25, 50, 75, 99, 100);
 
 foreach ($files as $which => $p) {
     $lines = file($p, FILE_IGNORE_NEW_LINES);
@@ -198,7 +205,8 @@ if ($offTier) {
         printf("    %-7s line %-6d Task %-8s prio %-4s %s\n",
                $h['file'], $h['line'], $h['id'], $h['priority'], $h['title']);
     }
-    echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 Next, 75 Soon,\n";
+    echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 and 99 Next,\n";
+    echo "75 Soon,\n";
     echo "50 Someday, 25 Maybe, 5 Parked, 0 Closed. (A temporary 95 tier parked work past EWB for\n";
     echo "one day and was retired on 2026-09-12: branch work needs no parking.)\n";
     echo "Pick the tier that is TRUE, never the nearest one: a task at 60 is a 75 you are hedging\n";

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2019,
-        "delta_key_count": 172,
+        "expected_key_count": 2022,
+        "delta_key_count": 176,
         "exempt_key_count": 39,
         "exempt_keys": [
             "calc_units_us",
@@ -563,6 +563,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_ts_menu": "Time series",
@@ -627,6 +629,7 @@
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
         "lpn_mapgeo_dial_turn": "Rotate the map",
@@ -641,6 +644,7 @@
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -737,6 +741,8 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_ts_menu": "Time series",
@@ -801,6 +807,7 @@
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
         "lpn_mapgeo_dial_turn": "Rotate the map",
@@ -815,6 +822,7 @@
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
         "lpn_settings_label_always": "Always show labels",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
@@ -1403,6 +1411,38 @@
                     "key": "lpn_file_import_geo_tip",
                     "value": "Apre un file di progetto o un file EPANET in una nuova scheda di progetto su questa pagina, sulla mappa stradale. Colloca tu stesso il disegno sul mondo: sposta e ingrandisci fino al sito, poi ridimensiona e ruota per adattarlo. Se la x e la y nel file sono già una longitudine e una latitudine, premi il pulsante Sono già lat\/lon e la rete salta direttamente dove appartiene. Ogni numero che hai digitato resta com'è.",
                     "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                }
+            }
+        },
+        "lpn_pane_not_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_text_attached",
+                    "value": "Collegato",
+                    "english": "Attached"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_filter_note",
+                    "value": "Filtrato per {q}. Mostrati {n} di {all}.",
+                    "english": "Filtered by {q}. Showing {n} of {all}."
+                }
+            }
+        },
+        "lpn_pane_goto_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Stampa tabella",
+                    "english": "Print table"
                 }
             }
         },
@@ -2430,6 +2470,22 @@
                 }
             }
         },
+        "lpn_mapgeo_readjust_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Rimuovere l'immagine di sfondo?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Fai clic su due punti dell'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
         "lpn_mapgeo_hint2": {
             "reason": "missing",
             "current_value": null,
@@ -2651,6 +2707,22 @@
                     "key": "lpn_settings_symbol_opacity",
                     "value": "Opacità dei simboli (da 0 a 1)",
                     "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_time_clock_day": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Orario di inizio",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_format_tip",
+                    "value": "Scrivi un orario come ore e minuti, ad esempio 2:30. Un numero semplice indica le ore, quindi 8 significa otto ore. Mezz'ora è 0:30.",
+                    "english": "Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30)."
                 }
             }
         },

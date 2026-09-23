@@ -313,8 +313,10 @@ async function group(title, mutate) {
 	// Mutation B: updateNode() no longer refreshes content even when told to.
 	console.log('\n-- live mutation: updateNode(id, true) stops refreshing content (Item 1a) --');
 	{
-		const FROM = "\t\tif (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }\n\t\tscheduleSolve();\n\t}";
-		const TO = "\t\tscheduleSolve();\n\t}";
+		// The line moved a level deeper when Task 690 wrapped updateNode()'s writes in a
+		// canvas-measurement hold; it is the same line and the same mutation.
+		const FROM = "\t\t\tif (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }\n";
+		const TO = "";
 		const page = openPage(function (src) {
 			if (src.indexOf(FROM) < 0) { throw new Error('updateNode() has moved; update mutation B'); }
 			return src.replace(FROM, TO);

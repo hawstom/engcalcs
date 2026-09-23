@@ -1679,7 +1679,6 @@ $ec_lang['lpn_tool_area_tip']='Kliknite na kartu prema uputama da odaberete sve 
 $ec_lang['lpn_area_selected']='{n} odabrano.';
 $ec_lang['lpn_area_none']='Ništa nije pronađeno u tom području.';
 $ec_lang['lpn_georef_tab_locked']='Završite postavljanje gumbom \'Zadrži ovo postavljanje\' ili pritisnite Odustani prije nego što promijenite projekt. Postavljanje pripada ovom projektu i ne može vas pratiti u drugi.';
-$ec_lang['lpn_pane_paste_note']='Ova tablica je namijenjena za unos vrijednosti lijepljenjem iz proračunske tablice u retke koji već postoje. Ako to ne zadovoljava vaše potrebe, upotrijebite Pomoć, Prijavi problem da nam kažete.';
 $ec_lang['lpn_pane_filter_note']='Filtrirano po {q}. Prikazano {n} od {all}.';
 $ec_lang['lpn_pane_filter_clear']='Prikaži sve';
 $ec_lang['lpn_pane_filter_none']='Ništa u ovoj tablici ne odgovara filtru.';

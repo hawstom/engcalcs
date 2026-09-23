@@ -1675,7 +1675,6 @@ $ec_lang['lpn_tool_area_tip']='Klikněte na mapu podle pokynů a vyberte vše uv
 $ec_lang['lpn_area_selected']='{n} vybráno.';
 $ec_lang['lpn_area_none']='V této oblasti nebylo nic nalezeno.';
 $ec_lang['lpn_georef_tab_locked']='Dokončete umístění tlačítkem „Ponechat toto umístění“ nebo stiskněte Zrušit, než přepnete projekt. Umístění patří tomuto projektu a nemůže vás následovat do jiného.';
-$ec_lang['lpn_pane_paste_note']='Tato tabulka slouží k zadávání hodnot vložením z tabulkového procesoru do řádků, které již existují. Pokud vám to nevyhovuje, použijte Nápověda, Opravit něco a dejte nám vědět.';
 $ec_lang['lpn_pane_filter_note']='Filtrováno podle {q}. Zobrazeno {n} z {all}.';
 $ec_lang['lpn_pane_filter_clear']='Zobrazit vše';
 $ec_lang['lpn_pane_filter_none']='Ničemu v této tabulce filtr neodpovídá.';

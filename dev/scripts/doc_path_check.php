@@ -1,6 +1,7 @@
 <?php
 /**
- * doc_path_check.php — every path CLAUDE.md cites is a file that exists. BLOCKING.
+ * doc_path_check.php — every path cited by CLAUDE.md, dev/session-handoff.md and .claude/agents/*.md
+ * is a file that exists. BLOCKING. (Widened 2026-09-23: all three are read before any work starts.)
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -144,35 +145,43 @@ if (defined('DOC_PATH_LIB_ONLY')) {
 
 $root = dirname(__DIR__, 2);
 $verbose = in_array('-v', $argv, true) || in_array('--verbose', $argv, true);
-$doc = $root . '/CLAUDE.md';
-if (!is_file($doc)) {
-    echo "doc_path_check: CLAUDE.md is missing from " . $root . "\n";
-    exit(1);
+
+// The files a session or an agent reads BEFORE doing anything: CLAUDE.md, the handoff it points
+// at first, and each agent's own definition. A dead pointer in any of them sends a cold reader to
+// nothing. Every other dev/*.md is out of scope, because its dead citations are mostly history.
+$docs = array_merge(['CLAUDE.md', 'dev/session-handoff.md'],
+    array_map(function ($f) use ($root) { return substr($f, strlen($root) + 1); },
+        glob($root . '/.claude/agents/*.md') ?: []));
+
+$dead = [];
+$ok = 0;
+$skipped = ['not-a-path' => 0, 'url' => 0, 'outside' => 0];
+$resolved = [];
+foreach ($docs as $rel) {
+    if (!is_file($root . '/' . $rel)) {
+        if ($rel === 'CLAUDE.md') { echo "doc_path_check: CLAUDE.md is missing from $root\n"; exit(1); }
+        continue;
+    }
+    $report = ecResolveCitations(file_get_contents($root . '/' . $rel), $root);
+    foreach ($report['dead'] as [$path, $line]) { $dead[] = [$rel, $path, $line]; }
+    foreach ($report['ok'] as $r) { $resolved[] = "$rel: $r"; }
+    $ok += count($report['ok']);
+    foreach ($skipped as $k => $n) { $skipped[$k] = $n + ($report['skipped'][$k] ?? 0); }
 }
 
-$report   = ecResolveCitations(file_get_contents($doc), $root);
-$dead     = $report['dead'];
-$resolved = $report['ok'];
-$ok       = count($resolved);
-$skipped  = $report['skipped'];
-
 if ($dead) {
-    echo 'CLAUDE.md cites ' . count($dead) . " path(s) that do not exist\n\n";
-    foreach ($dead as [$path, $line]) { echo sprintf("  CLAUDE.md:%d  %s\n", $line, $path); }
-    echo "\nCLAUDE.md is read at the start of every session and is almost all pointers. A pointer at\n";
-    echo "a file that is gone does not fail loudly -- the reader concludes the rule was withdrawn,\n";
+    echo count($dead) . " cited path(s) do not exist\n\n";
+    foreach ($dead as [$rel, $path, $line]) { echo sprintf("  %s:%d  %s\n", $rel, $line, $path); }
+    echo "\nThese files are read first, by every session or agent, and are mostly pointers. A pointer\n";
+    echo "at a file that is gone does not fail loudly -- the reader concludes the rule was withdrawn,\n";
     echo "or invents what the missing file said.\n";
-    echo "\nFIX, in the order to try them:\n";
-    echo "  - the file MOVED: update the citation to where it is now;\n";
-    echo "  - the file was DELETED and its rule still stands: move the rule's substance into\n";
-    echo "    CLAUDE.md, or into the file that replaced it, and cite that;\n";
-    echo "  - the file was deleted and the rule went with it: delete the sentence. A correction\n";
-    echo "    SUBSTITUTES the superseded text; it never appends to it.\n";
+    echo "\nFIX: if the file moved, update the citation; if it was deleted and its rule stands, cite\n";
+    echo "where the rule lives now; if the rule went with it, delete the sentence.\n";
     echo "Do not silence this by removing the backticks.\n";
     exit(1);
 }
 
-echo "CLAUDE.md paths OK -- $ok cited path(s) resolve, none dead.\n";
+echo "Start-of-session docs' paths OK -- $ok cited path(s) across " . count($docs) . " file(s) resolve, none dead.\n";
 echo sprintf("  not read as paths: %d code/prose run(s), %d URL(s), %d outside this repo"
     . " (absolute or ~, e.g. the librewaternet.org sibling).\n",
     $skipped['not-a-path'], $skipped['url'], $skipped['outside']);

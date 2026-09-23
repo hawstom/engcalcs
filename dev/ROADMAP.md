@@ -7,11 +7,17 @@ standing prose that is not a task.
 | Priority | Means |
 |---|---|
 | **100** | **Next.** Being worked, or the thing to pick up on finishing something. |
+| **99** | **Next, second rank.** In Next, not being worked this week. Narrows what 100 means. |
 | **75** | **Soon.** Real, wanted, queued behind Next. |
 | **50** | **Someday.** Agreed worth doing; nothing is waiting on it. |
 | **25** | **Maybe.** Worth keeping; not obviously worth doing. |
 | **5** | **Parked.** Alive only so it is not re-proposed from scratch. |
 | **0** | **Closed** — the block moves to `dev/roadmap-closed-ids.md` in the same edit. |
+
+**99 IS TOM'S OWN SIXTH TIER, ADDED 2026-09-23** (*"Demote to 99 (to narrow our priorities)"*). It
+is NOT the retired 95: 95 was a dated holding pen for work parked past one event, where 99 is a
+permanent second rank INSIDE Next, so that "what am I working on" has a short answer and nothing
+falls out of Next to be forgotten. Both live under one heading below.
 
 **NO TASK MAY SIT AT ANY OTHER NUMBER** (Tom, 2026-09-12: *"the system has been completely lost.
 Restore it... No tasks are allowed at any other priority tiers."*). **Five values again: the
@@ -59,6 +65,8 @@ the block.
 
 # Tasks
 
+## 100 and 99 — Next.
+
 - 25|672| **The placement wizard degrades and then crashes after a few pans.**
   **DROPPED TO 25 BY TOM, 2026-09-15: *"This is not manifesting. If it does, I will report."*** Kept
   rather than closed because the instrument built for it is the valuable part and should not be
@@ -73,7 +81,7 @@ the block.
     SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
-- 100|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
+- 99|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
   **PHASE 1 SHIPPED 2026-09-16: the solve and the label layout are kept, and the switch is 38%
   faster.** Measured in real Chrome on the geographic Net3 at his own zoom: **636 ms to 395 ms
   median**, `lblPlace` 210 ms and `fontSizes` 65 ms gone entirely, **label passes 1 -> 0 and label
@@ -116,7 +124,7 @@ the block.
     changed" already exists for the dirty asterisk. That alone does not fix the delay -- Tom
     measured that turning auto-run off changes nothing -- but it is waste with a cheap remedy.
 
-- 100|681| **Economize the label layout: it is half the cost of a project switch.**
+- 99|681| **Economize the label layout: it is half the cost of a project switch.**
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
     switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
@@ -231,7 +239,7 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 100|685| **Name every unit dropdown for a screen reader.**
+- 99|685| **Name every unit dropdown for a screen reader.**
   **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
   survey's finding.
   - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
@@ -246,6 +254,9 @@ the block.
     out to need new words, stop -- that is a different decision and a different price.
 
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
+  undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,
+  fill-down, multi-cell selection.
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not
@@ -288,51 +299,6 @@ the block.
   - Read with `dev/ROADMAP.md` Task 616 (a prompt history in the banner area, parked at 5 by Tom)
     and Task 622. **616 is the same idea arriving from the other direction** and should probably be
     folded in here rather than left parked separately; that is his call, not ours.
-
-- 100|688| **File, Convert units as: US to work in, SI to hand over.**
-  Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
-  are done, we want to convert to SI for the community."* Put to him that this collides with a rule
-  he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
-  - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
-    knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
-    SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
-    the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
-    authority on the other side.
-  - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
-    There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
-    happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
-    does not: the original project is untouched and a new one is produced. So this row joins the
-    **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
-    and behave alike -- a file picker, or a duplicate tab named for the original.
-  - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
-    what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
-    the project because declarative storage makes a bare number meaningless without it. So a
-    conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
-  - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
-    `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
-    be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
-  - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
-    original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
-  - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
-
-- 100|693| **Separate Length and Map coordinates units**
-  Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
-  Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
-  Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
-  is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
-  - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
-    project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
-    geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
-    unit, which need not be the one pipes are measured in.
-  - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
-    'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
-    an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
-    rest of this page treats a number it knows rather than one the user states.
-  - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
-    convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
-    DISPLAY of what the coordinate system already says, never an input that rewrites anything.
-  - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
-    Save-as side.
 
 - 50|694| **Export a map animation as an animated picture.**
   Tom, 2026-09-18: *"It would be very fun to export a map animation to a gif. And I bet it would not
@@ -419,6 +385,70 @@ the block.
       project to their selected CRS without further question. But we step them through Steps 1 and 2
       in case they want to make any changes."* So the steps stay, and they open ALREADY ANSWERED
       from the existing attachment rather than asking again from nothing.
+  - **TOM MERGED 688 AND 693 INTO THIS ONE, 2026-09-23** (*"Combine: 693 and 688 with 696 as a
+    single wizard"*), and his shape for the merged row is: *"(a) Project and units (maybe this one
+    menu row as 'Convert as...' can handle both units and coordinates), (b) step 1 (if CRS changed),
+    (c) step 2 (if CRS changed)."* **So there is ONE menu row, `File, Convert as...`, and the
+    placement steps appear only when the coordinate system actually changed.** Units alone is then
+    the cheap path through the same door, which is what made the two separate rows look wrong to him.
+  - **AND THE DEFECT THAT PROMPTED IT, WHICH IS THE BUG TO FIX FIRST** (his words, 2026-09-23): the
+    wizard *"is out of date with our current CRS paradigm, because for a 'lat/lon' (EPSG?) project,
+    it exits with the message 'This project is already on lat/lon'"*. That refusal is
+    `mapgeoStart()`'s `lpn_georef_on_map`, and under his own settled vocabulary it is simply wrong:
+    lat/lon is EPSG:4326, one coordinate system among hundreds, so "you are already on lat/lon" is
+    not a reason to refuse to convert TO something else. **The first thing the wizard must ask is
+    which coordinate system we are going to.**
+  - **HE SUSPECTS HE MET THIS IN HIS OWN WORDING PASS** (*"I think I pressed the problem here in my
+    lang edits"*) -- and he did: `lpn_crs_unplaceable` and `lpn_crs_unplaceable_mark` are the two
+    keys he answered with *"Please explain to me what this is in response to."* Answer those when
+    this is built; they are the same paradigm gap seen from the string side.
+
+### ABSORBED: Task 688, File, Convert units as (his agreement on file)
+
+    Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
+    are done, we want to convert to SI for the community."* Put to him that this collides with a rule
+    he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
+    - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
+      knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
+      SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
+      the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
+      authority on the other side.
+    - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
+      There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
+      happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
+      does not: the original project is untouched and a new one is produced. So this row joins the
+      **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
+      and behave alike -- a file picker, or a duplicate tab named for the original.
+    - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
+      what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
+      the project because declarative storage makes a bare number meaningless without it. So a
+      conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
+    - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
+      `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
+      be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
+    - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
+      original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
+    - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
+
+### ABSORBED: Task 693, Separate Length and Map coordinates units
+
+    Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
+    Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
+    Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
+    is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
+    - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
+      project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
+      geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
+      unit, which need not be the one pipes are measured in.
+    - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
+      'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
+      an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
+      rest of this page treats a number it knows rather than one the user states.
+    - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
+      convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
+      DISPLAY of what the coordinate system already says, never an input that rewrites anything.
+    - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
+      Save-as side.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -440,7 +470,7 @@ the block.
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
 
-- 100|679| **Narrower strokes on the About mark, and more pixels used.**
+- 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
   the outlines."*
@@ -460,7 +490,7 @@ the block.
     where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
     elements, not a line -- that is the drawing note, and it is his, not ours.
   - **Part of the one water-tower piece of work with Tasks 645 and 648** (Tom, 2026-09-21).
-- 100|676| **Watch the sites, and send a derived weekly report.**
+- 99|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
   diagnosis, and the things deliberately NOT to do: `dev/reputation-and-practice.md`.
@@ -715,7 +745,7 @@ the block.
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
-- 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+- 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
   recommendations."* Record, ranked list, per-runner audit: `dev/enforceable-rules-survey.md`.
   - **HALF A IS DONE.** 78 enforced, 4 left (rows 13, 14, 22, 23), each stating why no blocking
@@ -732,7 +762,7 @@ the block.
     29 keys reaching the tip helpers' `title=""` were unbound by rule B.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
-- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
+- 99|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
   `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
   write up** -- so the branch waits on his reading, not on more building.
@@ -1206,7 +1236,7 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 100|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+- 99|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
   performance win read as the bigger story: it is his top item *"because the network has to exist
   first."*

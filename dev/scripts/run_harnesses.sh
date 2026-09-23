@@ -50,23 +50,91 @@ if [ "$ASKED" -eq 0 ]; then
 	exit 1
 fi
 
-echo "$ASKED harness file(s) to run."
-RAN=0
-FAILED=""
+# **THEY RUN SEVERAL AT A TIME NOW, AND THE ACCOUNTING DID NOT MOVE** (2026-09-23). 241 harnesses
+# ran strictly one after another on a four-core box, so three cores sat idle through the longest
+# phase of check_all.sh -- and because every check_all in this project goes through one flock, that
+# serial phase is what a second worker waits behind. Measured here on 24 pure-node harnesses, on a
+# machine ALREADY running three other suites: 80 s serial against 50 s at three at a time. The gain
+# on an idle machine is larger; 1.6x is the loaded, conservative number and is the one to quote.
+#
+# **THE ELEVEN THAT DRIVE A REAL BROWSER STILL RUN ONE AT A TIME**, and which those are is DERIVED
+# from the source rather than typed -- a harness naming puppeteer, playwright or chromium is
+# exclusive. A typed list would go stale the first time somebody wrote a twelfth, and the failure
+# would be three Chromiums on a 7 GB box, which looks like a slow machine rather than a mistake.
+# That is the same reasoning lpn_furniture_check.php's derived key list already rests on.
+#
+# **OUTPUT STAYS IN GLOB ORDER AND STAYS WHOLE.** Each harness writes to its own file and the files
+# are printed in order afterwards, so a parallel run reads exactly like a serial one and two
+# harnesses cannot interleave mid-line. The `=== file ===` banner, the 300 s timeout, the 124
+# timeout note, the N/N last line and the FAILED list are all unchanged -- this script's whole
+# reason for existing is that it counts what it was ASKED for and not what it reached, and that
+# property is not something a speed change may weaken.
+#
+# ENGCALCS_HARNESS_JOBS overrides the pool size; 1 restores the old strictly-serial behaviour
+# exactly, which is the first thing to try if a harness starts failing only in company.
+JOBS="${ENGCALCS_HARNESS_JOBS:-}"
+if [ -z "$JOBS" ]; then
+	CORES="$(nproc 2>/dev/null || echo 2)"
+	JOBS=$((CORES - 1))
+	[ "$JOBS" -lt 1 ] && JOBS=1
+	[ "$JOBS" -gt 3 ] && JOBS=3
+fi
+
+OUT="$(mktemp -d)"
+trap 'rm -rf "$OUT"' EXIT INT TERM
+
+echo "$ASKED harness file(s) to run, $JOBS at a time (browser harnesses one at a time)."
+
+# One harness, into its own output file. Writes an empty marker file beside it when it FAILED, so
+# the parent can tell a failure from a pass without a shared variable a subshell cannot write to.
+run_one() {
+	_f="$1"; _o="$2"
+	{
+		echo "=== $_f ==="
+		if $RUN_ONE node "$_f" 2>&1; then
+			:
+		else
+			_s=$?
+			# 124 is timeout(1)'s own code for "the command was still running".
+			if [ "$_s" -eq 124 ]; then
+				echo "TIMED OUT after 300 s -- this harness did not exit. See the note at the head of"
+				echo "run_harnesses.sh: the usual cause is an async main() that returns instead of"
+				echo "calling process.exit(), while the EPANET engine holds the event loop open."
+			fi
+			: > "$_o.failed"
+		fi
+	} > "$_o" 2>&1
+}
+
+N=0
+PENDING=0
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
-	echo "=== $f ==="
-	if $RUN_ONE node "$f"; then
-		RAN=$((RAN + 1))
+	N=$((N + 1))
+	if grep -qE 'puppeteer|playwright|chromium' "$f" 2>/dev/null; then
+		# Exclusive: let the pool drain first, then run it alone.
+		[ "$PENDING" -gt 0 ] && wait
+		PENDING=0
+		run_one "$f" "$OUT/$N"
 	else
-		STATUS=$?
-		# 124 is timeout(1)'s own code for "the command was still running".
-		if [ "$STATUS" -eq 124 ]; then
-			echo "TIMED OUT after 300 s -- this harness did not exit. See the note at the head of"
-			echo "run_harnesses.sh: the usual cause is an async main() that returns instead of"
-			echo "calling process.exit(), while the EPANET engine holds the event loop open."
-		fi
+		run_one "$f" "$OUT/$N" &
+		PENDING=$((PENDING + 1))
+		if [ "$PENDING" -ge "$JOBS" ]; then wait; PENDING=0; fi
+	fi
+done
+wait
+
+RAN=0
+FAILED=""
+N=0
+for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
+	[ -f "$f" ] || continue
+	N=$((N + 1))
+	[ -f "$OUT/$N" ] && cat "$OUT/$N"
+	if [ -f "$OUT/$N.failed" ]; then
 		FAILED="$FAILED $(basename "$f")"
+	else
+		RAN=$((RAN + 1))
 	fi
 done
 
@@ -75,6 +143,8 @@ echo "$RAN/$ASKED lpn harnesses passed."
 if [ -n "$FAILED" ]; then
 	echo "FAILED:$FAILED"
 	echo "A harness that exits non-zero on its first line is usually calling something that MOVED."
+	echo "If it passes alone but fails in company, the pool is the suspect: re-run with"
+	echo "ENGCALCS_HARNESS_JOBS=1 to get the old strictly-serial behaviour and compare."
 	exit 1
 fi
 exit 0

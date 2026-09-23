@@ -89,6 +89,13 @@
             "words": "feat/map-menu: (1) I believe this is done now. Great decisions and great execution. Merge and delete branch.",
             "context": "Cleared in his 2026-09-22 message, after his R-126/R-127/R-128 round. In the same breath he asked two questions that do NOT gate the merge and are being answered separately: what the missing 'discard a grid placement' case actually is, and a terminology synchronisation (EPSG, unnamed local georeference, not georeferenced -- lat/lon retired as a label). He also confirmed 'Only three rows left. Zoom to fit, Background image, and World map.'",
             "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words."
+        },
+        "feat/tables-spreadsheet": {
+            "head": "17b902028c65c243059c2847b3aa38dcba847d25",
+            "date": "2026-09-23",
+            "words": "feat/tables-spreadsheet\n- Done. Merge and delete branch.",
+            "context": "Said after his pass over the fixes for R-110 (unreasonable column widths), R-161 (the 1px divider misalignment) and R-162 (print not respecting on-screen widths), in the same message as his rulings on feat/zoom-scale-rules, feat/notice-log and Settings undo.",
+            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words. The branch was 94 commits behind master and was deliberately not re-merged from master first, which would have moved the head and lapsed the approval."
         }
     }
 }

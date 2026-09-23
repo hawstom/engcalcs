@@ -377,34 +377,22 @@ console.log('\n--- six tabs, one renderer ---');
 		'the junction-specific tip and empty message are retired, not left beside the generic ones');
 }
 
-// ---- the paste note, said once for the table -------------------------------------------------
-console.log('\n--- the Tables pane says what it is for ---');
+// ---- no standing note above the table ---------------------------------------------------------
+console.log('\n--- no standing note above the table ---');
 {
-	// Tom, 2026-09-08, asked for a note "to the effect that this table is intended to be ready for
-	// asset entry and creation by pasting from a spreadsheet". The shipped sentence says "rows that
-	// already exist", because panePasteAt() cannot grow the table -- his own wording describes the
-	// feature's next phase and would be false today.
-	//
-	// **IT IS A NOTE ON THE PANEL, NOT A TIP ON THE TAB.** The Curves library teaches this exact
-	// workflow the same way, and a hover tip on the tab strip is the easiest thing on the page to
-	// miss. Asserted as PLACEMENT because that is the half a later tidy-up would undo.
-	const noteBody = fnBody('renderPaneTable');
-	report(/pc\.lpn_pane_paste_note/.test(noteBody), 'renderPaneTable() renders the paste note');
-	report(php.indexOf('lpn_pane_paste_note:') > 0, '...and the page supplies the key');
-	// **BEFORE the empty-table early return**, so a reader who opens a blank tab -- which is exactly
-	// when somebody has a spreadsheet open -- is told the rows have to be there first.
-	report(noteBody.indexOf('lpn_pane_paste_note') < noteBody.indexOf('if (!rows.length)'),
-		'...above the empty-table message, so a blank tab carries it too');
-	// And live, on a real render. This section changes no document state: a later section counts
-	// the rows of every table and would fail on anything this one added or removed.
+	// Tom, 2026-09-21: *"There is a message about 'rows that already exist'. When I scroll past the
+	// last visible row, that message disappears, and the headings jump upward. This is startling.
+	// The message uses precious head room."* The note and its key are gone; this holds both.
 	L.renderTable('junctions');
 	const panel = document.getElementById(L.paneTableById('junctions').panel);
-	const shown = (panel.childNodes || []).map((c) => c.textContent || '').join(' ');
-	report(shown.indexOf(PC.lpn_pane_paste_note) >= 0, 'and a rendered table really carries it');
-	// It must not have been folded into lpn_pane_none, which six Library sections share and where
-	// five of the six create rows by an Add button, not by paste.
+	const first = (panel.childNodes || [])[0];
+	report(!/lpn_pane_paste_note/.test(src + php), 'the paste note and its key are retired, not merely hidden');
+	// No junctions exist yet at this point, so the panel holds the empty message -- and ONLY that.
+	const kids = panel.childNodes || [];
+	report(kids.length === 1 && first._tag === 'p' && first.textContent === PC.lpn_pane_none,
+		'an empty table says only that it is empty: no second paragraph above it', kids.map((k) => k._tag).join(','));
 	const langEn = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
-	report(/\$ec_lang\['lpn_pane_none'\]='This network has none of these yet\.';/.test(langEn),
+	report(/\$ec_lang\['lpn_pane_none'\]=/.test(langEn),
 		'lpn_pane_none is untouched -- it is shared with six Library sections that create rows by a button');
 }
 
@@ -475,17 +463,28 @@ console.log('\n--- each table lists exactly its own type ---');
 		'a pipe’s From and To are read-only — re-drawing the pipe is how they change');
 	report(pipeCells.from.textContent === j1.id && pipeCells.to.textContent === j2.id,
 		'...and they name the right nodes', pipeCells.from.textContent + ' → ' + pipeCells.to.textContent);
-	// A pump has no editable scalar at all: what it is, is its curve.
-	// **THE THREE EXEMPTIONS ARE NOT SCALARS, WHICH IS WHY THE CLAIM SURVIVES THEM.** Active is
-	// whether this pump is in the network; Description and Tag are the identity band Tom ruled onto
-	// every table on 2026-09-15 (Task 674) -- what the asset is CALLED, not a number the pump has.
-	// A pump still has no editable number of its own, which is the fact this asserts.
+	// **THE PUMP TABLE MATCHES THE PUMP PROPERTIES, and this assertion used to say the opposite.**
+	// It read "a pump has no editable scalar at all: what it is, is its curve" and required every
+	// cell but Active, Description and Tag to be read-only. Tom struck that on 2026-09-18: *"Make
+	// the pump table match the pump properties; I see nothing special there, and I don't know why
+	// you asked."* The old claim was half right and the half it got wrong is the half that matters
+	// -- a curve genuinely is a document object edited in the Library, which is why the two curve
+	// columns are REFERENCES and carry no points; but a relative speed, a speed pattern, a price of
+	// power and its pattern are ordinary numbers and names, and a person entering forty pumps wants
+	// them in rows. Asserted from the POPUP's side rather than by listing columns here, so the two
+	// surfaces are held together rather than this file holding a third opinion.
 	L.renderTable('pumps');
 	const pumpCells = L.tableCells('pumps')[pu1.id];
-	const PUMP_NOT_SCALAR = { active: 1, desc: 1, tag: 1 };
-	report(Object.keys(pumpCells).every((k) => PUMP_NOT_SCALAR[k] || pumpCells[k]._tag === 'td'),
-		'every cell of the pump table but Active and the identity band is read-only — a pump IS its curve, and a curve lives in the popup',
-		Object.keys(pumpCells).filter((k) => !PUMP_NOT_SCALAR[k] && pumpCells[k]._tag !== 'td').join(','));
+	['speed', 'speedPattern', 'energyPrice', 'energyPattern', 'curveId', 'efficCurveId', 'closed']
+		.forEach(function (k) {
+			report(!!pumpCells[k], `the pump table has a ${k} cell, as the pump popup has that row`);
+		});
+	report(pumpCells.speed && pumpCells.speed._tag === 'input',
+		'...and the relative speed is editable, which is what "match the properties" means',
+		pumpCells.speed && pumpCells.speed._tag);
+	report(pumpCells.curveId && pumpCells.curveId._tag === 'select',
+		'...while the head curve is a REFERENCE chooser and never a table of points (Task 586)',
+		pumpCells.curveId && pumpCells.curveId._tag);
 	report(pumpCells.active && pumpCells.active.type === 'checkbox',
 		'...and Active is a checkbox on every table (Tom, 2026-09-08)');
 	// The valve's SETTING heading carries no unit, because the quantity differs per row.
@@ -664,13 +663,38 @@ console.log('\n--- heading and cells share one alignment ---');
 		const tds = tbody.children[0].children;
 		report(ths.length === cols.length && tds.length === cols.length,
 			spec.id + ': one heading and one cell per column', ths.length + ' / ' + tds.length);
-		const disagree = cols.filter((c, i) => ths[i].className !== tds[i].className);
-		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ classes',
+		// **THE ALIGNMENT CLASSES, NOT EVERY CLASS**, and the difference is real rather than a
+		// loosening. A cell that STATES A RULE instead of showing a value carries `lpn-pane-stated`
+		// and `ec-help` of its own -- the tank's mixing fraction where the model is not
+		// two-compartment, the valve's minor loss on a TCV -- and a heading never does, because the
+		// heading is not the thing that is inapplicable. Comparing whole class strings was only
+		// ever true because no fixture row had been a stated one; it is the ALIGNMENT that has to
+		// agree between a heading and its column, which is what this section is about.
+		const align = (el) => [NUM, FIRST].filter((k) => el.classList.contains(k)).join(' ');
+		const disagree = cols.filter((c, i) => align(ths[i]) !== align(tds[i]));
+		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ alignment',
 			disagree.map((c) => c.key).join(','));
+		// And nothing else may differ except the documented cell-only classes. `lpn-pane-idcell`
+		// joined them 2026-09-21: the ID cell holds a box AND the pin back to the map, and that
+		// class is what keeps the two on one line (Tom: *"the goto map icon ... is a line break
+		// below the ID number"*). The HEADING has no pin, so it correctly does not carry it.
+		const STATED = ['lpn-pane-stated', 'ec-help', 'lpn-pane-idcell'];
+		const extra = cols.filter((c, i) => {
+			const h = String(ths[i].className || '').split(/\s+/).filter(Boolean);
+			const d = String(tds[i].className || '').split(/\s+/).filter(Boolean);
+			return d.some((k) => h.indexOf(k) < 0 && STATED.indexOf(k) < 0) ||
+				h.some((k) => d.indexOf(k) < 0);
+		});
+		report(extra.length === 0,
+			spec.id + ': and a cell adds nothing to its heading’s classes but the stated-rule pair',
+			extra.map((c) => c.key).join(','));
 		// And the class is the one the alignment hangs on: a number is a number whether it was typed
-		// or computed, which is the rule the printed sheet has always used.
+		// or computed, which is the rule the printed sheet has always used. **A `str` column is
+		// text even when it is settable** (Task 690's id rename is what first made a settable
+		// column able to hold words rather than a quantity), so it is excluded here exactly as
+		// paneCellClass() excludes it.
 		const wrong = cols.filter((c, i) =>
-			(ths[i].classList.contains(NUM)) !== !!(c.result || c.set));
+			(ths[i].classList.contains(NUM)) !== !!((c.result || c.set) && !c.str));
 		report(wrong.length === 0, spec.id + ': exactly the number columns are marked as numbers',
 			wrong.map((c) => c.key).join(','));
 		// **AND EXACTLY ONE COLUMN IS THE FIRST ONE**, which is what the alignment now hangs on:
@@ -816,19 +840,58 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		'padding above it is the band the sliver showed in');
 	report(CSS.winning(CSS.rules, thChain, WIDE, 'padding-top', blind) === '6px',
 		'...the heading carries that padding itself, so the table still opens with air above it');
-	report(CSS.winning(CSS.rules, thChain, WIDE, 'position', blind) === 'sticky' &&
-		CSS.winning(CSS.rules, thChain, WIDE, 'top', blind) === '0',
-		'the heading row still sticks');
-	report(CSS.winning(CSS.rules, thChain, WIDE, 'z-index', blind) === '2',
+	// **THE ROW STICKS, NOT THE CELL, AND THAT IS A REPAIR RATHER THAN A TIDY-UP** (Tom, 2026-09-19:
+	// *"Strange missing heading border between Tanks Mixing model and Mixing fraction."*). A sticky
+	// TABLE CELL is composited in a layer of its own whose bounds are snapped to whole device
+	// pixels, so where the cell's sub-pixel trailing edge rounds inward its last pixel column is
+	// not painted and the separator drawn there disappears. Measured in Chromium over 660 heading
+	// boundaries at eleven text sizes: sticky cells lose some, `position: static` loses none, and a
+	// border and a pseudo-element lose exactly the same ones -- the mechanism is the LAYER, not the
+	// paint. One layer for the whole row and every separator survives.
+	const trChain = [html, panel, table, thead, tr];
+	report(CSS.winning(CSS.rules, trChain, WIDE, 'position', blind) === 'sticky' &&
+		CSS.winning(CSS.rules, trChain, WIDE, 'top', blind) === '0',
+		'the heading ROW still sticks');
+	report(CSS.winning(CSS.rules, trChain, WIDE, 'z-index', blind) === '2',
 		'...above the rows rather than merely painted after them');
+	// The cell is POSITIONED and not sticky, and both halves of that matter: the resize grip is
+	// absolutely positioned against its own heading, so without `relative` its containing block
+	// would become the sticky row and every grip would stack at the end of the table; and `sticky`
+	// here is the defect above.
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'position', blind) === 'relative',
+		'...and the heading CELL is positioned but not sticky, so the grip keeps a containing block',
+		CSS.winning(CSS.rules, thChain, WIDE, 'position', blind));
 	report(/^(#fff|rgb|white)/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'background', blind))),
 		'...opaque, in the pane’s own colour', CSS.winning(CSS.rules, thChain, WIDE, 'background', blind));
-	// The rule under the headings is an inset shadow: under `border-collapse: collapse` a border
-	// belongs to the TABLE, so it scrolls away from the sticky cell that declared it.
+	// The rules AROUND a heading are inset shadows: under `border-collapse: collapse` a border
+	// belongs to the TABLE, so it scrolls away from the sticky row that carries the cell.
 	report(/inset 0 -1px 0/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind))),
 		'the line under the headings travels with them');
+	// **AND THE GRID IS CLOSED ON ALL FOUR SIDES** (Tom, 2026-09-19: *"Top border is missing."*).
+	// Turning off the suite-wide blue frame took the heading row's top and leading edges with it;
+	// the body was never affected, because `tbody td` carries a border on all four sides.
+	report(/inset 0 1px 0/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind))),
+		'...and a line ABOVE them, so the table has a top edge again',
+		CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind));
+	{
+		// The leading edge lives on `:first-child`, and on `html[dir="rtl"]` for the five languages
+		// whose leading edge is the right-hand one. The reader above is deliberately blind to a
+		// pseudo-class and to an attribute selector -- it says so in its own blind-spot report at
+		// the end of this section -- so these two are read out of the stylesheet as text. A weaker
+		// claim, stated rather than dressed up: it says the rules are written, not which one wins.
+		const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
+		const rule = (sel) => {
+			const i = css.indexOf(sel + ' {');
+			return i < 0 ? '' : css.slice(i, css.indexOf('}', i));
+		};
+		report(/inset 1px 0 0/.test(rule('.lpn-pane-table thead th:first-child')),
+			'...and the leading heading closes the left-hand edge');
+		report(/inset -1px 0 0/.test(rule('html[dir="rtl"] .lpn-pane-table thead th:first-child')) &&
+			/inset 1px 0 0/.test(rule('html[dir="rtl"] .lpn-pane-table thead th')),
+			'...mirrored in Arabic, Farsi, Hebrew, Pashto and Urdu, where both edges change sides');
+	}
 	report(CSS.winning(CSS.rules, thChain, WIDE, 'border-bottom', blind) === null,
-		'...and is not a border, which under border-collapse would scroll on its own');
+		'...and none of it is a border, which under border-collapse would scroll on its own');
 
 	// 4. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
 	// Both were widened again in round 3 (2026-08-23). Roughness stops at 3.5em, the width every
