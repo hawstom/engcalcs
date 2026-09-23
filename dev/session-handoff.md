@@ -14,7 +14,7 @@ lines rather than appending corrections.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
 - Run `check_all.sh` and headless browser runs under their `flock` locks, and run no more than
-  three agent tracks at once. The box has 7 GB; six queued tracks on 2026-09-22 took an hour.
+  four agent tracks at once. WSL has 12 GB and 4 processors since 2026-09-23 (it was 7 GB, and six queued tracks on 2026-09-22 took an hour).
 
 ## RULINGS
 
