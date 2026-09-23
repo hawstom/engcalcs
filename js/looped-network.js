@@ -35995,9 +35995,29 @@ var EngCalcs = EngCalcs || {};
 			refreshMapStatus();
 		});
 	}
+	// **THE MAP COORDINATES LINE UNDER LENGTH** (Task 693, folded into 696). Derived, never chosen:
+	// degrees for lat/lon, the plane's own unit for an EPSG system, and the length unit for a local
+	// grid, attached or not, because that is what a local grid's numbers are in.
+	function mapCoordsUnitText() {
+		var pc = EngCalcs.pageConfig || {}, u;
+		if (isLatLonProject()) { return pc.lpn_units_mapcoords_deg || 'degrees'; }
+		if (!isProjectedProject()) { return unitLabel('lpn_u_length'); }
+		u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(projectCrsCode()) : null;
+		if (!u) { return projectCrsCode(); }
+		if (u.units === 'm') { return pc.u_m || 'm'; }
+		if (u.units === 'ft') { return pc.u_ft || 'ft'; }
+		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
+		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
+		return String(u.units);
+	}
+	function refreshMapCoordsUnit() {
+		var el = document.getElementById('lpn_u_mapcoords');
+		if (el) { el.textContent = mapCoordsUnitText(); }
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		ensureCrsForProject();
+		refreshMapCoordsUnit();
 		if (!el) { return; }
 		// A PIPE, not spaces. Three "Label: value" pairs run together are one undifferentiated string
 		// at 11px, and whitespace is the weakest divider there is.

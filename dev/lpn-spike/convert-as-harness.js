@@ -157,6 +157,9 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			near(L.outwardX(n(A.id).x), 304.8, 1e-9) && near(L.outwardX(n(B.id).x), 609.6, 1e-9),
 			L.outwardX(n(A.id).x) + ', ' + L.outwardX(n(B.id).x));
 		ok('...and the copy is stored with those units', stored(lib.openId).units.lpn_u_length === 'm');
+		// Task 693: Length is only Length now, and what the coordinates are in is a derived line.
+		ok('Settings says the grid\'s map coordinates are in its length unit, metres now',
+			byId.lpn_u_mapcoords.textContent === 'm', byId.lpn_u_mapcoords.textContent);
 		ok('THE ORIGINAL PROJECT IS UNTOUCHED, byte for byte', bytes(origId) === before);
 		ok('...and still in its own units', stored(origId).units.lpn_u_length === 'ft');
 		ok('the page says so', L.notice() === String(PC.lpn_convas_done).replace('{name}', L.getProject().name),
@@ -177,6 +180,8 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		const origId = lib.openId, before = bytes(origId);
 		const ll = L.getDoc().nodes.map((nd) => [L.outwardX(nd.x), L.outwardY(nd.y)]);
 		ok('the project is lat/lon, which is EPSG:3857 here', L.coordKind().crs === 'EPSG:3857');
+		ok('...whose map coordinates are in degrees', byId.lpn_u_mapcoords.textContent === PC.lpn_units_mapcoords_deg,
+			byId.lpn_u_mapcoords.textContent);
 
 		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:32612', units: sameUnits(), rounding: {} });
 		await new Promise((res) => setTimeout(res, 0));
@@ -197,6 +202,8 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			return Math.max(w, Math.hypot(L.outwardX(nd.x) - e[0], L.outwardY(nd.y) - e[1]));
 		}, 0);
 		ok('...with every coordinate the UTM easting and northing of its lat/lon', worst < 1e-3, worst.toExponential(2) + ' m');
+		ok('...and whose map coordinates are the plane\'s own unit, metres', byId.lpn_u_mapcoords.textContent === PC.u_m,
+			byId.lpn_u_mapcoords.textContent);
 		ok('the original lat/lon project is untouched', bytes(origId) === before);
 	}
 

@@ -2036,6 +2036,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    otherwise set the width of the whole column. It is the same 9rem the setting rows give a control,
    so the strip and the rows are one design. */
 .lpn-units-item > select { max-width: 9rem; }
+/* The derived Map coordinates line (Task 693): read, not chosen, so it is plain text at a select's height. */
+.lpn-units-derived { max-width: 9rem; padding: 3px 2px; min-height: 1.6em; opacity: .8; }
 
 /* ==== The profile view (ROADMAP Task 409) ====================================================
    A chart, not a map: it shares no symbol, scale or colour rule with the drawing. The suite's

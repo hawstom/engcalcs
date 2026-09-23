@@ -113,6 +113,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="d-print-none" id="lpn_units_strip">
 		<div id="lpn_units_all" class="lpn-units-group">
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?></span>
+		<?php // DERIVED AND READ-ONLY (Task 693, in 696): what the coordinates are in, which is a fact
+		      // the coordinate system states rather than a choice. No select, so nothing clones it
+		      // and nothing converts through it. Filled by refreshMapCoordsUnit(). ?>
+		<span class="lpn-units-item" id="lpn_u_mapcoords_row"><span class="lpn-units-name"><?=$ec_lang['lpn_units_mapcoords']?></span><span id="lpn_u_mapcoords" class="lpn-units-derived"></span></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?></span>
@@ -1911,6 +1915,10 @@ EngCalcs.pageConfig = {
       // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
       // already supplied further up this object; the elevation one was not supplied by anything. ?>
 	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
+	lpn_units_mapcoords_deg: <?=json_encode($ec_lang['lpn_units_mapcoords_deg'])?>,
+	lpn_units_usft: <?=json_encode($ec_lang['lpn_units_usft'])?>,
+	u_m: <?=json_encode($ec_lang['u_m'])?>,
+	u_ft: <?=json_encode($ec_lang['u_ft'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,

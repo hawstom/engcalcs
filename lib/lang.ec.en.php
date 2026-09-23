@@ -1065,7 +1065,14 @@ $ec_lang['lpn_tool_color_tip']='Color the network by one quantity, so a large ma
 // English is for when an English reader would stumble, and here one would not.
 $ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
 $ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
-$ec_lang['lpn_units_length']='Length and map coordinates';
+// **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
+// unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
+$ec_lang['lpn_units_length']='Length';
+// The derived line: degrees for lat/lon, the coordinate system's own unit for an EPSG plane, and
+// the length unit for a local grid. A display of what the coordinate system says, never an input.
+$ec_lang['lpn_units_mapcoords']='Map coordinates';
+$ec_lang['lpn_units_mapcoords_deg']='degrees';
+$ec_lang['lpn_units_usft']='US survey ft';
 $ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
