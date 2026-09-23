@@ -7443,7 +7443,8 @@ var EngCalcs = EngCalcs || {};
 	// inlined: a second view of a colour setting has appeared twice already, and when it appears
 	// again this is the one line it has to be added to.
 	function syncColorControls() {
-		buildColoringSection();
+		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
+		keepSetboxControl(buildColoringSection);
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -10124,6 +10125,10 @@ var EngCalcs = EngCalcs || {};
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
+		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
+		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
+		// this edit triggers: with nothing owed this is a no-op.
+		flushLabelRefresh();
 		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			fsNow = effectiveFontSize() + 'px', lines;
 		if (group === 'node') {
@@ -25649,6 +25654,9 @@ var EngCalcs = EngCalcs || {};
 	 * the label choices too, since both are serialized.
 	 */
 	function captureLabelLayout() {
+		// The kept layout must be the settled one: a pass owed and not yet run would otherwise be
+		// kept as the answer and restored on the way back (Task 653).
+		flushLabelRefresh();
 		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
 		function grab(h) {
 			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
@@ -26799,6 +26807,9 @@ var EngCalcs = EngCalcs || {};
 		lastSolveResult = (kept && kept.solve) || null;
 		// The labels wait for the camera -- see buildDom() and the restore below.
 		labelPassDeferred = true;
+		// And a pass requested for the OUTGOING document is not owed to this one, which is laid out
+		// once below (Task 653). Left set, it would run a second full pass a frame after arrival.
+		labelRefreshPending = false;
 		closePopup();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
@@ -35573,7 +35584,7 @@ var EngCalcs = EngCalcs || {};
 		// below it, which is the same rule .lpn-set-row carries in css/engcalcs.css.
 		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
-		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
+		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
 		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
 		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
@@ -35659,7 +35670,7 @@ var EngCalcs = EngCalcs || {};
 			spec.value = v;
 			spec.onChange(v);
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		return box;
 	}
@@ -35676,7 +35687,7 @@ var EngCalcs = EngCalcs || {};
 		box.setAttribute('aria-label', spec.title);
 		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
 		box.style.boxSizing = 'border-box';
-		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); refreshLabelText(); });
+		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); requestLabelRefresh(); });
 		return box;
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
@@ -35817,7 +35828,7 @@ var EngCalcs = EngCalcs || {};
 			if (isFinite(v) && v >= 0) { labelSettings.customerMaxWidth = v; }
 			else { input.value = String(labelSettings.customerMaxWidth); return; }
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
 		// view' button like the other one we restored in a different branch."*). Same words and the
@@ -35835,7 +35846,7 @@ var EngCalcs = EngCalcs || {};
 			labelSettings.customerMaxWidth = w;
 			input.value = String(labelSettings.customerMaxWidth);
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		wrap.className = 'lpn-set-ctlgroup';
 		wrap.appendChild(input); wrap.appendChild(useBtn);
@@ -36944,6 +36955,9 @@ var EngCalcs = EngCalcs || {};
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
 	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
+		return keepSetboxControl(rebuildSettingsFieldsNow);
+	}
+	function rebuildSettingsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {};
 		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
 		// option values) and MOVED in and out of this panel, never rebuilt. Park it back in its holder
@@ -37455,7 +37469,7 @@ var EngCalcs = EngCalcs || {};
 			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
 			// the very element that just changed under it.
 			refreshPopupIfOpen();
-			refreshLabelText();
+			requestLabelRefresh();
 			scheduleSolve();
 			saveToStorage();
 		});
@@ -38068,7 +38082,7 @@ var EngCalcs = EngCalcs || {};
 			// fields are printed and what prefix each carries, so the labels themselves have to be
 			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
 			// used to redraw only the legend, which left the map showing the old label set.
-			refreshLabelText();
+			requestLabelRefresh();
 			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
 			// positions too, and the colour controls were showing the old ones.
 			rebuildSettingsBox();
@@ -38225,11 +38239,128 @@ var EngCalcs = EngCalcs || {};
 		var b = setboxEl();
 		return !!b && b.style.display === 'flex';
 	}
+	// ---- THE CONTROL IN THE USER'S HAND SURVIVES A REBUILD OF THE BOX (Task 653) ----------------
+	//
+	// A rebuild replaces every control it builds, so "the same control" after it can only mean
+	// "the copy built in the same place". A KEY names that place: an id or a form name where the
+	// control has one, and otherwise the id'd host it sits in, the words on its row and its
+	// position among its kind in that host. **THE ROW'S WORDS ARE IN THE KEY ON PURPOSE:** two
+	// selects offering the same three options sit side by side in Water quality (bulk and wall
+	// reaction order), and a key by position alone would put one's handler under the other's name
+	// the day a row above them appeared.
+	function setboxControlKey(el, box) {
+		if (el.id) { return '#' + el.id; }
+		if (el.name) { return '@' + el.name; }
+		var host = el.parentNode, row = el.parentNode, words = '', list, i;
+		while (host && host !== box && !host.id) { host = host.parentNode; }
+		if (!host || host === box || !host.id) { return null; }
+		while (row && row !== host && !(row.classList && row.classList.contains('lpn-set-row'))) { row = row.parentNode; }
+		if (row && row !== host && row.firstChild) { words = row.firstChild.textContent || ''; }
+		list = setboxControlsOfTag(host, el.tagName);
+		for (i = 0; i < list.length; i++) { if (list[i] === el) { break; } }
+		return host.id + '|' + words + '|' + el.tagName + '|' + i;
+	}
+	// Document order, walked by hand over `children` rather than asked of querySelectorAll(), so
+	// the harness's DOM stub (which answers [] to every selector) walks the same tree.
+	function setboxControlsOfTag(root, tag) {
+		var out = [];
+		(function walk(e) {
+			var kids = e.children || [], i;
+			for (i = 0; i < kids.length; i++) {
+				if (kids[i].tagName === tag) { out.push(kids[i]); }
+				walk(kids[i]);
+			}
+		}(root));
+		return out;
+	}
+	function setboxControlByKey(box, key) {
+		var parts, host, list, i, el;
+		if (!key) { return null; }
+		if (key.charAt(0) === '#' || key.charAt(0) === '@') {
+			list = setboxControlsOfTag(box, 'SELECT').concat(setboxControlsOfTag(box, 'INPUT'), setboxControlsOfTag(box, 'TEXTAREA'));
+			for (i = 0; i < list.length; i++) {
+				if ((key.charAt(0) === '#' ? list[i].id : list[i].name) === key.slice(1)) { return list[i]; }
+			}
+			return null;
+		}
+		parts = key.split('|');
+		host = document.getElementById(parts[0]);
+		if (!host || !box.contains(host)) { return null; }
+		el = setboxControlsOfTag(host, parts[2])[+parts[3]] || null;
+		return el && setboxControlKey(el, box) === key ? el : null;
+	}
+	// The same list of choices, in the same words. A select whose options were rebuilt DIFFERENTLY
+	// (a unit in a field name, a method list that follows the field) is not kept: the copy is the
+	// truth and the old one would offer choices that no longer exist.
+	function sameSelectOptions(a, b) {
+		var oa = a.options || a.children || [], ob = b.options || b.children || [], i;
+		if (oa.length !== ob.length) { return false; }
+		for (i = 0; i < oa.length; i++) {
+			if (oa[i].value !== ob[i].value || oa[i].textContent !== ob[i].textContent) { return false; }
+		}
+		return true;
+	}
+	var setboxKeeping = false;
+	function keepSetboxControl(rebuild) {
+		// Only the outermost rebuild does this: rebuildSettingsBox() runs rebuildSettingsFields()
+		// and buildColoringSection(), and each can also be called alone.
+		if (setboxKeeping) { return rebuild(); }
+		var box = setboxEl(), ev = (typeof window !== 'undefined') ? window.event : null,
+			focused = (typeof document !== 'undefined') ? document.activeElement : null,
+			held = [], out;
+		// TWO CONTROLS CAN BE IN THE HAND AT ONCE: the one whose own change event is running, and
+		// the one focus has already moved to -- a text box commits on blur, so its change arrives
+		// while the control just clicked is focused. Safari does not focus a select on a click at
+		// all, which is why the event is asked as well as the focus.
+		[ev && (ev.type === 'change' || ev.type === 'input') ? ev.target : null, focused].forEach(function (el) {
+			if (!el || !box || !box.contains || !box.contains(el) || held.some(function (h) { return h.el === el; })) { return; }
+			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
+			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
+		});
+		if (!held.length) { return rebuild(); }
+		setboxKeeping = true;
+		try { out = rebuild(); } finally { setboxKeeping = false; }
+		held.forEach(function (h) {
+			var el = h.el, twin;
+			if (!box.contains(el)) {
+				twin = setboxControlByKey(box, h.key);
+				if (!twin) { return; }
+				if (el.tagName === 'SELECT' && twin.tagName === 'SELECT' && sameSelectOptions(el, twin)) {
+					// The copy holds the state `settings` now implies; the old element takes it on
+					// and the copy, never shown, is dropped.
+					if (typeof twin.value === 'string') { el.value = twin.value; }
+					el.disabled = twin.disabled;
+					el.title = twin.title;
+					twin.parentNode.replaceChild(el, twin);
+				} else {
+					el = twin;
+				}
+			}
+			// A move out of the page and back (the units block is parked during a rebuild) drops
+			// focus even though the element survived, so it is handed back either way.
+			if (h.focus && document.activeElement !== el && el.focus) {
+				try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+			}
+		});
+		return out;
+	}
 	// Rebuild EVERY section on every open. Built once at init and repainted only by the paths that
 	// remember, the box would show page-load values for every setting anything else wrote -- and a
 	// writer has to remember to repaint, and one will not. Rebuilding makes the box a VIEW of
 	// `settings` rather than a copy. Cheap: a few dozen form controls, only when it is opened.
+	//
+	// **BUT NEVER THE CONTROL IN THE USER'S HAND** (Task 653). Tom, 2026-09-13: *"the Settings
+	// Quality selector ... doesn't work (change) once it responds. All selectors are the same that
+	// way."* A select whose own change rebuilds the box was thrown away by that rebuild and a copy
+	// put in its place: the focus went with it, the next arrow key went nowhere, and a dropdown
+	// reopened on the old element opened on something no longer in the page. So the rebuild still
+	// happens -- the box stays a view of `settings` -- and afterwards the one control the user is
+	// working is put back where its fresh copy was built, carrying the copy's value and state. Any
+	// other control keeps its focus by moving it to the copy. See keepSetboxControl().
 	function rebuildSettingsBox() {
+		keepSetboxControl(rebuildSettingsBoxNow);
+	}
+	function rebuildSettingsBoxNow() {
 		rebuildSettingsFields();
 		rebuildLabelsFields();
 		buildColoringSection();
@@ -40137,6 +40268,16 @@ var EngCalcs = EngCalcs || {};
 	// says it is carried rather than worked out. A file stating `Quality Chlorine mg/L` must be able
 	// to keep saying so through an open-and-save, which means the mode has to be reachable; but the
 	// page cannot produce that state itself, because it would be offering an analysis it does not run.
+	// **WHETHER A QUALITY SETTING CAN CHANGE A SINGLE LETTER ON THE MAP** (Task 653). The mode, the
+	// trace node and the chemical reach the labels only through a field that prints quality -- its
+	// value, its decimals, its heading in the legend. With none of them ticked, which is how every
+	// project ships, a quality change owes the labels nothing until the run it schedules lands, and
+	// that run lays them out itself. Measured before this: one full label pass of the three a
+	// Quality change cost, spent redrawing identical text.
+	function qualityFieldsLabelled() {
+		var n = labelSettings.node || {}, l = labelSettings.link || {};
+		return !!(n.quality || n.initQuality || l.quality || l.rate);
+	}
 	function settingsQualityRows(host, rowFn, noteFn) {
 		var pc = EngCalcs.pageConfig || {}, q = qualitySetting(),
 			sel = document.createElement('select'), opts = [
@@ -40183,7 +40324,7 @@ var EngCalcs = EngCalcs || {};
 			if (backTo) {
 				requestAnimationFrame(function () { scrollSetboxTo(backTo); });
 			}
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -40209,7 +40350,7 @@ var EngCalcs = EngCalcs || {};
 			src.addEventListener('change', function () {
 				settings.quality.traceNode = src.value;
 				saveToStorage();
-				refreshLabelText();
+				if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 				refreshPopupIfOpen();
 				scheduleSolve();
 			});
@@ -40248,7 +40389,7 @@ var EngCalcs = EngCalcs || {};
 			settings.quality.chemical = name.value;
 			saveToStorage();
 			rebuildSettingsBox();
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -43662,7 +43803,7 @@ var EngCalcs = EngCalcs || {};
 		// The next element drawn must not land on a number now in use.
 		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
 		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
-		refreshLabelText();
+		requestLabelRefresh();
 		scheduleSolve();
 		saveToStorage();
 		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
@@ -47305,6 +47446,45 @@ var EngCalcs = EngCalcs || {};
 	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
+	//
+	// **SYNCHRONOUS, AND THE PATHS THAT NEED IT SO STILL CALL IT** -- building the drawing, a
+	// project arriving, a solve landing, and every harness. A control that only CHANGES something
+	// the labels print calls requestLabelRefresh() below instead (Task 653).
+	//
+	// **ONE PASS PER BURST, AFTER THE PAINT** (Task 653). Tom, 2026-09-13: *"the Settings Quality
+	// selector is very sluggish and doesn't work (change) once it responds."* Measured then: 89%
+	// of a 2.5 s select was this pass, run inside the select's own change handler, so the select
+	// could not even show its new value until every label had been re-measured. A request marks
+	// the pass owed and schedules it for after the next frame has painted; any number of requests
+	// before then cost one pass, and a synchronous refreshLabelText() in between pays the debt.
+	//
+	// **ANYTHING THAT READS THE LAYOUT FLUSHES FIRST** -- relayoutLabels(), refreshOneLabelInPlace(),
+	// captureLabelLayout() (the tab-switch keep) and the browser's own print -- so no reader can see
+	// the layout from before a change it has already been told about. A new document arriving
+	// cancels the debt instead: refreshAllFromDocument() lays its labels out itself.
+	var labelRefreshPending = false, labelRefreshScheduled = false;
+	function requestLabelRefresh() {
+		labelRefreshPending = true;
+		if (labelRefreshScheduled) { return; }
+		labelRefreshScheduled = true;
+		// rAF then a task: the rAF callback runs BEFORE its frame paints, so doing the pass there
+		// would hold the paint exactly as the synchronous call did. The task after it runs once
+		// the frame is on screen. Without rAF (a background tab, the node stub) a plain task.
+		var run = function () { labelRefreshScheduled = false; flushLabelRefresh(); };
+		if (typeof requestAnimationFrame === 'function') {
+			requestAnimationFrame(function () { setTimeout(run, 0); });
+		} else {
+			setTimeout(run, 0);
+		}
+	}
+	function flushLabelRefresh() {
+		if (labelRefreshPending) { refreshLabelText(); }
+	}
+	// Printing is a reader too, and it reads between tasks: Ctrl+P inside the owed frame would put
+	// the old lettering on paper.
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('beforeprint', function () { flushLabelRefresh(); });
+	}
 	function refreshLabelText() {
 		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
 		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
@@ -47316,6 +47496,8 @@ var EngCalcs = EngCalcs || {};
 		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
 		// elements and the legend is chrome; both are visible under a thematic map, so they are the
 		// part of this pass a suppressor has no business cancelling.
+		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
+		labelRefreshPending = false;
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -47790,6 +47972,9 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		// Placing text that a requested content pass is about to rewrite would place the old text
+		// (Task 653). Inside the pass itself nothing is owed, so this is a no-op there.
+		flushLabelRefresh();
 		// **OFF MEANS OFF: THE COLLISION RELAXATION IS THE SINGLE MOST EXPENSIVE THING ON THIS PAGE**
 		// (Tom, 2026-09-17), and running it over annotation `.lpn-labels-hidden` is not drawing
 		// decides where to put lettering nobody will see. This is the one place it is entered, which
@@ -50109,7 +50294,7 @@ var EngCalcs = EngCalcs || {};
 		// The pane's tabs carry their units in their headings and axis titles, so a switch has to
 		// redraw the open one for exactly the reason the popup is rebuilt.
 		refreshPaneIfOpen();
-		refreshLabelText();
+		requestLabelRefresh();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup
 		// does -- otherwise a US number sits under an SI label. THE WHOLE BOX: Coloring's field
