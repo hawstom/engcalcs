@@ -36,6 +36,14 @@
 //      (the cap is now purely a function of link lengths, never of the window or the view).
 //   9. Pipes shrink past the cap too, since 2026-09-22: *"Yes. Everything shrinks except
 //      reservoirs and tanks."* Only reservoirs and tanks are exempt; a pipe is not.
+//   10. THE INVARIANT ITSELF, restated as one ratio and swept across a span of scales rather than
+//      checked on each side separately: a junction's drawn diameter divided by a pipe's drawn
+//      width is CONSTANT at every zoom, both in world units and in the actual on-screen pixels.
+//      Tom, 2026-09-23, after testing the branch that shipped section 9: "At all zoom levels, links
+//      and nodes (except Res and Tank) should keep their same relative sizes... Maybe they have no
+//      scale-up limit." Measured live in headless Chrome on Novato and XY Net3 while diagnosing
+//      this and found already holding on the committed code -- this section is what makes that
+//      finding durable instead of a one-off script's word for it.
 //
 // **AND THEN IT MUTATES THE PAGE AND REQUIRES ITSELF TO FAIL.** Each mutation below takes one piece
 // of the rule out of the real source; the suite is re-run against it and must report at least one
@@ -386,6 +394,47 @@ function suite(mutate, quiet) {
 	check(L.linkStrokeWidth() * cap9 * 0.01 < st().linkWidth / 10,
 		'9.3 ...so ON THE SCREEN it shrinks with the zoom, exactly like a junction',
 		(L.linkStrokeWidth() * cap9 * 0.01).toFixed(4) + ' px');
+
+	// ============================================================================================
+	// **10. TOM'S ACTUAL RULE, STATED AS ONE NUMBER: A JUNCTION AND A PIPE KEEP THE SAME SIZE
+	// RELATIVE TO EACH OTHER AT EVERY ZOOM** (2026-09-23: "At all zoom levels, links and nodes
+	// (except Res and Tank) should keep their same relative sizes... Maybe they have no scale-up
+	// limit."). Sections 1-9 each check ONE side of the cap in isolation and can both be green while
+	// the two sides disagree with EACH OTHER -- which is the failure shape this exists to close.
+	// Measured live in headless Chrome on the Novato and Net3 examples while diagnosing this (a
+	// one-off script, not committed -- this harness is the assertion that survives): the ratio held
+	// there too, on the code as it stood, which is why this section is a SWEEP across a span of
+	// scales and not a spot check -- a divisor swap that only misbehaves near the cap boundary would
+	// hide behind one point. The ratio of a junction's drawn DIAMETER to a pipe's drawn STROKE WIDTH
+	// is `symbolSize / linkWidth` by construction whenever both divide by the SAME symbolScaleAt()
+	// -- see nodeRadius() and linkStrokeWidth() -- so this is a single algebraic identity, and it is
+	// the one identity a person can actually see break on screen.
+	head('--- 10. THE INVARIANT ITSELF: junction diameter / pipe width is CONSTANT at every zoom ---');
+	L.applySaved(chainDoc());
+	st().linkWidth = 2; st().symbolSize = 7;
+	const cap10 = L.symbolCapScale();
+	const expectedRatio10 = st().symbolSize / st().linkWidth;
+	// Well past the cap in BOTH directions: from 1/500th of it to 500 times it.
+	const sweep10 = [0.002, 0.01, 0.1, 0.5, 0.9, 0.999, 1, 1.001, 1.5, 5, 20, 100, 500].map(function (m) { return cap10 * m; });
+	const ratios10 = sweep10.map(function (s) {
+		setS(s);
+		const junctionDiam = 2 * L.nodeRadius({ type: 'junction' });
+		return junctionDiam / L.linkStrokeWidth();
+	});
+	check(ratios10.every(function (r) { return near(r, expectedRatio10, 1e-6); }),
+		'10.1 the ratio holds across a 250,000x span of scale, both sides of the cap',
+		ratios10.map(function (r) { return r.toFixed(4); }).join(', ') + ' (all should read ' + expectedRatio10.toFixed(4) + ')');
+	// Restated the way a person actually notices it: pick two scales, one deep in "screen-constant"
+	// territory and one deep in "ground-constant" territory, and confirm the drawn PIXEL sizes (not
+	// the world sizes) keep the same proportion to each other -- not merely that the world formula
+	// is self-consistent, but that what would actually appear on screen agrees.
+	setS(cap10 * 200);
+	const pxHi = { j: 2 * L.nodeRadius({ type: 'junction' }) * L.getState().s, p: L.linkStrokeWidth() * L.getState().s };
+	setS(cap10 * 0.005);
+	const pxLo = { j: 2 * L.nodeRadius({ type: 'junction' }) * L.getState().s, p: L.linkStrokeWidth() * L.getState().s };
+	check(near(pxHi.j / pxHi.p, pxLo.j / pxLo.p, 1e-6),
+		'10.2 ...and the same holds for the actual ON-SCREEN pixel sizes at two very different zooms',
+		(pxHi.j / pxHi.p).toFixed(4) + ' vs ' + (pxLo.j / pxLo.p).toFixed(4));
 
 	return failures;
 }
