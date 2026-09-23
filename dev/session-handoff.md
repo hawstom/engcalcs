@@ -8,10 +8,9 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Six branches may not merge without Tom's all-clear** (all in `protected` in
+- **Five branches may not merge without Tom's all-clear** (all in `protected` in
   `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
-  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, and `fix/one-solve-per-change`,
-  which is protected only because it steps past his 2026-08-19 ruling and needs his word.
+  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -88,7 +87,10 @@ lines rather than appending corrections.
   right-click shipped. An iPhone long-press on a heading needs a real phone.
 - **8106 `feat/property-venue`** (708): ready. Shut and mixing model are chosen from a list in
   the reader's language.
-- **8107 `fix/one-solve-per-change`** (653): his ruling needed (see Before merging).
+- **One solve per change is on master** (653): a fast network runs the whole period once per edit,
+  a slow one still shows the first step first. The "only the first time step" sentence it had been
+  weighed against was never his; he struck it 2026-09-23 (the one sensible case is while the EPANET
+  engine loads for a new browser). It also cancels a run an edit has made stale.
 - **8090 `feat/label-gang-search`**: unchanged; R-075..R-165 are his.
 
 ### Open with him
