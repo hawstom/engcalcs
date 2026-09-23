@@ -2671,3 +2671,117 @@ add a dot at the pivot so it reads as two hands from a hub rather than one bent 
 few more path edits and no new name or string, before reaching for a different picture entirely.
 
 No shipped file touched; nothing in the worktree touched.
+
+---
+
+## 2026-09-23 — Undo for Settings: should the stack hold preference changes at all
+
+Tom asked me and the build seat together, off `dev/undo-audit.md`'s findings #3 and #4 (new-asset
+defaults + ID prefixes, and map-coloring: both save immediately with no undo snapshot). His question
+in his own words: *"I'd like your and Ida's advice about undo for Settings. It sounds nice."*
+
+### First check: is this actually a project-vs-furniture question? No — both sides are project data
+
+OBSERVED (`js/looped-network.js:24067`, `serializeProject()`): the entire `settings` object —
+`idPrefixes`, `defaults`, `colorNodeField`/`colorLinkField`, units, hydraulics, quality, energy,
+custom property designs, everything the Settings box edits except the one `Page` sub-heading it
+labels as excluded — rides in the saved file. CLAUDE.md's `lpn_` furniture rule (window position,
+pane width — the browser's business) does not apply here at all; every Settings row this audit is
+about is modelling data, same axis as a pipe's diameter. **So "is it project data" cannot be the
+test that separates the sections, because the answer is yes for all of them.** I went in expecting
+this to settle it and it does the opposite — it removes the one clean dividing line CLAUDE.md
+supplies and leaves the actual product judgment fully open.
+
+### The dividing line that actually exists in the code today: visible effect at the moment of the edit
+
+OBSERVED (`js/looped-network.js:35608`, `defaultRow()`; `:35645`, the ID-prefix `input`): typing a
+new default diameter or a new ID prefix changes `settings.defaults[key]` / `settings.idPrefixes[key]`
+and calls `saveToStorage()`. **Nothing on screen moves.** No element redraws, no label changes,
+because nothing existing reads these values — they are read once, later, at the moment a NEW element
+is created (`seedDefaultInputs()`, `niceDefault()`). Pressing Ctrl+Z the instant after typing one
+would have nothing visible to restore even if it worked.
+
+OBSERVED (`js/looped-network.js:19011-19070`, `buildColoringSection()`, the `fieldSelect()` handler
+at `:19063`): choosing a thematic color field calls `refreshValueColors()` before `saveToStorage()`
+— **every existing node or link on the map recolors immediately.** This is the one Settings control
+in the audit's scope whose edit has an on-canvas, visible-right-now effect, which is exactly the
+property every genuinely-undoable action in this app already shares (`snapshotDragOnce()` for a
+drag, `saveUndoSnapshot()` before a delete or an add). Colouring is architecturally closer to those
+than to the defaults/prefix boxes sitting one section over from it.
+
+OBSERVED (`js/looped-network.js:42185-42237`, `applyIdPrefixToAll()`): the "Apply to all" button
+beside each ID-prefix box — which actually RENAMES every matching element's id — already calls
+`saveUndoSnapshot()` at `:42221`, correctly, because it is a real document rewrite with a visible
+result (every affected element's printed ID changes). **The audit's #3 finding is precise: the
+PREFERENCE (what a *future* element will be called) has no snapshot; the one operation in that same
+section that actually touches *existing* elements already has one.** The gap is exactly at the
+boundary this section argues for, not evidence the boundary is wrong.
+
+### Precedent: does established software put preference changes on the main undo stack
+
+CITED (Autodesk, "UNDO (Command)," help.autodesk.com, read 2026-09-23 — the official command
+reference, fetched directly): *"UNDO has no effect on some commands and system variables, including
+those that open, close, or save a window or a drawing, display information, change the graphics
+display, regenerate the drawing, or export the drawing in a different format."* Community threads
+confirm this by naming the concrete cases: `CLAYER` (current layer) and `CECOLOR` (current color) —
+the settings that decide what a *newly drawn* entity gets — are excluded from `U`/`UNDO` by design.
+**That is the exact shape of our new-asset defaults and ID prefixes**: a value read only at the
+moment something new is created, not a property of anything already on the sheet. AutoCAD's own
+documented answer to "should changing a new-entity default be undoable" is no.
+
+CITED (QGIS issue tracker, `github.com/qgis/QGIS` issue #50110, read 2026-09-23, and the Layer
+Styling panel documentation it references): a QGIS layer's SYMBOLOGY — its thematic coloring, the
+closest existing-software analog to this page's map-coloring section — has *"a History tab available
+in the Layer Styling panel"* that is a **separate undo history scoped to the styling panel itself**,
+distinct from the map canvas's own edit undo/redo. QGIS did not decide between "on the main stack" or
+"no undo at all" for this exact category of thing; it built a **third, local history** the audit's
+brief asked me to weigh and that is real, shipping precedent for it rather than an invention.
+
+### Weighed against Tom's own worry, and against mine
+
+Tom's brief already names the danger correctly: a stack mixing "I moved a pipe" with "I changed the
+default diameter for new junctions" makes Ctrl+Z unpredictable, because a press restores whatever is
+NEXT on the stack, not whatever the reader is looking at. For the defaults/prefix boxes this is worse
+than unpredictable — it is invisible: even if undone correctly, nothing on screen would change, so a
+reader who pressed Ctrl+Z expecting to see something happen would see nothing and reasonably conclude
+undo is broken again, which is the exact complaint this whole audit started from. **An invisible undo
+is a worse defect than no undo**, not a smaller version of the same feature.
+
+For coloring the danger is smaller but not zero: it is visible, but it would still sit on the same
+stack as ordinary drawing edits, so a reader who changes the color field and then edits a pipe and
+then presses Ctrl+Z twice gets the pipe edit back first and the recoloring back second (or the
+reverse), in an order that has nothing to do with which one they meant to undo. Joining the main
+stack buys visibility at the cost of the same interleaving problem, for a control that is used rarely
+compared to drawing edits.
+
+### The recommendation
+
+**Do not put any Settings section on the main Ctrl+Z stack. Leave findings #3 and #4 exactly as they
+are.** Both are consistent with how the rest of the Settings box already behaves — units, hydraulics,
+energy, quality, custom-property design all save immediately with no snapshot too, and #3/#4 are not
+outliers against that pattern, they are the pattern. Making colouring undoable while every other
+Settings row stays immediate-save would be the actual new inconsistency, not a fix for one.
+
+**If Tom wants a safety net specifically for map-coloring** — the one section where the argument for
+it is real, because the effect is visible — the right shape, on QGIS's own precedent, is a small
+**local control scoped to that section alone** ("Reset color settings," reverting `colorNodeField` /
+`colorLinkField` / the ramp to what they were when the Settings box was last opened), never a join
+onto the global stack. That is a few hours of work, one new string, and it cannot collide with a
+drawing edit's own Ctrl+Z the way a shared stack would. Not urgent, and not recommended as more than
+an option — nobody has reported losing a color scheme by accident the way Tom reported losing a Base
+demand value.
+
+**One paragraph for Tom, in his language, as asked:** Leave Settings out of Undo — it sounds nicer
+than it would feel. Everything in the Settings box already saves the moment you change it, on
+purpose and consistently, and that is correct: a "default diameter for new junctions" or an ID
+prefix has no effect on anything already drawn, so pressing Ctrl+Z after changing one would show you
+nothing happening even if it worked — which reads as "undo is broken" again, the exact complaint
+that started this. AutoCAD draws this same line in its own official documentation: the "what a new
+entity gets" settings are explicitly excluded from Undo, by design, industry-wide. The one Settings
+control that's genuinely different is map-coloring, because it repaints the whole drawing the moment
+you touch it — if you ever want a safety net there, the right shape (borrowed from how QGIS handles
+the same kind of control) is a small "Reset" link local to that one section, not a join onto the
+drawing's own Ctrl+Z — never mix "I changed how the map is colored" onto the same stack as "I moved a
+pipe," because pressing Ctrl+Z then stops reliably undoing the last thing you actually did.
+
+No shipped file touched.
