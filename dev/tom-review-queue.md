@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-173.
+**An ID is permanent and never reused.** Next free: R-177.
 
 ---
 
@@ -67,7 +67,7 @@ judgement and does not belong to a script.
 
 ### feat/tables-spreadsheet -- his fifth pass
 
-- [ ] R-110 feat/tables-spreadsheet | Sometimes the column widths are unreasonable. For example, Pumps.Date installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price pattern, width = 3em (due to selector?)
+- [x] R-110 feat/tables-spreadsheet | Sometimes the column widths are unreasonable. For example, Pumps.Date installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price pattern, width = 3em (due to selector?) -- merged to master 2026-09-23 on his all-clear (R-173)
 
 ### feat/notice-log -- his four
 
@@ -113,8 +113,8 @@ judgement and does not belong to a script.
 
 ### feat/tables-spreadsheet
 
-- [ ] R-161 feat/tables-spreadsheet | Some of the column and heading divider vertical borders are misaligned by 1 px.
-- [ ] R-162 feat/tables-spreadsheet | Print is not respecting on-screen column widths.
+- [x] R-161 feat/tables-spreadsheet | Some of the column and heading divider vertical borders are misaligned by 1 px. -- merged to master 2026-09-23 on his all-clear (R-173)
+- [x] R-162 feat/tables-spreadsheet | Print is not respecting on-screen column widths. -- merged to master 2026-09-23 on his all-clear (R-173)
 
 ### feat/label-gang-search
 
@@ -137,3 +137,10 @@ judgement and does not belong to a script.
 ### Task 696, the coordinate conversion wizard
 
 - [ ] R-172 -- | (1) In Step 1, a background image gets dragged around with the map (then snaps back on release of drag) instead of always staying with the project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center example, the world map worked, but the satellite view didn't. (3) I completely missed this until now, but this wizard is out of date with our current CRS paradigm. The first thing it needs to do is ask what coordinate system we are going to. -- folded into Task 696, which stays OPEN at 100 rather than closing, because his point (3) reopens the paradigm
+
+## Round of 2026-09-23 -- his rulings on three branches and Settings undo
+
+- [x] R-173 feat/tables-spreadsheet | Done. Merge and delete branch. -- merged to master 2026-09-23; R-110, R-161 and R-162 go with it
+- [ ] R-174 feat/zoom-scale-rules | (Text, Show at all zoom levels) This property should be off for all but the largest text object in our examples and for all projects with no previous settings. This property should appear in multi-properties, Tables, and Find/Replace.
+- [ ] R-175 feat/notice-log | (Messenger) I liked the down arrow that was initially used for the messenger. I don't like the one we have now. I don't recommend heroics to make it unique. Something very much like a selector (probably perfect) or a tab menu is fine.
+- [x] R-176 -- | (Settings Undo) Ida is right and wrong. Right that it does not edit the network. Wrong that it doesn't not do anything you can see at the moment you make it, for over half the settings including Symbology, most of Appearance, and Calculation when recalculate is on. We can leave it as is. -- Task 709 closed; Settings stay out of undo
