@@ -303,6 +303,12 @@ run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_
 # reads as progress on the very task it serves.
 run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
 run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
+# ROADMAP Task 708: the audit's mechanically-derivable slice, a THIRD editor of the same
+# document -- an editable Tables-pane column with no matching Find property for its element's
+# GROUP. Advisory while the matrix in dev/property-venue-matrix.md is still being ranked; its
+# selftest is blocking for the reason table_column_parity_selftest.php's own is.
+run_check "table/Find parity"            advisory php dev/scripts/property_venue_check.php
+run_check "table/Find parity selftest"   blocking php dev/scripts/property_venue_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
