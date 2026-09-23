@@ -2449,18 +2449,21 @@ var EngCalcs = EngCalcs || {};
 	var labelSideStrategies = ['corners', 'sector'];
 	// **THE SEARCH WIDENS INSTEAD OF DROPPING A LABEL THAT STILL HAS ROOM** (Task 539, 2026-09-21).
 	//
-	// **OFF, AND THAT IS A MEASUREMENT RATHER THAN CAUTION.** With the node ID alone -- Tom's own
-	// test -- it is a straight win: 79 labels hidden across the five examples becomes 35, and not
-	// one label that already had a place moves. **With every label field on it is not**, and the
-	// two existing ratchets say so: `label-spot-harness.js` goes from 14 hidden to 59 over
-	// Net3-World's four views for 7 more drawn, because a label the first-fit used to give up on
-	// now stands somewhere with a long leader and the CROSSING shed hides it instead; and
-	// `label-width-stability-harness.js` goes from 49 labels moving at the `1234=` prefix to all
-	// 97, which is the whole drawing rearranging and is the half of his sentence he minds most.
-	// **Trading a drop for a hide one rung further down is not a fix**, and choosing whether to
-	// take it is his call and not this one's. The switch is under ?debug=labels so the two drawings
-	// can be read back to back; §19 has every number.
-	var labelWidenSearch = false;
+	// **ON SINCE 2026-09-22, ON TOM'S OWN RULING:** *"I am seeing dropping when I would have
+	// preferred to see longer leaders."* A longer leader beats giving a property up, so the search
+	// looks further out before the value shed is reached at all.
+	//
+	// **IT SHIPPED OFF FOR ONE DAY AND THE REASON IT DID IS THE REASON THE PASS CHANGED SHAPE.**
+	// The measurement that turned it off was real: switching it on alone traded a drop for a HIDE
+	// one rung further down, because a label the first-fit used to give up on now stood somewhere
+	// with a long leader and the crossing shed at the bottom of the pass hid it instead -- and
+	// that shed had no rung below it, so hiding was all it could do. Two things answered that,
+	// both after the measurement was taken: the leader slide (Collide.slideTowardAnchors()), which
+	// pulls a widened label back in until something is in the way, and shedNodeLabelsForCrossing(),
+	// which makes a label the shed would hide give up a value and lays the drawing out again.
+	// **The shed did not go away; it moved to the bottom, which is where his ruling puts it.**
+	// The switch stays under ?debug=labels so the two drawings can still be read back to back.
+	var labelWidenSearch = true;
 	function spotDebugOn() { return debugOn('spots'); }
 	function drawSpotDebug() {
 		if (!spotDebugLayer) { return; }
@@ -2774,8 +2777,56 @@ var EngCalcs = EngCalcs || {};
 		lastNodeShedRungs = rungs;
 		return placed;
 	}
+	// **AND A LABEL ABOUT TO BE HIDDEN GIVES UP A VALUE FIRST** (Tom, 2026-09-22: *"I am seeing
+	// dropping when I would have preferred to see longer leaders."*).
+	//
+	// **THIS IS THE RUNG THAT MAKES HIS ORDER OF PREFERENCE TRUE END TO END.** The order is: the
+	// whole label near its node, then the whole label on a LONGER LEADER, then the label with a
+	// value given up, and only then the label gone. Until this existed the middle two were the
+	// wrong way round -- the value shed was triggered by a first-fit DROP, so it ran before the
+	// search was ever allowed to look further out, and the crossing shed at the end of the pass
+	// had no rung below it at all and could only hide. Measured on Net3-World at 2x with his three
+	// properties on: 23 labels dropped, 50 of 97 labels shed two of their three values, and four
+	// were still dropped afterwards.
+	//
+	// So the shed keeps its Drop column and its cascade and is simply reached LAST. Given the ids
+	// the crossing shed just hid, every NODE label among them that still has a value to give gives
+	// one up; the caller then lays the whole drawing out again. A link label is not here: it has
+	// its own cascade in shedAlignedForConflicts(), which has already run.
+	function shedNodeLabelsForCrossing(ids, nodeLabels, fsNow) {
+		var byId = {}, nodeOf = {}, recs = [], seen = {};
+		nodeLabels.forEach(function (l) { byId[l.id] = l; });
+		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
+		(ids || []).forEach(function (id) {
+			if (id.charAt(0) !== 'n' || seen[id]) { return; }
+			var rec = nodeShedRec(byId[id], nodeOf);
+			if (!rec) { return; }
+			seen[id] = true; recs.push(rec);
+		});
+		if (!recs.length) { return 0; }
+		// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung, exactly as the cascade
+		// above does it and for the same reason.
+		recs.forEach(function (rec) {
+			writeNodeLabelGlyphs(rec.ne, rec.n,
+				keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+		});
+		recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
+		recs.forEach(function (rec) {
+			rec.lbl.w = labelBoxWidth(rec.ne);
+			rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
+			rec.lbl.lines = labelRowWidths(rec.ne);
+		});
+		return recs.length;
+	}
+	// How many times the whole node layout may be laid out again so that a label the crossing shed
+	// would hide can give up a value instead. Two is what the three-property drawing can use (three
+	// values, two of them sheddable); the cap is what stops a seven-field drawing running the
+	// chain seven times for the last one or two labels.
+	var LPN_CROSS_SHED_MAX_RUNGS = 3;
 	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.
 	var lastNodeShedRungs = 0;
+	// The crossing-shed rungs the last pass ran, for a harness to read. Not a decision input.
+	var lastCrossShedRungs = 0;
 	// What the last leader slide did, for a harness to read. Not a decision input.
 	var lastLeaderSlide = null;
 	// **THE LABELS THAT ARE DRAWN AND CANNOT MOVE, as the gang repair needs to see them** (Task
@@ -3005,8 +3056,15 @@ var EngCalcs = EngCalcs || {};
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
-		var pad = fs * LPN_ALIGNED_PAD_FRAC,
-			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodePlaced, placed, crossRungs = 0;
+		// **THE WHOLE LAYOUT IS LAID OUT AGAIN WHEN THE ONLY MOVE LEFT WAS TO HIDE SOMETHING**
+		// (Tom's ruling of 2026-09-22 -- see shedNodeLabelsForCrossing()). Everything inside this
+		// loop is one complete answer for the drawing; the loop is entered a second time only when
+		// the crossing shed at the bottom of it hid a node label that still had a value to give,
+		// which is a handful of labels on a crowded view and none at all on most drawings. It is a
+		// pure function of the drawing either way, so the pass stays idempotent.
+		for (;;) {
+		nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
@@ -3022,11 +3080,11 @@ var EngCalcs = EngCalcs || {};
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
 		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
-		var t = labelTuning(),
-			placed = Collide.placeLabels(labels, obs, {
-				inner: t.inner * fs, outer: t.reach * fs,
-				steps: parseRingSteps(t.steps), k: t.k
-			});
+		var t = labelTuning();
+		placed = Collide.placeLabels(labels, obs, {
+			inner: t.inner * fs, outer: t.reach * fs,
+			steps: parseRingSteps(t.steps), k: t.k
+		});
 		// **AND THEN THE GANGS ARE REPAIRED** (Task 539). The first-fit places one label at a time,
 		// each treating the last as an obstacle, which is how two labels end up each locally
 		// reasonable and jointly absurd -- crossed leaders, or one label lying across the other's
@@ -3097,6 +3155,18 @@ var EngCalcs = EngCalcs || {};
 		// only rung left once moving has run out. It must run HERE, after both placements and before
 		// the holders are written, because a hide is a DROP and the drop seam is the loop below.
 		lastCrossingShed = shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs);
+		// **AND A HIDE IS NOT THE BOTTOM RUNG ANY MORE.** A node label the shed just hid gives up
+		// a value and the whole drawing is laid out again, which is his order of preference read
+		// from the bottom: hiding is what happens when there is nothing left to give up. Only on a
+		// content pass, for the reason the cascade above states -- a drag frame places the content
+		// the last content pass settled on.
+		if (!shedNodes || crossRungs >= LPN_CROSS_SHED_MAX_RUNGS
+				|| !shedNodeLabelsForCrossing(lastCrossingShed.hidden, nodeLabels, fsNow)) {
+			break;
+		}
+		crossRungs++;
+		}
+		lastCrossShedRungs = crossRungs;
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
