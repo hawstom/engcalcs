@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**29 still to read on master**, of 194 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**30 still to read on master**, of 194 untranslated keys, of 2044 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (194, 29 to read @@ NEEDS RULING)
+## lpn_  (194, 30 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -91,8 +91,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > unnamed
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
-  > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
-  _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this tip?_
+  > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
+  @@ NEEDS RULING
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
@@ -625,7 +625,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`508dc9dd`) — adds no English strings
+### feat/convert-as (`9889cfcc`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -780,7 +780,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.
   _Ruled OK 2026-09-23._
 
-### feat/zoom-control (`3eadfd61`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`bcaa8319`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -810,7 +810,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
 
-### feat/zoom-scale-rules (`e937735c`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/zoom-scale-rules (`53ae1a15`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…

@@ -1791,7 +1791,7 @@ $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane,
 // can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 // The same fact in a sentence, under the chooser's list and again if such a project is created.
-$ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
+$ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 // **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
