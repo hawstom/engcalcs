@@ -826,7 +826,16 @@ var EngCalcs = EngCalcs || {};
 		var anchor = nodeAt(n), arcs = (ctx && ctx.arcs) || Collide.openArcs([]);
 		return { id: nodeLabelKey(n.id), anchor: anchor, home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
-			widen: labelWidenSearch ? { offset: d, arcs: arcs, outer: reach } : null,
+			// **AND ONLY A LABEL WITH SOMETHING TO LOSE IS OFFERED THE LONGER LEADER.** His ruling is
+			// that a longer leader beats giving a PROPERTY up, so a label that has no property to
+			// give -- one ranked value, which is what a drawing showing the node ID alone is -- is
+			// not what the ruling is about, and widening it is a different trade entirely: a longer
+			// leader against a hide. Measured with it widening regardless: his own R-075 test went
+			// from 10 labels moving to 43, a content pass on Net3-World took two to three times as
+			// long, and two harnesses stopped finishing at all. With this test, an ID-only drawing
+			// is placed exactly as it was before any of today's work.
+			widen: (labelWidenSearch && nodeShedOrder(ne.allLines || []).length > 1)
+				? { offset: d, arcs: arcs, outer: reach } : null,
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			grow: LPN_NODE_ROOM_TO_GROW_ROWS.map(function (r) { return dataLabelBoxHeight(1) * r; }),
 			lines: labelRowWidths(ne) };
