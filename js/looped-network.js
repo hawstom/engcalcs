@@ -13963,7 +13963,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.')) { return; }
+		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		var unrotated = georefBackdropRotated(georef.t);
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
@@ -29006,7 +29006,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function convertSavedGeometry(saved, map, dstGeo) {
 		var srcGeo = !!(saved.project && saved.project.coords === LPN_COORDS_GEO),
-			org = savedOrigin(saved), failed = false, nodes = {}, linksById = {}, drawAt = {},
+			org = savedOrigin(saved), failed = false, nodeByOvKey = {}, linksById = {}, drawAt = {},
 			minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, eps, jobs = [];
 		function mapPos(p) {
 			var q = map(p);
@@ -29030,7 +29030,7 @@ var EngCalcs = EngCalcs || {};
 				y: ((bx.y - a.y) * v.x + (by.y - a.y) * v.y) / eps };
 		}
 		(saved.nodes || []).forEach(function (n) {
-			nodes[n.id] = n;
+			nodeByOvKey[ovKeyFor('node', n.id)] = n;
 			if (!isFinite(n.x) || !isFinite(n.y)) { return; }
 			var d = drawOfPos(n);
 			drawAt[n.id] = d;
@@ -29061,7 +29061,7 @@ var EngCalcs = EngCalcs || {};
 		(saved.scenarios || []).forEach(function (sc) {
 			if (sc.isBase) { return; }
 			Object.keys(sc.overrides || {}).forEach(function (key) {
-				var ov = sc.overrides[key], n = key.indexOf('n:') === 0 ? nodes[key.slice(2)] : null, a, q;
+				var ov = sc.overrides[key], n = nodeByOvKey[key] || null, a, q;
 				if (!ov || !n || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
 				a = absPos(n);
 				q = mapPos({ x: typeof ov.x === 'number' ? ov.x : a.x, y: typeof ov.y === 'number' ? ov.y : a.y });
