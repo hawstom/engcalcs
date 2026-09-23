@@ -838,6 +838,12 @@ the block.
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
 - 100|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
+  **HALF FIXED 2026-09-23 (`fix/settings-select-lag`, merged):** no Settings select is rebuilt under
+  the hand any more, label refreshes coalesce into one pass per frame, and Quality skips the pass when
+  no label shows quality: its handler went from 290-500 ms to 70-180 ms. **LEFT:** a UNIT select
+  still costs 0.4-0.8 s, because `afterUnitChange()` redraws the whole project; and one change
+  applies TWO solves (steady state, then the EPS run a second later), each a full label pass.
+  Applying one result instead of two is the cheaper step before his background-service idea.
   2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
   responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
   BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
