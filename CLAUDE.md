@@ -103,8 +103,9 @@ Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
 ### Specialist agents (`.claude/agents/`, journals in `dev/agents/`)
 
 Six seats: `utility-planning-engineer`, `utility-field-operator`, `market-researcher`,
-`data-entry-clerk`, `interface-designer` (Ida), and **`pre-reviewer`, which runs on every branch
-after the build agent reports and BEFORE Tom is told it is ready, and reports rather than fixes.**
+`data-entry-clerk`, `interface-designer` (Ida), and **`pre-reviewer`, which reviews a feature branch
+before Tom is asked for a browser pass on it, and reports rather than fixes.** Small fixes and tooling
+changes do not need it.
 An agent must carry something this repo does not already have — external evidence or an unoccupied
 vantage point. Each keeps its own ranked wish list; an agent never edits the roadmap. Roster and
 provenance rules: `dev/agents/README.md`.
@@ -183,13 +184,6 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
 - **Vocabulary:** our **Label** is EPANET's Notation; EPANET's **Label** is our **Text**. That one
   collision is the only place we depart from EPANET — **otherwise default to EPANET terminology**
   (static pressure, drawdown, converge, runs), and never invent plain-English substitutes.
-- **There is no house style for English strings. Do not write one.** The mechanisms are
-  `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php` and Tom's reading of
-  `dev/new-english-keys.md`. One advisory survives: **avoid the em dash in visitor-facing English**
-  (a ratchet, `em_dash_ratchet_check.php`).
-- **Mechanics follow APA 7th:** American spelling, serial comma, numerals from 10 up and with units —
-  in docs, comments, commits and visitor English alike. Ratchet, never a sweep. It is overruled only
-  on the em dash.
 - **When one name does two jobs, split it.** Source trace (the analysis, on a Trace node) vs Source
   share (the percentage).
 - **Extended-period simulation shipped, through the EPANET engine only** (`js/lpn-time.js`), with
@@ -280,6 +274,8 @@ mismatch; (D) single-quoted values only.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
   → `$ec_lang_syn`; the concept recurs → `glossary.json`.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
+- **English style:** APA 7th for mechanics (American spelling, serial comma), and no em dash in
+  visitor-facing English. No other house style.
 - **Keep sibling keys parallel in name and value across all 27 files.** An unrendered key is not
   automatically debt; decide per key, never bulk-delete (`key_hygiene_check.php` lists candidates).
 
@@ -314,8 +310,10 @@ merged. **`QUALITY`** in `lib/Language.Settings.php` is an honest defect-risk es
 `check_all.sh` runs every check, and the pre-push hook refuses to push master unless it passed on
 that exact commit. Each failure explains itself; what each check guards is in
 `dev/automated-checks.md`. Run it as `flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`,
-at most about three at once. When a new rule could be a check rather than a sentence here, prefer
-the check.
+at most about three at once.
+
+**Add a check for a defect a visitor could hit that a person would miss.** Do not add checks that
+police the wording or layout of documentation, or that check other checks.
 
 Tom will not read code. Save his attention for naming, scope, wording, and whether an
 unreferenced key is debt.
@@ -403,8 +401,8 @@ Full record: `dev/deploying.md`.
 - **A correction replaces the superseded reasoning in every doc, not just this one.** Keep the
   conclusion and the one rejected alternative that would otherwise be re-proposed.
 - **Don't attribute repo prose to Tom.** Quote only the transcript or a dated first-person quote.
-- **ROADMAP priority is 100 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed** — never
-  between, never a new tier. Entries run 1–3 lines, hard cap ~15; past that, a `dev/*.md` and a
+- **ROADMAP priority is 100 and 99 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed**
+  (`roadmap_id_check.php`). Entries run 1–3 lines, hard cap ~15; past that, a `dev/*.md` and a
   pointer. Closing a task is one line in `dev/roadmap-closed-ids.md` plus deleting the block.
 - **Suite-wide UX/convention issues go to `dev/ROADMAP.md`**, not inline fixes during
   single-calculator work.
