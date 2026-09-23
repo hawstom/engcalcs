@@ -53,6 +53,7 @@ const L = stub.loadLoopedNetwork(
 	"\t\tgetZoomToolShape: function () { return zoomToolShape; },\n" +
 	"\t\tsetZoomToolShape: function (s) { zoomToolShape = s; },\n" +
 	"\t\tgetZoomToolArmed: function () { return zoomToolArmed; },\n" +
+	"\t\tsetZoomToolArmed: function (v) { zoomToolArmed = v; },\n" +
 	"\t\tzoomWindowOpen: function () { return !!zoomWinDrag; },\n" +
 	"\t\twireToolbar: wireToolbar,\n" +
 	"\t\tnoteMapSized: noteMapSized,\n" +
@@ -78,12 +79,44 @@ function reset() {
 	st.s = 1; st.tx = 0; st.ty = 0;
 	L.setMode('select');
 	L.setZoomToolShape('fit');
+	// setMode('select') above is a no-op on `zoomToolArmed` whenever the mode was ALREADY 'select'
+	// (its own reset only fires `if (newMode !== mode)`), so a test block left armed by the one
+	// before it would otherwise start the next block with a stale "second press" already loaded.
+	L.setZoomToolArmed(false);
 }
 function fire(type, ev) { stub.setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
 function keydown(props) {
 	const ev = Object.assign({ key: '', ctrlKey: false, metaKey: false, altKey: false,
 		target: { tagName: 'BODY' }, preventDefault: function () {} }, props);
 	(global.document._listeners.keydown || []).slice().forEach(function (fn) { fn(ev); });
+}
+// **A DOCUMENT-LEVEL pointerdown, the way `wireZoomArmReset()`'s capture listener actually
+// receives one** -- this stub does not model event bubbling (dev/testing-notes.md's own reason for
+// document._listeners existing at all: a listener there is only ever exercised by dispatching to it
+// directly), so a click that lands on the CANVAS still has to be delivered to `document`'s own
+// listeners by hand, exactly as `fire()` above does for `svg`'s.
+function docPointerdown(target) {
+	(global.document._listeners.pointerdown || []).slice().forEach(function (fn) { fn({ target: target }); });
+}
+// Shared by every toolbar-button test below.
+function findByDataTool(root, tool) {
+	if (!root || !root.children) { return null; }
+	for (const c of root.children) {
+		if (c.dataset && c.dataset.tool === tool && String(c.tagName) === 'BUTTON') { return c; }
+		const found = findByDataTool(c, tool);
+		if (found) { return found; }
+	}
+	return null;
+}
+function clickBtn(btn) { (btn._listeners.click || []).forEach(function (fn) { fn({}); }); }
+// Built once per test that needs it: a clean strip (wireToolbar() APPENDS, it does not replace)
+// with the real click/pointerdown/keydown wiring, and the button `findByDataTool()` then locates.
+function buildZoomToolButton() {
+	svg._listeners = {};
+	L.wirePointerEvents();
+	stub.byId.lpn_toolbar.children.length = 0;
+	L.wireToolbar();
+	return findByDataTool(stub.byId.lpn_toolbar, 'zoom-window');
 }
 
 // ---------------------------------------------------------------------------
@@ -331,36 +364,21 @@ console.log('\n--- 5. R-179: the +/- buttons flex-centre their glyph, and carry 
 // ---------------------------------------------------------------------------
 console.log('\n--- 6. the toolbar button: first press fits and says so; only a SECOND, CONSECUTIVE press enters Zoom Window ---');
 {
-	function findByDataTool(root, tool) {
-		if (!root || !root.children) { return null; }
-		for (const c of root.children) {
-			if (c.dataset && c.dataset.tool === tool && String(c.tagName) === 'BUTTON') { return c; }
-			const found = findByDataTool(c, tool);
-			if (found) { return found; }
-		}
-		return null;
-	}
-	function click(btn) { (btn._listeners.click || []).forEach(function (fn) { fn({}); }); }
 	const pc = global.EngCalcs.pageConfig;
-
 	reset();
-	svg._listeners = {};
-	L.wirePointerEvents();
-	stub.byId.lpn_toolbar.children.length = 0;   // a clean strip: wireToolbar() appends, it does not replace
-	L.wireToolbar();
-	const btn = findByDataTool(stub.byId.lpn_toolbar, 'zoom-window');
+	const btn = buildZoomToolButton();
 	ok('the button is on the strip', !!btn);
 	if (btn) {
 		// **WORDING ASSERTED THROUGH pageConfig KEYS, NEVER AN ENGLISH LITERAL** (harness_wording_check.php).
 		ok('it opens showing Zoom to fit', btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent);
 
-		click(btn);
+		clickBtn(btn);
 		ok('...the face still says Zoom to fit after the first press -- R-181\'s whole point',
 			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent);
 		ok('...and the tool has NOT entered zoom-window mode yet', L.getMode() !== 'zoom-window');
 		ok('...armed, waiting for a second press', L.getZoomToolArmed());
 
-		click(btn);
+		clickBtn(btn);
 		ok('the SECOND, CONSECUTIVE press flips the face to Zoom Window',
 			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_window);
 		ok('...and enters the mode', L.getMode() === 'zoom-window');
@@ -370,17 +388,75 @@ console.log('\n--- 6. the toolbar button: first press fits and says so; only a S
 		L.setMode('select');
 		L.setZoomToolShape('fit');
 
-		click(btn);
+		clickBtn(btn);
 		ok('re-armed after a fresh first press', L.getZoomToolArmed());
 		// **ANY OTHER MODE CHANGE IN BETWEEN RESETS IT** (Ida's spec) -- picking a different tool is
 		// exactly the "something else pressed in between" case R-181 is about.
 		L.setMode('select-area');
 		ok('an intervening tool change un-arms it', !L.getZoomToolArmed());
 		L.setMode('select');
-		click(btn);
+		clickBtn(btn);
 		ok('...so the very next press is a first press again, not a second one',
 			btn.getAttribute('aria-label') === pc.lpn_tool_zoom_extent && L.getMode() !== 'zoom-window');
 	}
+}
+
+// ---------------------------------------------------------------------------
+// 6b-6d. THE GAP THE PRE-REVIEW FOUND, 2026-09-23: setMode()'s own reset only fires on a change of
+// MODE, and an ordinary click on the map that selects or deselects something NEVER changes mode --
+// Select mode stays 'select' throughout. Confirmed live in Chromium: press Zoom to fit, click a map
+// element, press the button again, and it jumped straight to Zoom Window with no drag or
+// click-click ever asked for. These three drive the REAL document-level pointerdown/keydown
+// listeners `wireZoomArmReset()` installs (never the internal setMode()/zoomToolArmed primitives
+// directly), because the whole defect was in what reaches those listeners.
+// ---------------------------------------------------------------------------
+console.log('\n--- 6b. an ordinary pointerdown on the map, between two presses, also un-arms it ---');
+{
+	reset();
+	const btn = buildZoomToolButton();
+	clickBtn(btn);
+	ok('armed after the first press', L.getZoomToolArmed());
+	// The map itself -- an ordinary select/deselect click, never a mode change (`mode` stays
+	// 'select' throughout; setMode() is never called).
+	docPointerdown(svg);
+	ok('an ordinary map click un-arms it, even though mode never changed', !L.getZoomToolArmed());
+	clickBtn(btn);
+	ok('so the next press fits again rather than entering Zoom Window',
+		L.getMode() !== 'zoom-window' && L.getZoomToolArmed());
+}
+
+console.log('\n--- 6c. pressing a DIFFERENT toolbar button (e.g. opening a menu) also un-arms it ---');
+{
+	reset();
+	const btn = buildZoomToolButton();
+	clickBtn(btn);
+	ok('armed after the first press', L.getZoomToolArmed());
+	// Any other control -- a menu bar button, a different toolbar tool -- is simply "not this
+	// button", and the reset listener does not special-case which one it was.
+	docPointerdown(document.body);
+	ok('pressing something else on the page un-arms it', !L.getZoomToolArmed());
+	clickBtn(btn);
+	ok('so the next press fits again rather than entering Zoom Window',
+		L.getMode() !== 'zoom-window' && L.getZoomToolArmed());
+}
+
+console.log('\n--- 6d. a keydown that is not this button\'s own activation un-arms it; the button\'s own does not ---');
+{
+	reset();
+	let btn = buildZoomToolButton();
+	clickBtn(btn);
+	ok('armed after the first press', L.getZoomToolArmed());
+	keydown({ key: 'Tab' });   // an ordinary keydown elsewhere, default target {tagName:'BODY'}
+	ok('an unrelated keydown un-arms it', !L.getZoomToolArmed());
+
+	btn = buildZoomToolButton();
+	clickBtn(btn);
+	ok('armed again after a fresh first press', L.getZoomToolArmed());
+	// The button's OWN keyboard activation (Enter/Space while it holds focus) must not un-arm the
+	// very press it is in the middle of -- a real Enter on a focused button fires 'keydown' with
+	// the button as target, then the browser's own synthesized 'click'.
+	keydown({ key: 'Enter', target: btn });
+	ok('...but a keydown ON THE BUTTON ITSELF leaves it armed', L.getZoomToolArmed());
 }
 
 console.log('\n' + checks + ' checks, ' + failures + ' failed');

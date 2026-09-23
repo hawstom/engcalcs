@@ -15582,10 +15582,44 @@ var EngCalcs = EngCalcs || {};
 	// the button currently SHOWS, and R-181 asks that the first press not change what it shows at
 	// all, so the paint decision and the "was the last press this same button, with nothing else
 	// pressed in between" question cannot share one variable. Set true the instant Zoom to fit
-	// fires; cleared by the same setMode() reset hook that already drops `zoomToolShape` back to
-	// 'fit' (extended below to fire on every mode change, not only a zoom-window exit), so any
-	// other tool or mode change in between un-arms the second press.
+	// fires; cleared on ANY other user action -- a mode change (setMode()'s own reset, kept as a
+	// belt-and-braces second door), OR an ordinary pointerdown/keydown anywhere that is not this
+	// same button (see `wireZoomArmReset()`).
+	//
+	// **THE FIRST SHIP OF THIS ONLY CLEARED IT ON A MODE CHANGE, AND THAT WAS WRONG** (pre-review,
+	// 2026-09-23, confirmed live in Chromium): press Zoom to fit once, click an ordinary map
+	// element to select or deselect it -- which never calls setMode(), since Select mode never
+	// leaves 'select' to look at something in it -- then press the button again, and it jumped
+	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
+	// TWICE IN A ROW", and a click on the map in between is not that.
 	var zoomToolArmed = false;
+	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
+	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
+	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
+	// otherwise leave a closure over a detached element.
+	var zoomToolButton = null;
+	var zoomArmResetWired = false;
+	// **THE ONE DOOR THAT UN-ARMS THE SECOND PRESS ON "ANYTHING ELSE"**, wired ONCE regardless of
+	// how many times wireToolbar() rebuilds the strip -- a second copy would just re-clear a flag
+	// that is already false, which is harmless, but a growing pile of document listeners is not
+	// nothing over a long session. Capture phase, so this runs before the target's own handler
+	// gets a chance to do anything, matching how Escape's own document listener is wired.
+	//
+	// **EXCLUDES THE BUTTON ITSELF** (`zoomToolButton.contains(e.target)`, true for a click landing
+	// on its icon's <svg>/<path> rather than the <button> element), because the button's own
+	// pointerdown fires before its own 'click' -- resetting there would un-arm the very press this
+	// flag exists to remember, one event early.
+	function wireZoomArmReset() {
+		if (zoomArmResetWired) { return; }
+		zoomArmResetWired = true;
+		function onOtherAction(e) {
+			if (!zoomToolArmed) { return; }
+			if (zoomToolButton && (e.target === zoomToolButton || (zoomToolButton.contains && zoomToolButton.contains(e.target)))) { return; }
+			zoomToolArmed = false;
+		}
+		document.addEventListener('pointerdown', onOtherAction, true);
+		document.addEventListener('keydown', onOtherAction, true);
+	}
 	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
 	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
 	// simply nothing to fade.
@@ -33906,6 +33940,8 @@ var EngCalcs = EngCalcs || {};
 			// so a second press elsewhere (a different tool, then back here) starts this over.
 		});
 		repaintZoomTool = paintZoomToolButton;
+		zoomToolButton = extentBtn;
+		wireZoomArmReset();
 		paintZoomToolButton();
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View

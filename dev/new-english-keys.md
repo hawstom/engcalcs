@@ -346,7 +346,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
 - **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Drag a box on the map to zoom in on it.
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
   @@ NEEDS RULING
 - **`lpn_msglog_ago`**
   > {x} ago
@@ -532,7 +532,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Zoom Window
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window_tip`**
-  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
   @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
@@ -599,7 +599,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**44 still to read**, of 67 new keys across 5 unmerged branch(es).
+**44 still to read**, of 67 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -805,7 +805,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/property-venue (`50ce4e93`) — adds no English strings
+### feat/property-venue (`5d48bc3c`) — adds no English strings
 
 ### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
 
@@ -822,4 +822,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`c66c8e08`) — adds no English strings
+### feat/zoom-control (`8e0dc003`) — adds no English strings
+
+### fix/one-solve-per-change (`6850e812`) — adds no English strings
