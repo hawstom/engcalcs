@@ -2613,6 +2613,7 @@ EngCalcs.pageConfig = {
 	lpn_mapgeo_step1: <?=json_encode($ec_lang['lpn_mapgeo_step1'])?>,
 	lpn_mapgeo_step2: <?=json_encode($ec_lang['lpn_mapgeo_step2'])?>,
 	lpn_mapgeo_hint1: <?=json_encode($ec_lang['lpn_mapgeo_hint1'])?>,
+	lpn_mapgeo_readjust_intro: <?=json_encode($ec_lang['lpn_mapgeo_readjust_intro'])?>,
 	lpn_mapgeo_hint2: <?=json_encode($ec_lang['lpn_mapgeo_hint2'])?>,
 	lpn_mapgeo_gestures: <?=json_encode($ec_lang['lpn_mapgeo_gestures'])?>,
 	lpn_mapgeo_dial_turn: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn'])?>,
