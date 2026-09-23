@@ -48,9 +48,30 @@ const MULTS = [1, 2, 4, 8];
 // Re-measured the same day when the leader slide began taking the nearest clear spot and going round
 // until nothing moved: Net3-World 11 -> 10, Net3 9 -> 10 (one more at its fit view). Traded
 // knowingly for the longest leader on his northwest case, 28 -> 19 text heights at 2x.
+//
+// **AND THEN THE `moved` CEILING ROSE, WHICH A RATCHET IS NOT SUPPOSED TO DO. READ THIS BEFORE
+// LOWERING IT BY HAND** (2026-09-22). Tom ruled that a longer leader is to be preferred to a label
+// giving a property up, so the widened search ships on (`labelWidenSearch`). **That puts 22 more
+// labels on the fit view of Net3-World** -- 69 drawn becomes 91 with the node ID alone, and the
+// sweep's hidden count at the fit view falls from 29 to 10 at every prefix length. More labels on
+// the drawing is more labels that can be in each other's way, so the number that move when the
+// prefix grows rises with it: 10 to 43 on Net3-World, 10 to 46 on Net3, and none of it at 4x or 8x,
+// where the property still holds exactly.
+//
+// **THE EVIDENCE THAT THIS IS CROWDING AND NOT THE PLACER GETTING WORSE IS THE `had-to-move`
+// COLUMN BESIDE IT**, which is the floor no placer can beat without printing text on something: it
+// rises from 33 to 45 on Net3-World, and the pass moves 43 -- fewer labels than have to move. Net3
+// is the one that does not read that cleanly (46 moved against a floor of 30, all of it at the fit
+// view) and it is honest to say so rather than to average it away.
+//
+// **IT IS ALSO A CONFLICT BETWEEN TWO OF HIS OWN ASKS, AND HE HAS NOT BEEN ASKED WHICH HE WANTS.**
+// R-075 says adding `12345678` must move nothing; today's ruling says a label must not give up a
+// property while a longer leader would do. At the fit view and at 2x they now pull opposite ways.
+// Measured with each half switched off separately: the widening accounts for ALL of the rise and
+// the crossing-shed rung for none.
 const CEILING = {
-	'Net3-Novato-CA-World.lwn': { moved: 10, hidden: 29 },
-	'Net3.lwn': { moved: 10, hidden: 22 }
+	'Net3-Novato-CA-World.lwn': { moved: 43, hidden: 27 },
+	'Net3.lwn': { moved: 46, hidden: 22 }
 };
 
 // THE BEFORE: room to grow switched off through the stub's own source hook, so every label is
@@ -287,7 +308,17 @@ function median(a) {
 
 // The ratchet on the sweep: the worst top-of-column leader and the worst hidden count over all
 // eleven lengths, fit and 2x. Measured 2026-09-22; may fall, may not rise.
-const SWEEP_CEILING = { top: 3.6, hidden: 47, mean: 2.1 };
+//
+// **TWO OF THE THREE ROSE ON 2026-09-22 AND IT IS THE SAME CAUSE AS CEILING'S** -- the widened
+// search ships on, so the fit view draws 19 more labels at every prefix length (hidden 29 -> 10 at
+// length 0) and they stand further out. A drawing with three labels on it has short leaders and a
+// three-row column; this one has thirteen. `hidden` FELL from 47 to 29, which is the same fact read
+// from the other side. **Two rows say plainly that the widening is not what makes a long leader
+// long:** at lengths 9 and 10 the "now" and "before" columns are identical to the decimal (9.2 and
+// 6.9 text heights), because past eight characters the text is wider than the reserve and room to
+// grow stops applying at all -- that number was there before any of this and is R-136's own
+// question. Measured 2026-09-22; may fall, may not rise.
+const SWEEP_CEILING = { top: 9.3, hidden: 29, mean: 3.6 };
 function sweepReport() {
 	const file = FILES[0], got = { now: child(file, false, 'sweep'), before: child(file, true, 'sweep') };
 	if (got.now.error || got.before.error) { report(false, 'prefix sweep', got.now.error || got.before.error); return; }

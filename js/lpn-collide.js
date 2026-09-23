@@ -1753,9 +1753,20 @@ EngCalcs.lpnCollide = (function () {
 		// A label that is STILL beaten here is enclosed as far as WIDEN_SHIPPED_LEVELS reaches --
 		// nine resting offsets as it ships, and that bound is a measurement; see the constant --
 		// and only then is it dropped, which is the rung where it gives a value up instead.
+		// **AND IT CLAIMS ITS ROOM TO GROW OUT HERE TOO** (2026-09-22). Room to grow is the whole
+		// reason a label's choice does not depend on how long its text is -- the ordinary loop above
+		// says why -- and the rescue was choosing by the bare text box, so every label it rescued
+		// chose by its width. **Measured, and it was the entire cost of switching the widening on:**
+		// Tom's own R-075 test -- add `12345678` to the node ID prefix, and count the shown labels
+		// that move -- went from 10 to 42 over Net3-World's four zooms the moment the rescue could
+		// run, and the crossing rung beside it accounted for none of it; the two halves were
+		// measured apart. Tiers widest first within one level, exactly as above, and the bare-box
+		// search below is what a label falls back to, so one that can only stand somewhere tight
+		// still stands there.
 		function rescue(lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
 				chosen = null, chosenBox = null, level, more, far, i, b,
+				tiers = lbl.dragged ? [] : growTiers(lbl), t, room, claimed = null, claimedW = 0,
 				wide = { boxes: [], segments: [] };
 			for (level = 1; level <= WIDEN_SHIPPED_LEVELS && !chosen; level++) {
 				more = widenSides(lbl.anchor, lbl.widen.offset, lbl.widen.arcs,
@@ -1768,10 +1779,19 @@ EngCalcs.lpnCollide = (function () {
 				}
 				farNear(lbl.anchor.x, lbl.anchor.y, far + Math.hypot(lbl.w, lbl.h) + pad, wide);
 				sides = sides.concat(more);   // a COPY: the caller's own array is never touched
-				for (i = sides.length - more.length; i < sides.length; i++) {
+				for (t = 0; t < tiers.length && !chosen; t++) {
+					for (i = sides.length - more.length; i < sides.length; i++) {
+						room = growBoxAt(lbl, sides[i], tiers[t]);
+						if (!roomClearOf(room, wide, pad, lbl.id)) { continue; }
+						chosen = sides[i]; chosenBox = labelLineBoxes(lbl, sides[i]);
+						claimed = room; claimedW = tiers[t];
+						break;
+					}
+				}
+				for (i = sides.length - more.length; i < sides.length && !chosen; i++) {
 					b = labelLineBoxes(lbl, sides[i]);
 					if (boxesClearOf(b, wide, pad, lbl.id) === 'clear') {
-						chosen = sides[i]; chosenBox = b; break;
+						chosen = sides[i]; chosenBox = b;
 					}
 				}
 			}
@@ -1780,11 +1800,13 @@ EngCalcs.lpnCollide = (function () {
 					dropped: true, side: -1, box: null, leader: null });
 				return;
 			}
+			if (claimed) { index.addBox(obs.boxes.push(claimed) - 1); }
 			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
 			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
 				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
 				dropped: false, side: sides.indexOf(chosen), widened: chosen.widened || 1,
-				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
+				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null,
+				room: claimedW > 0 ? claimedW : undefined });
 		}
 		deferred.forEach(rescue);
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
