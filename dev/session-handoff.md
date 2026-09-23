@@ -76,8 +76,8 @@ lines rather than appending corrections.
 
 ### Awaiting his pass (preview ports)
 
-- **8103 `feat/zoom-control`** (682): round 2 of R-179..R-181 is being fixed after Perry found an
-  ordinary map click did not reset the twice-in-a-row rule. Do not ask him until Perry clears it.
+- **8103 `feat/zoom-control`** (682): ready. R-179..R-181 built, and Perry's round-2 finding (a map
+  click did not reset the twice-in-a-row rule) fixed at `83eeb139`.
 - **8104 `feat/convert-as`** (696): ready. He liked the menu tip (R-182). Open question for him:
   the chooser offers EPSG:3857 as "lat/lon", per his own 2026-09-16 tip, while the stored numbers
   are EPSG:4326 degrees. The `$ec_lang_syn` for `lpn_units_length` still says "Pipe lengths and
