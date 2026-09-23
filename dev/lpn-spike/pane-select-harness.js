@@ -295,7 +295,14 @@ console.log('\n--- the cells abut ---');
 {
 	report(/\.lpn-pane-table tbody td \{[^}]*padding: 0;/.test(css),
 		'a body cell has no padding of its own');
-	report(/\.lpn-pane-table tbody td \{[^}]*border: 1px/.test(css),
+	// **WAS a real `border: 1px`, now an equivalent `inset box-shadow`** (2026-09-23, the 1px
+	// heading/column divider misalignment fix): a `border` under abutting cells is resolved by the
+	// table's own collapsed-border grid, which rounds differently from the sticky heading's own
+	// `inset box-shadow` divider at a fractional device pixel ratio. Making both cells use the same
+	// box-shadow mechanism removed the mismatch; the STYLESHEET assertion below moved with it, but
+	// the thing it is checking -- the body cell draws its own edge, in the same #ddd, so two cells
+	// still share what reads as one rule -- has not.
+	report(/\.lpn-pane-table tbody td \{[^}]*box-shadow: inset[^}]*#ddd/.test(css),
 		'...and carries the grid line itself, so two cells share one rule between them');
 	report(/\.lpn-pane-table tbody td input \{[^}]*border: 0;/.test(css),
 		'the control inside it has no border, or the grid would be drawn twice with a gutter');

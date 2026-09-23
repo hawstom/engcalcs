@@ -2235,8 +2235,25 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    between two cells rather than two lines and a gutter. The padding moves inside the control, so
    the figures sit exactly where they did. */
 .lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: center; border: 0; }
-.lpn-pane-table tbody td { padding: 0; border: 1px solid #ddd; }
-.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; }
+/* **A REAL `border` AND A BOX-SHADOW ARE POSITIONED BY DIFFERENT MACHINERY, AND THAT IS THE 1PX
+   MISALIGNMENT TOM REPORTED, MEASURED 2026-09-23 AGAINST HIS OWN COMBINATION** (125% Windows
+   display scaling = device pixel ratio 1.25, scrollbar showing, 100% browser zoom). A `border`
+   under `border-collapse`-style abutment is resolved once, by the table's own collapsed-border
+   grid, shared by every row including the sticky header; the heading's divider was drawn instead
+   as an `inset` `box-shadow` on the TH itself (see the block below), positioned from that cell's
+   own box edge and NOT through that shared grid. The two pipelines agree in CSS-pixel geometry
+   (`getBoundingClientRect` shows 0px difference at every ratio, which is why two earlier sessions
+   could not find this) and disagree by 1-2 DEVICE pixels once the ratio is fractional, because a
+   composited sticky layer's bounds are snapped to whole device pixels on their own schedule.
+   Reproduced in headless Chromium at DPR 1.25, 1.5 and 2 alike, on Net3's 92-row Junctions table
+   (a real vertical scrollbar, not merely a narrowed pane) -- `dev/lpn-spike/table-divider-align-
+   harness.js`. **The fix is to stop mixing the two mechanisms**: the body cell's divider is now an
+   `inset box-shadow` too, the same kind of paint as the heading's, so both are positioned by the
+   same cell-box-edge arithmetic and inherit the same rounding whatever it is. */
+.lpn-pane-table tbody td { padding: 0; border: 0; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
+.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset 1px 0 0 #ddd; }
+html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
+html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset -1px 0 0 #ddd; }
 .lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)) { padding: 1px 6px; }
 /* The control IS the cell: no border of its own, no background of its own, and the cell's own
    padding rather than the browser's. Its width is still the column's, so nothing Tom approved
@@ -2302,11 +2319,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    **THE GRID IS CLOSED ON ALL FOUR SIDES, AND IT TOOK TWO MORE LINES** (Tom, 2026-09-19: *"Top
    border is missing."*). Turning off the suite-wide blue frame on `.lpn-pane-table` took the top
    edge away and nothing replaced it; the heading's LEADING edge went with it and nobody looked.
-   The body was never affected -- `tbody td` carries a border on all four sides, so left, right and
-   bottom close themselves -- which is why only the heading row had open edges. `inset 0 1px 0 #ddd`
-   is the top for every heading and `inset 1px 0 0` the leading edge for the first one, both in the
-   body's own #ddd; the bottom stays #ccc, being the rule that separates head from body rather than
-   one cell from the next.
+   The body was never affected -- `tbody td` carried a `border` on all four sides at the time, so
+   left, right and bottom closed themselves -- which is why only the heading row had open edges.
+   `inset 0 1px 0 #ddd` is the top for every heading and `inset 1px 0 0` the leading edge for the
+   first one, both in the body's own #ddd; the bottom stays #ccc, being the rule that separates head
+   from body rather than one cell from the next. **`tbody td`'s own `border` is gone since
+   2026-09-23** (the 1px misalignment fix above), replaced by the equivalent two box-shadow insets
+   plus, on `.lpn-pane-first`, a third for the leading edge -- so the grid is still closed on all
+   four sides, by the same reasoning, through the new mechanism.
 
    **STICKINESS IS ON THE ROW AND NOT ON THE CELL, AND THAT IS WHAT MAKES A SEPARATOR RELIABLE**
    (Tom, 2026-09-19: *"Strange missing heading border between Tanks Mixing model and Mixing
@@ -2572,6 +2592,12 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	}
 	.lpn-print-table thead { display: table-header-group; }
 	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
+	/* **PRINT NEVER HAD THE DEVICE-PIXEL PROBLEM THE SCREEN FIX IS FOR** -- there is no sticky layer
+	   on paper, so there is nothing to gain from box-shadow here and something to lose: some print
+	   engines drop a box-shadow by default to save ink, where a `border` always prints. This
+	   restores the plain border the body cells carried before 2026-09-23, so the printed sheet is
+	   unchanged by the screen-only fix above it. */
+	.lpn-print-table tbody td, .lpn-print-table tbody td.lpn-pane-first { box-shadow: none; border: 1px solid #ddd; }
 	.lpn-print-table tr { page-break-inside: avoid; }
 	/* A table printed at the reader's dragged widths (panePrintWidths()): fixed layout so the
 	   widths are obeyed, never wider than the sheet, and a long value wraps inside its column
