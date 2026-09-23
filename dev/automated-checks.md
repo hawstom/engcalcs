@@ -3,7 +3,7 @@
 Moved verbatim out of `CLAUDE.md` on 2026-09-23 when that file was compacted. CLAUDE.md keeps the
 short rule and points here; this file keeps the reasoning, the quotes and the measurements.
 
-## Checks — `sh dev/scripts/check_all.sh`
+## Automated checks — `sh dev/scripts/check_all.sh`
 
 Seconds, free, and the first thing to reach for. Blocking failures exit 1. Each script explains its
 own failure; this table is an index, not a duplicate of that text.

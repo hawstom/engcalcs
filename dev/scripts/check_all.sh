@@ -525,7 +525,7 @@ if [ -n "$FAILED" ]; then
 fi
 if [ -n "$ADVISORY" ]; then
 	echo "Advisory findings above:$ADVISORY"
-	echo "Not blocking. Worth a look when convenient; see CLAUDE.md for what each one means."
+	echo "Not blocking. Worth a look when convenient; see dev/automated-checks.md for what each one means."
 fi
 echo "All blocking checks pass."
 
