@@ -122,72 +122,74 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
 
 ---
 
-## STATE -- 2026-09-22 (evening), perishable
+## STATE -- 2026-09-23, perishable
 
-### ON MASTER AND PUSHED AT `f9f87771`+. HE HAS PULLED NONE OF IT
+### ON MASTER AND PUSHED AT `ae1a0b0d`. HE HAS PULLED NONE OF IT
 
-- **His 125 English rulings and his 17 own rewordings are harvested and applied.** The rulings are
-  in `dev/english-key-rulings.json`; the 17 edited strings are in `lib/lang.ec.en.php` in HIS
-  words. **Applying them broke `js_fallback_string_check.php`** -- six of those keys carry a
-  duplicate English literal inside `js/`, and moving the language file alone drifted them. Fixed
-  the same session. **Next time his edits land, run that check before assuming master is green.**
-- **27 language keys RETIRED** -- every one `lpn_survey_*`, none ever translated, none rendered by
-  anything. `lpn_survey_fmt_*` were dead by his own 2026-09-18 ruling that the format chooser shows
-  the bare acronym. **One of the 27 was `lpn_survey_err_no_coords`, which he had reworded by hand
-  that same morning** -- he spent attention on a string nothing can display. Tell him when it
-  happens; it is the `EC.lpnTerrainFill()` shape again.
-- `fix/property-echo`: editing Base demand now updates the Properties box, not just the map label
-  and the table. The open popup was never refreshed when the debounced solve landed.
-- `fix/time-step-instant`: the time-step selector names ONE instant per row again (`25:00`), not a
-  range. **Tom reopened his own R-105 and was right the second time**; Mary confirmed against
-  EPANET, epanet-js and Bentley's Time Browser. Elapsed time still climbs past 24:00 and the clock
-  reading stays in the tip.
-- Tasks 247, 669 and 705 CLOSED on his word; 708 promoted to 100; Task 696 kept OPEN with his
-  round-three findings folded in.
+- **UNDO WAS BROKEN FOR ALMOST EVERY PROPERTY FIELD, and he found it with a throwaway test case**
+  (*"When I change Base demand, Ctrl+Z or the Undo button don't put it back"*). It was not Base
+  demand: **no plain number, text or dropdown field in the Properties popup took an undo snapshot
+  at all** -- elevation, tank levels, reservoir head, diameter, roughness, minor-loss k, reaction
+  coefficients, valve type -- nor did typing into a single Tables cell. Every other kind of edit
+  did, which is why it had never been noticed. Fixed at the seven shared field builders, so ~55
+  sites were repaired at once. `dev/undo-audit.md` is the full inventory; **the Settings panel's
+  own edits are still not undoable and that is his product call, not a defect to fix quietly.**
+- **THE HARNESSES RUN THREE AT A TIME NOW** (`run_harnesses.sh`). 241 harnesses ran strictly
+  serially on a four-core box, which is the phase every other worker waits behind. Measured on 24
+  pure-node harnesses while three other suites were running: **80 s serial against 50 s**. The 11
+  that drive a real browser still run alone, DERIVED from their source rather than a typed list.
+  `ENGCALCS_HARNESS_JOBS=1` restores the old behaviour exactly. 241/241 pass either way.
+- **99 IS A REAL TIER NOW**, on his instruction (*"Demote to 99 (to narrow our priorities)"*), and
+  `roadmap_id_check.php` enforces it. Next went from 21 tasks to 9 at 100 and 7 at 99. **It is not
+  the retired 95**: 95 was a dated holding pen, 99 is a permanent second rank inside Next.
+- **Tasks 688 and 693 are FOLDED INTO 696** on his word -- one `File, Convert as...` row carrying
+  both units and coordinates, with the placement steps shown only when the CRS actually changed.
+- **Re-adjust opens at STEP 1 now**, keeping the placement. That closes the "nothing can reach step
+  1 twice" gap without a Discard row; he chose it himself (*"I think that is kind"*).
+- The time-step tip names the day: `Day 2, 01:00`. **The day boundary is midnight on the clock, not
+  24 elapsed hours**, and the harness asserts exactly that on a 06:00 start.
+- `dev/language-strings.md` carries his new ruling against **"Do X and Y happens"** where the
+  meaning is conditional. Write *"Do X to get Y"* or *"If you do X, Y happens"*.
 
-### THE FOUR BRANCHES, AND WHAT IS OPEN ON EACH
+### THE FOUR BRANCHES -- ALL FOUR NOW AWAIT HIS BROWSER PASS
 
-- **`feat/notice-log`**: the "RIVER" bleed-through and the messages-on-one-line were ONE defect --
-  the panel was `display:flex` with no direction and had no background of its own. Both fixed and
-  confirmed live by Perry. The tip is off the glyph and `lpn_msglog_tip` is deleted.
-  **PERRY FOUND AN UNREQUESTED REGRESSION: dropping the tip also dropped "Messages" out of
-  Help > Toolbar key**, because `setIconLabel()` does both jobs. Repair dispatched. **THE GLYPH
-  ITSELF IS HIS TO SETTLE** -- Ida says neither the down arrow nor the `+` (the down triangle
-  already means "a menu opens below" twice on this page and marks column sort a third time; `+`
-  already means "make a new one" twice) and recommends repairing the same clock: a dot at the
-  centre and the hands spread wider.
-- **`feat/tables-spreadsheet`**: PRINT IS FIXED -- columns kept their em widths while the print
-  font stayed at 9pt, so headings shattered one letter per line; the sheet's font now shrinks by
-  the same factor. **THE 1px DIVIDER MISALIGNMENT DID NOT REPRODUCE** at device pixel ratios 1,
-  1.25, 1.5 and 2, at CSS zoom 80-150%, or with a forced classic scrollbar, measured by geometry
-  and by reading painted pixels. **This is the second session that failed to reproduce it. ASK HIM
-  for browser, zoom level, Windows display scaling, and whether a scrollbar was showing.**
-- **`feat/zoom-scale-rules`** (NEW): his four rulings of 2026-09-22 -- one percentile rule instead
-  of two, pipe widths shrinking too, Net3 threshold 30, and the misplaced `ft`.
-- **`feat/label-gang-search`**: round four in flight on his three items -- dropping must give way
-  to longer leaders, the one label in `_label-mystery.PNG` that both dropped properties and
-  travelled too far, and R-136's measured answer on why extra characters lengthen the gang.
-  **HE HAS SAID "This may be good to undo." THAT IS HIS CALL AND NOBODY ELSE'S.**
+- **`feat/tables-spreadsheet`: THE 1px DIVIDER IS REPRODUCED AND FIXED, and the earlier "not
+  reproduced" line here was STALE.** Two sessions failed on it because they measured with
+  `getBoundingClientRect`, which reports 0px difference every time. **The cause is Chromium's
+  sticky heading row**: the heading's dividers are painted as a shadow inside a sticky compositing
+  layer and the body's as an ordinary border, and under OS display scaling the two round to
+  different physical pixels. His own detail -- Windows at 125% -- is what cracked it; **the
+  scrollbar turned out to be a red herring**. The new harness reads actual SCREENSHOT PIXELS, which
+  is the only thing that could have seen it. Print widths are fixed too.
+- **`feat/label-gang-search`: dropping is now the LAST resort, not an early one.** On his own case:
+  labels showing fewer properties than asked 51 -> 18, labels not drawn 8 -> 5, property rows on
+  screen 408 -> 524. **Two costs he must weigh and only he can:** with EVERY node field on, 12 more
+  labels are hidden than before (14 -> 26), and the crowded view is about half again slower. One
+  unrequested control arrived on this branch and is the cheapest thing to withdraw: a **"Restore
+  label defaults"** button in the Labels box.
+- **`feat/zoom-scale-rules`: his "something is going wrong with the shrinking" DID NOT REPRODUCE.**
+  Measured in real Chrome on three examples over a 90,000-to-1 zoom sweep: the node-to-pipe ratio
+  is constant to 0.1-0.5% everywhere. The fix he is describing landed the same day he looked
+  (`d039bb13`), so **ask him to hard-reload and look again on this branch** before anyone hunts
+  further. The ratio is now a standing assertion, mutation-tested.
+- **`feat/notice-log`**: the RIVER bleed-through and the one-line messages were ONE defect. The tip
+  is gone, and **"Messages" is deliberately NOT in Help > Toolbar key** on his own ruling -- that
+  button is in the map overlay, not the toolbar, so the row would have named a place it is not.
 
 ### WHAT IS OUTSTANDING WITH HIM
 
-1. **The Messenger glyph** -- Ida's recommendation against both of his candidates, above.
-2. **The 1px table dividers** -- his browser and zoom, above.
-3. **The two "step 2" controls** -- still unanswered: which menu row did he press?
-4. **A discard row for a grid placement** -- Re-adjust opens step 2 only, so a grid project placed
-   in the wrong town has no way back. His wording needed.
-5. **His two general points about English**, which he asked to make general only "once we achieve
-   mutual understanding": (a) do not say a blank differs from zero, say what a blank is FOR;
-   (b) do not write "Leave it at X and Y happens" where the meaning is "Leave it at X to get Y."
-   Nothing has been written into `dev/language-strings.md` yet, deliberately.
-6. **R-004, R-043, R-062** -- open only because they wait on him.
+1. **The Messenger glyph.** He said *"I cave"* while making the better argument -- that every down
+   arrow on this page means "see more", which is cohesion rather than confusion. **He was not
+   overruled; he was told so.** Nothing has been redrawn.
+2. **The `%` sign** added after his percentile box, which was not in his sentence.
+3. **The label branch's two costs** above, and whether the Restore-defaults button stays.
+4. **Settings-panel undo**, from `dev/undo-audit.md`.
+5. **R-004, R-043, R-062** -- open only because they wait on him.
 
 ### THE SPRINT
 
-**NOT LAUNCHED, ON PURPOSE.** 168 keys are untranslated and 88 more wait on the four branches, and
-he has authorized a sprint "whenever you deem it prudent." It is not prudent yet: he reworded 17
-shipped strings this same day, and the branches will add more. A sprint now buys retranslations of
-text whose meaning is still moving. **Launch it when the four branches have merged.**
+**STILL NOT LAUNCHED, AND THE REASON HAS NOT CHANGED.** He is rewording shipped strings on most
+browser passes, and four branches are still open. Launch it when they have merged.
 
 ## What to hand Tom in the same breath as any panel change
 
