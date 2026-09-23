@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read on master**, of 182 untranslated keys, of 2030 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -385,7 +385,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
+  > Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom. Text you placed yourself stays, and your label choices are kept either way.
   @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
@@ -578,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 5 unmerged branch(es).
+**61 still to read**, of 84 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +589,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`23de4dfd`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`23de4dfd`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -654,6 +654,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
   @@ NEEDS RULING
@@ -664,7 +670,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
+### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -701,6 +707,12 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 - **`lpn_survey_column_n`**
   > column {n}
@@ -784,9 +796,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/property-venue (`50ce4e93`) — adds no English strings
+### feat/property-venue (`5d48bc3c`) — 2 new, 2 to read @@ NEEDS RULING
 
-### feat/table-editing (`e157bb40`) — 4 new, 4 to read @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/table-editing (`ab33c6fc`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_pane_filldown`**
   > Fill down
@@ -800,17 +819,29 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_show_col`**
   > Show {col}
   @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 
-### feat/zoom-control (`bcaa8319`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`83eeb139`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Drag a box on the map to zoom in on it.
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window`**
   > Zoom Window
   @@ NEEDS RULING
 - **`lpn_tool_zoom_window_tip`**
-  > Drag a box on the map to zoom in on it. Press this button again for Zoom to fit.
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
   @@ NEEDS RULING
 - **`lpn_zoom_in`**
   > Zoom in
