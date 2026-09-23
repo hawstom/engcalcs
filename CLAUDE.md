@@ -8,9 +8,14 @@ computation runs client-side in JavaScript. No database, no authentication.
 
 **How to read this file:** it states the current rules, tersely. The reasoning, quotes and
 measurements behind them live in the `dev/*.md` each section points at. Where a rule is enforced by
-a script, the script's own error text is the authority. Run `sh dev/scripts/check_all.sh` before
-every commit. **Read `dev/session-handoff.md` before the roadmap** — its top block is the current
-freeze, the branches you may not merge, and any open deploy blocker.
+a script, the script's own error text is the authority. **Read `dev/session-handoff.md` before the
+roadmap** — its top block is the current freeze, the branches you may not merge, and any open
+deploy blocker.
+
+**Keep this file to current rules only. Never append progress notes, changelogs, dated
+corrections, or the story of how a rule came about.** That belongs in the commit message, or in a
+`dev/*.md` if a future reader would act differently for knowing it. When a rule changes, rewrite
+it in place.
 
 ---
 
@@ -22,8 +27,7 @@ Full record, with Tom's words and the history of each rule: `dev/git-workflow.md
 to leave something uncommitted.
 
 - **`master` is the production line and nobody works on it.** Every change starts on a branch,
-  however small, and reaches master only by a merge somebody decided to make. "Sacred" means one
-  testable thing: `check_all.sh` passes on the MERGE RESULT before the merge is pushed.
+  however small, and reaches master only by a merge somebody decided to make.
 - **A release branch holds the line; a freeze does not.** `release/ewb` is cut from the SHA Tom
   deployed. A hotfix: branch off `release/ewb`, fix, `check_all`, merge, push; he pulls that; the
   same fix is merged to master separately. A clean release can always be cut from a pre-merge SHA
@@ -43,13 +47,11 @@ to leave something uncommitted.
 - **When Tom questions a standing rule twice, the rule is the suspect.** Re-argue it from scratch,
   out loud, and say which parts of the original reasoning do not answer what he asked.
 - **Stage explicit paths. Never `git add -A`** — concurrent sessions share the working directory.
-- **Report the push state unprompted:** the SHA, and that `git log --oneline origin/master..master`
-  is empty. Never tell Tom to `git pull` before verifying the push landed.
+- **Tell Tom the SHA you pushed.**
 - **Author every AI commit** `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`, so `git
   log` and `git blame` tell his commits from ours.
 - **Commit message: a subject of ≤72 characters and no body.** A body only when a future reader
-  would act differently without it, ≤40 words. Reasoning belongs in code comments or the roadmap.
-  End with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+  would act differently without it, ≤40 words.
 
 ### Worktrees
 
@@ -58,8 +60,8 @@ to leave something uncommitted.
 - **Give concurrent agents disjoint file territory, and name shared SEAMS in both briefs** (a write
   seam, a resolver, a single source of truth) or sequence them. `scenario_seam_check.php` guards the
   `setProp()` one.
-- **Subagents commit in their worktree and never push.** The orchestrator merges promptly, runs
-  `check_all.sh` on the merged tree, pushes, and deletes the branch.
+- **Subagents commit in their worktree and never push.** The orchestrator merges promptly, pushes,
+  and deletes the branch.
 - **Only the orchestrator regenerates `dev/translation_payloads/`, once, before the commit.** A
   subagent that adds a key says so and leaves the payloads alone; its `payload freshness` failure
   is expected.
@@ -309,122 +311,20 @@ merged. **`QUALITY`** in `lib/Language.Settings.php` is an honest defect-risk es
 
 ## Automated checks — `sh dev/scripts/check_all.sh`
 
-Blocking failures exit 1; each script explains its own failure. **What each check guards, why, and
-what it measured when written: `dev/automated-checks.md`.** Run it under the lock:
-`flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`, and no more than about three at once.
+`check_all.sh` runs every check, and the pre-push hook refuses to push master unless it passed on
+that exact commit. Each failure explains itself; what each check guards is in
+`dev/automated-checks.md`. Run it as `flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`,
+at most about three at once. When a new rule could be a check rather than a sentence here, prefer
+the check.
 
-| Check | Guards |
-|---|---|
-| php + js + shell syntax | Every `.php`, `.sh`, `js/*.js` and `js/vendor/*.js` |
-| `html_balance_check.php` | Well-formed HTML on every page |
-| `pageconfig_check.php` + selftest | Every pageConfig key JS reads is supplied (aliases included) |
-| `tip_markup_check.php` | Tips built by the helpers |
-| `js_fallback_string_check.php` + selftest | `pc.key \|\| 'English'` fallbacks equal the English value; ratchet at 0 |
-| `blank_target_check.php` + selftest | New tabs carry `noopener` |
-| `icon_name_check.php` + selftest | Every named icon exists |
-| `link_title_check.php` + selftest | No tip parked on `<a title=>` |
-| `dom_id_resolve_check.php` + selftest | Every referenced DOM id can exist; no duplicates |
-| `web_manifest_check.php` + selftest | `manifest.json` agrees with the pages |
-| `storage_guard_check.php` + selftest | Every web-storage access is inside `try` |
-| `button_type_check.php` + selftest | Every `<button>` declares its `type` |
-| `bootstrap_global_check.php` + selftest | Functions reading bootstrap globals declare them `global` |
-| `script_interpolation_check.php` + selftest | PHP echoed into `<script>` goes through `json_encode()` |
-| `attr_escape_check.php` + selftest | `$ec_lang` echoed into an attribute goes through `htmlspecialchars()` |
-| `number_step_check.php` + selftest | Every number input declares `step` |
-| `focus_order_check.php` | Hide control costs one keyboard stop |
-| `social_card_check.php` | `og:image` absolute and real |
-| `vendor_integrity_check.php` | Vendored files match the manifest |
-| `projection_catalogue_check.php` | EPSG catalogue intact and agreeing with the built-in fallback |
-| `coord_order_check.php` | lon,lat in system, lat,lon in public |
-| `browser_lang_tag_check.php` | No forged log rows |
-| `sw_manifest_check.php` | Service worker precaches what pages request |
-| `sw_map_host_check.php` + selftest | No map host or tile in the service worker |
-| `sw_scope_check.php` + selftest | Worker scope covers every mount (`ecSwMounts()`) |
-| `standalone_assets_check.php` | The suite ships its own assets |
-| `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a whitelist, never `HTTP_HOST` |
-| `canonical_path_check.php` + selftest | Pretty URLs nominate themselves |
-| `sitemap_canonical_check.php` + selftest | Sitemap URLs equal each page's canonical |
-| `nav_link_absolute_check.php` + selftest | Suite nav links are origin-absolute |
-| `deploy_identity_selftest.php` | About box build line describes the deploy |
-| `js_page_url_check.php` + selftest | JS-built suite URLs go through `suiteUrl()` |
-| `third_party_request_check.php` + selftest | Exactly four gated third-party requests |
-| `storage_inventory_check.php` + selftest | Every stored item is in the inventory |
-| `cookie_attribute_check.php` + selftest | Every cookie names samesite/secure/httponly |
-| `page_meta_check.php` + selftest | `$html_desc` set or declared exempt; no `?v=N` |
-| `calculator_page_check.php` + selftest | Every calculator is menued and its prefix documented above |
-| `verdict_string_check.php` + selftest | Verdicts lead with a glyph in all 27 languages |
-| `log_bucket_check.php` + selftest | Log rows end with `ecLogBucketSuffix()` |
-| `log_format_selftest.php` | Log readers read mixed-vintage rows correctly |
-| `no_session_check.php` + selftest | No PHP session, ever |
-| `docroot_exposure_check.php` + selftest | Every directory declared served or blocked |
-| `public_claim_check.php` + selftest | Struck public claims cannot return |
-| `plain_english_swap_check.php` + selftest | Struck plain-English substitutes cannot return |
-| `em_dash_ratchet_check.php` | Em dashes in visitor English may fall, never rise |
-| `scenario_seam_check.php` | Overridable properties go through `setProp()` |
-| `lpn_furniture_check.php` + selftest | Window furniture never enters `serializeProject()` |
-| `js_constant_check.php` + selftest | JS physical constants are exact |
-| `unit_factor_check.php` | `$ec_units` factors re-derived and mutually consistent |
-| `unit_family_check.php` + selftest | Unit-family absolutes |
-| `unit_select_family_check.php` + selftest | Unit selects name a family |
-| `unit_default_preset_check.php` + selftest | Unit-bearing defaults declared per preset |
-| `form_field_units_check.php` + selftest | `hasUnits` agrees with the rendered form |
-| `unit_default_set_selftest.php` | First-visit preset rule and measured option order |
-| `lang_syntax_validate.php` | Rules A–D |
-| `lang_key_resolve_check.php` + selftest | Every literal `$ec_lang['k']` read is defined |
-| `lang_tag_parity_check.php --strict` | Markup matches English |
-| `lang_placeholder_check.php` + selftest | Every `{placeholder}` can be substituted, globally if repeated |
-| `gloss_ref_check.php` | Every `gloss:` resolves |
-| `anchor_language_check.php` + selftest | Anchor prose agrees with `glossary.json` |
-| `js_module_wiring_check.php` + selftest | New JS modules are on a page and in the DOM stub |
-| `layout_tag_check.php` | Layout tags match their widget |
-| `syn_tag_side_check.php` + selftest | Tags sit right of the pipe in `$ec_lang_syn` |
-| `native_review_flag_check.php` + selftest | No "awaiting native review" |
-| `language_declaration_check.php` + selftest | Declared languages equal shipped files |
-| `coverage_selftest.php` | The coverage cross |
-| `generate_translation_payloads.php --check` | Payload freshness |
-| `payload_freshness_selftest.php` | Freshness judged by content, both directions |
-| `key_hygiene_selftest.php` | The reachability walk still sees a dead reader |
-| `prefix_map_check.php` + selftest | Every prefix wired to glossary terms |
-| `new_english_keys.php --check` | `dev/new-english-keys.md` is fresh |
-| `harvest_english_rulings.php --check` + `harvest_rulings_selftest.php` | Tom's marks on that list reach a durable file |
-| `generate_examples.php --check` | Served `examples/` matches source |
-| `generate_features.php --check` | `dev/features.md` matches its source |
-| `hook_install_check.php` | Git hooks installed as copies and current |
-| `branch_policy_selftest.php` | Merge gate: all-clear pinned to commit, feature freeze, defect tracks untouched |
-| `wait_guard_selftest.php` | Background wait loops can finish (`.claude/hooks/guard-wait-loops.php`) |
-| `roadmap_id_check.php` | Unique IDs; priority is 100, 75, 50, 25, 5 or 0 |
-| `review_queue_check.php` + selftest | Tom's review comments are well-formed and printed while open |
-| `check_table_parity_check.php` + selftest | This table and `check_all.sh` agree |
-| `doc_path_check.php` + selftest | Every path this file cites exists |
-| `run_harnesses.sh` | lpn solver and editor harnesses |
-| `run_calc_harnesses.sh` | Each calculator against its rendered HTML |
-| `harness_wording_check.php` + selftest | Harnesses assert `pageConfig` keys, not English literals; ratchet |
-| `stale_claim_check.php` | *Advisory.* Cited closed tasks beside a negation |
-| `stale_claim_selftest.php` | That check's demotions |
-| `usage_report_selftest.php` | Usage report reads the right fields and never sums the two buckets |
-| `daily_report_selftest.php` | Mailed report keeps its headings and bucket labels |
-| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php`, `branch_hygiene_check.php`, `nested_repo_boundary_check.php`, `host_script_parity_check.php` | Judgement calls, and checks that read outside this tree |
-| *advisory:* `sibling_exposure_check.php` | Sibling sites still guard their document roots |
-
-**Before writing a new rule in this file, ask whether it can be a check.** Every rule that became a
-script stopped being violated; every rule that stayed prose kept being violated by people who had
-read it.
-
-**Beyond the free tier:** `/code-review` is billed and only a human can start it — worth it for logic
-nobody can confirm by using the page, storage/privacy/legal text, or cross-cutting changes. Tom's
-attention is scarcest and he will not read code: reserve it for naming, scope, wording, and whether
-an unreferenced key is debt. Every calculator has a worked-example test except `rc` (partial).
-Row-table calculators build rows in their own per-page harness, not the smoke harness.
+Tom will not read code. Save his attention for naming, scope, wording, and whether an
+unreferenced key is debt.
 
 ## Testing
 
-**Minimize Tom's browser passes.** Write a harness in `dev/lpn-spike/` or `dev/calc-spike/`; full
-lessons in `dev/testing-notes.md`. Headless browser runs go through
-`flock /tmp/engcalcs-browser.lock`.
-
-- **A stub that removes the coupling makes a harness pass for the wrong reason.** Suspect the stub;
-  teach it the one physical relationship it holds constant.
-- **Render a page at global scope, one page per process**, with `dev/scripts/render_page.php`.
+Prefer a harness in `dev/lpn-spike/` or `dev/calc-spike/` to asking Tom for a browser pass.
+Headless browser runs go through `flock /tmp/engcalcs-browser.lock`. Render a page outside a web
+request only with `dev/scripts/render_page.php` (global scope, one page per process).
 
 ---
 
@@ -500,10 +400,8 @@ Full record: `dev/deploying.md`.
 
 ## Writing things down
 
-- **A correction substitutes the superseded reasoning; it never appends.** Keep the conclusion and
-  the one rejected alternative that would otherwise be re-proposed.
-- **Compact by load frequency.** This file is read every session; detail belongs in `dev/*.md`.
-- **Write order, not elapsed time** — there is no clock finer than the date.
+- **A correction replaces the superseded reasoning in every doc, not just this one.** Keep the
+  conclusion and the one rejected alternative that would otherwise be re-proposed.
 - **Don't attribute repo prose to Tom.** Quote only the transcript or a dated first-person quote.
 - **ROADMAP priority is 100 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed** — never
   between, never a new tier. Entries run 1–3 lines, hard cap ~15; past that, a `dev/*.md` and a
