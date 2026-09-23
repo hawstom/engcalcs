@@ -15,14 +15,21 @@
 // replaced "Thematic map (colors only)", which promised the opposite ("Text you placed yourself
 // stays"). js/looped-network.js splits this into `labelsPastThreshold()` (real number only, feeds
 // the per-label rule) and `labelsFullyHidden()` (0 or a real number exceeded, feeds
-// `dataLabelsHidden` and the labels legend) -- section 2 is the check that would catch the two
+// `dataLabelsHidden` and the labels legend) -- section 3 is the check that would catch the two
 // being collapsed back into one.
+//
+// **EVERY VALUE CHANGE GOES THROUGH THE REAL CONTROL, NEVER A DIRECT MODEL POKE OR A DIRECT
+// renderLabelsLegend() CALL** (pre-review finding, 2026-09-23): the box's own `change` event and
+// the "Use current view" button's own `click`, exactly as dev/lpn-spike/zoom-symbol-cap-harness.js
+// section 7 already does for the same control. A harness that pokes `settings.labelMaxWidth` and
+// then calls the render function itself cannot notice the render function's own caller forgetting
+// to call it -- which is exactly what slipped through the first version of this file.
 //
 // **NET3.lwn (THE XY EXAMPLE) SHIPS labelMaxWidth: 30 AND OPENS PAST IT** (Task 705,
 // 2026-09-22) -- dev/lpn-spike/switch-keep-harness.js clears it before reuse for exactly this
 // reason. This harness opens Net3-Novato-CA-World.lwn instead (labelMaxWidth is unset there) and
-// sets `settings.labelMaxWidth` explicitly in every section regardless, so no assertion here rides
-// on either shipped file's own number.
+// sets the threshold explicitly, through the real control, in every section regardless, so no
+// assertion here rides on either shipped file's own number.
 
 const fsmod = require('fs');
 const stub = require('./lpn-dom-stub.js');
@@ -52,7 +59,12 @@ const L = loadLoopedNetwork(
 	"\t\tsetView: function (v) { return applyView(v); }, geoHome: geoHomeView,\n" +
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\trefreshLabelText: refreshLabelText, refreshLabelSuppression: refreshLabelSuppression,\n" +
-	"\t\tapplyLabelVisibility: applyLabelVisibility, renderLabelsLegend: renderLabelsLegend,\n" +
+	"\t\tapplyLabelVisibility: applyLabelVisibility,\n" +
+	// **NOT renderLabelsLegend, EXPOSED FOR THE HARNESS TO CALL DIRECTLY.** The pre-review finding
+	// this file exists to guard against: a harness that drives the model and then calls the render
+	// function itself never notices when the real change path forgets to call it. Every legend
+	// assertion below goes through rebuildSettings()/fire() on the real Settings control instead.
+	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tlabelSettingsJson: function () { return JSON.stringify(labelSettings); },\n" +
 	"\t\tsettings: function () { return settings; },\n" +
@@ -96,6 +108,26 @@ function noteHidden() {
 	var le = L.labelEl(note.id);
 	return !!(le && le.text && le.text.classList && le.text.classList.contains('lpn-lbl-hidden'));
 }
+
+// **THE REAL CONTROL, THE REAL EVENT** -- the house pattern (dev/lpn-spike/zoom-symbol-cap-harness.js
+// section 7): the stub records listeners and this fires them, so a value change is exercised the
+// way a user's own keystroke exercises it, through setLabelMaxWidth()'s real onChange, not by
+// poking `settings.labelMaxWidth` and reading the model back.
+function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({ preventDefault() {} }); }); }
+function settingsInput(id) {
+	var all = [];
+	(function walk(e) {
+		if (!e) { return; }
+		all.push(e);
+		(e.children || []).forEach(walk);
+	})(stub.byId.lpn_set_map_fields);
+	return all.filter(function (e) { return e.id === id; })[0];
+}
+function useCurrentViewButton(box) {
+	return box.parentNode && (box.parentNode.children || [])
+		.filter(function (c) { return c.tagName && String(c.tagName).toLowerCase() === 'button'; })[0];
+}
+function setThreshold(box, v) { box.value = v; fire(box, 'change'); }
 
 // ---- 0. real-language wording exists, and the retired key is gone -----------------------------
 console.log('== wording (asserted through pageConfig, never an English literal) ==');
@@ -155,15 +187,22 @@ console.log('== migrating colorThematic on open ==');
 // ---- 2. blank: labels shown at any zoom ---------------------------------------------------------
 console.log('== blank: always shown ==');
 {
-	L.settings().labelMaxWidth = null;
+	L.rebuildSettings();
+	var box = settingsInput('lpn_set_label_max_width');
+	ok(!!box, 'the labeling-threshold row is on the Settings box');
+	ok(box.value === '', 'blank is the box\'s own starting value on a fresh project');
 	[10, 1000, 1e6, 1e9].forEach(function (w) {
 		L.setCanvas(w, 900);
 		L.applyLabelVisibility();
 		ok(!L.labelsHidden(), 'blank: labels are drawn at canvas width ' + w, L.svgClasses());
 	});
 	ok(!noteHidden(), 'blank: the user\'s own Text is drawn too');
-	L.renderLabelsLegend();
-	ok(L.legendBox().style.display !== 'none', 'blank: the labels legend is shown (a field is on)');
+	// **THROUGH THE REAL CONTROL'S OWN CHANGE HANDLER, NEVER A DIRECT RENDER CALL.** Pre-review
+	// (2026-09-23): the harness used to call renderLabelsLegend() itself here, which cannot catch
+	// setLabelMaxWidth() forgetting to. Re-typing blank still fires the real onChange.
+	setThreshold(box, '');
+	ok(L.legendBox().style.display !== 'none',
+		'blank: the labels legend is shown, through the real control\'s own change handler');
 	L.setCanvas(1400, 900);
 }
 
@@ -171,7 +210,10 @@ console.log('== blank: always shown ==');
 console.log('== zero: never shown ==');
 {
 	var before = L.labelSettingsJson();
-	L.settings().labelMaxWidth = 0;
+	var box = settingsInput('lpn_set_label_max_width');
+	setThreshold(box, '0');
+	ok(L.settings().labelMaxWidth === 0, 'typing 0 into the real box stores 0, not null',
+		String(L.settings().labelMaxWidth));
 	[10, 1000, 1e6, 1e9].forEach(function (w) {
 		L.setCanvas(w, 900);
 		L.applyLabelVisibility();
@@ -183,12 +225,16 @@ console.log('== zero: never shown ==');
 	// not reach a Text object's own visibility, which is governed by a REAL threshold only
 	// (labelsPastThreshold(), not labelsFullyHidden()).
 	ok(!noteHidden(), '0: the user\'s own Text stays drawn (it is not generated annotation)');
-	L.renderLabelsLegend();
-	ok(L.legendBox().style.display === 'none', '0: the labels legend hides with the labels');
+	// **THE PRE-REVIEW FINDING, HELD DOWN.** No manual renderLabelsLegend() call anywhere in this
+	// file -- this reads the legend box's own style straight after the real setter ran.
+	ok(L.legendBox().style.display === 'none',
+		'0: the labels legend hides too, through the real control\'s own change handler');
 	L.setCanvas(1400, 900);
-	L.settings().labelMaxWidth = null;
-	L.applyLabelVisibility();
+	setThreshold(box, '');
+	ok(L.settings().labelMaxWidth === null, 'clearing the real box stores null again');
 	ok(!L.labelsHidden(), 'clearing it back to blank restores the labels');
+	ok(L.legendBox().style.display !== 'none',
+		'...and the real control\'s own change handler brings the legend back too');
 }
 
 // ---- 4. a real positive number: the threshold behaves exactly as before ------------------------
@@ -210,18 +256,23 @@ console.log('== a real threshold: unchanged ==');
 		return !!(le && le.text && le.text.classList && le.text.classList.contains('lpn-lbl-hidden'));
 	}
 
-	L.settings().labelMaxWidth = 100; // this project's display length unit (ft)
 	// A scale worked out from the threshold itself, never guessed: at state.s = mapBox().w / X the
-	// view is X world units wide, so a scale either side of the 100-unit threshold is computed
+	// view is X world units wide, so a scale either side of a 100-unit threshold is computed
 	// directly from it rather than picked by trial and error.
 	var w = 1400; // mapBox().w, fixed by setCanvas() above
-	var sNarrow = w / 50;   // a 50-unit-wide view: inside the threshold
+	var sNarrow = w / 50;   // a 50-unit-wide view: inside a 100-unit threshold
 	var sWide = w / 200;    // a 200-unit-wide view: past it
-	L.getState().s = sWide;
-	L.applyLabelVisibility();
+
+	L.rebuildSettings();
+	var box2 = settingsInput('lpn_set_label_max_width');
+	L.getState().s = sWide; // set BEFORE the real change, so the real onChange sees the wide view
+	setThreshold(box2, '100'); // this project's display length unit (ft)
 	ok(L.labelWidthLimitSI() > 0 && L.visibleMapMetres() > L.labelWidthLimitSI(),
 		'the fixture really is past the threshold at this scale (a check on the check)');
 	ok(L.labelsHidden(), 'zoomed out past a real 100-unit threshold, labels are hidden');
+	ok(L.legendBox().style.display === 'none',
+		'...and typing that real threshold hides the legend too, through the real control');
+
 	L.getState().s = sNarrow;
 	L.applyLabelVisibility();
 	ok(L.visibleMapMetres() < L.labelWidthLimitSI(),
@@ -233,8 +284,29 @@ console.log('== a real threshold: unchanged ==');
 	L.applyLabelVisibility();
 	ok(note2Hidden(),
 		'a real threshold, exceeded, hides a Text object with "Show at all zoom levels" off too');
-	L.settings().labelMaxWidth = null;
-	L.applyLabelVisibility();
+}
+
+// ---- 5. "Use current view": the fourth path that must refresh the legend ------------------------
+console.log('== the "Use current view" button also refreshes the legend ==');
+{
+	var box3 = settingsInput('lpn_set_label_max_width');
+	var btn3 = useCurrentViewButton(box3);
+	ok(!!btn3, 'the "Use current view" button sits beside the box');
+	// Still zoomed to sWide from section 4, and the threshold is still 100 (well inside it) -- so
+	// the labels, and the legend, are hidden before the button is pressed.
+	ok(L.labelsHidden(), 'still past the 100-unit threshold at the wide view, labels are hidden');
+	ok(L.legendBox().style.display === 'none', '...and the legend is still hidden with them');
+	fire(btn3, 'click');
+	ok(L.settings().labelMaxWidth > 100,
+		'the button captured the current (wide) view as the new threshold',
+		String(L.settings().labelMaxWidth));
+	ok(!L.labelsHidden(), '...so the view it just captured is labelled again');
+	// **THE FOURTH PATH THE PRE-REVIEW NAMED.** captureViewWidth()'s button runs through the same
+	// setLabelMaxWidth() as a typed value, so this is the same real handler as sections 2-4 -- no
+	// manual render call here either.
+	ok(L.legendBox().style.display !== 'none',
+		'...and the "Use current view" button brings the legend back too');
+	setThreshold(box3, '');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

@@ -36866,10 +36866,17 @@ var EngCalcs = EngCalcs || {};
 	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
 	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
 	// changes neither input.
+	//
+	// **AND THE LABELS LEGEND, SINCE 2026-09-23.** The retired "Thematic map" checkbox's own change
+	// handler called renderLabelsLegend() directly (the key had to vanish the moment the mode did);
+	// folding thematic mode into this threshold moved that same obligation here, and every path that
+	// can change dataLabelsHidden -- a typed 0, blank, a real number, "Use current view", or a
+	// resize crossing it -- goes through this one function, so one call covers all of them.
 	function labelThresholdChanged() {
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
+		renderLabelsLegend();
 		if (!dataLabelsHidden) { relayoutLabels(); }
 	}
 	// **THE TRANSITION BACK COSTS A RELAYOUT, and that is why a suppressor calls this rather than
