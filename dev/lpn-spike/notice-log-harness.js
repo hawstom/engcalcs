@@ -59,6 +59,7 @@ const INJECT =
 	"\t\ttoggleMessageLogPanel: toggleMessageLogPanel,\n" +
 	"\t\tpanelOpen: function () { return msglogPanelOpen; },\n" +
 	"\t\twireMessageLogButton: wireMessageLogButton,\n" +
+	"\t\ticonGuideRows: function () { return iconGuideRows(); },\n" +
 	"\t\trenderBanner: renderBanner,\n" +
 	"\t\tsetBannerWarn: function (w) { bannerWarn = w; bannerRO = null; },\n" +
 	"\t\tsetBannerRO: function (r) { bannerRO = r; bannerWarn = null; },\n" +
@@ -277,6 +278,19 @@ ok('it has an accessible name, which an icon-only button does not get for free',
 ok('it carries no title text -- no tip to show on hover', !btn.title);
 ok('and no .ec-help class -- initTips() must not wire a popup onto this button',
 	String(btn.className || '').indexOf('ec-help') < 0);
+// **AND THE OTHER HALF OF THE SAME INVARIANT** (Perry's second review, 2026-09-22: dropping the
+// tip by building this button by hand instead of through setIconLabel() silently dropped it out
+// of Help > "Toolbar key" too -- the one NON-hover way a first-time or touch user learns what the
+// glyph does, which Tom never asked to lose along with the tip). Asserted TOGETHER with the no-tip
+// checks above, on purpose: a fix that restores one half and re-breaks the other must fail here,
+// not pass two separate, disconnected assertions in two separate files.
+{
+	const guideRow = L.iconGuideRows().filter(r => r.icon === 'history')[0];
+	ok('it is still in the Toolbar key list', !!guideRow, JSON.stringify(L.iconGuideRows().map(r => r.icon)));
+	ok('under its own name', guideRow && guideRow.label === PC.lpn_msglog_name);
+	ok('but the list row carries no tip either -- the whole point was to drop the tip, not hide it',
+		guideRow && !guideRow.tip);
+}
 ok('it draws a real icon -- a misspelt name renders nothing at all',
 	(btn.children || []).some(c => String(c.tagName || '').toLowerCase() === 'svg'));
 ok('it names the panel it discloses, for a screen reader that cannot see the arrow key otherwise',
@@ -685,6 +699,22 @@ console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and grou
 	const unknown = Array.from(found).filter(function (n) { return declared.indexOf(n) < 0; });
 	ok('a new, undeclared writer of #lpn_map_notice is caught by the SAME scan 8f runs',
 		unknown.indexOf('aNewUndeclaredWriter') >= 0, JSON.stringify(unknown));
+}
+
+console.log('10. THE LIVE MUTATION: dropping registerToolbarIcon() reproduces the exact regression '
+	+ '(Perry\'s second review, 2026-09-22) -- no tip is correct, but disappearing from Help > '
+	+ '"Toolbar key" along with it is not, and group 7 must catch that on its own');
+{
+	const M6 = load(src => {
+		const mark = "\t\tregisterToolbarIcon(btn, 'history', name, '');\n";
+		if (src.indexOf(mark) < 0) { throw new Error("wireMessageLogButton()'s registerToolbarIcon() call has moved"); }
+		return src.replace(mark, '');
+	});
+	M6.wireMessageLogButton();
+	const guideRow = M6.iconGuideRows().filter(r => r.icon === 'history')[0];
+	ok('without the registration call, the button vanishes from the Toolbar key list -- '
+		+ 'restoring the exact regression this section exists to catch',
+		!guideRow, JSON.stringify(M6.iconGuideRows().map(r => r.icon)));
 }
 
 global.setTimeout = realSetTimeout;

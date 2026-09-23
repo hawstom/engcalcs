@@ -29003,6 +29003,27 @@ var EngCalcs = EngCalcs || {};
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
+	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
+	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
+	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
+	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
+	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
+	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
+	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
+	// jobs from the one call it always made; a button built by hand because it must carry no tip
+	// calls this alone.
+	function registerToolbarIcon(el, iconName, name, tip) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === el) {
+				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
+				return;
+			}
+		}
+		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+	}
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
 		// when I hover on the toolbar icon, one is our styled tip. The other is the browser tip.
@@ -29026,17 +29047,9 @@ var EngCalcs = EngCalcs || {};
 		if (prior) { prior.dispose(); }
 		EngCalcs.setIconLabel(el, iconName, name, tip);
 		if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
-		// **THE INDEX IS KEYED ON THE BUTTON, so a repaint replaces its row rather than adding
-		// one.** Help, What the toolbar icons mean is DERIVED from this list; before this, cycling
-		// the area tool three times listed the area button four times.
-		var i;
-		for (i = 0; i < toolbarIconIndex.length; i++) {
-			if (toolbarIconIndex[i].el === el) {
-				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
-				return;
-			}
-		}
-		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+		// Help, What the toolbar icons mean is DERIVED from this list; before this, cycling the
+		// area tool three times listed the area button four times.
+		registerToolbarIcon(el, iconName, name, tip);
 	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
@@ -45174,14 +45187,23 @@ var EngCalcs = EngCalcs || {};
 	// which is the one selector initTips() wires a hover popup onto -- so this button is built by
 	// hand rather than through that door: the icon, and an `aria-label` so a screen reader still
 	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
-	// therefore unread; it and its 26 translations were deleted with this change.
+	// therefore unread; it (never translated into any of the other 26 languages) was deleted with
+	// this change.
+	// **AND STILL REGISTERED IN HELP > "TOOLBAR KEY"** (Perry's second review, 2026-09-22: building
+	// this button by hand instead of through setIconLabel() silently dropped it out of that list
+	// too, which is the one non-hover way a first-time or touch user learns what the glyph does --
+	// Tom asked only for the hover tip to go, not for that). `registerToolbarIcon()` is the
+	// bookkeeping half of setIconLabel() split out for exactly this: called here alone, with an
+	// empty tip, so the row appears with a name and no tip of its own.
 	function wireMessageLogButton() {
 		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
 		if (!btn) { return; }
+		var name = pc.lpn_msglog_name || 'Messages';
 		btn.textContent = '';
 		var ic = iconEl('history');
 		if (ic) { btn.appendChild(ic); }
-		btn.setAttribute('aria-label', pc.lpn_msglog_name || 'Messages');
+		btn.setAttribute('aria-label', name);
+		registerToolbarIcon(btn, 'history', name, '');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
 		btn.addEventListener('click', function (e) {
