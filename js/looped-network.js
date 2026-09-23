@@ -84,8 +84,12 @@ var EngCalcs = EngCalcs || {};
 	// label keeps the exact offset it was dropped at (n.lx/n.ly are absolute world units).
 
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
-	function defaultLabelOffset() {
-		var k = symbolFactor();
+	// `full`: fitItems() alone passes true, for the same reason nodeRadiusFull() exists -- the fit
+	// multiplies a world size back out by the LIVE scale to recover a scale-independent pixel
+	// figure, and that only cancels when this offset's own division uses that SAME scale
+	// unconditionally, which the capped symbolFactor() stops doing once the cap is in force.
+	function defaultLabelOffset(full) {
+		var k = full ? symbolFactorFull() : symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
 	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
@@ -95,8 +99,8 @@ var EngCalcs = EngCalcs || {};
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
-	function nodeLabelBase(n) {
-		var d = defaultLabelOffset();
+	function nodeLabelBase(n, full) {
+		var d = defaultLabelOffset(full);
 		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
 			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
 	}
@@ -6656,6 +6660,22 @@ var EngCalcs = EngCalcs || {};
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
 	}
+	// **THE FIT-ONLY, UNCAPPED TWIN OF nodeRadius() -- always symbolFactorFull(), never the cap.**
+	// fitItems() multiplies a world size by the LIVE scale to recover a scale-INDEPENDENT pixel
+	// figure, and that cancellation only holds when the division inside the world size and the
+	// multiplication outside it use the SAME scale unconditionally -- which symbolFactorFull() does
+	// and the capped symbolFactor() does not, once the view is far enough out that the cap (rather
+	// than the live scale) decides the divisor. A fit started at 0.02x and one started at 1x then
+	// disagreed on where the SAME candidate scale would put a junction, because the capped radius
+	// baked in whichever scale happened to be live when the fit was ASKED for, not the candidate
+	// scale being tested (`zoom-fit-harness.js`, section 2, caught it the day the cap's own default
+	// moved enough to cross this network's fit window). The fit reserves room as though every
+	// symbol were still at its full, unshrunk screen size -- conservative rather than wrong, since
+	// the true capped size past the fitted scale can only be smaller than what was reserved.
+	function nodeRadiusFull(n) {
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
+		return JUNCTION_R * symbolFactorFull();
+	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
 	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
 	// width/height per type, not nodeRadius()'s single circumscribing scalar; the non-uniform
@@ -10362,19 +10382,25 @@ var EngCalcs = EngCalcs || {};
 
 
 		doc.nodes.forEach(function (n) {
-			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
+			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
+			// whichever scale happened to be live when it was asked for.
+			var rad = nodeRadiusFull(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
 			fitItem(out, nat.x, nat.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
 			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
 			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
 			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
-			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
+			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
+			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
+			// fit was asked for, not the candidate scale being tested.
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
 				lx = (base.x >= nat.x) ? base.x : base.x - tw;
 			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
+			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
+			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactorFull() * sc;
 			for (j = 0; j < l.verts.length; j++) {
 				v = l.verts[j];
 				fitItem(out, v.x, v.y, vr, vr, vr, vr);
@@ -10384,8 +10410,9 @@ var EngCalcs = EngCalcs || {};
 			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
 			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
 			// pipe by a world distance derived from the arrow's pixel size.
+			// defaultLabelOffset(true): uncapped, same reason as the node loop above.
 			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
-				d = defaultLabelOffset(),
+				d = defaultLabelOffset(true),
 				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
 				ex = mid.x + (l.lx !== undefined ? l.lx : d.x),
 				ey = mid.y + (l.ly !== undefined ? l.ly : d.y),
