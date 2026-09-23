@@ -678,8 +678,8 @@
 		// The rest are about the FILE and not about a line, so they carry no number, no code and
 		// nothing printed underneath them: there is no line to point at.
 		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation, so none of them was read.', d, ax, line); }
-		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line was passed over: it names no columns this page knows.', d, ax, line); }
-		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines passed over: {detail}.', d, ax, line); }
+		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line was skipped: it names no columns this page knows.', d, ax, line); }
+		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines skipped: {detail}.', d, ax, line); }
 		return { text: text, raw: raw };
 	};
 
