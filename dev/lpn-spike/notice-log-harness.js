@@ -381,78 +381,55 @@ console.log('7d. Highlighted while a message shows, cleared the moment it is not
 	ok('and clears when that warning resolves', !active());
 }
 
-console.log('7e. The glyph is a DOWN ARROW, at real button size');
-// **TOM CHOSE THE DOWN ARROW, 2026-09-23** (*"OK. Down arrow."*), which retires the whole
-// clock-hands question this section used to hold. The old assertions parsed two hand vectors and
-// demanded they be near-perpendicular and unequal in length, because two strokes that close
-// together fuse into one bent line at 14-16px -- and Tom READ that bent line as an arrow and
-// preferred it. So what was a failure mode is now the design.
-//
-// **THE INVARIANT MOVED, IT DID NOT SOFTEN.** An arrow is only an arrow if the head is a head: two
-// barbs of similar length coming off the shaft's END, each angled well away from the shaft, and
-// the shaft itself clearly vertical. A "head" whose barbs are tiny reads as a plain line; one
-// whose barbs are shallow reads as the chevron this section was written about in the first place.
-// Still a STATIC check on lib/Icons.lib.php rather than a rendered-pixel one, for the same reason:
-// it holds regardless of how any one browser rasterises a 2px stroke.
+console.log('7e. The glyph is a plain selector-style caret (Tom, R-175: "I liked the down arrow '
+	+ 'that was initially used ... I don\'t like the one we have now ... Something very much like '
+	+ 'a selector ... is fine.")');
+// **RETIRES THE RINGED-ARROW INVARIANT.** That drawing (a circle, a vertical shaft and a two-barb
+// head) was itself Tom's own prior call, and R-175 overrules it: no ring, no shaft, no barbs -- a
+// single filled triangle, the same shape this page's own pane-tab and project-tab menu carets draw
+// as the character `▾`. Still a STATIC check on lib/Icons.lib.php rather than a rendered-pixel one:
+// it holds regardless of how any one browser rasterises a small fill.
 {
 	const iconsSrc = fs.readFileSync(path.join(ROOT, 'lib/Icons.lib.php'), 'utf8');
 	const m = iconsSrc.match(/'history'\s*=>\s*'((?:[^'\\]|\\.)*)'/);
 	if (!m) { throw new Error("'history' icon not found in lib/Icons.lib.php"); }
 	const markup = m[1];
 	const dAttrs = [...markup.matchAll(/<path d="([^"]+)"/g)].map(x => x[1]);
-	ok('the arrow is drawn as a shaft and a head', dAttrs.length === 2, dAttrs.join(' | '));
+	ok('the caret is a single filled path -- no ring, no separate shaft or head',
+		dAttrs.length === 1, dAttrs.join(' | '));
+	ok('it is filled with currentColor and has no stroke -- solid, like the tab-menu carets it matches',
+		/fill="currentColor"/.test(markup) && /stroke="none"/.test(markup), markup);
+	ok('no circle ring survives from the old drawing', !/<circle/.test(markup), markup);
 
-	// Absolute-path points: M/L/H/V, all the commands this suite's stroke icons use.
+	// Absolute-path points: M/L, all the commands a solid triangle needs.
 	function pts(d) {
-		const toks = d.match(/[MLHV][-\d.]+(?:\s+[-\d.]+)?/gi);
+		const toks = d.match(/[MLZ][-\d.]*(?:\s+[-\d.]+)?/gi);
 		if (!toks || !toks.length) { throw new Error('unexpected path shape: ' + d); }
 		const out = [];
-		let cur = null;
 		toks.forEach((tk) => {
-			const cmd = tk[0].toUpperCase(), n = tk.slice(1).trim().split(/\s+/).map(Number);
-			if (cmd === 'M' || cmd === 'L') { cur = [n[0], n[1]]; }
-			else if (cmd === 'H') { cur = [n[0], cur[1]]; }
-			else if (cmd === 'V') { cur = [cur[0], n[0]]; }
-			else { throw new Error('unsupported command: ' + cmd); }
-			out.push(cur);
+			const cmd = tk[0].toUpperCase();
+			if (cmd === 'Z') { return; }
+			const n = tk.slice(1).trim().split(/\s+/).map(Number);
+			out.push([n[0], n[1]]);
 		});
 		return out;
 	}
-	// The SHAFT is the two-point path; the HEAD is the three-point one. Told apart by shape rather
-	// than by order, so re-ordering the two <path> elements cannot silently swap the assertions.
-	const paths = dAttrs.map(pts);
-	const shaft = paths.filter(p => p.length === 2)[0];
-	const head = paths.filter(p => p.length === 3)[0];
-	ok('one path is a straight shaft and the other is a two-barb head',
-		!!shaft && !!head, dAttrs.join(' | '));
+	const tri = pts(dAttrs[0]);
+	ok('it is a triangle -- exactly three points', tri.length === 3, JSON.stringify(tri));
 
-	// THE SHAFT POINTS DOWN, and is mostly vertical rather than mostly sideways.
-	const sdx = shaft[1][0] - shaft[0][0], sdy = shaft[1][1] - shaft[0][1];
-	ok('the shaft runs DOWN the glyph -- y grows downward in SVG', sdy > 0, 'dy=' + sdy);
-	ok('...and is clearly vertical, not a diagonal', Math.abs(sdy) >= 3 * Math.abs(sdx),
-		'dx=' + sdx + ' dy=' + sdy);
-
-	// THE HEAD SITS AT THE SHAFT'S FOOT, not part-way up it: an arrowhead half-way along the line
-	// is a different mark entirely.
-	const tipIdx = 1, apex = head[tipIdx];
-	ok('the head apexes at the bottom of the shaft, not part-way along it',
-		Math.abs(apex[0] - shaft[1][0]) <= 1 && apex[1] >= shaft[1][1] - 1,
-		'apex=' + apex.join(',') + ' shaft foot=' + shaft[1].join(','));
-
-	// BOTH BARBS ARE REAL AND ARE A MATCHED PAIR. A head with one long barb and one stub is a tick.
-	const b1 = head[0], b2 = head[2];
-	const l1 = Math.hypot(b1[0] - apex[0], b1[1] - apex[1]);
-	const l2 = Math.hypot(b2[0] - apex[0], b2[1] - apex[1]);
-	ok('both barbs are long enough to read as a head, not as a kink',
-		Math.min(l1, l2) >= 3, 'lengths=' + l1.toFixed(2) + ',' + l2.toFixed(2));
-	ok('...and they are a matched pair, so the head is not a tick',
-		Math.max(l1, l2) / Math.min(l1, l2) <= 1.25, 'lengths=' + l1.toFixed(2) + ',' + l2.toFixed(2));
-	ok('...one to each side of the shaft', (b1[0] - apex[0]) * (b2[0] - apex[0]) < 0,
-		'b1=' + b1.join(',') + ' apex=' + apex.join(',') + ' b2=' + b2.join(','));
-	// AND THEY SWEEP BACK UP, away from the tip. Barbs level with the apex read as a T.
-	ok('...and both sweep back up the shaft, which is what makes it an arrow and not a T',
-		b1[1] < apex[1] - 1 && b2[1] < apex[1] - 1,
-		'b1y=' + b1[1] + ' b2y=' + b2[1] + ' apexy=' + apex[1]);
+	// THE APEX (the point that is not part of the flat top) POINTS DOWN, and the two remaining
+	// points form a roughly horizontal top edge above it -- a caret, not a triangle on its side.
+	const ys = tri.map((p) => p[1]);
+	const apex = tri.filter((p) => p[1] === Math.max(...ys))[0];
+	const top = tri.filter((p) => p !== apex);
+	ok('exactly two points share the topmost edge, and the third is strictly below both',
+		top.length === 2 && top[0][1] === top[1][1] && apex[1] > top[0][1],
+		JSON.stringify(tri));
+	ok('the top edge is roughly level with itself and wider than the shape is tall -- a caret, not '
+		+ 'a narrow spike', Math.abs(top[1][0] - top[0][0]) >= (apex[1] - top[0][1]),
+		JSON.stringify(tri));
+	ok('the apex sits roughly centred under the top edge, not off to one side',
+		Math.abs(apex[0] - (top[0][0] + top[1][0]) / 2) <= 1, JSON.stringify(tri));
 }
 
 console.log('7f. The panel stacks messages top-to-bottom, and paints an opaque backing behind '
@@ -490,6 +467,35 @@ console.log('7f. The panel stacks messages top-to-bottom, and paints an opaque b
 	const stripped = decl.replace(/flex-direction\s*:\s*column;?/, '').replace(/background\s*:\s*#fff;?/, '');
 	ok('the live mutation: removing both declarations reproduces the exact defect this check exists for',
 		!/flex-direction\s*:\s*column\b/.test(stripped) && !/background\s*:\s*#fff/.test(stripped));
+}
+
+console.log('7g. The GLYPH itself is opaque too (Tom, R-157: "I discovered what is appearing '
+	+ 'behind the glyph. It is the text \'RIVER\' from the model.")');
+{
+	// §7f fixed the PANEL's background, which is a different box than the always-on button that
+	// opens it -- a live probe against the real page (a real "River" Text object panned under the
+	// closed button, EPANET Net3) showed the letter still bleeding through .lpn-msglog-btn's own
+	// rgba(255,255,255,.8) after that fix landed, so this is a separate box needing the same remedy.
+	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
+	const m = css.match(/\.lpn-msglog-btn\s*\{([^}]*)\}/);
+	if (!m) { throw new Error('.lpn-msglog-btn has no rule of its own'); }
+	const decl = m[1];
+	const bgMatch = decl.match(/background(?:-color)?\s*:\s*([^;]+);/);
+	ok('the button declares its own background', !!bgMatch, decl.trim());
+	if (bgMatch) {
+		const bg = bgMatch[1].trim();
+		const rgbaAlpha = bg.match(/rgba\([^)]*,\s*([\d.]+)\s*\)/);
+		const isFullyOpaque = !rgbaAlpha ? !/transparent/i.test(bg) : Number(rgbaAlpha[1]) >= 1;
+		ok('and it is fully opaque -- nothing on the map canvas can show through the glyph itself',
+			isFullyOpaque, bg);
+	}
+	// The live mutation: put the old translucent value back and confirm this check is what would
+	// have caught it.
+	const stripped = decl.replace(/background\s*:\s*#fff;?/, 'background: rgba(255, 255, 255, .8);');
+	const strippedMatch = stripped.match(/background(?:-color)?\s*:\s*([^;]+);/);
+	const strippedAlpha = strippedMatch && strippedMatch[1].match(/rgba\([^)]*,\s*([\d.]+)\s*\)/);
+	ok('the live mutation: restoring the old rgba(...,.8) reproduces the exact defect this check exists for',
+		!!strippedAlpha && Number(strippedAlpha[1]) < 1);
 }
 
 console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 8099: '

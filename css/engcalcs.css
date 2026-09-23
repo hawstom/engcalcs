@@ -2950,13 +2950,17 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
-   button/glyph must be where the messages appear"). It carries the same translucent pill paint as
-   the mode text next to it, so the row reads as one readout and not as a control parked beside
-   one. pointer-events:auto because the row it sits in is otherwise inert like every map overlay. */
+   button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the
+   mode text next to it carries** (Tom, R-157: "I discovered what is appearing behind the glyph. It
+   is the text 'RIVER' from the model... It's a Text object, not a label."). A partial-alpha
+   background over the map canvas lets whatever is drawn underneath bleed through the glyph itself,
+   the same defect .lpn-msglog-panel was already given a solid background to avoid -- this button
+   gets the same remedy. pointer-events:auto because the row it sits in is otherwise inert like
+   every map overlay. */
 .lpn-msglog-btn {
 	pointer-events: auto;
 	display: inline-flex; align-items: center;
-	background: rgba(255, 255, 255, .8);
+	background: #fff;
 	border: 1px solid #bbb; border-radius: 3px;
 	padding: 1px 4px; font: inherit; font-size: 11px; line-height: 1;
 	color: #555; cursor: pointer;
