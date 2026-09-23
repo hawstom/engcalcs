@@ -108,7 +108,7 @@ console.log('\n--- right-click a heading offers to hide it ---');
 	report(before.indexOf('demand') >= 0, 'Demand starts visible', before.join(','));
 	const menu = rightClickHeading('junctions', 'demand');
 	report(!!menu, 'right-clicking the Demand heading opens a menu');
-	const item = menuItem(menu, PC.lpn_pane_hide_col || 'Hide this column');
+	const item = menuItem(menu, PC.lpn_pane_hide_col);
 	report(!!item, 'the menu offers "Hide this column"');
 	fire(item, 'click', {});
 	const after = L.colKeys('junctions');
@@ -132,7 +132,7 @@ console.log('\n--- a hidden column is absent from a copy, not merely invisible -
 console.log('\n--- ID cannot be hidden ---');
 {
 	const menu = rightClickHeading('junctions', 'id');
-	const item = menu && menuItem(menu, PC.lpn_pane_hide_col || 'Hide this column');
+	const item = menu && menuItem(menu, PC.lpn_pane_hide_col);
 	report(!item, 'the ID heading\'s own menu offers no "Hide this column"', menu ? 'menu opened' : 'no menu');
 	// The setter refuses too, not only the menu (Perry, 2026-09-23: deleting the setter's own guard
 	// left every check green, because only the menu was tested).
@@ -156,7 +156,7 @@ console.log('\n--- it is browser furniture: the same key column widths already u
 {
 	L.setCell('junctions', ids[0], 'demand', 42);   // give hiding something to survive alongside
 	rightClickHeading('junctions', 'demand');
-	fire(menuItem(menuEl(), PC.lpn_pane_hide_col || 'Hide this column'), 'click', {});
+	fire(menuItem(menuEl(), PC.lpn_pane_hide_col), 'click', {});
 	report(L.colKeys('junctions').indexOf('demand') < 0, 'Demand is hidden again, going into the reload test');
 	const stored = JSON.parse(global.localStorage.getItem(L.prefsKey) || '{}');
 	report(!!(stored.junctions && stored.junctions.hidden && stored.junctions.hidden.indexOf('demand') >= 0),
