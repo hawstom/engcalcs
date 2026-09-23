@@ -11258,12 +11258,21 @@ var EngCalcs = EngCalcs || {};
 	// tile offering a basemap the menu no longer agreed about -- the drift refreshBasemapTeaser()'s
 	// own comment warns against.
 	function basemapChoosable() { return projectLocatable() || xyGeorefOk(); }
+	// **GO TO AND THE PLACE-NAME SEARCH ASK THE WIDE QUESTION TOO, SINCE 2026-09-22** (Tom, on
+	// feat/map-menu: *"The last two menu rows showing for EPSG projects, Goto and Search, were not
+	// requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map
+	// is not attached (no georeference)."*). Both travel through goToPoint(), which gained a branch
+	// that turns a latitude and longitude into drawing units through the attached map's transform,
+	// so they no longer need anything a georeferenced grid project lacks. Moving the camera changes
+	// nothing in the document, which is why this widening is safe where the DEM's is not.
+	// On a grid project that means the map is SHOWING, not merely that a placement is kept: a
+	// Detached grid project greys both rows, as Tom's "disabled when a world map is not attached"
+	// says. A geographic or projected project is findable whether its map is showing or not.
+	function placeFindable() { return projectLocatable() || worldMapAttached(); }
 	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
-	// oversight.** It gates the place-name search and the DEM elevations as well as the tiles, and
-	// both of those want more than a transform: Go to points a camera whose units are DEGREES in a
-	// lat/lon project, and the DEM writes numbers into the document. Attaching a backdrop is meant
-	// to change nothing, so it unlocks the tiles and stops there; the other two rows are Tom's to
-	// ask for.
+	// oversight.** It still gates the DEM elevations, which write numbers into the document from a
+	// place on the Earth; attaching a backdrop is meant to change nothing, so an attached world map
+	// unlocks the tiles, Go to and the search (placeFindable() above), and stops there.
 	//
 	// **AND THIS IS TASK 692's QUESTION ASKED A FOURTH TIME.** That audit found four capabilities
 	// gated on "are these coordinates a latitude and a longitude" where what they meant was "can
@@ -11277,14 +11286,27 @@ var EngCalcs = EngCalcs || {};
 	// defect 692 closed, and widening these three would re-open it from the other side.
 	// dev/lpn-spike/xy-world-map-harness.js asserts both halves.
 	function basemapOn() { return basemapChoosable() && project.basemap !== 'off'; }
-	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
-	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
+	// One setter for both sources, and 'off'. **IT SETS; IT NO LONGER TOGGLES** (2026-09-22). It used
+	// to turn the basemap OFF when asked for the style already showing, which was right for the
+	// retired Hide/Show street map and satellite rows and nothing else: once World map, Attach went
+	// through it, Attach on a map that was already showing turned the map off while its notice said
+	// it had attached it (Perry's review, 2026-09-22). The corner teaser always asks for the OTHER
+	// style, so it never relied on the toggle.
+	//
+	// **THE STYLE IN USE IS REMEMBERED WHEN THE MAP GOES OFF**, so Detach then Attach brings back
+	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
+	// project for the same reason `basemap` is: it is a statement about this document's picture.
 	function setBasemapStyle(style) {
-		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
+		if (style === 'off' && project.basemap && project.basemap !== 'off') {
+			project.basemapLast = project.basemap;
+		}
+		project.basemap = style;
 		refreshBasemap();
 		saveToStorage();
 	}
-	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
+	function setBasemapOn(on) {
+		setBasemapStyle(on ? (project.basemapLast || 'osm') : 'off');
+	}
 	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
 	// a tile can, and the only thing that removes it is turning the basemap off. The two sources
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
@@ -11301,8 +11323,7 @@ var EngCalcs = EngCalcs || {};
 	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
 	// is a third thing to keep in step with openMapMenu(). It carries the SAME two strings as that
 	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
-	// come to mean different things -- including the seam's own rule that asking for the style
-	// already showing turns the basemap off.
+	// come to mean different things.
 	//
 	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
 	// bar to icons, so a phone reader has strictly FEWER routes to this than a desktop one; taking
@@ -11311,7 +11332,12 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!basemapChoosable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		// **HIDDEN WHILE DETACHED** (Perry's re-review, 2026-09-22). It asked basemapChoosable() --
+		// "a placement exists" -- so on a Detached project it re-attached the map silently, with no
+		// notice and no undo step. World map, Attach is the one way back, per Tom's "Detach and
+		// attach provide the same functionality"; this only swaps street for satellite on a map
+		// that is already showing.
+		if (!worldMapAttached() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -11323,14 +11349,18 @@ var EngCalcs = EngCalcs || {};
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');
 		b.title = name;
 	}
-	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF**, and that is the whole
-	// difference between it and the View rows. setBasemapStyle() toggles off when asked for the
-	// style already showing, which is right for a row that reads "Hide satellite images" and wrong
-	// for a corner tile: Tom pressed it twice and lost the basemap entirely -- "I get satellite, but
-	// now I lost map. No more map. Satellite has attribution, Map has nothing." Turning the tiles
-	// off stays in the View menu, where a row says so in words.
+	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF.** Tom pressed an earlier version
+	// twice and lost the basemap entirely -- "I get satellite, but now I lost map. No more map.
+	// Satellite has attribution, Map has nothing." Turning the tiles off is Map, World map, Detach,
+	// where a row says so in words.
+	// **A SWITCH IS ITS OWN UNDO STEP, ALWAYS** (2026-09-22). The style is on the project and every
+	// undo snapshot carries it, so a switch that took no snapshot of its own would be reverted by
+	// the NEXT unrelated Ctrl+Z -- a street map coming back because somebody undid a pipe. One
+	// snapshot per press makes Ctrl+Z after a switch put the other style back, and nothing else.
 	function toggleBasemapTeaser() {
-		setBasemapStyle(basemapOn() && basemapStyle() === 'satellite' ? 'osm' : 'satellite');
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
+		setBasemapStyle(basemapStyle() === 'satellite' ? 'osm' : 'satellite');
 	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
@@ -13091,7 +13121,7 @@ var EngCalcs = EngCalcs || {};
 		// was offered and the press did nothing at all. goToPoint() below travels through the
 		// transform, so there is nothing here a projected project cannot do. The wizard's own live
 		// transform is the one addition: while it is open, the drawing can say where it is.
-		if (!projectLocatable() && !mapgeoActive()) { return; }
+		if (!placeFindable() && !mapgeoActive()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -13159,10 +13189,39 @@ var EngCalcs = EngCalcs || {};
 			georefDetachTick();
 			return;
 		}
-		var box = extent ? inwardBox(extent) : null;
+		// **A GRID PROJECT WITH THE WORLD MAP ATTACHED TRAVELS THROUGH ITS OWN TRANSFORM** (Tom,
+		// 2026-09-22 -- see placeFindable()). The drawing frame is the user's x/y, so a latitude is
+		// turned into drawing units by the attached map's similarity and nothing else; the camera
+		// moves, no document number does. An extent is sized from its four corners, because the
+		// map may be turned and a turned box's corners are not its east and west. It shares the ONE
+		// crossing into the drawing frame below rather than writing its own, which is what
+		// dev/lpn-spike/local-origin-harness.js counts.
+		var xg = xyGeoref(), at = { x: ll.lon, y: ll.lat }, sFit = 0;
+		if (xg) {
+			at = EngCalcs.lpnGeorefFromLonLat(xg, ll.lon, ll.lat);
+			if (!isFinite(at.x) || !isFinite(at.y)) { return; }
+			if (inwardBox(extent)) {
+				var cs = [[extent.west, extent.north], [extent.east, extent.north],
+					[extent.west, extent.south], [extent.east, extent.south]].map(function (c) {
+						return EngCalcs.lpnGeorefFromLonLat(xg, c[0], c[1]); });
+				var xs = cs.map(function (c) { return c.x; }), ys = cs.map(function (c) { return c.y; });
+				var dx = Math.max.apply(null, xs) - Math.min.apply(null, xs),
+					dy = Math.max.apply(null, ys) - Math.min.apply(null, ys),
+					w = svg && svg.clientWidth ? svg.clientWidth : 0,
+					h = svg && svg.clientHeight ? svg.clientHeight : 0;
+				if (w && h && dx > 0 && dy > 0) {
+					sFit = Math.min(w / dx, h / dy) * SEARCH_FIT_PAD;
+					sFit = Math.min(sFit, w / (SEARCH_FIT_FLOOR_M / xg.metersPerUnit));
+				}
+			}
+		}
+		// On a geographic project the extent box is its own centre and size; on an attached grid
+		// only the size came from it (sFit), and the centre is the travelled-to point.
+		var box = (extent && !xg) ? inwardBox(extent) : null;
 		var fit = box ? fitScaleForBox(box) : 0;
-		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(ll.lon),
-			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(ll.lat), s: fit > 0 ? fit : state.s });
+		if (!(sFit > 0 && isFinite(sFit))) { sFit = 0; }
+		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(at.x),
+			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(at.y), s: fit > 0 ? fit : (sFit || state.s) });
 		georefDetachTick();
 	}
 	/**
@@ -14306,11 +14365,10 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		// **IT CONFIRMS BEFORE IT REPLACES ONE**, which is the first thing his own summary asks of
-		// this row: the georeferencing already on file is an answer somebody gave, and starting the
-		// wizard throws it away the moment the first frame is drawn.
-		if (xyGeorefOk() && !window.confirm(pc.lpn_mapgeo_replace ||
-				'This project already has the world map attached. Replace that georeferencing?')) { return; }
+		// **NO REPLACE-CONFIRMATION ANY MORE, because nothing reaches this with a placement on file**
+		// (2026-09-22). World map, Attach puts a kept placement straight back and calls this only
+		// when there is none; changing a placement is Re-adjust. The confirm and its string
+		// (lpn_mapgeo_replace) went when that made them unreachable.
 		ext = mapgeoExtent();
 		mapgeo = {
 			step: MAPGEO_STEP_WORLD,
@@ -14333,10 +14391,75 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
-	// **THE FIVE WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
-	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
-	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
-	// comes and goes teaches nobody what the feature can do.
+	/**
+	 * **IS THE WORLD MAP ROW USABLE AT ALL?** True for a plain grid (its own wizard places it), a
+	 * geographic project (its coordinates already are the place) and a projected one whose CRS this
+	 * page can transform. False only for the rare projected project whose method proj4 does not
+	 * implement -- there is nowhere to put a tile, so the row is disabled rather than offered dead.
+	 */
+	function worldMapUsable() { return xyMapAttachable() || projectLocatable(); }
+	// **RE-ADJUST AND SCALE ARE A GRID-ONLY QUESTION** (Tom, 2026-09-22: for an EPSG project "Scale
+	// and Re-adjust should be disabled unless there's user demand to expose them"). A geographic or
+	// projected project's coordinates already say exactly where and how big it is -- "we align the
+	// streets with the project, never the project with the streets" -- so there is no placement of
+	// OURS to nudge. Only a grid project's placement is ours to have gotten wrong.
+	function worldMapAdjustable() { return xyMapAttachable(); }
+	// **"ATTACHED" IS ONE RULE FOR EVERY PROJECT KIND: A PLACEMENT EXISTS AND THE MAP IS SHOWING.**
+	// A geographic or projected project always has a placement -- its own coordinates -- and a grid
+	// project has one once the wizard has written `project.georef`. So "attached" is basemapOn(),
+	// which already asks exactly that (basemapChoosable() is "a placement exists"). A grid project
+	// whose placement is KEPT while the map is hidden reads as detached, and that includes an older
+	// file saved with the map hidden (Perry's review, 2026-09-22, point 4).
+	function worldMapAttached() { return basemapOn(); }
+	// A grid project with a placement on file, whether or not the map is showing.
+	function worldMapPlacementKept() { return xyMapAttachable() && xyGeorefOk(); }
+	/**
+	 * **ATTACH, WIDENED PAST THE GRID CASE** (Tom, 2026-09-22, on a project he could not see this row
+	 * on at all: *"georeference xy -- I don't see this work merged... The map menu should have
+	 * parallel Background image and attach world map rows."* And: *"Even an EPSG project should have
+	 * the option to detach and reattach the world map... But when they attach, they don't have to do
+	 * the wizard."*).
+	 *
+	 * **THE WIZARD RUNS ONLY WHEN THERE IS NOTHING TO PUT BACK.** A geographic or projected project's
+	 * coordinates already locate it, and a grid project that was Detached kept its placement, so for
+	 * all of those Attach just shows the map again -- in the style it was last shown in. Changing a
+	 * kept placement is Re-adjust's job once it is showing; Attach does not offer to start over,
+	 * because a second question on the one row that used to be a plain switch is the complication
+	 * Tom's "Detach and attach provide the same functionality" was taking away.
+	 *
+	 * Already attached, it does nothing: the row is greyed then, the way Detach is greyed while
+	 * detached, and this guard is for anything that calls it anyway.
+	 */
+	function worldMapAttach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (worldMapAttached()) { return; }
+		if (xyMapAttachable() && !xyGeorefOk()) { mapgeoStart(); return; }
+		if (!basemapChoosable()) { return; }
+		saveUndoSnapshot();
+		setBasemapOn(true);
+		setNotice(pc.lpn_map_attach_done ||
+			'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+	}
+	/**
+	 * **DETACH HIDES THE MAP AND KEEPS THE PLACEMENT, ON EVERY PROJECT KIND** (Perry's review,
+	 * 2026-09-22, point 3). On a grid project it used to DELETE the georeference with no confirm and
+	 * no undo, so the job the retired Hide-street-map row did -- hide the tiles, keep the placement --
+	 * became impossible there, which made Tom's reason for retiring that row untrue on a grid. Now it
+	 * is one undo step (the undo snapshot already carries `project.basemap`) and Attach puts the same
+	 * placement straight back. No coordinate in the drawing moves either way.
+	 */
+	function worldMapDetach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
+		setBasemapOn(false);
+		refreshMapStatus();
+		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
+	}
+	// **THE FOUR WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
+	// Built fresh on every open so `disabled` is read from the state of the moment. Attach is dead
+	// while the map is attached and every other row is dead while it is not -- greyed and not
+	// hidden, because a row that comes and goes teaches nobody what the feature can do.
 	//
 	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
 	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
@@ -14345,10 +14468,11 @@ var EngCalcs = EngCalcs || {};
 	// "move it a bit" and a reader looking for "it is the wrong size" each find a row with their own
 	// word on it, and the hint that comes up names the handle they want.
 	function mapgeoRows() {
-		var pc = EngCalcs.pageConfig || {}, has = xyGeorefOk();
+		var pc = EngCalcs.pageConfig || {},
+			has = worldMapAdjustable() && worldMapAttached();
 		return [
 			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
-				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
+				tip: pc.lpn_map_attach_tip, fn: worldMapAttach, disabled: worldMapAttached() },
 			// **ONE ROW, BECAUSE THE TWO OPENED THE IDENTICAL THING** (Tom, 2026-09-19: *"Map
 			// submenus a lie: Yes. I see. Let's replace rows two and three (I like their
 			// behavior; good call) with 'Re-adjust'"*). Move and Scale by picking named two
@@ -14364,7 +14488,8 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'scale', label: pc.lpn_map_attach_scale_from || 'Scale from the current size…',
 				fn: mapgeoScaleFromCurrent, disabled: !has },
 			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Detach',
-				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !has }
+				tip: pc.lpn_map_attach_remove_tip, fn: worldMapDetach,
+				disabled: !worldMapAttached() }
 		];
 	}
 	/**
@@ -14609,15 +14734,6 @@ var EngCalcs = EngCalcs || {};
 		b = mapgeoBarEl('lpn_mapgeo_search');
 		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
 		mapgeoWireDial();
-	}
-	function removeMapAttach() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!xyGeorefOk()) { return; }
-		delete project.georef;
-		markEdited();
-		refreshBasemap();
-		saveToStorage();
-		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 
 	// ---- toolbar mode ----
@@ -22858,29 +22974,10 @@ var EngCalcs = EngCalcs || {};
 		// dodges the box that is there NOW -- see placeLegends().
 		placeLegends();
 	}
-	// ---- CLEAN MAP (ROADMAP Task 253) ----------------------------------------------------------
-	//
-	// **ONE TOGGLE, AND DELIBERATELY ONLY TWO THINGS.** Tom, 2026-08-09: *"The only thing I care for
-	// it to hide at the moment (for map screenshots) is the Mode status line."* So this hides
-	// #lpn_mode_hint and #lpn_coords and NOTHING else -- the units/scenario readouts stay, because a
-	// screenshot of bare numbers with no statement of what they are is worse than one with the
-	// coordinate tracker in it. Task 175 holds the real printable-version question; this is not it.
-	//
-	// **NOT STORED, and not part of the project.** It is a presentation mode you hold for as long as
-	// you are taking pictures, so persisting it would mean a user could lose the mode line
-	// permanently and have no idea what removed it. A reload restores everything.
-	//
-	// `display:none` rather than `visibility:hidden` on purpose: overlayReserve() measures
-	// offsetHeight, so hiding the mode line also gives zoomExtent() that strip of canvas back.
-	var cleanMap = false;
-	function cleanMapOn() { return cleanMap; }
-	function setCleanMap(on) {
-		cleanMap = !!on;
-		['lpn_mode_hint', 'lpn_coords'].forEach(function (id) {
-			var el = document.getElementById(id);
-			if (el) { el.style.display = cleanMap ? 'none' : ''; }
-		});
-	}
+	// ---- CLEAN MAP (ROADMAP Task 253) is RETIRED (2026-09-22) ------------------------------------
+	// Tom: *"Hide map readouts was a print prep command. But it isn't very useful any more. Let's
+	// remove it."* `cleanMap`/`cleanMapOn()`/`setCleanMap()` had no caller but the Map menu row that
+	// went with them. KEYS DELETED: lpn_clean_map, lpn_clean_map_off, lpn_clean_map_tip.
 
 	function setMode(newMode) {
 		// Read-only does NOT restrict the TOOLS: open a project read-only and you can do anything
@@ -30816,7 +30913,12 @@ var EngCalcs = EngCalcs || {};
 			// and the reason is that a reader does not meet these rows one feature at a time**: a
 			// picture behind the drawing and a map behind the drawing are the same kind of thing,
 			// so a reader who has learnt one submenu has learnt the other.
-			{ icon: 'globe', hidden: !xyMapAttachable(),
+			// **ALWAYS OFFERED, NEVER HIDDEN, SINCE 2026-09-22** (Tom: *"Keep all rows visible
+			// always. But disable what's not applicable."* And, on an EPSG project he could not
+			// find this on at all: *"Even an EPSG project should have the option to detach and
+			// reattach the world map."*). `disabled` covers the one real gap -- a projected
+			// project whose method proj4 does not implement, which has nowhere to put a tile.
+			{ icon: 'globe', disabled: !worldMapUsable(),
 				label: pc.lpn_map_attach_menu || 'World map…',
 				tip: pc.lpn_map_attach_tip,
 				submenu: function () { return mapgeoRows(); } },
@@ -30827,51 +30929,36 @@ var EngCalcs = EngCalcs || {};
 			// moved to the Project menu, beside Tables, where the two things you READ beside the
 			// map now sit together -- see openProjectBarMenu(). What is left here is the drawing
 			// itself: how it is framed, how much furniture is over it, and where on Earth it is.
-			// The label states what the row will DO, because this menu has no checkmark column --
-			// the same convention the street-map row below follows.
-			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Hide map readouts'),
-				tip: pc.lpn_clean_map_tip,
-				fn: function () { setCleanMap(!cleanMapOn()); } },
-			// **HIDDEN WHERE THE PROJECT CANNOT SAY WHERE IT IS, not disabled.** A grid project's
-			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
-			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
-			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
-			// place name. Is this intentional?"* -- it was not; it was `isLatLonProject()` written
-			// before there was a transform, and the answer to a typed latitude is now one forward
-			// projection away). The label states what the row will DO, because this menu has no
-			// checkmark column.
+			//
+			// **HIDE MAP READOUTS, AND THE SEPARATE HIDE/SHOW STREET MAP AND SATELLITE ROWS, ARE
+			// RETIRED** (Tom, 2026-09-22: *"Hide map readouts was a print prep command. But it
+			// isn't very useful any more. Let's remove it."* And: *"I think we can retire the
+			// Hide/Show street map and satellite images rows. Detach and attach provide the same
+			// functionality."*). World map, Attach/Detach now turns the tiles on and off for
+			// every project kind, and the corner teaser (refreshBasemapTeaser()) still swaps
+			// street for satellite. `cleanMapOn()`/`setCleanMap()` went with the readouts row --
+			// nothing else called them. KEYS DELETED: lpn_clean_map, lpn_clean_map_off,
+			// lpn_clean_map_tip, lpn_basemap_hide, lpn_basemap_satellite_hide, lpn_basemap_tip,
+			// lpn_basemap_satellite_tip.
+			//
+			// **SHOWN ON EVERY PROJECT, DISABLED WHERE IT CANNOT SAY WHERE IT IS** (Tom, 2026-09-22:
+			// *"Goto and Search ... can show for unnamed CRS projects, but disabled when a world map
+			// is not attached (no georeference)."*). This used to HIDE them on a grid project; it is
+			// now the same rule as the rest of this menu, greyed rather than gone. placeFindable()
+			// is lat/lon, a projected project with a transform, or a grid with the world map
+			// attached. The search row stays hidden only when js/lpn-search.js did not load, since
+			// then there is no label to show at all.
+			{ separator: true },
 			{
-				hidden: !projectLocatable(), separator: true
-			},
-			{
-				hidden: !projectLocatable(), icon: 'globe',
+				disabled: !placeFindable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
-				hidden: !projectLocatable() || !EngCalcs.lpnSearchOpen, icon: 'find',
+				hidden: !EngCalcs.lpnSearchOpen, disabled: !placeFindable(), icon: 'find',
 				label: EngCalcs.lpnSearchMenuLabel && EngCalcs.lpnSearchMenuLabel(),
 				tip: EngCalcs.lpnSearchMenuTip && EngCalcs.lpnSearchMenuTip(),
 				fn: function () { EngCalcs.lpnSearchOpen(); }
-			},
-			{
-				hidden: !basemapChoosable(), icon: 'view',
-				label: (basemapOn() && basemapStyle() === 'osm')
-					? (pc.lpn_basemap_hide || 'Hide street map')
-					: (pc.lpn_basemap_show || 'Show street map'),
-				tip: pc.lpn_basemap_tip,
-				fn: function () { setBasemapStyle('osm'); }
-			},
-			// **HIDDEN WITHOUT A TOKEN, not shown-and-broken.** A row that fetches a 401 per tile
-			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
-			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
-			{
-				hidden: !basemapChoosable() || !satelliteAvailable(), icon: 'view',
-				label: (basemapOn() && basemapStyle() === 'satellite')
-					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
-					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
-				tip: pc.lpn_basemap_satellite_tip,
-				fn: function () { setBasemapStyle('satellite'); }
 			}
 			// **THE TERRAIN-ELEVATIONS ROW IS GONE, TASK 542.** Tom pressed it and wrote the defect
 			// himself: *"To be honest, I did not expect nor necessarily welcome what I got. I was
@@ -44384,7 +44471,8 @@ var EngCalcs = EngCalcs || {};
 			// restored on almost none of them: undoing a diameter must not move the map, but a
 			// document put back into a frame the camera is not in has its whole drawing off screen
 			// -- grid numbers under a street-level lat/lon view. undo() draws that line.
-			coords: project.coords, basemap: project.basemap, view: currentView()
+			coords: project.coords, basemap: project.basemap, basemapLast: project.basemapLast,
+			view: currentView()
 		};
 	}
 	function pushUndoSnapshot(snap) {
@@ -44416,8 +44504,15 @@ var EngCalcs = EngCalcs || {};
 		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
 		var coordsChanged = snap.coords !== project.coords;
+		// **AND THE MAP ITSELF WHEN ITS PICTURE CHANGED** (Perry's re-review, 2026-09-22). World
+		// map, Detach and Attach, and a switch on the corner toggle, change `project.basemap` and
+		// never `coords`, so repainting only on a kind change left Ctrl+Z restoring the menu's
+		// idea of the map while the canvas kept the tiles it had. The comparison is made before the
+		// assignment, like `coordsChanged`.
+		var basemapChanged = snap.basemap !== project.basemap;
 		project.coords = snap.coords;
 		project.basemap = snap.basemap;
+		project.basemapLast = snap.basemapLast;
 		// The backdrop rides in the same snapshot rather than in a stack of its own: a Move that
 		// nudged the image and a Move that nudged a node are the same kind of event to the person
 		// pressing Ctrl+Z, and two stacks would make the order of undos depend on which kind each one
@@ -44443,7 +44538,7 @@ var EngCalcs = EngCalcs || {};
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
 		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
-		if (coordsChanged) {
+		if (coordsChanged || basemapChanged) {
 			refreshBasemap();
 			refreshMapStatus();
 		}
@@ -48324,7 +48419,7 @@ var EngCalcs = EngCalcs || {};
 		// **THE WIZARD IS LOCATABLE WHILE IT RUNS**, which is what makes Tom's step 1 offer Search
 		// by name on a project that states no coordinate system at all: the place is what the
 		// wizard is asking for, so refusing to look one up would refuse the question.
-		EngCalcs.lpnSearchInit({ locatable: function () { return projectLocatable() || mapgeoActive(); },
+		EngCalcs.lpnSearchInit({ locatable: function () { return placeFindable() || mapgeoActive(); },
 			goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
