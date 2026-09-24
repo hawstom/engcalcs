@@ -5109,7 +5109,10 @@ var EngCalcs = EngCalcs || {};
 			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'M' },
+			// M is the structural (internal) letter for Customer (LPN_ID_KEY.meter); its default
+			// DISPLAYED prefix is 'C' (R-229) -- a project stored with the old 'M' default keeps it,
+			// since only the user touches a file's data.
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -5243,7 +5246,7 @@ var EngCalcs = EngCalcs || {};
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
 			symbolCapMultiple: 0.5,
 			symbolCapPercentile: 20,
-			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
+			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
 			alignPipeLabels: true,
@@ -37252,7 +37255,8 @@ var EngCalcs = EngCalcs || {};
 			['T', pc.lpn_tool_add_tank || 'Tank'],
 			['L', pc.lpn_tool_add_pipe || 'Pipe'],
 			['P', pc.lpn_tool_add_pump || 'Pump'],
-			['V', pc.lpn_tool_add_valve || 'Valve']
+			['V', pc.lpn_tool_add_valve || 'Valve'],
+			['M', pc.lpn_tool_add_meter || 'Customer']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps it inside
@@ -40532,7 +40536,7 @@ var EngCalcs = EngCalcs || {};
 				['age', pc.lpn_quality_age || 'Water age'],
 				['trace', pc.lpn_quality_trace || 'Source trace']
 			];
-		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that reacts']);
+		opts.push(['chemical', pc.lpn_quality_chemical || 'A reactive chemical']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];

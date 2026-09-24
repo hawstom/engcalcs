@@ -248,6 +248,16 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 		.filter(n => n.tagName === 'SELECT')
 		.map(sel => (sel.children || []).map(o => o.value).join(','))[0] || '';
 	ok('and a document that names none can now choose one', /chemical/.test(plain), plain);
+	// R-206 (Tom, after consulting MOD): the option's own text, not just its value.
+	const chemSel = all(byId.lpn_set_quality_fields, [])
+		.filter(n => n.tagName === 'SELECT')
+		.find(sel => (sel.children || []).some(o => o.value === 'chemical'));
+	const chemOpt = chemSel && (chemSel.children || []).find(o => o.value === 'chemical');
+	ok('the chemical option reads the current lang string',
+		!!chemOpt && chemOpt.textContent === PC.lpn_quality_chemical,
+		chemOpt && chemOpt.textContent);
+	ok('...which is Tom\'s reworded text, not the old wording',
+		PC.lpn_quality_chemical === 'A reactive chemical', PC.lpn_quality_chemical);
 }
 
 // ---------------------------------------------------------------------------
