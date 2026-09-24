@@ -350,11 +350,16 @@ console.log('\n-- R-205: Net3-Novato-CA-World gets an all-labels zoom limit and 
 				String(d.settings && d.settings.labelMaxWidth));
 		});
 	}
-	const en = fs.readFileSync(path.join(root, 'lib/lang.ec.en.php'), 'utf8');
-	report(en.indexOf("$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';") >= 0,
-		'lpn_ex_net3_world_title is exactly "EPANET Net3, lat/lon"');
-	report(en.indexOf("$ec_lang['lpn_ex_net3_world_desc']='The EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it.';") >= 0,
-		'lpn_ex_net3_world_desc matches Tom\'s exact words');
+	// NOT a literal comparison to the exact wording Tom asked for (dev/scripts/harness_wording_check.php's
+	// ratchet bans spelling a current $ec_lang value out in a harness) -- a shape check instead:
+	// the title still names the network and its coordinate kind, and the description still names the
+	// place and the world map, whatever words carry that from here on.
+	const novatoTitle = novato && novato.title || '';
+	const novatoDesc = novato && novato.description || '';
+	report(/Net3/.test(novatoTitle) && /lat.?\/.?lon/i.test(novatoTitle),
+		'lpn_ex_net3_world_title still names Net3 and lat/lon', novatoTitle);
+	report(/Novato/.test(novatoDesc) && /CA/.test(novatoDesc) && /world map/i.test(novatoDesc),
+		'lpn_ex_net3_world_desc still names Novato, CA and the world map', novatoDesc);
 }
 
 console.log('\n-- R-205: the other EPANET examples say "example", not "sample" --');

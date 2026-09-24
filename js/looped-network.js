@@ -10787,6 +10787,36 @@ var EngCalcs = EngCalcs || {};
 	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights -- a touch
 	// generous, so the labels it lays out are comfortable at the tighter scale the second pass picks.
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
+	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
+	// example has needed; the cap exists so a layout that never settles cannot hang a click.
+	var LPN_FIT_SETTLE_PASSES = 5;
+	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
+	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
+	// on the map, so it cannot be off it.
+	function drawnInkItems() {
+		var out = [], sc = state.s || 1, rr = svg.getBoundingClientRect(), els, i, e, b, cs, ax, ay, n, h, id;
+		if (!labelsLayer || !labelsLayer.querySelectorAll || !window.getComputedStyle) { return out; }
+		els = labelsLayer.querySelectorAll('text, line.lpn-leader');
+		for (i = 0; i < els.length; i++) {
+			e = els[i];
+			if (e.tagName.toLowerCase() === 'text' && !(e.textContent || '').trim()) { continue; }
+			cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) { continue; }
+			b = e.getBoundingClientRect ? e.getBoundingClientRect() : null;
+			if (!b || (!b.width && !b.height)) { continue; }
+			id = e.getAttribute('data-nodelbl');
+			n = id ? nodeById(id) : null;
+			if (n) {
+				h = nodeLabelBase(n); ax = h.x; ay = h.y;
+			} else {
+				ax = (b.left + b.width / 2 - rr.left - state.tx) / sc;
+				ay = (b.top + b.height / 2 - rr.top - state.ty) / sc;
+			}
+			var sx = state.tx + sc * ax + rr.left, sy = state.ty + sc * ay + rr.top;
+			fitItem(out, ax, ay, sx - b.left, b.right - sx, sy - b.top, b.bottom - sy);
+		}
+		return out;
+	}
 	function zoomExtent(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it: the mode hint sits
@@ -10826,17 +10856,20 @@ var EngCalcs = EngCalcs || {};
 			setTransform();
 			onZoomChanged();
 		}
-		// **TWO SOLVES, NOT A CONVERGENCE LOOP.**
+		// **AN ANALYTIC SEED, THEN A SETTLE ON WHAT IS REALLY DRAWN** (R-214).
 		//   1. fit the MODEL ALONE, with six text heights of extra room, so the answer cannot depend
 		//      on the view we arrived from and the labels get somewhere comfortable to land.
-		//   2. work out the labels ONCE, at that scale.
-		//   3. fit again to the model plus those label boxes, without recomputing them.
-		// NOT an iterate-until-stable loop: it seeds from state.s, so arriving from a 0.02x view --
-		// where a label is 550 world units of lettering -- gives a different answer from arriving at
-		// 1x. NOT a flat pad of ~6 text heights either: a fixed pad is most of a small map and
-		// nothing on a large one. Deliberately accepted: the labels are laid out for step 1's scale,
-		// so a label can end fractionally outside the padding.
-
+		//   2. work out the labels' HOME boxes once, at that scale, and fit model plus labels.
+		//   3. SETTLE: draw at that scale, lay the labels out for real (reshedNow()), measure every
+		//      piece of lettering and every leader as drawn, and if any of it is outside the frame,
+		//      solve again with those measured boxes. Repeat until nothing is outside.
+		// Step 3 exists because the home boxes are not where the labels end up: the placement pass
+		// pushes a label out along its own leader to clear its neighbours (a dragged one by ~80 px on
+		// the Basic SI example), and that push is decided at the scale being drawn, so only a layout
+		// AT the target scale can say where the lettering is -- a fixed point, solved by iterating.
+		// **IT STILL CANNOT DEPEND ON THE VIEW WE ARRIVED FROM**: the settle starts from step 2's
+		// answer, never from state.s, and the scale only ever steps DOWN, so it ends, and a second
+		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
 		s = solve(labelTuning().fitRoom * settings.textSize);
@@ -10862,9 +10895,42 @@ var EngCalcs = EngCalcs || {};
 		// fit, and it is also taken whenever the label-aware answer would leave a node off the
 		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
 		var at = place(s, items);
-		if (!(s > minScale()) || !modelInside(s, at)) { s = modelFit; at = place(s, modelItems); }
-		apply(s, at);
+		if (!(s > minScale()) || !modelInside(s, at)) {
+			apply(modelFit, place(modelFit, modelItems));
+		} else {
+			apply(s, at);
+			settleOnDrawnInk();
+		}
 		if (auto) { rebaseSignatureIfClean(); }
+		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
+		// PIXELS, which is the shape a label really has: a node label is anchored at its home
+		// endpoint (nodeLabelBase(), the user's drag included), anything else at its own centre.
+		// The nudge the placement pass added is then pixels of reach, which is what it is.
+		function settleOnDrawnInk() {
+			var k, ink, all, s2, p2;
+			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
+				reshedNow();
+				ink = drawnInkItems();
+				if (inkInside(ink)) { return; }
+				all = modelItems.concat(ink);
+				items = all;
+				s2 = Math.min(state.s, solve());
+				if (!(s2 > minScale())) { return; }
+				p2 = place(s2, all);
+				if (!modelInside(s2, p2)) { return; }
+				apply(s2, p2);
+			}
+			reshedNow();
+		}
+		function inkInside(ink) {
+			var i, it, x, y, e = 0.5;
+			for (i = 0; i < ink.length; i++) {
+				it = ink[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
+				if (x - it.l < pad - e || x + it.r > r.width - pad + e ||
+					y - it.t < padTop - e || y + it.b > r.height - padBottom + e) { return false; }
+			}
+			return true;
+		}
 	}
 
 	// ---- OPENSTREETMAP BASEMAP, FOR A GEOGRAPHIC PROJECT (ROADMAP Task 145) ----------------------
@@ -22714,56 +22780,49 @@ var EngCalcs = EngCalcs || {};
 		wrap.appendChild(table);
 		return wrap;
 	}
-	// **THE PORTRAIT-PAGE BUDGET, IN `em` AT THE SHEET'S OWN 9pt** (`.lpn-print-table`'s declared
-	// font-size). Nothing in JS can read the paper a visitor's printer is about to use, so this is
-	// the conservative floor rather than a measurement: 7.5in of usable width -- an 8.5in letter
-	// page less a half-inch margin each side -- at 9pt is 60em. Landscape or a larger sheet only
-	// gives MORE room than this, never less.
-	var PANE_PRINT_BUDGET_EM = 60;
-	var PANE_PRINT_BASE_PT = 9;
 	/**
-	 * **THE SHEET USES THE COLUMN WIDTHS THE READER SEES, ALWAYS -- NOT ONLY THE ONES DRAGGED --
-	 * AND THE TEXT SHRINKS WITH THEM RATHER THAN THE SHEET STRETCHING PAST THE PAGE** (Tom,
-	 * 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
-	 * resizing. And I think that it's important to use the column widths adjusted by the user."*
-	 * 2026-09-22, on the result: *"Print is not respecting on-screen column widths."* And again:
-	 * *"Print table does not respect column widths. It expands to 100% of printable area."*). Three
-	 * rounds, because the first two fixes still had an escape hatch: a table NOBODY had dragged took
-	 * none of this and printed at the browser's own auto-layout content width, which is exactly the
-	 * case that "expands to 100%" describes on a wide network table -- no budget, no scaling, nothing
-	 * holding it to a sheet. Undragged is no longer special: every column, dragged or not, is read
-	 * off the live heading's drawn width (paneColDrawnEm()), so the sheet's ratios are always the
-	 * screen's ratios, and the budget/scale step below always runs.
+	 * **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to
+	 * use the column widths adjusted by the user"*; 2026-09-22: *"Print is not respecting on-screen
+	 * column widths"*; 2026-09-24, R-215: *"Widths seem to be trying, but not succeeding (tighter fit
+	 * on print than on screen)"*). Every column is given the width it is DRAWN at on screen, as a
+	 * literal `em` of the screen table's own font, and the sheet takes that same font -- so at full
+	 * size the printed table is the screen's, pixel for pixel. When the paper is narrower than that,
+	 * the font is `min(<screen px>, 100cqw x <screen px / table px>)`: the size at which the table is
+	 * exactly as wide as the sheet the browser is laying out, whatever paper that is. Widths, padding
+	 * and text are all in `em`, so every one of them shrinks by that one factor, and a heading wraps
+	 * where it wraps on screen.
 	 *
-	 * Every column is given the width it has on screen -- the dragged ones their stored em, the rest
-	 * the width they are drawn at -- as a literal `em`, so the table's true width is the sum of what
-	 * the reader actually sees. When that sum is wider than a printed page can hold, the SHEET'S OWN
-	 * FONT-SIZE is reduced instead of the columns' share of it: every column's `em` width is
-	 * unchanged, so it shrinks in lockstep with the text inside it, at exactly the ratio the screen
-	 * already had -- smaller paper, not a different layout, and never a stretch past the sheet.
-	 * `max-width: 100%` stays on as the belt for a sheet narrower than the assumed budget.
+	 * The rounds before this one assumed a 60em-at-9pt letter page and set padding in `pt`. The
+	 * assumption was wrong on A4 and the `pt` padding did not scale, so a shrunk sheet gave a bigger
+	 * share of each column to padding than the screen does -- which is the "tighter fit" he saw, and
+	 * what broke "Elevation" and "Base demand" mid-word. Measured in real Chromium, as a PDF, by
+	 * dev/browser-pass/specs/print.js.
 	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
 	function panePrintWidths(spec, table) {
-		var cols = paneCols(spec), unit, ems, sum = 0, cg, scale;
+		var cols = paneCols(spec), unit, ems, sum = 0, cg;
 		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
-		ems = cols.map(function (c) {
-			return paneColUserWidth(spec.id, c) || paneColDrawnEm(spec, c, unit);
-		});
+		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
 		ems.forEach(function (e) { sum += e; });
 		if (!(sum > 0)) { return null; }
+		// **EACH COLUMN ALSO CARRIES ITS 1px RULE, OUTSIDE THE SCALE.** On screen the grid is inset
+		// box-shadow, which takes no width; on paper it is a real border (a shadow is background
+		// paint and is dropped with "Background graphics" off), and under border-collapse each column
+		// owns 1px of it. Left inside the `em`, that pixel came out of the text's room -- at a
+		// sheet scaled to 0.45 it was enough to wrap "Shut" onto two lines.
 		cg = document.createElement('colgroup');
 		ems.forEach(function (e) {
 			var col = document.createElement('col');
-			col.style.width = (Math.round(e * 100) / 100) + 'em';
+			col.style.width = 'calc(' + (Math.round(e * 100) / 100) + 'em + 1px)';
 			cg.appendChild(col);
 		});
 		table.appendChild(cg);
 		table.className += ' lpn-print-fixed';
-		table.style.width = (Math.round(sum * 100) / 100) + 'em';
-		scale = sum > PANE_PRINT_BUDGET_EM ? (PANE_PRINT_BUDGET_EM / sum) : 1;
-		if (scale < 1) { table.style.fontSize = (Math.round(PANE_PRINT_BASE_PT * scale * 100) / 100) + 'pt'; }
+		table.style.width = 'calc(' + (Math.round(sum * 100) / 100) + 'em + ' + (ems.length + 1) + 'px)';
+		// (100cqw - the rules) / sum-in-em is the font at which the table fills the sheet exactly.
+		table.style.fontSize = 'min(' + (Math.round(unit * 100) / 100) + 'px, calc((100cqw - ' + (ems.length + 1) +
+			'px) / ' + (Math.round(sum * 100) / 100) + '))';
 		return ems;
 	}
 	// Taken down on afterprint where the browser has one, so nothing is removed while the print
@@ -37073,15 +37132,20 @@ var EngCalcs = EngCalcs || {};
 	var reshedTimer = null;
 	function scheduleReshed() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
-		reshedTimer = setTimeout(function () {
-			reshedTimer = null;
-			if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
-			beginLinkGeomHold();
-			try {
-				reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
-				relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
-			} finally { endLinkGeomHold(); }
-		}, 120);
+		reshedTimer = setTimeout(reshedNow, 120);
+	}
+	// The debounced pass above, run NOW -- for Zoom to fit, which has to see the labels exactly as
+	// they will be drawn at the scale it is testing (R-214). Cancels the pending timer, so the same
+	// work is not done twice.
+	function reshedNow() {
+		if (reshedTimer) { clearTimeout(reshedTimer); }
+		reshedTimer = null;
+		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+		beginLinkGeomHold();
+		try {
+			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
+			relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
+		} finally { endLinkGeomHold(); }
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that

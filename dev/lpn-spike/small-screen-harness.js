@@ -771,7 +771,7 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	const panes = node('div', '', ['lpn-setbox-panes'], setboxHost);
 	const index = node('div', 'lpn_setbox_index', ['lpn-setbox-index'], panes);
 	// 7.26rem: 0.8 x the 7.5rem it shipped at, then 1.1 x that once Tom had used it (2026-08-23),
-	// then 10% wider again (R-204, 2026-09-24): 6.6 x 1.1 = 7.26.
+	// then 1.1 x THAT again on R-204 (2026-09-24: "the index pane 10% wider than now").
 	ok('the index pane is 7.26rem on the desktop',
 		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 7.26rem');
 	// **AND STILL A SIDE COLUMN ON A PHONE** (restored 2026-08-29). Task 527 turned it into a
@@ -1315,7 +1315,7 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 // The fix is the one this page already had for the same shape (the Find box, and the fire flow
 // box): cap the box to the room below the floor BEFORE placing it, so the overflow lands inside
 // `.lpn-popover-body`, which scrolls. Section 8 above asserts the other two symptoms -- the index
-// is 4.5rem on a phone and 7.26rem on the desktop (R-204, 2026-09-24).
+// is 4.5rem on a phone and 7.26rem on the desktop (R-204, 2026-09-24; 6.6rem before that).
 //
 // A BROWSER IS NOT AVAILABLE HERE, so the chrome's real height cannot be measured. The assertions
 // are therefore made over a RANGE of floors rather than against an invented number: whatever the
