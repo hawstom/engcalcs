@@ -2228,8 +2228,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    overruled: it is right for a column of numerals in isolation and wrong here, where what the
    reader is looking at is the boxes they type in.
    THE CLASS COMES FROM THE COLUMN'S POSITION, not from what it holds, so a table that gains a
-   column cannot acquire a second left one. The printed sheet keeps the old names-left,
-   figures-right split -- restated in @media print below. */
+   column cannot acquire a second left one. The printed sheet aligns exactly as the screen does
+   (R-215, 2026-09-24). */
 /* **THE CELLS ABUT EACH OTHER, AS A SPREADSHEET'S DO** (Tom, 2026-09-06, Task 186 part 1: "cells
    abut each other like Google Sheets, in appearance and not only in behaviour"). What was there
    was two nested boxes per cell -- a padded <td> holding a bordered <input> -- so the grid a
@@ -2584,36 +2584,43 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	   four-column table across the sheet and put inches of white between a label and its
 	   number. .lpn-pane-table carries no width at all on screen; the print copy now matches. */
 	.lpn-print-table { border-collapse: collapse; font-size: 9pt; }
-	/* **THE SHEET KEEPS THE OLD SPLIT: names left, figures right.** The screen went to centred
-	   columns because the reader is aiming at the boxes they type in; nobody types on paper, and a
-	   printed column of figures reads as one only when it is right-aligned. Restated rather than
-	   inherited, because the screen rules above are the same selectors at the same specificity --
-	   these win by coming later, and the first column is left in both places either way. */
-	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; text-align: left; }
-	.lpn-print-table th.lpn-pane-num, .lpn-print-table td.lpn-pane-num {
-		text-align: right; font-variant-numeric: tabular-nums;
-	}
+	/* **THE SHEET IS THE SCREEN, SCALED -- ALIGNMENT, BORDERS AND PADDING INCLUDED** (Tom,
+	   2026-09-24, R-215: *"No heading borders, Widths seem to be trying, but not succeeding (tighter
+	   fit on print than on screen), and the print horiz alignments are differen than the on-screen
+	   alighments"*). Three print-only rules made the sheet a different table from the one on screen:
+	   a names-left/figures-right split (the screen centres every column but the first), a heading
+	   drawn with a bottom rule only, and padding in `pt`, which does not shrink when the sheet's font
+	   does -- so a scaled-down sheet spent a larger share of every column on padding and its headings
+	   broke mid-word where the screen's did not. Alignment is now the screen's own rules, which carry
+	   no media condition; borders are the screen's grid drawn as real borders (a box-shadow is
+	   background paint, which a browser drops when "Background graphics" is off); and padding is in
+	   `em`, the screen's pixels divided by its 14.4px font, so it scales with everything else. The
+	   `#lpn_print_area` prefix is what lets these beat the screen's cell rules, several of which
+	   (`:not(:has(input))`, `:first-child`) out-rank a bare class pair.
+	   Measured in real Chromium by dev/browser-pass/specs/print.js. */
+	#lpn_print_area .lpn-print-table tbody td { padding: .07em .42em; }
+	#lpn_print_area .lpn-print-table thead th { padding: .42em .42em .07em 0; }
 	.lpn-print-table thead { display: table-header-group; }
-	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
-	/* **EVERY HEADING GETS THE SAME BORDER, NOT ONLY ID** (Tom: *"Print table puts heading borders
-	   only around ID."*). `.lpn-pane-table thead th:first-child` (the screen rule that draws the
-	   sticky heading's own left/right/top seams) carries no media condition, so it is not a screen
-	   rule at all -- it wins on EVERY medium, print included -- and its box-shadow beats the line
-	   above at equal specificity because a bare `thead th` is one class lighter than `thead
-	   th:first-child`. Restated at matching specificity so this rule is the later, winning one. */
-	.lpn-print-table thead th:first-child { box-shadow: none; }
-	/* **PRINT NEVER HAD THE DEVICE-PIXEL PROBLEM THE SCREEN FIX IS FOR** -- there is no sticky layer
-	   on paper, so there is nothing to gain from box-shadow here and something to lose: some print
-	   engines drop a box-shadow by default to save ink, where a `border` always prints. This
-	   restores the plain border the body cells carried before 2026-09-23, so the printed sheet is
-	   unchanged by the screen-only fix above it. */
-	.lpn-print-table tbody td, .lpn-print-table tbody td.lpn-pane-first { box-shadow: none; border: 1px solid #ddd; }
+	#lpn_print_area .lpn-print-table thead th {
+		position: static; box-shadow: none; border: 1px solid #ddd; border-bottom-color: #ccc;
+	}
+	#lpn_print_area .lpn-print-table tbody td { box-shadow: none; border: 1px solid #ddd; }
+	#lpn_print_area .lpn-print-table tbody td.lpn-pane-first { padding: .07em .42em .07em .28em; }
 	.lpn-print-table tr { page-break-inside: avoid; }
-	/* A table printed at the reader's dragged widths (panePrintWidths()): fixed layout so the
-	   widths are obeyed, never wider than the sheet, and a long value wraps inside its column
-	   instead of being cut off -- paper has no box to scroll inside. */
-	.lpn-print-table.lpn-print-fixed { table-layout: fixed; max-width: 100%; }
+	/* **ONE SCALE FACTOR FOR EVERY COLUMN, TAKEN FROM THE PAPER THE BROWSER IS ACTUALLY USING.**
+	   panePrintWidths() gives each column its on-screen width in `em` and the table a font-size of
+	   `min(<screen font>, 100cqw x <screen font / screen table width>)`: the screen's own size when
+	   the sheet has room, and otherwise exactly the size at which the table's width is the sheet's.
+	   `cqw` needs a container, which is this one. Every width, padding and letter is then in `em`, so
+	   all of them shrink by the one factor and the wrapping is the screen's wrapping. */
+	body.lpn-printing-table #lpn_print_area { container-type: inline-size; }
+	.lpn-print-table.lpn-print-fixed { table-layout: fixed; }
 	.lpn-print-table.lpn-print-fixed th, .lpn-print-table.lpn-print-fixed td { overflow-wrap: anywhere; }
+	/* The letters are 3% smaller than the columns they sit in. A glyph's advance does not scale
+	   exactly linearly at 5-8px, and a heading that exactly fills its column on screen (every one
+	   does: the table is `max-content`) then wraps on paper for want of a fraction of a pixel. The
+	   column widths are in the TABLE's em, so this moves no column. */
+	#lpn_print_area .lpn-print-table.lpn-print-fixed th, #lpn_print_area .lpn-print-table.lpn-print-fixed td { font-size: .97em; }
 }
 
 /* ==== The Settings box (ROADMAP Task 441) ====================================================
@@ -2657,8 +2664,25 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    lesson, as Task 435: the box model is not addable by hand. Height has no such floor -- a short
    box just scrolls -- so 18rem is only enough to keep the search field and a row of content in
    view. */
+/* **34rem -> 26.965rem, PC ONLY (R-204; Tom, 2026-09-24): "the main pane could be 70% of what it
+   now is ... It has a hard minimum that seems perfectly acceptable to me, and maybe we could use
+   that as the initial default."** Measured in Chromium rather than argued, the same way 25rem
+   above was: at the shipped 34rem the content pane is 410.4 px; the box's own 25rem floor squeezes
+   it to 266.4 px (16.65rem) when the index (below) still took its OLD 6.6rem. 0.7 x 410.4 = 287.3 px
+   (17.955rem), which is LARGER than that floor, so 70% is what ships -- the floor stays exactly
+   where it was, only the STARTING width moves.
+
+   26.965rem is 7.26rem of index (its own new figure, below) + 1.75rem of fixed overhead (16 px
+   padding + 2 px border + the 10 px effective gap the divider's negative margins reduce to, all
+   measured on the rule above's own numbers) + 17.955rem of content: 7.26 + 1.75 + 17.955 = 26.965.
+
+   THE FIRST-TIME WIDTH ONLY, exactly as 34rem was: setboxLayout.w remembers whatever the user has
+   already dragged, and this rule never fires against a stored width. PC only, the same viewport
+   split every other PC/phone difference in this box uses -- @media (max-width: 640px) below
+   overrides the index unconditionally and the box's own min(_, 94vw) already governs a phone, so
+   this base rule only ever reaches a screen wider than that. */
 .lpn-setbox {
-	width: min(34rem, 94vw);
+	width: min(26.965rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -2770,9 +2794,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    **AND IT GAVE BACK A TENTH, 6.6rem** (Tom, 2026-08-23, having now used the narrowed box on a PC:
    "Settings.index 1.1"). The 0.8 above was decided sight-unseen; this is the correction after
    looking at it. PC ONLY -- the phone figure he asked about in the same breath went the other way
-   and is unchanged at 4.5rem. */
+   and is unchanged at 4.5rem.
+
+   **AND 10% WIDER AGAIN, 7.26rem** (R-204; Tom, 2026-09-24: "the index pane 10% wider than now").
+   6.6 x 1.1 = 7.26. PC only, same as the step above -- the phone override at the foot of this file
+   derives its own figure from ITS OWN 4.5rem and is untouched. */
 .lpn-setbox-index {
-	flex: 0 0 6.6rem; min-width: 0; overflow: auto;
+	flex: 0 0 7.26rem; min-width: 0; overflow: auto;
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
