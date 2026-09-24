@@ -68,58 +68,58 @@ function echoCalculatorFormAppend() {
 				<th><?=$ec_lang['ip_count']?></th>
 				<th>
 					<?=$ec_lang['ip_length']?><br />
-					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string); ?>
+					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string, $ec_lang['ip_length']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_diameter']?><br />
-					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
+					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string, $ec_lang['ip_diameter']); ?>
 				</th>
 				<th>
 					<?=ecLinkTipLabel(ecRefUrl('darcy_weisbach_e'), $ec_lang['ip_roughness'], $ec_lang['dw_roughness_tip'])?><br />
-					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
+					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string, $ec_lang['ip_roughness']); ?>
 				</th>
 				<th>
 					<?=ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_elev_ds']?><br />
-					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string); ?>
+					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string, $ec_lang['ip_elev_ds']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_usu', $units = 'flow_emitter', $indent_string); ?>
+					<?php echoUnitSelect($name = 'q_usu', $units = 'flow_emitter', $indent_string, $ec_lang['ip_flow']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_usu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_usu', $units = 'partial_head', $indent_string, $ec_lang['ip_press']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_dsu', $units = 'flow_emitter', $indent_string); ?>
+					<?php echoUnitSelect($name = 'q_dsu', $units = 'flow_emitter', $indent_string, $ec_lang['ip_flow']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_dsu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_dsu', $units = 'partial_head', $indent_string, $ec_lang['ip_press']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_v617']?><br />
-					<?php echoUnitSelect($name = 'vu', $units = 'velocity', $indent_string); ?>
+					<?php echoUnitSelect($name = 'vu', $units = 'velocity', $indent_string, $ec_lang['mi_v617']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?><br />
-					<?php echoUnitSelect($name = 'hvu', $units = 'velocity_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hvu', $units = 'velocity_head', $indent_string, $ec_lang['mi_hv617']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hf']?><br />
-					<?php echoUnitSelect($name = 'hfu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hfu', $units = 'partial_head', $indent_string, $ec_lang['ip_hf']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hm']?><br />
-					<?php echoUnitSelect($name = 'hmu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hmu', $units = 'partial_head', $indent_string, $ec_lang['ip_hm']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hl']?><br />
-					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string, $ec_lang['ip_hl']); ?>
 				</th>
 			</tr>
 		</thead>

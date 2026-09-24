@@ -559,6 +559,7 @@ function mkUnitSelect(name, family, opts, chosen) {
   if (unitSelects[name]) { unitSelects[name].parentNode = null; }
   const s = mkEl('select');
   s.name = name;
+  s.id = name;   // echoUnitSelect() emits id=name since Task 685
   s.dataset.family = family;
   s.options = opts.map(n => ({ value: n, textContent: n }));
   s.selectedIndex = opts.indexOf(chosen);
