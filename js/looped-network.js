@@ -21120,7 +21120,17 @@ var EngCalcs = EngCalcs || {};
 	// switch, only by rebuilding everything; now that a switch refills, it is stated here.
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
+		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
+		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
+		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
+		// row-id string is unchanged from the last render, so this fell into the refill branch
+		// below, which repaints cells by id and never touches a header button -- the arrow never
+		// appeared and the click looked like nothing happened. A second click, after some OTHER
+		// column had scrambled the row order, always changed the row-id string and so always
+		// rebuilt; that is why the defect was invisible except as the very first click.
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
+			spec.sort.col + '/' + spec.sort.dir + '||' +
 			cols.map(paneHeadingText).join('|') + '||' +
 			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
 			cols.map(function (c) {
