@@ -1816,6 +1816,14 @@ the block.
     has already passed in the browser. The limitation is now written at the top of the harness so it
     no longer implies coverage it does not have.
 
+- 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
+  important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
+  colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
+  hard-coded chrome colour; phases 2-3 are a dark token set and the Settings row (a browser setting).
+  - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
+    toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
+
 - 100|708| **Every property in every venue: an audit, then a check.**
   Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
   multi-properties. Should we do an audit to ensure that all properties are represented in all
