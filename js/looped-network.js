@@ -10652,9 +10652,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One-time fill and wiring, called from the same boot pass as wireMessageLogButton() etc.
 	// The button reuses `lpn_tool_zoom_extent` -- the toolbar's own "Zoom to fit" string -- rather
-	// than a second key for the same action, and calls zoomExtent() the same way the toolbar
-	// button does (no `auto` argument), so it counts as a manual fit wherever that distinction
-	// matters.
+	// than a second key for the same action, and is wired to `zoomExtent` the same DIRECT way the
+	// toolbar button is (`addEventListener('click', zoomExtent)`, not a wrapping closure): a
+	// wrapped `function () { zoomExtent(); }` is a second BARE call view-memory-harness.js counts
+	// as an automatic fit nobody asked for (Task 439's asterisk trap) -- see that harness's "every
+	// automatic fit says so" assertion. `zoomExtent` reads its `auto` argument off the click event
+	// it is handed here, exactly as the toolbar's own button already does, so this is not a new
+	// quirk.
 	function wireOffscreenNotice() {
 		var pc = EngCalcs.pageConfig || {};
 		var text = document.getElementById('lpn_offscreen_notice_text');
@@ -10662,7 +10666,7 @@ var EngCalcs = EngCalcs || {};
 		if (text) { text.textContent = pc.lpn_offscreen_intact || 'Your network is intact.'; }
 		if (btn) {
 			btn.textContent = pc.lpn_tool_zoom_extent || 'Zoom to fit';
-			btn.addEventListener('click', function () { zoomExtent(); });
+			btn.addEventListener('click', zoomExtent);
 		}
 	}
 	function applyView(v) {
