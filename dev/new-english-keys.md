@@ -575,7 +575,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**65 still to read**, of 94 new keys across 7 unmerged branch(es).
+**71 still to read**, of 100 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -586,7 +586,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab6ad007`) — 29 new, 28 to read @@ NEEDS RULING
+### feat/convert-as (`51530232`) — 30 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -608,6 +608,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
@@ -805,9 +808,24 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`865d75f2`) — adds no English strings
+### feat/label-limit (`a5538f99`) — adds no English strings
 
-### feat/property-venue (`1066860e`) — 3 new, 2 to read @@ NEEDS RULING
+### feat/offscreen-notice (`d4acb740`) — 4 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/property-venue (`324c217e`) — 3 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_labels_customer_width`**
   > Widest view that attempts to display customer labels
@@ -819,11 +837,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 
-### feat/table-editing (`388e56c6`) — 7 new, 6 to read @@ NEEDS RULING
+### feat/table-editing (`b1da93a8`) — 11 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_labels_customer_width`**
   > Widest view that attempts to display customer labels
   _Ruled OK 2026-09-23._
+- **`lpn_notes_6_def`**
+  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  @@ NEEDS RULING
 - **`lpn_pane_filldown`**
   > Fill down
   @@ NEEDS RULING
@@ -832,6 +859,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_pane_hide_col`**
   > Hide this column
+  @@ NEEDS RULING
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
   @@ NEEDS RULING
 - **`lpn_pane_show_col`**
   > Show {col}
@@ -843,7 +873,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 
-### feat/zoom-control (`7ac181c1`) — 10 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`05291ba3`) — 10 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_labels_customer_width`**
   > Widest view that attempts to display customer labels
@@ -874,16 +904,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
-
-### fix/table-print (`b2126819`) — 3 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
