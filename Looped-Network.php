@@ -1032,12 +1032,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // defaultSettings() in js/looped-network.js. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_node_fields"></div>
+							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_link_fields"></div>
+							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
 						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
@@ -1054,7 +1054,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_customer_fields"></div>
+							<div id="lpn_labels_customer_fields" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">

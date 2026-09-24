@@ -449,6 +449,52 @@ exports.run = async function ({ browser, report }) {
 		});
 		await a.settle(300);
 
+		// **R-226 (2026-09-24): A MATCHING ROW MUST NOT DRAG ITS UNRELATED SIBLINGS ALONG.** Tom:
+		// "when I filter on 'view zoom' or 'zoom', I see a bunch of Customer settings that don't
+		// match. It seems that they are lumped together." Reproduced: #lpn_labels_customer_fields
+		// (and the Node/Link field lists beside it) were the only field groups in the box missing
+		// the `lpn-set-part` class every sibling group (colours, units, ids, defaults...) already
+		// carried, so filterSetboxContainer() (js/looped-network.js) matched the group's AGGREGATE
+		// text as one leaf instead of recursing row by row -- a search that hit only the Customer
+		// zoom-limit row lit up the whole group, dragging ID/Demand/Base demand/etc. along with it.
+		// Fixed in Looped-Network.php by adding the class the correctly-behaving groups already had.
+		for (const word of ['zoom', 'view zoom']) {
+			await a.page.evaluate((w) => {
+				const f = document.getElementById('lpn_setbox_filter');
+				f.value = w;
+				f.dispatchEvent(new Event('input', { bubbles: true }));
+			}, word);
+			await a.settle(300);
+			for (const hostId of ['lpn_labels_customer_fields', 'lpn_labels_node_fields', 'lpn_labels_link_fields']) {
+				const rows = await a.page.evaluate((id) => {
+					const host = document.getElementById(id);
+					if (!host) { return null; }
+					return [...host.querySelectorAll(':scope > *')].map((c) => ({
+						shown: c.style.display !== 'none',
+						text: (c.textContent || '').trim().replace(/\s+/g, ' ')
+					}));
+				}, hostId);
+				report.ok(!!rows, `${hostId} is on the page`);
+				if (!rows) { continue; }
+				const shown = rows.filter((r) => r.shown);
+				const words = word.toLowerCase().split(/\s+/);
+				report.ok(shown.every((r) => words.every((w) => r.text.toLowerCase().indexOf(w) !== -1)),
+					`"${word}" in ${hostId}: every shown row contains every word typed`,
+					shown.map((r) => r.text.slice(0, 40)).join(' | ') || '(none shown)');
+				// The group itself is never all-or-nothing once ANY of its rows fails to match --
+				// the dragged-along bug showed every row in the group the instant one of them hit.
+				report.ok(shown.length === 0 || shown.length < rows.length || rows.every((r) => words.every((w) => r.text.toLowerCase().indexOf(w) !== -1)),
+					`"${word}" in ${hostId}: not an all-or-nothing group match`,
+					`${shown.length} of ${rows.length}`);
+			}
+		}
+		await a.page.evaluate(() => {
+			const f = document.getElementById('lpn_setbox_filter');
+			f.value = '';
+			f.dispatchEvent(new Event('input', { bubbles: true }));
+		});
+		await a.settle(300);
+
 		// ---- 3. it is a BOX: geometry, drag, and it does not close on a click away ----------
 		const g = await boxRect(a);
 		report.ok(g.width > 300 && g.height > 250, 'it is a real two-pane box, not a strip',
