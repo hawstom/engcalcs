@@ -8,8 +8,10 @@
 // (1) After Zoom to fit on each example, no node symbol, label or leader may lie under anything
 // that sits over the map: the mode hint and notice strip, the bottom strip (scale bar, readouts,
 // scenario button), the tile credit, the +/- chip and either legend.
-// (2) Press Zoom to fit, turn the REAL WHEEL (and, separately, press the + chip, the keyboard's +,
-// and pinch-free wheel out), then press again: the second press must fit, not open Zoom Window.
+// (2) From one press (armed) and from two (Zoom Window), a zoom by the real wheel, a trackpad pinch,
+// the +/- chip or the keyboard puts the button back to Zoom to fit, and the next press fits.
+// (3) A press before the first results land is finished when they do. (4) A press from the view a
+// fit already settled on costs one measurement, not a relayout.
 
 const { Session } = require('../lib/session');
 
@@ -146,42 +148,101 @@ exports.run = async function ({ browser, report }) {
 		}
 	}
 
-	// (2) The second press, after a zoom by any other means.
+	// (2) A zoom by any other means puts the button back to a first press. Read off the BUTTON --
+	// its aria-label and aria-pressed, which are what a person sees -- from BOTH states it can be
+	// left in: armed after one press, and showing Zoom Window after two. The first version of this
+	// spec tried only the armed state, where a click or key press already disarmed the button
+	// through the page's pointerdown/keydown listeners, so the + chip and the keyboard passed here
+	// while a user who had pressed twice was left in Zoom Window (pre-review, 2026-09-24).
 	const a = await Session.open(browser, 'zoomreset-' + Date.now());
 	try {
 		await a.goto();
 		await a.answerTrainingPanel().catch(() => {});
 		await a.openExampleCard(await lang(a, 'lpn_ex_net1_title'));
 		const c = await centre(a);
+		const fitLbl = await lang(a, 'lpn_tool_zoom_extent');
+		const face = () => a.page.evaluate(() => {
+			const b = document.querySelector('button[data-tool="zoom-window"]');
+			return (b.getAttribute('aria-label') || '') + '|' + b.getAttribute('aria-pressed');
+		});
+		const neutral = async () => { await a.page.mouse.click(c.x * 2 - 60, c.y * 2 - 160); await a.settle(100); };
 		// Control: two presses in a row DO open Zoom Window (R-181), or the rest proves nothing.
-		await press(a); await press(a);
+		await neutral(); await press(a); await press(a);
 		report.ok(await inZoomWindow(a), 'control: two presses in a row open Zoom Window');
-		await a.page.keyboard.press('Escape'); await a.settle(100);
 		const ways = [
 			['the wheel in', async () => { await a.page.mouse.move(c.x, c.y); for (let i = 0; i < 3; i++) { await a.page.mouse.wheel(0, -240); await a.settle(30); } }],
 			['the wheel out', async () => { await a.page.mouse.move(c.x, c.y); for (let i = 0; i < 3; i++) { await a.page.mouse.wheel(0, 240); await a.settle(30); } }],
+			// A trackpad pinch reaches the page as a wheel event with ctrlKey set.
+			['a trackpad pinch', async () => { await a.page.mouse.move(c.x, c.y); await a.page.keyboard.down('Control'); for (let i = 0; i < 3; i++) { await a.page.mouse.wheel(0, -30); await a.settle(30); } await a.page.keyboard.up('Control'); }],
 			['the + chip', async () => { await a.page.click('#lpn_zoom_in'); await a.settle(100); }],
 			['the - chip', async () => { await a.page.click('#lpn_zoom_out'); await a.settle(100); }],
-			['the keyboard +', async () => { await a.page.keyboard.press('+'); await a.settle(100); }]
+			['the keyboard +', async () => { await a.page.keyboard.press('+'); await a.settle(100); }],
+			['the keyboard -', async () => { await a.page.keyboard.press('-'); await a.settle(100); }]
 		];
 		for (const [what, zoom] of ways) {
-			// A click on the map between rounds, so each round's first press is a first press. NOT a
-			// key: a key press lands on the focused button itself, which R-181 counts as the button.
-			await a.page.mouse.click(c.x * 2 - 60, c.y * 2 - 160); await a.settle(100);
-			await press(a);
-			const s0 = (await measure(a)).s;
-			await zoom();
-			const s1 = (await measure(a)).s;
-			await press(a);
-			const s2 = (await measure(a)).s;
-			report.ok(!(await inZoomWindow(a)) && Math.abs(s2 / s0 - 1) < 0.02,
-				'press, zoom by ' + what + ', press: the second press fits again, not Zoom Window',
-				'scale ' + s0.toFixed(3) + ' -> ' + s1.toFixed(3) + ' -> ' + s2.toFixed(3) + (await inZoomWindow(a) ? ' (Zoom Window opened)' : ''));
-			report.ok(s1 !== s0, '...and ' + what + ' really zoomed', s0.toFixed(3) + ' -> ' + s1.toFixed(3));
-			if (await inZoomWindow(a)) { await a.page.keyboard.press('Escape'); await a.settle(100); }
+			for (const presses of [1, 2]) {
+				await a.page.keyboard.press('Escape'); await neutral();
+				for (let i = 0; i < presses; i++) { await press(a); }
+				const s0 = (await measure(a)).s, f0 = await face(a);
+				await zoom();
+				const s1 = (await measure(a)).s, f1 = await face(a);
+				report.ok(s1 !== s0, what + ' after ' + presses + ' press(es) really zoomed', s0.toFixed(3) + ' -> ' + s1.toFixed(3));
+				report.ok(f1 === fitLbl + '|false', '...and the button is back to Zoom to fit, not pressed', f0 + ' -> ' + f1);
+				await press(a);
+				const s2 = (await measure(a)).s;
+				report.ok(!(await inZoomWindow(a)) && s2 !== s1, '...so the next press fits rather than opening Zoom Window',
+					'scale ' + s1.toFixed(3) + ' -> ' + s2.toFixed(3));
+			}
 		}
 		report.ok(a.errors.length === 0, 'no uncaught page errors', a.errors.join(' | ').slice(0, 400));
 	} finally {
 		await a.close();
+	}
+
+	// (3) Pressed before the first results land. Net2's EPS answer takes about a second; a press in
+	// that second fitted node 1's label at three lines and the P= line then grew it 3 px into the
+	// coordinate readout (pre-review, 2026-09-24). The press finishes when the results do.
+	for (const vp of [{ width: 1280, height: 800 }, { width: 1366, height: 768 }]) {
+		const b = await Session.open(browser, 'zoomearly-' + Date.now());
+		try {
+			await b.page.setViewportSize(vp);
+			await b.goto();
+			await b.answerTrainingPanel().catch(() => {});
+			await b.openExampleCard(await lang(b, 'lpn_ex_net2_title'));
+			await press(b);
+			await b.settle(3000);
+			const m = await measure(b);
+			report.ok(m.hits.length === 0, 'Net2 at ' + vp.width + 'x' + vp.height + ', pressed before the results: nothing under the furniture once they land',
+				m.hits.slice(0, 5).join('; '));
+		} finally {
+			await b.close();
+		}
+	}
+
+	// (4) A press from the view a fit already settled on is a measurement, not a relayout. On the
+	// geographic Net3 the full fit lays the labels out twice (~0.5 s each here); the repeat must not.
+	const n = await Session.open(browser, 'zoomrepeat-' + Date.now());
+	try {
+		await n.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		await n.goto();
+		await n.answerTrainingPanel().catch(() => {});
+		await n.openExampleCard(await lang(n, 'lpn_ex_net3_world_title'));
+		await n.settle(3000);
+		const c = await centre(n);
+		const timed = async () => {
+			await n.page.mouse.click(c.x * 2 - 60, c.y * 2 - 160); await n.settle(100);
+			const h = await fitButton(n), bb = await h.boundingBox(), t = Date.now();
+			await n.page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
+			const ms = Date.now() - t;
+			await n.settle(400);
+			return ms;
+		};
+		const first = await timed(), s1 = (await measure(n)).s;
+		const again = [await timed(), await timed(), await timed()], s2 = (await measure(n)).s;
+		report.note('geographic Net3: first press ' + first + ' ms, repeats ' + again.join('/') + ' ms');
+		report.ok(Math.max.apply(null, again) < 200 && s1 === s2, 'geographic Net3: a press from the fitted view is cheap and changes nothing',
+			again.join('/') + ' ms');
+	} finally {
+		await n.close();
 	}
 };

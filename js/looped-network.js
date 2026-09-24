@@ -10762,6 +10762,19 @@ var EngCalcs = EngCalcs || {};
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
 	var LPN_FIT_SETTLE_PASSES = 8;
+	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
+	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
+	var lastFit = null;
+	// A pressed fit waiting on a solve that was due when it was pressed (see zoomExtent()).
+	var fitAwaitsSolve = null, LPN_FIT_AWAIT_SOLVE_MS = 8000;
+	function finishFitAfterSolve() {
+		var f = fitAwaitsSolve;
+		fitAwaitsSolve = null;
+		if (!f || Date.now() - f.at > LPN_FIT_AWAIT_SOLVE_MS) { return; }
+		setTimeout(function () {
+			if (state.s === f.s && state.tx === f.tx && state.ty === f.ty) { zoomExtent(false); }
+		}, 0);
+	}
 	// Everything that sits OVER the map, as rectangles in canvas pixels (R-216): every occupant
 	// overlayOccupants() already lists for the legends to dodge -- the mode hint and notice strip,
 	// each cell of the bottom strip including the scale bar, the tile credit, the +/- chip -- plus
@@ -10889,6 +10902,22 @@ var EngCalcs = EngCalcs || {};
 		// **AND THE FALLBACK IS CENTRED ON THE MODEL, NOT ON THE LETTERING** that just failed to
 		// fit, and it is also taken whenever the label-aware answer would leave a node off the
 		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
+		// **A PRESS FROM THE VIEW THE LAST FIT LEFT IS NEARLY FREE** (pre-review 2026-09-24: about
+		// 1.2 s a press on the geographic Net3, every press). Steps 1 and 2 are arithmetic; step 3
+		// redraws. If steps 1 and 2 give the same seed they gave last time, on a canvas of the same
+		// size, and the view is still exactly the one that fit settled on, then the only question
+		// left is whether anything drawn has since moved under an overlay or off the frame -- one
+		// measurement, no relayout. Anything else (an edit, a resize, a pan, a zoom, new results)
+		// changes the seed or the view and takes the full path.
+		var seed = [modelFit, s, r.width, r.height].join(' ');
+		if (lastFit && lastFit.seed === seed && lastFit.s === state.s && lastFit.tx === state.tx &&
+			lastFit.ty === state.ty) {
+			padLeft = lastFit.pads[0]; padRight = lastFit.pads[1]; padTop = lastFit.pads[2]; padBottom = lastFit.pads[3];
+			if (!firstObstruction(modelItems.concat(drawnInkItems()))) {
+				if (auto) { rebaseSignatureIfClean(); }
+				return;
+			}
+		}
 		var at = place(s, items);
 		if (!(s > minScale()) || !modelInside(s, at)) {
 			apply(modelFit, place(modelFit, modelItems));
@@ -10896,6 +10925,17 @@ var EngCalcs = EngCalcs || {};
 			apply(s, at);
 			settleOnDrawnInk();
 		}
+		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
+		// **A PRESS THAT BEAT THE RESULTS FINISHES WHEN THEY ARRIVE** (pre-review 2026-09-24: Net2's
+		// node 1 ended 3 px under the coordinate readout). Pressed while a solve is still due, the
+		// fit frames labels that are about to gain a line -- P= appears when the answer lands -- so
+		// the label it cleared grows back under the bottom strip. The press is not finished until
+		// the drawing it was asked to fit is, so applySolveResult() runs it once more, but ONLY if
+		// the view is still exactly the one this press left and only within a few seconds of it.
+		// That is the end of a fit somebody asked for, not the automatic post-solve re-fit the note
+		// above restoreViewOrFit() forbids: a fit nobody asked for (`auto`) never sets this.
+		fitAwaitsSolve = (!auto && (solveTimer || !lastSolveResult))
+			? { s: state.s, tx: state.tx, ty: state.ty, at: Date.now() } : null;
 		if (auto) { rebaseSignatureIfClean(); }
 		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
 		// PIXELS, which is the shape a label really has: a node label is anchored at its home
@@ -12552,7 +12592,15 @@ var EngCalcs = EngCalcs || {};
 		// 2026-09-24: *"Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is
 		// startling."*). The wheel is not a pointerdown or a keydown, so wireZoomArmReset() never
 		// saw it; this door is the one the wheel, the pinch, the +/- chip and the keyboard all use.
+		//
+		// **AND IT RESETS THE FACE AS WELL AS THE FLAG.** Two presses in a row leave the button in
+		// Zoom Window, where `zoomToolArmed` is already false -- so clearing the flag alone left a
+		// + click or a wheel notch with the button still saying Zoom Window (pre-review,
+		// 2026-09-24). A Zoom Window with NO box started yet is dropped back to Select, which puts
+		// the face back to Zoom to fit; one with its first corner down is kept, because zooming to
+		// find the second corner is part of drawing that box, not a different action.
 		zoomToolArmed = false;
+		if (mode === 'zoom-window' && !zoomWinDrag && !zoomWinPressAt) { setMode('select'); }
 		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
 		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
 		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
@@ -50928,6 +50976,7 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		finishFitAfterSolve();
 		if (!result.ok) {
 			lastSolveResult = null;
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
