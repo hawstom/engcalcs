@@ -1227,8 +1227,6 @@ $ec_lang['lpn_file_convert_as_tip']='Copies this project to a new tab and conver
 // convention and it is why this said lon/lat, but it is a convention about STORAGE, and this button
 // is read by a person. The internal code keeps naming its variables {lon, lat} in x,y order; that is
 // invisible and stays.
-$ec_lang['lpn_georef_asdeg_btn']='These are already lat/lon';
-$ec_lang['lpn_georef_asdeg_tip']='Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.';
 $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.';
 // Task 696: a project that already knows where it is (lat/lon, an EPSG coordinate system, or an
 // attached world map) opens the placement steps already answered. Tom's own sentence for this case

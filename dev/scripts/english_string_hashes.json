@@ -2596,8 +2596,6 @@
         "lpn_fittings_none": "b615dcfdcf8645f7f5c7054fb0e9e6f21d8d9e21",
         "lpn_geomap": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
         "lpn_georef_adjust": "e5af13bcbd04eebd8e96cb6deded72be4bd6c1ad",
-        "lpn_georef_asdeg_btn": "489eb920bda19f826833d49ff77ec3ec77ad50e1",
-        "lpn_georef_asdeg_tip": "bd564aa596821aab2d3e372512e1cb6cbb7d093a",
         "lpn_georef_asdegrees": "c13ac3f8f725066e5adf32eb4ea0155b08a845e9",
         "lpn_georef_backdrop_unrotated": "044e4077a7af86a4d7da986c8225d3fe47f02980",
         "lpn_georef_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
@@ -6750,14 +6748,6 @@
         },
         "lpn_georef_adjust": {
             "words": 45,
-            "ends_sentence": true
-        },
-        "lpn_georef_asdeg_btn": {
-            "words": 4,
-            "ends_sentence": false
-        },
-        "lpn_georef_asdeg_tip": {
-            "words": 42,
             "ends_sentence": true
         },
         "lpn_georef_asdegrees": {
