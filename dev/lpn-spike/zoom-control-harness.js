@@ -517,5 +517,33 @@ console.log('\n--- 7. Tom\'s sequence: press, press, click, click, press => fitt
 		L.getMode() === 'zoom-window');
 }
 
+console.log('\n--- 8. R-216: a zoom by any other means makes the next press a first press ---');
+{
+	// Tom, 2026-09-24: "Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is
+	// startling." The wheel is neither a pointerdown nor a keydown, so it is driven here through the
+	// page's own wheel listener on the canvas -- the real wiring, not a call to zoomAbout().
+	// dev/browser-pass/specs/zoomfurniture.js asks the same of real Chrome with a real wheel.
+	reset();
+	const btn = buildZoomToolButton();
+	function pressBtn() { docPointerdown(btn); clickBtn(btn); }
+	const ways = [
+		['the wheel', function () { fire('wheel', { clientX: 400, clientY: 300, deltaY: -100, preventDefault: function () {} }); }],
+		['the wheel outward', function () { fire('wheel', { clientX: 400, clientY: 300, deltaY: 100, preventDefault: function () {} }); }]
+	];
+	ways.forEach(function (w) {
+		pressBtn();
+		const fitS = L.getState().s;
+		ok('press arms (' + w[0] + ' round)', L.getZoomToolArmed());
+		w[1]();
+		ok('...' + w[0] + ' really zoomed', L.getState().s !== fitS);
+		ok('...and disarmed the button', !L.getZoomToolArmed());
+		pressBtn();
+		ok('...so the next press fits again rather than opening Zoom Window',
+			L.getMode() !== 'zoom-window' && Math.abs(L.getState().s - fitS) < 1e-6);
+		// Leave the next round's first press a first press.
+		fire('wheel', { clientX: 400, clientY: 300, deltaY: -100, preventDefault: function () {} });
+	});
+}
+
 console.log('\n' + checks + ' checks, ' + failures + ' failed');
 process.exit(failures ? 1 : 0);

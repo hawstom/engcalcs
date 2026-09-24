@@ -10761,7 +10761,30 @@ var EngCalcs = EngCalcs || {};
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
-	var LPN_FIT_SETTLE_PASSES = 5;
+	var LPN_FIT_SETTLE_PASSES = 8;
+	// Everything that sits OVER the map, as rectangles in canvas pixels (R-216): every occupant
+	// overlayOccupants() already lists for the legends to dodge -- the mode hint and notice strip,
+	// each cell of the bottom strip including the scale bar, the tile credit, the +/- chip -- plus
+	// the two legends themselves. Measured, never assumed, because most of them fill in or change
+	// size after the page has drawn.
+	function mapFurnitureRects(canvasRect) {
+		var wrap = svg && svg.parentNode, out = [], list, i, b, extra, cr = canvasRect;
+		if (!wrap || !wrap.getBoundingClientRect || !(cr.width > 0)) { return out; }
+		list = overlayOccupants(wrap.getBoundingClientRect()).map(function (o) { return o.rect; });
+		extra = [document.getElementById('lpn_labels_legend'), colorLegendBox];
+		for (i = 0; i < extra.length; i++) {
+			if (extra[i] && extra[i].style && extra[i].style.display !== 'none' && extra[i].getBoundingClientRect) {
+				list.push(extra[i].getBoundingClientRect());
+			}
+		}
+		for (i = 0; i < list.length; i++) {
+			b = list[i];
+			if (!b || !(b.width > 0) || !(b.height > 0)) { continue; }
+			if (b.right <= cr.left || b.left >= cr.right || b.bottom <= cr.top || b.top >= cr.bottom) { continue; }
+			out.push({ l: b.left - cr.left, r: b.right - cr.left, t: b.top - cr.top, b: b.bottom - cr.top });
+		}
+		return out;
+	}
 	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
 	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
 	// on the map, so it cannot be off it.
@@ -10798,17 +10821,17 @@ var EngCalcs = EngCalcs || {};
 		// It guarantees nothing is under an overlay IMMEDIATELY AFTER a fit, and nothing more -- the
 		// user can still pan or zoom content back under one, because the overlays are screen-fixed
 		// and the drawing is not. A guarantee needs the overlays out of the canvas (Task 253).
-		var r = svg.getBoundingClientRect(), pad = 16,
+		var r = svg.getBoundingClientRect(), pad = 16, padLeft = pad, padRight = pad,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
+			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
 				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function place(v, set) {
-			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, pad, pad).t,
+			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
 				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
 		}
 		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
@@ -10878,13 +10901,24 @@ var EngCalcs = EngCalcs || {};
 		// PIXELS, which is the shape a label really has: a node label is anchored at its home
 		// endpoint (nodeLabelBase(), the user's drag included), anything else at its own centre.
 		// The nudge the placement pass added is then pixels of reach, which is what it is.
+		//
+		// **AND NOTHING MAY END UNDER THE MAP'S FURNITURE** (R-216, Tom 2026-09-24: *"Zooms almost
+		// to fit. Only the scale bar obscures a label."*). The two bands above reserve the top and
+		// bottom strips by their measured height, but a corner overlay -- the scale bar when the
+		// strip wraps, the tile credit, the +/- chip, a legend -- is a rectangle, not a band, and it
+		// changes size after the fit it sits over (the scale bar appears, a legend fills in). So the
+		// settle asks the real question: is any node or any piece of drawn lettering under any
+		// overlay, measured as drawn? For each one that is, the edge it hugs is reserved to the
+		// overlay's own measured depth -- whichever edge gives up the smaller share of the canvas --
+		// and the fit is solved again. Reserves only grow and the scale only steps down, so it ends.
 		function settleOnDrawnInk() {
-			var k, ink, all, s2, p2;
+			var k, all, s2, p2, hit;
 			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
 				reshedNow();
-				ink = drawnInkItems();
-				if (inkInside(ink)) { return; }
-				all = modelItems.concat(ink);
+				all = modelItems.concat(drawnInkItems());
+				hit = firstObstruction(all);
+				if (!hit) { return; }
+				if (hit !== true) { reserveEdgeFor(hit); }
 				items = all;
 				s2 = Math.min(state.s, solve());
 				if (!(s2 > minScale())) { return; }
@@ -10894,14 +10928,33 @@ var EngCalcs = EngCalcs || {};
 			}
 			reshedNow();
 		}
-		function inkInside(ink) {
-			var i, it, x, y, e = 0.5;
-			for (i = 0; i < ink.length; i++) {
-				it = ink[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
-				if (x - it.l < pad - e || x + it.r > r.width - pad + e ||
-					y - it.t < padTop - e || y + it.b > r.height - padBottom + e) { return false; }
+		// `true` when something is outside the padded frame, the overlay's rectangle when something
+		// is under an overlay, null when all is clear.
+		function firstObstruction(all) {
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			for (i = 0; i < all.length; i++) {
+				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
+				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
+				for (j = 0; j < furn.length; j++) {
+					f = furn[j];
+					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				}
+				if (bl < padLeft - e || br > r.width - padRight + e ||
+					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
 			}
-			return true;
+			return outside || null;
+		}
+		function reserveEdgeFor(f) {
+			var gap = 4, cands = [
+				{ k: 'top', d: f.b, span: r.height }, { k: 'bottom', d: r.height - f.t, span: r.height },
+				{ k: 'left', d: f.r, span: r.width }, { k: 'right', d: r.width - f.l, span: r.width }
+			];
+			cands.sort(function (a, b) { return a.d / a.span - b.d / b.span; });
+			var c = cands[0], v = c.d + gap;
+			if (c.k === 'top') { padTop = Math.max(padTop, v); }
+			else if (c.k === 'bottom') { padBottom = Math.max(padBottom, v); }
+			else if (c.k === 'left') { padLeft = Math.max(padLeft, v); }
+			else { padRight = Math.max(padRight, v); }
 		}
 	}
 
@@ -12495,6 +12548,11 @@ var EngCalcs = EngCalcs || {};
 	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
 	// pinch come through here, so the two cannot come to different ideas about which is happening.
 	function wheelZoom(sx, sy, factor) {
+		// **ANY ZOOM BY ANY OTHER MEANS MAKES THE NEXT Zoom to fit PRESS A FIRST PRESS** (R-216, Tom
+		// 2026-09-24: *"Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is
+		// startling."*). The wheel is not a pointerdown or a keydown, so wireZoomArmReset() never
+		// saw it; this door is the one the wheel, the pinch, the +/- chip and the keyboard all use.
+		zoomToolArmed = false;
 		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
 		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
 		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
