@@ -28311,7 +28311,7 @@ var EngCalcs = EngCalcs || {};
 			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
 				var crsNote = document.createElement('p');
 				crsNote.style.margin = '0 0 8px';
-				crsNote.textContent = pc.lpn_inp_report_no_crs || 'This file states no coordinate system, so its numbers are not longitude and latitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
+				crsNote.textContent = pc.lpn_inp_report_no_crs || 'This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
 				body.appendChild(crsNote);
 			}
 			// The one place an anchor mode is worth mentioning, and only to someone whose file had
