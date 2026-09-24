@@ -786,6 +786,8 @@ console.log('\n--- Settings panel stays in sync ---');
       sels.length === stripCount && sels.every(s => !!s.dataset.family), sels.length + ' with families');
     ok('...and NONE of them carries the name that would reach the unit-change handler',
       sels.every(s => !s.name), sels.map(s => s.name || '-').join(','));
+    ok('...nor the id, which would repeat the strip\'s own on the page',
+      sels.every(s => !s.id), sels.map(s => s.id || '-').join(','));
     ok('...and they open on what the strip is showing',
       sels[0].value === L.setUnitEl('lpn_u_length').value, sels[0].value);
     // The clone is a copy, not a reference: changing one must not move the page's own strip.

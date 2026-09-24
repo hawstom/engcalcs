@@ -60,42 +60,42 @@ function echoCalculatorFormAppend() {
 				<th><?=ecTipLabel($ec_lang['bpn_upstream'], $ec_lang['bpn_upstream_tip'])?></th>
 				<th>
 					<?=$ec_lang['ip_length']?><br />
-					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string); ?>
+					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string, $ec_lang['ip_length']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_diameter']?><br />
-					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
+					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string, $ec_lang['ip_diameter']); ?>
 				</th>
 				<th>
 					<?=ecLinkTipLabel($bpn_roughness_urls['hw'], '<span id="bpn_roughness_symbol">C</span>', $ec_lang['bpn_roughness_tip'])?><br />
-					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
+					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string, 'C'); ?>
 				</th>
 				<th>
 					<span class="ec-narrowcol"><?=ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?></span>
 				</th>
 				<th>
 					<?=ecTipLabel($ec_lang['bpn_demand'], $ec_lang['bpn_demand_tip'])?><br />
-					<?php echoUnitSelect($name = 'demandu', $units = 'flow_node', $indent_string); ?>
+					<?php echoUnitSelect($name = 'demandu', $units = 'flow_node', $indent_string, $ec_lang['bpn_demand']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['bpn_elev_down']?><br />
-					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string); ?>
+					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string, $ec_lang['bpn_elev_down']); ?>
 				</th>
 				<th>
 					<?=ecTipLabel($ec_lang['bpn_q_line'], $ec_lang['bpn_q_line_tip'])?><br />
-					<?php echoUnitSelect($name = 'q_lineu', $units = 'flow_node', $indent_string); ?>
+					<?php echoUnitSelect($name = 'q_lineu', $units = 'flow_node', $indent_string, $ec_lang['bpn_q_line']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_v617']?><br />
-					<?php echoUnitSelect($name = 'vu', $units = 'velocity', $indent_string); ?>
+					<?php echoUnitSelect($name = 'vu', $units = 'velocity', $indent_string, $ec_lang['mi_v617']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hl']?><br />
-					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string, $ec_lang['ip_hl']); ?>
 				</th>
 				<th>
 					<?=ecTipLabel($ec_lang['bpn_p_down'], $ec_lang['bpn_p_down_tip'])?><br />
-					<?php echoUnitSelect($name = 'p_downu', $units = 'partial_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'p_downu', $units = 'partial_head', $indent_string, $ec_lang['bpn_p_down']); ?>
 				</th>
 			</tr>
 		</thead>

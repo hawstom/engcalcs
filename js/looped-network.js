@@ -31619,6 +31619,7 @@ var EngCalcs = EngCalcs || {};
 			sel = copy.querySelector('select');
 			if (!sel) { return; }
 			sel.removeAttribute('name');
+			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
 			host.appendChild(copy);
 			newBoxUnits.push({ name: name, sel: sel, item: copy });
@@ -35655,14 +35656,50 @@ var EngCalcs = EngCalcs || {};
 		}
 		return key;
 	}
-	// One redraw for either answer: the document's numbers or their meaning changed, so everything
-	// derived from them is stale -- the labels, the solve, and what is on disk.
+	// **NOT refreshAllFromDocument() -- THAT IS THE PROJECT-ARRIVAL PATH** (ROADMAP Task 653, LEFT
+	// half). A unit change is not a different network arriving: nothing moves. CLAUDE.md's Unit
+	// Sets rule is "changing a unit reinterprets the typed number; it never converts it" -- so the
+	// STORED numbers are untouched (Non-destructive) or rewritten in place by convertUnitValues()
+	// (Destructive) before this runs either way, and no unit here ever decides a coordinate (see
+	// unitServes() and LPN_UNIT_SELECTS -- length, diameter, roughness, elevation/head, pressure,
+	// flow, velocity, gradient, age; x/y and lon/lat are never among them). So buildDom() has
+	// nothing to rebuild: every element keeps its shape and its place, and rebuilding the whole SVG
+	// tree, the Settings box and the Libraries box for that is the 0.4-0.8 s this task measured.
+	//
+	// What DOES go stale is what reads the numbers through the unit strip: every label's text,
+	// Properties (an open popup), the Tables pane, the legend, the status readout, and any colour
+	// break defined in this quantity. All of it is READ FROM `doc`/`lastSolveResult` at render
+	// time, so re-rendering it -- not rebuilding the DOM it renders into -- is the whole job.
 	function afterUnitChange() {
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
 		invalidateSymbolCap();
-		refreshAllFromDocument();
+		// **ONE COALESCED PASS, LIKE EVERY OTHER SETTINGS CONTROL SINCE THE FIRST HALF OF 653.**
+		// requestLabelRefresh() also repaints the labels legend and the scenario marks
+		// (refreshLabelPassTail()), and anything that reads the layout before the frame flushes it
+		// first -- so nothing here can show the old lettering.
+		requestLabelRefresh();
+		// Colour breaks are typed in the unit just changed, so a thematic map painted before this
+		// change is now reading its own numbers in the wrong quantity.
+		refreshValueColors();
+		// The two panels that show the document's numbers without waiting to be asked.
+		refreshPaneIfOpen();
+		refreshPopupIfOpen();
+		// The status strip names the flow and pressure units directly (Task 522).
+		refreshMapStatus();
+		// **ONE SOLVE, NOT TWO, AND NOT THE PROJECT-ARRIVAL ONE.** scheduleArrivalSolve() (what
+		// refreshAllFromDocument() used) unconditionally drops the fire-flow run, which is right for
+		// a different network arriving and wrong for an edit -- Task 530's ruling is that only a
+		// genuinely different network clears the rings. scheduleSolve() is the same door every other
+		// edit on this page goes through: recalculate ON gets one debounced solve, which itself
+		// redraws labels, colours, the pane and the popup again once the new numbers exist;
+		// recalculate OFF leaves the stale answers on screen, exactly as the snapshot rule requires,
+		// while still saving the edit.
+		scheduleSolve();
+		// The unit choice is part of the PROJECT (there are no browser units on this page), so it
+		// is saved at once rather than on the solve's debounce -- the user just made one deliberate
+		// choice, not a burst of keystrokes.
 		saveToStorage();
 	}
 	function wireUnitSelects() {

@@ -47,12 +47,12 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_station']?><br />
 					<br />
-					<?php echoUnitSelect($name = 'stationu', $units = 'distance_medium', $indent_string); ?>
+					<?php echoUnitSelect($name = 'stationu', $units = 'distance_medium', $indent_string, $ec_lang['mi_station']); ?>
 				</th>
 				<th>
 					<span class="ec-narrowcol"><?=$ec_lang['mi_elevation']?></span>
 					<br />
-					<?php echoUnitSelect($name = 'elevationu', $units = 'distance_medium', $indent_string); ?>
+					<?php echoUnitSelect($name = 'elevationu', $units = 'distance_medium', $indent_string, $ec_lang['mi_elevation']); ?>
 				</th>
 				<th>
 					<span class="ec-narrowcol"><?=$ec_lang['mi_is_bank']?></span>
@@ -60,7 +60,7 @@ function echoCalculatorFormAppend() {
 				<th>
 					<span class="ec-narrowcol" style="width:3.5em"><?=$ec_lang['mi_tau']?></span>
 					<br />
-					<?php echoUnitSelect($name = 'tauu', $units = 'stress', $indent_string); ?>
+					<?php echoUnitSelect($name = 'tauu', $units = 'stress', $indent_string, $ec_lang['mi_tau']); ?>
 				</th>
 				<th>
 					<a target="_blank" rel="noopener" href="<?=ecRefUrl('manning_n')?>"><?=$ec_lang['mi_n']?></a>
@@ -68,22 +68,22 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_t']?>
 					<br />
-					<?php echoUnitSelect($name = 'tu', $units = 'distance_medium', $indent_string); ?>
+					<?php echoUnitSelect($name = 'tu', $units = 'distance_medium', $indent_string, $ec_lang['mi_t']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_pw']?>
 					<br />
-					<?php echoUnitSelect($name = 'pwu', $units = 'distance_medium', $indent_string); ?>
+					<?php echoUnitSelect($name = 'pwu', $units = 'distance_medium', $indent_string, $ec_lang['mi_pw']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_a']?>
 					<br />
-					<?php echoUnitSelect($name = 'au', $units = 'flow_area', $indent_string); ?>
+					<?php echoUnitSelect($name = 'au', $units = 'flow_area', $indent_string, $ec_lang['mi_a']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_rh']?>
 					<br />
-					<?php echoUnitSelect($name = 'rhu', $units = 'distance_medium', $indent_string); ?>
+					<?php echoUnitSelect($name = 'rhu', $units = 'distance_medium', $indent_string, $ec_lang['mi_rh']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_n617']?>
@@ -91,12 +91,12 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_v617']?>
 					<br />
-					<?php echoUnitSelect($name = 'v617u', $units = 'velocity', $indent_string); ?>
+					<?php echoUnitSelect($name = 'v617u', $units = 'velocity', $indent_string, $ec_lang['mi_v617']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?>
 					<br />
-					<?php echoUnitSelect($name = 'hv617u', $units = 'velocity_head', $indent_string); ?>
+					<?php echoUnitSelect($name = 'hv617u', $units = 'velocity_head', $indent_string, $ec_lang['mi_hv617']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_fr617']?>
@@ -104,7 +104,7 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_q617']?>
 					<br />
-					<?php echoUnitSelect($name = 'q617u', $units = 'flow_channel', $indent_string); ?>
+					<?php echoUnitSelect($name = 'q617u', $units = 'flow_channel', $indent_string, $ec_lang['mi_q617']); ?>
 				</th>
 			</tr>
 		</thead>

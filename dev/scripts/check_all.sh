@@ -351,6 +351,13 @@ run_check "unit default set selftest"    blocking php dev/scripts/unit_default_s
 # solver as 6 metres. The page renders, the select is right, and the answer is wrong by 25.4.
 run_check "form field units"             blocking php dev/scripts/form_field_units_check.php
 run_check "form field units selftest"    blocking php dev/scripts/form_field_units_selftest.php
+# Task 685, Tom 2026-09-17: "name each one after its own field". 226 of 430 rendered form controls
+# had no accessible name, essentially every unit select in the suite -- a screen reader announced
+# "combo box, feet" with nothing saying which field it belonged to. Renders the 16 calculator pages
+# and fails on any <select> (not only a unit one) with no aria-label, no resolving aria-labelledby,
+# and no <label>.
+run_check "unit select accessible names" blocking php dev/scripts/unit_select_name_check.php
+run_check "unit select name selftest"    blocking php dev/scripts/unit_select_name_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
