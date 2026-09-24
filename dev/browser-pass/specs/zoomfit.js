@@ -69,8 +69,10 @@ async function walk(a, report, key, strictScale) {
 	const base = await measure(a);
 	report.ok(base.inside === base.total && base.total > 0, key + ': the fit from the opened view shows every node',
 		base.inside + '/' + base.total + ' at scale ' + base.s.toFixed(3));
+	// Each round starts from the fitted view the round before left. No extra press here: on
+	// feat/zoom-control two presses in a row open Zoom Window (R-181), and the wheel between the
+	// presses below is what makes each one a first press (R-216).
 	for (const mult of [2, 4, 8, 32, Infinity]) {
-		await fit(a);
 		const pre = await zoomIn(a, base.s * mult);
 		await fit(a);
 		const post = await measure(a), ratio = post.s / base.s;
