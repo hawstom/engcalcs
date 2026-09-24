@@ -1110,3 +1110,112 @@ through a translation sprint yet -- expected for an unmerged feature branch, not
 five independent ways, and worth Tom knowing about, but it predates this branch's own diff and is
 not itself a reason to withhold this round's browser pass -- name it to him as a separate, small
 finding rather than blocking on it.
+
+## 2026-09-24 -- feat/table-editing (R-221/R-222) and feat/zoom-control (R-214/R-216)
+
+OBSERVED, both worktrees, real headless Chromium via playwright-core against the live preview
+servers (8105, 8103), real `page.mouse` down/move/up sequences and real `page.keyboard`, not
+synthetic `dispatchEvent`; `flock /tmp/engcalcs-browser.lock` held for every run. No `check_all`
+run (builders' job this round, per brief).
+
+**feat/table-editing, R-221: drag-select and multi-hide CONFIRMED** -- a real mouse drag from
+Tag's heading through Shut's, unmodified, selected exactly those three headings
+(`.lpn-pane-head-sel`, full-cell blue highlight per `css/engcalcs.css:2375`, cursor `grab`),
+right-click offered exactly one item ("Hide these columns"), and clicking it hid exactly those
+three and no others. This is Tom's literal ask ("drag through multiple columns in usual Select
+manner") and it works.
+
+**feat/table-editing, R-221 -- THE REGRESSION NOBODY ASKED FOR: a bare drag on an unselected
+heading no longer moves the column.** `dev/cookie-storage-inventory.md`'s `lpn_panecols` row cites
+"Tom's spreadsheet specification, 2026-09-18, points (d) and (e)": *"Columns can be dragged left
+and right using their headings"* -- no mention of selecting first, and it shipped that way
+2026-09-19 (`dev/lpn-spike/pane-column-drag-harness.js`). This branch changed the gesture: a plain
+mousedown+drag on a heading that is not already in `spec.headSel` now starts a RANGE SELECT
+instead (`js/looped-network.js` ~21417-21421, comment: *"dragging across headings selects them;
+dragging a selected one moves it"*). I drove exactly that plain gesture -- press From, drag onto
+To, release, no modifier -- and column order was UNCHANGED; two headings ended up selected
+instead (`selCount: 2`). Only after a real Ctrl+click on From FIRST, then a second separate drag,
+did the column move (From/To swapped). **The single most basic use of this feature -- drag a
+heading to reorder one column, which is the one thing Tom asked for and got seven days ago --
+now takes two gestures instead of one**, and the first attempt (a plain drag) visibly does
+something else (a blue highlight, not a move), which is likely to read as "broken" rather than
+"needs a click first." Real Google Sheets does not have this two-step shape: a single press+drag
+on an unselected header both selects and moves it in one continuous gesture. Worth flagging to Tom
+explicitly since he is not likely to guess he needs to click first, then drag.
+
+**feat/table-editing, R-222 CONFIRMED.** Help > Notes > "Table keyboard shortcuts" is now a real
+`<dl>/<dd><ul><li>` (verified via `outerHTML`, not just textContent) -- one shortcut a line,
+key/gesture in a left column via `<strong>`, action text in a right column, 14 items, screenshotted
+live. It also documents the drag/select-then-move split above in its own words ("Drag across
+column headings" -> Select; "Drag a selected heading" -> Move), which at least means the new
+gesture is self-documenting even though it is a step longer than before.
+
+**feat/table-editing, R-215 print CONFIRMED, measured via `emulateMedia('print')` + computed
+style, not just visual.** On EPANET Net3's Pipes table at an 850px (page-width) viewport: heading
+and body text-align now match screen exactly, column by column (`start` on ID, `center` on every
+other column, both screen and print) -- Tom's exact complaint ("all centered except ID") is now
+true in both places. The print table's own width equals the container's width to the pixel (no
+overflow, no shrink-with-room-left), and every heading carries a real 1px solid border (not a
+box-shadow, which prints only with "Background graphics" on). Screenshot at
+`/tmp/.../scratchpad/print_table_zoom.png` (session-local, not preserved). NOTE: `window.print()`
+fires real `beforeprint`/`afterprint` events under Playwright even when stubbed, which tears down
+`#lpn_print_area` — read state BEFORE calling `page.pdf()`/`page.pdf()`-adjacent APIs, not after,
+or the table silently vanishes and reads as a false "print broke" failure. I could not produce a
+literal browser Print-dialog/PDF via `pdftoppm` (poppler-utils not installed, no sudo here); the
+`emulateMedia('print')` + computed-style route is a good proxy but a real Ctrl+P preview is still
+UNVERIFIABLE FROM HERE.
+
+**Verdict, feat/table-editing: READY WITH ONE CALLOUT.** R-221 and R-222 do what Tom asked, R-215
+(inherited from fix/table-print2) checks out under measurement. The drag-to-move regression above
+is not something he asked to have changed and should be named to him explicitly before he goes
+looking for the old one-step drag and can't find it.
+
+---
+
+**feat/zoom-control, R-216(1) label clearance: MOSTLY CONFIRMED, one small real miss found.**
+Measured DOM bounding-box overlap between every rendered label/leader/node and every piece of map
+furniture (mode-hint/notice strip, footer strip incl. scale bar and coordinate readout, basemap
+credit, +/- chip, both legends) after a real click on "Zoom to fit", across five examples (Net1,
+Net2, Net3, Net3 lat/lon, Elm Street Center) at two viewport sizes (1280x900, 900x600). Four of
+five examples: zero overlaps. **EPANET Net2, both viewport sizes, reproducible across 5 separate
+re-runs from wait=50ms through wait=2500ms (not a transient "still solving" race): node 1's
+label block (ID+Qb+P+Z, 4 stacked lines) overlaps the bottom-left coordinate readout
+(`lpn_coords`, "X: -- Y: --") by ~3px** -- screenshotted (`zc_net2_crop.png`): the label's last
+line all but touches the readout text. Small, but the same shape of defect as his own R-214/R-216
+complaint, on a different piece of furniture (the coordinate readout beside the scale bar, not the
+scale bar itself) that this fix's own fit calculation apparently does not clear the way it clears
+the notice strip and legends.
+
+**feat/zoom-control, R-216(2) the "startling" reset: CONFIRMED for the gesture Tom named, MISSED
+for two gestures this SAME branch (Task 682) added.** Verified via the toolbar button's own
+`aria-label`/`aria-pressed` (it is one button that reads "Zoom to fit"/pressed=false at rest and
+relabels to "Zoom Window"/pressed=true once armed by a first press): press, press again -> armed
+(`Zoom Window`, true) -- correct, that's the two-click window gesture. Press, then a REAL
+`page.mouse.wheel()` zoom, then press again -> correctly reads `Zoom to fit`/false, i.e. wheel
+zoom resets the arming exactly as R-216 asked. **But arm it (press twice), then click the
+on-screen `#lpn_zoom_in` chip, or press the keyboard `+` -- both added by this same branch's own
+Task 682 -- and the button stays armed (`Zoom Window`, true).** A user who zooms with the chip or
+the keyboard instead of the wheel and then presses "Zoom to fit" gets the exact startling
+Zoom-Window trap Tom already complained about, unfixed for those two paths. This is the leak this
+round's brief asked me to look for: the fix covers the one input path Tom happened to name and not
+the sibling paths the same feature ships.
+
+**feat/zoom-control timing: measured, and the builder's own number undersold the worst case.**
+Real settle-time (rAF-polled until the SVG `<g transform>` stops changing) on plain EPANET Net3:
+43/46/45 ms, trivial. On **Net3 lat/lon (geographic, the case the builder named)**, four
+alternating-direction presses gave 1263 / 38 / 32 / 1203 ms -- roughly every other press took
+~1.2 seconds, not the "~0.75 s" the builder reported, and did not correlate cleanly with zoom
+direction in my small sample. 1.2 s is well past the point a press reads as instant; worth Tom
+timing himself, since "which presses are slow" was not obviously predictable from four samples.
+
+**UNVERIFIABLE FROM HERE:** whether the ~3px Net2 overlap or the 1.2s stall are things Tom's own
+eye/hand would register as a problem versus noise -- both are small enough that a browser pass is
+the only way to know if they're worth fixing before merge, and I could not test a real trackpad
+pinch or a real two-finger scroll-zoom (Playwright has no pinch gesture), so whether THOSE also
+fail to reset the arming (like the chip and keyboard do) is unverified from here.
+
+**Verdict, feat/zoom-control: NOT READY as "R-216 fully fixed."** The wheel-zoom case he
+specifically named works. Two sibling zoom gestures this branch itself introduced do not, and will
+reproduce the identical "startling" complaint the moment he happens to use + instead of the wheel.
+Worth a one-line fix before this goes back to him, or at minimum telling him explicitly that only
+wheel-zoom resets it today.
