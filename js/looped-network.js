@@ -22686,56 +22686,49 @@ var EngCalcs = EngCalcs || {};
 		wrap.appendChild(table);
 		return wrap;
 	}
-	// **THE PORTRAIT-PAGE BUDGET, IN `em` AT THE SHEET'S OWN 9pt** (`.lpn-print-table`'s declared
-	// font-size). Nothing in JS can read the paper a visitor's printer is about to use, so this is
-	// the conservative floor rather than a measurement: 7.5in of usable width -- an 8.5in letter
-	// page less a half-inch margin each side -- at 9pt is 60em. Landscape or a larger sheet only
-	// gives MORE room than this, never less.
-	var PANE_PRINT_BUDGET_EM = 60;
-	var PANE_PRINT_BASE_PT = 9;
 	/**
-	 * **THE SHEET USES THE COLUMN WIDTHS THE READER SEES, ALWAYS -- NOT ONLY THE ONES DRAGGED --
-	 * AND THE TEXT SHRINKS WITH THEM RATHER THAN THE SHEET STRETCHING PAST THE PAGE** (Tom,
-	 * 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
-	 * resizing. And I think that it's important to use the column widths adjusted by the user."*
-	 * 2026-09-22, on the result: *"Print is not respecting on-screen column widths."* And again:
-	 * *"Print table does not respect column widths. It expands to 100% of printable area."*). Three
-	 * rounds, because the first two fixes still had an escape hatch: a table NOBODY had dragged took
-	 * none of this and printed at the browser's own auto-layout content width, which is exactly the
-	 * case that "expands to 100%" describes on a wide network table -- no budget, no scaling, nothing
-	 * holding it to a sheet. Undragged is no longer special: every column, dragged or not, is read
-	 * off the live heading's drawn width (paneColDrawnEm()), so the sheet's ratios are always the
-	 * screen's ratios, and the budget/scale step below always runs.
+	 * **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to
+	 * use the column widths adjusted by the user"*; 2026-09-22: *"Print is not respecting on-screen
+	 * column widths"*; 2026-09-24, R-215: *"Widths seem to be trying, but not succeeding (tighter fit
+	 * on print than on screen)"*). Every column is given the width it is DRAWN at on screen, as a
+	 * literal `em` of the screen table's own font, and the sheet takes that same font -- so at full
+	 * size the printed table is the screen's, pixel for pixel. When the paper is narrower than that,
+	 * the font is `min(<screen px>, 100cqw x <screen px / table px>)`: the size at which the table is
+	 * exactly as wide as the sheet the browser is laying out, whatever paper that is. Widths, padding
+	 * and text are all in `em`, so every one of them shrinks by that one factor, and a heading wraps
+	 * where it wraps on screen.
 	 *
-	 * Every column is given the width it has on screen -- the dragged ones their stored em, the rest
-	 * the width they are drawn at -- as a literal `em`, so the table's true width is the sum of what
-	 * the reader actually sees. When that sum is wider than a printed page can hold, the SHEET'S OWN
-	 * FONT-SIZE is reduced instead of the columns' share of it: every column's `em` width is
-	 * unchanged, so it shrinks in lockstep with the text inside it, at exactly the ratio the screen
-	 * already had -- smaller paper, not a different layout, and never a stretch past the sheet.
-	 * `max-width: 100%` stays on as the belt for a sheet narrower than the assumed budget.
+	 * The rounds before this one assumed a 60em-at-9pt letter page and set padding in `pt`. The
+	 * assumption was wrong on A4 and the `pt` padding did not scale, so a shrunk sheet gave a bigger
+	 * share of each column to padding than the screen does -- which is the "tighter fit" he saw, and
+	 * what broke "Elevation" and "Base demand" mid-word. Measured in real Chromium, as a PDF, by
+	 * dev/browser-pass/specs/print.js.
 	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
 	function panePrintWidths(spec, table) {
-		var cols = paneCols(spec), unit, ems, sum = 0, cg, scale;
+		var cols = paneCols(spec), unit, ems, sum = 0, cg;
 		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
-		ems = cols.map(function (c) {
-			return paneColUserWidth(spec.id, c) || paneColDrawnEm(spec, c, unit);
-		});
+		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
 		ems.forEach(function (e) { sum += e; });
 		if (!(sum > 0)) { return null; }
+		// **EACH COLUMN ALSO CARRIES ITS 1px RULE, OUTSIDE THE SCALE.** On screen the grid is inset
+		// box-shadow, which takes no width; on paper it is a real border (a shadow is background
+		// paint and is dropped with "Background graphics" off), and under border-collapse each column
+		// owns 1px of it. Left inside the `em`, that pixel came out of the text's room -- at a
+		// sheet scaled to 0.45 it was enough to wrap "Shut" onto two lines.
 		cg = document.createElement('colgroup');
 		ems.forEach(function (e) {
 			var col = document.createElement('col');
-			col.style.width = (Math.round(e * 100) / 100) + 'em';
+			col.style.width = 'calc(' + (Math.round(e * 100) / 100) + 'em + 1px)';
 			cg.appendChild(col);
 		});
 		table.appendChild(cg);
 		table.className += ' lpn-print-fixed';
-		table.style.width = (Math.round(sum * 100) / 100) + 'em';
-		scale = sum > PANE_PRINT_BUDGET_EM ? (PANE_PRINT_BUDGET_EM / sum) : 1;
-		if (scale < 1) { table.style.fontSize = (Math.round(PANE_PRINT_BASE_PT * scale * 100) / 100) + 'pt'; }
+		table.style.width = 'calc(' + (Math.round(sum * 100) / 100) + 'em + ' + (ems.length + 1) + 'px)';
+		// (100cqw - the rules) / sum-in-em is the font at which the table fills the sheet exactly.
+		table.style.fontSize = 'min(' + (Math.round(unit * 100) / 100) + 'px, calc((100cqw - ' + (ems.length + 1) +
+			'px) / ' + (Math.round(sum * 100) / 100) + '))';
 		return ems;
 	}
 	// Taken down on afterprint where the browser has one, so nothing is removed while the print
