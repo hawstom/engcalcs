@@ -236,8 +236,13 @@ ok('...and Cancel leaves it exactly as it was',
 console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
 {
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_convert_as'),
-		lnSrc.indexOf('label: pc.lpn_file_convert_as') + 200);
+	// **BOUNDED TO THE OBJECT LITERAL'S OWN CLOSING BRACE, NOT A FIXED CHARACTER COUNT** (R-213
+	// moved this row to sit right before Save all's own comment, which starts "disabled when it
+	// would do nothing" -- a fixed 200-character window reached past this row's own `}` into that
+	// unrelated text and read its "disabled" as this row's own, though nothing here moved the
+	// property itself). This row's own text has no nested `{`, so its first `}` is its own close.
+	const start = lnSrc.indexOf('label: pc.lpn_file_convert_as');
+	const row = lnSrc.slice(start, lnSrc.indexOf('}', start) + 1);
 	ok('File carries the row, and it converts the open project into a copy',
 		/label: pc\.lpn_file_convert_as \|\|/.test(lnSrc) && /fn: convertAs/.test(row),
 		row.split('\n')[1]);

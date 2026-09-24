@@ -630,13 +630,15 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		.map(e => String(e.textContent || ''));
 	check(rows.some(t => t.indexOf(String(pc.lpn_library_import)) >= 0),
 		`the File menu carries the wizard: ${JSON.stringify(rows.filter(Boolean).slice(0, 12))}`);
-	// BELOW THE THREE ROWS THAT OPEN A WHOLE PROJECT, because this one does not open anything: it
-	// copies into the project already on screen, and a row that edits the open document sitting
-	// above the rows that REPLACE it would read as one of them.
+	// BELOW THE ROWS THAT OPEN A WHOLE PROJECT, because this one does not open anything: it copies
+	// into the project already on screen, and a row that edits the open document sitting above the
+	// rows that REPLACE it would read as one of them. Convert as… dropped out of that group under
+	// R-213 (Task 696; Tom, 2026-09-24: it acts on the OPEN project, so it now sits beside Save as…
+	// instead) -- Import EPANET file… is the last of the rows this one still has to sit below.
 	const at = (label) => rows.map((t, i) => [t, i]).filter(p => p[0].indexOf(String(label)) >= 0)
 		.map(p => p[1])[0];
-	check(at(pc.lpn_library_import) > at(pc.lpn_file_convert_as),
-		'below Open xy file on map, which is the last row that opens a project');
+	check(at(pc.lpn_library_import) > at(pc.lpn_file_import_inp),
+		'below Import EPANET file…, the last of the rows that open a project');
 	// AND IT IS THE ONLY ROW ANYWHERE THAT OPENS THE WIZARD. Section 8 asserts the Libraries box
 	// has none; this asserts the menu row is genuinely there to have taken their place, so the
 	// removal cannot leave the wizard unreachable.
