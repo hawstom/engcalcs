@@ -3853,6 +3853,26 @@ var EngCalcs = EngCalcs || {};
 		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat),
 			s: Math.max(minScale(), Math.min(w, h) / degLat) };
 	}
+	// **PROJECT1's OWN HOME VIEW, KEPT SEPARATE FROM `LPN_GEO_HOME`** (R-208,
+	// dev/tom-review-queue.md: *"we start the Project1 on WGS84 zoomed to our favorite place ...
+	// possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center,
+	// Novato, CA."*). Repointing `LPN_GEO_HOME` itself would move every wizard-made blank
+	// geographic project to Novato too, surprising someone who explicitly chose "start blank,
+	// geographic" -- this constant and function exist only for the ONE tab nobody chose to make.
+	//
+	// Centre and span are the real Nominatim `jsonv2` result for "Downtown Novato Center, Novato,
+	// CA" (2026-09-24: centre from the result's lat/lon, span from its own `boundingbox`, the
+	// larger of the two sides) -- the same search a visitor's own place-name lookup would return,
+	// not a hand-picked point.
+	var LPN_FIRST_VISIT_HOME = { lon: -122.579669, lat: 38.108195 };
+	var LPN_FIRST_VISIT_SPAN = 0.0024; // degrees -- the geocoder's own bounding box, padded a hair
+	function firstVisitHomeView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return null; }
+		return { cx: inwardX(LPN_FIRST_VISIT_HOME.lon), cy: inwardY(LPN_FIRST_VISIT_HOME.lat),
+			s: Math.max(minScale(), Math.min(w, h) / LPN_FIRST_VISIT_SPAN) };
+	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
 	function coordText(v) { return isLatLonProject() ? v.toFixed(6) : v.toFixed(2); }
@@ -10687,6 +10707,11 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
+	// **R-208's OWN DEFERRAL, SEPARATE FROM `pendingView`/`pendingViewFor`.** Set once, in init(),
+	// for the ONE project a first visit is born with; consumed and cleared by `noteMapSized()`,
+	// which is the first moment the canvas has a real height to compute Novato's home view against.
+	// See the note where it is set for why it cannot be an ordinary `pendingView`.
+	var firstVisitPendingId = null;
 	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
@@ -33304,6 +33329,31 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
+			// GRID.** The reported defect was specific: attaching the world map to the default tab
+			// errored, because a schematic project has no coordinate system to place tiles with.
+			// Making Project1 geographic from birth removes the error at its source instead of
+			// routing the visitor around it -- see `firstVisitHomeView()` above for where the
+			// numbers come from and why `LPN_GEO_HOME` itself is untouched.
+			project.coords = LPN_COORDS_GEO;
+			// **BASEMAP STAYS OFF, ON PURPOSE, EVEN THOUGH A GEOGRAPHIC PROJECT DEFAULTS ON**
+			// (`basemapOn()` is `project.basemap !== 'off'`, so an unset value already shows
+			// tiles). Every existing door to a geographic project -- the New Project wizard, Import
+			// XY to lat/lon, Map > World map > Attach -- is itself the visitor's explicit action,
+			// which is the "asks you first" `privacy.php` and CLAUDE.md's four-third-party-request
+			// list both promise. A first visit is not an action; nobody has asked for anything yet.
+			// Fetching OpenStreetMap tiles here would be a NEW third-party request with no visitor
+			// gesture behind it, so this one tab is deliberately the exception to the geographic
+			// default: positioned, but with the map behind it switched off until Map > World map >
+			// Attach (or the Background image / basemap toggle) is pressed by hand.
+			project.basemap = 'off';
+			// **NOT `pendingView`/`pendingViewFor` HERE** -- `firstVisitHomeView()`, like
+			// `geoHomeView()`, needs the canvas's real height to compute a scale, and at this point
+			// in boot the canvas is still behind the curtain (height 0 until `applyMapHeight()` runs
+			// on `window load` -- see the Task 418 note above "AND IT IS BORN CLEAN"). Computed now,
+			// it would come back null and the camera would never move. `firstVisitPendingId` asks
+			// `noteMapSized()` to compute and apply it once the canvas actually has a size.
+			firstVisitPendingId = firstId;
 			// **AND IT IS BORN CLEAN.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
@@ -36498,6 +36548,15 @@ var EngCalcs = EngCalcs || {};
 			fitWhenSized = false;
 			if (!(validView(v) && applyView(v))) { zoomExtent(wasAuto); }
 		}
+		// **R-208: PROJECT1's HOME VIEW, NOW THAT THE CANVAS CAN ANSWER `clientWidth`/`clientHeight`
+		// HONESTLY.** Guarded on the SAME project still being open and still empty -- a visitor who
+		// switched tabs or started drawing before the canvas ever sized must not have their camera
+		// moved out from under them, which is the same discipline `pendingViewFor` observes for the
+		// ordinary case.
+		if (firstVisitPendingId && firstVisitPendingId === library.openId && !doc.nodes.length) {
+			applyView(firstVisitHomeView());
+		}
+		firstVisitPendingId = null;
 		// **NOTHING THAT HAPPENED BEFORE THE CANVAS HAD A SIZE WAS A USER EDIT** (Task 418), so this
 		// re-baselines once, here, and never again -- the mapSized guard above makes this function
 		// run exactly once per page load, and rebaseSignatureIfClean() still refuses a project that
