@@ -31383,6 +31383,7 @@ var EngCalcs = EngCalcs || {};
 			sel = copy.querySelector('select');
 			if (!sel) { return; }
 			sel.removeAttribute('name');
+			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
 			host.appendChild(copy);
 			newBoxUnits.push({ name: name, sel: sel, item: copy });
