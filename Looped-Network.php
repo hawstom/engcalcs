@@ -631,7 +631,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // own arithmetic rather than a second geometry. Hidden instantly, no fade: the display
 		      // toggle is the only style write. ?>
 		<div id="lpn_offscreen_notice" class="d-print-none" role="status" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;pointer-events:none;text-align:center">
-			<div style="pointer-events:auto;background:#fffbe6;border:1px solid #a80;border-radius:4px;padding:10px 16px">
+			<div class="lpn-offscreen-card">
 				<div id="lpn_offscreen_notice_text" style="margin-bottom:6px"></div>
 				<button type="button" id="lpn_offscreen_zoom_btn" class="btn btn-sm btn-outline-secondary"></button>
 			</div>

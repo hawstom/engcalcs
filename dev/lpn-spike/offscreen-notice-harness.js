@@ -164,6 +164,16 @@ console.log('--- 5. an empty project: never shown ---');
 	ok(!shown(), 'and panning an empty canvas around does not conjure one either');
 }
 
+// ---- 6. IT WEARS AN EXISTING STYLE, NOT ONE OF ITS OWN (R-227) ----------------------------------
+console.log('--- 6. the card uses the neutral panel class, not the warning pair ---');
+{
+	const fs = require('fs'), path = require('path');
+	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	const m = php.match(/<div id="lpn_offscreen_notice"[\s\S]*?<\/div>\s*<\/div>/);
+	ok(!!m && /class="lpn-offscreen-card"/.test(m[0]), 'the card carries .lpn-offscreen-card');
+	ok(!!m && !/#fffbe6|#a80\b/i.test(m[0]), 'and no inline warning colours (it is reassurance, not a warning)');
+}
+
 console.log('');
 console.log(failures ? failures + ' of ' + checks + ' FAILED' : 'all ' + checks + ' checks passed');
 process.exit(failures ? 1 : 0);
