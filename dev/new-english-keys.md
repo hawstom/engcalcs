@@ -659,7 +659,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**46 still to read**, of 69 new keys across 8 unmerged branch(es).
+**44 still to read**, of 67 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -670,7 +670,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab6ad007`) — adds no English strings
+### feat/convert-as (`a562e7c7`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -798,7 +798,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`1bbcae1d`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/label-limit (`a5538f99`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -807,7 +807,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 
-### feat/offscreen-notice (`3dcd3e8d`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/offscreen-notice (`d4acb740`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -828,7 +828,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 
-### feat/table-editing (`894a1525`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/table-editing (`b1da93a8`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -861,7 +861,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`1373951a`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`05291ba3`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -889,13 +889,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
-
-### fix/table-print (`a7a9395e`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_file_import_geo`**
-  > Convert coordinates as…
-  @@ NEEDS RULING
-- **`lpn_file_import_geo_tip`**
-  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING

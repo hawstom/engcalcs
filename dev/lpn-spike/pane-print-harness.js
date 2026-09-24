@@ -411,10 +411,16 @@ console.log('\n--- what the print stylesheet promises ---');
 	report(/\.lpn-pane-print \{/.test(css), 'the button has a style of its own');
 }
 
-// **THE SHEET USES THE WIDTHS THE READER DRAGGED** (Tom, 2026-09-21: *"I think that 'Print table'
-// has not been revisited since we added column resizing. And I think that it's important to use the
-// column widths adjusted by the user."*).
-console.log('\n--- the sheet uses the column widths the reader dragged ---');
+// **THE SHEET USES THE WIDTHS THE READER DRAGGED -- AND, SINCE, THE ONES NOBODY TOUCHED TOO**
+// (Tom, 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
+// resizing. And I think that it's important to use the column widths adjusted by the user."*
+// 2026-09-22: *"Print is not respecting on-screen column widths."* And again: *"Print table does
+// not respect column widths. It expands to 100% of printable area."*). The third round is why an
+// UNTOUCHED table no longer takes a different path from a dragged one: it used to print at the
+// browser's own auto-layout content width, with no budget and no scaling -- exactly what "expands
+// to 100%" describes on a many-column table. panePrintWidths() now reads every column's drawn
+// width, dragged or not, so the budget/scale step always runs.
+console.log('\n--- the sheet uses the column widths the reader dragged -- and now ALSO the ones nobody touched ---');
 {
 	const cg = (sheetEl) => {
 		const t = (sheetEl.children || []).filter((c) => c._tag === 'table')[0];
@@ -423,8 +429,11 @@ console.log('\n--- the sheet uses the column widths the reader dragged ---');
 	L.forgetWidths('junctions');
 	L.renderTable('junctions');
 	let got = cg(L.buildPrintable('junctions'));
-	report(got.cols.length === 0 && String(got.t.className).indexOf('lpn-print-fixed') < 0,
-		'a table nobody has resized prints as before, at its content’s width', got.cols.length + ' cols');
+	report(got.cols.length === L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).length &&
+			String(got.t.className).indexOf('lpn-print-fixed') >= 0,
+		'a table nobody has resized STILL goes through the fixed-layout/budget path', got.cols.length + ' cols, class=' + got.t.className);
+	report(!!got.t.style.fontSize, '...and, drawn at the stub\'s generous default width, its font is already scaled to the page budget',
+		got.t.style.fontSize);
 	const keys = L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).map((c) => c.key);
 	L.setUserWidth('junctions', keys[1], 20);
 	L.renderTable('junctions');
