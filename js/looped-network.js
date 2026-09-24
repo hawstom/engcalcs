@@ -40532,7 +40532,7 @@ var EngCalcs = EngCalcs || {};
 				['age', pc.lpn_quality_age || 'Water age'],
 				['trace', pc.lpn_quality_trace || 'Source trace']
 			];
-		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that reacts']);
+		opts.push(['chemical', pc.lpn_quality_chemical || 'A reactive chemical']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
