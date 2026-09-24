@@ -10759,6 +10759,36 @@ var EngCalcs = EngCalcs || {};
 	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights -- a touch
 	// generous, so the labels it lays out are comfortable at the tighter scale the second pass picks.
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
+	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
+	// example has needed; the cap exists so a layout that never settles cannot hang a click.
+	var LPN_FIT_SETTLE_PASSES = 5;
+	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
+	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
+	// on the map, so it cannot be off it.
+	function drawnInkItems() {
+		var out = [], sc = state.s || 1, rr = svg.getBoundingClientRect(), els, i, e, b, cs, ax, ay, n, h, id;
+		if (!labelsLayer || !labelsLayer.querySelectorAll || !window.getComputedStyle) { return out; }
+		els = labelsLayer.querySelectorAll('text, line.lpn-leader');
+		for (i = 0; i < els.length; i++) {
+			e = els[i];
+			if (e.tagName.toLowerCase() === 'text' && !(e.textContent || '').trim()) { continue; }
+			cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) { continue; }
+			b = e.getBoundingClientRect ? e.getBoundingClientRect() : null;
+			if (!b || (!b.width && !b.height)) { continue; }
+			id = e.getAttribute('data-nodelbl');
+			n = id ? nodeById(id) : null;
+			if (n) {
+				h = nodeLabelBase(n); ax = h.x; ay = h.y;
+			} else {
+				ax = (b.left + b.width / 2 - rr.left - state.tx) / sc;
+				ay = (b.top + b.height / 2 - rr.top - state.ty) / sc;
+			}
+			var sx = state.tx + sc * ax + rr.left, sy = state.ty + sc * ay + rr.top;
+			fitItem(out, ax, ay, sx - b.left, b.right - sx, sy - b.top, b.bottom - sy);
+		}
+		return out;
+	}
 	function zoomExtent(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it: the mode hint sits
@@ -10798,17 +10828,20 @@ var EngCalcs = EngCalcs || {};
 			setTransform();
 			onZoomChanged();
 		}
-		// **TWO SOLVES, NOT A CONVERGENCE LOOP.**
+		// **AN ANALYTIC SEED, THEN A SETTLE ON WHAT IS REALLY DRAWN** (R-214).
 		//   1. fit the MODEL ALONE, with six text heights of extra room, so the answer cannot depend
 		//      on the view we arrived from and the labels get somewhere comfortable to land.
-		//   2. work out the labels ONCE, at that scale.
-		//   3. fit again to the model plus those label boxes, without recomputing them.
-		// NOT an iterate-until-stable loop: it seeds from state.s, so arriving from a 0.02x view --
-		// where a label is 550 world units of lettering -- gives a different answer from arriving at
-		// 1x. NOT a flat pad of ~6 text heights either: a fixed pad is most of a small map and
-		// nothing on a large one. Deliberately accepted: the labels are laid out for step 1's scale,
-		// so a label can end fractionally outside the padding.
-
+		//   2. work out the labels' HOME boxes once, at that scale, and fit model plus labels.
+		//   3. SETTLE: draw at that scale, lay the labels out for real (reshedNow()), measure every
+		//      piece of lettering and every leader as drawn, and if any of it is outside the frame,
+		//      solve again with those measured boxes. Repeat until nothing is outside.
+		// Step 3 exists because the home boxes are not where the labels end up: the placement pass
+		// pushes a label out along its own leader to clear its neighbours (a dragged one by ~80 px on
+		// the Basic SI example), and that push is decided at the scale being drawn, so only a layout
+		// AT the target scale can say where the lettering is -- a fixed point, solved by iterating.
+		// **IT STILL CANNOT DEPEND ON THE VIEW WE ARRIVED FROM**: the settle starts from step 2's
+		// answer, never from state.s, and the scale only ever steps DOWN, so it ends, and a second
+		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
 		s = solve(labelTuning().fitRoom * settings.textSize);
@@ -10834,9 +10867,42 @@ var EngCalcs = EngCalcs || {};
 		// fit, and it is also taken whenever the label-aware answer would leave a node off the
 		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
 		var at = place(s, items);
-		if (!(s > minScale()) || !modelInside(s, at)) { s = modelFit; at = place(s, modelItems); }
-		apply(s, at);
+		if (!(s > minScale()) || !modelInside(s, at)) {
+			apply(modelFit, place(modelFit, modelItems));
+		} else {
+			apply(s, at);
+			settleOnDrawnInk();
+		}
 		if (auto) { rebaseSignatureIfClean(); }
+		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
+		// PIXELS, which is the shape a label really has: a node label is anchored at its home
+		// endpoint (nodeLabelBase(), the user's drag included), anything else at its own centre.
+		// The nudge the placement pass added is then pixels of reach, which is what it is.
+		function settleOnDrawnInk() {
+			var k, ink, all, s2, p2;
+			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
+				reshedNow();
+				ink = drawnInkItems();
+				if (inkInside(ink)) { return; }
+				all = modelItems.concat(ink);
+				items = all;
+				s2 = Math.min(state.s, solve());
+				if (!(s2 > minScale())) { return; }
+				p2 = place(s2, all);
+				if (!modelInside(s2, p2)) { return; }
+				apply(s2, p2);
+			}
+			reshedNow();
+		}
+		function inkInside(ink) {
+			var i, it, x, y, e = 0.5;
+			for (i = 0; i < ink.length; i++) {
+				it = ink[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
+				if (x - it.l < pad - e || x + it.r > r.width - pad + e ||
+					y - it.t < padTop - e || y + it.b > r.height - padBottom + e) { return false; }
+			}
+			return true;
+		}
 	}
 
 	// ---- OPENSTREETMAP BASEMAP, FOR A GEOGRAPHIC PROJECT (ROADMAP Task 145) ----------------------
@@ -37011,15 +37077,20 @@ var EngCalcs = EngCalcs || {};
 	var reshedTimer = null;
 	function scheduleReshed() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
-		reshedTimer = setTimeout(function () {
-			reshedTimer = null;
-			if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
-			beginLinkGeomHold();
-			try {
-				reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
-				relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
-			} finally { endLinkGeomHold(); }
-		}, 120);
+		reshedTimer = setTimeout(reshedNow, 120);
+	}
+	// The debounced pass above, run NOW -- for Zoom to fit, which has to see the labels exactly as
+	// they will be drawn at the scale it is testing (R-214). Cancels the pending timer, so the same
+	// work is not done twice.
+	function reshedNow() {
+		if (reshedTimer) { clearTimeout(reshedTimer); }
+		reshedTimer = null;
+		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+		beginLinkGeomHold();
+		try {
+			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
+			relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
+		} finally { endLinkGeomHold(); }
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
