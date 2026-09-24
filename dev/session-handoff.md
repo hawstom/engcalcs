@@ -8,10 +8,10 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Seven branches may not merge without Tom's all-clear** (all in `protected` in
+- **Ten branches may not merge without Tom's all-clear** (all in `protected` in
   `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
   `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/label-limit`,
-  `feat/offscreen-notice`.
+  `feat/offscreen-notice`, `feat/usage-report`, `feat/select-on-focus`, `feat/first-project`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -71,53 +71,61 @@ lines rather than appending corrections.
   hands back while waiting queues duplicates. Count queued runs (`/proc/*/fd` on the lock) before
   launching another track.
 
-## STATE — 2026-09-23, late (session c)
+- **`git stash` is ONE stack shared by every worktree.** 2026-09-24 one agent's `stash pop` took
+  another worktree's entry. Never stash while agents are live; brief them so.
+- **Ten check_all runs queued at once took four hours to drain** (2026-09-24, ~20 min each). A
+  run's pass is judged on the tree at its END, so an agent that edits while queued re-queues.
+  Stagger build tracks rather than launching seven together.
+- **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
+  running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
+- **Flaky under load, green alone:** `run-progress-harness.js`; `specs/basemap.js`/`firstproject.js`
+  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
+  `specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
+  `specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  check_all.
 
-### On master (pushed at ffd1ef87), not yet pulled by him
+## STATE — 2026-09-24
 
-- Defect fixes, merged on green: print table borders and widths (R-162, R-201); **Zoom to fit from
-  a deep zoom** (R-184's real cause: dragged label offsets multiplied by the starting scale;
-  `dev/browser-pass/specs/zoomfit.js` plus `zoom-fit-harness.js` section 5); first sort click on a
-  column where every row ties (Tag, Part of this network, Shut); copied unit selects drop their id.
-- **Task 653 closed**: a unit select no longer rebuilds the project, and no longer clears
-  fire-flow results as it used to. **Task 685 closed**: 226 unnamed selects now 0, held by the
-  blocking `unit_select_name_check.php`.
-- `visibility.js` spec corrected (both failures were a stale spec; Escape closing a box only with
-  focus and pointer in it is his 2026-09-19 ruling). `.gitignore` now ignores the node_modules
-  SYMLINK, so a worktree's check_all stamps again.
-- Tasks 711-713 added from pre-review findings.
+### On master, pushed at 61806814 (not yet pulled by him)
 
-### Awaiting his pass (preview ports; every branch merged master and passed its suite)
+Print table measured in real Chrome (R-215); Zoom to fit lays labels out at the target zoom and
+refits (R-214); MOD's small fixes R-204, R-205, R-206, R-209, R-229. Payloads regenerated there.
+Mary's EPANET gap audit (`dev/agents/market-researcher/epanet-gap-audit.md`); Ida's
+`dev/theming-plan.md` and Task 714; the lpn scope doc's "cut" list un-struck for what shipped.
 
-- **8103 `feat/zoom-control`** 05291ba3: carries the Zoom to fit fix. His R-184 retest.
-- **8104 `feat/convert-as`** 8216bbe5: R-185, R-187, R-189 done. Decisions for him: R-188
-  (recommend labelling lat/lon "WGS 84 latitude/longitude (EPSG:4326)", since the stored numbers are
-  4326 degrees and 3857 means metres); R-190 (keep or drop "These are already lat/lon", which serves
-  only a plain `.inp` whose numbers happen to be degrees); whether untouched pre-filled Label
-  suffixes should be applied. New strings: `lpn_convas_label_col`, `lpn_convas_label_tip`,
-  `lpn_convas_label_depth_na`.
-- **8105 `feat/table-editing`** b1da93a8: R-191..R-193. New strings: `lpn_pane_fill_none`,
-  `lpn_pane_hide_cols`, `lpn_notes_6_term`, `lpn_notes_6_def`.
-- **8106 `feat/property-venue`** 324c217e: R-195, R-197, R-198. "Table to filter" became "Table",
-  our word, needs his.
-- **8108 `feat/label-limit`** ff7ded9a: R-199 (a)-(g). Perry's blank-customer-box finding fixed.
-- **8109 `feat/offscreen-notice`** d4acb740 (Task 647, NEW PORT, needs the Apache reload below):
-  Ida's design, a centred "Your network is intact." with Zoom to fit. **Seam with zoom-control**:
-  its +/- buttons and keys do not exist on this branch; whichever merges second must check the
-  overlay re-evaluates after them (they should reach it through `onZoomChanged()`).
-- **8090 `feat/label-gang-search`**: unchanged; he edited the queue, "Still a lot is open."
+### Awaiting his pass (every one green on its own check_all; none has master's 61806814 yet)
+
+Merge master into each before it merges, and run the suite on that merge. Panel descriptions in
+`~/webdev/worktrees/_panel/ports.conf` carry his test steps. Ports 8109-8112 need the Apache reload.
+
+- **8103 `feat/zoom-control`** c5eea7de: R-216. Two rulings for him: a zoom keeps a half-drawn
+  Zoom Window box; a Zoom to fit pressed before results arrive re-runs once when they land (<8 s,
+  only if the view is untouched), which he may read as the forbidden refit-after-solve.
+- **8104 `feat/convert-as`** 0693cb6d: R-213, R-217..R-219. Strings to rule on: `lpn_convas_label_col`
+  "Suffix", `lpn_crs_latlon_display`, `lpn_convas_epsg_tip`, `lpn_georef_scale_tip`,
+  `lpn_inp_report_no_crs`. Perry: the 1:1 note is a paragraph in Import but only a tip in Convert as.
+- **8105 `feat/table-editing`** efeaa75a: R-221, R-222. **Dragging an unselected heading now selects
+  columns; a column moves only by dragging a SELECTED heading** (Perry: he approved plain
+  drag-to-move on 2026-09-18). Changed string `lpn_notes_6_def` (a list).
+- **8106 `feat/property-venue`** 98613d7f: "Closed", "Filter in table >".
+- **8108 `feat/label-limit`** 4bcf92ab: Settings filter row by row.
+- **8109 `feat/offscreen-notice`** 291bd4c7: neutral panel style. Seam with zoom-control still stands.
+- **8110 `feat/usage-report`** 5da3e7ae: `spock.php`, no password. Production needs nothing but a pull.
+- **8111 `feat/select-on-focus`** 11edc1ad: `js/Calculators.lib.js`, every calculator page.
+- **8112 `feat/first-project`** 8bfe1454: first-visit Project1 at Novato, basemap off. Perry: nothing
+  tells a newcomer the map can be attached. Its builder wrongly removed Tom's 65000 label limit;
+  restored in 8bfe1454.
+- **8090 `feat/label-gang-search`**: unchanged.
 
 ### Open with him
 
-1. The `%` sign added after his percentile box, which he did not ask for.
-2. The label branch's trade-offs and the Restore-defaults button.
-3. R-004, R-043, R-062, R-154, R-188, R-190.
-4. Net3-Novato has no labeling threshold. Should it have one?
+1. R-202/R-203 (preview the one-button style? delete the menu hint now?), and R-188..R-190 closed.
+2. Mary's Full Report and Status Report: roadmap tasks before EPANET++?
+3. The `%` sign after his percentile box; the label branch's trade-offs; R-004, R-043, R-062, R-154.
 
 ### Translation sprint
 
-Not launched: seven branches are open and he is still ruling on English. Launch after they merge;
-by then `detect_english_drift.php` lists about 156 drifted keys.
+Not launched: ten branches are open and new English waits on his rulings.
 
 ## Commands to hand Tom with any panel change
 
