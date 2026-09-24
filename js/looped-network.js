@@ -9164,19 +9164,21 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
 	}
-	function customerLabelWidthLimitSI() { return viewWidthLimitSI(labelSettings.customerMaxWidth); }
-	// **THE LABELING THRESHOLD IN METRES, `null` for "no threshold" (always draw), or 0 for a real
-	// threshold nothing is ever narrower than (never draw).** `viewWidthLimitSI()` collapses both
-	// "blank" and "0" to the same 0, which is right for the customer row (it has no "always" state)
-	// but wrong here, where blank and 0 are Tom's two different answers -- so this reads
-	// `settings.labelMaxWidth` directly rather than going through that shared converter. The stored
-	// number is in the project's own length unit, so a project in feet keeps the number its reader
-	// typed and changing the unit REINTERPRETS it, exactly as every other typed number on this page.
-	function labelWidthLimitSI() {
-		if (settings.labelMaxWidth === 0) { return 0; }
-		var lim = viewWidthLimitSI(settings.labelMaxWidth);
+	// **`null` FOR "NO THRESHOLD" (ALWAYS DRAW), OR 0 FOR A REAL THRESHOLD NOTHING IS EVER NARROWER
+	// THAN (NEVER DRAW).** `viewWidthLimitSI()` collapses both "blank" and "0" to the same 0, which
+	// is wrong here, where blank and 0 are two different answers -- so this reads the stored value
+	// directly rather than going through that shared converter. The stored number is in the
+	// project's own length unit, so a project in feet keeps the number its reader typed and
+	// changing the unit REINTERPRETS it, exactly as every other typed number on this page.
+	// **THE CUSTOMER ROW NOW FOLLOWS THE SAME RULE** (Tom, 2026-09-23 pre-review: "make the customer
+	// row accept exactly what the all-labels row accepts") -- both readers share this one shape.
+	function labelMaxWidthLimitSI(v) {
+		if (v === 0) { return 0; }
+		var lim = viewWidthLimitSI(v);
 		return lim > 0 ? lim : null;
 	}
+	function labelWidthLimitSI() { return labelMaxWidthLimitSI(settings.labelMaxWidth); }
+	function customerLabelWidthLimitSI() { return labelMaxWidthLimitSI(labelSettings.customerMaxWidth); }
 	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
 	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
 	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
@@ -9216,7 +9218,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function customerLabelsAttempted() {
 		var lim = customerLabelWidthLimitSI(), wide;
-		if (dataLabelsHidden || !lim) { return false; }
+		if (dataLabelsHidden) { return false; }
+		// **BLANK IS "ALWAYS", 0 IS "NEVER"** (Tom, 2026-09-23 pre-review), the same reading
+		// `labelsPastThreshold()` gives `labelWidthLimitSI()` -- `lim === null` means the customer
+		// row itself imposes no limit (the all-labels gate above still applies); `lim === 0` is the
+		// real "never label a customer" answer this row has always had.
+		if (lim === 0) { return false; }
+		if (lim === null) { return true; }
 		wide = visibleMapMetres();
 		// A view we cannot measure is not a view we refuse to label: the threshold is a courtesy,
 		// and failing closed on an unmeasurable canvas would blank every label in a harness.
@@ -26617,9 +26625,15 @@ var EngCalcs = EngCalcs || {};
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		// A number, and ZERO IS A REAL ANSWER here ("never label a customer"), so this is a type
 		// test and never a truthiness one -- `savedLS.customerMaxWidth || default` would silently
-		// turn the one setting that says NEVER back into the default.
-		if (typeof savedLS.customerMaxWidth === 'number' && isFinite(savedLS.customerMaxWidth) &&
-			savedLS.customerMaxWidth >= 0) { labelSettings.customerMaxWidth = savedLS.customerMaxWidth; }
+		// turn the one setting that says NEVER back into the default. **NULL IS ALSO A REAL ANSWER**
+		// (Tom, 2026-09-23 pre-review: blank means "always show", the same state the all-labels row
+		// already persists) -- accepted here the same way `savedSettings.labelMaxWidth`'s own reader
+		// treats it a few lines down, so a blanked customer row survives a save/reload round trip
+		// instead of silently reverting to whatever number the field held before.
+		if (savedLS.customerMaxWidth === null || (typeof savedLS.customerMaxWidth === 'number' &&
+			isFinite(savedLS.customerMaxWidth) && savedLS.customerMaxWidth >= 0)) {
+			labelSettings.customerMaxWidth = savedLS.customerMaxWidth;
+		}
 		backdrop = saved.backdrop || null;
 		// Same one-level-deeper merge the labelSettings block documents: `defaults` and
 		// `sectionsOpen` are nested, so a top-level Object.assign swaps the saved one in whole and
@@ -35905,12 +35919,60 @@ var EngCalcs = EngCalcs || {};
 	// row layout itself was already correct. rebuildLabelsFields() now calls columnHeadings() on this
 	// host before this function runs, with trailingCols trimmed to ['decimals'] because a customer
 	// label has no Drop column to head (see customerFieldDefs()'s own comment).
+	// **ONE CONTROL, BUILT ONCE, USED BY BOTH THE ALL-LABELS AND CUSTOMER ROWS** (Tom, 2026-09-23
+	// pre-review: "Best: build both rows through one shared function so they cannot drift."). The
+	// two rows differ only in WHERE the number lives and what else a change must also do --
+	// `spec.get`/`spec.set` are the whole of that difference. Everything else (the box, its width,
+	// the placeholder, the unit, the capture button, and the three-way blank/0/number read a typed
+	// entry gets) is written once.
+	//
+	// **BLANK IS null ("ALWAYS"), 0 IS A REAL NUMBER ("NEVER"), A REFUSED ENTRY PUTS BACK WHATEVER
+	// spec.get() ALREADY HELD** -- the same rule `setLabelMaxWidth()` used to enforce for the
+	// all-labels row alone; the customer row never had a door to null before this, so its own box
+	// could show "Always show" but never actually reach the state that placeholder promises.
+	function buildLabelWidthControl(spec) {
+		var pc = EngCalcs.pageConfig || {},
+			wrap = document.createElement('span'), input = document.createElement('input'),
+			unit = document.createElement('span'), btn = document.createElement('button');
+		wrap.className = 'lpn-set-ctlgroup';
+		input.type = 'number'; input.step = 'any'; input.min = '0';
+		// **THE SAME WIDTH ON BOTH ROWS** (Tom, 2026-09-23 pre-review: the customer box was 2.6rem,
+		// the all-labels box 7em -- visibly narrower for no reason tied to what either box holds).
+		input.style.width = '7em'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
+		if (spec.id) { input.id = spec.id; }
+		input.placeholder = pc.lpn_settings_label_always || 'Always show';
+		input.setAttribute('aria-label', spec.label || pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less');
+		function paint() {
+			var v = spec.get();
+			input.value = (typeof v === 'number' && isFinite(v) && v >= 0) ? String(v) : '';
+		}
+		paint();
+		function commit(v) { spec.set(v); paint(); }
+		input.addEventListener('change', function () {
+			var t = input.value.trim();
+			if (t === '') { commit(null); return; }
+			var v = +t;
+			if (isFinite(v) && v >= 0) { commit(v); } else { paint(); }
+		});
+		btn.type = 'button'; btn.className = 'lpn-btn';
+		btn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		btn.addEventListener('click', function (e) {
+			// Inside a <label>, so the press must not also be read as a click on the box.
+			if (e && e.preventDefault) { e.preventDefault(); }
+			var w = captureViewWidth();
+			if (w > 0) { commit(w); }
+		});
+		unit.className = 'lpn-set-note';
+		unit.textContent = unitLabel('lpn_u_length');
+		// **THE UNIT SITS BEFORE THE BUTTON** (Tom, 2026-09-22/23: "'ft' is in the wrong place. It
+		// should be before the button.") -- on both rows now.
+		wrap.appendChild(input); wrap.appendChild(unit); wrap.appendChild(btn);
+		return { wrap: wrap, input: input, paint: paint };
+	}
 	function buildCustomerLabelSection(host) {
 		var pc = EngCalcs.pageConfig || {}, line = document.createElement('label'),
-			text = document.createElement('span'), input = document.createElement('input'),
-			unit = document.createElement('span'), note = document.createElement('div'),
-			wrap = document.createElement('span'), useBtn = document.createElement('button'),
-			cur = labelSettings.customerMaxWidth;
+			text = document.createElement('span'), note = document.createElement('div');
 		customerFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
 				function (v) { labelSettings.customer[f[0]] = v; },
@@ -35936,65 +35998,30 @@ var EngCalcs = EngCalcs || {};
 		note.textContent = pc.lpn_labels_customer_note ||
 			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
-		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS** (Tom, 2026-09-23: "Make
-		// the Customer labels and All labels zoom limits settings interfaces identical"). This
-		// function cannot reach rebuildSettingsFieldsNow()'s own nested row() helper -- a different
-		// top-level function -- so the same `.lpn-set-row` label/setFieldLabel() shape it builds is
-		// reproduced here by hand rather than duplicated with different markup. Same wording, too:
-		// the row NAME is shared with lpn_settings_label_max_width (the all-labels row's own key)
-		// rather than a second key carrying an identical string, per CLAUDE.md's "reuse whole
-		// labels" rule -- these two rows now say exactly the same thing about what they gate.
+		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
+		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
+		// interfaces identical"; pre-review, same day: "build both rows through one shared function
+		// so they cannot drift"). This function cannot reach rebuildSettingsFieldsNow()'s own nested
+		// row() helper -- a different top-level function -- so the `.lpn-set-row`/setFieldLabel()
+		// wrapper is built here by hand, but `buildLabelWidthControl()` above supplies everything
+		// inside it. Same wording, too: the row NAME is shared with lpn_settings_label_max_width
+		// (the all-labels row's own key) rather than a second key carrying an identical string, per
+		// CLAUDE.md's "reuse whole labels" rule -- these two rows now say exactly the same thing
+		// about what they gate.
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
 			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
-		input.type = 'number'; input.step = 'any'; input.min = '0';
-		input.style.width = LPN_LABEL_AFFIX_W; input.style.flex = '0 0 auto';
-		input.style.boxSizing = 'border-box';
-		// **"ALWAYS SHOW", THE SAME PLACEHOLDER THE ALL-LABELS ROW USES** (Tom, 2026-09-23 (a)) --
-		// this row has no such state (0 is customer-only "never"; the all-labels row's own limit
-		// still governs, see the tip above), but the placeholder is read the same way a blank box
-		// on the row below it is, so the two rows must say the same thing about a blank box.
-		input.placeholder = pc.lpn_settings_label_always || 'Always show';
-		input.setAttribute('aria-label', pc.lpn_settings_label_max_width ||
-			'Show labels when zoomed to this map width or less');
-		input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
-		// **A REFUSED ENTRY PUTS THE OLD NUMBER BACK RATHER THAN STANDING**, which is the energy
-		// rows' own rule: a box showing a value the document does not hold is the one state a
-		// reader cannot tell from a setting that took.
-		input.addEventListener('change', function () {
-			var v = parseFloat(input.value);
-			if (isFinite(v) && v >= 0) { labelSettings.customerMaxWidth = v; }
-			else { input.value = String(labelSettings.customerMaxWidth); return; }
-			saveToStorage();
-			requestLabelRefresh();
+		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
+		// the box's own "Always show" placeholder was previously unreachable -- the old change
+		// handler refused an empty entry and put the last number back). saveToStorage() and
+		// requestLabelRefresh() are this row's own two side effects, exactly as they were before.
+		var lw = buildLabelWidthControl({
+			get: function () { return labelSettings.customerMaxWidth; },
+			set: function (v) { labelSettings.customerMaxWidth = v; saveToStorage(); requestLabelRefresh(); },
+			label: pc.lpn_settings_label_max_width
 		});
-		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
-		// view' button like the other one we restored in a different branch."*). Same words and the
-		// same rounding UP; the QUANTITY is captured by captureViewWidth(), which reads what
-		// this box is actually compared against rather than what the other branch's box is -- see
-		// the comment there for the two ways a verbatim copy was wrong.
-		//
-		// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps the pair
-		// inside the row's control column instead of pushing the whole group left.
-		useBtn.type = 'button';
-		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		useBtn.addEventListener('click', function () {
-			var w = captureViewWidth();
-			if (!(w > 0)) { return; }
-			labelSettings.customerMaxWidth = w;
-			input.value = String(labelSettings.customerMaxWidth);
-			saveToStorage();
-			requestLabelRefresh();
-		});
-		unit.className = 'lpn-set-note';
-		unit.textContent = unitLabel('lpn_u_length');
-		// **THE UNIT SITS BEFORE THE BUTTON, THE SAME ORDER THE ALL-LABELS ROW USES** (Tom,
-		// 2026-09-22 on that row, now applied here too (d): "'ft' is in the wrong place. It should
-		// be before the button.").
-		wrap.className = 'lpn-set-ctlgroup';
-		wrap.appendChild(input); wrap.appendChild(unit); wrap.appendChild(useBtn);
-		line.appendChild(text); line.appendChild(wrap);
+		line.appendChild(text); line.appendChild(lw.wrap);
 		host.appendChild(line);
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -37777,47 +37804,21 @@ var EngCalcs = EngCalcs || {};
 		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
 		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
 		// generated labels and nothing else; the symbol-size cap is the separate row below.
-		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
-			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
-		lmwWrap.className = 'lpn-set-ctlgroup';
-		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
-		lmwInput.id = 'lpn_set_label_max_width';
-		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show';
-		lmwInput.value = (typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth) &&
-			settings.labelMaxWidth >= 0) ? String(settings.labelMaxWidth) : '';
 		// Blank or anything unreadable is "no threshold", stored as null -- the value a project that
 		// has never been asked carries, so there is exactly one way to say it. **0 IS A REAL ANSWER
 		// here ("never show a label"), so this is a type test and never a truthiness one** --
 		// `v || null` would silently turn the one setting that says NEVER back into "always",
-		// exactly the trap `labelSettings.customerMaxWidth`'s own comment names.
-		function setLabelMaxWidth(v) {
-			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v >= 0) ? v : null;
-			lmwInput.value = settings.labelMaxWidth === null ? '' : String(settings.labelMaxWidth);
-			labelThresholdChanged();
-			saveToStorage();
-		}
-		lmwInput.addEventListener('change', function () {
-			var t = lmwInput.value.trim();
-			setLabelMaxWidth(t === '' ? null : +t);
+		// exactly the trap `labelSettings.customerMaxWidth`'s own comment names. Built through
+		// `buildLabelWidthControl()` (above `buildCustomerLabelSection()`), the same door the
+		// customer row's own box now goes through -- `labelThresholdChanged()` is this row's own
+		// extra side effect (the customer row's is `requestLabelRefresh()`).
+		var lmw = buildLabelWidthControl({
+			id: 'lpn_set_label_max_width',
+			get: function () { return settings.labelMaxWidth; },
+			set: function (v) { settings.labelMaxWidth = v; labelThresholdChanged(); saveToStorage(); }
 		});
-		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
-		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		lmwBtn.addEventListener('click', function (e) {
-			// Inside a <label>, so the press must not also be read as a click on the box.
-			if (e && e.preventDefault) { e.preventDefault(); }
-			var w = captureViewWidth();
-			if (w > 0) { setLabelMaxWidth(w); }
-		});
-		lmwUnit.className = 'lpn-set-note';
-		lmwUnit.textContent = unitLabel('lpn_u_length');
-		// **THE UNIT NAMES THE NUMBER, SO IT SITS RIGHT AFTER IT** (Tom, 2026-09-22, on a screenshot
-		// showing "ft" trailing the button: *"'ft' is in the wrong place. It should be before the
-		// button."*). It used to read "[box] [Use current view] ft", which reads as though the
-		// BUTTON took the unit.
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
-			lmwWrap, pc.lpn_settings_label_max_width_tip);
+			lmw.wrap, pc.lpn_settings_label_max_width_tip);
 		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
 		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
 		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --

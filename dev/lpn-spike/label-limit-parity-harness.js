@@ -46,6 +46,7 @@ const L = loadLoopedNetwork(
 	"\t\tcustomerLabelsAttempted: function () { return customerLabelsAttempted(); },\n" +
 	"\t\tsetboxWordsMatch: setboxWordsMatch, filterSetboxContainer: filterSetboxContainer,\n" +
 	"\t\tapplySetboxFilter: function () { applySetboxFilter(); },\n" +
+	"\t\tserialize: function () { return serializeProject(); },\n" +
 	"\t\tgetState: function () { return state; }"
 );
 L.buildLayers();
@@ -135,6 +136,13 @@ console.log('== (a)-(d),(f): the two rows are built the same way, in real DOM ==
 			'(a) the all-labels box\'s placeholder is "Always show"', allInput.placeholder);
 		ok(custInput.placeholder === allInput.placeholder,
 			'(a) the customer box carries the identical placeholder', custInput.placeholder);
+		// **THE TWO NUMBER BOXES ARE THE SAME WIDTH** (Tom, 2026-09-23 pre-review: the all-labels
+		// box was 7em, the customer box 2.6rem -- visibly narrower for no reason tied to what either
+		// box holds). Both now come from the one shared `buildLabelWidthControl()`, so this also
+		// guards against a future edit changing one without the other.
+		ok(allInput.style.width === '7em', 'the all-labels box is 7em wide', allInput.style.width);
+		ok(custInput.style.width === allInput.style.width,
+			'the customer box is the identical width, not its old narrower 2.6rem', custInput.style.width);
 		// (b) the row NAME -- setFieldLabel() writes it as the help span's leading text node, so the
 		// label's own textContent (before the trailing "?" glyph text) is compared with the
 		// all-labels row's own key, asserted through pageConfig rather than an English literal.
@@ -208,6 +216,58 @@ console.log('== (e): the all-labels limit wins over a customer setting that woul
 		'(e) ...and customer labels too, even though the customer row itself never changed');
 	box.value = ''; fire(box, 'change');
 	ok(L.customerLabelsAttempted() === true, 'clearing the all-labels row again lets customer labels back');
+}
+
+// ---- blanking the CUSTOMER box now reaches null, exactly like the all-labels box always could ---
+// (Tom, pre-review, 2026-09-23: the change handler refused an empty entry and reverted to the old
+// number, so the "Always show" placeholder was unreachable -- nothing ever set
+// labelSettings.customerMaxWidth to null.) Driven through the real box and its real `change` event,
+// never a direct model poke, the same rule label-limit-zero-harness.js already follows for the
+// all-labels box.
+console.log('== blanking the customer box: null, shown at any zoom, and it survives a save/reload ==');
+{
+	L.setCanvas(1400, 900);
+	var box = inputIn(rowsIn('lpn_set_map_fields').filter(function (r) {
+		return inputIn(r) && inputIn(r).id === 'lpn_set_label_max_width';
+	})[0]);
+	var custBox = inputIn(rowsIn('lpn_labels_customer_fields').filter(function (r) { return !!inputIn(r); })[0]);
+	// The all-labels row must be OUT OF THE WAY here -- blank, its own "always" state -- so this
+	// section is testing the customer row's own reach for null, not (e)'s gate re-appearing.
+	box.value = ''; fire(box, 'change');
+	// Start the customer row on a real, narrow number, so "cleared it" is an observable change and
+	// not a box that already read blank by coincidence.
+	custBox.value = '50'; fire(custBox, 'change');
+	ok(L.labelSettings().customerMaxWidth === 50, 'a real number takes, as before', String(L.labelSettings().customerMaxWidth));
+	custBox.value = ''; fire(custBox, 'change');
+	ok(L.labelSettings().customerMaxWidth === null,
+		'blanking the real box through its own change handler stores null, not the old number');
+	ok(custBox.value === '', 'the box itself shows blank, not a reverted number');
+	// **AT ANY ZOOM** -- null means no threshold of its own, so this must hold at a canvas 1 px wide
+	// and one a billion wide alike, the same width sweep label-limit-zero-harness.js runs for the
+	// all-labels row's own blank case.
+	[10, 1000, 1e6, 1e9].forEach(function (w) {
+		L.setCanvas(w, 900);
+		ok(L.customerLabelsAttempted() === true,
+			'null shows customer labels at canvas width ' + w, '(subject to the all-labels gate, which is blank here too)');
+	});
+	L.setCanvas(1400, 900);
+	// **SURVIVES serializeProject() -> applySaved()** -- JSON round-trips `null` faithfully; the
+	// reader at 26621-26635 has to accept it on the way back in, which is the actual gap the
+	// pre-review named ("nothing ever sets... to null" was half the bug; the other half was that
+	// even a hand-poked null would have been silently dropped on reload before this fix).
+	var saved = JSON.parse(JSON.stringify(L.serialize()));
+	ok(saved.labelSettings.customerMaxWidth === null, 'the saved project file itself carries null, not 0 or a number');
+	// Reload it, through the real door -- applySaved(), never a direct labelSettings assignment.
+	saved.labelSettings.customerMaxWidth = null;   // re-assert after the JSON round trip above, belt and braces
+	L.applySaved(saved);
+	ok(L.labelSettings().customerMaxWidth === null,
+		'reloading the saved project keeps the customer row blank -- null, not reverted to a default');
+	// Put the fixture back the way every later section expects to find it.
+	openNet3Novato();
+	Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });
+	Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
+	L.refreshLabelText();
+	L.rebuildSettings();
 }
 
 // ---- (g): the filter is an AND of words, not one substring ------------------------------------
