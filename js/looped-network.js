@@ -4808,7 +4808,7 @@ var EngCalcs = EngCalcs || {};
 			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
 			// logic to bypass -- unlike `emitter` and `length` above.
 			//
-			// **LABELLED `lpn_field_closed` ("Shut"), THE TABLE COLUMN'S OWN KEY, NOT
+			// **LABELLED `lpn_field_closed` ("Closed"), THE TABLE COLUMN'S OWN KEY, NOT
 			// `lpn_result_status`** (pre-review, Task 708). `lpn_result_status` ("Status") already
 			// names a DIFFERENT concept elsewhere on this page -- the post-solve/EPS status the
 			// colour ramp and the Labels legend show (`linkFieldDefs()`, `COLOR_LINK_FIELDS`),
@@ -4818,7 +4818,7 @@ var EngCalcs = EngCalcs || {};
 			// codes here and the words a Find/Replace `<select>` shows can never drift apart.
 			{ key: 'status', group: 'link', field: 'status', prop: 'status',
 				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
-				label: pc.lpn_field_closed || 'Shut',
+				label: pc.lpn_field_closed || 'Closed',
 				applies: function () { return true; },
 				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
 				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
@@ -15965,16 +15965,16 @@ var EngCalcs = EngCalcs || {};
 			['km', 'lpn_field_km_short', 'Minor loss, k'],
 			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
 			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient'],
-			// **ACTIVE/SHUT, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
+			// **ACTIVE/CLOSED, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
 			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
 			// gate is needed below -- the generic test already offers it to every link.
 			//
-			// **LABELLED `lpn_field_closed` ("Shut"), NOT `lpn_result_status` ("Status")** --
+			// **LABELLED `lpn_field_closed` ("Closed"), NOT `lpn_result_status` ("Status")** --
 			// pre-review, Task 708: `lpn_result_status` already names the post-solve/EPS status
 			// the colour ramp and the Labels legend show (`COLOR_LINK_FIELDS`, `linkFieldDefs()`),
 			// a different, run-dependent reading of the same link. Reusing that word here would
 			// put "Status" on two different questions in this one panel.
-			['status', 'lpn_field_closed', 'Shut'],
+			['status', 'lpn_field_closed', 'Closed'],
 			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
 			// below exactly as the pipe reaction pair is gated to a pipe.
 			['speed', 'lpn_field_pump_speed', 'Relative speed'],
@@ -16869,12 +16869,20 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number') { return String(v); }
 		return String(+v.toFixed(4));
 	}
-	function findSelect(parent, labelText, options, value, onChange) {
+	// `hideLabel`: the wrapping <label> still carries labelText, so a screen reader still says
+	// what the selector is, but nothing is drawn on screen for it -- for a selector whose question
+	// is answered by a button beside it instead (R-225: "The word 'Table' is not needed").
+	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
-		lab.style.display = 'block';
+		if (hideLabel) {
+			lab.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;' +
+				'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+		} else {
+			lab.style.display = 'block';
+		}
 		options.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -17610,7 +17618,7 @@ var EngCalcs = EngCalcs || {};
 		// different things about one filter.
 		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
 	}
-	// **ONE ROW: [Find] [Filter in Table] [which table]** (Tom, 2026-09-23). `findBtn` is the Find
+	// **ONE ROW: [Find] [Filter in table >] [which table]** (Tom, 2026-09-23; wording per R-225). `findBtn` is the Find
 	// button built in rebuildFindForm() -- passed in rather than built twice, so there is exactly
 	// one Find button and exactly one place that wires its click.
 	function buildFilterRow(box, findBtn) {
@@ -17629,15 +17637,17 @@ var EngCalcs = EngCalcs || {};
 		// Tom's own words -- not "Filter in current table" or "Filter in selected table", either of
 		// which answers a question the button was never asking (2026-09-23: *"is this offering two
 		// options or just one?"*). There is one table, the one named in the selector beside it.
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in Table';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table >';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
 		// **THE SELECTOR FOLLOWS "WHAT TO SEARCH"** (findFilterTarget()) until the user overrides
 		// it, and sits right beside the button that reads it -- so "which table" is answered where
-		// it is asked, on the one line, rather than in a row of its own underneath.
+		// it is asked, on the one line, rather than in a row of its own underneath. The button's own
+		// text now points at the selector (R-225), so the selector's "Table" label is not drawn --
+		// only kept as this control's accessible name.
 		findSelect(row, pc.lpn_find_filter_table || 'Table', paneTables().map(function (s) {
 			return [s.id, pc[s.label] || s.id];
-		}), findFilterTarget(), function (v) { findFilterTable = v; });
+		}), findFilterTarget(), function (v) { findFilterTable = v; }, true);
 		box.appendChild(row);
 	}
 	function runFind() {
@@ -20277,7 +20287,7 @@ var EngCalcs = EngCalcs || {};
 			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
 	}
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
-	// whether the scenario contains the link at all, Shut is whether water can pass through the one
+	// whether the scenario contains the link at all, Closed is whether water can pass through the one
 	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
 	function paneColClosed() {
 		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
@@ -20332,7 +20342,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1 here exactly as they do in the popup -- a pump at
 	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
-	// failure to avoid. Turning a pump off has its own column, Shut.
+	// failure to avoid. Turning a pump off has its own column, Closed.
 	function paneColPumpSpeed() {
 		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
 			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
@@ -21455,7 +21465,7 @@ var EngCalcs = EngCalcs || {};
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
 		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
-		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// column where every row ties (Active and Closed before anything is edited, Tag before
 		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
 		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
 		// row-id string is unchanged from the last render, so this fell into the refill branch
@@ -46451,7 +46461,7 @@ var EngCalcs = EngCalcs || {};
 		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
 		// order for the same control shape on the same popup.
 		var text = document.createElement('span');
-		setFieldLabel(text, pc.lpn_field_closed || 'Shut', pc.lpn_field_closed_tip);
+		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);

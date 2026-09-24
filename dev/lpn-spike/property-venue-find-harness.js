@@ -496,6 +496,23 @@ function build(unitSet) {
 		!!row && row.children.some(function (c) { return c.id === 'lpn_find_filter_go'; }));
 	ok('...beside the table selector, all three in one row',
 		!!row && !!L.selectAt(row, 1));
+	// R-225 (2026-09-24): the selector's own "Table" label is no longer drawn -- its wording moved
+	// onto the button -- but the <label> stays in the DOM, wrapping the <select>, so the selector
+	// still has an accessible name. Asserted against the LIVE strings, never a literal, per
+	// harness_wording_check.php.
+	const filterBtn = row && row.children.filter(function (c) { return c.id === 'lpn_find_filter_go'; })[0];
+	ok('the Filter button carries the current lpn_find_filter_btn wording',
+		!!filterBtn && filterBtn.textContent === global.EngCalcs.pageConfig.lpn_find_filter_btn,
+		filterBtn && filterBtn.textContent);
+	const tableSelect = L.selectAt(row, 1);
+	const tableLabel = tableSelect && tableSelect.parentNode;
+	ok('the table selector is still wrapped in a <label> naming it (accessible name kept)',
+		!!tableLabel && tableLabel._tag === 'label' &&
+		tableLabel.textContent.indexOf(global.EngCalcs.pageConfig.lpn_find_filter_table) !== -1,
+		tableLabel && tableLabel.textContent);
+	ok('...but that label is visually hidden, not drawn on screen',
+		!!tableLabel && /clip/.test((tableLabel._styleAttr || '') + JSON.stringify(tableLabel.style || {})),
+		tableLabel && tableLabel._styleAttr);
 
 	// ---- 3. Changing Find's Property pushes Replace's Property to change ----
 	L.setFindState('pipe', 'length', 'gt', '0');

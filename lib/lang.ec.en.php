@@ -1463,9 +1463,12 @@ $ec_lang['lpn_find_value']='Value';
 $ec_lang['lpn_find_btn']='Find';
 // THE TABLE FILTER (Task 597). {q} is the query line as the reader wrote it, {n} and {all} are
 // whole numbers. Tom, 2026-09-06: "Maybe Find could have next to the Find button a Filter in tables
-// button ... with a selector for which table." Task 708, 2026-09-23: the button now sits on the
-// same line as Find and the table selector, in his own words for the button, "Filter in Table."
-$ec_lang['lpn_find_filter_btn']='Filter in Table';
+// button ... with a selector for which table." Task 708, 2026-09-23: the button sits on the
+// same line as Find and the table selector. R-225 (2026-09-24): "The word 'Table' is not needed...
+// we can add a > ... to point to the selector"; the selector's own visible label is gone, its
+// wording folded into the button, and the selector keeps an accessible name only (see
+// buildFilterRow()).
+$ec_lang['lpn_find_filter_btn']='Filter in table >';
 $ec_lang['lpn_find_filter_table']='Table';
 $ec_lang['lpn_find_filter_tip']='Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
 // The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
@@ -2378,16 +2381,18 @@ $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on th
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. The label highlights briefly to alert you that it was moved. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
-// "Shut", not "Closed" (Tom, 2026-08-14: *"We change in English to ... good catch!"*). Wave 0 found
-// that "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is a full, pressurised pipe
-// as opposed to an open channel, and every pipe on this page is one, so the wrong reading is not
-// obviously wrong to a translator. Fixing the English fixes all 27 languages and needs no _syn.
-// Chosen over Tom's other candidates for reasons worth keeping: "Blocked" and "Plugged" imply a
-// FAULT rather than a state the user chose; "Off" is vague on a pipe; "No flow" names the RESULT, on
-// a page where flow is a computed output. And this label's own tip already said "Shut this pipe so
-// no water can pass through it" -- the English had already picked the word, in the sentence beside it.
-$ec_lang['lpn_field_closed']='Shut';
-$ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
+// "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
+// What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
+// chosen (2026-08-14) because "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is
+// a full, pressurised pipe as opposed to an open channel, and every pipe on this page is one, so
+// the wrong reading was not obviously wrong to a translator. Tom's ruling overrides that: EPANET's
+// own word wins, translators already had EPANET's dictionary for it (every language here that had
+// translated this key had independently landed on its own word for "closed", not "shut"), and one
+// polysemy risk does not outweigh the suite running two words for one state. This is unrelated to
+// Active, which is a different question -- whether the scenario contains the link at all
+// (paneColClosed() in js/looped-network.js) -- and stays "Active".
+$ec_lang['lpn_field_closed']='Closed';
+$ec_lang['lpn_field_closed_tip']='Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 // A geographic project's coordinates (Task 145). The SAME two rows as X and Y, in the vocabulary

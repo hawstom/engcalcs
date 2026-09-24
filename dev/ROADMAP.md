@@ -1872,7 +1872,7 @@ the block.
   popup-vs-table half.
   - **AUDIT SHIPPED 2026-09-23:** `dev/property-venue-matrix.md` (8 element types x 8 venues) and
     `property_venue_check.php` (advisory, 42 table columns with no Find row). Top gaps a user would
-    hit: Active/Shut not findable on any link; emitter coefficient; a tank's levels, diameter and
+    hit: Active/Closed not findable on any link; emitter coefficient; a tank's levels, diameter and
     mixing; pump speed and energy price; pipe length findable but not replaceable. Filling them is
     the next step, a branch of its own; Text's allZoom is in flight on `feat/zoom-scale-rules`.
 - 50|702| **A view window cannot describe a span across the far side of the world.**

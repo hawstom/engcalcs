@@ -86,7 +86,7 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[PIPES]`/`[TAGS]` |
 | Endpoints | ✓ | n/a *(a connectivity fact, asked through the "Connection" row instead)* | n/a | n/a | ✓ | `[PIPES]` |
-| Active / Shut | ✓ | ✓ *(Task 708, internal key `status`, labelled `lpn_field_closed`/"Shut"; the table's own `closed` checkbox key is a declared exemption in `property_venue_check.php`)* | ✓ *(Task 708, a `<select>` of the translated Open/Closed words, `choices: ['open','closed']` underneath)* | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, internal key `status`, labelled `lpn_field_closed`/"Closed"; the table's own `closed` checkbox key is a declared exemption in `property_venue_check.php`)* | ✓ *(Task 708, a `<select>` of the translated Open/Closed words, `choices: ['open','closed']` underneath)* | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
 | Pipe type | ✓ | n/a *(a type reference; a type's stated diameter/roughness are what Find offers)* | n/a | n/a *(categorical)* | n/a | n/a *(this suite's own concept; exports the resolved diameter/roughness)* |
 | Diameter | ✓ | ✓ | ✓ | ✓ | ✓ | `[PIPES]` |
 | Length | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | ✓ *(Task 708, own `set` -- not `prop` -- so `lenAuto` is cleared in Base, matching the table's own cell)* | n/a *(declared not colourable, `FIND_EXTRA_LINK_FIELDS`'s own comment)* | ✓ | `[PIPES]` |
@@ -103,7 +103,7 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[PUMPS]`/`[TAGS]` |
 | Endpoints | ✓ | n/a | n/a | n/a | ✓ | `[PUMPS]` |
-| Active / Shut | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
 | Pump curve reference | ✓ | n/a *(a curve is a document object, Library-edited, per `dev/lpn-rulings.md`)* | n/a | n/a | n/a | `[PUMPS]`/`[CURVES]` |
 | Relative speed | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, base-owned, the same 1-if-blank/zero/negative rule the table cell uses)* | — | — | `[PUMPS]` |
 | Speed pattern | ✓ | — | — | n/a | n/a | `[PUMPS]` |
@@ -117,7 +117,7 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[VALVES]`/`[TAGS]` |
 | Endpoints | ✓ | n/a | n/a | n/a | ✓ | `[VALVES]` |
-| Active / Shut | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
 | Valve type | ✓ | n/a *(categorical)* | n/a | n/a | ✓ | `[VALVES]` |
 | Setting | ✓ | n/a *(no shared unit across types; `EC_TABLE_PARITY_EXEMPT`'s own reason)* | ✓ *(exempt from the popup-side check by kind, see `lpn_field_valve_setting_*`)* | n/a | ✓ | `[VALVES]` |
 | Diameter | ✓ | ✓ *(shared link band)* | ✓ *(TCV only, per `pushSpecList`'s own comment)* | ✓ | ✓ | `[VALVES]` |
@@ -170,7 +170,7 @@ case-insensitively through the new `choices` door in `replaceValueOf()`). It rea
 same `effective(l, 'status')` / `setProp(l, 'status', ...)` seam the table's own `closed` checkbox
 does (`paneColClosed()`), under Find's own KEY for it rather than the checkbox's inverted one --
 `property_venue_check.php` declares `pipe/closed`, `pump/closed` and `valve/closed` as exemptions
-for exactly that key-name mismatch. **Labelled `lpn_field_closed` ("Shut"), not `lpn_result_status`
+for exactly that key-name mismatch. **Labelled `lpn_field_closed` ("Closed"), not `lpn_result_status`
 ("Status")** -- pre-review fix: that word already names a different, run-dependent concept
 elsewhere on this page (the post-solve/EPS status the colour ramp and the Labels legend show), and
 using it here too would put "Status" on two different questions in one panel.
