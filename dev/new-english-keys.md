@@ -578,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 6 unmerged branch(es).
+**59 still to read**, of 82 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +589,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`fcf23dd8`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`a562e7c7`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -607,7 +607,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
-  > This project: {crs}
+  > Current: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_label_col`**
+  > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
+  @@ NEEDS RULING
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
@@ -784,12 +793,27 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`c949316e`) — adds no English strings
+### feat/label-limit (`a5538f99`) — adds no English strings
 
-### feat/property-venue (`de2ef299`) — adds no English strings
+### feat/offscreen-notice (`c5abf2c4`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
 
+### feat/property-venue (`1066860e`) — adds no English strings
+
+### feat/table-editing (`1740e3fa`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_notes_6_def`**
+  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  @@ NEEDS RULING
 - **`lpn_pane_filldown`**
   > Fill down
   @@ NEEDS RULING
@@ -799,11 +823,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_hide_col`**
   > Hide this column
   @@ NEEDS RULING
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
+  @@ NEEDS RULING
 - **`lpn_pane_show_col`**
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`83eeb139`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`1373951a`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -826,3 +853,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
+
+### fix/table-print (`a7a9395e`) — adds no English strings
+
+### fix/zoom-fit-high-scale (`910f6d13`) — adds no English strings
