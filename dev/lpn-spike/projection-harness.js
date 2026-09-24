@@ -259,8 +259,14 @@ setUnitSet('si');
 	ok('a projected project is named by its zone', L.crsName().indexOf(L.crsLabel(ZONE12N)) === 0,
 		L.crsName());
 	ok('...and states its EPSG number', L.crsName().indexOf(ZONE12N) > 0, L.crsName());
+	// **R-218: NEVER Pseudo-Mercator HERE** (Tom, 2026-09-24, resolving R-188's confusion over
+	// EPSG:3857 offered as "lat/lon" while the stored numbers are EPSG:4326 degrees). The status
+	// strip names what the numbers ARE -- longitude and latitude -- never the code this page reuses
+	// internally to mark that kind of project. `crsLabel(L.WEBMERC)` below still names the register
+	// entry Pseudo-Mercator; this is the one place that speaks for a lat/lon PROJECT instead.
 	L.reset(L.GEO);
-	ok('a geographic project names Pseudo-Mercator', /Pseudo-Mercator/.test(L.crsName()), L.crsName());
+	ok('a geographic project is named WGS 84 latitude/longitude, not Pseudo-Mercator',
+		L.crsName() === PC.lpn_crs_latlon_display && !/Pseudo-Mercator/.test(L.crsName()), L.crsName());
 
 	// The readout is REWRITTEN when the kind changes, and two zones are two kinds: a northing read
 	// under the wrong zone is the silent error this whole feature exists to stop.
@@ -308,12 +314,18 @@ setUnitSet('si');
 	L.reset();
 	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
 	ok('...leaving the project with no projection at all', L.crsCode() === '');
-	// The status strip's geographic name and the catalogue's are ONE string now -- the strip adds
-	// the EPSG number, and a geographic project has one like any other: it IS EPSG:3857.
+	// **THE STATUS STRIP'S GEOGRAPHIC NAME NO LONGER COMES FROM THE CATALOGUE** (R-218; Tom,
+	// 2026-09-24, resolving R-188). It used to be one string with the catalogue's own Pseudo-Mercator
+	// entry, on the argument that a geographic project's internal code IS EPSG:3857 -- true, and also
+	// what told Tom the stored numbers were projected metres, when they are longitude and latitude
+	// degrees. The strip now says what the numbers ARE, with EPSG:4326's own number, not 3857's.
 	L.reset(L.GEO);
-	ok('the status strip reads the geographic name out of the catalogue',
-		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) === 0, L.crsName());
-	ok('...and numbers it too', L.crsName().indexOf(L.WEBMERC) > 0, L.crsName());
+	ok('the status strip names a lat/lon project WGS 84 latitude/longitude',
+		L.crsName() === PC.lpn_crs_latlon_display, L.crsName());
+	ok('...never the catalogue\'s own Pseudo-Mercator entry',
+		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) !== 0, L.crsName());
+	ok('...and states EPSG:4326, not EPSG:3857', L.crsName().indexOf('4326') > 0 &&
+		L.crsName().indexOf(L.WEBMERC) === -1, L.crsName());
 }
 
 // ---- 8. WHERE ON THE EARTH A PROJECTION APPLIES -------------------------------------------------

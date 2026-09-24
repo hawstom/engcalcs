@@ -3597,8 +3597,13 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
+		// **R-218: NEVER "WGS 84 / Pseudo-Mercator (EPSG:3857)" HERE.** That is the catalogue's own
+		// name for the code this page uses internally to mark a lat/lon project (comment at
+		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
+		// projected metres when they are longitude and latitude degrees (R-188). This is the one
+		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
 		if (isLatLonProject()) {
-			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
+			return pc.lpn_crs_latlon_display || 'WGS 84 latitude/longitude (EPSG:4326)';
 		}
 		code = projectCrsCode();
 		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
@@ -13103,12 +13108,6 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
 		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = detached ? '' : 'none'; }
-		// Offered only while the model is still in hand, and only when the numbers COULD be
-		// coordinates -- see georefStart(). It is the one thing on this bar that says the drawing
-		// does not need placing at all.
-		if (georefBarEl('lpn_georef_asdeg')) {
-			georefBarEl('lpn_georef_asdeg').style.display = (detached && georef.mayBeDegrees) ? '' : 'none';
-		}
 		if (georefBarEl('lpn_georef_twopt')) { georefBarEl('lpn_georef_twopt').style.display = detached ? 'none' : ''; }
 		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
@@ -13146,13 +13145,6 @@ var EngCalcs = EngCalcs || {};
 		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
 		var go = georefBarEl('lpn_georef_goto');
 		if (go) { go.addEventListener('click', goToLatLon); }
-		var asdeg = georefBarEl('lpn_georef_asdeg');
-		if (asdeg) {
-			asdeg.addEventListener('click', function () {
-				if (!georef || !georef.mayBeDegrees) { return; }
-				georefArmAsDegrees();
-			});
-		}
 		// A TOGGLE, so the tool it arms can be put down again without leaving the wizard. There is no
 		// second label for the pressed state: the notice says what the next click will do, and it is
 		// the notice a user is reading while picking.
@@ -13855,12 +13847,15 @@ var EngCalcs = EngCalcs || {};
 		// nearly every drawing made on a plain grid fits inside +/-180 and +/-90, so the test's
 		// false-positive rate on the case it is supposed to reject is close to 100%.
 		//
-		// So the wizard always opens at step 1, which is what the menu row the user chose promised,
-		// and the reinterpret case is a BUTTON on the bar instead of a guess. Nothing is lost by
-		// waiting: georefArmAsDegrees() rebuilds every point from `georef.restore`, the numbers the
-		// document arrived with, so arming it after a step of panning is exactly as exact as arming
-		// it on the first frame.
-		georef.mayBeDegrees = georefSrcReadsAsDegrees();
+		// So the wizard always opens at step 1, which is what the menu row the user chose promised.
+		// **THE MANUAL REINTERPRET BUTTON THAT USED TO SIT HERE IS GONE** (R-219; Tom, 2026-09-24,
+		// answering R-190). It offered, on this same range-test guess, to arm the model unmoved
+		// whenever every coordinate could pass for a longitude and a latitude; the identical result
+		// -- the file's own numbers used unchanged -- is reached by typing 1 into the Ground distance
+		// field on step 2, so it is dropped as a control that bought nothing a visitor could not
+		// already do. georefArmAsDegrees() itself is untouched and still runs automatically from
+		// georefOpenAnswered(), for the different case of a project that already STATES it is
+		// georeferenced -- a known fact about the file, not a guess from its coordinates.
 		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
 		// entire world, whatever location and zoom that is, so that they can zoom to their
 		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
@@ -13898,16 +13893,6 @@ var EngCalcs = EngCalcs || {};
 		georefArmAsDegrees();
 		georefDetach();
 		setNotice(pc.lpn_georef_answered || 'This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.');
-	}
-	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
-	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
-	// That is why the answer only chooses where the wizard OPENS, and never what the project is.
-	function georefSrcReadsAsDegrees() {
-		var src = georef && georef.src;
-		if (!src || !src.length) { return false; }
-		return src.every(function (p) {
-			return isFinite(p.x) && isFinite(p.y) && Math.abs(p.x) <= 180 && Math.abs(p.y) <= 90;
-		});
 	}
 	// **REINTERPRET: the label was wrong, the geometry was not.** Nothing is repositioned here. The
 	// document keeps the exact numbers it arrived with, and pressing Keep this placement without
@@ -28316,6 +28301,19 @@ var EngCalcs = EngCalcs || {};
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
 			body.appendChild(sum);
+			// **THIS FILE STATES NO COORDINATE SYSTEM** (R-219; Tom, 2026-09-24: files with an
+			// unreferenced EPSG coordinate system can be scaled 1:1 in Step 2 of the Convert as…
+			// wizard, and both Import and Convert as should say so). `mapUnits` is 'degrees' only
+			// when [BACKDROP] UNITS said so; every other file -- Feet, Meters, None or no [BACKDROP]
+			// at all -- lands as a plain XY drawing (docFromInp() above), which is what "unreferenced"
+			// means here. This report is the one place BOTH doors show it: it renders for a plain
+			// Import EPANET file… and for the copy File, Convert as… lands before its own box opens.
+			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
+				var crsNote = document.createElement('p');
+				crsNote.style.margin = '0 0 8px';
+				crsNote.textContent = pc.lpn_inp_report_no_crs || 'This file states no coordinate system, so its numbers are not longitude and latitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
+				body.appendChild(crsNote);
+			}
 			// The one place an anchor mode is worth mentioning, and only to someone whose file had
 			// labels in it (Task 332). Deliberately NOT a setting: nobody can hold an opinion about
 			// an anchor mode before seeing it, and this report already says what is different about
@@ -28960,12 +28958,18 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The chooser button and the name beside it, as the New project box shows its own.
 	function syncConvasCrs() {
-		var b = document.getElementById('lpn_convas_crs_pick'),
+		var pc = EngCalcs.pageConfig || {},
+			b = document.getElementById('lpn_convas_crs_pick'),
 			n = document.getElementById('lpn_convas_crs_name'),
 			off = convasKind() !== 'epsg';
 		if (b) { b.disabled = off; }
 		if (n) {
-			n.textContent = crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			// R-218: the same lat/lon-only name as crsDisplayName(), not the catalogue's own
+			// "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the default target when the box opens on a
+			// lat/lon project, and this is the choice Tom read as offering projected metres.
+			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
+				? (pc.lpn_crs_latlon_display || 'WGS 84 latitude/longitude (EPSG:4326)')
+				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
 			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
 		}
 	}
@@ -32618,29 +32622,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
-			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
-			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
-			// along. That is what this row is for, and it takes both kinds of file for exactly that
-			// reason.
-			//
-			// **THIRD, BELOW BOTH ROWS IT RESCUES.** Tom, 2026-08-19: *"But make it third since it is
-			// truly our fallback option."* The first two are what a person reaches for; this is what
-			// they reach for after one of those gave them the wrong coordinate kind. A fallback
-			// listed above the thing it falls back from reads as an equal alternative.
-			//
-			// **A ROW RATHER THAN A PROMPT ON Open…**, by Tom's standing rule that a choice must not
-			// stand in front of the common action: opening a file is common, placing a grid drawing
-			// on the world is rare, so the rare act carries the extra door.
-			//
-			// **NEVER DISABLED.** It opens a file, and there is always a file it could open --
-			// nothing about the project on screen makes this impossible, because the result is a new
-			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
-			// had to be greyed whenever that project was already on the map, is gone with it.
-			// **FILE, CONVERT AS... SINCE TASK 696**: one row for coordinates and units, which copies
-			// THIS project and converts the copy (convertAs()). On an empty tab it opens a file first.
-			{ icon: 'globe', label: pc.lpn_file_convert_as || 'Convert as…',
-			  tip: pc.lpn_file_convert_as_tip, fn: convertAs },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -32721,6 +32702,17 @@ var EngCalcs = EngCalcs || {};
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
+			// **DIRECTLY AFTER SAVE AS..., NOT AMONG THE ROWS THAT OPEN A FILE** (Task 696, R-213;
+			// Tom, 2026-09-24: *"there is nothing else about converting, and it's not about
+			// importing or exporting"*). It copies THIS project and converts the copy (convertAs()),
+			// so it belongs with Save, Save as, Save all and Revert -- the rows that act on the open
+			// project -- rather than with Open, Open example and the import/export rows, each of
+			// which replaces it with something else. On an empty tab it opens a file first.
+			//
+			// It replaced Task 447's "Import XY to lat/lon…", which converted the open project in
+			// place and had to be greyed whenever that project was already on the map.
+			{ icon: 'globe', label: pc.lpn_file_convert_as || 'Convert as…',
+			  tip: pc.lpn_file_convert_as_tip, fn: convertAs },
 			// **Present always, disabled when it would do nothing.** A row that appears and
 			// disappears teaches no one it is there, and its absence reads as a missing feature
 			// rather than as a state. Every sibling here -- Save, Revert -- greys out instead.

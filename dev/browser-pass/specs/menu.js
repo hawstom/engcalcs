@@ -9,10 +9,12 @@ const { Session } = require('../lib/session');
 exports.title = '3. The File menu';
 
 // The ORDER as it stands after Task 264 (New project… became a fly-out of templates), Task 314
-// (Open example… joined it, under Open rather than under New) and Task 447 (the lat/lon row became
-// a third way to OPEN a file rather than a conversion of the open project, and sits third because
-// it is the fallback the two rows above it fall back TO). Recent files are absent because there are
-// none yet; that row group appears only when a file has been opened.
+// (Open example… joined it, under Open rather than under New), Task 592 (Import surveyed points…
+// joined the file rows), Task 611 (Import libraries… joined them too) and Task 696/R-213 (Convert
+// as… moved off the rows that open a file and sits directly after Save as…, the row it now reads
+// beside: Tom, 2026-09-24, "there is nothing else about converting, and it's not about importing
+// or exporting"). Recent files are absent because there are none yet; that row group appears only
+// when a file has been opened.
 //
 // **THE ROWS ARE NAMED BY KEY, NOT BY TOM'S WORDS.** This list held eleven English literals until
 // 2026-09-09; his rewording of `lpn_file_convert_as` from 'Import xy to lat/lon…' to 'Open an xy
@@ -20,9 +22,10 @@ exports.title = '3. The File menu';
 // dev/session-handoff.md §4 records as having cost three harnesses. What this spec is actually
 // about is WHICH ROWS ARE THERE AND IN WHAT ORDER, so it asserts the keys' own values, resolved
 // from the page at run time.
-const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_inp',
-	'lpn_file_convert_as', 'lpn_file_export_inp',
-	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_saveall', 'lpn_file_revert', 'lpn_file_close'];
+const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_survey',
+	'lpn_file_import_inp', 'lpn_file_export_inp', 'lpn_library_import',
+	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_convert_as', 'lpn_file_saveall', 'lpn_file_revert',
+	'lpn_file_close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');

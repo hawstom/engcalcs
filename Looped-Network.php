@@ -490,10 +490,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // than by dragging -- and because picking a point off the drawing needs the model to be
 			      // on the ground, which is what step 2 means. ?>
 			<button type="button" id="lpn_georef_twopt" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_twopt'], $ec_lang['lpn_georef_twopt_tip'])?></button>
-			<?php // Shown in step 1 only, and only when every coordinate could also be a lon/lat pair
-			      // (georefRefreshBar). It is the reinterpret case, which used to be a range test
-			      // deciding for the user -- and deciding wrong for any drawing on a small grid. ?>
-			<button type="button" id="lpn_georef_asdeg" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_asdeg_btn'], $ec_lang['lpn_georef_asdeg_tip'])?></button>
+			<?php // **THE "THESE ARE ALREADY lat/lon" BUTTON IS GONE** (R-219; Tom, 2026-09-24,
+			      // answering R-190: "We have 'Ground distance per drawing unit' on Step 2 ... That
+			      // can be set to 1 to use project coordinates. So I say drop it"). It offered, on a
+			      // range-test guess, to reinterpret a small XY drawing's own numbers as degrees rather
+			      // than place it; the same effect -- the file's numbers used unchanged as ground
+			      // distance -- is reached by typing 1 into the Ground distance field the step-2
+			      // controls above already carry, so the guess-and-button pair bought nothing a
+			      // visitor could not already do. georefArmAsDegrees() itself stays: a project that
+			      // ALREADY states it is georeferenced still lands through it automatically
+			      // (georefOpenAnswered()), which is a known fact about that file, never a guess. ?>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
@@ -1517,7 +1523,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
 				</select>
 				<?php if ($rk === 'depth') { ?>
-				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" disabled aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>"><?=ecTipLabel('', $ec_lang['lpn_convas_label_depth_na'])?>
+				<?php // NO SEPARATE TIP GLYPH HERE (R-217, Tom, 2026-09-24: "No Depth glyph, because
+				      // it's throwing out the alighment"): a fourth flex child in this row alone ate
+				      // into the label's flexible space that the other three rows keep, which is what
+				      // moved this row's own select out of line with them. The tip stays, as the
+				      // box's own native title -- the box can still be greyed and explained without
+				      // becoming an extra element in the row's layout. ?>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" disabled title="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_label_depth_na']))?>" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
 				<?php } else { ?>
 				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
 				<?php } ?>
@@ -1770,6 +1782,7 @@ EngCalcs.pageConfig = {
 	lpn_coord_off_world: <?=json_encode($ec_lang['lpn_coord_off_world'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
 	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
+	lpn_crs_latlon_display: <?=json_encode($ec_lang['lpn_crs_latlon_display'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,
@@ -2698,6 +2711,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_report_counts: <?=json_encode($ec_lang['lpn_inp_report_counts'])?>,
 	lpn_inp_report_clean: <?=json_encode($ec_lang['lpn_inp_report_clean'])?>,
 	lpn_inp_report_label_anchor: <?=json_encode($ec_lang['lpn_inp_report_label_anchor'])?>,
+	lpn_inp_report_no_crs: <?=json_encode($ec_lang['lpn_inp_report_no_crs'])?>,
 	lpn_inp_report_lead: <?=json_encode($ec_lang['lpn_inp_report_lead'])?>,
 	lpn_inp_drop_headloss: <?=json_encode($ec_lang['lpn_inp_drop_headloss'])?>,
 	lpn_inp_drop_tank_curve: <?=json_encode($ec_lang['lpn_inp_drop_tank_curve'])?>,

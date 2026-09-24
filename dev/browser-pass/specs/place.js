@@ -777,37 +777,24 @@ exports.run = async function ({ browser, report }) {
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
 			report.ok(await a.nodeCount() >= 3, `an EPANET file opens through ${ROW} too`,
 				(await a.nodeCount()) + ' symbols drawn');
-			// **REINTERPRET, NOT PLACE — BUT IT IS A BUTTON NOW, NOT A GUESS** (Tom, 2026-08-21,
-			// importing EPA's own Net3: *"it put me at Step 2 in North Darfur"*). The range test used
-			// to open the wizard ATTACHED whenever every coordinate fell inside ±180/±90, and nearly
-			// every drawing made on a plain grid does — Net3's own x 8..45, y 0..31 read as a
-			// perfectly good lon/lat box and dropped the model at 26E 15N. So the wizard always opens
-			// at step 1, which is what the menu row the user chose promised, and the range test only
-			// decides whether to OFFER the reinterpret. Nothing is lost by waiting: georefArmAsDegrees()
-			// rebuilds every point from the numbers the document arrived with.
-			//
-			// This spec asserted the old guess until Task 511. It now walks the door: step 1, the
-			// offer, the press, step 2 — and the coordinates untouched at the end of it, which is the
-			// promise that never changed.
+			// **REINTERPRET IS GONE AS A MANUAL DOOR** (R-219; Tom, 2026-09-24, answering R-190).
+			// This spec used to walk a range-test guess into a "These are already lat/lon" button
+			// that armed the model unmoved; Tom dropped the button on the argument that typing 1 into
+			// Step 2's own Ground distance field reaches the identical result -- the file's own
+			// numbers used unchanged -- so the guess-and-button pair bought nothing a visitor could
+			// not already do. The wizard still always opens at step 1, whatever the coordinates are,
+			// which is what the menu row the user chose promised.
 			const b14 = await bar(a);
 			report.ok(b14.visible, '...and the placement bar is up');
 			report.has(b14.step, 'Step 1', '...at step 1, because no range test may place a network by itself');
-			report.ok(await a.page.evaluate(() => {
-				const e = document.getElementById('lpn_georef_asdeg');
-				return !!e && getComputedStyle(e).display !== 'none';
-			}), '...offering to read the numbers as degrees, since these ones could be');
-			await a.page.click('#lpn_georef_asdeg');
-			await a.settle(700);
-			report.has((await bar(a)).step, 'Step 2', '...and pressing it lands attached, on the model\'s own streets');
-			report.ok(await a.page.evaluate(() =>
-				[...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
-					.some(e => e.getAttribute('cx') === '-122.5686103')),
-				'...and not one coordinate was moved to get there');
+			report.ok(await a.page.evaluate(() => !document.getElementById('lpn_georef_asdeg')),
+				'...with no "already lat/lon" button on the bar any more');
 			await a.page.click('#lpn_georef_cancel');
 			await a.settle(700);
 
-			// The other path, from the same row: coordinates that CANNOT be degrees have no question
-			// to answer, so the model is carried out to the whole-world view exactly as before.
+			// The other path, from the same row: State Plane coordinates open exactly the same way,
+			// detached, to be aimed -- there is no longer a question of offering a reinterpret button
+			// for either kind of file.
 			await openAsLatLon(a, 'state-plane.inp', INP
 				.replace(' J1  -122.5686103  38.106067', ' J1  579350  4218000')
 				.replace(' R1  -122.5700  38.1070', ' R1  579900  4218600'));
@@ -815,12 +802,7 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(600);
 			const b14b = await bar(a);
 			report.has(b14b.step, 'Step 1',
-				'a State Plane drawing cannot be degrees, so it opens detached, to be aimed');
-			// The half the range test still decides: it picks whether the offer is on the bar at all.
-			report.ok(await a.page.evaluate(() => {
-				const e = document.getElementById('lpn_georef_asdeg');
-				return !e || getComputedStyle(e).display === 'none';
-			}), '...with no offer to read half a million as a longitude');
+				'a State Plane drawing opens detached, to be aimed, same as any other XY drawing');
 			await a.page.click('#lpn_georef_cancel');
 			await a.settle(700);
 

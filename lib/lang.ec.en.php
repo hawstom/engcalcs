@@ -1198,7 +1198,7 @@ $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
-$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
 $ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached at the place the project is.';
 $ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map.';
@@ -1207,7 +1207,7 @@ $ec_lang['lpn_convas_round']='Round converted values';
 $ec_lang['lpn_convas_round_tip']='Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.';
 $ec_lang['lpn_convas_round_none']='No rounding';
 $ec_lang['lpn_convas_round_flow']='Demand and flow';
-$ec_lang['lpn_convas_label_col']='Label';
+$ec_lang['lpn_convas_label_col']='Suffix';
 $ec_lang['lpn_convas_label_tip']='Text added after this value on the copy\'s map labels, such as \' mm\' or \' gpm\'. Pre-filled from the unit chosen above; clear it for no suffix.';
 $ec_lang['lpn_convas_label_depth_na']='Tank depth has no map label to add this to yet.';
 $ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.';
@@ -1313,7 +1313,10 @@ $ec_lang['lpn_georef_finish']='Keep this placement';
 $ec_lang['lpn_georef_cancel']='Cancel';
 $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change.';
+// R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
+// already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
+// whose own numbers should be used unchanged.
+$ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change. Type 1 to use a file\'s own numbers unchanged as ground distance, such as one with no coordinate system of its own.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model counterclockwise to align with the world map.';
@@ -1801,6 +1804,12 @@ $ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate 
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
+// **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218; Tom, 2026-09-24,
+// answering R-188's confusion over EPSG:3857 offered as "lat/lon" while the stored numbers are
+// EPSG:4326 degrees: "Yes."). `crsCatalogue()`'s own Pseudo-Mercator entry is untouched -- this
+// string is used only where the page is describing a project whose coordinates ARE longitude and
+// latitude, never the general EPSG picker list.
+$ec_lang['lpn_crs_latlon_display']='WGS 84 latitude/longitude (EPSG:4326)';
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
@@ -1867,6 +1876,12 @@ $ec_lang['lpn_inp_report_heading']='Imported {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
 $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places them, from their top left corner.';
+// **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
+// favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
+// that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
+// or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
+// system either. See showInpReport() in js/looped-network.js.
+$ec_lang['lpn_inp_report_no_crs']='This file states no coordinate system, so its numbers are not longitude and latitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
