@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 189 untranslated keys, of 2039 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, all ruled)
+## lpn_  (189, 7 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -345,6 +345,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  @@ NEEDS RULING
 - **`lpn_msglog_ago`**
   > {x} ago
   _Ruled OK 2026-09-23._
@@ -525,6 +528,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -573,12 +582,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
+- **`lpn_zoom_in`**
+  > Zoom in
+  @@ NEEDS RULING
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
+  @@ NEEDS RULING
+- **`lpn_zoom_out`**
+  > Zoom out
+  @@ NEEDS RULING
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 6 unmerged branch(es).
+**51 still to read**, of 74 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +610,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`fcf23dd8`) — 24 new, 24 to read @@ NEEDS RULING
+### feat/convert-as (`ab6ad007`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -607,7 +628,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
-  > This project: {crs}
+  > Current: {crs}
+  @@ NEEDS RULING
+- **`lpn_convas_label_col`**
+  > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
@@ -784,12 +811,27 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`c949316e`) — adds no English strings
+### feat/label-limit (`d4753f87`) — adds no English strings
 
-### feat/property-venue (`de2ef299`) — adds no English strings
+### feat/offscreen-notice (`3dcd3e8d`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/table-editing (`ab33c6fc`) — 4 new, 4 to read @@ NEEDS RULING
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
 
+### feat/property-venue (`1066860e`) — adds no English strings
+
+### feat/table-editing (`fd604304`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_notes_6_def`**
+  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  @@ NEEDS RULING
 - **`lpn_pane_filldown`**
   > Fill down
   @@ NEEDS RULING
@@ -799,30 +841,13 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_hide_col`**
   > Hide this column
   @@ NEEDS RULING
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
+  @@ NEEDS RULING
 - **`lpn_pane_show_col`**
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`83eeb139`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`7ac181c1`) — adds no English strings
 
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  @@ NEEDS RULING
-- **`lpn_zoom_in`**
-  > Zoom in
-  @@ NEEDS RULING
-- **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
-- **`lpn_zoom_out`**
-  > Zoom out
-  @@ NEEDS RULING
-- **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
+### fix/table-print (`feea16a0`) — adds no English strings
