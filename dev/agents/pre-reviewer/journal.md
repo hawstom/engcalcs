@@ -821,3 +821,378 @@ length's, so this is inherited confidence rather than a fresh measurement).
    tested.
 4. UNVERIFIABLE FROM HERE — whether Tom is comfortable with "Status" (Find) naming the same word
    as the pre-existing map-legend RESULT field of the same name.
+## 2026-09-23 -- feat/property-venue at 1066860e, R-195/R-197/R-198: CONFIRMED in a real browser; one MISSED gap on translation
+
+OBSERVED, checked 2026-09-23. Mutation-confirmed `dev/lpn-spike/property-venue-find-harness.js`
+section 7 is real: copied it unmodified into a worktree built from the pre-fix commit (`de2ef299`)
+and 7 of its assertions FAIL there (value-clearing both directions, the filter row, the property
+push); all 39 pass at branch head. Then drove the real feature through real Chromium
+(`dev/browser-pass/lib/session.js`/`env.js`, `php -S` + sentinel, `flock /tmp/engcalcs-browser.lock`)
+with a REAL pipe (two junctions + a pipe drawn through the toolbar, not just `makeEdit()`'s bare
+junction, which was not enough to make Replace's specs list non-empty and hid a whole class of this
+round's fix at first).
+
+**CONFIRMED, R-195(1) and (2), on a real pipe, real DOM:** switching Find's Property away from Shut
+(status) leaves the Value free-entry box empty (`""`, not the leftover "closed"); switching TO Shut
+always redraws a `<select>` with exactly `open`/`closed`, regardless of what the box held before --
+read straight off `select.options`/`select.value`, not the stub's state.
+
+**CONFIRMED, R-197(2), the one-row layout, both 1280px and 390px:** the Find button, "Filter in
+Table" button and the table `<select>` share one `.lpn-find-filter` row, all three at the same `y`
+(`Math.abs(...) < 5`), and at 390px the row does not wrap (`rowWraps: false`) and the whole popup
+stays inside the viewport (`x:4, w:382` inside `vw:390`). Screenshots:
+`/tmp/claude-1000/.../find-390.png` (English) confirm this visually -- one tidy row reading
+`[Find] [Filter in Table] Table [Junctions v]`.
+
+**CONFIRMED, R-197(1), the selector follows What to search:** changing Find's scope select (Pipes
+-> Junctions) changed the filter-row table select from `pipes` to `junctions` with no user action on
+that select itself.
+
+**CONFIRMED, R-198, the property push, including the case that actually tests something:** with
+Replace's own Property manually set to a THIRD value (`roughness`, deliberately different from
+Find's `length`, to rule out the trivial case where they already matched), changing Find's Property
+to `diameter` pushed Replace's Property to `diameter` too -- overriding the manual choice, which is
+exactly what "audacious" means and what Tom asked for.
+
+**CONFIRMED, Replace still works end-to-end, real apply, both kinds of property:** length (numeric)
+written to 999 and re-found by a fresh query; status (choice) written to `closed` via its own New-
+value `<select>` and re-found the same way. Neither regressed.
+
+**MISSED, and it is the exact thing R-197 was about:** the English wording DID shorten (`Table to
+filter` -> `Table`, `Filter in current table` -> `Filter in Table`), but nothing in this round
+touched the 26 other languages, and the repo's own `detect_english_drift.php` already flags it --
+`lpn_find_filter_table` as a **ROLE CHANGE** (3 words -> 1) and `lpn_find_filter_btn` as changed too.
+Measured directly: Arabic still reads `الجدول المراد تصفيته` ("the table that is to be filtered"),
+the old, verbose, literal translation of the old English -- not a short "Table". Spanish the same
+(`Tabla para filtrar`). Screenshot: `/tmp/claude-1000/.../find-ar.png`. **A reader in any language but
+English still sees the confusing long label Tom complained about**, because this branch's whole
+premise is "chosen from a list in the reader's language, in every venue" and the R-197 fix has not
+reached any venue but English yet. This is not a build defect in the mechanism -- it is a translation
+debt this round created and did not flag or queue (`dev/new-english-keys.md` has no entry for either
+key), worth Tom knowing before he calls R-197 closed.
+
+**Judgment call, not a defect, Tom asked for directly:** whether the table selector still needs a
+visible "Table" label now that it is one word beside the button. Measured: at 390px it costs about
+75px of horizontal room in a 382px-wide row that already has two buttons in it (see screenshot) --
+tight but not overflowing. Not resolved here; his call.
+
+**Lesson for future rounds:** `Session.makeEdit()` places one bare junction, which is enough for
+Find's own query controls but NOT for `replaceSpecs()` -- which needs a real candidate in the
+group (`findCandidates()`), so a scope of `pipe` returns zero specs and the whole Replace section
+silently does not build. A round-2 probe here first "confirmed" R-198 with `beforeVal: null` because
+of exactly this -- draw a real pipe (two junctions + connect), not just `makeEdit()`, before testing
+anything in Replace.
+
+**Not checked:** the choice-property Find/Replace mixingModel round trip specifically through the
+one-row filter layout (covered by the harness, not re-driven in the real browser this round); RTL
+mirroring of the row's internal button/select order (Arabic screenshot shows the row present and on
+screen, but button/select left-right order inside it was not separately asserted); a phone viewport
+narrower than 390px; whether `detect_english_drift.php`'s flag on these two keys is itself something
+`check_all.sh` fails on (not traced).
+
+---
+## 2026-09-23, feat/convert-as (commits 6b4707ac, ab6ad007), R-185/R-187
+
+**OBSERVED, the headline finding, measured not argued:** the new Label-suffix column is wired so
+that EVERY "Convert as", including one where the user never opens or edits the Label column at all,
+now silently writes non-empty suffixes into the new copy's `labelSettings.suffix` -- `link.diameter`,
+`node.head`, `node.demand`, `customer.demand` -- because the four boxes are pre-filled by default and
+`convasAnswers()` reads whatever is in them, touched or not. Measured directly with the node harness
+(`dev/lpn-spike/lpn-dom-stub.js` + the page's own functions): opened the box, read `convasAnswers()`
+without typing anything, ran `runConvertAs(a)`, and the brand-new copy came out with
+`{"node":{"head":" fth2o","demand":" gpm"},"link":{"diameter":" in"},"customer":{"demand":" gpm"}}`
+where the original project had `{}` everywhere. This is the R-027 shape exactly -- a change scoped
+to "entry of a label suffix" (opt-in, per Tom's own words: "we allow ... entry of") leaking into a
+default-on behaviour for a feature (coordinate/unit conversion) that never touched map labels before.
+The shipped harness (`dev/lpn-spike/convert-as-harness.js` section 7) never tests this path -- it only
+asserts what happens when the user DOES type a custom suffix, never what happens when they don't.
+
+**OBSERVED, confirmed a genuine gap, not paranoia:** the Depth ("Water depth") Label box is visually
+and behaviourally identical to the three working boxes, with no tip or disabled state marking it as
+inert, and it truly has nowhere to go: `level` does not appear in `nodeFieldDefs()`
+(js/looped-network.js ~36466), so there is no "Water depth" row anywhere in Settings > Labels for a
+suffix to attach to, even in principle -- the destination does not exist yet, not just the wiring.
+The PHP's own comment admits this. A person who types into it and expects a labeled tank depth on the
+map will get nothing, silently.
+
+**CONFIRMED via harness (mutation-tested: fails on the pre-ab6ad007 code, passes after) and a live
+Chromium run on the Elm Street Center example at :8104:** the "Current:" wording (not "This
+project:") is plain text, not muted (`lpn-dim` class absent, confirmed by computed style too); the
+two-column split exists; the Label boxes pre-fill from the chosen unit and re-paint on an SI/US
+preset click until a row is typed into (`convasSuffixDirty`); after Convert, the new copy's own map
+labels show the typed suffix on a real element (`8 MMX` on a pipe diameter label, `Qb=190.00 FFX` on
+a junction) with no doubling of a pre-existing unit -- default suffixes were all `''` before this
+shipped, confirmed by reading `labelDefaultSuffix()`.
+
+**Lesson for next time:** when a build agent's own harness only tests the "user typed something"
+branch of a pre-filled optional field, always hand-test the "user changed nothing" branch too --
+that is exactly where a default silently becomes mandatory. Also: `git show <sha>^:path` plus running
+the NEW harness against the OLD file is a cheap, fast way to confirm a harness is not decoration
+before trusting any of its other PASS lines.
+
+**Not checked:** the Label-suffix write surviving through the georeferencing wizard steps (EPSG /
+unnamed conversion + a typed custom suffix, all the way through "Keep this placement") -- the shipped
+harness only exercises the suffix write on a `kind: 'none'` (not-georeferenced) conversion; a phone
+viewport narrower than 390px; whether a second "Convert as" run on an already-converted copy compounds
+the suffix (e.g. doubles " in in"); print/PDF export of a converted copy's labels.
+
+---
+
+## 2026-09-23 — R-184, MISSED and reproduced live: the stub harness tests an empty document
+
+OBSERVED, `feat/zoom-control` at `1373951a` (worktree head), checked 2026-09-23. Driven in real
+Chromium against the branch's own preview server (port 8103), through
+`dev/browser-pass/lib/env.js`/`session.js`, real `page.mouse` events, on the shipped Net1 example.
+
+The build agent could not reproduce R-184 in `dev/lpn-spike/zoom-control-harness.js` section 7 and
+guessed Tom must have tested an older build. **That guess was wrong, and the harness told them
+so falsely.** `zoom-control-harness.js` opens with `doc.nodes.length = 0; doc.links.length = 0;` --
+it drives the real button/mode state machine but over an EMPTY document. `zoomExtent()`'s own
+comment says it "measures RENDERED label text" and seeds its first fit pass from `state.s`, the
+CURRENT scale, before laying anything out (`js/looped-network.js:10791`,
+`items = fitItems(state.s, true);`). An empty document has no labels to mismeasure, so the harness's
+section 7 passes 10/10 regardless of what the real bug does.
+
+**Reproduced twice, by two unrelated routes, both landing on the same measurement:** the quality of
+`Zoom to fit`'s result degrades as a smooth function of the scale it is invoked FROM, becoming a
+fully blank canvas well before any cap is hit:
+
+| zoom-in clicks before pressing Zoom to fit | scale invoked from | visible symbols after Zoom to fit (of 66) |
+|---|---|---|
+| 10 | 18.5 | 66 (fine) |
+| 20 | 47.9 | 66 (fine) |
+| 25 | 77.2 | 58 |
+| 28 | 102.8 | 46 |
+| 30 | 124.3 | 38 |
+| 35 | 200.2 | 5 |
+| 40 | 322.5 | 0 -- blank, and STAYS blank after the fit |
+
+The SAME blank-canvas result was reached Tom's own way -- two map clicks close enough together to
+draw a near-degenerate Zoom Window box, which `applyView()` clamps to `maxScale()`
+(`MAX_SCALE_GRID = 500`, `js/looped-network.js:12269`) -- and the very next press of the toolbar
+button, exactly as Tom described, entered Zoom Window instead of fitting (screenshot taken;
+`sample` rect after the "fit" press sat at screen y=2411 against a ~1090px-tall canvas, fully off
+window). **No Zoom Window tool involvement is needed at all** -- reaching the same scale by the
+plain `+` zoom-in button breaks the fit identically, which places the defect in `zoomExtent()`'s own
+scale-seeded label layout, not in the Zoom Window feature the branch was reviewed for.
+
+**Lesson for next time, sharper than the R-054/R-059 shape this seat already tracks:** a stub that
+drives real control-flow wiring over a document with nothing IN it can pass every assertion about
+sequencing while missing a defect that only exists in the content-dependent code the sequencing
+calls into. "The harness drives the real listeners" is not the same claim as "the harness drives the
+real computation" -- check what the fixture document HOLDS before trusting a green run that a build
+agent used to override its own tester's browser report.
+
+**Not checked:** the exact mechanism inside `fitItems()`/`fitScaleFor()`/`fitWindow()` that turns a
+high seed scale into a wrong translate (a scale that is `> minScale()` so the existing "fall back to
+modelFit" guard never fires); whether the same degradation occurs on a project with fewer/no
+labels; the geographic case at an equivalently EXTREME fraction of its own (far larger) scale
+ceiling, which this session's Net3-lat/lon probes did not reach.
+
+## 2026-09-23 -- feat/label-limit at d4753f87, R-199: NOT READY, one promise the code cannot keep
+
+Worktree `/home/haws/webdev/worktrees/feat-label-limit/engcalcs`, preview :8108. Ran the build
+agent's own `dev/lpn-spike/label-limit-parity-harness.js` (32/32) and mutation-tested it by copying
+it unmodified onto the pre-fix commit `c949316e` -- it crashes there (`setboxWordsMatch is not
+defined`), so it is not decoration. Then drove the real feature in headless Chromium against the
+live preview for everything a unit harness cannot see: screenshots of both rows, DOM measurement,
+real keyboard input, the AND-word filter, 390px, `?lang=ar`.
+
+**MISSED, the headline: the Customer row's new wording promises a state its own code has never
+supported, and nothing in this round drove a real blank box through it.** The commit's new tip
+sentence reads *"Leave the box blank to draw them at every zoom"* and the new placeholder is
+"Always show," both read the same way the all-labels row's blank box already is. Typed it myself,
+for real: clicked the customer box, selected all, pressed Backspace, pressed Tab to leave the
+field -- and it snapped straight back to "1000." The row's own `change` handler (untouched by this
+commit) refuses any non-numeric entry and reverts to the old number, by its own comment's own
+admission ("A REFUSED ENTRY PUTS THE OLD NUMBER BACK RATHER THAN STANDING"). Grepped every write
+site to `labelSettings.customerMaxWidth` in the file: default 1000, a captured view width, or this
+refusal -- none of them, anywhere, ever sets it to null or blank. So "Always show" is currently
+unreachable through the interface for this one row, and the sentence that tells a reader how to
+reach it is false. This is new wording describing old, unmodified, incompatible behaviour -- the
+R-054/R-027 shape this seat exists to catch. The shipped harness's own item for (e) only ever
+blanks the ALL-LABELS box; it never drives the customer box's own blank state, so it could not
+have caught this.
+
+**MISSED, minor and visual: the two boxes render at very different widths.** Measured directly:
+the all-labels number box is 112px, the customer number box 41.6px -- pre-existing CSS constants
+(`7em` vs. `LPN_LABEL_AFFIX_W` = `2.6rem`) this commit left alone while matching everything else
+about the two rows. In the narrow box "Always show" reads cramped against the edge.
+
+**CONFIRMED, all measured live rather than read:** (a) identical placeholder "Always show" in
+English and Arabic both (neither language has the key translated, so both rely on the JS fallback,
+which was itself stale -- "Always show labels" -- until this same round's own follow-up commit
+`d4753f87` fixed it, verified live in `ar` after); (b) identical row name; (c) the misleading last
+sentence is gone from the all-labels tip, the customer tip carries the parallel sentence plus his
+qualifier verbatim; (d) both carry the "?" glyph and put "ft" before the button, read straight off
+the live DOM; (f) zoom/show/label present in both rows' own text; (e) typing a small all-labels
+width (5 ft) sets `lpn-labels-hidden` on the canvas and `customerLabelsAttempted()` checks that
+flag before its own (much wider) limit -- confirmed in the harness (mutation-killed) and live, with
+the customer limit set to 999999; (g) "zoom label" and "label zoom" both find exactly the two
+zoom-limit rows regardless of order, "show customer" narrows to the customer row alone, unrelated
+existing rows ("friction", "opacity") stayed findable, clearing restored all 65 rows. The two rows
+ARE genuinely tellable apart -- not just by wording -- confirmed by walking the live DOM: Customer
+sits under Symbology > Customer, the all-labels row sits under Map and page > Appearance.
+
+**Lesson for the standing list:** a tip or placeholder that asserts "leave it blank" is a claim
+about the CHANGE HANDLER, not about the label -- when a round changes only the wording of a control
+built earlier for a different purpose, drive the exact action the new wording describes through a
+real keystroke, not a scripted `.fill('')` that may not exercise the same code path as a user
+tabbing out of the field. The all-labels row's harness assertion for blank called the setter
+directly; the row that actually needed checking was the one whose wording changed without its
+mechanism following.
+
+**Verdict: NOT READY.** Six of seven lettered items hold up under live re-measurement. The "leave
+it blank" clause on the customer tip is the one piece written but never wired -- either the box
+needs to accept a blank entry the way the all-labels box does, or that clause needs to come back
+out before he sees it.
+
+## Task 647 — off-screen network overlay (feat/offscreen-notice, 3dcd3e8d + c5abf2c4)
+
+OBSERVED (real Chrome, `dev/browser-pass/lib/env.js` + `session.js`, Net1 grid example, 390px+
+`?lang=ar`, 26 assertions, all passing): a real mouse drag that pans the whole network off screen
+shows the overlay only AFTER `pointerup` release, never mid-drag or on an intermediate
+`pointermove`; a real wheel-zoom onto empty ground keeps it shown through the debounced settle; a
+real wheel-zoom OUT until the network is a tiny dot does NOT show it (matches Ida's "no sliver
+threshold" spec); the overlay's own "Zoom to fit" button clears it after the same 120ms settle a
+wheel spin uses; the empty project never shows it, dragged or wheel-zoomed; the overlay box does
+not cover `lpn_mode_hint`, `lpn_map_notice`, or `lpn_map_footer` at any point I measured; a click
+just outside the centred box (near the canvas edge) reaches a real toolbar button
+(`lpn_msglog_btn`), not the overlay, confirming the `pointer-events:none` wrapper / `auto` inner
+box split works as designed; the box stays inside a 390px viewport in `ar`.
+
+**The one thing I set out to disprove and could not, after two attempts.** My first hypothesis was
+a Task-647-shaped scope leak: `updateOffscreenNotice()` is called from exactly two places
+(pan-release, and `scheduleReshed()`'s debounced settle) and NOT from any tab-switch path, so I
+suspected switching to a different project tab and back would leave stale overlay state (the R-027
+shape: a change that works for the direct gesture but not for a path nobody wired). First attempt
+using File > New project as the second tab produced a false positive — the overlay correctly did
+NOT reappear on switching back, but only because `newProject()`/`importProject()` (unlike
+`openProject()`) never call `rememberCurrentView()`, so the outgoing tab's camera is discarded and
+`restoreViewOrFit()` falls through to an automatic `zoomExtent(true)` that puts the network back in
+view — a real, pre-existing, unrelated behaviour (worth a line on the roadmap on its own: panning
+one tab and switching to File>New project loses that pan permanently) that happened to mask the
+question I was asking. Rebuilt the test with two tabs BOTH opened via the gallery and each switched
+to at least once (so both go through `openProject()`'s `rememberCurrentView()`), then panned tab 1
+off screen, switched to tab 2 (correctly hidden, ground-truth confirmed in view), switched back to
+tab 1 with no new gesture on it — **the overlay correctly reappeared, matching a direct DOM
+ground-truth check of whether any node's bounding box intersects the canvas.** `restoreViewOrFit()`
+→ `applyView()` → `onZoomChanged()` (when the incoming scale differs from `lastLayoutScale`) →
+`scheduleReshed()` → `updateOffscreenNotice()` covers the tab-switch case after all, because a tab
+switch is itself a scale change in the ordinary case. Recorded so nobody re-litigates the leak
+hypothesis without re-testing it the same way — and so a future reader doesn't stop at the first
+(New-project) attempt and file a false defect.
+
+**UNVERIFIABLE FROM HERE, precisely:** (1) I could not mechanically reproduce "pan back by hand
+until exactly one node shows" with pixel precision — a real mouse drag in fixed large steps either
+overshoots the whole network back into view or undershoots it entirely; Ida's own harness (§4 of
+`dev/lpn-spike/offscreen-notice-harness.js`) already covers the equivalent case at the unit level
+(a node placed with a 4-world-unit margin inside the window edge, no overlay), so the RULE is
+verified, but Tom's own hand on a real trackpad should confirm the transition reads right, not
+jumpy. (2) Whether pressing the overlay's "Zoom to fit" from a genuinely extreme zoom scale
+reproduces the separately-tracked `fix/zoom-fit-high-scale` blank-screen bug — I drove 60 wheel
+notches of zoom-in and the button still recovered the network cleanly (screenshot confirms), so I
+could not trigger the known defect at the depth I reached; a person should check at whatever zoom
+depth that other branch's own repro uses, and if the screen does go blank, attribute it to that
+branch, not this one, per the task brief.
+
+**Note for the record, not a Task 647 finding:** Tom's checklist item "keyboard +/- zoom and the
+toolbar zoom buttons — evaluated too?" does not apply to this page as built: there is no keyboard
++/- zoom shortcut anywhere in `js/looped-network.js` (confirmed by grep for every plausible key
+name) and no separate toolbar Zoom-in/Zoom-out button — only wheel/pinch (`zoomAbout` →
+`onZoomChanged` → `scheduleReshed`) and the single "Zoom to fit" toolbar button (`zoomExtent` →
+same chain via `apply()`'s own `onZoomChanged()` call). Both of those ARE covered and both were
+exercised live above.
+
+**Verdict: CONFIRMED.** Every behaviour in Ida's design brief and Tom's checklist that could be
+driven from here was measured live and held. Two items above are explicitly out of my reach and
+named for whoever does the browser pass.
+
+## 2026-09-23 -- feat/table-editing at 1740e3fa, R-191/R-192/R-193: CONFIRMED, plus a genuine
+defect found while running Tom's own checklist item, unrelated to what shipped
+
+OBSERVED, checked 2026-09-23, worktree `/home/haws/webdev/worktrees/feat-table-editing/engcalcs`,
+real headless Chromium via `dev/browser-pass`'s own server + playwright-core
+(`flock /tmp/engcalcs-browser.lock`), real mouse clicks/modifiers and real `keyboard.press()`
+throughout -- not synthetic `dispatchEvent`, after a first pass with dispatched events gave a false
+negative on "plain click still sorts" that a real Playwright click then contradicted (see below).
+
+**R-191 CONFIRMED, all of it, driven with real modifier-clicks and right-clicks on Net1's Pipes
+table.** Ctrl+click on two headings (Tag, Shut) selected both (`lpn-pane-head-sel` class) without
+sorting either (`aria-sort` stayed null on both). Right-click on a selected heading offered
+exactly "Hide these columns"; clicking it removed precisely those two columns and no others.
+Right-click on a remaining heading then offered "Show Tag" and "Show Shut" -- exactly two rows,
+one per hidden column -- and clicking each restored the original 19-column layout.
+
+**R-192 CONFIRMED with real keyboard, including the one measurement Tom's checklist named
+specifically: `event.defaultPrevented`.** Selected a two-row range on the From column (real click
++ shift-click) and pressed real Ctrl+D: a document-level listener recorded
+`defaultPrevented === true` on that keydown (so the browser's own Bookmark-editing shortcut is
+genuinely suppressed), and the notice line read "Nothing in this selection can be filled down."
+On a fillable column (Diameter), the same real Ctrl+D copied row 0's value into rows 1 and 2, and
+one real Ctrl+Z restored the original three values exactly. The right-click menu's accelerators
+read "Copy Ctrl+C" and "Fill down Ctrl+D" beside their rows. Help > Notes gained a "Table keyboard
+shortcuts" entry whose full text matches what shipped in `lib/lang.ec.en.php` exactly, word for
+word, read out of the live rendered dialog.
+
+**R-193 CONFIRMED by absence and by design.** No `.lpn-pane-cur::after` dot exists in the shipped
+CSS; the accelerator/menu route (Ctrl+D, right-click Fill down) is what remains, matching Tom's
+"if it were gone... that would be nice."
+
+**Mac wording, UNVERIFIABLE FROM HERE in the sense that matters, but measured as far as this
+instrument goes:** there is no Mac-specific branch anywhere in `js/looped-network.js` (grepped for
+`isMac`, `navigator.platform`, `Cmd+`, `⌘` -- none). Loaded the page under a real Mac Safari-style
+user agent and confirmed live: the context menu still reads "Ctrl+D"/"Ctrl+C", never "Cmd", and
+the Notes dialog text is identical regardless of UA (it is server-rendered, UA-blind by
+construction). Functionally Ctrl+D still works on a Mac because the handler already checks
+`ctrlKey || metaKey`, so Cmd+D on a real Mac would also work -- but the ON-SCREEN LABEL will say
+"Ctrl+D" on a Mac too, everywhere this branch put an accelerator. Not a regression (nothing before
+this branch had Mac-aware wording either) but worth naming since Tom's own checklist asked
+specifically what a Mac UA shows.
+
+**A genuine, independently-reproduced defect found while driving Tom's own instruction to check
+"that plain click still sorts": three specific columns never sort by a plain click, on a totally
+unrelated, pre-existing code path this branch did not touch.** `paneColTag()`, `paneColActive()`
+("Part of this network") and `paneColClosed()` ("Shut") are shared column-builder functions used
+on Pipes/Pumps/Valves/Junctions. Clicking any of their headings -- verified across five separate
+sessions, three separate columns, with waits from 300ms to 5000ms, as both the first click of the
+session and a repeated click -- never sets `aria-sort`, never appends the sort arrow, and never
+changes the sorted row order; `ID` stays at its untouched default ("ascending") throughout. This
+is NOT a false negative from a bad selector: a real Playwright click was confirmed to reach both
+the app's own click listener and a tooltip-dismiss listener on the same button (instrumented via a
+wrapped `addEventListener`), and the row order over a Tag column loaded with real, differing typed
+values (`zzz`/`mmm`/`aaa`) also never reordered -- except that ONE time, sorting on Tag DID
+succeed, immediately after an unrelated successful sort on a different column (`From`) or after a
+real cell edit had triggered a table rebuild. **The bug is not "these columns can never sort" but
+"these columns never sort as the operative click; sorting on them only works as a click that
+happens to follow another render."** I did not find the exact internal cause (no Mac dev-tools
+`getEventListeners` reachable from playwright-core, and I could not attribute it to a thrown/caught
+exception -- no console error, no page error, in either state) and I did not chase it further
+because the change that could explain it is not on this branch: `git diff master...HEAD` touches
+only the click handler's OUTER wrapper (the new modifier check), never `sortPaneTable()`,
+`paneTableSorted()`, or the three column-builder functions themselves, and the wrapper's added
+branch is a no-op on an unmodified, first-ever click (`paneHeadSel(spec).length` is `0`, so the
+`paneHeadSelClear()` call is skipped and `sortPaneTable(spec, c.key)` runs exactly as it always
+did). **This reads as pre-existing, not introduced here** -- but Tom's own checklist for this round
+explicitly asked to verify "plain click still sorts," and on three of nineteen Pipes columns it
+does not, so it is reported here rather than assumed out of scope. Whoever picks this up next
+should start from `paneColTag`/`paneColActive`/`paneColClosed` (`js/looped-network.js` ~19650,
+~19800, ~19922) and `sortPaneTable`/`paneTableSorted` (~21361, ~20871), and try reproducing with a
+DevTools breakpoint rather than a scripted probe, since this one resisted every instrumentation a
+headless script could reach.
+
+**Also confirmed, briefly:** the ID heading offers no context menu at all when right-clicked alone
+(no "Hide" -- matches the code's own "ID's own heading with nothing hidden: no menu" comment);
+Escape closes an open context menu; a hidden column stays hidden under `emulateMedia('print')`
+(header count 19 vs. 20, Tag correctly absent) though the table's own print-mode width/border
+numbers read 0 under plain `emulateMedia` with no Print-menu trigger, so that half is
+UNVERIFIABLE FROM HERE -- someone needs to open the real Print dialog on this table, the same
+caveat a prior entry on `feat/tables-spreadsheet` already recorded for print; at 390px and
+`?lang=ar` the table renders RTL, hide/show works identically, and the new English-only strings
+(`lpn_pane_hide_col` etc.) fall back to their English default in Arabic because they have not been
+through a translation sprint yet -- expected for an unmerged feature branch, not a defect.
+
+**Verdict: READY on R-191/R-192/R-193 as asked.** The three-column sort defect is real, verified
+five independent ways, and worth Tom knowing about, but it predates this branch's own diff and is
+not itself a reason to withhold this round's browser pass -- name it to him as a separate, small
+finding rather than blocking on it.

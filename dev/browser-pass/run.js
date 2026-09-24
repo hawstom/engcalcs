@@ -12,15 +12,18 @@
 //   §1  the native picker's user-activation handshake — the riskiest single guess in the build
 //   §6  a permission that is genuinely 'prompt' or 'denied' — OPFS is always granted
 //   §11 Firefox and Safari
-//   anything visual: banner colours, the Save-all flicker, print layout
+//   anything visual: banner colours, the Save-all flicker, the physical printed PAGE (paper size,
+//   margins, page breaks)
 // (The stray scrollbar was on that list and has come off it: specs/noscroll.js measures the geometry
-//  under it, which is a number rather than a picture.)
+//  under it, which is a number rather than a picture. specs/print.js is the same idea for the
+//  printed TABLE: borders, box-shadow and column-width ratios under emulateMedia('print') are
+//  computed style, not a picture, so they came off the list too.)
 
 const fs = require('fs');
 const path = require('path');
 const { REPO, startServer, stopServer, launchBrowser, clearLockRecords } = require('./lib/env');
 
-const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas', 'find', 'boxes', 'geo', 'basemap', 'units', 'color', 'profile', 'place', 'goto', 'gallery', 'cleanmap', 'noscroll', 'labelcols', 'share', 'geohit', 'toolbar', 'visibility', 'perf', 'time', 'search', 'setbox', 'crossproject', 'pane', 'library', 'projectmenu', 'tabcolumn', 'smallscreen', 'mtcbuttons', 'phonemenu', 'hiddenlbl', 'cursorflicker', 'nodehit', 'lblhit', 'areadrag', 'mapscale', 'pan', 'msglogpos', 'tables', 'worldmap'];
+const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas', 'find', 'boxes', 'geo', 'basemap', 'units', 'color', 'profile', 'place', 'goto', 'gallery', 'cleanmap', 'noscroll', 'labelcols', 'share', 'geohit', 'toolbar', 'visibility', 'perf', 'time', 'search', 'setbox', 'crossproject', 'pane', 'library', 'projectmenu', 'tabcolumn', 'smallscreen', 'mtcbuttons', 'phonemenu', 'hiddenlbl', 'cursorflicker', 'nodehit', 'lblhit', 'areadrag', 'mapscale', 'pan', 'msglogpos', 'tables', 'worldmap', 'print', 'zoomfit'];
 
 // **A SPEC FILE THAT IS NOT IN THE LIST ABOVE NEVER RUNS, AND NOTHING SAID SO** (Task 322). The
 // order of SPECS is the run order and is worth keeping by hand, but a typed list is a second place

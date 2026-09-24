@@ -2785,3 +2785,81 @@ drawing's own Ctrl+Z — never mix "I changed how the map is colored" onto the s
 pipe," because pressing Ctrl+Z then stops reliably undoing the last thing you actually did.
 
 No shipped file touched.
+
+---
+
+## Task 647 — instrument for "network intact, off screen"
+
+**The two facts that decide this are already in the repo, and they point the same direction.**
+
+OBSERVED (`dev/tom-review-queue.md:616-625`, Task 647): Tom's own framing pairs the alert with
+Zoom to fit as the action, and flags Task 616's finding as the thing to weigh against any transient
+instrument.
+
+OBSERVED (`js/looped-network.js:47487-47488`, Task 704, Tom 2026-09-22): "**All** messages now need
+to go through this messenger system" — and Task 691 (`dev/roadmap-closed-ids.md:632`) closed by
+*replacing* a timed banner with a log "the user controls rather than a banner that leaves on a
+timer." Tom rejected the timed-banner shape for messages generally, one day before this task's
+ranking exercise, on the adjacent feature.
+
+OBSERVED (`js/looped-network.js:47484-47487`): `#lpn_map_notice` is `position:absolute`, transient,
+and explicitly NOT allowed to affect layout ("a transient must not change the fit, or every save
+would re-zoom the map") — i.e. the existing notice strip is architecturally the row nobody is
+looking at, the same row Task 616 measured MJH not seeing at 120 seconds.
+
+**Recommendation: a persistent centred overlay on the empty map, not the notice strip, not the
+Messenger.** Words, kept to Tom's economy: a two-line block —
+"Your network is intact." / "[Zoom to fit]" — the button IS the second line, not prose beside it;
+one tap does the job `zoomExtent` (already wired to the toolbar's Zoom to fit,
+`js/looped-network.js:2253`) already does. No "off to the north-west" clause in v1: direction text
+in 27 languages is real cost (CLAUDE.md's translation-price rule) for a payload an arrow can carry
+free — see runner-up below.
+
+**Why the overlay and not the notice strip or the Messenger:** the notice strip is disqualified by
+its own doc comment (transient by architecture) and by Task 616's finding, twice-measured, on this
+exact page. The Messenger is disqualified because it is a log of what ALREADY HAPPENED, opened by a
+glyph the user must remember exists and chooses to open — this is a fact about the CURRENT state of
+the view, always true until the user acts, and belongs where the emptiness is: centred in the one
+thing on the page that IS empty. An overlay sitting where the drawing should be is not competing
+with the drawing for attention the way chrome does — there is nothing to compete with. That is also
+why it does not need to be loud: a plain box, no color-coded severity, because the state is neutral
+information, not a warning.
+
+**Show/hide rule:** compute after any pan or zoom settles (never mid-drag, matching the `viewShowsModel()` "at rest" discipline already used for the load-time case, Task 628,
+`dev/roadmap-closed-ids.md:590`) — zero elements of the model intersect the current window. Hide the
+instant that test fails again, including as a direct RESULT of the user's own Zoom to fit press, with
+no fade and no delay: the moment the network reappears, the box has nothing left to say. Do NOT show
+it for "only a sliver visible" (Tom already leans "probably not") — a sliver is not the same failure
+mode as blank-equals-lost; a partly-visible network still answers its own question by being partly
+visible, and a coverage-fraction threshold is a second number to tune and defend where a boolean
+(zero vs. not-zero) is not.
+
+**Phone (390px) / RTL:** the box centres on the canvas regardless of writing direction — it has no
+inherent side. Button-first (Zoom to fit) reads fine centred in either direction since it is not a
+sentence with a start and end, just a label. On a phone the notice strip and Zoom to fit itself
+already survive at that width (`js/looped-network.js:47231`, mode hint goes `display:none` under
+640px but the toolbar's own zoom control persists); the overlay should follow the same rule as the
+toolbar's other overlays already do at small width — no new phone-specific case needed if it is
+built as a variant of the existing overlay layer, not the flow layer the mode hint lives in.
+
+**Ranked runners-up, one line each:**
+1. Edge arrow/chevron pointing toward the off-screen network, badge-style at the canvas edge nearest
+   the model's centroid — better than the overlay ONLY if Tom wants directional information kept
+   (it can encode direction without new translated strings, using rotation), but it is a second new
+   visual idiom the suite has never used, more code, and untested on RTL canvas edges; hold in
+   reserve if he asks for direction back.
+2. Highlighting the Zoom to fit button — cheapest, but fails Task 616's own lesson on its face: a
+   highlight IS a transient mark on a row (the toolbar) that PCW and MJH already demonstrated they
+   do not fixate on; it is the same failure mode relocated, not solved.
+3. A notice in the Messenger strip — wrong tier entirely (see above); also silently satisfies nobody
+   because the user never had a reason to open the log for a state, not an event.
+
+**What would make me wrong:** if Tom's real objection on 2026-09-23 was to the SURPRISE of the blank
+screen rather than to not knowing where the network went — i.e. if what he wants is to never reach
+a blank state at all (Zoom to fit / Zoom Window always guaranteeing at least a sliver stays in view)
+— then this is the wrong layer to fix it at, and the right move is upstream in the zoom-control
+branch's own logic, not a new overlay. Ask him directly before shipping: "intact but off-screen,
+told after the fact" vs "never let the fit produce a fully-blank result" are different fixes, and
+only one of them was actually described in the 2026-09-13 quote this task is built on.
+
+No shipped file touched.
