@@ -432,3 +432,36 @@ is answered for the three that remain after the divorce; see item 5 series above
     use. Rank first, ahead of folding the lock/file banner into the same log (second) and auditing
     the 57 `alert()`/`confirm()` sites for which genuinely need to block (third, and the only piece
     big enough to be the "feature branch" Tom floated). See journal, 2026-09-21.
+
+43. **Retire `#lpn_menu_cue` once (and only once) a chrome-button-style branch ships.** It is my own
+    2026-09-10 recommendation and MOD's 2026-09-23 test shows it failing the same way the
+    Hide-titles highlight failed — quiet chrome asking the eye to move somewhere it does not go on
+    its own. Do not patch it with a lightbulb glyph (a fifth iteration of the same weak shape).
+    Sequence: preview `feature/chrome-button-style` (uniform bright/outlined buttons for the menu
+    bar AND toolbar, closing the nav-list-vs-tool-palette genre gap
+    `dev/app-chrome-postdivorce-recommendations.md` §F measured) → Tom judges it on a real render →
+    if it ships, delete the cue; if it does not, the cue stays as the weakest-but-only instrument.
+    See journal, 2026-09-24 (R-202/R-203).
+44. **Theming phase 1 should absorb the chrome-button-style work, not run beside it.** The accent
+    colour and button shape #43 previews IS phase 1's first token (`--ec-accent`) and its
+    "one component style per kind" goal for buttons — doing them as two efforts risks the palette
+    being picked twice. Preview the button branch first; let its accepted colour become the token.
+    Full plan: `dev/theming-plan.md`. See journal, 2026-09-24 (R-211, R-202/R-203).
+45. **The offscreen-notice card (`feat/offscreen-notice`) is using the WARNING colour pair
+    (`#fffbe6`/`#a80`) for a neutral, reassuring message.** Swap to the suite's neutral panel pair
+    (`rgba(255,255,255,.8)` / `#bbb`-class border, as `.lpn-msglog-panel-empty` already uses) before
+    merge — small, does not need to wait for theming. The CARD SHAPE itself (centred, rounded,
+    padded, with a button) is a new box style worth feeding into theming's phase-1 panel primitive
+    once that exists, but that is not a merge blocker. See journal, 2026-09-24 (R-227).
+46. **Select-all-on-focus for Properties/Settings/Find text and number inputs** (not textarea, not
+    spreadsheet-mode table cells): confirmed as correct by Tom's own reaction and the address-bar
+    convention. Needs the mousedown/already-focused check so a second click in a focused field
+    places the caret normally rather than re-selecting. Full spec in journal, 2026-09-24 (R-207).
+47. **Project1's first-visit tab should be born geographic (WGS84, Downtown Novato Center), not
+    schematic.** Fixes the reported "attach world map errors" defect at its source rather than
+    routing around it with a funnel screen, and leaves the existing examples gallery overlay
+    untouched. Build point: `js/looped-network.js:33296-33298` (the true first-visit path, NOT
+    `newProject()`), imitating but not sharing `LPN_GEO_HOME`/`geoHomeView()`
+    (`js/looped-network.js:3843-3855`) so ordinary wizard-made blank geographic projects are not
+    also repointed to Novato. Needs a `project.basemap` default too, or the geographic canvas shows
+    nothing behind the grid. See journal, 2026-09-24 (R-208).
