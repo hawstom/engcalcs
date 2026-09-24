@@ -823,39 +823,6 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
-- 100|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
-  **HALF FIXED 2026-09-23 (`fix/settings-select-lag`, merged):** no Settings select is rebuilt under
-  the hand any more, label refreshes coalesce into one pass per frame, and Quality skips the pass when
-  no label shows quality: its handler went from 290-500 ms to 70-180 ms. **LEFT:** a UNIT select
-  still costs 0.4-0.8 s, because `afterUnitChange()` redraws the whole project; and one change
-  applies TWO solves (steady state, then the EPS run a second later), each a full label pass.
-  Applying one result instead of two is the cheaper step before his background-service idea.
-  **THE DOUBLE SOLVE IS FIXED** (`fix/one-solve-per-change`, 2026-09-23): one change, one result, one
-  label pass on a network whose run takes under 1 s; busy time about halved. Unit selects remain.
-  2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
-  responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
-  BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
-  so it is not a Firefox defect and not Task 636's. The CPU profile puts 89% of it in
-  `refreshLabelText()`: `getBBox` per label plus `lpn-collide`'s overlap pass, on all 97 nodes,
-  every time. Rebuilding the whole box is 4.6% and is the design the code argues for. Task 651 took
-  the one free 15% (`unitEl()` was a `document.querySelector` per unit read); what is left is the
-  label engine, which is why this is its own task and not a patch. The user-visible half is that
-  the box is rebuilt under an open dropdown, so the control reads as broken rather than as slow --
-  `refreshLabelText()` has 40 call sites and coalescing it into a frame is the shape of the fix.
-  - **TOM, 2026-09-21, OFFERING A DIFFERENT SHAPE ENTIRELY:** *"Maybe we could make everything
-    better by making label placement a background service? You get what you get until better is
-    available?"*
-    - **It is a real proposal and it changes the acceptance test rather than the algorithm.** Today
-      a pass must finish before the drawing is right, so every improvement to the search is paid for
-      in waiting. As a background service the drawing is never blocked: labels appear where the last
-      answer put them and improve as a better answer arrives.
-    - **What it buys is the thing three tasks are separately chasing** -- 680's keep, 681's
-      economies, 683's per-zoom bank -- because none of them matters if nobody is waiting.
-    - **What it costs is honesty about motion.** A label that improves after you have started
-      reading is a label that MOVES under your eye, and his own standing worry about banked
-      placements is exactly that: they jump, and the likeliest moment is the half-second before a
-      tap. So the design question is not whether it can run in the background; it is **what is
-      allowed to change once a reader is looking at it.**
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
