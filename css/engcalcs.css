@@ -2585,6 +2585,12 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 
    The map's own printing is untouched: without .lpn-printing-table on the body nothing below
    applies, so Ctrl+P still prints the drawing exactly as it did. */
+/* **THE TABLE SHORTCUTS NOTE IS A LIST, ONE SHORTCUT A LINE, THE KEY THEN WHAT IT DOES** (Tom,
+   2026-09-24, R-222: *"should be a readable list instead of a wall of text"*). The key or gesture
+   is the value's <strong>, and it gets a column of its own so the actions line up. */
+ul.lpn-notes-keys { list-style: none; margin: .25em 0 0; padding: 0; }
+ul.lpn-notes-keys li { display: grid; grid-template-columns: minmax(8em, 15em) 1fr; column-gap: .75em; margin: 0 0 .15em; }
+@media (max-width: 480px) { ul.lpn-notes-keys li { grid-template-columns: 1fr; margin-bottom: .4em; } }
 #lpn_print_area { display: none; }
 @media print {
 	body.lpn-printing-table > *:not(#lpn_print_area) { display: none !important; }

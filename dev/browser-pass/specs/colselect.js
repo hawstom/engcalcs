@@ -15,9 +15,12 @@
 //   (5) a plain click still sorts and selects nothing;
 //   (6) one selection, not two: a click on a cell ends a column selection, and Ctrl+C on a column
 //       selection copies those columns;
-//   (7) a SELECTED heading dragged onto another moves the column (Tom's earlier point (e)).
+//   (7) a SELECTED heading dragged onto another moves the column (Tom's earlier point (e));
+//   (8) R-222, the Help > Notes entry "Table keyboard shortcuts": "should be a readable list instead
+//       of a wall of text". One shortcut a line, the key first, the actions lined up in a column.
 
 const { Session } = require('../lib/session');
+const { REPO } = require('../lib/env');
 
 exports.title = 'Tables: spreadsheet column selection and Hide these columns';
 
@@ -215,6 +218,39 @@ exports.run = async function ({ browser, report }) {
 		const s = await state(a);
 		report.ok(s.keys.indexOf(k) === before.keys.indexOf(dest), 'a selected heading dragged onto another moves its column there',
 			JSON.stringify(s.keys));
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (8) R-222: Help > Notes on this page > Table keyboard shortcuts is a list -------------
+	{
+		const a = await Session.open(browser, 'E');
+		await a.goto('Looped-Network.php');
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.menuClick(await a.lang('lpn_help_notes'), 'help');
+		await a.settle(200);
+		// Not bridged into pageConfig (the notes are page HTML), so read from the language file.
+		const term = (/\$ec_lang\['lpn_notes_6_term'\]='([^']*)'/.exec(require('fs').readFileSync(require('path').join(REPO, 'lib', 'lang.ec.en.php'), 'utf8')) || [])[1];
+		const got = await a.page.evaluate((term) => {
+			const pop = document.getElementById('lpn_notes_popup');
+			const dt = [...pop.querySelectorAll('dt')].find((d) => d.textContent.trim() === term);
+			const dd = dt && dt.nextElementSibling;
+			const lis = dd ? [...dd.querySelectorAll('li')] : [];
+			return {
+				shown: getComputedStyle(pop).display !== 'none',
+				n: lis.length,
+				keyFirst: lis.every((li) => li.firstElementChild && li.firstElementChild.tagName === 'STRONG' && li.firstChild === li.firstElementChild),
+				tops: lis.map((li) => Math.round(li.getBoundingClientRect().top)),
+				actionLeft: lis.map((li) => { const r = document.createRange(); r.setStartAfter(li.firstElementChild); r.setEnd(li, li.childNodes.length); return Math.round(r.getBoundingClientRect().left); }),
+				bullets: lis.map((li) => getComputedStyle(li.parentNode).listStyleType)
+			};
+		}, term);
+		report.ok(got.shown, 'Help > Notes on this page opens the notes');
+		report.ok(got.n >= 10, 'the shortcuts note is a list', got.n + ' items');
+		report.ok(got.keyFirst, '...each item leads with its key or gesture');
+		report.ok(new Set(got.tops).size === got.tops.length && got.tops.every((t, i) => i === 0 || t > got.tops[i - 1]),
+			'...one shortcut a line', JSON.stringify(got.tops));
+		report.ok(new Set(got.actionLeft).size === 1, '...and what each one does starts in the same column', JSON.stringify([...new Set(got.actionLeft)]));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
