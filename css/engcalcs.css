@@ -2595,6 +2595,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	}
 	.lpn-print-table thead { display: table-header-group; }
 	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
+	/* **EVERY HEADING GETS THE SAME BORDER, NOT ONLY ID** (Tom: *"Print table puts heading borders
+	   only around ID."*). `.lpn-pane-table thead th:first-child` (the screen rule that draws the
+	   sticky heading's own left/right/top seams) carries no media condition, so it is not a screen
+	   rule at all -- it wins on EVERY medium, print included -- and its box-shadow beats the line
+	   above at equal specificity because a bare `thead th` is one class lighter than `thead
+	   th:first-child`. Restated at matching specificity so this rule is the later, winning one. */
+	.lpn-print-table thead th:first-child { box-shadow: none; }
 	/* **PRINT NEVER HAD THE DEVICE-PIXEL PROBLEM THE SCREEN FIX IS FOR** -- there is no sticky layer
 	   on paper, so there is nothing to gain from box-shadow here and something to lose: some print
 	   engines drop a box-shadow by default to save ink, where a `border` always prints. This

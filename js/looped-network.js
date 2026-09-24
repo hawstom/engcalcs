@@ -10421,9 +10421,14 @@ var EngCalcs = EngCalcs || {};
 			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
 			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
 			// fit was asked for, not the candidate scale being tested.
+			// **A DRAGGED OFFSET IS WORLD UNITS AND IS ANCHORED, NOT REACHED** (R-184). `n.lx`/`n.ly`
+			// are drawing units that do not shrink with the zoom, so counting them in the reach turned
+			// ten units of offset into 5,000 px at scale 500 and Zoom to fit framed empty paper. The
+			// item's anchor carries the world part and the reach only the pixel part.
 			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
-				lx = (base.x >= nat.x) ? base.x : base.x - tw;
-			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
+				lx = (base.x >= nat.x) ? base.x : base.x - tw,
+				ax = nat.x + (n.lx !== undefined ? n.lx : 0), ay = nat.y + (n.ly !== undefined ? n.ly : 0);
+			boxFor(ax, ay, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
 			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
@@ -10448,7 +10453,9 @@ var EngCalcs = EngCalcs || {};
 			// the scale being tested: the label is a fixed width in pixels, so it covers more of a
 			// pipe the further out you are. Asked here at atScale rather than at the current one.
 			if (tw * sc / (atScale || 1) * SHORT_LINE_MULT > Geom.polylineLength(linkPointList(l))) { return; }
-			boxFor(mid.x, mid.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+			// World part of the offset in the anchor, as in the node loop above.
+			boxFor(mid.x + (l.lx !== undefined ? l.lx : 0), mid.y + (l.ly !== undefined ? l.ly : 0),
+				lx, ly - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id]; if (!le) { return; }
@@ -10770,10 +10777,24 @@ var EngCalcs = EngCalcs || {};
 			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
 				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
-		function apply(v) {
+		function place(v, set) {
+			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, pad, pad).t,
+				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+		}
+		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
+		// Zoom to fit exists for (R-184): whatever else it does, it never shows empty paper.
+		function modelInside(v, p) {
+			var i, it, x, y;
+			for (i = 0; i < modelItems.length; i++) {
+				it = modelItems[i]; x = p.tx + v * it.x; y = p.ty + v * it.y;
+				if (!(x >= 0 && x <= r.width && y >= 0 && y <= r.height)) { return false; }
+			}
+			return true;
+		}
+		function apply(v, p) {
 			state.s = v;
-			state.tx = fitWindow(items, v, 'x', 'l', 'r', r.width, pad, pad).t;
-			state.ty = fitWindow(items, v, 'y', 't', 'b', r.height, padTop, padBottom).t;
+			state.tx = p.tx;
+			state.ty = p.ty;
 			setTransform();
 			onZoomChanged();
 		}
@@ -10789,6 +10810,7 @@ var EngCalcs = EngCalcs || {};
 		// so a label can end fractionally outside the padding.
 
 		items = fitItems(state.s, true);
+		var modelItems = items;
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -10808,8 +10830,12 @@ var EngCalcs = EngCalcs || {};
 		// So a step-2 answer that bottomed out is not an answer. Fall back to the model fit and let
 		// the lettering overhang, which is the trade the original branch intended: **the NETWORK is
 		// what Zoom to fit is for.**
-		if (!(s > minScale())) { s = modelFit; }
-		apply(s);
+		// **AND THE FALLBACK IS CENTRED ON THE MODEL, NOT ON THE LETTERING** that just failed to
+		// fit, and it is also taken whenever the label-aware answer would leave a node off the
+		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
+		var at = place(s, items);
+		if (!(s > minScale()) || !modelInside(s, at)) { s = modelFit; at = place(s, modelItems); }
+		apply(s, at);
 		if (auto) { rebaseSignatureIfClean(); }
 	}
 
@@ -21290,7 +21316,17 @@ var EngCalcs = EngCalcs || {};
 	// switch, only by rebuilding everything; now that a switch refills, it is stated here.
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
+		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
+		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
+		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
+		// row-id string is unchanged from the last render, so this fell into the refill branch
+		// below, which repaints cells by id and never touches a header button -- the arrow never
+		// appeared and the click looked like nothing happened. A second click, after some OTHER
+		// column had scrambled the row order, always changed the row-id string and so always
+		// rebuilt; that is why the defect was invisible except as the very first click.
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
+			spec.sort.col + '/' + spec.sort.dir + '||' +
 			cols.map(paneHeadingText).join('|') + '||' +
 			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
 			cols.map(function (c) {
@@ -22854,31 +22890,31 @@ var EngCalcs = EngCalcs || {};
 	var PANE_PRINT_BUDGET_EM = 60;
 	var PANE_PRINT_BASE_PT = 9;
 	/**
-	 * **THE SHEET USES THE COLUMN WIDTHS THE READER DRAGGED, AND THE TEXT SHRINKS WITH THEM RATHER
-	 * THAN STAYING BEHIND** (Tom, 2026-09-21: *"I think that 'Print table' has not been revisited
-	 * since we added column resizing. And I think that it's important to use the column widths
-	 * adjusted by the user."* And 2026-09-22, on the result: *"Print is not respecting on-screen
-	 * column widths."*). He was right twice. The first pass gave every column its screen `em`
-	 * width, correctly -- but then fit a table wider than the sheet by capping its CSS width at
-	 * `max-width: 100%` while leaving each column's share a PERCENTAGE of that capped width. The
-	 * percentages stayed proportional to each other; the FONT stayed fixed at 9pt regardless, so a
-	 * fourteen-column network table (the ordinary case -- Junctions on Net3 has thirteen) had its
-	 * columns physically squeezed to a fraction of their `em` width while their text did not
-	 * shrink, and a heading that read on two lines on screen came back broken to single characters.
+	 * **THE SHEET USES THE COLUMN WIDTHS THE READER SEES, ALWAYS -- NOT ONLY THE ONES DRAGGED --
+	 * AND THE TEXT SHRINKS WITH THEM RATHER THAN THE SHEET STRETCHING PAST THE PAGE** (Tom,
+	 * 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
+	 * resizing. And I think that it's important to use the column widths adjusted by the user."*
+	 * 2026-09-22, on the result: *"Print is not respecting on-screen column widths."* And again:
+	 * *"Print table does not respect column widths. It expands to 100% of printable area."*). Three
+	 * rounds, because the first two fixes still had an escape hatch: a table NOBODY had dragged took
+	 * none of this and printed at the browser's own auto-layout content width, which is exactly the
+	 * case that "expands to 100%" describes on a wide network table -- no budget, no scaling, nothing
+	 * holding it to a sheet. Undragged is no longer special: every column, dragged or not, is read
+	 * off the live heading's drawn width (paneColDrawnEm()), so the sheet's ratios are always the
+	 * screen's ratios, and the budget/scale step below always runs.
 	 *
-	 * A table nobody has resized prints exactly as before, at its content's width. Once ANY column
-	 * has been dragged, every column is given the width it has on screen -- the dragged ones their
-	 * stored em, the rest the width they are drawn at -- as a literal `em`, so the table's true
-	 * width is the sum of what the reader actually sees. When that sum is wider than a printed page
-	 * can hold, the SHEET'S OWN FONT-SIZE is reduced instead of the columns' share of it: every
-	 * column's `em` width is unchanged, so it shrinks in lockstep with the text inside it, at
-	 * exactly the ratio the screen already had -- smaller paper, not a different layout.
+	 * Every column is given the width it has on screen -- the dragged ones their stored em, the rest
+	 * the width they are drawn at -- as a literal `em`, so the table's true width is the sum of what
+	 * the reader actually sees. When that sum is wider than a printed page can hold, the SHEET'S OWN
+	 * FONT-SIZE is reduced instead of the columns' share of it: every column's `em` width is
+	 * unchanged, so it shrinks in lockstep with the text inside it, at exactly the ratio the screen
+	 * already had -- smaller paper, not a different layout, and never a stretch past the sheet.
 	 * `max-width: 100%` stays on as the belt for a sheet narrower than the assumed budget.
-	 * Returns the em widths it applied, or null when it left the table alone.
+	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
 	function panePrintWidths(spec, table) {
 		var cols = paneCols(spec), unit, ems, sum = 0, cg, scale;
-		if (!cols.some(function (c) { return paneColUserWidth(spec.id, c) > 0; })) { return null; }
+		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) {
 			return paneColUserWidth(spec.id, c) || paneColDrawnEm(spec, c, unit);

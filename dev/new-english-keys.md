@@ -599,7 +599,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 74 new keys across 8 unmerged branch(es).
+**52 still to read**, of 75 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -610,7 +610,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab6ad007`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/convert-as (`a562e7c7`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -632,6 +632,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
@@ -811,9 +814,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`d4753f87`) — adds no English strings
+### feat/label-limit (`a5538f99`) — adds no English strings
 
-### feat/offscreen-notice (`3dcd3e8d`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/offscreen-notice (`c5abf2c4`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_offscreen_intact`**
   > Your network is intact.
@@ -821,7 +824,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/property-venue (`1066860e`) — adds no English strings
 
-### feat/table-editing (`fd604304`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/table-editing (`1740e3fa`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
   > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
@@ -848,6 +851,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`7ac181c1`) — adds no English strings
-
-### fix/table-print (`feea16a0`) — adds no English strings
+### feat/zoom-control (`1373951a`) — adds no English strings
