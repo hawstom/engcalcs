@@ -74,7 +74,7 @@ judgement and does not belong to a script.
 
 ### feat/tables-spreadsheet
 
-- [ ] R-162 feat/tables-spreadsheet | Print is not respecting on-screen column widths. -- merged to master 2026-09-23 on his all-clear (R-173)
+- [x] R-162 feat/tables-spreadsheet | Print is not respecting on-screen column widths. -- merged to master 2026-09-23 on his all-clear (R-173) -- REOPENED AND FIXED AGAIN 2026-09-23c on master (fix/table-print): an untouched table now prints at its on-screen widths, scaled to the page
   - TGH: Reopening.
 
 ### feat/label-gang-search
@@ -103,34 +103,34 @@ judgement and does not belong to a script.
 ### feat/zoom-control (8103)
 
 - [x] R-183 feat/zoom-control | Glyphs centred: "Yes". Press, click the map, press again refits: "Yes". Zoom Window takes two corner clicks or a drag: "Yes".
-- [ ] R-184 feat/zoom-control | "Bug: When I click twice, then zoom to a window with two map clicks, then click Zoom to Fit, it doesn't work. This presents as a catastrophic loss because my screen is blank. To get Zoom to Fit again, I click on the map again, then click Zoom to Fit. Note that all the worse with this bug, when I fail to get Zoom to Fit and I click the button a second time, it gives me Zoom Window."
+- [x] R-184 feat/zoom-control | "Bug: When I click twice, then zoom to a window with two map clicks, then click Zoom to Fit, it doesn't work. This presents as a catastrophic loss because my screen is blank. To get Zoom to Fit again, I click on the map again, then click Zoom to Fit. Note that all the worse with this bug, when I fail to get Zoom to Fit and I click the button a second time, it gives me Zoom Window." -- THE CAUSE WAS ZOOM TO FIT ITSELF, NOT ZOOM WINDOW: from a deep zoom it multiplied your dragged label offsets by that zoom (about 5,000 px of phantom label at the ceiling). Fixed on master (fix/zoom-fit-high-scale) and merged into feat/zoom-control; every node now ends on screen from any zoom
 
 ### feat/convert-as (8104)
 
-- [ ] R-185 feat/convert-as | "This wizard may be confusing. Let's try changing "This project: Not georeferenced" to "Current: Not georeferenced" and making it plain text, not faded/gray."
+- [x] R-185 feat/convert-as | "This wizard may be confusing. Let's try changing "This project: Not georeferenced" to "Current: Not georeferenced" and making it plain text, not faded/gray." -- feat/convert-as 6b4707ac
 - [x] R-186 feat/convert-as | "Satellite works great." -- closes R-172(2)
-- [ ] R-187 feat/convert-as | "Let's turn the Round converted values section into two columns, Round converted values and Label (suffix, we can explain in a tip), so that after each of the four dropdowns we allow (and possibly pre-fill from Units) entry of a label suffix (" mm ft gpm L/sec etc)."
+- [x] R-187 feat/convert-as | "Let's turn the Round converted values section into two columns, Round converted values and Label (suffix, we can explain in a tip), so that after each of the four dropdowns we allow (and possibly pre-fill from Units) entry of a label suffix (" mm ft gpm L/sec etc)." -- feat/convert-as ab6ad007..a562e7c7. Diameter, head and flow suffixes reach the new copy's labels; depth is greyed (no tank-depth label exists: Task 712). YOUR CALL: untouched pre-filled boxes are applied too
 - [?] R-188 feat/convert-as | (on EPSG:3857 offered as "lat/lon" while stored numbers are EPSG:4326 degrees) "I don't understand. I can't find the context. Give me more information." -- re-explained in the 2026-09-23c report
-- [ ] R-189 feat/convert-as | (the `$ec_lang_syn` for lpn_units_length) "Yes. "Pipe lengths, tank diameters, etc.""
+- [x] R-189 feat/convert-as | (the `$ec_lang_syn` for lpn_units_length) "Yes. "Pipe lengths, tank diameters, etc."" -- feat/convert-as 6cb06e08
 - [?] R-190 feat/convert-as | (the "These are already lat/lon" button) "I don't understand. I can't find the context. Give me more information." -- re-explained in the 2026-09-23c report; the handoff had conflated it with lpn_transform_georefed_btn
 
 ### feat/table-editing (8105)
 
-- [ ] R-191 feat/table-editing | Hide this column: "Yes. Works well. Well done. But can we select multiple heading cells to hide multiple columns at once?"
-- [ ] R-192 feat/table-editing | "Ctrl+D on Pipes.From or To opens the browser Bookmark editing. It would be nice to have this documented somewhere somehow. I confess that I did not know about Ctrl+D"
-- [ ] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice."
+- [x] R-191 feat/table-editing | Hide this column: "Yes. Works well. Well done. But can we select multiple heading cells to hide multiple columns at once?" -- feat/table-editing fd604304: Ctrl/Cmd+click or Shift+click headings, then right-click, Hide these columns
+- [x] R-192 feat/table-editing | "Ctrl+D on Pipes.From or To opens the browser Bookmark editing. It would be nice to have this documented somewhere somehow. I confess that I did not know about Ctrl+D" -- feat/table-editing fd604304: Ctrl+D is always claimed in the grid; menu shows Ctrl+C / Ctrl+D; Help > Notes lists the table keys. Mac still reads Ctrl (Task 713)
+- [x] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build
 - [x] R-194 feat/table-editing | iPhone long-press: "Sorry. I don't have an iPhone to test with." -- untested; noted, not a blocker
 
 ### feat/property-venue (8106)
 
-- [ ] R-195 feat/property-venue | Find > Pipes > Shut > equal to > Closed: "(1) Switching away from this leaves "closed" in the Value field. (2) Switching to this doesn't add the selector for the Value field if the value is already something else (doesn't discard what's there)."
+- [x] R-195 feat/property-venue | Find > Pipes > Shut > equal to > Closed: "(1) Switching away from this leaves "closed" in the Value field. (2) Switching to this doesn't add the selector for the Value field if the value is already something else (doesn't discard what's there)." -- feat/property-venue 1066860e
 - [x] R-196 feat/property-venue | Replace a tank's lowest water depth: "Yes. A little confusing. But powerful enough to justify it."
-- [ ] R-197 feat/property-venue | "Table to filter is confusing. (1) Is this offering two options or just one? In other words, is the button offering "Filter in selected table" or "Filter in active table"? (2) I think this would work better on the same line as the Find button like this: [Find][Filter in Table][tables_selector], and change/switch/push tables_selector when What to Search is changed/switched."
-- [ ] R-198 feat/property-venue | "This is a little audacious, but I think we also should change/push "Property to change" when "Property" is changed since normally that is what users want, and power users can learn."
+- [x] R-197 feat/property-venue | "Table to filter is confusing. (1) Is this offering two options or just one? In other words, is the button offering "Filter in selected table" or "Filter in active table"? (2) I think this would work better on the same line as the Find button like this: [Find][Filter in Table][tables_selector], and change/switch/push tables_selector when What to Search is changed/switched." -- feat/property-venue 1066860e: one row [Find][Filter in Table] Table [selector]; "Table to filter" shortened to "Table", which is OUR word and needs yours
+- [x] R-198 feat/property-venue | "This is a little audacious, but I think we also should change/push "Property to change" when "Property" is changed since normally that is what users want, and power users can learn." -- feat/property-venue 1066860e
 
 ### feat/label-limit (8108)
 
-- [ ] R-199 feat/label-limit | "Make the Customer labels and All labels zoom limits settings interfaces identical. (a) Both to have the placeholder "Always show", (not "Always show labels"). (b) Both to say "Show labels when zoomed to this map width or less". (c) Both tips to be similar to the all labels tip, but with the last sentence removed since it's misleading. (d) Both styles to use the ? glyph. (d) Both "ft" to be before the button. (e) All means all, not all except customer. Customer labels can't show alone based on zoom. We should put a qualifier in the Customer label tip that "This has no effect if it is larger than the similar setting for all labels." (f) Ensure that the words "zoom", "show", and "label" are present for filtering. (g) Peripheral issue possibly for roadmap if too hard to address here: can Settings filter work as an AND word search? I think it currently works as an entire string search. "Type a word or multiple words to see settings that mention all of them.""
+- [x] R-199 feat/label-limit | "Make the Customer labels and All labels zoom limits settings interfaces identical. (a) Both to have the placeholder "Always show", (not "Always show labels"). (b) Both to say "Show labels when zoomed to this map width or less". (c) Both tips to be similar to the all labels tip, but with the last sentence removed since it's misleading. (d) Both styles to use the ? glyph. (d) Both "ft" to be before the button. (e) All means all, not all except customer. Customer labels can't show alone based on zoom. We should put a qualifier in the Customer label tip that "This has no effect if it is larger than the similar setting for all labels." (f) Ensure that the words "zoom", "show", and "label" are present for filtering. (g) Peripheral issue possibly for roadmap if too hard to address here: can Settings filter work as an AND word search? I think it currently works as an entire string search. "Type a word or multiple words to see settings that mention all of them."" -- feat/label-limit 9c7e54ab..1bbcae1d: one shared control for both rows; AND-word Settings filter; key lpn_labels_customer_width deleted
 
 ### feat/label-gang-search (8090)
 
@@ -138,4 +138,4 @@ judgement and does not belong to a script.
 
 ### feat/tables-spreadsheet (on master)
 
-- [ ] R-201 feat/tables-spreadsheet | "Print table puts heading borders only around ID." (and R-162 reopened: "Print table does not respect column widths. It expands to 100% of printable area.")
+- [x] R-201 feat/tables-spreadsheet | "Print table puts heading borders only around ID." (and R-162 reopened: "Print table does not respect column widths. It expands to 100% of printable area.") -- fixed on master (fix/table-print): a sticky-header rule was overriding the print borders
