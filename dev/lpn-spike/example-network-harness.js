@@ -924,7 +924,9 @@ console.log('\n--- Settings panel stays in sync ---');
   // anything ever calls it. That mutation survived until this line changed.
   EngCalcs.setUnits('si');
   const siText = byId.lpn_map_status.textContent;
-  ok('switching units changes it', /lps/.test(siText) && !/gpm/.test(siText), siText);
+  // The DISPLAY text ('L/s'), not the internal unit id ('lps') -- lib/lang.ec.en.php's own
+  // $ec_lang['u_lps'], the same text a reader sees in the dropdown and the readout both.
+  ok('switching units changes it', siText.indexOf(PC.u_lps) >= 0 && !/gpm/.test(siText), siText);
 
   // The method is hardcoded today, but read through frictionMethod() so Task 271 inherits a working
   // readout rather than a literal to hunt down.

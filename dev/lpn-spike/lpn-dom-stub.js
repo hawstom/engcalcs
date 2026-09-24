@@ -489,6 +489,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
 // of that rule tests nothing.
 byId.lpn_menu_popup.appendChild(byId.lpn_menu_list);
 byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
+// The Convert as box's Depth Label input ships `disabled` in Looped-Network.php (tank level has no
+// per-field label suffix to write into -- see the comment there), so the stub starts it disabled
+// too, or a harness reading `.disabled` would see a stub default rather than the shipped markup.
+byId.lpn_convas_suffix_depth.disabled = true;
 // Same reason: the credits footer really is a child of the content pane, and buildColoringSection()
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.
@@ -556,6 +560,25 @@ const unitSelects = {};
 // `family` is NOT decoration: echoUnitSelect() puts data-family on every real select, and Task
 // 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
 // that function skip every select and vacuously report "us", which is a test agreeing with itself.
+// **AN OPTION'S textContent IS THE TRANSLATED LABEL, NEVER THE UNIT'S NAME** -- echoUnitSelect()
+// (lib/Calculators.lib.php) prints `$ec_lang['u_' . $unit]` as the option's text, so 'fth2o' reads
+// "ft H2O" on the real page. A stub whose textContent equalled the value could not tell a caller
+// that reads the display text from one that (wrongly) reads the value: the two would agree by
+// construction. Found this way, 2026-09-23: pre-review reported a Convert as Label box pre-filling
+// with the raw unit id, and a stub with this bug in it would have shown the same result for either
+// a correct read or an incorrect one.
+const unitLabels = (function () {
+  const src = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+  const out = {};
+  for (const m of src.matchAll(/\$ec_lang\['u_([a-zA-Z0-9_]+)'\]\s*=\s*'((?:[^'\\]|\\.)*)'\s*;/g)) {
+    out[m[1]] = m[2].replace(/\\'/g, "'");
+  }
+  return out;
+}());
+function unitLabelText(name) {
+  if (!(name in unitLabels)) { throw new Error("lpn-dom-stub.js: no \$ec_lang['u_" + name + "'] in lib/lang.ec.en.php"); }
+  return unitLabels[name];
+}
 function mkUnitSelect(name, family, opts, chosen) {
   // **A REPLACED SELECT IS DETACHED, BECAUSE THAT IS WHAT REPLACING ONE DOES** (Task 651).
   // setUnitSet() calls this again for every name, and the old object used to keep its parentNode
@@ -568,7 +591,7 @@ function mkUnitSelect(name, family, opts, chosen) {
   const s = mkEl('select');
   s.name = name;
   s.dataset.family = family;
-  s.options = opts.map(n => ({ value: n, textContent: n }));
+  s.options = opts.map(n => ({ value: n, textContent: unitLabelText(n) }));
   s.selectedIndex = opts.indexOf(chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
   Object.defineProperty(s, 'value', { get() { return this.options[this.selectedIndex].value; } });
