@@ -62,7 +62,8 @@
         "feat/convert-as",
         "feat/table-editing",
         "feat/property-venue",
-        "feat/label-limit"
+        "feat/label-limit",
+        "feat/offscreen-notice"
     ],
     "feature_freeze": {
         "active": false,
