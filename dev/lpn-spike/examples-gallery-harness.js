@@ -322,5 +322,58 @@ console.log('\n-- wiring: the manifest is fetched lazily --');
 		'a returning user with a network on screen never pays for the manifest');
 }
 
+console.log('\n-- R-205: every example opens with the world map at half opacity --');
+examples.forEach(function (ex) {
+	[srcDir, outDir].forEach(function (dir) {
+		const where = dir === srcDir ? 'authored' : 'served';
+		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
+		report(d.settings && d.settings.backdropOpacity === 0.5,
+			`${ex.file} (${where}) opens at backdropOpacity 0.5`, String(d.settings && d.settings.backdropOpacity));
+	});
+});
+console.log('\n-- R-205: a new project defaults to the same 0.5 backdrop opacity --');
+{
+	const m = src.match(/backdropOpacity:\s*([0-9.]+),\s*\/\/ 0-1, applied to the backdrop image/);
+	report(!!m && m[1] === '0.5', 'the hard-coded new-project default is 0.5', m && m[1]);
+}
+
+console.log('\n-- R-205: Net3-Novato-CA-World gets an all-labels zoom limit and new gallery text --');
+{
+	const novato = examples.find(function (e) { return e.file === 'Net3-Novato-CA-World.lwn'; });
+	report(!!novato, 'Net3-Novato-CA-World is in the manifest');
+	if (novato) {
+		[srcDir, outDir].forEach(function (dir) {
+			const where = dir === srcDir ? 'authored' : 'served';
+			const d = JSON.parse(fs.readFileSync(path.join(dir, novato.file), 'utf8'));
+			report(d.settings && d.settings.labelMaxWidth === 65000,
+				`Net3-Novato-CA-World (${where}) has labelMaxWidth 65000`,
+				String(d.settings && d.settings.labelMaxWidth));
+		});
+	}
+	// NOT a literal comparison to the exact wording Tom asked for (dev/scripts/harness_wording_check.php's
+	// ratchet bans spelling a current $ec_lang value out in a harness) -- a shape check instead:
+	// the title still names the network and its coordinate kind, and the description still names the
+	// place and the world map, whatever words carry that from here on.
+	const novatoTitle = novato && novato.title || '';
+	const novatoDesc = novato && novato.description || '';
+	report(/Net3/.test(novatoTitle) && /lat.?\/.?lon/i.test(novatoTitle),
+		'lpn_ex_net3_world_title still names Net3 and lat/lon', novatoTitle);
+	report(/Novato/.test(novatoDesc) && /CA/.test(novatoDesc) && /world map/i.test(novatoDesc),
+		'lpn_ex_net3_world_desc still names Novato, CA and the world map', novatoDesc);
+}
+
+console.log('\n-- R-205: the other EPANET examples say "example", not "sample" --');
+{
+	const en = fs.readFileSync(path.join(root, 'lib/lang.ec.en.php'), 'utf8');
+	['lpn_ex_net1_desc', 'lpn_ex_net2_desc', 'lpn_ex_net3_desc'].forEach(function (k) {
+		const m = en.match(new RegExp("\\$ec_lang\\['" + k + "'\\]='([^']*)';"));
+		report(!!m, `${k} exists`);
+		if (m) {
+			report(!/\bsample\b/i.test(m[1]), `${k} no longer says "sample"`, m[1]);
+			report(/\bexamples?\b/i.test(m[1]), `${k} says "example"`, m[1]);
+		}
+	});
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

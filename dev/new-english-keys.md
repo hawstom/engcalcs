@@ -578,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**59 still to read**, of 82 new keys across 9 unmerged branch(es).
+**61 still to read**, of 84 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +589,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`a562e7c7`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/convert-as (`b11b9dbc`) — 29 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -604,13 +604,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPSG coordinate system
   @@ NEEDS RULING
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
-  > Label
+  > Suffix
   @@ NEEDS RULING
 - **`lpn_convas_label_depth_na`**
   > Tank depth has no map label to add this to yet.
@@ -654,6 +654,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_convas_unnamed_tip`**
   > Local coordinates in the length unit, with the world map attached at the place the project is.
   @@ NEEDS RULING
+- **`lpn_crs_latlon_display`**
+  > WGS 84 latitude/longitude (EPSG:4326)
+  @@ NEEDS RULING
 - **`lpn_file_convert_as`**
   > Convert as…
   @@ NEEDS RULING
@@ -662,6 +665,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  @@ NEEDS RULING
+- **`lpn_inp_report_no_crs`**
+  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
   @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
@@ -672,6 +678,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_units_usft`**
   > US survey ft
   @@ NEEDS RULING
+
+### feat/first-project (`dc5b5843`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
@@ -793,20 +801,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`a5538f99`) — adds no English strings
+### feat/label-limit (`4bcf92ab`) — adds no English strings
 
-### feat/offscreen-notice (`c5abf2c4`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/offscreen-notice (`291bd4c7`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_offscreen_intact`**
   > Your network is intact.
   @@ NEEDS RULING
 
-### feat/property-venue (`1066860e`) — adds no English strings
+### feat/property-venue (`98613d7f`) — adds no English strings
 
-### feat/table-editing (`1740e3fa`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/select-on-focus (`66734953`) — adds no English strings
+
+### feat/table-editing (`efeaa75a`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
-  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -830,7 +840,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`1373951a`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/usage-report (`5da3e7ae`) — adds no English strings
+
+### feat/zoom-control (`a0784a15`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -854,6 +866,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
 
-### fix/table-print (`a7a9395e`) — adds no English strings
+### fix/first-use (`88d8e262`) — adds no English strings
 
-### fix/zoom-fit-high-scale (`910f6d13`) — adds no English strings
+### fix/table-print2 (`4055de7b`) — adds no English strings
+
+### fix/zoom-fit-labels (`c32b731a`) — adds no English strings
+
+### merge/fixes-0924 (`957b4288`) — adds no English strings

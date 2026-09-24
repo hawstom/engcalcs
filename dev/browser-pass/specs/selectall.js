@@ -218,7 +218,9 @@ exports.run = async function ({ browser, report }) {
 			// ---- Find and replace ------------------------------------------------------------
 			await a.page.keyboard.press('Escape');
 			await a.settle(200);
-			await a.menuClick('Find and replace', 'edit');
+			// Read off the language file rather than pinned, per dev/session-handoff.md §4 --
+			// a rewording of the row must not turn this spec red.
+			await a.menuClick(await a.lang('lpn_find_menu'), 'edit');
 			await a.settle(300);
 			const findSel = '#lpn_find_form input[type="text"], #lpn_find_form input[type="number"]';
 			const findField = await rectOf(a.page, findSel);

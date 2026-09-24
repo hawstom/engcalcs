@@ -860,24 +860,21 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	report(align(sortBtn, WIDE) === 'inherit',
 		'the sort button hands its alignment back to its own heading cell', align(sortBtn, WIDE));
 
-	// 2. THE PRINTED SHEET IS A SEPARATE QUESTION AND DID NOT MOVE. Names left, figures right, as it
-	// has been since it shipped: nobody types on paper, and a printed column of figures reads as one
-	// only when it is right-aligned. The screen rules are the same selectors, so this is the check
-	// that they do not leak onto it.
+	// 2. THE PRINTED SHEET ALIGNS AS THE SCREEN DOES (Tom, 2026-09-24, R-215: *"the print horiz
+	// alignments are differen than the on-screen alighments (all centered except ID)"*). The
+	// names-left/figures-right split the sheet used to keep is gone; the screen rules carry no
+	// media condition, so they answer for paper too.
 	{
 		const printTable = { tag: 'table', cls: ['lpn-pane-table', 'lpn-print-table'] };
 		const pCell = (tag, key, num, first) => [html, printTable]
 			.concat(tag === 'th' ? [thead] : [], [tr, { tag: tag, cls: clsFor(key, num, first) }]);
 		const pAlign = (chain) => CSS.winning(CSS.rules, chain, WIDE, 'text-align', blind, 'print');
-		report(pAlign(pCell('td', 'flow', true, false)) === 'right' &&
-			pAlign(pCell('th', 'flow', true, false)) === 'right',
-			'on paper a figures column is still right', pAlign(pCell('td', 'flow', true, false)));
-		report(pAlign(pCell('td', 'from', false, false)) === 'left' &&
-			pAlign(pCell('td', 'id', false, true)) === 'left',
-			'...and a name column, first or not, is still left');
-		// And the screen is not answering with the paper's rules either way round.
-		report(align(cell('td', 'flow', true, false), WIDE) === 'center',
-			'...while the screen is unaffected by any of it');
+		report(pAlign(pCell('td', 'flow', true, false)) === 'center' &&
+			pAlign(pCell('th', 'flow', true, false)) === 'center',
+			'on paper a figures column is centred, as on screen', pAlign(pCell('td', 'flow', true, false)));
+		report(pAlign(pCell('td', 'from', false, false)) === 'center' &&
+			pAlign(pCell('td', 'id', false, true)) === 'start',
+			'...a name column too, and the first column leads, as on screen');
 	}
 
 	// 3. THE STICKY HEADING, and the 6px band the rows were scrolling through above it.
