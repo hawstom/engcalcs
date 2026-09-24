@@ -5243,7 +5243,7 @@ var EngCalcs = EngCalcs || {};
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
 			symbolCapMultiple: 0.5,
 			symbolCapPercentile: 20,
-			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
+			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
 			alignPipeLabels: true,
