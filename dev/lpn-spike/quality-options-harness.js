@@ -256,8 +256,12 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 	ok('the chemical option reads the current lang string',
 		!!chemOpt && chemOpt.textContent === PC.lpn_quality_chemical,
 		chemOpt && chemOpt.textContent);
-	ok('...which is Tom\'s reworded text, not the old wording',
-		PC.lpn_quality_chemical === 'A reactive chemical', PC.lpn_quality_chemical);
+	// NOT a literal comparison to the current wording (dev/scripts/harness_wording_check.php's
+	// ratchet bans spelling a current $ec_lang value out in a harness) -- a shape check instead:
+	// R-206 dropped "reacts" as a verb naming the chemical and made it an adjective on "chemical".
+	ok('...and R-206\'s reword landed: an adjective on "chemical", not a verb "reacts"',
+		/\bchemical\b/i.test(PC.lpn_quality_chemical) && !/\breacts\b/i.test(PC.lpn_quality_chemical),
+		PC.lpn_quality_chemical);
 }
 
 // ---------------------------------------------------------------------------
