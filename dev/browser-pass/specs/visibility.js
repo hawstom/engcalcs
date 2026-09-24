@@ -108,13 +108,19 @@ exports.run = async function ({ browser, report }) {
 		// "Node and link" joined them on 2026-08-19: the high/low mark and the text between values
 		// are true of a node label and a link label alike, so they stand between the two symbology
 		// groups and Map appearance rather than inside either one.
+		// **CUSTOMER SYMBOLOGY (Task 247, Tom 2026-09-19)** sits between Link symbology and the
+		// shared "All" group — a customer label answers a different question ("whose is this and
+		// how much does it draw") than a junction's, so it is a group of its own rather than folded
+		// into Node.
+		// **CUSTOM PROPERTIES (Task 636)** joined New elements after Defaults — a field the user
+		// invents belongs beside the other things that decide what the next element looks like.
 		// Energy and Quality joined the calculation category after this list was written; Quality is
 		// deliberately LAST, because it is the section fewest readers want and putting it mid-list
 		// makes everyone scroll past a chemistry question to reach the clock.
 		report.eq(subs.join(','),
-			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_nodeLink,lpn_set_sub_mapDisplay,' +
-			'lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
-			'lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
+			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_custLbl,lpn_set_sub_nodeLink,' +
+			'lpn_set_sub_mapDisplay,lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
+			'lpn_set_sub_customProps,lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
 			'lpn_set_sub_energy,lpn_set_sub_quality',
 			'...and the sub-headings under them, unmoved by the regrouping', subs.join(','));
 		report.ok(!(await a.page.evaluate(() =>
@@ -755,13 +761,39 @@ exports.run = async function ({ browser, report }) {
 			document.querySelectorAll('#lpn_set_time_fields input[type="text"]').length >= 7),
 			'the time settings moved here from the bottom pane');
 
-		// Escape closes it, the third of the property popup's three ways out.
-		await a.page.evaluate(() => {
-			document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-		});
+		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT AND THE POINTER IS OVER IT** (Tom,
+		// 2026-09-19: *"please don't let Escape close those boxes when the mouse cursor is
+		// elsewhere. When I say 'only when box is in focus', I mean it in the strongest way
+		// possible. Big guards on closing a box."*, and, reading the first repair the same day,
+		// *"What about mouse away and I don't click away, then I press Esc? ... very severe against
+		// accidental Esc closures."*). `escapeOwnsBox()` in js/looped-network.js asks both questions
+		// and closes only when they agree; the guard's own logic is mutation-tested headlessly in
+		// dev/lpn-spike/escape-focus-harness.js (added alongside the guard, bdf0b552). What a
+		// browser-only harness cannot see is whether the REAL page wires a REAL click and a REAL key
+		// the same way that harness's stub does, so that is what this checks.
+		//
+		// First, from where the drag/resize probes above left the mouse: focus is on nothing inside
+		// the box (a drag never focuses anything) and the pointer is wherever the last drag ended,
+		// so Escape must leave the box exactly alone.
+		await a.page.keyboard.press('Escape');
 		await a.settle(300);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_settings_box').style.display === 'none'), 'Escape closes it');
+			document.getElementById('lpn_settings_box').style.display === 'flex'),
+			'Escape from outside does NOT close it — focus and pointer both have to be on the box');
+		// A real click into the box's own filter field puts both focus and the pointer on it in the
+		// same real mouse gesture (the filter is empty, so its own Escape-clears-first handler is a
+		// no-op and this key reaches the document handler). That is the one case the ruling closes.
+		const filterBox = await a.page.evaluate(() => {
+			const r = document.getElementById('lpn_setbox_filter').getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		});
+		await a.page.mouse.click(filterBox.x, filterBox.y);
+		await a.settle(200);
+		await a.page.keyboard.press('Escape');
+		await a.settle(300);
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_settings_box').style.display === 'none'),
+			'...and Escape closes it once focus and the pointer are both really on it');
 
 		// ---- 5. the right pane has NO DOOR, which is the point ------------------------------
 		//
