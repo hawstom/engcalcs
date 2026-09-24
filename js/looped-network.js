@@ -29021,10 +29021,13 @@ var EngCalcs = EngCalcs || {};
 	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
 	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
 	// **THE LABEL COLUMN (Task 696), ONE UNIT FAMILY PER ROUNDING ROW.** Read to pre-fill the box
-	// (' ' + the unit's own display text, matching a shipped quality suffix's own leading space --
+	// (' ' + the unit's own DISPLAY TEXT -- the option's textContent, what the dropdown itself
+	// shows, never its value/name -- matching a shipped quality suffix's own leading space --
 	// labelDefaultSuffix()) and to know which cloned select's change should refresh which row.
-	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', depth: 'lpn_u_elevhead',
-		flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
+	// **DEPTH IS DELIBERATELY ABSENT.** Its box is disabled in Looped-Network.php -- tank level has
+	// no per-field label suffix to write into (see the comment there) -- so there is nothing to
+	// pre-fill it from.
+	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
 	// Sees an edit that started from the user, not from a pre-fill, so a row they typed into is
 	// never overwritten by a later unit change. Reset each time the box opens.
 	var convasSuffixDirty = {};
@@ -29037,12 +29040,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **ONLY A ROW THE USER HAS NOT TOUCHED YET REPAINTS**, so a preset click or a per-field unit
 	// change keeps every box in step with what it would say fresh, without clobbering a suffix
-	// somebody already typed.
+	// somebody already typed. A disabled row (depth) is skipped outright.
 	function refreshConvasSuffixPrefill() {
 		LPN_CONVAS_ROUND.forEach(function (k) {
 			if (convasSuffixDirty[k]) { return; }
 			var el = document.getElementById('lpn_convas_suffix_' + k), u = convasSuffixUnitClone(LPN_CONVAS_SUFFIX_UNIT[k]);
-			if (!el || !u || !u.sel || !u.sel.options.length) { return; }
+			if (!el || el.disabled || !u || !u.sel || !u.sel.options.length) { return; }
 			el.value = ' ' + u.sel.options[u.sel.selectedIndex].textContent;
 		});
 	}

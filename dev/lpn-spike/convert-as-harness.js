@@ -306,15 +306,31 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			String(byId.lpn_convas_from.className || '').indexOf('lpn-dim') < 0,
 			JSON.stringify(byId.lpn_convas_from.className));
 
-		// The stub's option text IS the unit key (mkUnitSelect in lpn-dom-stub.js), so the pre-fill
-		// is checked against the same keys setUnitSet('us') chose: in, fth2o (twice), gpm.
-		ok('the Label column pre-fills from this project\'s own (US) units',
+		// **THE PRE-FILL IS THE OPTION'S DISPLAY TEXT, NEVER THE UNIT'S NAME.** lpn-dom-stub.js reads
+		// this off lib/lang.ec.en.php's own $ec_lang['u_*'] values, exactly as echoUnitSelect() does
+		// for the real page, so this is the same text a reader sees in the dropdown itself -- not
+		// the raw stored key ('fth2o'), which pre-review caught the box showing.
+		ok('the Label column pre-fills from this project\'s own (US) units, in DISPLAY text',
 			byId.lpn_convas_suffix_diameter.value === ' in' &&
-			byId.lpn_convas_suffix_head.value === ' fth2o' &&
-			byId.lpn_convas_suffix_depth.value === ' fth2o' &&
+			byId.lpn_convas_suffix_head.value === ' ft H2O' &&
 			byId.lpn_convas_suffix_flow.value === ' gpm',
 			JSON.stringify({ diameter: byId.lpn_convas_suffix_diameter.value, head: byId.lpn_convas_suffix_head.value,
-				depth: byId.lpn_convas_suffix_depth.value, flow: byId.lpn_convas_suffix_flow.value }));
+				flow: byId.lpn_convas_suffix_flow.value }));
+		// The raw unit id and its display text happen to agree for diameter/flow's US units ('in',
+		// 'gpm' print unchanged), so head -- whose US unit id 'fth2o' reads 'ft H2O' -- is the row
+		// that actually proves textContent, not value, was read.
+		ok('...and head is NOT the raw unit id: its display text differs from it, and the box shows the text',
+			byId.lpn_convas_suffix_head.value !== ' ' + a0().units.lpn_u_elevhead,
+			byId.lpn_convas_suffix_head.value + ' vs raw id ' + a0().units.lpn_u_elevhead);
+		function a0() { return L.convasAnswers(); }
+
+		// **DEPTH IS DISABLED, NOT PRE-FILLED.** Tank level (`level`) is not one of nodeFieldDefs()'s
+		// rows -- no per-field label suffix exists to write it into -- and Looped-Network.php marks
+		// the box `disabled` rather than inventing a setting (see the comment there for the measured
+		// cost of adding one).
+		ok('the Depth Label box is disabled and stays blank', byId.lpn_convas_suffix_depth.disabled === true &&
+			byId.lpn_convas_suffix_depth.value === '', JSON.stringify({ disabled: byId.lpn_convas_suffix_depth.disabled,
+				value: byId.lpn_convas_suffix_depth.value }));
 
 		// Typing into one row marks it dirty; a preset click afterward must leave that row alone
 		// while still repainting the untouched ones.
@@ -323,12 +339,15 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		fire(byId.lpn_convas_si, 'click');
 		ok('a typed row survives a unit preset click', byId.lpn_convas_suffix_diameter.value === ' custom',
 			byId.lpn_convas_suffix_diameter.value);
-		ok('...and an untouched row repaints to the new (SI) unit',
-			byId.lpn_convas_suffix_flow.value === ' lps', byId.lpn_convas_suffix_flow.value);
+		ok('...and an untouched row repaints to the new (SI) unit, again in display text',
+			byId.lpn_convas_suffix_flow.value === ' L/s', byId.lpn_convas_suffix_flow.value);
+		ok('...and that is not the raw id either (SI flow is "lps", shown as "L/s")',
+			byId.lpn_convas_suffix_flow.value !== ' ' + a0().units.lpn_u_flow,
+			byId.lpn_convas_suffix_flow.value + ' vs raw id ' + a0().units.lpn_u_flow);
 
 		const a = L.convasAnswers();
-		ok('convasAnswers() carries the four suffix boxes', a.suffix.diameter === ' custom' &&
-			a.suffix.flow === ' lps', JSON.stringify(a.suffix));
+		ok('convasAnswers() carries the three live suffix boxes', a.suffix.diameter === ' custom' &&
+			a.suffix.flow === ' L/s' && a.suffix.depth === '', JSON.stringify(a.suffix));
 
 		L.runConvertAs(a);
 		const ls = L.labelSettings();
@@ -341,6 +360,39 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			JSON.stringify({ node: ls.suffix.node.demand, customer: ls.suffix.customer.demand }));
 		ok('depth (tank level) has no per-field label suffix to write into, so nothing was invented',
 			ls.suffix.node.level === undefined, JSON.stringify(ls.suffix.node));
+	}
+
+	console.log('\n--- 8. Untouched: pressing Convert without touching a Label box still writes the pre-fill ---');
+	{
+		function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({ target: el }); }); }
+		setUnitSet('us');
+		L.newProject(null, '');
+		const R = L.addNode('reservoir', 0, 0);
+		const A = L.addNode('junction', 1000, -500);
+		R._head = 250; A.elev = 100; A._demand = 50;
+		const p1 = L.addLink('pipe', R.id, A.id);
+		p1._diameter = 8;
+		L.saveToStorage();
+
+		// Open, switch straight to SI (the one thing a person is likely to do before pressing
+		// Convert), and press Convert without ever touching a Label box.
+		L.openConvertAsBox();
+		fire(byId.lpn_convas_si, 'click');
+		const a = L.convasAnswers();
+		ok('every Label box the wizard can fill is untouched and still holds the SI pre-fill',
+			a.suffix.diameter === ' mm' && a.suffix.head === ' m H2O' && a.suffix.flow === ' L/s' && a.suffix.depth === '',
+			JSON.stringify(a.suffix));
+
+		L.runConvertAs(a);
+		const ls = L.labelSettings();
+		// **THIS IS THE CURRENT, INTENDED BEHAVIOUR, PENDING TOM'S WORD** (per the brief for this
+		// change): a wizard run nobody touched the Label column on still writes the pre-filled unit
+		// text into the new project, exactly as if the user had accepted what was already showing.
+		ok('...and Convert wrote that pre-fill through, unedited, into the new project\'s labels',
+			ls.suffix.link.diameter === ' mm' && ls.suffix.node.head === ' m H2O' &&
+			ls.suffix.node.demand === ' L/s' && ls.suffix.customer.demand === ' L/s',
+			JSON.stringify({ diameter: ls.suffix.link.diameter, head: ls.suffix.node.head,
+				demand: ls.suffix.node.demand, customerDemand: ls.suffix.customer.demand }));
 	}
 
 	console.log('');

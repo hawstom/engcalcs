@@ -1486,9 +1486,20 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // Two columns (Tom, 2026-09-23): Round converted values, unchanged, and Label -- a
 		      // suffix appended after that quantity on the copy's own map labels, through the same
 		      // per-field labelSettings.suffix a Labels row already writes (js/looped-network.js
-		      // setLabelAffix()), pre-filled from the unit chosen above. Depth (tank level) has no
-		      // such field to write into -- see dev/lpn-spike/convert-as-harness.js's note on it --
-		      // so that one box is filled and readable but goes nowhere yet. ?>
+		      // setLabelAffix()), pre-filled from the unit chosen above.
+		      //
+		      // **DEPTH (TANK LEVEL) HAS NO SUCH FIELD, AND ITS BOX IS DISABLED RATHER THAN
+		      // INVENTING ONE.** `level` is not one of nodeFieldDefs()'s rows. Making it one was
+		      // measured, not guessed: it touches defaultLabelSettings() in four places (the node
+		      // on/off map, its decimals map, and a RENUMBER of the seven-entry node priority rank
+		      // -- Task 445's drop order, which dev/lpn-spike/label-priority-harness.js and
+		      // node-shed-harness.js assert invariants over and would need new fixtures for), a new
+		      // LPN_NODE_DROP_RULE classification (a judgement call among 'like'/'low'/'extreme',
+		      // not mechanical), nodeFieldDefs() itself, and the value computed and pushed in BOTH
+		      // node label render paths (refreshLabelTextPass() and the single-element
+		      // refreshOneLabelInPlace() the stale-snapshot ruling requires) -- eight-plus touch
+		      // points across the map's core render and collision path, for a feature (a new kind of
+		      // map label) Tom has not asked for. That is Tom's call, not this wizard's. ?>
 		<fieldset class="lpn-new-block">
 			<legend><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></legend>
 			<div class="lpn-convas-round-head">
@@ -1504,7 +1515,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
 					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
 				</select>
+				<?php if ($rk === 'depth') { ?>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" disabled aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>"><?=ecTipLabel('', $ec_lang['lpn_convas_label_depth_na'])?>
+				<?php } else { ?>
 				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
+				<?php } ?>
 			</div>
 			<?php } ?>
 		</fieldset>

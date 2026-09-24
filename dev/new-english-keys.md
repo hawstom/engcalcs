@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**27 still to read on master**, of 208 untranslated keys, of 2056 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**28 still to read on master**, of 209 untranslated keys, of 2057 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (208, 27 to read @@ NEEDS RULING)
+## lpn_  (209, 28 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -47,6 +47,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
@@ -656,7 +659,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**39 still to read**, of 62 new keys across 7 unmerged branch(es).
+**46 still to read**, of 69 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -667,7 +670,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`fcf23dd8`) — adds no English strings
+### feat/convert-as (`ab6ad007`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 41 new, 18 to read @@ NEEDS RULING
 
@@ -795,13 +798,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`c949316e`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/label-limit (`1bbcae1d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
   @@ NEEDS RULING
 - **`lpn_file_import_geo_tip`**
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+
+### feat/offscreen-notice (`3dcd3e8d`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
   @@ NEEDS RULING
 
 ### feat/property-venue (`1066860e`) — 2 new, 2 to read @@ NEEDS RULING
@@ -813,13 +828,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
 
-### feat/table-editing (`388e56c6`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/table-editing (`894a1525`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
   @@ NEEDS RULING
 - **`lpn_file_import_geo_tip`**
   > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_notes_6_def`**
+  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
   @@ NEEDS RULING
 - **`lpn_pane_filldown`**
   > Fill down
@@ -830,11 +854,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_hide_col`**
   > Hide this column
   @@ NEEDS RULING
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
+  @@ NEEDS RULING
 - **`lpn_pane_show_col`**
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`7ac181c1`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/zoom-control (`1373951a`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -864,7 +891,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
 
-### fix/table-print (`b2126819`) — 2 new, 2 to read @@ NEEDS RULING
+### fix/table-print (`a7a9395e`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
