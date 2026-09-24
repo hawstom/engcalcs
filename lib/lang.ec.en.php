@@ -1017,15 +1017,15 @@ $ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minut
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='The smallest of EPANET’s own three sample networks: one reservoir, a pump and a single loop.';
+$ec_lang['lpn_ex_net1_desc']='The smallest of EPANET’s own three example networks: one reservoir, a pump and a single loop.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s samples.';
+$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s examples.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET’s large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
+$ec_lang['lpn_ex_net3_desc']='EPANET’s large example: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='The same network as EPANET Net3, put down at an arbitrary place on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.';
+$ec_lang['lpn_ex_net3_world_desc']='The EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1714,9 +1714,9 @@ $ec_lang['lpn_new_coords']='Coordinates';
 // the correct untranslated state. Whether they are debt is a judgement call and Tom's.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
 $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.';
-$ec_lang['lpn_new_coordsys_geo']='Geographic projection';
+$ec_lang['lpn_new_coordsys_geo']='Coordinate system';
 $ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
-$ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
+$ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom coordinate system';
 $ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image, or the world map, at any time from the Map menu. Your coordinates never change when you do.';
 // ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
@@ -3102,7 +3102,7 @@ $ec_lang['lpn_settings_quality_source_tip']='The node whose water is traced. Eve
 $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
-$ec_lang['lpn_quality_chemical']='A chemical that reacts';
+$ec_lang['lpn_quality_chemical']='A reactive chemical';
 $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation. Set a Total run time under Time, then press the Calculate button.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a

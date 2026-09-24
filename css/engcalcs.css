@@ -2664,8 +2664,25 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    lesson, as Task 435: the box model is not addable by hand. Height has no such floor -- a short
    box just scrolls -- so 18rem is only enough to keep the search field and a row of content in
    view. */
+/* **34rem -> 26.965rem, PC ONLY (R-204; Tom, 2026-09-24): "the main pane could be 70% of what it
+   now is ... It has a hard minimum that seems perfectly acceptable to me, and maybe we could use
+   that as the initial default."** Measured in Chromium rather than argued, the same way 25rem
+   above was: at the shipped 34rem the content pane is 410.4 px; the box's own 25rem floor squeezes
+   it to 266.4 px (16.65rem) when the index (below) still took its OLD 6.6rem. 0.7 x 410.4 = 287.3 px
+   (17.955rem), which is LARGER than that floor, so 70% is what ships -- the floor stays exactly
+   where it was, only the STARTING width moves.
+
+   26.965rem is 7.26rem of index (its own new figure, below) + 1.75rem of fixed overhead (16 px
+   padding + 2 px border + the 10 px effective gap the divider's negative margins reduce to, all
+   measured on the rule above's own numbers) + 17.955rem of content: 7.26 + 1.75 + 17.955 = 26.965.
+
+   THE FIRST-TIME WIDTH ONLY, exactly as 34rem was: setboxLayout.w remembers whatever the user has
+   already dragged, and this rule never fires against a stored width. PC only, the same viewport
+   split every other PC/phone difference in this box uses -- @media (max-width: 640px) below
+   overrides the index unconditionally and the box's own min(_, 94vw) already governs a phone, so
+   this base rule only ever reaches a screen wider than that. */
 .lpn-setbox {
-	width: min(34rem, 94vw);
+	width: min(26.965rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -2777,9 +2794,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    **AND IT GAVE BACK A TENTH, 6.6rem** (Tom, 2026-08-23, having now used the narrowed box on a PC:
    "Settings.index 1.1"). The 0.8 above was decided sight-unseen; this is the correction after
    looking at it. PC ONLY -- the phone figure he asked about in the same breath went the other way
-   and is unchanged at 4.5rem. */
+   and is unchanged at 4.5rem.
+
+   **AND 10% WIDER AGAIN, 7.26rem** (R-204; Tom, 2026-09-24: "the index pane 10% wider than now").
+   6.6 x 1.1 = 7.26. PC only, same as the step above -- the phone override at the foot of this file
+   derives its own figure from ITS OWN 4.5rem and is untouched. */
 .lpn-setbox-index {
-	flex: 0 0 6.6rem; min-width: 0; overflow: auto;
+	flex: 0 0 7.26rem; min-width: 0; overflow: auto;
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
