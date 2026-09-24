@@ -106,27 +106,28 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // pair is as wide as the longer of its two halves instead of their sum, so the whole strip
 	      // wraps into a couple of tidy rows inside a sensible box.
 	      //
-	      // A <span> per pair, not a <label>: echoUnitSelect() emits a `name=` and no `id=`, so a
-	      // <label for> has nothing to point at and a wrapping <label> would make the name text a
-	      // second click target for the select -- which on a narrow box means a stray tap opens a
-	      // dropdown the user was only reading. ?>
+	      // A <span> per pair, not a <label>: a wrapping <label> would make the name text a second
+	      // click target for the select -- which on a narrow box means a stray tap opens a dropdown
+	      // the user was only reading. Each select still gets its accessible name (ROADMAP Task 685)
+	      // from the same string this span shows, passed straight to echoUnitSelect() as aria-label
+	      // rather than tied through the span's id -- one fewer id to keep in sync with the name. ?>
 	<div class="d-print-none" id="lpn_units_strip">
 		<div id="lpn_units_all" class="lpn-units-group">
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', '', $ec_lang['lpn_units_length']); ?></span>
 		<?php // DERIVED AND READ-ONLY (Task 693, in 696): what the coordinates are in, which is a fact
 		      // the coordinate system states rather than a choice. No select, so nothing clones it
 		      // and nothing converts through it. Filled by refreshMapCoordsUnit(). ?>
 		<span class="lpn-units-item" id="lpn_u_mapcoords_row"><span class="lpn-units-name"><?=$ec_lang['lpn_units_mapcoords']?></span><span id="lpn_u_mapcoords" class="lpn-units-derived"></span></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', '', $ec_lang['lpn_field_diameter']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', '', $ec_lang['lpn_units_elevhead']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', '', $ec_lang['lpn_units_pressure']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', '', $ec_lang['lpn_units_flow']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', '', $ec_lang['lpn_units_velocity']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', '', $ec_lang['lpn_result_gradient']); ?></span>
 		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
 		      // typed in hours. A source share is a percentage and has no selector at all. ?>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', ''); ?></span>
-		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', '', $ec_lang['lpn_result_water_age']); ?></span>
+		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', '', $ec_lang['lpn_field_roughness']); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
@@ -238,7 +239,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
 	      // fixed center-screen placement. ?>
 	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
-		<?=$ec_lang['lpn_backdrop_target_label']?>
+		<label for="lpn_backdrop_target_mode"><?=$ec_lang['lpn_backdrop_target_label']?></label>
 		<select id="lpn_backdrop_target_mode">
 			<option value="node"><?=$ec_lang['lpn_backdrop_target_node']?></option>
 			<option value="free"><?=$ec_lang['lpn_backdrop_target_free']?></option>

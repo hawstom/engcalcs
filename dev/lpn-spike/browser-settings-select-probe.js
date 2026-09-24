@@ -56,6 +56,12 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
   const probes = [
     ['Quality', "document.querySelector('#lpn_set_quality_fields select')", ['age', 'none']],
     ['Unit (pressure)', "document.querySelector('select[name=lpn_u_pressure]')", null],
+    // Task 653, LEFT half: flow and length join pressure so the unit-select fix is measured on
+    // more than one quantity -- flow is a RESULT unit (LPN_RESULT_UNIT), length is a stored-value
+    // unit that is never a coordinate (see afterUnitChange()'s comment), so between the three every
+    // kind of thing a unit can decide is exercised.
+    ['Unit (flow)', "document.querySelector('select[name=lpn_u_flow]')", null],
+    ['Unit (length)', "document.querySelector('select[name=lpn_u_length]')", null],
     ['Colour nodes by', "document.getElementById('lpn_set_color_node')", null]
   ];
   // COUNT=1 counts label passes with a conditional breakpoint that never stops (the condition
@@ -96,8 +102,21 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
         s.value = v;
         s.dispatchEvent(new Event('input', { bubbles: true }));
         s.dispatchEvent(new Event('change', { bubbles: true }));
-        var t1 = performance.now();
-        return JSON.stringify({ to: v, sync: Math.round(t1 - window.__t0), passesSync: window.__lp || 0 });
+        var t1 = performance.now(), dialogged = false;
+        // A UNIT SELECT SERVING A FIELD THIS PROJECT HAS VALUES IN opens the Non-destructive /
+        // Destructive question (onUnitChange()) instead of acting at once -- the select is put
+        // BACK to its old value until it is answered, so the real cost this probe wants is not in
+        // the dispatch above but in the button click below. Non-destructive (the first button, and
+        // the suite's standing default) is what a hand reaches for, so that is what is timed.
+        var dlg = document.getElementById('lpn_dialog');
+        if (dlg && dlg.style.display !== 'none') {
+          dialogged = true;
+          var btn = document.querySelector('#lpn_dialog_buttons button');
+          window.__t0 = performance.now();
+          if (btn) { btn.click(); }
+          t1 = performance.now();
+        }
+        return JSON.stringify({ to: v, dialogged: dialogged, sync: Math.round(t1 - window.__t0), passesSync: window.__lp || 0 });
       })()`);
       await sleep(3000);
       const prof = await send('Profiler.stop');
