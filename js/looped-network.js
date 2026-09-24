@@ -20808,25 +20808,108 @@ var EngCalcs = EngCalcs || {};
 	function paneHeadSelClear(spec) {
 		spec.headSel = [];
 		spec.headSelAnchor = null;
-		paneHeadSelPaint(spec);
+		paneHeadSelApply(spec);
+	}
+	/**
+	 * **SELECTED COLUMNS ARE A SELECTION OF CELLS, NOT A SECOND KIND OF SELECTION** (Tom,
+	 * 2026-09-24, R-221: *"I only like this solution if it's spreadsheet-like. This would mean that
+	 * entire heading cells or columns highlight and that I can use the mouse to drag through
+	 * multiple columns in usual Select manner."*). A spreadsheet has one selection: selecting a
+	 * column selects every cell in it, and pressing on a cell afterwards replaces it. So this writes
+	 * the columns into `spec.sel` as a full-height rectangle whenever they are side by side -- which
+	 * is what Copy, Delete and fill-down already read -- and paneSelPaint() washes every cell of
+	 * every selected column, contiguous or not, and lights the headings with them.
+	 *
+	 * `spec.headSelSig` is the rectangle as this wrote it. Anything else that moves the selection
+	 * afterwards (a click on a cell, an arrow, Ctrl+A) changes `spec.sel`, paneSelPaint() sees that
+	 * it no longer matches, and the column selection is over -- one rule for every writer instead
+	 * of a clear call in each of them.
+	 */
+	function paneHeadSelApply(spec) {
+		var sel = paneHeadSel(spec), cols = paneCols(spec), rows, idx, lo, hi, a, contiguous;
+		rows = paneTableRowsInOrder(spec);
+		if (sel.length && rows.length) {
+			idx = sel.map(function (k) { return paneIndexOfKey(cols, k); }).filter(function (i) { return i >= 0; });
+			idx.sort(function (x, y) { return x - y; });
+			lo = idx[0]; hi = idx[idx.length - 1];
+			contiguous = idx.length > 0 && hi - lo + 1 === idx.length;
+			if (contiguous) {
+				a = paneIndexOfKey(cols, spec.headSelAnchor);
+				if (a < lo || a > hi) { a = lo; }
+				spec.sel = { aId: rows[0].id, aKey: cols[a].key, fId: rows[rows.length - 1].id,
+					fKey: cols[a === hi ? lo : hi].key };
+			} else {
+				spec.sel = null;
+			}
+			spec.headSelSig = JSON.stringify(spec.sel);
+		} else {
+			spec.headSelSig = null;
+		}
+		paneSelPaint(spec, rows, cols);
 	}
 	// **CTRL/CMD+CLICK TOGGLES ONE HEADING; SHIFT+CLICK EXTENDS A RANGE FROM THE LAST ONE
 	// TOUCHED** -- the same two idioms the body cells already answer to (paneSelSet's `ext`), so a
 	// reader who has selected a row range with Shift+click already knows the heading gesture too.
+	// **THE ANCHOR OUTLIVES A PLAIN CLICK**, which is the reason only one column hid (R-221). A
+	// plain click sorts and selects nothing, and it used to leave no anchor either -- so the
+	// ordinary spreadsheet gesture, click one heading and Shift+click another, selected only the
+	// second one, and a right-click then offered "Hide this column" for it alone. The click now
+	// leaves its column as the anchor, and Shift+click extends from there.
 	function paneHeadSelRange(spec, key) {
 		var keys = paneCols(spec).map(function (c) { return c.key; }),
 			i0 = spec.headSelAnchor ? keys.indexOf(spec.headSelAnchor) : -1, i1 = keys.indexOf(key), lo, hi;
-		if (i0 < 0) { i0 = i1; }
+		if (i0 < 0) { i0 = i1; spec.headSelAnchor = key; }
 		if (i1 < 0) { return; }
 		lo = Math.min(i0, i1); hi = Math.max(i0, i1);
 		spec.headSel = keys.slice(lo, hi + 1);
-		paneHeadSelPaint(spec);
+		paneHeadSelApply(spec);
 	}
 	function paneHeadSelToggle(spec, key) {
-		var sel = paneHeadSel(spec), i = sel.indexOf(key);
+		var sel = paneHeadSel(spec), i;
+		// Ctrl+click on a heading while CELLS are selected starts a column selection afresh: the
+		// two are one selection, and adding a column to a cell range is not a thing a table has.
+		if (!spec.headSelSig || spec.headSelSig !== JSON.stringify(spec.sel)) { spec.headSel = sel = []; }
+		i = sel.indexOf(key);
 		if (i === -1) { sel.push(key); } else { sel.splice(i, 1); }
 		spec.headSelAnchor = key;
-		paneHeadSelPaint(spec);
+		paneHeadSelApply(spec);
+	}
+	/**
+	 * **PRESS ON A HEADING AND DRAG ACROSS OTHERS TO SELECT THEM** (R-221). The press itself selects
+	 * nothing, so a click that never leaves its heading is still the sort Tom approved; the first
+	 * time the pointer crosses into another heading, the range from the pressed one to that one is
+	 * selected, and it follows the pointer until the button comes up. `spec.headDragged` then eats
+	 * the click the browser sends when the button is released over the heading it started on.
+	 * Returns the handlers so a harness can drive them.
+	 */
+	function paneStartHeadSelDrag(spec, key, ev) {
+		var moved = false;
+		if (ev && ev.button) { return null; }
+		function move(e2) {
+			var th = paneThOfEvent(e2 && e2.target), keys, i0, i1;
+			if (e2 && typeof e2.buttons === 'number' && !(e2.buttons & 1)) { up(); return; }
+			if (!th || !th._lpnColKey || (!moved && th._lpnColKey === key)) { return; }
+			keys = paneCols(spec).map(function (c) { return c.key; });
+			i0 = keys.indexOf(key); i1 = keys.indexOf(th._lpnColKey);
+			if (i0 < 0 || i1 < 0) { return; }
+			moved = true;
+			spec.headSelAnchor = key;
+			spec.headSel = keys.slice(Math.min(i0, i1), Math.max(i0, i1) + 1);
+			paneHeadSelApply(spec);
+			if (e2.preventDefault) { e2.preventDefault(); }
+		}
+		function up() {
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+			if (moved) {
+				spec.headDragged = true;
+				// A release outside every heading sends no click at all, so nothing would clear it.
+				setTimeout(function () { spec.headDragged = false; }, 0);
+			}
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+		return { move: move, up: up };
 	}
 	function paneHeadSelClick(spec, key, ev) {
 		if (ev && ev.shiftKey) { paneHeadSelRange(spec, key); } else { paneHeadSelToggle(spec, key); }
@@ -21316,16 +21399,28 @@ var EngCalcs = EngCalcs || {};
 			// cells to hide multiple columns at once?"*). A plain click still sorts, and drops
 			// whatever was selected, exactly as a plain click on an unmodified cell would.
 			b.addEventListener('click', function (ev) {
+				// The release that ends a drag-select is not a click on the heading it ended over.
+				if (spec.headDragged) { spec.headDragged = false; return; }
 				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { paneHeadSelClick(spec, c.key, ev); return; }
 				if (paneHeadSel(spec).length) { paneHeadSelClear(spec); }
+				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
 				sortPaneTable(spec, c.key);
 			});
-			// **DRAGGING THE HEADING MOVES THE COLUMN** (Tom's point (e)). It is a mousedown on the
-			// heading rather than a drag handle of its own: the heading IS the handle, which is what
-			// he asked for and what every spreadsheet does. A click that never moves is still a
-			// sort, because the reorder only commits once the pointer has crossed into another
-			// heading -- so the two gestures cannot be confused by a hand that is not quite still.
-			b.addEventListener('mousedown', function (ev) { paneStartColDrag(spec, c.key, ev); });
+			// **DRAGGING ACROSS HEADINGS SELECTS THEM; DRAGGING A SELECTED ONE MOVES IT** (R-221, and
+			// Tom's earlier point (e)). Both are a press on the heading, so what is under the press
+			// decides, as it does in Google Sheets: a heading that is not selected starts a
+			// selection, and a heading that already is selected is picked up and moved. A click that
+			// never leaves its heading is still a sort either way. A modified press is the click
+			// handler's business (Ctrl/Cmd toggles, Shift extends), and the press must not also
+			// start a drag or select characters.
+			b.addEventListener('mousedown', function (ev) {
+				if (ev && ev.button) { return; }
+				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
+				if (paneHeadSel(spec).indexOf(c.key) !== -1) { paneStartColDrag(spec, c.key, ev); return; }
+				if (ev && ev.preventDefault) { ev.preventDefault(); }
+				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
+				paneStartHeadSelDrag(spec, c.key, ev);
+			});
 			th.appendChild(b);
 			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
 			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
@@ -21359,7 +21454,7 @@ var EngCalcs = EngCalcs || {};
 				if (sel.length <= 1 || sel.indexOf(c.key) === -1) {
 					spec.headSel = [c.key];
 					spec.headSelAnchor = c.key;
-					paneHeadSelPaint(spec);
+					paneHeadSelApply(spec);
 				}
 				paneOpenColMenu(spec, ev.clientX || 0, ev.clientY || 0, c.key);
 			});
@@ -21687,8 +21782,27 @@ var EngCalcs = EngCalcs || {};
 	 * cells were already lit.
 	 */
 	function paneSelPaint(spec, rows, cols) {
-		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {},
-			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey;
+		var box, tds = spec.tds || {},
+			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey, hs, ak;
+		// A column selection that something else has since replaced is over (paneHeadSelApply()).
+		if (spec.headSel && spec.headSel.length && spec.headSelSig !== JSON.stringify(spec.sel)) {
+			spec.headSel = [];
+			spec.headSelSig = null;
+		}
+		hs = (spec.headSel && spec.headSel.length) ? spec.headSel : null;
+		box = paneSelBox(spec, rows, cols);
+		if (hs && !box) {
+			// Columns that are not side by side: no rectangle to hold them, so they are painted
+			// from the list. The top cell of the anchor column carries the border, as a range's
+			// starting cell does.
+			ak = spec.headSelAnchor;
+			rows.forEach(function (el2, r2) {
+				hs.forEach(function (k) {
+					if (paneIndexOfKey(cols, k) < 0) { return; }
+					now[el2.id + '\u0000' + k] = (r2 === 0 && k === ak) ? 'selcur' : 'sel';
+				});
+			});
+		}
 		if (box) {
 			// **ONE CELL IS NEVER WASHED, AND A WASH ALWAYS MEANS A RANGE** (Tom, 2026-09-19:
 			// *"In Navigate mode, there should be no blue shading, since that's reserved for Select
@@ -21733,6 +21847,7 @@ var EngCalcs = EngCalcs || {};
 			if (now[key] !== 'sel') { td.classList.add('lpn-pane-cur'); }
 		}
 		spec.painted = now;
+		paneHeadSelPaint(spec);
 	}
 	function paneTdByPaintKey(tds, key) {
 		var cut = key.indexOf('\u0000'), id = key.slice(0, cut), col = key.slice(cut + 1);

@@ -243,12 +243,22 @@ console.log('\n--- R-110: a drag starts from the width on screen ---');
 	}
 }
 
-console.log('\n--- (e) dragging a heading moves the column ---');
+// **A SELECTED HEADING IS THE ONE THAT MOVES** (R-221, 2026-09-24). Dragging across headings that
+// are not selected now selects them, the spreadsheet way (dev/browser-pass/specs/colselect.js
+// drives that with real mouse events); a heading already selected is picked up and moved, as in
+// Google Sheets.
+console.log('\n--- (e) dragging a SELECTED heading moves the column ---');
 {
 	const before = L.colKeys('junctions');
 	const from = 'elev', to = before[before.length - 1];
 	report(before.indexOf(from) < before.indexOf(to), 'the two columns start in this order',
 		before.indexOf(from) + ' < ' + before.indexOf(to));
+	fire(sortBtnOf(from), 'mousedown', { button: 0 });
+	docFire('mousemove', { target: sortBtnOf(to) });
+	docFire('mouseup', {});
+	report(L.colKeys('junctions').join() === before.join(),
+		'dragging an UNSELECTED heading across others moves nothing -- it selects');
+	fire(sortBtnOf(from), 'click', { ctrlKey: true });
 	fire(sortBtnOf(from), 'mousedown', { button: 0 });
 	docFire('mousemove', { target: sortBtnOf(to) });
 	docFire('mouseup', {});

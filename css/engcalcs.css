@@ -2370,7 +2370,9 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    multiple heading cells to hide multiple columns at once?"*). The same wash the body cells use
    for their own selection (`.lpn-pane-table tbody td.lpn-pane-sel`), so a reader who already knows
    what a selected cell looks like recognises a selected heading without being told twice. */
-.lpn-pane-table thead th.lpn-pane-head-sel { background: #e8f0fe; }
+/* One shade deeper than the cells beneath it, as a spreadsheet's selected column heading is, so
+   the column reads as selected from the top down (R-221). */
+.lpn-pane-table thead th.lpn-pane-head-sel { background: #d3e3fd; }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
    <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
@@ -2557,10 +2559,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	cursor: col-resize; user-select: none;
 }
 .lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, #8ab 5px, #8ab 6px, transparent 6px); }
-/* A heading is draggable left and right (his point (e)), so it says so under the pointer. `grab`
-   rather than `move`: the column is not going anywhere until it is picked up. */
-.lpn-pane-sort { cursor: grab; }
-.lpn-pane-sort:active { cursor: grabbing; }
+/* A press on a heading that is not selected SELECTS (a drag across headings takes the range,
+   R-221) and a click on it sorts, so it wears the ordinary pointer. A SELECTED heading is the one
+   that picks up and moves (his point (e)), so it says so under the pointer. `grab` rather than
+   `move`: the column is not going anywhere until it is picked up. */
+.lpn-pane-sort { cursor: pointer; }
+.lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
+.lpn-pane-head-sel .lpn-pane-sort:active { cursor: grabbing; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
