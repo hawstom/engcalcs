@@ -1714,3 +1714,52 @@ toolbar is not that control and should go back to naming one instant, for exampl
 than `24:00 - 25:00`.
 
 — Mary
+
+## 2026-09-24 — R-210: EPANET gap audit before the EPANET++ release
+
+Tom's question via the orchestrator: a deep pass through EPANET Help to find anything EPANET has
+that `lpn_` does not, excluding graphs (Task 600). Full table, ranked gaps, and the "does this bear
+on the EPANET++ name" question are in `dev/agents/market-researcher/epanet-gap-audit.md` — not
+duplicated here in full; this entry is the pointer plus the two findings worth carrying independent
+of that file.
+
+**OBSERVED, and the most consequential single thing this pass found: `dev/looped-network-
+calculator-scope.md`'s "Cut, not deferred" list is stale on two items, not superseded-in-place the
+way tank/PRV/PSV/FCV already were.** It still reads (checked today) "Water quality, in every form
+(age, trace, chlorine decay, multi-species)" as permanently cut, and "PBV and GPV stay cut." Both
+are false today: `js/looped-network.js:40531-40535` and `js/lpn-epanet.js` ship single-chemical
+water quality (age, source trace, a reacting chemical) through the EPANET engine, confirmed in the
+page's own visitor-facing Notes text (`lib/lang.ec.en.php:2120`, `lpn_notes_2_def`: "Water quality is
+modeled..."); GPV and PBV are both real valve types with `.inp` round-trip, closed under ROADMAP
+Tasks 586/588 (`dev/roadmap-closed-ids.md:558-559`). Multi-species (EPANET-MSX) genuinely is absent
+(grepped, zero hits) — so the honest present-tense sentence is "single-chemical, not multi-species,"
+not "water quality is cut." I have not edited that doc — out of this seat's write access — flagging
+it here so whoever next touches it makes the same edit that already happened for tank/PRV/PSV/FCV
+in that same section.
+
+**The ranked short list (audit file §3), independent of build-cost sizing, in order: Full Report
+export, Status Report (narrative of run-time status changes), Calibration (already Task 601, this
+pass adds nothing new), `.PRO` profile import (already Task 604, ditto), Meter-on-a-label (already
+Task 482, deliberately deferred, ditto), multi-species water quality (low priority for this suite's
+actual audience), an overview/locator inset (low priority at the 10-20 node target scale), and
+multiple document windows (not a real gap — browser tabs already answer the same need).** Full
+reasoning and cost notes for each are in the audit file; not repeating them here.
+
+**On the EPANET++ name (Tom's stated reason for asking):** this pass supports, and if anything
+understates, his own argument in `dev/positioning.md` §6 that the suite is "an extension of EPANET
+with scenarios, fire flow, libraries, and more" — the multi-scenario compare tool in particular has
+no first-class equivalent in EPANET's own desktop GUI. **The one thing that must travel with that
+finding is `dev/positioning.md` §2's own standing rule: never write a completeness claim against
+EPANET.** This audit is evidence FOR "we extend EPANET," not evidence that the gap is closed or
+bounded — a gap list from one session is a sample, not a boundary, and the file says so in its own
+closing section.
+
+Provenance for the audit file itself: outward sources are this seat's own prior CITED fetches
+(EPANET 2.2 manual, OWA-EPANET README) from 2026-09-08/09-15, re-cited rather than re-fetched (they
+do not change); the Status/Full/Energy/Calibration/Query/Group-Edit menu-shape knowledge is this
+seat's general familiarity with EPANET's desktop UI, NOT re-verified against a live install this
+session — flagged explicitly in the audit file as needing confirmation before anyone writes public
+copy naming those EPANET features by their EPANET names, the same discipline Task 601 already
+imposed on itself for the Calibration Report.
+
+— Mary
