@@ -602,7 +602,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**49 still to read**, of 72 new keys across 7 unmerged branch(es).
+**50 still to read**, of 73 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -814,13 +814,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`0053e241`) — adds no English strings
+### feat/label-limit (`d4753f87`) — adds no English strings
+
+### feat/offscreen-notice (`3dcd3e8d`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
 
 ### feat/property-venue (`1066860e`) — adds no English strings
 
-### feat/table-editing (`388e56c6`) — adds no English strings
+### feat/table-editing (`77bec106`) — adds no English strings
 
-### feat/zoom-control (`7ac181c1`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`1373951a`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -844,4 +850,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
 
-### fix/table-print (`b2126819`) — adds no English strings
+### fix/table-print (`a7a9395e`) — adds no English strings
