@@ -100,6 +100,25 @@ function ecTipLabel($text, $tip)
 }
 
 /**
+ * The plain-text field name inside a label built by ecTipLabel()/ecLinkTipLabel(), or any other
+ * 'label' HTML a calculator page hands echoUnitSelect() -- for use as that select's accessible
+ * name (ROADMAP Task 685, Tom 2026-09-17: "name each one after its own field").
+ *
+ * NO NEW WORDING: this strips markup out of a string that is already written and already
+ * translated 26 times; it never composes one. The tip glyph (<span class="ec-tip">?</span>) is
+ * removed FIRST and by name, not caught by strip_tags() -- its "?" is a literal text node, a
+ * visual affordance for the hover/tap target, and reading "Pipe diameter ?" to a screen reader
+ * would announce a stray question mark that means nothing there. The tip's own explanation never
+ * reaches this string in the first place: ecTipLabel() puts it in a title="" attribute, and
+ * title is not part of the accessible name an aria-label carries.
+ */
+function ecPlainLabelText($html)
+{
+    $html = preg_replace('#<span class="ec-tip">.*?</span>#s', '', $html);
+    return trim(preg_replace('/\s+/', ' ', strip_tags($html)));
+}
+
+/**
  * Label text wrapped in an external link, followed by a separate tip glyph. See ecTipLabel().
  *
  * $target defaults to a new tab because every existing call site opens one: these are reference
@@ -136,7 +155,9 @@ function solverControlHtml($onclick, $units = 'flow_channel')
         . '<button type="button" onclick="' . $onclick . '">' . $ec_lang['mpf_solve_btn'] . '</button> '
         . $ec_lang['mpf_solve_for_flow'] . ' '
         . '<input class="input" type="number" step="any" id="solver_q" value="1.0" />'
-        . ' <select id="solver_qu" data-family="' . htmlspecialchars($family) . '" onchange="EngCalcs.submitForm()">';
+        . ' <select id="solver_qu" data-family="' . htmlspecialchars($family) . '"'
+        . ' aria-label="' . htmlspecialchars(ecPlainLabelText($ec_lang['mpf_solve_for_flow']), ENT_QUOTES, 'UTF-8') . '"'
+        . ' onchange="EngCalcs.submitForm()">';
     $default = ecDefaultUnit($family);
     foreach ($units as $unit) {
         $html .= '<option value="' . $unit . '"'
@@ -188,7 +209,17 @@ function ecDefaultUnit($family)
     return $ec_unit_sets[EC_DEFAULT_UNIT_SET][$family];
 }
 
-function echoUnitSelect($name, $units, $indent_string)
+/**
+ * $ariaLabel (ROADMAP Task 685): the field's OWN existing label text, plain -- see
+ * ecPlainLabelText(). Most callers have a `<label>`/text node sitting right beside the select
+ * that a sighted visitor already reads, but nothing in the markup ties the two together for a
+ * screen reader, which otherwise announces bare "combo box, feet". Optional so a caller that has
+ * genuinely no field context (there is none left) still renders. `id="<name>"` is emitted
+ * unconditionally -- it costs nothing, every name here is already unique (it is the form control
+ * name), and it is what lets a caller point a `<label for>`/`aria-labelledby` at this select
+ * instead of handing over $ariaLabel, when that shape fits the page better.
+ */
+function echoUnitSelect($name, $units, $indent_string, $ariaLabel = null)
 {
     global $ec_lang;
 
@@ -206,7 +237,8 @@ function echoUnitSelect($name, $units, $indent_string)
     // data-family lets a preset find this select; the value lets it pick an option without
     // matching translated label text (fragile across languages, and the mechanism of the old
     // overwrite bug).
-    echo "\n" . $indent_string . '<select name="' . $name . '" data-family="' . htmlspecialchars($family) . '" onchange="EngCalcs.submitForm()">';
+    $aria = ($ariaLabel === null || $ariaLabel === '') ? '' : ' aria-label="' . htmlspecialchars($ariaLabel, ENT_QUOTES, 'UTF-8') . '"';
+    echo "\n" . $indent_string . '<select name="' . $name . '" id="' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '" data-family="' . htmlspecialchars($family) . '"' . $aria . ' onchange="EngCalcs.submitForm()">';
     $default = ecDefaultUnit($family);
     foreach ($options as $unit) {
         echo "\n" . $indent_string . "\t" . '<option value="' . $unit . '"'
@@ -354,7 +386,7 @@ function echoInputGrid($arrayInputs)
 		else { $labelsPlain[] = $label; }
 
 		ob_start();
-		echoUnitSelect($n . 'u', $input['units'], '');
+		echoUnitSelect($n . 'u', $input['units'], '', ecPlainLabelText($input['label']));
 		$select = trim(ob_get_clean());
 
 		// THE NO-BREAK SPACE IS THE OLD LAYOUT, TO THE PIXEL. The input and its select shared one
@@ -484,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
 								<td><?=$result['label']?></td>
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
-									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
+									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t", ecPlainLabelText($result['label']));?>
 
 								</td>
 								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
