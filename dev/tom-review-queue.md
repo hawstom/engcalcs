@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-202.
+**An ID is permanent and never reused.** Next free: R-230.
 
 ---
 
@@ -139,3 +139,63 @@ judgement and does not belong to a script.
 ### feat/tables-spreadsheet (on master)
 
 - [x] R-201 feat/tables-spreadsheet | "Print table puts heading borders only around ID." (and R-162 reopened: "Print table does not respect column widths. It expands to 100% of printable area.") -- fixed on master (fix/table-print): a sticky-header rule was overriding the print borders
+
+## Round of 2026-09-24 -- MOD's test, his notes, and his pass over the six preview ports
+
+### MOD's first-use test (2026-09-23)
+
+- [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that."
+- [ ] R-203 -- | "Our hint above the toolbar didn't help him. He suggested maybe a colored light bulb glyph. But I think that is a feeble attempt to rescue an attempt that isn't working."
+- [ ] R-204 -- | Settings index pane wider: "on PC we can make the index pane 10% wider. The main pane could be 70% of what it now is ... It has a hard minimum that seems perfectly acceptable to me, and maybe we could use that as the initial default."
+- [ ] R-205 -- | "(1) For all examples and new projects, can we set the background image opacity to 0.5? (2) For Net3 Novato (lat/lon) Can we set the all labels zoom limit to 65000 and change the gallery text to "EPANET Net3, lat/lon\nThe EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it." (3) For the other EPANET projects gallery text, can we replace "sample" with "example"?"
+- [ ] R-206 -- | Settings, Quality parameter: "Change "A chemical that reacts" to "A reactive chemical". This is after consulting MOD."
+- [ ] R-207 -- | "In Settings and all inputs everywhere that are not spreadsheet mode, he was startled that when he clicked on a text input, he got a cursor instead of the entire contents highlighted ... Expected behavior in Properties, settings, etc, is to highlight the entire contents for immediate overwriting by default. Check this with Ida, but it checks out for me, and it was his natural expectation."
+- [ ] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA."
+- [ ] R-209 -- | "File, New Project wizard radio 1 "Geographic projection" is not approved wording. It should be "Coordinate system". Also, change "Local, schematic, or custom" to "Local, schematic, or custom coordinate system"."
+
+### Requests
+
+- [ ] R-210 -- | EPANET++: "Ask Mary to do a deep pass through EPANET Help etc to find out if we are missing anything that EPANET has, other than graphs that are already on our roadmap. Before we release as EPANET++, I want to be sure we are not behind EPANET."
+- [ ] R-211 -- | Theming: "Ask Ida to prepare a phased plan for our roadmap to implement/offer theming choices in Settings ... I think that preparing for this and implementing it will force us into some important code discipline."
+- [ ] R-212 -- | Usage report: "I would like a URL I can visit that gives scripted views of our logs ... phase 1 is to create the URL and the script. It doesn't have to be secret, but we won't publish or link it. How about `engcalcs/spock.php` or `engcalcs/spock-cast.php`?"
+- [ ] R-213 -- | File menu: "I think that Convert coordinates as... should be the next row after Save as... There is nothing else about converting, and it's not about importing or exporting. Ask Ida about specifics."
+
+### His retest of the 2026-09-23c fixes
+
+- [ ] R-214 -- | R-184 on master: "The problem is that now Zoom to Fit doesn't account for labels. Not all fits. We are back to week 1 of development. Maybe this works better in feat/zoom-control"
+- [ ] R-215 -- | R-162/R-201: "Not fixed on master or on feat/table-editing. No heading borders, Widths seem to be trying, but not succeeding (tighter fit on print than on screen), and the print horiz alignments are differen than the on-screen alighments (all centered except ID)."
+
+### feat/zoom-control (8103)
+
+- [ ] R-216 feat/zoom-control | "(1) Zooms almost to fit. Only the scale bar obscures a label. (2) Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is startling."
+
+### feat/convert-as (8104)
+
+- [ ] R-217 feat/convert-as | "(1) Horiz alignment is terrible. Water depth has a glyph that throws it left. All the rounding selectors are misaligned with each other and their label heading. (2) Suffix column. Label it "Suffix" to match its tip." Later: "No Depth glyph, because it's throwing out the alighment unless you can fix that."
+- [ ] R-218 feat/convert-as | R-188 answered: label the lat/lon choice "WGS 84 latitude/longitude (EPSG:4326)": "Yes."
+- [ ] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. So I say drop it, but ensure that both 'Import' and 'Convert as ...' state clearly that files with an unreferenced EPSG coordinate system can be scaled 1:1 in Step 2 of the Convert as... wizard."
+- [x] R-220 feat/convert-as | Untouched pre-filled Label suffixes applied to the new copy: "Yes" -- already the behaviour
+
+### feat/table-editing (8105)
+
+- [ ] R-221 feat/table-editing | Hide these columns: "Does not work, only one column hides, and I only like this solution if it's spreadsheet-like. This would mean that entire heading cells or columns highlight and that I can use the mouse to drag through multiple columns in usual Select manner." New strings: "Hide these columns" "I didn't find this.", "Nothing in this selection can be filled down." "I didn't find this."
+- [ ] R-222 feat/table-editing | Table keyboard shortcuts note: "Not very likely to be read. But should be a readable list instead of a wall of text."
+- [x] R-223 feat/table-editing | Ctrl+D notice, menu shortcuts, Help > Notes: yes. The little square gone: "I didn't ask for it to go away. I asked for it to behave as advertised. I guess it's okay." Sorting: "OK on feat/table-editing."
+
+### feat/property-venue (8106)
+
+- [ ] R-224 feat/property-venue | "it's not good that we are using different words Shut and Closed. What are the translators supposed to do? EPANET says "Closed". So we purge Shut. I know there was some argument for Shut, but let's follow EPANET."
+- [ ] R-225 feat/property-venue | "The word "Table" is not needed. We can add a &gt; or " shown" to the "Filter in table" if you want to point to the selector." And on the string: "" shown" or " >". No word "Filter"." Changing Property also sets Property to change: "OK".
+
+### feat/label-limit (8108)
+
+- [ ] R-226 feat/label-limit | Identical rows and blank Customer box: "OK". Settings filter: "OK. But when I filter on "view zoom" or "zoom", I see a bunch of Customer settings that don't match. It seems that they are lumped together with what I am looking for."
+
+### feat/offscreen-notice (8109)
+
+- [ ] R-227 feat/offscreen-notice | "OK. But there is a problem, this notice is a new style. We need good thematic design, not ad hoc styles. It's pretty, it's creative, and I like it, but we can't be going willy nilly with anything that strikes us at the moment. We have to plan and coordinate these things. This is an app."
+
+### Bugs he found on master
+
+- [ ] R-228 -- | "My Elms Street Center modification has a customer that is red, and I don't know why or how that happened. Any clues? This is on master branch."
+- [ ] R-229 -- | "Customer default prefix should in the Settings.ID prefixes list. And it should default to C, not M."
