@@ -71,7 +71,8 @@ the equivalent section in `branched-network-calculator-scope.md` turned out to b
 valuable page. Everything below is **out permanently**. Reopening any of it requires a new decision
 with a new reason, not an appeal to completeness.
 
-- **Extended-period simulation.** Steady state only.
+- ~~**Extended-period simulation.**~~ **SHIPPED, through the EPANET engine only** (`js/lpn-time.js`):
+  patterns, controls, `[RULES]`, tank levels over time. The built-in solver still solves one instant.
 - ~~**Tank.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP Task 248).** This is the first entry
   ever to leave this list, and the section above asks for a new decision with a new reason rather
   than an appeal to completeness, so here is both. The reason is not completeness: Tom raised Task
@@ -86,7 +87,8 @@ with a new reason, not an appeal to completeness.
   The second payoff was not anticipated and is larger than the first: `.inp` import used to drop
   every tank **and every link touching one**, so a municipal model arrived missing whole branches.
   EPA's own Net1, Net2 and Net3 all have tanks.
-- **Water quality**, in every form (age, trace, chlorine decay, multi-species).
+- ~~**Water quality.**~~ **SHIPPED through the EPANET engine**: water age, source trace, and one
+  reacting chemical (`lpn_notes_2_def`). **Multi-species (EPANET-MSX) stays cut.**
 - ~~**Active pressure controls — PRV / PSV / FCV.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP
   Task 248 phase 2)** — the second entry ever to leave this list, and it left it in a way the
   original entry did not anticipate. The reason for the cut still stands word for word: *their
@@ -105,17 +107,16 @@ with a new reason, not an appeal to completeness.
     sentence — *a fixed minor-loss valve (a k-value on a pipe) is fine and is in scope* — was
     already describing a TCV; all that changed is that it is now an element with a name and a
     symbol instead of a pipe pretending.
-  - **PBV and GPV stay cut.** A GPV's behaviour is a head-loss CURVE and a PBV's is a fixed pressure
-    drop; this page has no element for either, and an imported one still arrives as a reported open
-    pipe. That is the same exclusion, for the same reason, narrowed to the two types it still fits.
+  - **PBV and GPV shipped too**, later (a GPV names a HEADLOSS curve in `doc.curves`; ROADMAP Tasks
+    586, 588). Every EPANET valve type is now an element.
   - `bpn_` is unaffected and still makes the original exclusion.
-- **Demand patterns and energy cost.**
+- ~~**Demand patterns and energy cost.**~~ **SHIPPED** with extended-period simulation.
 - **Sparse linear algebra** — CSR storage, conjugate gradient, fill-reducing orderings, cached
   symbolic factorization. Cut *because of* the 10–20 node target; see below.
 - **Any matrix library.** math.js is ~180 KB for a function that is thirty lines here.
-- **Being a GIS.** No coordinate reference systems to choose, no reprojection, no datum handling, no
-  shapefile or GeoJSON import. The document is flat Cartesian and stays that way; see "Backdrop and
-  coordinates". Tiled maps (Phase 4) are a backdrop layer's problem, never the network's.
+- **Being a GIS.** No datum handling, no shapefile or GeoJSON import. A project is either local
+  Cartesian or geographic (stored in longitude/latitude, drawn in Web Mercator; `dev/geographic-projects.md`),
+  and File, Convert coordinates as makes a converted COPY. Nothing beyond that.
 
 ## Solver
 
