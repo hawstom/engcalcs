@@ -78,10 +78,10 @@ lines rather than appending corrections.
   Stagger build tracks rather than launching seven together.
 - **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
   running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
-- **Flaky under load, green alone:** `run-progress-harness.js`; `specs/basemap.js`/`firstproject.js`
+- **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
   tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
-  `specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
-  `specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
+  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
 ## STATE — 2026-09-24
