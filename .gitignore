@@ -21,7 +21,7 @@ lpn-locks/*.json
 
 # The browser pass installs playwright-core locally; the Chromium binary lives in the
 # user cache, not here. Both are reproducible from dev/browser-pass/package.json.
-dev/browser-pass/node_modules/
+dev/browser-pass/node_modules
 dev/browser-pass/package-lock.json
 
 # Real client water models Tom drops in to stress-test the .inp importer (ROADMAP Task 196). They
