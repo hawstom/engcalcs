@@ -239,20 +239,6 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 99|685| **Name every unit dropdown for a screen reader.**
-  **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
-  survey's finding.
-  - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
-    **272** carry no accessible name, and **226 of those are the unit selects** -- essentially every
-    one in the suite. A screen reader announces *"combo box, feet"* with no way to know which field
-    it belongs to.
-  - **IT IS NOT THE SURVEY'S USUAL PATTERN and that is why it is a task rather than a check.**
-    Nothing here was decided two ways: `echoUnitSelect()` has simply never been handed the label
-    sitting beside it. There is no ratchet to set, because there is no correct half to ratchet to.
-  - **NO NEW WORDING IN ANY LANGUAGE, which is what makes his answer cheap.** The name is the
-    field's own existing label, already written and already translated 26 times. If a design turns
-    out to need new words, stop -- that is a different decision and a different price.
-
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
   undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,

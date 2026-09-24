@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 6 · Soon (75): 19 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 7
+**90 open tasks.** Next (100): 6 · Soon (75): 19 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
 
 ## 100 — Next (6)
 
@@ -18,7 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
 - Task 708 — Every property in every venue: an audit, then a check.
 
-## 99 — Priority 99 (7)
+## 99 — Priority 99 (6)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
@@ -26,7 +26,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
-- Task 685 — Name every unit dropdown for a screen reader.
 
 ## 75 — Soon (19)
 
@@ -122,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 91 titles are within 4–12 words. `!` marks the rest;
+82 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
