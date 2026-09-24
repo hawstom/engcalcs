@@ -10421,9 +10421,14 @@ var EngCalcs = EngCalcs || {};
 			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
 			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
 			// fit was asked for, not the candidate scale being tested.
+			// **A DRAGGED OFFSET IS WORLD UNITS AND IS ANCHORED, NOT REACHED** (R-184). `n.lx`/`n.ly`
+			// are drawing units that do not shrink with the zoom, so counting them in the reach turned
+			// ten units of offset into 5,000 px at scale 500 and Zoom to fit framed empty paper. The
+			// item's anchor carries the world part and the reach only the pixel part.
 			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
-				lx = (base.x >= nat.x) ? base.x : base.x - tw;
-			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
+				lx = (base.x >= nat.x) ? base.x : base.x - tw,
+				ax = nat.x + (n.lx !== undefined ? n.lx : 0), ay = nat.y + (n.ly !== undefined ? n.ly : 0);
+			boxFor(ax, ay, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
 			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
@@ -10448,7 +10453,9 @@ var EngCalcs = EngCalcs || {};
 			// the scale being tested: the label is a fixed width in pixels, so it covers more of a
 			// pipe the further out you are. Asked here at atScale rather than at the current one.
 			if (tw * sc / (atScale || 1) * SHORT_LINE_MULT > Geom.polylineLength(linkPointList(l))) { return; }
-			boxFor(mid.x, mid.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+			// World part of the offset in the anchor, as in the node loop above.
+			boxFor(mid.x + (l.lx !== undefined ? l.lx : 0), mid.y + (l.ly !== undefined ? l.ly : 0),
+				lx, ly - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id]; if (!le) { return; }
@@ -10770,10 +10777,24 @@ var EngCalcs = EngCalcs || {};
 			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
 				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
-		function apply(v) {
+		function place(v, set) {
+			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, pad, pad).t,
+				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+		}
+		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
+		// Zoom to fit exists for (R-184): whatever else it does, it never shows empty paper.
+		function modelInside(v, p) {
+			var i, it, x, y;
+			for (i = 0; i < modelItems.length; i++) {
+				it = modelItems[i]; x = p.tx + v * it.x; y = p.ty + v * it.y;
+				if (!(x >= 0 && x <= r.width && y >= 0 && y <= r.height)) { return false; }
+			}
+			return true;
+		}
+		function apply(v, p) {
 			state.s = v;
-			state.tx = fitWindow(items, v, 'x', 'l', 'r', r.width, pad, pad).t;
-			state.ty = fitWindow(items, v, 'y', 't', 'b', r.height, padTop, padBottom).t;
+			state.tx = p.tx;
+			state.ty = p.ty;
 			setTransform();
 			onZoomChanged();
 		}
@@ -10789,6 +10810,7 @@ var EngCalcs = EngCalcs || {};
 		// so a label can end fractionally outside the padding.
 
 		items = fitItems(state.s, true);
+		var modelItems = items;
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -10808,8 +10830,12 @@ var EngCalcs = EngCalcs || {};
 		// So a step-2 answer that bottomed out is not an answer. Fall back to the model fit and let
 		// the lettering overhang, which is the trade the original branch intended: **the NETWORK is
 		// what Zoom to fit is for.**
-		if (!(s > minScale())) { s = modelFit; }
-		apply(s);
+		// **AND THE FALLBACK IS CENTRED ON THE MODEL, NOT ON THE LETTERING** that just failed to
+		// fit, and it is also taken whenever the label-aware answer would leave a node off the
+		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
+		var at = place(s, items);
+		if (!(s > minScale()) || !modelInside(s, at)) { s = modelFit; at = place(s, modelItems); }
+		apply(s, at);
 		if (auto) { rebaseSignatureIfClean(); }
 	}
 
@@ -21173,7 +21199,17 @@ var EngCalcs = EngCalcs || {};
 	// switch, only by rebuilding everything; now that a switch refills, it is stated here.
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
+		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
+		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
+		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
+		// row-id string is unchanged from the last render, so this fell into the refill branch
+		// below, which repaints cells by id and never touches a header button -- the arrow never
+		// appeared and the click looked like nothing happened. A second click, after some OTHER
+		// column had scrambled the row order, always changed the row-id string and so always
+		// rebuilt; that is why the defect was invisible except as the very first click.
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
+			spec.sort.col + '/' + spec.sort.dir + '||' +
 			cols.map(paneHeadingText).join('|') + '||' +
 			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
 			cols.map(function (c) {

@@ -1835,6 +1835,17 @@ the block.
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
+- 75|711| **A pan is lost when File, New project opens beside it.**
+  Found by the pre-reviewer 2026-09-23 while testing Task 647: New project and Open example never
+  call `rememberCurrentView()` for the tab being left, so switching back refits it and the pan is
+  gone. A tab opened from the gallery and switched to once keeps its view correctly.
+- 50|712| **Tank water depth as a map label field.**
+  Convert as has a Label suffix box for depth that is disabled because `level` is not in
+  `nodeFieldDefs()`. Measured 2026-09-23 at eight sites, including the dense label priority table
+  and both label passes, so it is a label feature, not a wizard fix.
+- 50|713| **Say Cmd, not Ctrl, to a Mac reader.**
+  The tables' right-click accelerators and Help > Notes say Ctrl+C / Ctrl+D on every platform
+  (feat/table-editing). The keys already accept Cmd; only the words are wrong on a Mac.
 - 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
   Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
   panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have

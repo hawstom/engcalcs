@@ -602,7 +602,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**50 still to read**, of 73 new keys across 8 unmerged branch(es).
+**51 still to read**, of 74 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -613,7 +613,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab6ad007`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/convert-as (`a562e7c7`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -635,6 +635,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Label
+  @@ NEEDS RULING
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
@@ -814,9 +817,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`d4753f87`) — adds no English strings
+### feat/label-limit (`a5538f99`) — adds no English strings
 
-### feat/offscreen-notice (`3dcd3e8d`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/offscreen-notice (`d4acb740`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_offscreen_intact`**
   > Your network is intact.
@@ -824,9 +827,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/property-venue (`1066860e`) — adds no English strings
 
-### feat/table-editing (`77bec106`) — adds no English strings
+### feat/table-editing (`1740e3fa`) — adds no English strings
 
-### feat/zoom-control (`1373951a`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`05291ba3`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -849,5 +852,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_zoom_out_tip`**
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
-
-### fix/table-print (`a7a9395e`) — adds no English strings
