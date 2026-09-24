@@ -286,10 +286,15 @@ console.log('== (g): AND-of-words, driven against the real filterSetboxContainer
 		row.title = '';
 		return row;
 	}
+	// **FIXTURE TEXT, NOT SHIPPED WORDING** -- invented sentences that happen to carry "zoom" and
+	// "label" apart (never adjacent, so the pre-fix substring bug would miss them) without reading
+	// as any real `$ec_lang` value, so this section tests the matcher's own logic rather than
+	// pinning a string harness_wording_check.php would otherwise have to hold still forever.
 	var container = mkEl('div');
-	var rowA = fakeRow('Show labels when zoomed to this map width or less',
-		'Labels are drawn only while the map is this wide or narrower.');
-	var rowB = fakeRow('Snap leader lines to set angles', 'Snap angle used when you drag a label.');
+	var rowA = fakeRow('Zoomed far out, this fixture stops showing its own label',
+		'A made-up row for this test alone, never a real Settings control.');
+	var rowB = fakeRow('Rotate the compass rose icon by this many degrees',
+		'Another made-up row, about something entirely unrelated.');
 	container.children.push(rowA, rowB);
 
 	function shown(words) {
@@ -308,7 +313,8 @@ console.log('== (g): AND-of-words, driven against the real filterSetboxContainer
 	ok(shown(['zoom', 'label'])[1] === 'none', '...and the row that only matches one of them does not');
 	ok(shown(['zoom', 'xyzzy'])[0] === 'none' && shown(['zoom', 'xyzzy'])[1] === 'none',
 		'a word that matches nothing excludes every row, even alongside one that does match');
-	ok(L.setboxWordsMatch('show labels when zoomed', ['zoom', 'show', 'label']) === true,
+	ok(L.setboxWordsMatch('zoomed far out, this fixture stops showing its own label',
+		['zoom', 'show', 'label']) === true,
 		'(f) the shared row text a reader would search for finds itself under all three words');
 }
 
