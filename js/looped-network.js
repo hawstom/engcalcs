@@ -37783,7 +37783,7 @@ var EngCalcs = EngCalcs || {};
 		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
 		lmwInput.id = 'lpn_set_label_max_width';
 		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
+		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show';
 		lmwInput.value = (typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth) &&
 			settings.labelMaxWidth >= 0) ? String(settings.labelMaxWidth) : '';
 		// Blank or anything unreadable is "no threshold", stored as null -- the value a project that
