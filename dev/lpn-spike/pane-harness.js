@@ -495,6 +495,53 @@ console.log('\n--- each table lists exactly its own type ---');
 		'...and the valve Type is read-only — changing it re-seeds the setting, which belongs in the popup');
 }
 
+console.log('\n--- the FIRST click on Tag / Active / Shut sorts, even when every row ties ---');
+{
+	// A pre-reviewer's real-browser run found Tag, Active and Shut never sorted on the click that
+	// mattered -- no arrow, no reorder -- but worked fine the moment another column had already
+	// been sorted. Every pipe here starts with the same (blank) tag, the same active (true) and
+	// the same shut (false), so the FIRST click on one of these headings sorts to exactly the row
+	// order already on screen -- ties break by id, which is the unsorted order too. That is the
+	// trap: paneTableSignature() used to be built from the row-id string alone, so a sort whose
+	// result happens to equal what is already rendered left the signature unchanged, and
+	// renderPaneTable() took the refill branch (line ~21164), which repaints cells by id and never
+	// touches a header <th> -- so the arrow never appeared. A second sort, after some OTHER column
+	// had scrambled the row order, always changed the row-id string and so always rebuilt -- which
+	// is exactly the "works right after another column" symptom. One fresh, never-sorted table per
+	// column, so each assertion is really that column's very first click, not a click that is
+	// secretly riding on an earlier one's rebuild.
+	function tieBrokenIds(ids) {
+		return ids.slice().sort(function (a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); });
+	}
+	// The heading <th> carries a sort <button> and a resize <span> grip; textContent walks both,
+	// and only the button ever carries the ▲/▼.
+	function headingText(id, col) {
+		var th = L.paneTableById(id).headCells[col];
+		return th ? th.textContent : '';
+	}
+	[['pipes', 'tag'], ['pumps', 'active'], ['valves', 'closed'], ['junctions', 'active']].forEach(function (t) {
+		var id = t[0], col = t[1], before, expected;
+		report(L.paneTableById(id).sort.col === 'id', id + '.' + col + ' starts unsorted, so this click is really the first',
+			L.paneTableById(id).sort.col);
+		before = L.tableOrder(id);
+		expected = tieBrokenIds(before);
+		L.sortTable(id, col);
+		report(L.paneTableById(id).sort.col === col && L.paneTableById(id).sort.dir === 1,
+			'clicking ' + col + ' on ' + id + ' sets the sort state on the FIRST click',
+			L.paneTableById(id).sort.col + ' / ' + L.paneTableById(id).sort.dir);
+		report(L.tableOrder(id).join(',') === expected.join(','),
+			'...and the row order is the tie-broken sort, not whatever it happened to be before',
+			L.tableOrder(id).join(','));
+		report(headingText(id, col).indexOf('▲') >= 0,
+			'...and the heading shows the ascending arrow — this is the one a stale refill branch drops',
+			JSON.stringify(headingText(id, col)));
+	});
+	// Pipes and Junctions are reused below by tests that assume they still open at the default
+	// id sort -- put them back exactly where this block found them.
+	L.sortTable('pipes', 'id');
+	L.sortTable('junctions', 'id');
+}
+
 console.log('\n--- sorting: a gesture, per table ---');
 {
 	const doc = L.getDoc();
