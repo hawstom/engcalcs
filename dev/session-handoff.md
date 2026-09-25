@@ -120,10 +120,12 @@ chore-queue-0925, fix-menu-cue, merge-0925, bisect. Their branches are merged. R
   `lpn_georef_projected`, `lpn_terrain_no_place`), tank Water depth label. SEAM with first-project:
   both edit `crsDisplayName()`; convert-as reads the catalogue's 4326 entry, first-project added
   `LPN_CRS_WGS84` constants. Keep one.
-- **8105 `feat/table-editing`** d9c4a066: R-239..R-241 per Ida (drag preventDefault, hover sort
-  arrow, ⋯ menu, Manage columns, Ctrl+Space). **Perry: NOT READY** -- 5ddf79d0 (09-24) made a
-  one-motion drag of an unselected heading SELECT instead of move, which is his "can't drag". Being
-  reworked: click sorts, any drag moves, Ctrl/Shift+click and Ctrl+Space select; ⋯ overlap fixed.
+- **8105 `feat/table-editing`** 34b757b8: R-239..R-241. Click sorts; a one-motion drag of ANY
+  heading moves it (a selection moves as a block); Ctrl/Shift+click and Ctrl+Space select;
+  drag-to-select removed; hover sort arrow; ⋯ corner badge with Sort, Hide, Show all columns,
+  Manage columns. Perry found 5ddf79d0 (09-24) had turned his one-motion drag into a selection,
+  which was his "can't drag"; fixed in 53283193. Watch: a body-cell click may not always clear a
+  column selection (seen only in a harness).
 - **8106 `feat/property-venue`** b8733c5d: R-242, one "Filter in table" button with his tip. Perry: ready.
 - **8112 `feat/first-project`** f775f0a6: R-243/R-244. Empty lat/lon project follows the view
   (nodes and tiles were drawn millions of px off canvas); street map ON behind the gallery;
