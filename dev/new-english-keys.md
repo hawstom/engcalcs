@@ -370,7 +370,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -629,7 +629,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**59 still to read**, of 82 new keys across 16 unmerged branch(es).
+**58 still to read**, of 81 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -640,11 +640,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/queue-0925 (`2878d1d0`) — adds no English strings
+### chore/journals-0925 (`291c3e74`) — 2 new, 2 to read @@ NEEDS RULING
 
-### chore/tom-edits-0925 (`9d8f81cc`) — adds no English strings
+- **`lpn_ff_skipped`**
+  > {n} selected elements are not junctions, so they were not tested.
+  @@ NEEDS RULING
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
 
-### feat/convert-as (`43fd9e33`) — 28 new, 28 to read @@ NEEDS RULING
+### feat/convert-as (`47649c32`) — 28 new, 28 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -731,7 +736,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/customer-node (`61bd2109`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/customer-node (`cd7640b1`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_node`**
   > Connected to
@@ -740,7 +745,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
   @@ NEEDS RULING
 
-### feat/first-project (`2aa7c2c1`) — adds no English strings
+### feat/first-project (`f775f0a6`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
@@ -862,13 +867,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`4bcf92ab`) — adds no English strings
-
-### feat/offscreen-notice (`291bd4c7`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_offscreen_intact`**
-  > Your network is intact.
-  @@ NEEDS RULING
+### feat/menu-button (`a82d32f5`) — adds no English strings
 
 ### feat/property-venue (`b8733c5d`) — 3 new, 3 to read @@ NEEDS RULING
 
@@ -882,11 +881,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Filtered by {q}. {rows}.
   @@ NEEDS RULING
 
-### feat/select-on-focus (`11edc1ad`) — adds no English strings
-
-### feat/table-editing (`a1209984`) — adds no English strings
-
-### feat/usage-report (`5da3e7ae`) — adds no English strings
+### feat/table-editing (`53283193`) — adds no English strings
 
 ### feat/zoom-control (`dc1fa5a9`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -910,18 +905,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
   > Zoom out one step. Shortcut: -
-  @@ NEEDS RULING
-
-### fix/fireflow-eps (`1cf3e804`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_ff_skipped`**
-  > {n} selected elements are not junctions, so they were not tested.
-  @@ NEEDS RULING
-
-### fix/menu-cue (`07c0ed29`) — adds no English strings
-
-### merge/0925 (`013958ef`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_offscreen_intact`**
-  > Your network is intact.
   @@ NEEDS RULING
