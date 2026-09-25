@@ -243,11 +243,13 @@ console.log('\n--- R-110: a drag starts from the width on screen ---');
 	}
 }
 
-// **A SELECTED HEADING IS THE ONE THAT MOVES** (R-221, 2026-09-24). Dragging across headings that
-// are not selected now selects them, the spreadsheet way (dev/browser-pass/specs/colselect.js
-// drives that with real mouse events); a heading already selected is picked up and moved, as in
-// Google Sheets.
-console.log('\n--- (e) dragging a SELECTED heading moves the column ---');
+// **ONE PRESS, ONE MOTION, MOVES A HEADING WHETHER OR NOT IT IS SELECTED** (pre-review, 2026-09-25,
+// superseding R-221's "drag an unselected heading to select it, drag a selected one to move it" --
+// that split the single gesture master already shipped 2026-09-18 into two, and the one Tom
+// actually reached for landed on the wrong one because nothing starts out selected).
+// dev/browser-pass/specs/colselect.js drives this with real mouse events; this is the state-level
+// half.
+console.log('\n--- (e) dragging ANY heading, selected or not, moves it in one motion ---');
 {
 	const before = L.colKeys('junctions');
 	const from = 'elev', to = before[before.length - 1];
@@ -256,14 +258,9 @@ console.log('\n--- (e) dragging a SELECTED heading moves the column ---');
 	fire(sortBtnOf(from), 'mousedown', { button: 0 });
 	docFire('mousemove', { target: sortBtnOf(to) });
 	docFire('mouseup', {});
-	report(L.colKeys('junctions').join() === before.join(),
-		'dragging an UNSELECTED heading across others moves nothing -- it selects');
-	fire(sortBtnOf(from), 'click', { ctrlKey: true });
-	fire(sortBtnOf(from), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: sortBtnOf(to) });
-	docFire('mouseup', {});
 	const after = L.colKeys('junctions');
-	report(after.indexOf(from) === before.indexOf(to), 'the dragged column lands where it was dropped',
+	report(after.indexOf(from) === before.indexOf(to),
+		'dragging an UNSELECTED heading moves it in one motion -- no selecting step first',
 		before.indexOf(from) + ' -> ' + after.indexOf(from));
 	report(after.length === before.length, '...and no column is lost or duplicated',
 		after.length + ' / ' + before.length);
@@ -279,6 +276,32 @@ console.log('\n--- (e) dragging a SELECTED heading moves the column ---');
 	// A column that appears later is placed AFTER the remembered ones rather than dropped.
 	L.renderTable('junctions');
 	report(L.colKeys('junctions').join() === after.join(), 'the order survives a rebuild');
+}
+
+// **DRAGGING A HEADING THAT IS PART OF A STANDING MULTI-COLUMN SELECTION MOVES THE WHOLE
+// SELECTION** -- the one thing a plain single-column drag never did, and the reason the
+// selection/drag split existed at all before it was dropped. Selection is Ctrl+click only now, not
+// a drag of its own.
+console.log('\n--- dragging a heading that is part of a multi-column selection moves the group ---');
+{
+	L.renderTable('junctions');
+	const before = L.colKeys('junctions');
+	const a1 = before[1], a2 = before[2], dest = before[before.length - 1];
+	report(before.indexOf(a2) === before.indexOf(a1) + 1, 'two adjacent columns to select', a1 + ',' + a2);
+	fire(sortBtnOf(a1), 'click', { ctrlKey: true });
+	fire(sortBtnOf(a2), 'click', { ctrlKey: true });
+	fire(sortBtnOf(a1), 'mousedown', { button: 0 });
+	docFire('mousemove', { target: sortBtnOf(dest) });
+	docFire('mouseup', {});
+	const after = L.colKeys('junctions');
+	report(after.indexOf(a2) === after.indexOf(a1) + 1, '...they land beside each other still, in the same relative order',
+		after.indexOf(a1) + ',' + after.indexOf(a2));
+	report(after.indexOf(a2) === before.indexOf(dest), '...as a block, at the destination',
+		before.indexOf(dest) + ' vs ' + after.indexOf(a2));
+	report(after.length === before.length && after.slice().sort().join() === before.slice().sort().join(),
+		'...and it is still the same set of columns, only reordered');
+	L.renderTable('junctions');
+	report(L.colKeys('junctions').join() === after.join(), 'the group move survives a rebuild');
 }
 
 console.log('\n--- NEITHER OF THEM IS PROJECT DATA (Task 584) ---');

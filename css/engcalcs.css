@@ -2594,16 +2594,21 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 /* **THE "..." COLUMN MENU** (Tom: *"Maybe a three dots menu for sorting and hiding."*) -- opens the
    same menu the right-click/long-press does (`paneHeadMenuTrigger()`), so it is a second door onto
    one room rather than a second menu to keep in step. `position: absolute` for the same "no extra
-   heading width" reason as the sort glyph above; it sits on the grip's own margin, which the grip
-   (7px, `inset-inline-end: 0`) leaves clear of it at `inset-inline-end: 8px`. Hover- and
-   focus-reveal it on a device that HAS hover; a touch screen never fires `:hover` at all, so it is
-   drawn at all times there instead -- the one place a mouse and a finger are told apart in this
-   file. */
+   heading width" reason as the sort glyph above. Hover- and focus-reveal it on a device that HAS
+   hover; a touch screen never fires `:hover` at all, so it is drawn at all times there instead --
+   the one place a mouse and a finger are told apart in this file.
+   **PINNED TO THE TOP-RIGHT CORNER OF THE CELL, NOT ITS FULL HEIGHT, AND OPAQUE** (pre-review,
+   2026-09-25: on a narrow column -- "Base demand (gpm)" wraps to four lines at its declared 3.5em
+   -- the old full-height, transparent glyph sat centred over the SECOND line of wrapped text,
+   which read as a stray mark through the middle of "demand"). A small badge at the corner instead,
+   the same background as the heading itself (`#fff`, matching `.lpn-pane-table thead th`) so it
+   covers rather than blends with whatever text is under it, and short enough (1.1em) to never
+   reach past the first line no matter how many lines the heading wraps to. */
 .lpn-pane-colmenu {
-	position: absolute; inset-inline-end: 8px; top: 0; height: 100%; width: 14px;
+	position: absolute; inset-inline-end: 1px; top: 1px; height: 1.1em; width: 13px;
 	display: flex; align-items: center; justify-content: center;
-	background: none; border: 0; padding: 0; margin: 0; font: inherit; font-weight: normal;
-	color: #667; cursor: pointer; opacity: 0;
+	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
+	font-weight: normal; color: #667; cursor: pointer; opacity: 0;
 }
 /* The glyph itself, same reasoning as `.lpn-pane-sort::after` just above: `content:` rather than a
    text node, so print.js's per-text-node line count never sees it. */

@@ -20874,43 +20874,11 @@ var EngCalcs = EngCalcs || {};
 		spec.headSelAnchor = key;
 		paneHeadSelApply(spec);
 	}
-	/**
-	 * **PRESS ON A HEADING AND DRAG ACROSS OTHERS TO SELECT THEM** (R-221). The press itself selects
-	 * nothing, so a click that never leaves its heading is still the sort Tom approved; the first
-	 * time the pointer crosses into another heading, the range from the pressed one to that one is
-	 * selected, and it follows the pointer until the button comes up. `spec.headDragged` then eats
-	 * the click the browser sends when the button is released over the heading it started on.
-	 * Returns the handlers so a harness can drive them.
-	 */
-	function paneStartHeadSelDrag(spec, key, ev) {
-		var moved = false;
-		if (ev && ev.button) { return null; }
-		function move(e2) {
-			var th = paneThOfEvent(e2 && e2.target), keys, i0, i1;
-			if (e2 && typeof e2.buttons === 'number' && !(e2.buttons & 1)) { up(); return; }
-			if (!th || !th._lpnColKey || (!moved && th._lpnColKey === key)) { return; }
-			keys = paneCols(spec).map(function (c) { return c.key; });
-			i0 = keys.indexOf(key); i1 = keys.indexOf(th._lpnColKey);
-			if (i0 < 0 || i1 < 0) { return; }
-			moved = true;
-			spec.headSelAnchor = key;
-			spec.headSel = keys.slice(Math.min(i0, i1), Math.max(i0, i1) + 1);
-			paneHeadSelApply(spec);
-			if (e2.preventDefault) { e2.preventDefault(); }
-		}
-		function up() {
-			document.removeEventListener('mousemove', move);
-			document.removeEventListener('mouseup', up);
-			if (moved) {
-				spec.headDragged = true;
-				// A release outside every heading sends no click at all, so nothing would clear it.
-				setTimeout(function () { spec.headDragged = false; }, 0);
-			}
-		}
-		document.addEventListener('mousemove', move);
-		document.addEventListener('mouseup', up);
-		return { move: move, up: up };
-	}
+	// **DRAG-ACROSS-HEADINGS-TO-SELECT IS GONE** (pre-review, 2026-09-25: it is what made a plain
+	// drag of an unselected heading select instead of move, which is the gesture Tom actually
+	// reached for and master already gave him). Whole-column selection is Ctrl+click, Shift+click
+	// (paneHeadSelClick(), just below) and Ctrl+Space (paneHandleKey()) only now -- the same three
+	// idioms a spreadsheet answers to for its own column headers, none of which compete with drag.
 	function paneHeadSelClick(spec, key, ev) {
 		if (ev && ev.shiftKey) { paneHeadSelRange(spec, key); } else { paneHeadSelToggle(spec, key); }
 	}
@@ -21208,7 +21176,15 @@ var EngCalcs = EngCalcs || {};
 	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
 	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
 	// button's own click handler does its job; a press, a travel and a release somewhere else is a
-	// column move and the click that follows is suppressed once.
+	// column move and the click that follows is suppressed once. **IF THE PRESSED HEADING IS PART
+	// OF A STANDING MULTI-COLUMN SELECTION, THE WHOLE SELECTION MOVES TOGETHER** -- one press, one
+	// motion, same as moving a single column; a heading that is not part of any selection (or is
+	// the whole of a one-column selection) moves alone. No `spec.headDragged` bookkeeping is needed
+	// here: a mousedown and mouseup on two DIFFERENT headings never produces a `click` on either
+	// one (the browser's click target is their common ancestor, which neither button's own listener
+	// is attached to), so there is no follow-on click to suppress. That flag remains meaningful only
+	// for a press-and-release that never leaves its own heading, which the sort button's `click`
+	// listener already answers on its own.
 	function paneStartColDrag(spec, key, ev) {
 		var over = null;
 		if (ev && ev.button) { return; }
@@ -21217,14 +21193,44 @@ var EngCalcs = EngCalcs || {};
 			if (th && th._lpnColKey && th._lpnColKey !== key) { over = th._lpnColKey; }
 		}
 		function up() {
+			var sel = paneHeadSel(spec), group;
 			document.removeEventListener('mousemove', move);
 			document.removeEventListener('mouseup', up);
 			if (over === null) { return; }
-			if (paneMoveCol(spec, key, paneColIndex(spec, over))) { renderPaneTable(spec); }
+			group = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel : [key];
+			if ((group.length > 1) ? paneMoveCols(spec, group, over) : paneMoveCol(spec, key, paneColIndex(spec, over))) {
+				renderPaneTable(spec);
+			}
 		}
 		document.addEventListener('mousemove', move);
 		document.addEventListener('mouseup', up);
 		return { move: move, up: up };
+	}
+	// **THE GROUP VERSION OF `paneMoveCol()`**, for dragging a whole multi-column selection at once.
+	// Generalises it exactly: pull every moving key out of the order (keeping their relative order
+	// among themselves), then splice the whole block back in at the DESTINATION's index in the
+	// ORIGINAL (pre-removal) order -- which is what `paneMoveCol()` itself does for a single key, so
+	// a one-key call here lands identically. Landing beside the destination on whichever side the
+	// pointer approached from falls out of the same arithmetic `paneMoveCol()` already relies on:
+	// removing a key BEFORE the destination shifts every later index down by one, so re-inserting at
+	// the destination's ORIGINAL index lands the moved block AFTER it; removing one AFTER the
+	// destination leaves earlier indices alone, so it lands BEFORE.
+	function paneMoveCols(spec, keys, destKey) {
+		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
+			moveSet = {}, moving = [], kept, toIndex, pref;
+		keys.forEach(function (k) { moveSet[k] = true; });
+		if (moveSet[destKey]) { return false; }
+		toIndex = order.indexOf(destKey);
+		if (toIndex < 0) { return false; }
+		order.forEach(function (k) { if (moveSet[k]) { moving.push(k); } });
+		if (!moving.length) { return false; }
+		kept = order.filter(function (k) { return !moveSet[k]; });
+		kept.splice.apply(kept, [toIndex, 0].concat(moving));
+		pref = paneColPrefFor(spec.id);
+		pref.order = kept;
+		savePaneColPrefs();
+		paneTableReset(spec);
+		return true;
 	}
 	function paneThOfEvent(node) {
 		var n = node, guard = 0;
@@ -21417,29 +21423,30 @@ var EngCalcs = EngCalcs || {};
 				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
 				sortPaneTable(spec, c.key);
 			});
-			// **DRAGGING ACROSS HEADINGS SELECTS THEM; DRAGGING A SELECTED ONE MOVES IT** (R-221, and
-			// Tom's earlier point (e)). Both are a press on the heading, so what is under the press
-			// decides, as it does in Google Sheets: a heading that is not selected starts a
-			// selection, and a heading that already is selected is picked up and moved. A click that
-			// never leaves its heading is still a sort either way. A modified press is the click
-			// handler's business (Ctrl/Cmd toggles, Shift extends), and the press must not also
-			// start a drag or select characters.
+			// **ONE GESTURE, ONE JOB** (pre-review, 2026-09-25, after Tom tried the one-motion drag
+			// master already had and could not move a column: R-221's "drag an unselected heading to
+			// select it, drag a selected one to move it" split the single press-and-drag master
+			// shipped and approved 2026-09-18 into two gestures that look identical until the pointer
+			// has already moved, so the one he reached for -- press any heading and drag it -- landed
+			// on the wrong one whenever the heading was not already selected, which is every heading
+			// on a fresh table). A click that never leaves its heading is still a sort. A press that
+			// travels is ALWAYS a move, selected or not: if the pressed heading is part of a standing
+			// multi-column selection the whole selection moves together; otherwise only the pressed
+			// column does. Whole-column SELECTION no longer has a drag gesture of its own -- it is
+			// Ctrl+click, Shift+click and Ctrl+Space, same as any other multi-select in this table. A
+			// modified press is the click handler's business (Ctrl/Cmd toggles, Shift extends), and
+			// the press must not also start a drag or select characters.
 			b.addEventListener('mousedown', function (ev) {
 				if (ev && ev.button) { return; }
 				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
-				if (paneHeadSel(spec).indexOf(c.key) !== -1) {
-					// **THE MISSING LINE.** Its siblings (the resize grip, and the select-drag three
-					// lines below) both call this before attaching their own listeners; this branch
-					// never did, so the browser's own mousedown handling raced the custom drag -- a
-					// press on a selected heading started native text selection or a focus ring
-					// instead of picking the column up, which is very likely why Tom could not get a
-					// column to drag (Ida, 2026-09-25).
-					if (ev && ev.preventDefault) { ev.preventDefault(); }
-					paneStartColDrag(spec, c.key, ev); return;
-				}
+				// **THE MISSING LINE** (Ida, 2026-09-25): paneStartColDrag()'s siblings (the resize
+				// grip, and this button's own old select-drag path) both called preventDefault()
+				// before attaching their listeners; this call did not, so the browser's own mousedown
+				// handling raced the custom drag -- a press on a heading started native text
+				// selection or a focus ring instead of picking the column up.
 				if (ev && ev.preventDefault) { ev.preventDefault(); }
 				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
-				paneStartHeadSelDrag(spec, c.key, ev);
+				paneStartColDrag(spec, c.key, ev);
 			});
 			th.appendChild(b);
 			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
