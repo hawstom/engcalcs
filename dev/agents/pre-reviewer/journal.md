@@ -1435,3 +1435,187 @@ observed both today and 2026-09-24) reads as sluggish to Tom's own hand -- it is
 branch's latest commits and was already named to him previously.
 
 **Verdict: READY FOR TOM.**
+
+---
+
+## 2026-09-25, second round -- four more branches, real headless Chrome
+
+### feat/table-editing (worktree /home/haws/webdev/worktrees/feat-table-editing/engcalcs)
+
+OBSERVED, real Chromium, scratch scripts against the real `Looped-Network.php` served by the
+worktree's own `dev/browser-pass/lib/env.js` (not the branch's own `colselect.js`/`colmanage.js`
+specs, which I read but did not re-run, since they are the branch author's own evidence and Tom's
+task specifically asked me to try to reproduce the drag failure independently, in real Chrome, with
+real `page.mouse` events, on BOTH master and the branch).
+
+- **R-241, "Sorry I can't get a column to drag": REPRODUCED, and the cause is bigger than the
+  branch's own diagnosis.** The branch's commit (`a1209984`) explains the report as one missing
+  `preventDefault()` on a mousedown that lands on an ALREADY-SELECTED heading. That fix is real and
+  correct as far as it goes -- but it treats the wrong gesture. I drove the plain, unmodified gesture
+  a first-time user actually makes: press an UNSELECTED heading and drag it onto another, in one
+  motion, real `page.mouse.move` in 15 steps + `down`/`up`, no Ctrl, no prior click.
+  - **On master** (`/home/haws/webdev/hawsedc.com/engcalcs`, read-only): that one motion moves the
+    column. `before` keys `[...,"axis2","desc","tag","active",...]` become
+    `[...,"desc","tag","active","axis2",...]` -- `axis2` landed where `active` was. One gesture, no
+    modifier, done.
+  - **On feat/table-editing**: the identical gesture does **nothing**. `before` and `after` keys are
+    byte-identical; no page error. The branch's own R-221 commit (`5ddf79d0`, same branch, earlier
+    today) changed the heading's `mousedown` handler so a column can only be REORDERED once it is
+    already selected -- an unselected press now starts a SELECTION drag instead (`paneStartHeadSelDrag`),
+    and only a second press, after the heading is already lit, calls `paneStartColDrag`. Master never
+    had this two-step requirement; this branch introduced it in the same round that also introduced
+    the preventDefault bug the commit fixed.
+  - **This reads exactly as Tom's own words.** He did not say "dragging a selected column doesn't
+    work" (the bug the commit fixes); he said he could not get a column to drag AT ALL, which is what
+    a user meets on first try, every time, on this branch: the single natural gesture master supported
+    directly now silently does nothing (or silently starts a range-selection, which looks like
+    nothing happened if the reader is not watching for header shading).
+  - Scripts used, kept in scratch for reference, not committed:
+    `/tmp/claude-1000/.../scratchpad/drag_probe.js` (run against each tree's own
+    `dev/browser-pass/lib/env.js` and `lib/session.js`, so this is the real production
+    `paneStartColDrag`/`paneStartHeadSelDrag` code path, not a reimplementation).
+  - **This is the single highest-cost item in this round.** The build agent believed it had found
+    and fixed "why Tom could not get a column to drag," reported so, and the harness it wrote
+    (`colselect.js` point 7) only ever tests dragging a heading that was ALREADY selected by a prior
+    Ctrl+click -- so its own suite is green while the naive, undocumented, most-likely-to-be-tried
+    gesture is broken. This is the R-054/R-027 shape exactly: checked that the intended fix worked,
+    never checked the plain case a visitor actually hits first.
+- **The "..." column menu glyph overlaps wrapped heading text on a narrow column, confirmed
+  visually.** Measured every heading's own text-node bounding box against the `.lpn-pane-colmenu`
+  button's box on Net3's Junctions table: on `demand` ("Base demand (gpm)", wraps to 3 lines), the
+  rendered text's own right edge (647px) sits to the right of the menu button's left edge (631px) --
+  a real overlap, not a rounding artifact. Same for `active`, `fireFlow`, `elev` -- every column
+  whose heading wraps to its full 3-line height on this table. A screenshot at 3x device pixel ratio,
+  cropped tight to the button's own rect while it was genuinely hovered (`getComputedStyle` confirmed
+  `opacity:1`, `content:"⋯"`, `color: rgb(102,102,119)`), shows the glyph is there but nearly
+  illegible: pale grey, 14px square, sitting directly over the tail of the wrapped word "demand" and
+  the top of "(gpm)". `dev/lpn-spike` has no existing check for this; screenshot kept at
+  `/tmp/claude-1000/.../scratchpad/ellipsis-tight.png` (not committed, per instructions).
+- I did not run the branch's own `colselect.js`/`colmanage.js` (65 checks between them by their own
+  file listing) as a pass/fail gate -- reading them was enough to see what they do and do not cover,
+  and running someone's own harness as the proof of their own fix is exactly the self-review this
+  seat exists to avoid.
+
+**Verdict: NOT READY.** The plain drag gesture is provably broken by this branch's own change, not
+merely under-fixed; the "..." glyph is visually compromised on any column whose heading wraps. Both
+need Tom to see them named, not to discover them himself in a browser pass that was supposed to be
+clean.
+
+### feat/customer-node (worktree /home/haws/webdev/worktrees/feat-customer-node/engcalcs)
+
+OBSERVED. `dev/lpn-spike/customer-node-harness.js` run live, 2026-09-25: **56/56 checks passed**
+(sections 3-7, node-fallback-on-pipe-delete section 6 and legacy-file section 7 in particular).
+
+- **"Red for node-connected Customers is a bad decision. Let's leave it black."** CONFIRMED. CSS
+  diff: `.lpn-service-snapped` / `.lpn-meter-snapped` are deleted outright, not merely unused --
+  `grep` across `js/` and `css/` finds them nowhere except the comment explaining why they are gone.
+  A settled node connection now paints with no class of its own, i.e. plain black, matching every
+  other settled customer.
+- **"Customer symbols appear to be 0.2 * Junction size ... raise it another 0.05."** CONFIRMED.
+  `LPN_METER_NODE_FRAC = 0.30` in `js/looped-network.js:8672`, with a comment doing the arithmetic
+  Tom asked for explicitly (0.25 shipped + 0.05 = 0.30) rather than silently picking a different
+  number.
+- **"Do we have Customers not allowed to connect directly to nodes? ... Customer connected to a node
+  instead of a link at station 0."** CONFIRMED as a real feature, not just a display change: the
+  harness's section 6 places a service pressed onto a node, confirms Properties reads "Connected to"
+  and names the junction (not a pipe id or a station), confirms no pipe id or station heading is
+  printed, then DELETES the pipe entirely and confirms the customer still reads as connected to the
+  same node (now via a stored fallback), still lumps its demand there, survives a node RENAME, and
+  correctly detaches only when the node itself is deleted -- with the un-accounted-demand notice
+  worded correctly on the map.
+- **Leak check on the string wiring**: commit `cd7640b1` (within this same branch) fixes a real gap
+  its own author found on a second pass -- `lpn_field_meter_node`/`_tip` were defined in the language
+  file but never wired into `Looped-Network.php`'s `pageConfig`, so the "Connected to" row would have
+  rendered the raw key or nothing at all in production. Caught and fixed before I got to it, but
+  worth noting as the kind of self-review gap this seat exists to catch when a branch does NOT catch
+  it itself.
+- UNVERIFIABLE FROM HERE: how the black customer dot at 0.30 actually reads on screen next to a
+  0.30-scaled junction at typical zoom -- I did not render the map and screenshot it for this branch,
+  given time spent reproducing the table-editing drag defect; a browser pass should still glance at
+  the sizing ratio directly rather than trust the arithmetic alone.
+
+**Verdict: READY FOR TOM**, with that one sizing screenshot named as unchecked.
+
+### feat/menu-button (worktree /home/haws/webdev/worktrees/feat-menu-button/engcalcs)
+
+OBSERVED, real Chromium, two ways: the branch's own `dev/lpn-spike/menu-button-harness.js` (run
+live, ALL GREEN, both `solid` and `outline` variants at a desktop and a phone viewport), and my own
+direct look at its two screenshots (`menu-solid-desktop.png`, `menu-outline-desktop.png`) -- not
+just trusting the harness's verdict.
+
+- **"testers ... very slow to find the menus ... colors only for now ... thematic blue rounded
+  rectangles."** CONFIRMED, by eye: the menu bar (File/Edit/Map/Water/Help/English) is solid accent
+  blue (`#0645ad`, the same blue the consent banner's own buttons already use -- visibly consistent
+  in the screenshot, not just asserted in a comment) with rounded corners, white text, in both
+  variants.
+- **`?menustyle=outline` as the FIRST query parameter**: CONFIRMED by direct regex test outside the
+  page (`/[?&]menustyle=outline\b/.test('?menustyle=outline')` -> `true`), matching how
+  `window.location.search` actually begins with `?` rather than `&`.
+- **"nothing but the menu bar changed"**: CONFIRMED by reading, not just running the harness --
+  `.lpn-menubar-item` is used nowhere outside `buildMenuBar()`'s own bar items (`grep` across
+  `js/looped-network.js` and `css/engcalcs.css`), so no toolbar icon, popup or other button shares the
+  class. The harness's own three "toolbar button ... unchanged" checks passed live, and I read the
+  screenshot myself and confirm the toolbar icon row directly below the menu bar is visually
+  untouched.
+- **Process note, not a defect**: I ran `menu-button-harness.js` once without wrapping it in
+  `flock /tmp/engcalcs-browser.lock` (a mistake on my part -- CLAUDE.md and this task both say never
+  do this). It happened to complete cleanly because the lock was briefly free, but it is exactly the
+  kind of contention risk the rule exists to prevent (I later fought a genuinely-stuck queue on
+  another script for several minutes, caused by another agent's own harness holding the lock). Not
+  repeated after I noticed it.
+
+**Verdict: READY FOR TOM.** This is a preview switch behind a URL parameter that changes nothing
+outside the menu bar; both variants render as described.
+
+### feat/convert-as (worktree /home/haws/webdev/worktrees/feat-convert-as/engcalcs)
+
+OBSERVED, real Chromium, driven through the actual Convert as box and the actual coordinate-system
+picker it opens (`#lpn_crsbox`), not read from source alone.
+
+- **R-237(1a), "WGS 84 (EPSG:4326) missing from the options"**: CONFIRMED FIXED, live. The picker's
+  own `<select>` lists 5347 options; `WGS 84 (EPSG:4326)` is the second entry, right beside
+  `WGS 84 / Pseudo-Mercator (EPSG:3857)`, both in the register's own unmodified names.
+- **R-237(1b), "(no map)" after 3857's name**: CONFIRMED FIXED, live -- zero of the 5347 rendered
+  option strings contain "(no map)". Root cause in the code matches what the live DOM shows: a
+  comment dated 2026-09-25 states neither lat/lon code (3857 or 4326) is ever asked of the
+  `lpnCrsHas()` check that used to wrongly mark 3857 unplaceable.
+- **R-237(2a-c), tip wording**: CONFIRMED by diffing `lib/lang.ec.en.php` against its own history --
+  `lpn_convas_epsg_tip` had "WGS 84 latitude/longitude (EPSG:4326)" and now reads "WGS 84
+  (EPSG:4326)" (the duplicated "latitude/longitude" phrase removed, exactly as asked);
+  `lpn_convas_unnamed_tip` now ends "...with the world map attached." (dropped "at the place the
+  project is"); `lpn_convas_none_tip` now ends "...with no world map for now."
+- **R-237(3a-d)**: CONFIRMED live. The picker's own title reads "Coordinate system"
+  (`lpn_crsbox_title`), matching both callers (New project and Convert as) rather than either one's
+  own radio label. `lpn_crs_view_tip` and `lpn_crs_name`/`lpn_crs_name_tip` say "coordinate
+  system(s)", never "projection" -- confirmed both by reading the key values and by a live
+  case-insensitive text search of the whole rendered picker box (`0` hits for "projection"). The
+  bottom message is confirmed by reading `js/looped-network.js:32472-32484`: the IOGP credit line is
+  now the last thing appended to the note, with an explicit comment naming Tom's "nonsense" complaint
+  and where the old trailing sentence used to come from.
+- **R-237, "no visitor-facing 'projection' remains"**: CONFIRMED, live, on both the Convert as panel
+  text (full `innerText` search) and the coordinate-system picker's text -- `0` hits in either.
+- **R-238, tank Water depth coverage**: CONFIRMED, live. The Convert as box's own "Suffix" rounding
+  section lists four rows -- Diameter, **Water depth**, Demand and flow, Head -- where Tom's
+  complaint was that Water depth was disabled there instead of being given the coverage it was
+  missing. `LPN_CONVAS_SUFFIX_UNIT` in `js/looped-network.js:29109` carries a `depth` entry
+  (`lpn_u_elevhead`, the same unit family Head uses), and it renders enabled in the live box, not
+  greyed out.
+- I could not get the picker to open my first several attempts (it requires the EPSG radio checked
+  first, since the "..." button starts disabled on a plain local project -- not documented anywhere
+  I could find outside the source, which cost real time here) -- once that was accounted for, the
+  live picker opened and confirmed every wording claim above.
+- UNVERIFIABLE FROM HERE: how the picker's very long option list (5347 rows) scrolls and performs on
+  a real trackpad/phone, and whether "Filter by map view" narrows it usefully in a real session with
+  a real map position -- I exercised the unfiltered list only, not the filter itself.
+
+**Verdict: READY FOR TOM**, with the filter behaviour named as unchecked.
+
+**A general note on this round**: the shared `/tmp/engcalcs-browser.lock` was under real contention
+from at least one other agent's own harness (`table-divider-align-harness.js`,
+`node-shed-harness.js`) working in the `feat-convert-as`/`feat-table-editing` worktrees at the same
+time. Several of my own probes queued for 5-13 minutes waiting for the lock, and Node's own stdout
+buffering when redirected to a file meant a queued-then-running script showed no output at all until
+it exited, which looked identical to a genuine hang from the outside. Worth remembering next time
+before concluding something is stuck: check who actually holds the lock
+(`for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && cat
+$p/cmdline; done`) before killing anything.
