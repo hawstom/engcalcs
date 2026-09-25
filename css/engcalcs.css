@@ -2350,6 +2350,12 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* A long-press on a heading opens Hide/Show; iOS Safari shows its own copy callout instead unless
    told not to, as #lpn_canvas already is (Perry, 2026-09-23). */
 .lpn-pane-table thead th { -webkit-touch-callout: none; }
+/* Insurance beside the real fix (the missing preventDefault() on a selected heading's mousedown,
+   js/looped-network.js paneStartColDrag's call site): a drag that overshoots into a neighbouring
+   heading's padding must never leave the browser's own text selected behind it. The sort button was
+   never the culprit -- a <button> already suppresses this -- but the heading cell itself was not
+   covered, and neither was the sort glyph now living beside its label. */
+.lpn-pane-table thead th, .lpn-pane-sort { user-select: none; }
 .lpn-pane-table thead th {
 	position: relative; background: #fff;
 	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
@@ -2563,9 +2569,65 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    R-221) and a click on it sorts, so it wears the ordinary pointer. A SELECTED heading is the one
    that picks up and moves (his point (e)), so it says so under the pointer. `grab` rather than
    `move`: the column is not going anywhere until it is picked up. */
-.lpn-pane-sort { cursor: pointer; }
+.lpn-pane-sort { cursor: pointer; position: relative; }
 .lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
 .lpn-pane-head-sel .lpn-pane-sort:active { cursor: grabbing; }
+/* **THE SORT GLYPH: ALWAYS ON THE SORTED COLUMN, HOVER-REVEALED ON EVERY OTHER ONE, NO EXTRA
+   HEADING WIDTH** (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe
+   including a hover revelation?"*). A `::after` with a `content:` string, not a DOM node -- a real
+   span holding "▲" is a TEXT NODE, and `dev/browser-pass/specs/print.js` walks every text node of
+   a heading to compare screen and print line counts; an invisible span still has a client rect and
+   was silently double-counted as an extra wrapped line once, on every column, before this moved to
+   `content:` (2026-09-25 pre-review, print.js caught it). `position: absolute` is the "no width"
+   part -- an out-of-flow box contributes nothing to the button's own min-content, so
+   `.lpn-pane-sort` above declares `position: relative` for this to sit against. */
+.lpn-pane-sort::after {
+	content: '▲'; position: absolute; inset-inline-end: 1px; top: 50%; transform: translateY(-50%);
+	font-size: .85em; font-weight: normal; opacity: 0; pointer-events: none;
+}
+.lpn-pane-sort-desc::after { content: '▼'; }
+.lpn-pane-sort-active::after { opacity: 1; }
+.lpn-pane-table thead th:hover .lpn-pane-sort::after,
+.lpn-pane-table thead th:focus-within .lpn-pane-sort::after { opacity: .5; }
+.lpn-pane-table thead th:hover .lpn-pane-sort-active::after,
+.lpn-pane-table thead th:focus-within .lpn-pane-sort-active::after { opacity: 1; }
+/* **THE "..." COLUMN MENU** (Tom: *"Maybe a three dots menu for sorting and hiding."*) -- opens the
+   same menu the right-click/long-press does (`paneHeadMenuTrigger()`), so it is a second door onto
+   one room rather than a second menu to keep in step. `position: absolute` for the same "no extra
+   heading width" reason as the sort glyph above; it sits on the grip's own margin, which the grip
+   (7px, `inset-inline-end: 0`) leaves clear of it at `inset-inline-end: 8px`. Hover- and
+   focus-reveal it on a device that HAS hover; a touch screen never fires `:hover` at all, so it is
+   drawn at all times there instead -- the one place a mouse and a finger are told apart in this
+   file. */
+.lpn-pane-colmenu {
+	position: absolute; inset-inline-end: 8px; top: 0; height: 100%; width: 14px;
+	display: flex; align-items: center; justify-content: center;
+	background: none; border: 0; padding: 0; margin: 0; font: inherit; font-weight: normal;
+	color: #667; cursor: pointer; opacity: 0;
+}
+/* The glyph itself, same reasoning as `.lpn-pane-sort::after` just above: `content:` rather than a
+   text node, so print.js's per-text-node line count never sees it. */
+.lpn-pane-colmenu::after { content: '⋯'; }
+.lpn-pane-table thead th:hover .lpn-pane-colmenu,
+.lpn-pane-table thead th:focus-within .lpn-pane-colmenu,
+.lpn-pane-colmenu:focus-visible { opacity: 1; }
+.lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible { color: #0645ad; outline: 0; }
+@media (hover: none) {
+	.lpn-pane-colmenu { opacity: 1; }
+}
+/* The Manage columns dialog (openDialog(), #lpn_dialog): one row per column, a Show checkbox and
+   two reorder buttons. Plain and compact -- this dialog is open for a few seconds, not a page of
+   its own. */
+.lpn-managecols-table { border-collapse: collapse; width: 100%; }
+.lpn-managecols-table th, .lpn-managecols-table td {
+	text-align: start; padding: 3px 6px; border-bottom: 1px solid #eee; font-weight: normal;
+}
+.lpn-managecols-table th { font-weight: bold; font-size: .9em; color: #555; }
+.lpn-managecols-table td button {
+	background: none; border: 1px solid #ccc; border-radius: 2px; cursor: pointer;
+	padding: 1px 5px; margin-inline-end: 2px; font: inherit;
+}
+.lpn-managecols-table td button:disabled { color: #bbb; border-color: #eee; cursor: default; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the

@@ -868,6 +868,15 @@ $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
 $ec_lang['lpn_pane_hide_col']='Hide this column';
 $ec_lang['lpn_pane_hide_cols']='Hide these columns';
 $ec_lang['lpn_pane_show_col']='Show {col}';
+$ec_lang['lpn_pane_show_all_cols']='Show all columns';
+$ec_lang['lpn_pane_sort_asc']='Sort ascending';
+$ec_lang['lpn_pane_sort_desc']='Sort descending';
+$ec_lang['lpn_pane_manage_cols']='Manage columns…';
+$ec_lang['lpn_pane_manage_cols_title']='Manage columns';
+$ec_lang['lpn_pane_manage_cols_show']='Show';
+$ec_lang['lpn_pane_manage_cols_up']='Move up';
+$ec_lang['lpn_pane_manage_cols_down']='Move down';
+$ec_lang['lpn_pane_colmenu_tip']='Sort, hide, or manage columns';
 $ec_lang['lpn_tool_area_window']='Select a window';
 $ec_lang['lpn_tool_area_lasso']='Select a lasso';
 $ec_lang['lpn_tool_area_polygon']='Select a polygon';
@@ -2143,7 +2152,7 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 $ec_lang['lpn_notes_4_term']='Also on this page';
 $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table keyboard shortcuts';
-$ec_lang['lpn_notes_6_def']='<ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>';
+$ec_lang['lpn_notes_6_def']='<ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

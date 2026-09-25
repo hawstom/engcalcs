@@ -21381,17 +21381,26 @@ var EngCalcs = EngCalcs || {};
 		spec.headCells = {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button'),
-				grip = document.createElement('span');
+				grip = document.createElement('span'), menuBtn = document.createElement('button');
 			th.className = paneCellClass(c, i) +
 				(paneColUserWidth(spec.id, c) ? ' lpn-pane-tight' : '');
 			th._lpnColKey = c.key;
 			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
-			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
-			// that is a button already says it can be clicked.
-			b.textContent = paneHeadingText(c) +
-				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
+			// **THE ARROW IS ALWAYS THERE ON THE SORTED COLUMN, AND HOVER-REVEALED ON EVERY OTHER
+			// ONE** (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe
+			// including a hover revelation?"*). A CSS `::after`, not a DOM text node: a real node
+			// with "▲" in it is TEXT, and `dev/browser-pass/specs/print.js` walks every text node of
+			// a heading to compare screen and print line counts -- an invisible node still has a
+			// client rect, so it was silently counted as an extra line on the sorted-arrow's column
+			// once, before this went to `content:` instead (2026-09-25 pre-review). A `content:`
+			// string is not in the DOM at all, so `b.textContent` -- and everything that reads it,
+			// on either side of the print comparison -- never sees it, and it costs no heading width
+			// for the same reason the earlier span would have (out of flow either way).
+			b.textContent = paneHeadingText(c);
+			b.className += (spec.sort.col === c.key) ? ' lpn-pane-sort-active' : '';
+			b.className += (spec.sort.col === c.key && spec.sort.dir < 0) ? ' lpn-pane-sort-desc' : '';
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
 			// **CTRL/CMD OR SHIFT ON THE HEADING SELECTS IT INSTEAD OF SORTING** -- the same modifier
 			// convention a spreadsheet uses for its own column headers, so several can be marked
@@ -21416,7 +21425,16 @@ var EngCalcs = EngCalcs || {};
 			b.addEventListener('mousedown', function (ev) {
 				if (ev && ev.button) { return; }
 				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
-				if (paneHeadSel(spec).indexOf(c.key) !== -1) { paneStartColDrag(spec, c.key, ev); return; }
+				if (paneHeadSel(spec).indexOf(c.key) !== -1) {
+					// **THE MISSING LINE.** Its siblings (the resize grip, and the select-drag three
+					// lines below) both call this before attaching their own listeners; this branch
+					// never did, so the browser's own mousedown handling raced the custom drag -- a
+					// press on a selected heading started native text selection or a focus ring
+					// instead of picking the column up, which is very likely why Tom could not get a
+					// column to drag (Ida, 2026-09-25).
+					if (ev && ev.preventDefault) { ev.preventDefault(); }
+					paneStartColDrag(spec, c.key, ev); return;
+				}
 				if (ev && ev.preventDefault) { ev.preventDefault(); }
 				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
 				paneStartHeadSelDrag(spec, c.key, ev);
@@ -21445,19 +21463,36 @@ var EngCalcs = EngCalcs || {};
 			// drag above, so only hide is new); this menu is the whole of the affordance, and it is
 			// also the obvious way BACK -- a hidden column's own entry offers to show it again.
 			th.addEventListener('contextmenu', function (ev) {
-				var sel;
 				if (ev.preventDefault) { ev.preventDefault(); }
 				if (ev.stopPropagation) { ev.stopPropagation(); }
-				// A right-click ON the current multi-selection acts on all of it; anywhere else, it
-				// is the single-column case Tom already had, unchanged.
-				sel = paneHeadSel(spec);
-				if (sel.length <= 1 || sel.indexOf(c.key) === -1) {
-					spec.headSel = [c.key];
-					spec.headSelAnchor = c.key;
-					paneHeadSelApply(spec);
-				}
-				paneOpenColMenu(spec, ev.clientX || 0, ev.clientY || 0, c.key);
+				paneHeadMenuTrigger(spec, c.key, ev.clientX || 0, ev.clientY || 0);
 			});
+			// **A HOVER-REVEALED "..." AT THE TRAILING EDGE OF EVERY HEADING** (Tom, 2026-09-25: *"I
+			// honestly don't know [about] a grab cursor somewhere... Maybe a three dots menu for
+			// sorting and hiding."*). The right-click/long-press menu was already the whole of this
+			// affordance; a desktop mouse user who does not already know to right-click had no way to
+			// find it, and a KEYBOARD user had no way at all -- this is a real, focusable button, not
+			// a decoration, so Tab reaches it and `:focus-within` (CSS) reveals it same as hover does.
+			// It opens the exact same menu, positioned under itself rather than the pointer --
+			// `position: absolute` in CSS, so like the sort glyph it costs no heading width. Shown
+			// unconditionally on a touch screen too, where "hover" never happens at all.
+			// **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- the sort glyph beside it
+			// learned this the hard way (see its own comment): a real "⋯" character in the button
+			// would be one more text node under the heading for `print.js`'s screen/print line-count
+			// walk to trip over on every column, not only the sorted one. The accessible name comes
+			// from `title` instead (picked up by `ec-help` for the styled tip, same as every other
+			// icon-only button on this page).
+			menuBtn.type = 'button';
+			menuBtn.className = 'lpn-pane-colmenu ec-help';
+			menuBtn.setAttribute('aria-haspopup', 'menu');
+			menuBtn.setAttribute('aria-label', pc.lpn_pane_colmenu_tip || 'Sort, hide, or manage columns');
+			menuBtn.title = pc.lpn_pane_colmenu_tip || 'Sort, hide, or manage columns';
+			menuBtn.addEventListener('click', function (ev) {
+				var r = menuBtn.getBoundingClientRect();
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				paneHeadMenuTrigger(spec, c.key, r.left, r.bottom);
+			});
+			th.appendChild(menuBtn);
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -22483,6 +22518,16 @@ var EngCalcs = EngCalcs || {};
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 			return true;
 		}
+		// **CTRL+SPACE TOGGLES THE CURRENT COLUMN INTO THE SELECTION** -- Google Sheets' own
+		// shortcut for exactly this (Ida, 2026-09-25, survey of established grids), reused rather
+		// than invented: a reader who already knows it in a spreadsheet knows it here. Read the
+		// column from the ANCHOR cell, matching every other "current column" idea in this handler
+		// (the copy-down arrow-key comment above). A cell being typed in keeps its own space
+		// character.
+		if (jump && !editing && key === ' ') {
+			paneHeadSelToggle(spec, cols[box.ac].key);
+			return true;
+		}
 		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
@@ -22919,15 +22964,31 @@ var EngCalcs = EngCalcs || {};
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
 		paneClampMenu(menu, x, y);
 	}
-	// **THE HEADING'S OWN MENU: HIDE THIS COLUMN (OR THESE COLUMNS), AND SHOW ONE BACK.** A
-	// right-click (or long-press) on any heading but ID offers to hide it; whenever this table has
-	// a hidden column, the same menu lists each one by name so showing it again is never more than
-	// a right-click away -- the "obvious way back" Declan's design asks for, with no separate
-	// popover to build. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can we select multiple
-	// heading cells to hide multiple columns at once?"*) -- when the right-clicked heading is part
-	// of a standing multi-selection, Hide acts on the whole selection in one write; otherwise it is
+	// **SELECT-THEN-OPEN, SHARED BY EVERY WAY IN** (right-click, long-press -- which arrives as the
+	// same `contextmenu` event on a touch browser -- and the hover-revealed "..." button). A
+	// trigger ON the current multi-selection acts on all of it; anywhere else it is the
+	// single-column case, unchanged, exactly as it was written inline three times before this.
+	function paneHeadMenuTrigger(spec, key, x, y) {
+		var sel = paneHeadSel(spec);
+		if (sel.length <= 1 || sel.indexOf(key) === -1) {
+			spec.headSel = [key];
+			spec.headSelAnchor = key;
+			paneHeadSelApply(spec);
+		}
+		paneOpenColMenu(spec, x, y, key);
+	}
+	// **THE HEADING'S OWN MENU: SORT, HIDE (OR HIDE SEVERAL), SHOW ONE BACK, SHOW ALL, MANAGE.** A
+	// right-click (or long-press) on any heading offers it; whenever this table has a hidden
+	// column, the same menu lists each one by name so showing it again is never more than a
+	// right-click away -- the "obvious way back" Declan's design asks for, with no separate popover
+	// to build. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can we select multiple heading
+	// cells to hide multiple columns at once?"*) -- when the triggering heading is part of a
+	// standing multi-selection, Hide acts on the whole selection in one write; otherwise it is
 	// exactly the single-column case this always was. ID is dropped from the targets rather than
-	// blocking the whole menu, so hiding a selection that happens to include ID still hides the rest.
+	// blocking the whole menu, so hiding a selection that happens to include ID still hides the
+	// rest -- ID itself is never hideable (paneSetColsHidden already refuses it).
+	// Sort acts on `key` alone (the heading that was triggered), never the selection: sorting by
+	// several columns at once is not a thing this table offers anywhere else.
 	function paneOpenColMenu(spec, x, y, key) {
 		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden, sel, targets;
 		paneCloseContextMenu();
@@ -22945,6 +23006,12 @@ var EngCalcs = EngCalcs || {};
 			menu.appendChild(b);
 			return b;
 		};
+		mk(pc.lpn_pane_sort_asc || 'Sort ascending', function () {
+			spec.sort.col = key; spec.sort.dir = 1; spec.orderIds = null; renderPaneTable(spec);
+		});
+		mk(pc.lpn_pane_sort_desc || 'Sort descending', function () {
+			spec.sort.col = key; spec.sort.dir = -1; spec.orderIds = null; renderPaneTable(spec);
+		});
 		sel = paneHeadSel(spec);
 		targets = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key];
 		targets = targets.filter(function (k) { return k !== 'id'; });
@@ -22957,10 +23024,90 @@ var EngCalcs = EngCalcs || {};
 			mk(String(pc.lpn_pane_show_col || 'Show {col}').replace('{col}', paneHeadingText(c)),
 				function () { paneSetColHidden(spec, c.key, false); });
 		});
-		if (!menu.childNodes.length) { return; }   // ID's own heading with nothing hidden: no menu
+		// **NOT THE FILTER'S "Show all"** (`lpn_pane_filter_clear`, which clears the ROW filter and
+		// lives in the same pane) -- a different command reusing that string would say one thing in
+		// two places, which CLAUDE.md's label-normalization rule forbids for anything past a whole
+		// sentence. Shown only once something is hidden, same as the per-column entries above it.
+		if (hidden.length) {
+			mk(pc.lpn_pane_show_all_cols || 'Show all columns', function () {
+				paneSetColsHidden(spec, hidden.map(function (c) { return c.key; }), false);
+			});
+		}
+		mk(pc.lpn_pane_manage_cols || 'Manage columns…', function () { paneOpenManageColsDialog(spec); });
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
+		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
 		paneClampMenu(menu, x, y);
+	}
+	// **THE TOUCH AND KEYBOARD PATH FOR REORDER AND MULTI-HIDE** -- the mouse-drag gesture above
+	// does not cover either, so this is not a second way to do what the drag already does; it is
+	// the only way for anyone without a mouse (Ida, 2026-09-25, after QGIS's "Organize columns").
+	// **REUSES `openDialog()`**, this page's one generic modal (js/looped-network.js, the tab-close
+	// prompt and others) rather than a new draggable/resizable "box": every other box on this page
+	// (Settings, Library, Compare, Energy, the run report) remembers its own position and size in a
+	// SEPARATE `localStorage` key, and a seventh one would be new storage for a dialog that is open
+	// for a few seconds and has nothing worth remembering between visits. Column order and hidden
+	// state are already `lpn_panecols` (paneColPrefs); this dialog reads and writes exactly that and
+	// adds no key of its own.
+	// **EVERY CHANGE APPLIES LIVE AND THE DIALOG REDRAWS ITSELF**, so a reader watching the table
+	// through the gap the dialog leaves (it is not full-screen) sees each checkbox and each reorder
+	// land immediately, the same promise Recalculate-off makes for the table's own edits.
+	function paneOpenManageColsDialog(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var h = document.createElement('p'), table, thead, htr,
+				tbody, mkTh, redraw;
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = pc.lpn_pane_manage_cols_title || 'Manage columns';
+			body.appendChild(h);
+			table = document.createElement('table');
+			table.className = 'lpn-managecols-table';
+			thead = document.createElement('thead');
+			htr = document.createElement('tr');
+			mkTh = function (text) { var th = document.createElement('th'); th.textContent = text; htr.appendChild(th); return th; };
+			mkTh(pc.lpn_pane_manage_cols_show || 'Show');
+			mkTh('');
+			mkTh('');
+			thead.appendChild(htr);
+			table.appendChild(thead);
+			tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+			body.appendChild(table);
+			// A column hidden or reordered from HERE rebuilds the live table (paneSetColHidden and
+			// paneMoveCol both do), and this dialog redraws itself from the same paneColsAll(spec)
+			// the table now reflects -- one read, so the two can never say something different.
+			redraw = function () {
+				var cols = paneColsAll(spec);
+				tbody.innerHTML = '';
+				cols.forEach(function (c, i) {
+					var tr = document.createElement('tr'), tdShow = document.createElement('td'),
+						tdName = document.createElement('td'), tdOrder = document.createElement('td'),
+						cb = document.createElement('input'), up = document.createElement('button'),
+						down = document.createElement('button');
+					cb.type = 'checkbox';
+					cb.checked = !paneColHidden(spec.id, c.key);
+					// ID can never be hidden (paneSetColsHidden already refuses it) -- shown checked
+					// and disabled rather than left off the list, so the list is every column this
+					// table has, not a subset the reader has to guess is missing one.
+					if (c.key === 'id') { cb.disabled = true; }
+					cb.addEventListener('change', function () { paneSetColHidden(spec, c.key, !cb.checked); redraw(); });
+					tdShow.appendChild(cb);
+					tdName.textContent = paneHeadingText(c);
+					up.type = 'button'; up.textContent = '▲'; up.disabled = (i === 0);
+					up.title = pc.lpn_pane_manage_cols_up || 'Move up';
+					up.addEventListener('click', function () { if (paneMoveCol(spec, c.key, i - 1)) { renderPaneTable(spec); redraw(); } });
+					down.type = 'button'; down.textContent = '▼'; down.disabled = (i === cols.length - 1);
+					down.title = pc.lpn_pane_manage_cols_down || 'Move down';
+					down.addEventListener('click', function () { if (paneMoveCol(spec, c.key, i + 1)) { renderPaneTable(spec); redraw(); } });
+					tdOrder.appendChild(up);
+					tdOrder.appendChild(down);
+					tr.appendChild(tdShow); tr.appendChild(tdName); tr.appendChild(tdOrder);
+					tbody.appendChild(tr);
+				});
+			};
+			redraw();
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
