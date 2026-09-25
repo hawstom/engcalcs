@@ -1687,7 +1687,6 @@ $ec_lang['lpn_pane_filter_clear']='显示全部';
 $ec_lang['lpn_pane_filter_none']='此表中没有与过滤条件匹配的内容。';
 $ec_lang['lpn_help_screenshots']='截图库';
 $ec_lang['lpn_find_filter_btn']='在当前表格中过滤';
-$ec_lang['lpn_find_filter_table']='要过滤的表格';
 $ec_lang['lpn_find_filter_tip']='只在地图下方的某个表格中显示与此查询匹配的部分。绘图内容不会改变，也不会删除任何内容。';
 $ec_lang['lpn_engine_needed_loading']='正在加载 EPANET 求解器，您可以继续绘制。加载完成后即可获得结果。';
 $ec_lang['lpn_engine_needed_failed']='EPANET 求解器尚未加载，目前也无法加载，而此管网只能由它求解。连接互联网后即可加载。';

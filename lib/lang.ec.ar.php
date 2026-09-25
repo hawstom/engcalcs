@@ -1688,7 +1688,6 @@ $ec_lang['lpn_pane_filter_clear']='إظهار الكل';
 $ec_lang['lpn_pane_filter_none']='لا شيء في هذا الجدول يطابق عامل التصفية.';
 $ec_lang['lpn_help_screenshots']='معرض لقطات الشاشة';
 $ec_lang['lpn_find_filter_btn']='تصفية في الجدول الحالي';
-$ec_lang['lpn_find_filter_table']='الجدول المراد تصفيته';
 $ec_lang['lpn_find_filter_tip']='إظهار الأجزاء المطابقة لهذا الاستعلام فقط في أحد الجداول أسفل الخريطة. لا يتغيّر الرسم ولا يُحذف شيء.';
 $ec_lang['lpn_engine_needed_loading']='يجري تحميل حلّال EPANET أثناء بنائك للشبكة. ستتوفر النتائج عند اكتمال التحميل.';
 $ec_lang['lpn_engine_needed_failed']='لم يُحمَّل حلّال EPANET بعد، ولا يمكن تحميله الآن، وهذه الشبكة لا يمكن حلّها إلا به. سيُحمَّل عندما تكون متصلاً بالإنترنت.';

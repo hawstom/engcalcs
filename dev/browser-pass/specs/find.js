@@ -103,16 +103,11 @@ exports.run = async function ({ browser, report }) {
 
 		// The three pull-downs and the value box are the whole QUERY control surface.
 		//
-		// **THE FILTER ROW'S OWN SELECT IS EXCLUDED, and that is Task 597 rather than a
-		// regression.** A fourth `<select>` — "which table" — sits in `.lpn-find-filter` (Task 708:
-		// on the SAME row as the Find button since 2026-09-23, so a plain `.lpn-find-filter`
-		// exclusion would now take the Find button's own click target with it). It is not part of
-		// the query: it says which pane table the found set is applied TO. Counting every select in
-		// the popup made this read `got 4, wanted 3`, and (below) made "the pull-downs go away" read
-		// `got 1, wanted 0` — the filter row stays, correctly, because a compound query still has a
-		// set to filter a table with. The `selects` count still names `.lpn-find-filter` and steps
-		// over it; `buttons` names the filter button by its own id instead, so the Find button
-		// beside it is still counted.
+		// **`.lpn-find-filter` HOLDS TWO BUTTONS, FIND AND FILTER IN TABLE, AND NO SELECT AT ALL**
+		// (R-197, 2026-09-25: Tom's table selector was cut in favour of "which table(s)" being
+		// decided by the query, never picked by hand). The exclusion below is kept anyway rather
+		// than assuming the row can never grow a select again; `buttons` names the filter button by
+		// its own id so the Find button beside it is still counted.
 		const controls = await a.page.evaluate(() => {
 			const p = document.getElementById('lpn_find_popup');
 			const q = (sel) => [...p.querySelectorAll(sel)].filter(e => !e.closest('.lpn-find-filter'));

@@ -1282,11 +1282,6 @@
             "ruled": "2026-09-07",
             "answer": "Edited."
         },
-        "lpn_find_filter_table": {
-            "on": "Table to filter",
-            "ruled": "2026-09-07",
-            "answer": "OK."
-        },
         "lpn_find_filter_tip": {
             "on": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
             "ruled": "2026-09-07",

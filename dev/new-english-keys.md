@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 185 untranslated keys, of 2034 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, all ruled)
+## lpn_  (185, 3 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -138,6 +138,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_file_import_survey_tip`**
   > Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.
   _Ruled OK 2026-09-23._
+- **`lpn_find_filter_none`**
+  > No table has a property this query names.
+  @@ NEEDS RULING
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  @@ NEEDS RULING
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
@@ -578,7 +587,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**59 still to read**, of 82 new keys across 7 unmerged branch(es).
+**63 still to read**, of 99 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +598,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`51530232`) — 27 new, 27 to read @@ NEEDS RULING
+### chore/queue-0925 (`2878d1d0`) — 1 new, all ruled
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### chore/tom-edits-0925 (`9d8f81cc`) — 1 new, all ruled
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### feat/convert-as (`0693cb6d`) — 30 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -604,13 +625,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPSG coordinate system
   @@ NEEDS RULING
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 / Pseudo-Mercator (EPSG:3857).
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
-  > Label
+  > Suffix
   @@ NEEDS RULING
 - **`lpn_convas_label_depth_na`**
   > Tank depth has no map label to add this to yet.
@@ -654,14 +675,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_convas_unnamed_tip`**
   > Local coordinates in the length unit, with the world map attached at the place the project is.
   @@ NEEDS RULING
+- **`lpn_crs_latlon_display`**
+  > WGS 84 latitude/longitude (EPSG:4326)
+  @@ NEEDS RULING
 - **`lpn_file_convert_as`**
   > Convert as…
   @@ NEEDS RULING
 - **`lpn_file_convert_as_tip`**
   > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
   @@ NEEDS RULING
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  @@ NEEDS RULING
+- **`lpn_inp_report_no_crs`**
+  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
   @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
@@ -673,7 +703,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
+### feat/first-project (`2aa7c2c1`) — 1 new, all ruled
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### feat/label-gang-search (`0346dc5d`) — 40 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -699,6 +735,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 - **`lpn_labels_restore`**
   > Restore label defaults
   _Ruled OK 2026-09-23._
@@ -793,20 +832,40 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`a5538f99`) — adds no English strings
+### feat/label-limit (`4bcf92ab`) — 1 new, all ruled
 
-### feat/offscreen-notice (`d4acb740`) — 1 new, 1 to read @@ NEEDS RULING
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 
+### feat/offscreen-notice (`291bd4c7`) — 2 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 - **`lpn_offscreen_intact`**
   > Your network is intact.
   @@ NEEDS RULING
 
-### feat/property-venue (`1066860e`) — adds no English strings
+### feat/property-venue (`98613d7f`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/table-editing (`b1da93a8`) — 8 new, 8 to read @@ NEEDS RULING
+- **`lpn_find_filter_table`**
+  > Table
+  @@ NEEDS RULING
 
+### feat/select-on-focus (`11edc1ad`) — 1 new, all ruled
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### feat/table-editing (`efeaa75a`) — 9 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 - **`lpn_notes_6_def`**
-  > Arrow keys move the selection, and Tab and Enter move it after you type. Shift extends the selection, and Shift+Tab and Shift+Enter move backward. Ctrl+C copies the selection, Ctrl+D fills it down from its top row, Ctrl+A selects the whole table, Delete clears a cell, F2 opens a cell to edit it, and Esc cancels an edit. Right-click, or long-press, a column heading to hide it, or to show one back; select more than one heading first (Ctrl-click or Shift-click) to hide several at once.
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -830,8 +889,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/zoom-control (`05291ba3`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/usage-report (`5da3e7ae`) — 1 new, all ruled
 
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### feat/zoom-control (`dc1fa5a9`) — 8 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
   @@ NEEDS RULING
@@ -845,11 +913,26 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   @@ NEEDS RULING
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
+  > Zoom in one step. Shortcut: +
   @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
+  > Zoom out one step. Shortcut: -
+  @@ NEEDS RULING
+
+### fix/menu-cue (`07c0ed29`) — 1 new, all ruled
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+
+### merge/0925 (`013958ef`) — 2 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_find_filter_table`**
+  > Table to filter
+  _Ruled OK 2026-09-07._
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
   @@ NEEDS RULING

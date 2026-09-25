@@ -1685,7 +1685,6 @@ $ec_lang['lpn_pane_filter_clear']='Afișează tot';
 $ec_lang['lpn_pane_filter_none']='Nimic din acest tabel nu corespunde filtrului.';
 $ec_lang['lpn_help_screenshots']='Galerie de capturi de ecran';
 $ec_lang['lpn_find_filter_btn']='Filtrează în tabelul curent';
-$ec_lang['lpn_find_filter_table']='Tabel de filtrat';
 $ec_lang['lpn_find_filter_tip']='Afișează doar părțile care corespund acestei interogări într-unul dintre tabelele de sub hartă. Desenul nu este modificat și nimic nu este șters.';
 $ec_lang['lpn_engine_needed_loading']='Se încarcă rezolvitorul EPANET în timp ce construiți. Rezultatele vor fi disponibile după încărcarea completă.';
 $ec_lang['lpn_engine_needed_failed']='Rezolvitorul EPANET nu a fost încă încărcat, nu poate fi încărcat, iar această rețea poate fi rezolvată doar de el. Va fi încărcat atunci când sunteți conectat la internet.';

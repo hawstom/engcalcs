@@ -1690,7 +1690,6 @@ $ec_lang['lpn_pane_filter_clear']='Onyesha vyote';
 $ec_lang['lpn_pane_filter_none']='Hakuna kitu kwenye jedwali hili kinacholingana na kichujio.';
 $ec_lang['lpn_help_screenshots']='Mkusanyiko wa picha za skrini';
 $ec_lang['lpn_find_filter_btn']='Chuja kwenye jedwali la sasa';
-$ec_lang['lpn_find_filter_table']='Jedwali la kuchuja';
 $ec_lang['lpn_find_filter_tip']='Onyesha sehemu tu zinazolingana na hoja hii katika mojawapo ya majedwali chini ya ramani. Mchoro haubadilishwi na hakuna kinachofutwa.';
 $ec_lang['lpn_engine_needed_loading']='Inapakia kitatuzi cha EPANET wakati unajenga. Matokeo yatapatikana kitatuzi kikisha kupakiwa kikamilifu.';
 $ec_lang['lpn_engine_needed_failed']='Kitatuzi cha EPANET hakijapakiwa bado, hakiwezi kupakiwa, na mtandao huu unaweza kutatuliwa nacho pekee. Kitapakiwa utakapounganishwa na mtandao wa intaneti.';

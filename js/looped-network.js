@@ -17374,10 +17374,6 @@ var EngCalcs = EngCalcs || {};
 		}), findState.scope, function (v) {
 			findState.scope = v;
 			findNormalize();
-			// The filter's table follows the scope again -- see findFilterTarget(). A scope change
-			// already re-points the property and the condition; leaving the table pinned to the old
-			// scope's tab would be the one control that did not follow.
-			findFilterTable = null;
 			rebuildFindForm(); renderFindResults(null);
 		});
 		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
@@ -17580,15 +17576,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- THE FILTER BUTTON, BESIDE THE FIND BUTTON (ROADMAP Task 597) ---------------------------
 	//
-	// **WHICH TABLE IS DERIVED FROM THE SCOPE UNTIL THE USER SAYS OTHERWISE, and that is where the
-	// clicks are saved.** Somebody searching Pipes almost always wants the Pipes table, so the
-	// selector is already on it and the whole gesture is one press. Picking another one sticks;
-	// changing the scope hands the choice back to the derivation, because a scope change has already
-	// re-pointed the property and the condition for the same reason.
+	// **ONE BUTTON, NO SELECTOR** (Tom, 2026-09-25, of R-197's report that the selector was gone:
+	// *"I think what is simplest and closest to what we have is a simple 'Filter in table' button
+	// ... I think it implies that we filter all tables insofar as we can if 'Everything' is
+	// selected."*). A scope that names one table -- Junction, Pipe, ... -- filters that table
+	// alone, which is where the earlier selector always ended up anyway once it followed the
+	// scope. "Everything", and a typed compound query, name no single table, so the button filters
+	// every table the query can be asked of.
 	//
-	// `null` from the derivation means the scope names no single table -- Everything, and Text,
-	// which has no tab at all because nothing about a text label solves.
-	var findFilterTable = null;
+	// **A TABLE THE QUERY DOES NOT NAME A PROPERTY OF IS LEFT AS IT WAS, NEVER EMPTIED.** "Pressure
+	// above 40" is a fact about nodes; asking it of the Pipes table is not "zero pipes match", it
+	// is a question Pipes cannot answer, and those are different facts. `propAppliesToTable()`
+	// answers through the same menu findPropDefs() already builds for a scope's pull-down -- one
+	// list of "properties that exist here", read both to fill the menu and to test this.
 	function paneTableForScope(scope) {
 		var d = findScopeDef(scope), list = paneTables(), i;
 		if (d.key === 'all' || d.group === 'label') { return null; }
@@ -17597,30 +17597,98 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function findFilterTarget() {
-		return findFilterTable || paneTableForScope(findState.scope) || paneTables()[0].id;
+	// The scope key whose group/type matches this table -- the reverse of paneTableForScope().
+	// Unlike it, this matches Text too (paneTableForScope() answers "does this scope name ONE
+	// table", which Text does not, since Everything also reaches it; this answers "which scope
+	// speaks for this table's properties", which for the Text table is still 'text').
+	function scopeKeyForTable(spec) {
+		var defs = findScopeDefs(), i, d;
+		for (i = 0; i < defs.length; i++) {
+			d = defs[i];
+			if (d.group !== spec.group) { continue; }
+			if (!d.type || d.type === spec.type) { return d.key; }
+		}
+		return null;
+	}
+	function propAppliesToTable(prop, spec) {
+		var key = scopeKeyForTable(spec), save, defs, i;
+		if (!key) { return false; }
+		save = findState.scope;
+		findState.scope = key;
+		defs = findPropDefs();
+		findState.scope = save;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === prop) { return true; } }
+		return false;
+	}
+	// Every property named by a leaf condition, compound or not -- the set `propAppliesToTable()`
+	// tests a table against.
+	function findAstLeafProps(ast, out) {
+		if (!ast) { return out; }
+		if (ast.t === 'cond') { out[ast.prop] = true; return out; }
+		findAstLeafProps(ast.a, out); findAstLeafProps(ast.b, out);
+		return out;
+	}
+	function findQueryProps() {
+		if (findQueryAst) { return findAstLeafProps(findQueryAst, {}); }
+		var out = {};
+		out[findState.prop] = true;
+		return out;
+	}
+	function findQueryAppliesToTable(props, spec) {
+		var p;
+		for (p in props) {
+			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+		}
+		return true;
+	}
+	// One row of the multi-table receipt: "Junctions: 5 of 12".
+	function findFilterRowText(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_find_filter_row || '{table}: {n} of {all}')
+			.split('{table}').join(pc[spec.label] || spec.id)
+			.split('{n}').join(String(paneTableRowsInOrder(spec).length))
+			.split('{all}').join(String(paneTableAllElements(spec).length));
 	}
 	// **THE LINE THAT RUNS IS THE ONE IN THE BOX**, exactly as it is for the Find button: the query
 	// input is the single expression of what this panel selects, whether the controls wrote it or
 	// the user typed it. That is also what makes the filter and the search provably the same
 	// question -- there is one string and one evaluator.
 	function applyTableFilter() {
-		var text = findQueryInput ? findQueryInput.value : findQueryString(),
-			id = findFilterTarget(), spec, run;
+		var pc = EngCalcs.pageConfig || {},
+			text = findQueryInput ? findQueryInput.value : findQueryString(),
+			single = findQueryAst ? null : paneTableForScope(findState.scope),
+			run, props, firstId = null, rows = [];
 		run = findSelectByQuery(text);
 		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
 		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
 		if (!run.ok) { renderFindResults(run.msg); return; }
-		paneSetFilter(id, String(text).trim());
-		openPane(id);
-		spec = paneTableById(id);
-		// The receipt is the table's own banner text, so the panel and the table cannot say two
-		// different things about one filter.
-		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
+		if (single) {
+			paneSetFilter(single, String(text).trim());
+			openPane(single);
+			// The receipt is the table's own banner text, so the panel and the table cannot say two
+			// different things about one filter.
+			renderFindResults(paneFilterNoteText(paneTableById(single), paneTableRowsInOrder(paneTableById(single))));
+			return;
+		}
+		props = findQueryProps();
+		paneTables().forEach(function (spec) {
+			if (!findQueryAppliesToTable(props, spec)) { return; }
+			paneSetFilter(spec.id, String(text).trim());
+			if (!firstId) { firstId = spec.id; }
+			rows.push(findFilterRowText(spec));
+		});
+		if (!firstId) {
+			renderFindResults(pc.lpn_find_filter_none || 'No table has a property this query names.');
+			return;
+		}
+		openPane(firstId);
+		renderFindResults(String(pc.lpn_find_filter_summary || 'Filtered by {q}. {rows}.')
+			.split('{q}').join(String(text).trim())
+			.split('{rows}').join(rows.join(', ')));
 	}
-	// **ONE ROW: [Find] [Filter in table >] [which table]** (Tom, 2026-09-23; wording per R-225). `findBtn` is the Find
-	// button built in rebuildFindForm() -- passed in rather than built twice, so there is exactly
-	// one Find button and exactly one place that wires its click.
+	// **ONE ROW: [Find] [Filter in table]** (Tom, 2026-09-25: a plain button, no selector). `findBtn`
+	// is the Find button built in rebuildFindForm() -- passed in rather than built twice, so there
+	// is exactly one Find button and exactly one place that wires its click.
 	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
 		row.className = 'lpn-find-filter';
@@ -17633,21 +17701,10 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		// Tom's own words -- not "Filter in current table" or "Filter in selected table", either of
-		// which answers a question the button was never asking (2026-09-23: *"is this offering two
-		// options or just one?"*). There is one table, the one named in the selector beside it.
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table >';
+			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
-		// **THE SELECTOR FOLLOWS "WHAT TO SEARCH"** (findFilterTarget()) until the user overrides
-		// it, and sits right beside the button that reads it -- so "which table" is answered where
-		// it is asked, on the one line, rather than in a row of its own underneath. The button's own
-		// text now points at the selector (R-225), so the selector's "Table" label is not drawn --
-		// only kept as this control's accessible name.
-		findSelect(row, pc.lpn_find_filter_table || 'Table', paneTables().map(function (s) {
-			return [s.id, pc[s.label] || s.id];
-		}), findFilterTarget(), function (v) { findFilterTable = v; }, true);
 		box.appendChild(row);
 	}
 	function runFind() {

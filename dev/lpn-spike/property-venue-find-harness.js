@@ -17,7 +17,7 @@
 // Every element is FOUND before it is REPLACED, so a Find regression cannot hide behind a Replace
 // pass that reads replaceSpecs() directly.
 
-const { ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { ensure, setUnitSet, loadLoopedNetwork, visibleTip } = require('./lpn-dom-stub.js');
 ensure('lpn_find_form');
 ensure('lpn_find_results');
 // The real lib/lang.ec.en.php the stub loads, read once so this file never pins English wording
@@ -51,7 +51,6 @@ const L = loadLoopedNetwork(
 	"\t\tfindValue: function () { return findState.value; },\n" +
 	"\t\treplaceProp: function () { return replaceState.prop; },\n" +
 	"\t\treplaceValue: function () { return replaceState.value; },\n" +
-	"\t\tfilterTarget: function () { return findFilterTarget(); },\n" +
 	// The Nth <input> under one root, in document order -- the same walk as selectAt() but for the
 	// free-entry Value/New value boxes, which is what a Property switch away from a choice
 	// property leaves behind.
@@ -59,10 +58,10 @@ const L = loadLoopedNetwork(
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\t\tif (c._tag === 'input') { i++; if (i === n) { out = c; } } walk(c); }); })(root);\n" +
 	"\t\t\treturn out; },\n" +
-	// **THE FIND BUTTON, THE FILTER BUTTON AND THE TABLE SELECTOR ARE ONE ROW** (Task 708, Tom
-	// 2026-09-23: "[Find][Filter in Table][tables_selector]"). Asserted structurally rather than
-	// visually -- the stub draws no layout -- as: do the Find button and the Filter button share a
-	// `.lpn-find-filter` parent, and does that same parent hold the table select.
+	// **THE FIND BUTTON AND THE FILTER BUTTON ARE ONE ROW, NO SELECTOR** (R-197, Tom 2026-09-25: a
+	// plain "Filter in table" button, table(s) chosen by the query rather than picked by hand).
+	// Asserted structurally rather than visually -- the stub draws no layout -- as: do the Find
+	// button and the Filter button share a `.lpn-find-filter` parent.
 	"\t\tfilterRow: function () { var out = null;\n" +
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\t\tif (c.className === 'lpn-find-filter') { out = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
@@ -485,34 +484,24 @@ function build(unitSet) {
 	ok('switching Replace\'s own Property away from Shut clears its Value the same way',
 		L.replaceValue() === '', JSON.stringify(L.replaceValue()));
 
-	// ---- 2. One row: Find, Filter in Table, then which table ----
+	// ---- 2. One row: Find, then Filter in table -- no selector (R-197) ----
 	L.setFindState('pipe', 'id', 'contains', '');
 	L.buildPanel();
 	const row = L.filterRow();
 	ok('the filter row exists', !!row);
 	ok('the Find button is IN the filter row, not on a line of its own above it',
 		!!row && row.children.some(function (c) { return c.id === 'lpn_find_go'; }));
-	ok('...beside the Filter in Table button',
+	ok('...beside the Filter in table button',
 		!!row && row.children.some(function (c) { return c.id === 'lpn_find_filter_go'; }));
-	ok('...beside the table selector, all three in one row',
-		!!row && !!L.selectAt(row, 1));
-	// R-225 (2026-09-24): the selector's own "Table" label is no longer drawn -- its wording moved
-	// onto the button -- but the <label> stays in the DOM, wrapping the <select>, so the selector
-	// still has an accessible name. Asserted against the LIVE strings, never a literal, per
-	// harness_wording_check.php.
+	ok('...and there is no third control: the row holds exactly two buttons',
+		!!row && row.children.length === 2);
 	const filterBtn = row && row.children.filter(function (c) { return c.id === 'lpn_find_filter_go'; })[0];
 	ok('the Filter button carries the current lpn_find_filter_btn wording',
 		!!filterBtn && filterBtn.textContent === global.EngCalcs.pageConfig.lpn_find_filter_btn,
 		filterBtn && filterBtn.textContent);
-	const tableSelect = L.selectAt(row, 1);
-	const tableLabel = tableSelect && tableSelect.parentNode;
-	ok('the table selector is still wrapped in a <label> naming it (accessible name kept)',
-		!!tableLabel && tableLabel._tag === 'label' &&
-		tableLabel.textContent.indexOf(global.EngCalcs.pageConfig.lpn_find_filter_table) !== -1,
-		tableLabel && tableLabel.textContent);
-	ok('...but that label is visually hidden, not drawn on screen',
-		!!tableLabel && /clip/.test((tableLabel._styleAttr || '') + JSON.stringify(tableLabel.style || {})),
-		tableLabel && tableLabel._styleAttr);
+	ok('...and Tom\'s exact tip text',
+		!!filterBtn && visibleTip(filterBtn) === global.EngCalcs.pageConfig.lpn_find_filter_tip,
+		filterBtn && visibleTip(filterBtn));
 
 	// ---- 3. Changing Find's Property pushes Replace's Property to change ----
 	L.setFindState('pipe', 'length', 'gt', '0');
