@@ -1209,8 +1209,8 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // **ONE STRING FOR EIGHT BUTTONS** (Task 595). The digit is substituted at render time from
 // LPN_TOOL_KEYS, so the mapping has a single home and no translator has to keep a number in step
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
-$ec_lang['lpn_tool_key_hint']='Shortcut: press {key}.';
-$ec_lang['lpn_tool_key_hint_two']='Shortcut: press {key} or {key2}.';
+$ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
+$ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
 $ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
 $ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';

@@ -593,19 +593,19 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_convas_coordsys_tip`**
   > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_convas_done`**
   > The converted copy is {name}. The original project is unchanged.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_convas_epsg`**
   > EPSG coordinate system
-  @@ NEEDS RULING
+  OK.
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
-  @@ NEEDS RULING
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
+  Edited.
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
@@ -655,29 +655,29 @@ build for that would be a gate nobody keeps. Refresh it with
   > Local coordinates in the length unit, with the world map attached at the place the project is.
   @@ NEEDS RULING
 - **`lpn_crs_latlon_display`**
-  > WGS 84 latitude/longitude (EPSG:4326)
-  @@ NEEDS RULING
+  > WGS 84 (EPSG:4326)
+  Edited. Probably no longer needed since we are not changing any of the entries.
 - **`lpn_file_convert_as`**
   > Convert as…
-  @@ NEEDS RULING
+  OK.
 - **`lpn_file_convert_as_tip`**
   > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_inp_report_no_crs`**
-  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
-  @@ NEEDS RULING
+  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
+  Edited.
 - **`lpn_units_mapcoords`**
   > Map coordinates
-  @@ NEEDS RULING
+  OK.
 - **`lpn_units_mapcoords_deg`**
   > degrees
-  @@ NEEDS RULING
+  OK.
 - **`lpn_units_usft`**
   > US survey ft
-  @@ NEEDS RULING
+  OK.
 
 ### feat/first-project (`dc5b5843`) — adds no English strings
 
@@ -685,26 +685,26 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_basemap_hide`**
   > Hide street map
-  @@ NEEDS RULING
+  OK.
 - **`lpn_basemap_satellite_hide`**
   > Hide satellite images
-  @@ NEEDS RULING
+  OK.
 - **`lpn_basemap_satellite_tip`**
-  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
-  @@ NEEDS RULING
+  > Photographs of the earth from Mapbox.
+  Edited.
 - **`lpn_basemap_tip`**
-  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
-  @@ NEEDS RULING
+  > Street map images from OpenStreetMap.
+  Edited.
 - **`lpn_clean_map`**
   > Hide map readouts
-  @@ NEEDS RULING
+  This is obsolete. It doesn't go anywhere. Delete key.
 - **`lpn_clean_map_off`**
   > Show map readouts
-  @@ NEEDS RULING
+  This is obsolete. It doesn't go anywhere. Delete key.
 - **`lpn_clean_map_tip`**
   > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
-  @@ NEEDS RULING
-- **`lpn_confirm_labels_restore`**
+  This is obsolete. It doesn't go anywhere. Delete key.
+  - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 - **`lpn_labels_restore`**
@@ -718,7 +718,7 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_column_n`**
   > column {n}
   _Ruled OK 2026-09-23._
@@ -732,8 +732,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > That GPX file holds no waypoints, so there is nothing to make junctions from.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_err_no_coords`**
-  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
-  @@ NEEDS RULING
+  > Could not find two coordinate columns in that file. Provide a header with column names and try again. The first row reads: {detail}
+  Edited. Not sure I understood. Please check.
 - **`lpn_survey_err_plane`**
   > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
@@ -745,25 +745,25 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_survey_fmt_nez`**
   > Northing, easting, elevation (NEZ)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_fmt_nezd`**
   > Northing, easting, elevation, description (NEZD)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_fmt_penz`**
   > Point name, easting, northing, elevation (PENZ)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_fmt_penzd`**
   > Point name, easting, northing, elevation, description (PENZD)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_fmt_pnez`**
   > Point name, northing, easting, elevation (PNEZ)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_fmt_pnezd`**
   > Point name, northing, easting, elevation, description (PNEZD)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_from_header`**
   > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_survey_map_gpx`**
   > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
   _Ruled OK 2026-09-17._
@@ -807,7 +807,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_offscreen_intact`**
   > Your network is intact.
-  @@ NEEDS RULING
+  OK.
 
 ### feat/property-venue (`98613d7f`) — adds no English strings
 
@@ -817,28 +817,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
-  @@ NEEDS RULING
+  OK.
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_filldown`**
   > Fill down
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_filled`**
   > Filled down {n} cells. {skipped} were not changed.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_hide_col`**
   > Hide this column
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_hide_cols`**
   > Hide these columns
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pane_show_col`**
   > Show {col}
-  @@ NEEDS RULING
+  OK.
 
 ### feat/usage-report (`5da3e7ae`) — adds no English strings
 
@@ -846,24 +846,24 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_tool_zoom_window`**
   > Zoom Window
-  @@ NEEDS RULING
+  OK.
 - **`lpn_tool_zoom_window_tip`**
   > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_zoom_in`**
   > Zoom in
-  @@ NEEDS RULING
+  OK.
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
+  > Zoom in one step. Shortcut: +
+  Edited.
 - **`lpn_zoom_out`**
   > Zoom out
-  @@ NEEDS RULING
+  OK.
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
+  > Zoom out one step. Shortcut: -
   @@ NEEDS RULING
 
 ### fix/first-use (`88d8e262`) — adds no English strings
