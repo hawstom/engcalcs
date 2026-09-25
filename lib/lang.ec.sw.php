@@ -1779,7 +1779,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Chagua mchoro wa ramani wa kijiografia. Tu
 $ec_lang['lpn_new_coordsys_local']='Ya ndani, mchoro rahisi, au maalum';
 $ec_lang['lpn_new_coordsys_local_tip']='Haijawekewa marejeleo ya kijiografia. Ambatisha picha yako mwenyewe ya nyuma au usiweke yoyote.';
 $ec_lang['lpn_new_crs']='Mchoro wa ramani';
-$ec_lang['lpn_new_crs_tip']='Mchoro ambao kuratibu zako tayari zimepimwa nao. Kuratibu huhifadhiwa kama ulivyoziandika hasa, na hakuna kinachobadilishwa. Chaguo hili ni la kudumu; njia pekee ya kubadilisha mtandao kuwa kuratibu tofauti ni kwa "Faili, Fungua kwa kuratibu mpya", nayo ni ya makadirio. UTM ndio kiwango kikubwa duniani kote, eneo linaweza kuwa na desturi zake, na Mpima Ardhi ndiye wa kumuuliza kama hujui.';
 $ec_lang['lpn_crs_view']='Chuja kwa mwonekano wa ramani';
 $ec_lang['lpn_crs_view_tip']='Hutoa michoro inayofunika mahali ramani inapoangalia pekee. Izime ili kusoma orodha nzima.';
 $ec_lang['lpn_crs_place']='Tafuta jina la mahali';

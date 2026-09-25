@@ -2332,11 +2332,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_new_crs_tip": {
-            "on": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
-            "ruled": "2026-09-14",
-            "answer": "Edited."
-        },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",
             "ruled": "2026-08-29"

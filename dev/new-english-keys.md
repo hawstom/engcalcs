@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**30 still to read on master**, of 211 untranslated keys, of 2057 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 210 untranslated keys, of 2055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (211, 30 to read @@ NEEDS RULING)
+## lpn_  (210, 29 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -40,16 +40,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > EPSG coordinate system
   @@ NEEDS RULING
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
   @@ NEEDS RULING
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Suffix
-  @@ NEEDS RULING
-- **`lpn_convas_label_depth_na`**
-  > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
@@ -58,7 +55,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
   @@ NEEDS RULING
 - **`lpn_convas_none_tip`**
-  > Local coordinates in the length unit, with no world map.
+  > Local coordinates in the length unit, with no world map for now.
   @@ NEEDS RULING
 - **`lpn_convas_ok`**
   > Convert
@@ -88,7 +85,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Unnamed (local) georeference
   @@ NEEDS RULING
 - **`lpn_convas_unnamed_tip`**
-  > Local coordinates in the length unit, with the world map attached at the place the project is.
+  > Local coordinates in the length unit, with the world map attached.
   @@ NEEDS RULING
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -96,9 +93,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_copy_of`**
   > Copy of {name}
   _Ruled OK 2026-09-23._
-- **`lpn_crs_latlon_display`**
-  > WGS 84 latitude/longitude (EPSG:4326)
-  @@ NEEDS RULING
 - **`lpn_crs_unnamed`**
   > unnamed
   _Ruled OK 2026-09-23._
@@ -108,6 +102,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
+- **`lpn_crsbox_title`**
+  > Coordinate system
+  @@ NEEDS RULING
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
   _Ruled OK 2026-09-23._
@@ -220,7 +217,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
   _Ruled OK 2026-09-23._
 - **`lpn_inp_report_no_crs`**
-  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
+  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
   @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
@@ -665,7 +662,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**76 still to read**, of 99 new keys across 12 unmerged branch(es).
+**110 still to read**, of 133 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -676,9 +673,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab1b2c7f`) — adds no English strings
-
-### feat/first-project (`e012a104`) — 4 new, 4 to read @@ NEEDS RULING
+### chore/queue-0925 (`2878d1d0`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -692,8 +687,59 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
   @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 
-### feat/label-gang-search (`0346dc5d`) — 43 new, 20 to read @@ NEEDS RULING
+### chore/tom-edits-0925 (`9d8f81cc`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_btn`**
+  > These are already lat/lon
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_tip`**
+  > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+
+### feat/convert-as (`0693cb6d`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_convas_label_depth_na`**
+  > Tank depth has no map label to add this to yet.
+  @@ NEEDS RULING
+- **`lpn_crs_latlon_display`**
+  > WGS 84 latitude/longitude (EPSG:4326)
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+
+### feat/first-project (`2aa7c2c1`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_btn`**
+  > These are already lat/lon
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_tip`**
+  > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`0346dc5d`) — 44 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
@@ -740,6 +786,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_replace`**
   > This project already has the world map attached. Replace that georeferencing?
   _Ruled OK 2026-09-23._
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
   @@ NEEDS RULING
@@ -825,7 +874,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/label-limit (`4bcf92ab`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/label-limit (`4bcf92ab`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -839,8 +888,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
   @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 
-### feat/offscreen-notice (`291bd4c7`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/offscreen-notice (`291bd4c7`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -853,12 +905,42 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
   @@ NEEDS RULING
 - **`lpn_offscreen_intact`**
   > Your network is intact.
   @@ NEEDS RULING
 
-### feat/property-venue (`98613d7f`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/property-venue (`b8733c5d`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_find_filter_none`**
+  > No table has a property this query names.
+  @@ NEEDS RULING
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  @@ NEEDS RULING
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_btn`**
+  > These are already lat/lon
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_tip`**
+  > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+
+### feat/select-on-focus (`11edc1ad`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -872,8 +954,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
   @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 
-### feat/table-editing (`efeaa75a`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/table-editing (`efeaa75a`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -886,6 +971,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
   @@ NEEDS RULING
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
@@ -912,7 +1000,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show {col}
   @@ NEEDS RULING
 
-### feat/usage-report (`5da3e7ae`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/usage-report (`5da3e7ae`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -926,8 +1014,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
   @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 
-### feat/zoom-control (`a0784a15`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/zoom-control (`dc1fa5a9`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -944,6 +1035,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
   @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
 - **`lpn_tool_zoom_window`**
   > Zoom Window
   @@ NEEDS RULING
@@ -954,16 +1048,37 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   @@ NEEDS RULING
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
+  > Zoom in one step. Shortcut: +
   @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
+  > Zoom out one step. Shortcut: -
   @@ NEEDS RULING
 
-### fix/first-use (`1c9ba402`) — 4 new, 4 to read @@ NEEDS RULING
+### fix/fireflow-eps (`1cf3e804`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_ff_skipped`**
+  > {n} selected elements are not junctions, so they were not tested.
+  @@ NEEDS RULING
+- **`lpn_file_import_geo`**
+  > Convert coordinates as…
+  @@ NEEDS RULING
+- **`lpn_file_import_geo_tip`**
+  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_btn`**
+  > These are already lat/lon
+  @@ NEEDS RULING
+- **`lpn_georef_asdeg_tip`**
+  > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+
+### fix/menu-cue (`07c0ed29`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -977,23 +1092,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
   @@ NEEDS RULING
-
-### fix/table-print2 (`4055de7b`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_file_import_geo`**
-  > Convert coordinates as…
-  @@ NEEDS RULING
-- **`lpn_file_import_geo_tip`**
-  > Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  @@ NEEDS RULING
-- **`lpn_georef_asdeg_btn`**
-  > These are already lat/lon
-  @@ NEEDS RULING
-- **`lpn_georef_asdeg_tip`**
-  > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
   @@ NEEDS RULING
 
-### fix/zoom-fit-labels (`c32b731a`) — 4 new, 4 to read @@ NEEDS RULING
+### merge/0925 (`013958ef`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geo`**
   > Convert coordinates as…
@@ -1006,4 +1109,10 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_georef_asdeg_tip`**
   > Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
+  @@ NEEDS RULING
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
   @@ NEEDS RULING

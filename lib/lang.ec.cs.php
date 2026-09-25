@@ -1769,7 +1769,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Vyberte zeměpisnou projekci. Pro zeměpis
 $ec_lang['lpn_new_coordsys_local']='Místní, schematický nebo vlastní';
 $ec_lang['lpn_new_coordsys_local_tip']='Bez georeferencování. Připojte vlastní podkladový obrázek, nebo žádný.';
 $ec_lang['lpn_new_crs']='Mapová projekce';
-$ec_lang['lpn_new_crs_tip']='Projekce, ve které jsou vaše souřadnice už změřeny. Souřadnice se ukládají přesně tak, jak je zadáte, a nic se nepřevádí. Tento výběr je trvalý; jediný způsob, jak převést síť do jiných souřadnic, je „Soubor, Otevřít do nových souřadnic“, a je to jen přibližné. UTM je celosvětově nejrozšířenější standard, v daném regionu mohou platit vlastní zvyklosti, a pokud si nejste jisti, zeptejte se zeměměřiče.';
 $ec_lang['lpn_crs_view']='Filtrovat podle pohledu mapy';
 $ec_lang['lpn_crs_view_tip']='Nabízí jen projekce, které pokrývají místo, na které se mapa právě dívá. Vypněte to, chcete-li si přečíst celý seznam.';
 $ec_lang['lpn_crs_place']='Vyhledávání podle názvu místa';

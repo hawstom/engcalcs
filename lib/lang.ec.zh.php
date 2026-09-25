@@ -1776,7 +1776,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='选择一种地理投影。若使用经纬
 $ec_lang['lpn_new_coordsys_local']='本地、示意性或自定义';
 $ec_lang['lpn_new_coordsys_local_tip']='不带地理参照。可附加您自己的背景图片，或不附加任何图片。';
 $ec_lang['lpn_new_crs']='地图投影';
-$ec_lang['lpn_new_crs_tip']='您的坐标已经采用的投影方式。坐标会按照您输入的原样存储，不会进行任何转换。此选择是永久性的；将管网转换为不同坐标的唯一方法是使用"文件"、"在地图上打开 xy 文件…"，且转换结果是近似值。UTM 是全球通行的主流标准，但各地区可能有自己的习惯做法，如果不确定，请咨询土地测量师。';
 $ec_lang['lpn_crs_view']='按地图视图筛选';
 $ec_lang['lpn_crs_view_tip']='仅显示覆盖当前地图所显示位置的投影。关闭此项可查看完整列表。';
 $ec_lang['lpn_crs_place']='地名搜索';

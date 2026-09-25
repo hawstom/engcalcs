@@ -1771,7 +1771,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Sélectionnez une projection géographique
 $ec_lang['lpn_new_coordsys_local']='Locale, schématique ou personnalisée';
 $ec_lang['lpn_new_coordsys_local_tip']='Non géoréférencé. Associez votre propre image de fond, ou aucune.';
 $ec_lang['lpn_new_crs']='Projection cartographique';
-$ec_lang['lpn_new_crs_tip']='La projection dans laquelle vos coordonnées sont déjà mesurées. Les coordonnées sont enregistrées exactement telles que vous les saisissez, et rien n\'est converti. Ce choix est permanent ; le seul moyen de convertir un réseau vers d\'autres coordonnées est « Fichier, Ouvrir vers de nouvelles coordonnées », et c\'est une conversion approximative. L\'UTM est la norme dominante dans le monde, une région peut avoir ses propres usages, et un géomètre est la personne à consulter en cas de doute.';
 $ec_lang['lpn_crs_view']='Filtrer selon la vue de la carte';
 $ec_lang['lpn_crs_view_tip']='Ne propose que les projections qui couvrent l\'endroit affiché par la carte. Désactivez cette option pour voir la liste complète.';
 $ec_lang['lpn_crs_place']='Recherche par nom de lieu';

@@ -1775,7 +1775,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Selecione uma projeção geográfica. Use 
 $ec_lang['lpn_new_coordsys_local']='Local, esquemático ou personalizado';
 $ec_lang['lpn_new_coordsys_local_tip']='Não georreferenciado. Anexe sua própria imagem de fundo ou nenhuma.';
 $ec_lang['lpn_new_crs']='Projeção do mapa';
-$ec_lang['lpn_new_crs_tip']='A projeção em que suas coordenadas já estão medidas. As coordenadas são armazenadas exatamente como você as digita, e nada é convertido. Esta seleção é permanente; a única forma de converter uma rede para coordenadas diferentes é com "Arquivo, Abrir em novas coordenadas", e isso é aproximado. UTM é o padrão dominante no mundo todo, uma região pode ter costumes próprios, e um agrimensor é a pessoa a quem perguntar se você não tiver certeza.';
 $ec_lang['lpn_crs_view']='Filtrar pela visualização do mapa';
 $ec_lang['lpn_crs_view_tip']='Oferece apenas as projeções que cobrem o lugar para onde o mapa está olhando. Desligue para ler a lista inteira.';
 $ec_lang['lpn_crs_place']='Busca por nome de lugar';

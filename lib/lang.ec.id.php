@@ -1771,7 +1771,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Pilih proyeksi geografis. Gunakan WGS 84 /
 $ec_lang['lpn_new_coordsys_local']='Lokal, skematik, atau khusus';
 $ec_lang['lpn_new_coordsys_local_tip']='Tidak digeoreferensi. Lampirkan gambar latar Anda sendiri atau tanpa gambar latar.';
 $ec_lang['lpn_new_crs']='Proyeksi peta';
-$ec_lang['lpn_new_crs_tip']='Proyeksi tempat koordinat Anda sudah diukur. Koordinat disimpan persis seperti yang Anda ketik, dan tidak ada yang dikonversi. Pilihan ini bersifat permanen; satu-satunya cara untuk mengonversi jaringan ke koordinat yang berbeda adalah dengan "Berkas, Buka ke koordinat baru", dan hasilnya bersifat perkiraan. UTM adalah standar dunia yang dominan, suatu wilayah mungkin memiliki kebiasaannya sendiri, dan seorang Surveyor Tanah adalah orang yang tepat untuk ditanya jika Anda tidak yakin.';
 $ec_lang['lpn_crs_view']='Saring berdasarkan tampilan peta';
 $ec_lang['lpn_crs_view_tip']='Hanya menawarkan proyeksi yang mencakup tempat yang sedang dilihat peta. Matikan untuk membaca seluruh daftar.';
 $ec_lang['lpn_crs_place']='Pencarian nama tempat';

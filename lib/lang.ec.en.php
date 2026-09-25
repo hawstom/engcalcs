@@ -1198,10 +1198,10 @@ $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
-$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
-$ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached at the place the project is.';
-$ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map.';
+$ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
+$ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
 $ec_lang['lpn_convas_units_tip']='The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.';
 $ec_lang['lpn_convas_round']='Round converted values';
 $ec_lang['lpn_convas_round_tip']='Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.';
@@ -1209,7 +1209,6 @@ $ec_lang['lpn_convas_round_none']='No rounding';
 $ec_lang['lpn_convas_round_flow']='Demand and flow';
 $ec_lang['lpn_convas_label_col']='Suffix';
 $ec_lang['lpn_convas_label_tip']='Text added after this value on the copy\'s map labels, such as \' mm\' or \' gpm\'. Pre-filled from the unit chosen above; clear it for no suffix.';
-$ec_lang['lpn_convas_label_depth_na']='Tank depth has no map label to add this to yet.';
 $ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.';
 $ec_lang['lpn_convas_ok']='Convert';
 $ec_lang['lpn_convas_no_transform']='This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.';
@@ -1767,22 +1766,19 @@ $ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image
 // NAME is the EPSG register's own, exactly as the OpenStreetMap credit is, and a GIS reader in any
 // language looks for those characters.
 $ec_lang['lpn_new_crs']='Map projection';
-// **WHAT IT PROMISES AND WHAT IT REFUSES.** The promise is that nothing is converted, which is this
-// suite's own rule about the user's numbers. The refusal is that the choice is final, and it is
-// stated here because this control is the only place it can be read before it binds.
-//
-// Nothing here claims anything about how accurate a length is: that claim waits on Task 643.
-$ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
+// it names the box's own subject rather than either caller's radio label.
+$ec_lang['lpn_crsbox_title']='Coordinate system';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Filter by map view';
-$ec_lang['lpn_crs_view_tip']='Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.';
+$ec_lang['lpn_crs_view_tip']='Offers only the coordinate systems that cover the place the map is looking at. Turn it off to read the whole list.';
 $ec_lang['lpn_crs_place']='Place name search';
 $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.';
 $ec_lang['lpn_crs_search']='Search';
-$ec_lang['lpn_crs_name']='Projection name filter';
-$ec_lang['lpn_crs_name_tip']='Shows only the projections whose name or EPSG code contains what you type. Try a zone number, or UTM, or Mercator.';
+$ec_lang['lpn_crs_name']='Coordinate system name filter';
+$ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
 $ec_lang['lpn_crs_list']='Projection';
 $ec_lang['lpn_crs_list_tip']='The projections left by the two filters above. Choose one and press Select.';
 $ec_lang['lpn_crs_choose']='Select';
@@ -1804,12 +1800,11 @@ $ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate 
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
-// **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218; Tom, 2026-09-24,
-// answering R-188's confusion over EPSG:3857 offered as "lat/lon" while the stored numbers are
-// EPSG:4326 degrees: "Yes."). `crsCatalogue()`'s own Pseudo-Mercator entry is untouched -- this
-// string is used only where the page is describing a project whose coordinates ARE longitude and
-// latitude, never the general EPSG picker list.
-$ec_lang['lpn_crs_latlon_display']='WGS 84 latitude/longitude (EPSG:4326)';
+// **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218/2026-09-25: Tom
+// asked for WGS 84 (EPSG:4326) as an ordinary catalogue entry, so this now reads that entry
+// (`crsDisplayName()` in js/looped-network.js) instead of carrying its own wording -- the register's
+// own name for 4326 already says what R-218 needed said, and a second string that could drift from
+// the catalogue's is one this page no longer needs.
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
@@ -1881,7 +1876,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
-$ec_lang['lpn_inp_report_no_crs']='This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
+$ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';

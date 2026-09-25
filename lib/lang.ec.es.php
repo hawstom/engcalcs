@@ -1444,7 +1444,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Seleccione una proyección geográfica. Us
 $ec_lang['lpn_new_coordsys_local']='Local, esquemática o personalizada';
 $ec_lang['lpn_new_coordsys_local_tip']='Sin georreferenciar. Adjunte su propia imagen de fondo, o ninguna.';
 $ec_lang['lpn_new_crs']='Proyección cartográfica';
-$ec_lang['lpn_new_crs_tip']='La proyección en la que ya están medidas sus coordenadas. Las coordenadas se guardan exactamente como usted las escribe, y nada se convierte. Esta selección es permanente; la única forma de convertir una red a otras coordenadas es con «Archivo, Abrir con nuevas coordenadas», y es aproximada. UTM es el estándar mundial dominante, una región puede tener sus propias costumbres, y un Agrimensor es la persona a quien preguntar si no está seguro.';
 $ec_lang['lpn_crs_view']='Filtrar por la vista del mapa';
 $ec_lang['lpn_crs_view_tip']='Ofrece solo las proyecciones que cubren el lugar que el mapa está mostrando. Desactívelo para ver la lista completa.';
 $ec_lang['lpn_crs_place']='Búsqueda de nombre de lugar';

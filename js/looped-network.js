@@ -3298,6 +3298,13 @@ var EngCalcs = EngCalcs || {};
 	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	// **WGS 84 ITSELF, THE OTHER GEOGRAPHIC ANSWER** (Tom, 2026-09-25: EPSG:4326 was missing from
+	// the chooser and must be an ordinary, unmodified-name option). Its own stored numbers are the
+	// same longitude and latitude degrees LPN_CRS_WEBMERC already means here, so picking either one
+	// makes the identical lat/lon project -- crsIsLatLonCode() is where that equivalence is stated,
+	// and crsBoxOk() is where a 4326 pick is folded onto LPN_CRS_WEBMERC before anything reads it.
+	var LPN_CRS_GEOWGS84 = 'EPSG:4326';
+	function crsIsLatLonCode(code) { return code === LPN_CRS_WEBMERC || code === LPN_CRS_GEOWGS84; }
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3468,8 +3475,14 @@ var EngCalcs = EngCalcs || {};
 		var out = [], i, f, z;
 		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
 		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// **AND EPSG:4326 RIGHT BESIDE IT** (Tom, 2026-09-25), the register's own name for the plain
+		// longitude/latitude CRS this page's own lat/lon project actually stores. Both entries lead
+		// to the identical project -- crsIsLatLonCode() -- so neither is a projected CRS the register
+		// list below could duplicate.
+		out.push({ code: LPN_CRS_GEOWGS84, name: 'WGS 84' });
 		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
-		// CRS like any other, so it is skipped rather than offered twice.
+		// CRS like any other, so it is skipped rather than offered twice. EPSG:4326 is geographic,
+		// not projected, so the register (projected CRS only) never carries it and needs no skip.
 		if (crsRegisterReady()) {
 			for (i = 0; i < LPN_CRS_REG_LIST.length; i++) {
 				if (LPN_CRS_REG_LIST[i].code !== LPN_CRS_WEBMERC) { out.push(LPN_CRS_REG_LIST[i]); }
@@ -3522,6 +3535,9 @@ var EngCalcs = EngCalcs || {};
 		if (c === LPN_CRS_WEBMERC) {
 			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
 		}
+		// WGS 84 geographic has no Mercator pole cut -- it is plain latitude and covers the whole
+		// globe, pole to pole.
+		if (c === LPN_CRS_GEOWGS84) { return { w: -180, e: 180, s: -90, n: 90 }; }
 		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
 		// THE REGISTER'S OWN BOX WINS over anything derived here, and for a reason worth stating:
 		// the family table rounds a band OUTWARD across all of a family's zones, because one row
@@ -3572,10 +3588,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
-		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
-		// write a document claiming its longitudes were metres.
-		if (String(code) === LPN_CRS_WEBMERC) { return false; }
+		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
+		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
+		// ever reached here it would write a document claiming its longitudes were metres.
+		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
 			(doc.labels && doc.labels.length))) { return false; }
@@ -3602,8 +3618,16 @@ var EngCalcs = EngCalcs || {};
 		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
 		// projected metres when they are longitude and latitude degrees (R-188). This is the one
 		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
+		//
+		// **THROUGH THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A SEPARATE STRING** (Tom, 2026-09-25,
+		// closing R-218's own key: "probably no longer needed since we are not changing any of the
+		// entries"). The register's name for 4326 is "WGS 84", which crsOptionText() turns into
+		// "WGS 84 (EPSG:4326)" -- the exact fact this line used to spell out by hand, now read off
+		// the one place a CRS's name is allowed to live. **THIS IS THE SEAM**: any other surface
+		// naming a lat/lon project's coordinate system (the map status strip included) should call
+		// this function rather than grow a second copy of it.
 		if (isLatLonProject()) {
-			return pc.lpn_crs_latlon_display || 'WGS 84 latitude/longitude (EPSG:4326)';
+			return crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) });
 		}
 		code = projectCrsCode();
 		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
@@ -4916,7 +4940,11 @@ var EngCalcs = EngCalcs || {};
 			// them for a reason they did not ask for.
 			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
 				// OFF, like every other field a network does not have until it is asked for.
-				quality: false, initQuality: false },
+				quality: false, initQuality: false,
+				// **TANK WATER DEPTH, OFF BY DEFAULT** (Task 696, Tom, 2026-09-25: fix the missing
+				// coverage rather than disable it in Convert as). A junction and a reservoir have no
+				// 'level' to print, exactly as they have no diameter -- see the node loop below.
+				level: false },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -4980,7 +5008,9 @@ var EngCalcs = EngCalcs || {};
 				// water age and concentration exactly as before.
 				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
 				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1,
+				// level 2 -- a water depth reads in the same Elevation/Head unit and precision as
+				//   elev and head, which it sits between physically.
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, level: 2, quality: 1,
 					'quality:trace': 0, initQuality: 2 },
 				// The customer group's own two numbers, its own entries: this map is what decides
 				// which rows get a decimals spinner, so borrowing the node's would have tied a
@@ -5050,7 +5080,12 @@ var EngCalcs = EngCalcs || {};
 				// and "do not make this a criterion for which whole label wins a contested spot".
 				// initQuality ranks just under quality for the same argument: it is only ever on
 				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
-				node: { quality: 7, initQuality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				// **RENUMBERED AGAIN, NOT REORDERED** (Task 696): level (tank water depth) slots
+				// between elev and head, on the same argument nodeFieldDefs()'s ordering comment
+				// gives for elev trailing head/pressure -- head is DERIVED from elev and level, so
+				// it is still the first of the three to give up its space when a label is crowded.
+				node: { quality: 8, initQuality: 7, demandActual: 6, demand: 5, pressure: 4, elev: 3,
+					level: 2, head: 1 },
 				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
 				// neighbours it had, and the three new ones are slotted where they belong -- the
 				// friction factor beside the gradient it is derived from, the status and the
@@ -10195,6 +10230,10 @@ var EngCalcs = EngCalcs || {};
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696), same treatment elev/quality/initQuality
+			// get above: guarded, and with no extrema mark (null) since this is one label, not a pass.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, null, nd.level))); }
 			var qualVal = nodeQualityValue(n);
 			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
 			var initQualVal = nodeInitQuality(n);
@@ -28311,7 +28350,7 @@ var EngCalcs = EngCalcs || {};
 			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
 				var crsNote = document.createElement('p');
 				crsNote.style.margin = '0 0 8px';
-				crsNote.textContent = pc.lpn_inp_report_no_crs || 'This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.';
+				crsNote.textContent = pc.lpn_inp_report_no_crs || 'EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 				body.appendChild(crsNote);
 			}
 			// The one place an anchor mode is worth mentioning, and only to someone whose file had
@@ -28958,17 +28997,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The chooser button and the name beside it, as the New project box shows its own.
 	function syncConvasCrs() {
-		var pc = EngCalcs.pageConfig || {},
-			b = document.getElementById('lpn_convas_crs_pick'),
+		var b = document.getElementById('lpn_convas_crs_pick'),
 			n = document.getElementById('lpn_convas_crs_name'),
 			off = convasKind() !== 'epsg';
 		if (b) { b.disabled = off; }
 		if (n) {
-			// R-218: the same lat/lon-only name as crsDisplayName(), not the catalogue's own
-			// "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the default target when the box opens on a
-			// lat/lon project, and this is the choice Tom read as offering projected metres.
+			// R-218: the same lat/lon name crsDisplayName() reads off the catalogue's own EPSG:4326
+			// entry, not the catalogue's Pseudo-Mercator name -- crsBoxOk() has already folded any
+			// 4326 pick onto LPN_CRS_WEBMERC by the time convasPick.crs is read here, so this is the
+			// one comparison that still needs to ask which code it is.
 			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
-				? (pc.lpn_crs_latlon_display || 'WGS 84 latitude/longitude (EPSG:4326)')
+				? crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) })
 				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
 			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
 		}
@@ -29064,10 +29103,10 @@ var EngCalcs = EngCalcs || {};
 	// (' ' + the unit's own DISPLAY TEXT -- the option's textContent, what the dropdown itself
 	// shows, never its value/name -- matching a shipped quality suffix's own leading space --
 	// labelDefaultSuffix()) and to know which cloned select's change should refresh which row.
-	// **DEPTH IS DELIBERATELY ABSENT.** Its box is disabled in Looped-Network.php -- tank level has
-	// no per-field label suffix to write into (see the comment there) -- so there is nothing to
-	// pre-fill it from.
-	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
+	// **DEPTH PRE-FILLS FROM THE SAME UNIT HEAD DOES** (Task 696, Tom, 2026-09-25): a water depth
+	// is in the Elevation/Head family like Head is, and it now has a per-field label suffix to write
+	// into -- nodeFieldDefs()'s 'level' row, wired through convasApplyLabelSuffixes() below.
+	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', depth: 'lpn_u_elevhead', flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
 	// Sees an edit that started from the user, not from a pre-fill, so a row they typed into is
 	// never overwritten by a later unit change. Reset each time the box opens.
 	var convasSuffixDirty = {};
@@ -29373,15 +29412,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE LABEL COLUMN, INTO THE ONE SETTING THAT ALREADY DOES THIS JOB** (Task 333's
 	// labelSettings.suffix, read by labelSuffixFor() and written by setLabelAffix() -- the same seam
-	// a Labels row uses). Diameter and Head land straight on the field the rounding above just
+	// a Labels row uses). Diameter, Depth and Head land straight on the field the rounding above just
 	// rewrote; Flow lands on both typed demand fields the rounding touches, junction and customer.
-	// **DEPTH (TANK LEVEL) HAS NO SUCH FIELD.** `level` is not one of nodeFieldDefs()'s rows, so
-	// there is nothing in labelSettings to write it into -- inventing one is Tom's call, not this
-	// wizard's, so that box is filled in and legible and simply goes nowhere yet. Runs on the COPY,
-	// after importProject() has switched context onto it, exactly as convasApplyUnits() already does.
+	// **DEPTH (TANK LEVEL) NOW HAS ONE** (Task 696, Tom, 2026-09-25): nodeFieldDefs()'s 'level' row,
+	// the same field the Settings label columns for tanks offer. Runs on the COPY, after
+	// importProject() has switched context onto it, exactly as convasApplyUnits() already does.
 	function convasApplyLabelSuffixes(a) {
 		var s = a.suffix || {};
 		if (typeof s.diameter === 'string') { setLabelAffix('suffix', 'link', 'diameter', s.diameter); }
+		if (typeof s.depth === 'string') { setLabelAffix('suffix', 'node', 'level', s.depth); }
 		if (typeof s.head === 'string') { setLabelAffix('suffix', 'node', 'head', s.head); }
 		if (typeof s.flow === 'string') {
 			setLabelAffix('suffix', 'node', 'demand', s.flow);
@@ -32360,9 +32399,18 @@ var EngCalcs = EngCalcs || {};
 	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
 	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 *
+	 * **NEITHER LAT/LON CODE EVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
+	 * beside "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the very projection the map is drawn in).
+	 * js/lpn-crs.js's proj4 definitions cover PROJECTED systems; EPSG:3857 and EPSG:4326 both mean
+	 * this page's own native lat/lon project, placed with the hand-written Mercator math
+	 * (Geom.mercLat/mercY) this page has always drawn its basemap with, never through proj4 --
+	 * lpnCrsHas('3857') and lpnCrsHas('4326') both correctly answer false, and asking either was the
+	 * defect, not the answer.
 	 */
 	function crsCannotBePlaced(code) {
-		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+		if (!code || crsIsLatLonCode(code)) { return false; }
+		return !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
 			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
 	}
 	function crsOptionText(entry) {
@@ -32427,14 +32475,12 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
-			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
-			// "(no map)" mark in the option is what a person scanning the list sees; this is what
-			// they read once their choice has settled on one. Two sizes of the same fact, because
-			// the mark has to be short enough not to push a 50-character register name out of the
-			// select and the sentence has to be long enough to say what is lost.
-			if (crsCannotBePlaced(crsBox.code)) {
-				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.');
-			}
+			// **THE NOTE ENDS HERE, AFTER THE IOGP CREDIT** (Tom, 2026-09-25: the sentence this used
+			// to append -- lpn_crs_unplaceable's full explanation -- read as nonsense here). The
+			// "(no map)" mark in the option is what a person scanning the list sees for the rare
+			// unplaceable row; the key itself is still rendered, at the actual moment of consequence
+			// -- newProject()'s own refusal sentence a few hundred lines below this file, once
+			// somebody has gone ahead and created on one of the 106 anyway.
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -32456,7 +32502,12 @@ var EngCalcs = EngCalcs || {};
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
 			pick = crsBox.onPick;
 		closeCrsBox();
-		if (pick) { pick(code, crsBox.place); }
+		// **BOTH LAT/LON ENTRIES ANSWER AS LPN_CRS_WEBMERC**, the one code every caller downstream
+		// (New project, Convert as) already knows means "make the lat/lon project". EPSG:3857 and
+		// EPSG:4326 are offered as two unmodified, honestly-named rows so nothing in the register is
+		// hidden (Tom, 2026-09-25); which one somebody clicked never needs to be told apart again
+		// after this point, because both name the identical project.
+		if (pick) { pick(crsIsLatLonCode(code) ? LPN_CRS_WEBMERC : code, crsBox.place); }
 	}
 	var crsBoxWired = false;
 	function wireCrsBox() {
@@ -36539,6 +36590,12 @@ var EngCalcs = EngCalcs || {};
 			['demand', pc.lpn_field_base_demand || 'Base demand'],
 			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			['elev', pc.lpn_field_elev || 'Elevation'],
+			// **TANK WATER DEPTH** (Task 696, Tom, 2026-09-25: give the coverage this was missing
+			// rather than disable it in Convert as). Trails Elevation on the same physical-order
+			// argument: a tank is the one node type that has it, and the node loop below prints it
+			// only where one is typed, exactly as Elevation prints nothing for an imported reservoir
+			// with none. The same key names it in the tank's own Properties popup (renderNodeFields).
+			['level', pc.lpn_field_tank_level || 'Water depth'],
 			// LAST, and off by default. It is the one field here that no network has until a run
 			// has been made with the analysis switched on, and its heading follows that switch.
 			['quality', qualityLabel()],
@@ -48425,7 +48482,11 @@ var EngCalcs = EngCalcs || {};
 		// and a user who wants a prefix can type their own.
 		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
 		// quality row's own input, and neither half of that pair has a symbol a reader would know.
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '', initQuality: '' },
+		// **TANK WATER DEPTH GETS NONE EITHER** (Task 696): 'd' is ambiguous with a pipe's own
+		// diameter on the same label set, and no single letter for depth is standard the way Q, H,
+		// P and Z are. A user who wants one types it into the prefix box, same as quality.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=',
+			level: '', quality: '', initQuality: '' },
 		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
 		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
 		// are. A status prints a WORD and would read as an equation with one; an average quality
@@ -48718,6 +48779,11 @@ var EngCalcs = EngCalcs || {};
 		// solver in SI and go through displayRound().
 		var nodeVal = {
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
+			// **TANK WATER DEPTH ONLY** (Task 696): a junction or reservoir has no 'level' to print,
+			// exactly as it has no diameter. plainRound(), not displayRound(): effective(n, 'level')
+			// is a typed number already in the Elevation/Head display unit, the same treatment elev
+			// gets above.
+			level: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(effective(n, 'level'), nd.level) : undefined; }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
@@ -48759,6 +48825,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
+			level: fieldExtrema(nodeVal.level.list),
 			demand: fieldExtrema(nodeVal.demand.list),
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
@@ -48845,6 +48912,13 @@ var EngCalcs = EngCalcs || {};
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
 			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
+			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
+			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
+			// nodeVal.level exists only to feed extrema.level above, the same division every other
+			// field on this list keeps.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, extrema.level, nd.level))); }
 			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.

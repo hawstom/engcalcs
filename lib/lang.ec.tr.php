@@ -1788,7 +1788,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Bir coğrafi projeksiyon seçin. Enlem/Boy
 $ec_lang['lpn_new_coordsys_local']='Yerel, şematik veya özel';
 $ec_lang['lpn_new_coordsys_local_tip']='Coğrafi referanslı değildir. Kendi arka plan görüntünüzü ekleyin veya hiçbirini kullanmayın.';
 $ec_lang['lpn_new_crs']='Harita projeksiyonu';
-$ec_lang['lpn_new_crs_tip']='Koordinatlarınızın zaten ölçüldüğü projeksiyon. Koordinatlar tam olarak yazdığınız şekilde saklanır ve hiçbir şey dönüştürülmez. Bu seçim kalıcıdır; bir şebekeyi farklı koordinatlara dönüştürmenin tek yolu "Dosya, Yeni koordinatlara aç" seçeneğidir ve bu yaklaşık bir dönüşümdür. UTM dünya çapında baskın standarttır, bir bölgenin kendi gelenekleri olabilir ve emin değilseniz sorulacak kişi bir Harita Mühendisidir.';
 $ec_lang['lpn_crs_view']='Harita görünümüne göre filtrele';
 $ec_lang['lpn_crs_view_tip']='Yalnızca haritanın baktığı yeri kapsayan projeksiyonları sunar. Tüm listeyi görmek için kapatın.';
 $ec_lang['lpn_crs_place']='Yer adı arama';

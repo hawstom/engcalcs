@@ -1775,7 +1775,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Selectați o proiecție geografică. Folos
 $ec_lang['lpn_new_coordsys_local']='Local, schematic sau personalizat';
 $ec_lang['lpn_new_coordsys_local_tip']='Fără georeferențiere. Atașați propria imagine de fundal sau niciuna.';
 $ec_lang['lpn_new_crs']='Proiecție cartografică';
-$ec_lang['lpn_new_crs_tip']='Proiecția în care sunt deja măsurate coordonatele dvs. Coordonatele sunt stocate exact așa cum le introduceți, iar nimic nu este convertit. Această selecție este permanentă; singura modalitate de a converti o rețea la alte coordonate este cu „Fișier, Deschide la coordonate noi”, iar aceasta este aproximativă. UTM este standardul dominant la nivel mondial, o regiune poate avea propriile obiceiuri, iar un topograf este persoana potrivită de întrebat dacă nu sunteți sigur.';
 $ec_lang['lpn_crs_view']='Filtrează după vizualizarea hărții';
 $ec_lang['lpn_crs_view_tip']='Oferă doar proiecțiile care acoperă locul spre care este orientată harta. Dezactivați pentru a citi lista completă.';
 $ec_lang['lpn_crs_place']='Căutare după nume de loc';

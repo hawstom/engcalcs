@@ -1522,17 +1522,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
 					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
 				</select>
-				<?php if ($rk === 'depth') { ?>
-				<?php // NO SEPARATE TIP GLYPH HERE (R-217, Tom, 2026-09-24: "No Depth glyph, because
-				      // it's throwing out the alighment"): a fourth flex child in this row alone ate
-				      // into the label's flexible space that the other three rows keep, which is what
-				      // moved this row's own select out of line with them. The tip stays, as the
-				      // box's own native title -- the box can still be greyed and explained without
-				      // becoming an extra element in the row's layout. ?>
-				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" disabled title="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_label_depth_na']))?>" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
-				<?php } else { ?>
+				<?php // R-217 (Tom, 2026-09-24) dropped this row's own tip glyph for alignment; that
+				      // stands. Depth's suffix box is no longer disabled -- tank water depth is now a
+				      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three
+				      // (Tom, 2026-09-25). ?>
 				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
-				<?php } ?>
 			</div>
 			<?php } ?>
 		</fieldset>
@@ -1564,10 +1558,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
 <div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
-	<?php // The title carries the tip that says what choosing one COMMITS you to -- that nothing of
-	      // yours is converted, and that the choice is final. It is the phase-1 wording, moved from
-	      // the control that is gone to the box that replaced it. ?>
-	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_crs_tip'])?></div>
+	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
+	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
+	      // permanence-warning tip this title used to carry had no other reader and is retired
+	      // with it. ?>
+	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crsbox_title']?></div>
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
@@ -1782,7 +1777,6 @@ EngCalcs.pageConfig = {
 	lpn_coord_off_world: <?=json_encode($ec_lang['lpn_coord_off_world'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
 	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
-	lpn_crs_latlon_display: <?=json_encode($ec_lang['lpn_crs_latlon_display'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,

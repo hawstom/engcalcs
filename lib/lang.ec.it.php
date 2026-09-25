@@ -1767,7 +1767,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Selezionare una proiezione geografica. Usa
 $ec_lang['lpn_new_coordsys_local']='Locale, schematico o personalizzato';
 $ec_lang['lpn_new_coordsys_local_tip']='Non georeferenziato. Collegare un\'immagine di sfondo personalizzata oppure nessuna.';
 $ec_lang['lpn_new_crs']='Proiezione cartografica';
-$ec_lang['lpn_new_crs_tip']='La proiezione in cui le coordinate sono già misurate. Le coordinate sono memorizzate esattamente come vengono digitate, e nulla viene convertito. Questa selezione è permanente; l\'unico modo per convertire una rete in coordinate diverse è “File, Apri in nuove coordinate”, ed è approssimativo. UTM è lo standard dominante a livello mondiale, una regione può avere convenzioni proprie, e un topografo è la persona da consultare in caso di dubbio.';
 $ec_lang['lpn_crs_view']='Filtra per vista mappa';
 $ec_lang['lpn_crs_view_tip']='Propone solo le proiezioni che coprono il luogo inquadrato dalla mappa. Disattivarlo per leggere l\'elenco completo.';
 $ec_lang['lpn_crs_place']='Ricerca per nome del luogo';

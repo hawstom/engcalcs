@@ -1773,7 +1773,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Odaberite zemljopisnu projekciju. Za zemlj
 $ec_lang['lpn_new_coordsys_local']='Lokalno, shematsko ili prilagođeno';
 $ec_lang['lpn_new_coordsys_local_tip']='Nije georeferencirano. Pridružite vlastitu pozadinsku sliku ili nijednu.';
 $ec_lang['lpn_new_crs']='Kartografska projekcija';
-$ec_lang['lpn_new_crs_tip']='Projekcija u kojoj su vaše koordinate već izmjerene. Koordinate se pohranjuju točno onako kako ih upišete, i ništa se ne pretvara. Ovaj je odabir trajan; jedini način da mrežu pretvorite u druge koordinate jest naredbom „Datoteka, Otvori u nove koordinate”, i to je približno. UTM je dominantan svjetski standard, neko područje može imati vlastite običaje, a geodet je osoba koju treba pitati ako niste sigurni.';
 $ec_lang['lpn_crs_view']='Filtriraj prema prikazu karte';
 $ec_lang['lpn_crs_view_tip']='Nudi samo projekcije koje pokrivaju mjesto na koje karta gleda. Isključite da biste pročitali cijeli popis.';
 $ec_lang['lpn_crs_place']='Pretraga po nazivu mjesta';

@@ -1768,7 +1768,6 @@ $ec_lang['lpn_new_coordsys_geo_tip']='Wählen Sie eine geografische Projektion. 
 $ec_lang['lpn_new_coordsys_local']='Lokal, schematisch oder benutzerdefiniert';
 $ec_lang['lpn_new_coordsys_local_tip']='Nicht georeferenziert. Fügen Sie ein eigenes Hintergrundbild hinzu, oder keines.';
 $ec_lang['lpn_new_crs']='Kartenprojektion';
-$ec_lang['lpn_new_crs_tip']='Die Projektion, in der Ihre Koordinaten bereits gemessen sind. Koordinaten werden genau so gespeichert, wie Sie sie eingeben, und nichts wird umgerechnet. Diese Wahl ist endgültig; die einzige Möglichkeit, ein Netz in andere Koordinaten umzuwandeln, ist über „Datei, Eine xy-Datei auf der Karte öffnen…“, und das ist nur annähernd. UTM ist der weltweit vorherrschende Standard, eine Region kann jedoch eigene Gepflogenheiten haben, und im Zweifel ist ein Vermessungsingenieur die richtige Ansprechperson.';
 $ec_lang['lpn_crs_view']='Nach Kartenausschnitt filtern';
 $ec_lang['lpn_crs_view_tip']='Bietet nur die Projektionen an, die den auf der Karte gezeigten Ort abdecken. Schalten Sie dies aus, um die gesamte Liste zu sehen.';
 $ec_lang['lpn_crs_place']='Ortssuche';

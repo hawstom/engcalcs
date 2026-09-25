@@ -2825,7 +2825,6 @@
         "lpn_new_coordsys_tip": "26b42c81605e839b4f6435b371aaadd135964c06",
         "lpn_new_create": "6e157c5da4410b7e9de85f5c93026b9176e69064",
         "lpn_new_crs": "6282076ab8db0197621911cfbf5022873718c578",
-        "lpn_new_crs_tip": "21878d2890490fc68c1b32bb21ed31db1c70e558",
         "lpn_new_place_hint": "41856c8b6bada67d66440e6e0d8c6077f490e058",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_new_title": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
@@ -7665,10 +7664,6 @@
         "lpn_new_crs": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_new_crs_tip": {
-            "words": 74,
-            "ends_sentence": true
         },
         "lpn_new_place_hint": {
             "words": 2,
