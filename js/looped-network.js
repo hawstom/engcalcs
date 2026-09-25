@@ -31019,7 +31019,16 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !list) { return; }
 		if (!level) {
 			if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
+			// **THE OPEN ITEM LOOKS PRESSED** (feat/menu-button preview, R-202/R-203): aria-expanded
+			// was already the accessible signal a menu button owes a screen reader; it is now also
+			// what .lpn-menubar-item[aria-expanded="true"] (css/engcalcs.css) paints darker, so no
+			// second piece of state was invented to track "which one is open" -- one attribute, read
+			// by both. Harmless on the few non-menubar anchors that also open a level-0 popup (the
+			// scenario menu, a tab's context menu): aria-expanded is valid on any button that
+			// controls a popup, and no CSS rule outside .lpn-menubar-item reads it.
+			if (openMenuAnchor) { openMenuAnchor.setAttribute('aria-expanded', 'false'); }
 			openMenuAnchor = anchor;
+			if (anchor) { anchor.setAttribute('aria-expanded', 'true'); }
 			closeSubMenu();   // a new pull-down never inherits the previous one's fly-out
 			closeViewPopovers();
 		}
@@ -31158,6 +31167,7 @@ var EngCalcs = EngCalcs || {};
 		hidePanel(document.getElementById('lpn_menu_popup'));
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		unparkAnchorTip(0);
+		if (openMenuAnchor) { openMenuAnchor.setAttribute('aria-expanded', 'false'); }
 		openMenuAnchor = null;
 	}
 	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
@@ -32853,6 +32863,11 @@ var EngCalcs = EngCalcs || {};
 			b.id = m.id;
 			if (m.id === 'lpn_menu_file') { fileMenuButton = b; }
 			b.className = 'lpn-menubar-item';
+			// Starts closed; openMenu()/closeMenu() flip this as the pull-down opens and shuts, and
+			// .lpn-menubar-item[aria-expanded="true"] (css/engcalcs.css) is what paints the open item
+			// pressed. Set here too (not just by openMenu()) so a screen reader gets the right state
+			// on first render, before anything has been clicked.
+			b.setAttribute('aria-expanded', 'false');
 			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
 			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
 			// appends the label as a bare TEXT NODE, and a stylesheet cannot reach one -- so the
@@ -32886,6 +32901,16 @@ var EngCalcs = EngCalcs || {};
 			});
 			bar.appendChild(b);
 		});
+		// **PREVIEW SWITCH, feat/menu-button, so Tom can see the outlined variant beside the solid
+		// default without a second deploy.** `?menustyle=outline` in the URL, read once, here, and
+		// never written to storage, a cookie or `serializeProject()` -- it adds nothing to what is
+		// stored on a visitor's device. Branch-only: `.lpn-menubar-outline` and the query read both
+		// go if this does not ship past preview.
+		try {
+			if (/[?&]menustyle=outline\b/.test(window.location.search)) {
+				bar.classList.add('lpn-menubar-outline');
+			}
+		} catch (ignore) { /* no URL to read (headless harness, etc.) -- solid stays the default */ }
 		showMenuCue();
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
 		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
