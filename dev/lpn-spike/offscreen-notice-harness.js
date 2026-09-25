@@ -120,7 +120,9 @@ console.log('--- 3. pressing the overlay\'s own Zoom to fit clears it ---');
 const zoomBtn = require('./lpn-dom-stub.js').byId.lpn_offscreen_zoom_btn;
 ok(!!zoomBtn.textContent, 'the button carries the reused lpn_tool_zoom_extent label', zoomBtn.textContent);
 (zoomBtn._listeners.click || []).forEach((fn) => fn({}));
-ok(shown(), 'not cleared on the same tick -- it waits for the zoom to settle, same as a wheel spin');
+// Zoom to fit now lays labels out synchronously at the target zoom (R-214, reshedNow()), and that
+// pass decides the overlay too -- so an explicit fit may clear it on the same tick. Either tick is
+// right; what matters is that it is gone once the zoom has settled, asserted below.
 await settle();
 ok(L.viewShowsModel(L.currentView()), 'the network is back in view');
 ok(!shown(), 'and the overlay is gone, with no fade -- one style write');

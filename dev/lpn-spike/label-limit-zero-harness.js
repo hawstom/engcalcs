@@ -27,7 +27,7 @@
 //
 // **NET3.lwn (THE XY EXAMPLE) SHIPS labelMaxWidth: 30 AND OPENS PAST IT** (Task 705,
 // 2026-09-22) -- dev/lpn-spike/switch-keep-harness.js clears it before reuse for exactly this
-// reason. This harness opens Net3-Novato-CA-World.lwn instead (labelMaxWidth is unset there) and
+// reason. This harness opens Net3-Novato-CA-World.lwn instead, with its labelMaxWidth (65000 since R-205) deleted, and
 // sets the threshold explicitly, through the real control, in every section regardless, so no
 // assertion here rides on either shipped file's own number.
 
@@ -84,9 +84,14 @@ L.setCanvas(1400, 900);
 // puts it (a sibling of the canvas), or its display style is a property on a node nothing shows.
 stub.byId.lpn_canvas.appendChild(stub.byId.lpn_labels_legend);
 
+// **WITH ITS OWN LABEL LIMIT REMOVED.** Since R-205 the Novato example ships Tom's 65000, so a
+// file-as-shipped no longer stands for "a project that never set one", which is what every
+// section below starts from. Deleting it here keeps that meaning without riding on the file.
 function openNet3Novato() {
-	L.applySaved(JSON.parse(fsmod.readFileSync(
-		ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8')));
+	var saved = JSON.parse(fsmod.readFileSync(
+		ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8'));
+	if (saved.settings) { delete saved.settings.labelMaxWidth; }
+	L.applySaved(saved);
 	L.buildDom();
 	L.setView(L.geoHome());
 	L.noteMapSized();

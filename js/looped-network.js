@@ -32337,12 +32337,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
+				+ (pc.lpn_tool_key_hint_two || 'Shortcut: {key} or {key2}')
 					.replace('{key}', key).replace('{key2}', alt);
 		}
 		if (key || alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', key || alt);
+				+ (pc.lpn_tool_key_hint || 'Shortcut: {key}').replace('{key}', key || alt);
 		}
 		return tip;
 	}
