@@ -613,6 +613,30 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;inset:0;pointer-events:none;overflow:auto">
 			<div id="lpn_examples_pane" class="lpn-examples"></div>
 		</div>
+		<?php // ROADMAP Task 647, Tom 2026-09-13: "a blank map is equally fatal as a lost project.
+		      // User doesn't know the difference" -- so when the model has elements but none of
+		      // them intersect the current view, this says so instead of leaving a blank canvas
+		      // that reads exactly like a lost project.
+		      //
+		      // **A PERSISTENT OVERLAY, NOT THE TRANSIENT NOTICE STRIP AND NOT THE MESSENGER LOG**
+		      // (Ida, Task 647 journal entry): #lpn_map_notice is architecturally transient (its own
+		      // doc comment: "a transient must not change the fit") and Task 616 measured that row
+		      // going unread; the Messenger is a log of what already happened, opened by a glyph the
+		      // reader must remember exists, and this is a fact about the CURRENT view, always true
+		      // until the reader acts. So it sits centred where the emptiness is, styled after
+		      // #lpn_empty_hint immediately above it: `inset:0`, wrapper `pointer-events:none` so
+		      // panning still works in the gaps, and only the box itself takes clicks. No inherent
+		      // side, so RTL needs nothing special. updateOffscreenNotice() in js/looped-network.js
+		      // is the one place this is shown or hidden -- called only when a pan or a zoom gesture
+		      // has settled, never mid-drag and never per wheel notch, reusing viewShowsModel()'s
+		      // own arithmetic rather than a second geometry. Hidden instantly, no fade: the display
+		      // toggle is the only style write. ?>
+		<div id="lpn_offscreen_notice" class="d-print-none" role="status" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;pointer-events:none;text-align:center">
+			<div class="lpn-offscreen-card">
+				<div id="lpn_offscreen_notice_text" style="margin-bottom:6px"></div>
+				<button type="button" id="lpn_offscreen_zoom_btn" class="btn btn-sm btn-outline-secondary"></button>
+			</div>
+		</div>
 		<?php // THE BOTTOM STATUS STRIP. Both readouts in ONE flex row so their order is real rather
 		      // than two absolute boxes that happen not to collide: settings first, then the
 		      // coordinate tracker (Tom, 2026-08-10 -- "move to left before the coordinates to match
@@ -1646,6 +1670,7 @@ EngCalcs.pageConfig = {
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
+	lpn_offscreen_intact: <?=json_encode($ec_lang['lpn_offscreen_intact'])?>,
 	lpn_examples_welcome: <?=json_encode($ec_lang['lpn_examples_welcome'])?>,
 	lpn_examples_heading: <?=json_encode($ec_lang['lpn_examples_heading'])?>,
 	lpn_examples_sub: <?=json_encode($ec_lang['lpn_examples_sub'])?>,

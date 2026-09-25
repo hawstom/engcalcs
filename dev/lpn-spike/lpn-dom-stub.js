@@ -474,7 +474,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The Libraries box's own hidden file picker (Task 611). Its own input rather than a second use
   // of #lpn_project_file, because the two feed different readers; absent from this list,
   // libImportPick() returns at its first line and the plumbing cannot be asked anything.
-  'lpn_library_file'
+  'lpn_library_file',
+  // The "network intact, off screen" overlay (ROADMAP Task 647). Absent from this list,
+  // updateOffscreenNotice() and wireOffscreenNotice() both return/no-op at their `getElementById`
+  // guard and the whole feature is invisible to every harness.
+  'lpn_offscreen_notice', 'lpn_offscreen_notice_text', 'lpn_offscreen_zoom_btn'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

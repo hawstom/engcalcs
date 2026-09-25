@@ -953,6 +953,11 @@ $ec_lang['lpn_close']='Close';
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='Properties';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
+// ROADMAP Task 647, Tom 2026-09-13: a project with elements, none of which the current view can
+// see, reads exactly like a lost project unless something says otherwise. Shown in a centred
+// overlay on the map (see #lpn_offscreen_notice in Looped-Network.php), paired with a "Zoom to
+// fit" button that reuses lpn_tool_zoom_extent rather than a second copy of that string.
+$ec_lang['lpn_offscreen_intact']='Your network is intact.';
 // The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
 // -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
 // the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting

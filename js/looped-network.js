@@ -10661,6 +10661,43 @@ var EngCalcs = EngCalcs || {};
 		return v.cx + halfW >= ext.minx && v.cx - halfW <= ext.maxx &&
 			v.cy + halfH >= ext.miny && v.cy - halfH <= ext.maxy;
 	}
+	// **TASK 647: "the network is intact, just off screen" is a different failure from "the
+	// project is gone", and a visitor cannot tell them apart on a blank canvas** (Tom, 2026-09-13:
+	// "a blank map is equally fatal as a lost project. User doesn't know the difference."). This
+	// reuses viewShowsModel()'s own arithmetic rather than a second geometry -- the same boolean
+	// that decides whether a SAVED view is worth restoring at load, asked again after the user has
+	// panned or zoomed by hand. `modelExtent()` returning null (no elements at all) is answered by
+	// leaving the overlay off: there is nothing off screen to be intact, and Task 314's shop
+	// window already owns that canvas.
+	//
+	// **CALLED ONLY AT REST** -- from the pan-release path (endPointer's wasPan branch) and from
+	// scheduleReshed()'s own debounced settle, never per drag frame or per wheel notch -- matching
+	// the "at rest" discipline viewShowsModel() already keeps for the load-time case (Task 628).
+	function updateOffscreenNotice() {
+		var el = document.getElementById('lpn_offscreen_notice');
+		var v = currentView();
+		var show = !!el && !!v && !!modelExtent() && !viewShowsModel(v);
+		if (el) { el.style.display = show ? 'flex' : 'none'; }
+	}
+	// One-time fill and wiring, called from the same boot pass as wireMessageLogButton() etc.
+	// The button reuses `lpn_tool_zoom_extent` -- the toolbar's own "Zoom to fit" string -- rather
+	// than a second key for the same action, and is wired to `zoomExtent` the same DIRECT way the
+	// toolbar button is (`addEventListener('click', zoomExtent)`, not a wrapping closure): a
+	// wrapped `function () { zoomExtent(); }` is a second BARE call view-memory-harness.js counts
+	// as an automatic fit nobody asked for (Task 439's asterisk trap) -- see that harness's "every
+	// automatic fit says so" assertion. `zoomExtent` reads its `auto` argument off the click event
+	// it is handed here, exactly as the toolbar's own button already does, so this is not a new
+	// quirk.
+	function wireOffscreenNotice() {
+		var pc = EngCalcs.pageConfig || {};
+		var text = document.getElementById('lpn_offscreen_notice_text');
+		var btn = document.getElementById('lpn_offscreen_zoom_btn');
+		if (text) { text.textContent = pc.lpn_offscreen_intact || 'Your network is intact.'; }
+		if (btn) {
+			btn.textContent = pc.lpn_tool_zoom_extent || 'Zoom to fit';
+			btn.addEventListener('click', zoomExtent);
+		}
+	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
@@ -33449,6 +33486,7 @@ var EngCalcs = EngCalcs || {};
 		wireScenarioButton();
 		wireWrongButtons();
 		wireMessageLogButton();
+		wireOffscreenNotice();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -34275,7 +34313,9 @@ var EngCalcs = EngCalcs || {};
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
-			if (wasPan && !drag) { relayoutLabels(); }
+			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
+			// and its release is the "at rest" moment -- never mid-drag.
+			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
 		}
 		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
 		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
@@ -37157,6 +37197,11 @@ var EngCalcs = EngCalcs || {};
 	function reshedNow() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
 		reshedTimer = null;
+		// Task 647: this is the zoom gesture's own "settled" signal -- one notch or a whole wheel
+		// spin, never a mid-gesture frame -- so the off-screen overlay is decided here too, ahead of
+		// the dataLabelsHidden early return below (that return is about re-composing text, not about
+		// whether the model is on screen).
+		updateOffscreenNotice();
 		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
 		beginLinkGeomHold();
 		try {

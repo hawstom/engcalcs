@@ -3356,6 +3356,15 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	border: 1px solid #bbb; border-radius: 3px;
 	padding: 2px 6px; font-size: 11px; color: #666;
 }
+/* "Your network is intact." (Task 647) wears the suite's NEUTRAL panel pair, the one above, not the
+   #fffbe6/#a80 warning pair: it is reassurance, not a warning (Ida, R-227). Theming phase 1
+   (Task 714) turns both into one token rather than two copies of the same two values. */
+.lpn-offscreen-card {
+	pointer-events: auto;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 10px 16px;
+}
 /* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
    on why. No background of its own: it is a caption under the pills, not one more of them. */
 .lpn-msglog-panel-note { font-size: 0.85em; color: #666; padding: 2px 6px; }
