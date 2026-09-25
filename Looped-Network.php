@@ -1033,12 +1033,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // defaultSettings() in js/looped-network.js. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_node_fields"></div>
+							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_link_fields"></div>
+							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
 						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
@@ -1055,7 +1055,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_customer_fields"></div>
+							<div id="lpn_labels_customer_fields" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
@@ -2114,7 +2114,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
-	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
 	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
@@ -2969,8 +2968,6 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_gray: <?=json_encode($ec_lang['lpn_color_ramp_gray'])?>,
 	lpn_settings_color_reverse: <?=json_encode($ec_lang['lpn_settings_color_reverse'])?>,
 	lpn_color_none: <?=json_encode($ec_lang['lpn_color_none'])?>,
-	lpn_settings_color_thematic: <?=json_encode($ec_lang['lpn_settings_color_thematic'])?>,
-	lpn_settings_color_thematic_tip: <?=json_encode($ec_lang['lpn_settings_color_thematic_tip'])?>,
 	lpn_settings_color_key_position: <?=json_encode($ec_lang['lpn_settings_color_key_position'])?>,
 	lpn_settings_color_breaks: <?=json_encode($ec_lang['lpn_settings_color_breaks'])?>,
 	lpn_settings_color_equal_intervals: <?=json_encode($ec_lang['lpn_settings_color_equal_intervals'])?>,
