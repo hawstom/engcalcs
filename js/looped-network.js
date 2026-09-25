@@ -7789,8 +7789,16 @@ var EngCalcs = EngCalcs || {};
 		var nf = colorFieldOf('node'), lf = colorFieldOf('link');
 		var nb = nf ? effectiveBreaks('node', nf) : [], lb = lf ? effectiveBreaks('link', lf) : [];
 		doc.nodes.forEach(function (n) { paintNodeColor(n.id, nb); });
-		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); });
+		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
 		renderColorLegend();
+	}
+	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
+	// starts with. buildLinkEls() draws it once; this keeps it true on every solve and every step
+	// of the transport, which is what reaches here without rebuilding a single element.
+	function paintLinkStatus(l) {
+		var le = linkEls[l.id];
+		if (!le || !le.line || !le.line.classList) { return; }
+		le.line.classList.toggle('lpn-link-closed', linkStatusOf(l) === 'closed');
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
 	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no generated
@@ -7980,11 +7988,13 @@ var EngCalcs = EngCalcs || {};
 		}, linksLayer);
 		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
 		// open one on the map while carrying no water, which turns a one-click state into an
-		// invisible cause of a network that will not solve. Read through effective(), so a future
-		// scenario override changes the drawing too, not only the arithmetic.
+		// invisible cause of a network that will not solve. Read through linkStatusOf(), so a
+		// scenario override changes the drawing too, and so does a run: at a time step where a
+		// control has opened a pump the file starts shut, the pump is drawn open (Tom, 2026-09-25,
+		// on Net3's pump 10). paintLinkStatus() keeps it current as the transport moves.
 		var line = el('polyline', {
 			points: linkPoints(l), fill: 'none',
-			'class': 'lpn-link lpn-link-' + l.type + (effective(l, 'status') === 'closed' ? ' lpn-link-closed' : ''),
+			'class': 'lpn-link lpn-link-' + l.type + (linkStatusOf(l) === 'closed' ? ' lpn-link-closed' : ''),
 			'data-link': l.id
 		}, linksLayer);
 		var handles = [], i;
@@ -19829,6 +19839,14 @@ var EngCalcs = EngCalcs || {};
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (l) { return colorLinkValue(l, key); } };
 	}
+	// **A LINK'S STATUS AT THE TIME STEP ON SCREEN, AS A RESULT** (Tom, 2026-09-25: Net3's pump 10
+	// opens at 1:00 by its control, and the Tables kept calling it closed). The Shut column is the
+	// INPUT -- the status the run starts from -- and stays the user's; this one is EPANET's Status
+	// column, the word and not a number, blank until something has been solved.
+	function paneColLinkStatus() {
+		return { key: 'status', label: 'lpn_result_status', result: true, str: true,
+			get: function (l) { return lastSolveResult ? linkStatusText(l) : undefined; } };
+	}
 	function paneColNodeResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (n) { return colorNodeValue(n, key); } };
@@ -20564,6 +20582,7 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus(),
 					paneColLinkReactionRate()
 				])
 			},
@@ -20587,7 +20606,8 @@ var EngCalcs = EngCalcs || {};
 					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkStatus()
 				])
 			},
 			{
@@ -20614,7 +20634,8 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
-					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient)
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus()
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -20985,7 +21006,7 @@ var EngCalcs = EngCalcs || {};
 		// what a typed cell can be parsed back from; a choice and a text read verbatim.
 		if (c.bool) { return v ? '1' : '0'; }
 		if (!panePresent(v)) { return ''; }
-		if (c.result) { return String(plainRound(v, 2)); }
+		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
 	}
@@ -45456,6 +45477,12 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
+			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
+			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
+			// the INPUT, the status the run starts from, and stays exactly what the user set; this
+			// row is what EPANET reports for the step on screen, the column its own link report
+			// ends on.
+			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -49287,6 +49314,52 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 
+	// **THE TIME STEP ON SCREEN IS THE CONDITION TESTED, AND ALL OF IT, NOT ONLY ITS DEMANDS**
+	// (Tom, 2026-09-25, on Net3: *"the static pressure for Junction 10 never matches the map
+	// pressure, and it's always significantly lower"*). assembleModel() already scales demands,
+	// reservoir heads and pump speeds to the transport's time, because those are patterns anyone can
+	// evaluate at an instant. Two parts of the state cannot be evaluated at an instant, because a run
+	// produced them: where each TANK stands, which is everything that flowed in or out since the run
+	// began, and which links a CONTROL or RULE has switched. Without them the sweep tested Net3 with
+	// every tank at its starting level and pump 10 still shut as the file starts it, although its
+	// control opens it at 1:00 -- a network nobody was looking at.
+	//
+	// So where a run is on screen, its frame at this moment is laid over the copy: each tank's water
+	// surface, and each link's status. Only on the COPY; the document's own starting levels and
+	// statuses are the user's input and are never touched.
+	//
+	// **WHICH STATUSES ARE LAID OVER, AND WHICH ARE LEFT TO THE SOLVE.** An open link is laid over
+	// always: whatever shut it in the file, the run says it was open at this moment. A closed one is
+	// laid over for a pipe or a pump, where only the file, a control or a rule shuts it, with one
+	// exception -- a link touching a tank that is sitting at its lowest or highest level, which the
+	// engine shuts on its own for that step and would open again the moment a fire drew on the tank.
+	// A valve that went shut is left to decide for itself, because a PRV, PSV or FCV closes on its
+	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
+	// feed.
+	function fireFlowAtFrame(model) {
+		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
+			atLimit = {}, TOL = 1e-3;
+		if (!f || !f.heads) { return false; }
+		model.nodes.forEach(function (n) {
+			var h = f.heads[n.id];
+			if (n.type !== 'tank' || typeof h !== 'number' || !isFinite(h)) { return; }
+			n.head = h;
+			n.level = h - (n.elev || 0);
+			if (n.level <= (n.minLevel || 0) + TOL ||
+				(n.maxLevel > 0 && n.level >= n.maxLevel - TOL)) { atLimit[n.id] = true; }
+		});
+		if (f.statuses) {
+			model.links.forEach(function (l) {
+				var st = f.statuses[l.id];
+				if (st === 'open') { l.status = 'open'; return; }
+				if (st !== 'closed' || l.type === 'valve') { return; }
+				if (atLimit[l.from] || atLimit[l.to]) { return; }
+				l.status = 'closed';
+			});
+		}
+		return true;
+	}
+
 	// ---- the marks on the map -------------------------------------------------------------------
 	//
 	// **A CLASS ON THE JUNCTION'S OWN CIRCLE, NOT A SECOND ELEMENT AND NOT THE COLOUR RAMP.** The
@@ -49394,7 +49467,7 @@ var EngCalcs = EngCalcs || {};
 
 		boxes.scope = ffSelect([
 			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junction only']
+			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -49910,6 +49983,7 @@ var EngCalcs = EngCalcs || {};
 			minPressure = ffValue(ask.minPressure, 'lpn_u_pressure'),
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
+			skipped = 0,
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -49917,14 +49991,29 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
 		}
+		// **EVERY SELECTED JUNCTION, ONE AT A TIME** (Tom, 2026-09-25: *"area selection and
+		// multi-selection succeeded fire flow analysis and fire flow analysis does not know how to
+		// handle multiple selected hydrants"*). This read `selection`, the singular, which is the LAST
+		// thing selected -- so a window drag over six hydrants tested one of them and said nothing
+		// about the other five. The list is the subject now, in the order it was picked, and each
+		// junction in it gets its own row exactly as a whole-system sweep gives it one. Whatever else
+		// the drag caught -- a pipe, a tank, a label -- is not a hydrant, and the count of those is
+		// said rather than swallowed.
 		if (ask.scope === 'selected') {
-			if (!selection || selection.kind !== 'node' ||
-				!junctions.some(function (n) { return n.id === selection.id; })) {
+			skipped = 0;
+			ids = [];
+			selections.forEach(function (s) {
+				if (s.kind === 'node' && junctions.some(function (n) { return n.id === s.id; })) {
+					ids.push(s.id);
+				} else {
+					skipped++;
+				}
+			});
+			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
 					'No junction is selected. Choose one on the map, or test every junction.');
 				return;
 			}
-			ids = [selection.id];
 		} else {
 			ids = junctions.map(function (n) { return n.id; });
 		}
@@ -49933,6 +50022,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		model = assembleModel();
+		fireFlowAtFrame(model);
 		engine = engineFor(model);
 		if (ask.design !== 'off') {
 			design = {
@@ -49958,6 +50048,10 @@ var EngCalcs = EngCalcs || {};
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
 		openFireFlowRunBox(ids.length);
+		if (skipped) {
+			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
+				.replace('{n}', String(skipped)));
+		}
 
 		return EngCalcs.lpnFireFlowSweep(model, {
 			solve: engine.solve,

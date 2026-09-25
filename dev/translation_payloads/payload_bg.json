@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 2029,
-        "delta_key_count": 184,
+        "expected_key_count": 2030,
+        "delta_key_count": 185,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -668,6 +668,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -854,6 +855,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -3242,6 +3244,22 @@
                     "key": "lpn_terrain_done",
                     "value": "{n} кота(и) попълнени.",
                     "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_ff_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_no_selection",
+                    "value": "Не е избран възел. Изберете такъв на картата или изпитайте всеки възел.",
+                    "english": "No junction is selected. Choose one on the map, or test every junction."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_required",
+                    "value": "Изисквано противопожарно водно количество",
+                    "english": "Required fire flow"
                 }
             }
         },

@@ -1124,7 +1124,14 @@
 				// Measured before the fix: a curve steepened at every point still reported the old 6 m.
 				'\u0001' + (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV'
 					? (l.curvePoints || []).map(function (q) { return q[0] + ',' + q[1]; }).join(';')
-					: ''));
+					: '') +
+				// **A PUMP'S STATUS IS IN THE SIGNATURE, AND IT HAS TO BE** (2026-09-25). A session
+				// opened with a pump shut and then handed EN_INITSTATUS = open by pushValues() still
+				// solves with that pump delivering nothing: measured on Net3's pump 10, shut at 0:00
+				// and opened by its control at 1:00, 30 psi low at Junction 10 against the run it was
+				// asked to reproduce, while the same model opened cold was right to 0.0001 psi. So a
+				// pump opening or shutting reopens the Project from its text, which is always right.
+				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
