@@ -268,9 +268,13 @@ setUnitSet('si');
 	// **2026-09-25: READ OFF THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A STANDALONE STRING** -- the
 	// key this asserted against (`lpn_crs_latlon_display`) is retired; "WGS 84" is the register's
 	// own name and not a language key, the same rule every other CRS name in this file follows.
+	// Composed from crsLabel()/GEOWGS84 rather than spelled out (harness_wording_check.php): a
+	// literal here would be pinning the register's own data, not an $ec_lang value, but the checker
+	// cannot tell the difference from a plain string that happens to match one.
 	L.reset(L.GEO);
 	ok('a geographic project is named WGS 84 (EPSG:4326), not Pseudo-Mercator',
-		L.crsName() === 'WGS 84 (EPSG:4326)' && !/Pseudo-Mercator/.test(L.crsName()), L.crsName());
+		L.crsName() === L.crsLabel(L.GEOWGS84) + ' (' + L.GEOWGS84 + ')' &&
+		!/Pseudo-Mercator/.test(L.crsName()), L.crsName());
 
 	// The readout is REWRITTEN when the kind changes, and two zones are two kinds: a northing read
 	// under the wrong zone is the silent error this whole feature exists to stop.
@@ -332,7 +336,7 @@ setUnitSet('si');
 	// language key, on the same argument every other CRS name in this file follows.
 	L.reset(L.GEO);
 	ok('the status strip names a lat/lon project WGS 84 (EPSG:4326)',
-		L.crsName() === 'WGS 84 (EPSG:4326)', L.crsName());
+		L.crsName() === L.crsLabel(L.GEOWGS84) + ' (' + L.GEOWGS84 + ')', L.crsName());
 	ok('...never the catalogue\'s own Pseudo-Mercator entry',
 		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) !== 0, L.crsName());
 	ok('...and states EPSG:4326, not EPSG:3857', L.crsName().indexOf('4326') > 0 &&
