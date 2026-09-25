@@ -2572,25 +2572,25 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-sort { cursor: pointer; position: relative; }
 .lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
 .lpn-pane-head-sel .lpn-pane-sort:active { cursor: grabbing; }
-/* **THE SORT GLYPH: ALWAYS ON THE SORTED COLUMN, HOVER-REVEALED ON EVERY OTHER ONE, NO EXTRA
-   HEADING WIDTH** (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe
-   including a hover revelation?"*). A `::after` with a `content:` string, not a DOM node -- a real
-   span holding "▲" is a TEXT NODE, and `dev/browser-pass/specs/print.js` walks every text node of
-   a heading to compare screen and print line counts; an invisible span still has a client rect and
+/* **THE HOVER-REVEALED SORT HINT, ON EVERY COLUMN BUT THE SORTED ONE, NO EXTRA HEADING WIDTH**
+   (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe including a hover
+   revelation?"*). The SORTED column's own arrow is real text, appended in
+   js/looped-network.js beside its label exactly as it always was
+   (`dev/lpn-spike/pane-harness.js` reads it off `th.textContent`). This is only the HINT the other
+   columns get, and it is a `::after` `content:` string rather than a second real text node: a span
+   holding "▲" is a TEXT NODE, and `dev/browser-pass/specs/print.js` walks every text node of a
+   heading to compare screen and print line counts -- an invisible span still has a client rect and
    was silently double-counted as an extra wrapped line once, on every column, before this moved to
-   `content:` (2026-09-25 pre-review, print.js caught it). `position: absolute` is the "no width"
-   part -- an out-of-flow box contributes nothing to the button's own min-content, so
+   `content:` (2026-09-25 pre-review, print.js caught it). `:not(.lpn-pane-sort-active)` keeps it
+   off the sorted column entirely, so the two arrows never stack. `position: absolute` is the "no
+   width" part -- an out-of-flow box contributes nothing to the button's own min-content, so
    `.lpn-pane-sort` above declares `position: relative` for this to sit against. */
-.lpn-pane-sort::after {
+.lpn-pane-sort:not(.lpn-pane-sort-active)::after {
 	content: '▲'; position: absolute; inset-inline-end: 1px; top: 50%; transform: translateY(-50%);
 	font-size: .85em; font-weight: normal; opacity: 0; pointer-events: none;
 }
-.lpn-pane-sort-desc::after { content: '▼'; }
-.lpn-pane-sort-active::after { opacity: 1; }
-.lpn-pane-table thead th:hover .lpn-pane-sort::after,
-.lpn-pane-table thead th:focus-within .lpn-pane-sort::after { opacity: .5; }
-.lpn-pane-table thead th:hover .lpn-pane-sort-active::after,
-.lpn-pane-table thead th:focus-within .lpn-pane-sort-active::after { opacity: 1; }
+.lpn-pane-table thead th:hover .lpn-pane-sort:not(.lpn-pane-sort-active)::after,
+.lpn-pane-table thead th:focus-within .lpn-pane-sort:not(.lpn-pane-sort-active)::after { opacity: .5; }
 /* **THE "..." COLUMN MENU** (Tom: *"Maybe a three dots menu for sorting and hiding."*) -- opens the
    same menu the right-click/long-press does (`paneHeadMenuTrigger()`), so it is a second door onto
    one room rather than a second menu to keep in step. `position: absolute` for the same "no extra

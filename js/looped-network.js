@@ -21388,19 +21388,21 @@ var EngCalcs = EngCalcs || {};
 			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
-			// **THE ARROW IS ALWAYS THERE ON THE SORTED COLUMN, AND HOVER-REVEALED ON EVERY OTHER
+			// **THE ARROW IS ALWAYS THERE ON THE SORTED COLUMN** -- inline TEXT, exactly as it
+			// always was (`dev/lpn-spike/pane-harness.js` reads it off `th.textContent`, the trap
+			// it guards being the stale-refill branch that repaints cells by id and never touches a
+			// heading at all -- see that harness's own comment). **AND HOVER-REVEALED ON EVERY OTHER
 			// ONE** (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe
-			// including a hover revelation?"*). A CSS `::after`, not a DOM text node: a real node
-			// with "▲" in it is TEXT, and `dev/browser-pass/specs/print.js` walks every text node of
-			// a heading to compare screen and print line counts -- an invisible node still has a
-			// client rect, so it was silently counted as an extra line on the sorted-arrow's column
-			// once, before this went to `content:` instead (2026-09-25 pre-review). A `content:`
-			// string is not in the DOM at all, so `b.textContent` -- and everything that reads it,
-			// on either side of the print comparison -- never sees it, and it costs no heading width
-			// for the same reason the earlier span would have (out of flow either way).
-			b.textContent = paneHeadingText(c);
+			// including a hover revelation?"*), where it is a CSS `::after` rather than a second real
+			// node: a hint span holding "▲" is a TEXT NODE too, and `dev/browser-pass/specs/print.js`
+			// walks every text node of a heading to compare screen and print line counts -- an
+			// invisible span still has a client rect and was silently double-counted as an extra line
+			// on EVERY column once, before the hint (only) moved to `content:` (2026-09-25
+			// pre-review). The active column needs no hint glyph -- its real arrow already shows --
+			// so the two never stack.
+			b.textContent = paneHeadingText(c) +
+				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
 			b.className += (spec.sort.col === c.key) ? ' lpn-pane-sort-active' : '';
-			b.className += (spec.sort.col === c.key && spec.sort.dir < 0) ? ' lpn-pane-sort-desc' : '';
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
 			// **CTRL/CMD OR SHIFT ON THE HEADING SELECTS IT INSTEAD OF SORTING** -- the same modifier
 			// convention a spreadsheet uses for its own column headers, so several can be marked
