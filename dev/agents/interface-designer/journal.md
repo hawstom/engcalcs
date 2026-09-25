@@ -3129,3 +3129,110 @@ stronger than the written argument, moving it costs little; the placement above 
 do it with the least collateral damage to the rows around it.
 
 No shipped file touched.
+
+## 2026-09-25 — Tables pane heading: sort vs select vs move vs hide (feat/table-editing)
+
+**The bug under the complaint.** `paneStartColDrag()` (the branch on a SELECTED heading) never
+calls `ev.preventDefault()` before attaching its mousemove/mouseup listeners — unlike
+`paneStartColResize()` and the sibling `paneStartHeadSelDrag()` path, which both do.
+OBSERVED: js/looped-network.js:21212-21226 (function body), vs. the guarded call site at
+js/looped-network.js:21416 (`if (paneHeadSel(spec).indexOf(c.key) !== -1) { paneStartColDrag(spec,
+c.key, ev); return; }` — no preventDefault on this branch, only on the sibling one three lines
+later). This is very likely why Tom could not get a column to drag: the browser's native
+mousedown handling (focus/press ring, and on a `<button>` whose row runs into adjacent `<th>`
+text, sometimes drag-select of neighboring cell text) fights the custom drag. **Fix this line
+first, regardless of anything else below** — it is a one-line, zero-cost repair of a real defect,
+not a design change.
+
+**Does `user-select: none` on the heading fix it?** Tom's suspicion is half right. The sort label
+is already inside a `<button>` (js/looped-network.js:21386), and buttons suppress native text
+selection in every evergreen browser by default — so the heading TEXT was never really the
+draggable culprit. OBSERVED: css/engcalcs.css has no explicit `user-select` rule on
+`.lpn-pane-sort`. Add one anyway (`user-select: none` on `.lpn-pane-sort` and `.lpn-pane-table
+thead th`) as cheap insurance against a drag that overshoots into a neighboring `<th>`'s padding —
+but it is not the fix for "can't drag"; the missing `preventDefault()` is.
+
+**Survey of established grids.** CITED, from documented/observed behavior of each product:
+- **Excel / Google Sheets**: clicking a header never sorts. Sort lives in a separate command
+  (Data > Sort, or the AutoFilter dropdown arrow). A plain click on the header selects the whole
+  column; Sheets' own keyboard equivalent is Ctrl+Space with a cell in that column focused. This
+  is how spreadsheets avoid this exact conflict — sort and select are never on the same click.
+- **AG Grid**: click header = sort; the *same* header is also the drag handle for column reorder,
+  distinguished by movement distance — a press that never leaves the header is a sort, a press
+  that travels is a move. This branch already uses that exact distinction (click with no drag =
+  sort; drag = select or move, gated on `spec.headDragged`). A separate hover-revealed icon
+  (angle/menu glyph, only rendered on `:hover`, no layout width cost) opens AG Grid's column menu
+  for pin/autosize/hide.
+- **MUI DataGrid**: click header sorts; a hover-revealed sort caret hints sortability before the
+  click; a separate "⋮" icon (also hover-revealed) opens a menu with Sort, Filter, Hide column,
+  Manage columns.
+- **Airtable**: no click-to-sort at all — clicking a header opens its field menu (edit, sort, hide,
+  duplicate); reordering is a drag on the header.
+- **QGIS attribute table**: click header sorts (toggles asc/desc, same as this branch); right-click
+  offers "Hide column"; a separate **"Organize columns"** dialog offers checkboxes for
+  show/hide plus reorder — the closest existing precedent for Tom's "Manage columns" idea.
+
+**Recommendation.** Keep this branch's existing click/drag-distance split — it already matches
+AG Grid's proven resolution and needs no redesign. Do not zone the heading cell into a "text
+sorts, margin selects" split (Tom's own tentative idea): no surveyed grid does this, a boundary
+inside a heading this narrow (CLAUDE.md, "width is king") has no visible edge, and it doubles the
+discovery burden instead of resolving it. Reject it explicitly if re-proposed.
+
+Instead, three additions, cheapest first:
+1. **Fix the missing `preventDefault()`** at js/looped-network.js:21416 — the actual drag bug.
+2. **Add "Show all columns" to the existing hide/show context menu**, shown only when at least one
+   column is hidden, alongside the per-column "Show {col}" entries already there
+   (js/looped-network.js:22952-22958). Do not reuse the filter's "Show all" string
+   (`lpn_pane_filter_clear`) — it means something else (clear the row filter) and appears in the
+   same UI region; reusing it across two different commands on the same table would be the exact
+   kind of reuse CLAUDE.md's label-normalization rule forbids ("reuse stops at sentences," and this
+   is two different actions, not one label two places).
+3. **Add a hover-revealed "⋮" icon at the trailing edge of every heading** (no layout width; drawn
+   absolutely over the grip's margin, visible only on `:hover`/`:focus-within`, same treatment as
+   AG Grid's and MUI's column-menu glyph) that opens the *same* context menu right-click/long-press
+   already opens. This is the fix for "I honestly don't know [about] a grab cursor somewhere" —
+   it gives desktop users a visible, clickable affordance for Hide/Show/Manage instead of requiring
+   they already know to right-click, while leaving long-press as the touch equivalent unchanged.
+   Add one new menu item, **"Manage columns…"**, opening a small dialog: one row per column
+   (including hidden ones), a checkbox for Show, and up/down reorder buttons — this is the touch
+   and keyboard path for reorder and multi-hide that the mouse-drag gesture does not cover
+   (paralleling QGIS's Organize columns).
+
+**Cursors, stated plainly** (mostly already correct, OBSERVED css/engcalcs.css:2566-2568):
+sort button = `pointer`; a selected heading = `grab`, `grabbing` while held; resize grip =
+`col-resize`; the new "⋮" menu glyph = `pointer`. No new cursor is needed.
+
+**Keyboard.** Tab reaches each heading button; Enter/Space already sorts (native button behavior).
+Add Ctrl+Space (a cell focused in that column, or the heading itself focused) to toggle that
+column into the selection, matching Google Sheets' own shortcut (CITED) rather than inventing one.
+Column reorder and hide/show by keyboard both route through the new "Manage columns…" dialog
+(item 3 above) rather than a bespoke arrow-key drag — nobody surveyed ships keyboard column-drag,
+and a dialog with ordinary Tab/Space/Up/Down controls is the accessible answer for free.
+
+**Touch.** Long-press already opens the hide/show menu (unchanged) — add "Show all columns" and
+"Manage columns…" to it, same as desktop. Do not attempt touch drag-to-reorder or drag-to-select:
+it competes with page/pane scroll and no surveyed grid solves that well on a narrow heading, so
+route every touch column operation through the menu and the dialog.
+
+**New English strings needed** (plain American English, no em dashes):
+- `lpn_pane_show_all_cols` = "Show all columns"
+- `lpn_pane_manage_cols` = "Manage columns…"
+- `lpn_pane_manage_cols_title` = "Manage columns" (dialog title)
+- `lpn_pane_manage_cols_show` = "Show" (checkbox column heading in the dialog)
+- (Optional, only if the dialog needs empty-state text) `lpn_pane_manage_cols_hint` = "Check a
+  column to show it. Drag or use the arrows to reorder."
+
+**Rejected alternative, most likely to be re-proposed**: splitting the heading cell into a
+text zone (sorts) and a margin zone (selects/drags). Loses because: (a) no surveyed grid does it —
+each resolves the same conflict with either a movement-distance threshold (AG Grid, and this
+branch already) or by taking sort off the plain click entirely (Excel, Sheets, Airtable); (b) a
+column this narrow ("width is king," CLAUDE.md) has no room to show the boundary, so the split
+would be undiscoverable by definition; (c) it does not fix Tom's actual failure, which is the
+missing `preventDefault()`, not a click/drag ambiguity.
+
+Provenance: bug location and current behavior are OBSERVED against
+`js/looped-network.js` and `css/engcalcs.css` on branch `feat/table-editing`
+(worktree `/home/haws/webdev/worktrees/feat-table-editing/engcalcs`) as of 2026-09-25. Grid
+conventions (Excel, Google Sheets, AG Grid, MUI DataGrid, Airtable, QGIS) are CITED from general
+product knowledge, not fetched fresh this session — flag for a follow-up web check before this is
+built if any single claim needs to be load-bearing.
