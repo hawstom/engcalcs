@@ -107,9 +107,9 @@ judgement and does not belong to a script.
 
 ### MOD's first-use test (2026-09-23)
 
-- [?] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go
+- [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one
   - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
-- [?] R-203 -- | "Our hint above the toolbar didn't help him. He suggested maybe a colored light bulb glyph. But I think that is a feeble attempt to rescue an attempt that isn't working." -- Ida agrees: retire the hint, no light bulb; she would delete it when R-202's button style ships. Delete it now instead?
+- [x] R-203 -- | "Our hint above the toolbar didn't help him. He suggested maybe a colored light bulb glyph. But I think that is a feeble attempt to rescue an attempt that isn't working." -- Ida agrees: retire the hint, no light bulb; she would delete it when R-202's button style ships. Delete it now instead? -- deleted on master 61fa16f4 (fix/menu-cue)
   - [TGH 2026-09-25: "Delete the toolbar hint. It failed."]
 - [ ] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached
 
@@ -127,13 +127,13 @@ judgement and does not belong to a script.
 
 ### Real-world use (IOD, senior civil engineer; `dev/real-world-reviews.md`)
 
-- [ ] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25
+- [x] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25 -- Mary: dev/agents/market-researcher/watercad-migration.md; Sue: her journal. Both: no WaterCAD-expert seat; one WaterCAD-exported .inp from IOD is the next step
 
 ### Fire flow and Net3 Pump 10
 
-- [ ] R-231 -- | "Pump 10 is initially closed, making the pressure at node 10 -0.64 psi. But the pump opens at time step 1 ... I see that head and pressure jump at time 1. But the link still shows as closed, and Properties and Tables shows it as closed." -- fix/fireflow-eps
-- [ ] R-232 -- | "Fire flow analysis says that it works on the current time step, and its results **do** vary. But the static pressure for Junction 10 never matches the map pressure, and it's always significantly lower ... it seems clear to me that the static pressure for all hydrants should match the map." (Elm Street Center matched.) -- fix/fireflow-eps
-- [ ] R-233 -- | "I think that area selection and multi-selection succeeded fire flow analysis and fire flow analysis does not know how to handle multiple selected hydrants. Check and fix that." -- fix/fireflow-eps
+- [x] R-231 -- | "Pump 10 is initially closed, making the pressure at node 10 -0.64 psi. But the pump opens at time step 1 ... I see that head and pressure jump at time 1. But the link still shows as closed, and Properties and Tables shows it as closed." -- fix/fireflow-eps -- merged, master f9ebf891
+- [x] R-232 -- | "Fire flow analysis says that it works on the current time step, and its results **do** vary. But the static pressure for Junction 10 never matches the map pressure, and it's always significantly lower ... it seems clear to me that the static pressure for all hydrants should match the map." (Elm Street Center matched.) -- fix/fireflow-eps -- merged, master f9ebf891
+- [x] R-233 -- | "I think that area selection and multi-selection succeeded fire flow analysis and fire flow analysis does not know how to handle multiple selected hydrants. Check and fix that." -- fix/fireflow-eps -- merged, master f9ebf891
 
 ### Workflow
 
@@ -142,12 +142,12 @@ judgement and does not belong to a script.
 ### feat/zoom-control (8103)
 
 - [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
-- [ ] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed
+- [ ] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass
 
 ### feat/convert-as (8104)
 
-- [ ] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP."
-- [ ] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here."
+- [ ] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP." -- feat/convert-as 47649c32, awaiting your pass
+- [ ] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here." -- feat/convert-as: tank Water depth is a label now; awaiting your pass
 
 ### feat/table-editing (8105)
 
@@ -157,18 +157,18 @@ judgement and does not belong to a script.
 
 ### feat/property-venue (8106)
 
-- [ ] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected."
+- [ ] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected." -- feat/property-venue b8733c5d, built as you proposed; awaiting your pass
 
 ### feat/first-project (8112)
 
-- [ ] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?"
-- [ ] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?"
+- [ ] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?" -- feat/first-project f775f0a6: street map on at first load; privacy.php changed; landing page claim needs your ruling
+- [ ] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?" -- feat/first-project: WGS 84 (EPSG:4326)
 
 ### Customer
 
-- [ ] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black."
-- [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0."
-- [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is."
+- [ ] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black." -- feat/customer-node cd7640b1, awaiting your pass
+- [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass
+- [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass
 
 ### Rulings recorded, nothing to build
 
