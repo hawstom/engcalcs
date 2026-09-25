@@ -908,6 +908,12 @@
 	EC.lpnTimeRunNow = function () { requestRun(true); };
 
 	/**
+	 * Move the transport to `t` seconds, exactly as the slider does. The one door a harness has to a
+	 * time step without clicking the toolbar.
+	 */
+	EC.lpnTimeGoTo = function (t) { setTime(t); };
+
+	/**
 	 * **WHAT THE PUMPS COST OVER THE RUN IN HAND, OR NULL** (Task 566; dev/pump-energy.md).
 	 * js/lpn-epanet.js works it out while the clock is walking; this is the one door the page reads
 	 * it through, so it can never answer out of a run that has been superseded -- the frames and
