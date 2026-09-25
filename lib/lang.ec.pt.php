@@ -1795,7 +1795,6 @@ $ec_lang['lpn_crs_count']='{n} de {total} projeções listadas.';
 $ec_lang['lpn_crs_place_projected']='Um projeto projetado abre no seu próprio plano, não no lugar que você buscou. Colocar esse plano sobre a Terra precisa de uma transformação de coordenadas, que esta página ainda não tem.';
 $ec_lang['lpn_crs_none']='Não georreferenciado';
 $ec_lang['lpn_storage_unreadable']='Não salvo. Este projeto não pôde ser lido do armazenamento do navegador. A cópia armazenada é mantida exatamente como está e não será sobrescrita, então nada nesta aba está sendo salvo. Abra um arquivo ou crie um novo projeto para continuar trabalhando.';
-$ec_lang['lpn_menu_cue']='Comece pelos menus acima. Use a barra de ferramentas para acesso rápido.';
 $ec_lang['lpn_about_credits']='Créditos';
 $ec_lang['lpn_help_welcome']='Página de boas-vindas';
 $ec_lang['lpn_about_license']='Licenciado sob a GNU General Public License v3.0 ou posterior.';

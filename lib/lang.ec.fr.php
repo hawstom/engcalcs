@@ -1791,7 +1791,6 @@ $ec_lang['lpn_crs_count']='{n} projection(s) sur {total} listée(s).';
 $ec_lang['lpn_crs_place_projected']='Un projet en projection s\'ouvre sur son propre plan, et non à l\'endroit recherché. Placer ce plan sur la Terre nécessite une transformation de coordonnées, que cette page ne propose pas encore.';
 $ec_lang['lpn_crs_none']='Non géoréférencé';
 $ec_lang['lpn_storage_unreadable']='Non enregistré. Ce projet n\'a pas pu être lu depuis le stockage du navigateur. Sa copie enregistrée reste exactement telle quelle et ne sera pas écrasée ; rien n\'est donc enregistré depuis cet onglet. Ouvrez un fichier ou créez un nouveau projet pour continuer à travailler.';
-$ec_lang['lpn_menu_cue']='Commencez par les menus ci-dessus. Utilisez la barre d\'outils pour un accès rapide.';
 $ec_lang['lpn_about_credits']='Crédits';
 $ec_lang['lpn_help_welcome']='Page d\'accueil';
 $ec_lang['lpn_about_license']='Distribué sous licence GNU General Public License v3.0 ou ultérieure.';

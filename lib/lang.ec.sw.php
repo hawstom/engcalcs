@@ -1799,7 +1799,6 @@ $ec_lang['lpn_crs_count']='Michoro {n} kati ya {total} imeorodheshwa.';
 $ec_lang['lpn_crs_place_projected']='Mradi wenye mchoro haufunguki mahali ulipotafuta bali kwenye ndege yake mwenyewe. Kuweka ndege hiyo Duniani kunahitaji ubadilishaji wa kuratibu, ambao ukurasa huu haujaupata bado.';
 $ec_lang['lpn_crs_none']='Haijawekewa marejeleo ya kijiografia';
 $ec_lang['lpn_storage_unreadable']='Hakijahifadhiwa. Mradi huu haukuweza kusomwa kutoka hifadhi ya kivinjari. Nakala yake iliyohifadhiwa imeachwa kama ilivyo hasa na haitaandikwa upya, hivyo hakuna kinachohifadhiwa kwenye kichupo hiki. Fungua faili au unda mradi mpya ili kuendelea kufanya kazi.';
-$ec_lang['lpn_menu_cue']='Anza na menyu zilizo hapo juu. Tumia upau wa zana kwa ufikiaji wa haraka.';
 $ec_lang['lpn_about_credits']='Shukrani';
 $ec_lang['lpn_help_welcome']='Ukurasa wa karibu';
 $ec_lang['lpn_about_license']='Imepewa leseni chini ya GNU General Public License v3.0 au toleo jipya zaidi.';

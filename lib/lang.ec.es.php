@@ -887,7 +887,6 @@ $ec_lang['lpn_status_closed_opened']='Se cerró {closed}. Ahora se muestra {open
 $ec_lang['lpn_status_closed_empty']='Se cerró {closed}. Se inició un nuevo proyecto vacío.';
 $ec_lang['lpn_storage_full']='No guardado. El almacenamiento del navegador está lleno o no disponible, así que sus cambios recientes se perderán al cerrar esta pestaña.';
 $ec_lang['lpn_storage_unreadable']='No guardado. Este proyecto no se pudo leer del almacenamiento del navegador. Su copia guardada se deja exactamente como está y no se sobrescribirá, así que nada se está guardando en esta pestaña. Abra un archivo o cree un proyecto nuevo para seguir trabajando.';
-$ec_lang['lpn_menu_cue']='Comience con los menús de arriba. Use la barra de herramientas para un acceso rápido.';
 $ec_lang['lpn_about_credits']='Créditos';
 $ec_lang['lpn_help_welcome']='Página de bienvenida';
 $ec_lang['lpn_about_license']='Con licencia bajo la Licencia Pública General de GNU (GNU General Public License) v3.0 o posterior.';

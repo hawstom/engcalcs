@@ -1796,7 +1796,6 @@ $ec_lang['lpn_crs_count']='已列出 {total} 个投影中的 {n} 个。';
 $ec_lang['lpn_crs_place_projected']='已投影的项目会在其自身的平面上打开，而不是在您搜索到的地点。要将该平面对应到地球上，需要进行坐标转换，而本页面目前尚不具备这一功能。';
 $ec_lang['lpn_crs_none']='不带地理参照';
 $ec_lang['lpn_storage_unreadable']='未保存。此项目无法从浏览器存储中读取。其存储的副本将保持原样，不会被覆盖，因此此标签页中的内容不会被保存。请打开一个文件或新建一个项目以继续操作。';
-$ec_lang['lpn_menu_cue']='请从上方的菜单开始。使用工具栏可快速访问常用功能。';
 $ec_lang['lpn_about_credits']='致谢';
 $ec_lang['lpn_help_welcome']='欢迎页面';
 $ec_lang['lpn_about_license']='根据 GNU 通用公共许可证 v3.0 或更高版本授权。';

@@ -25571,7 +25571,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', AREA_HINT_KEY, MENU_CUE_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -32525,8 +32525,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
 	function wireNotesPopup() {
-		var cx = document.getElementById('lpn_menu_cue_x');
-		if (cx) { cx.addEventListener('click', retireMenuCue); }
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
 		var x = document.getElementById('lpn_notes_close');
@@ -32881,12 +32879,10 @@ var EngCalcs = EngCalcs || {};
 			if (m.tip) { b.title = m.tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function (e) {
 				e.stopPropagation();
-				retireMenuCue();   // they found the bar; the cue has done its job
 				m.open(e.currentTarget);
 			});
 			bar.appendChild(b);
 		});
-		showMenuCue();
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
 		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
 		initTipsIn(bar);
@@ -37120,56 +37116,9 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **SHOWN IS THE DEFAULT AND A BLOCKED STORAGE IS SHOWN**, which is the safe direction for a
 	// help bubble exactly as it is for the page titles above.
-	// ---- The menu cue (Task 625; Ida's re-diagnosis, section F item 4) -------------------------
-	//
-	// **IT RETIRES ITSELF THE MOMENT IT WORKS.** Opening ANY menu is proof the reader has found the
-	// bar, so that is what dismisses it for good -- not a timer, and not only the close button.
-	// A cue that keeps appearing after it has done its job is the Hide-titles highlight again in
-	// another costume.
-	//
-	// FURNITURE, so localStorage and never the project: whether one reader has found the menus is
-	// a fact about that reader, and a colleague opening the file must not inherit it.
-	var MENU_CUE_KEY = 'lpn_menucue';
-	function menuCueDone() {
-		try { return localStorage.getItem(MENU_CUE_KEY) === '0'; } catch (e) { return true; }
-	}
-	function retireMenuCue() {
-		var el = document.getElementById('lpn_menu_cue');
-		if (el) { el.style.display = 'none'; }
-		try { localStorage.setItem(MENU_CUE_KEY, '0'); } catch (e) {}
-	}
-	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design.
-	//
-	// **THE ARROW LANDS ON File, NOT ON THE MARK AND NOT ON Water** (Tom, 2026-09-11, asking the
-	// right question). The mark is IDENTITY, not a command, and the sentence sends the reader to
-	// the menus -- pointing at the mark would aim it at the one item that holds none.
-	// Water is this page's own menu and the most interesting one, but singling it out contradicts
-	// "every", and a reader who follows the arrow to Water has been told the bar is one menu wide.
-	// File is the first COMMAND menu and the start of the reading order, so the arrow points at
-	// where the row begins and the eye continues along it.
-	function showMenuCue() {
-		var el = document.getElementById('lpn_menu_cue'), bar = document.getElementById('lpn_menubar'),
-			arrow = el && el.querySelector ? el.querySelector('.lpn-menu-cue-arrow') : null,
-			txt = document.getElementById('lpn_menu_cue_text'), pc = EngCalcs.pageConfig || {};
-		if (!el || !bar || menuCueDone()) { return; }
-		// Nothing to point at yet: the bar is built after this file loads.
-		if (!bar.children || !bar.children.length) { return; }
-		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Start with the menus above. Use the toolbar for quick access.'; }
-		el.style.display = '';
-		// Measured, not assumed: the mark's width depends on the icon and the bar's own gap, and a
-		// hardcoded offset would drift the first time either changes. Falls back to no indent if
-		// the bar has not been laid out yet, which is correct rather than wrong-by-a-guess.
-		// `fileMenuButton`, not getElementById: buildMenuBar() already holds the button, and the id
-		// is assigned computedly (`b.id = m.id`) so a lookup by name is invisible to
-		// dom_id_resolve_check.php -- which said so.
-		var file = fileMenuButton;
-		if (file && arrow && file.getBoundingClientRect && bar.getBoundingClientRect) {
-			var fr = file.getBoundingClientRect(), br = bar.getBoundingClientRect();
-			if (fr.width > 0) {
-				el.style.marginLeft = Math.max(0, fr.left - br.left + (fr.width / 2) - 10) + 'px';
-			}
-		}
-	}
+	// The menu cue (Task 625) is gone: Tom, 2026-09-25, "Delete the toolbar hint. It failed." Every
+	// tester was slow to find the MENUS, and a quiet strip of prose under them did not change that.
+	// Its localStorage key is still erased by literal in Erase everything, for browsers that hold it.
 	var AREA_HINT_KEY = 'lpn_areahint';
 	function areaHintShown() {
 		try { return localStorage.getItem(AREA_HINT_KEY) !== '0'; } catch (e) { return true; }

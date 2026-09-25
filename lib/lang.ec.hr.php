@@ -1793,7 +1793,6 @@ $ec_lang['lpn_crs_count']='{n} od {total} projekcija na popisu.';
 $ec_lang['lpn_crs_place_projected']='Projicirani projekt otvara se u vlastitoj ravnini, a ne na mjestu koje ste tražili. Postavljanje te ravnine na Zemlju zahtijeva koordinatnu transformaciju, koju ova stranica još nema.';
 $ec_lang['lpn_crs_none']='Nije georeferencirano';
 $ec_lang['lpn_storage_unreadable']='Nije spremljeno. Ovaj se projekt nije mogao pročitati iz pohrane preglednika. Njegova pohranjena kopija ostaje točno onakva kakva jest i neće biti prepisana, pa se ništa na ovoj kartici ne sprema. Otvorite datoteku ili napravite novi projekt da biste nastavili raditi.';
-$ec_lang['lpn_menu_cue']='Počnite s izbornicima iznad. Upotrijebite alatnu traku za brzi pristup.';
 $ec_lang['lpn_about_credits']='Zasluge';
 $ec_lang['lpn_help_welcome']='Stranica dobrodošlice';
 $ec_lang['lpn_about_license']='Licencirano prema GNU General Public License v3.0 ili novijoj.';
