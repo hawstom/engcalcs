@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 182 untranslated keys, of 2029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 183 untranslated keys, of 2030 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, 3 to read @@ NEEDS RULING)
+## lpn_  (183, 4 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -69,6 +69,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ff_clear`**
   > Clear rings
   _Ruled OK 2026-09-23._
+- **`lpn_ff_skipped`**
+  > {n} selected elements are not junctions, so they were not tested.
+  @@ NEEDS RULING
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -578,7 +581,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**20 still to read**, of 47 new keys across 14 unmerged branch(es).
+**30 still to read**, of 60 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,11 +592,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/queue-0925 (`2878d1d0`) — adds no English strings
+### chore/journals-0925 (`5fcd6529`) — adds no English strings
 
-### chore/tom-edits-0925 (`9d8f81cc`) — adds no English strings
-
-### feat/convert-as (`0693cb6d`) — 29 new, 18 to read @@ NEEDS RULING
+### feat/convert-as (`47649c32`) — 28 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -608,17 +609,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPSG coordinate system
   _Ruled OK 2026-09-25._
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
-  @@ NEEDS RULING
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Suffix
   _Ruled OK 2026-09-25._
-- **`lpn_convas_label_depth_na`**
-  > Tank depth has no map label to add this to yet.
-  @@ NEEDS RULING
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
@@ -626,7 +624,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
   @@ NEEDS RULING
 - **`lpn_convas_none_tip`**
-  > Local coordinates in the length unit, with no world map.
+  > Local coordinates in the length unit, with no world map for now.
   @@ NEEDS RULING
 - **`lpn_convas_ok`**
   > Convert
@@ -656,10 +654,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Unnamed (local) georeference
   @@ NEEDS RULING
 - **`lpn_convas_unnamed_tip`**
-  > Local coordinates in the length unit, with the world map attached at the place the project is.
+  > Local coordinates in the length unit, with the world map attached.
   @@ NEEDS RULING
-- **`lpn_crs_latlon_display`**
-  > WGS 84 latitude/longitude (EPSG:4326)
+- **`lpn_crsbox_title`**
+  > Coordinate system
   @@ NEEDS RULING
 - **`lpn_file_convert_as`**
   > Convert as…
@@ -671,8 +669,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
 - **`lpn_inp_report_no_crs`**
-  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
-  @@ NEEDS RULING
+  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
+  _Ruled OK 2026-09-25._
 - **`lpn_units_mapcoords`**
   > Map coordinates
   _Ruled OK 2026-09-25._
@@ -683,7 +681,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   _Ruled OK 2026-09-25._
 
-### feat/first-project (`f3b49428`) — adds no English strings
+### feat/customer-node (`cd7640b1`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_field_meter_node`**
+  > Connected to
+  @@ NEEDS RULING
+- **`lpn_field_meter_node_tip`**
+  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
+  @@ NEEDS RULING
+
+### feat/first-project (`f775f0a6`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -697,22 +704,31 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-limit (`4bcf92ab`) — adds no English strings
+### feat/menu-button (`a82d32f5`) — adds no English strings
 
-### feat/offscreen-notice (`291bd4c7`) — adds no English strings
+### feat/property-venue (`b8733c5d`) — 3 new, 3 to read @@ NEEDS RULING
 
-### feat/property-venue (`98613d7f`) — adds no English strings
+- **`lpn_find_filter_none`**
+  > No table has a property this query names.
+  @@ NEEDS RULING
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  @@ NEEDS RULING
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  @@ NEEDS RULING
 
-### feat/select-on-focus (`11edc1ad`) — adds no English strings
-
-### feat/table-editing (`efeaa75a`) — 8 new, all ruled
+### feat/table-editing (`d9c4a066`) — 17 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
-  _Ruled OK 2026-09-25._
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
+  @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
   _Ruled OK 2026-09-25._
+- **`lpn_pane_colmenu_tip`**
+  > Sort, hide, or manage columns
+  @@ NEEDS RULING
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
   _Ruled OK 2026-09-25._
@@ -728,13 +744,35 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_hide_cols`**
   > Hide these columns
   _Ruled OK 2026-09-25._
+- **`lpn_pane_manage_cols`**
+  > Manage columns…
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_down`**
+  > Move down
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_show`**
+  > Show
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_title`**
+  > Manage columns
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_up`**
+  > Move up
+  @@ NEEDS RULING
+- **`lpn_pane_show_all_cols`**
+  > Show all columns
+  @@ NEEDS RULING
 - **`lpn_pane_show_col`**
   > Show {col}
   _Ruled OK 2026-09-25._
+- **`lpn_pane_sort_asc`**
+  > Sort ascending
+  @@ NEEDS RULING
+- **`lpn_pane_sort_desc`**
+  > Sort descending
+  @@ NEEDS RULING
 
-### feat/usage-report (`5da3e7ae`) — adds no English strings
-
-### feat/zoom-control (`c5eea7de`) — 7 new, 2 to read @@ NEEDS RULING
+### feat/zoom-control (`dc1fa5a9`) — 7 new, all ruled
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -749,15 +787,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
-  @@ NEEDS RULING
+  > Zoom in one step. Shortcut: +
+  _Ruled OK 2026-09-25._
 - **`lpn_zoom_out`**
   > Zoom out
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
-  @@ NEEDS RULING
+  > Zoom out one step. Shortcut: -
+  _Ruled 2026-09-25: His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's._
 
-### fix/menu-cue (`07c0ed29`) — adds no English strings
-
-### merge/0925 (`88e5e2d2`) — adds no English strings
+### fix/fireflow-eps (`a484e879`) — adds no English strings

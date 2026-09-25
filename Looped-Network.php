@@ -2502,6 +2502,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_scope_selected: <?=json_encode($ec_lang['lpn_ff_scope_selected'])?>,
 	lpn_ff_no_junctions: <?=json_encode($ec_lang['lpn_ff_no_junctions'])?>,
 	lpn_ff_no_selection: <?=json_encode($ec_lang['lpn_ff_no_selection'])?>,
+	lpn_ff_skipped: <?=json_encode($ec_lang['lpn_ff_skipped'])?>,
 	lpn_ff_required: <?=json_encode($ec_lang['lpn_ff_required'])?>,
 	lpn_ff_required_tip: <?=json_encode($ec_lang['lpn_ff_required_tip'])?>,
 	lpn_ff_required_own: <?=json_encode($ec_lang['lpn_ff_required_own'])?>,
