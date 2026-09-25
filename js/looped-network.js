@@ -32467,7 +32467,7 @@ var EngCalcs = EngCalcs || {};
 			// A filter that is on and filtering nothing looks broken, so it says which it is.
 			note.textContent = (crsBoxViewOn() && !crsBox.place)
 				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
-				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
+				: (pc.lpn_crs_count || '{n} of {total} coordinate systems listed.')
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
 			// **THE ACKNOWLEDGEMENT THE IOGP TERMS REQUIRE, AND IT IS NOT A LANGUAGE KEY** -- the
 			// same rule as the OpenStreetMap and Nominatim credits: it names an owner rather than

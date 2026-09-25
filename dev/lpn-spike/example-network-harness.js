@@ -832,7 +832,7 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('...on a project that is still clean', L.tabAsterisk(L.indexEntry(mid)).show === false);
 
   // A lat/lon project, and the place it opens at. **IT IS A POINT NOW, NOT WORDS** (Task 641
-  // phase 2): the place-name search runs in the Geographic projection box, where it is answering
+  // phase 2): the place-name search runs in the Coordinate system box, where it is answering
   // the "which projections cover this" question, so creating the project travels to a point that
   // has already been found rather than sending a second request to somebody else's free service.
   // Where that point comes from is projection-harness.js's business; what is asserted here is that

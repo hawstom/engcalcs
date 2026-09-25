@@ -2298,16 +2298,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_new_coordsys_geo": {
-            "on": "Geographic projection",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
-        "lpn_new_coordsys_geo_tip": {
-            "on": "Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
         "lpn_new_coordsys_local": {
             "on": "Local, schematic, or custom",
             "ruled": "2026-09-14",

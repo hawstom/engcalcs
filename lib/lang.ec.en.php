@@ -1755,17 +1755,20 @@ $ec_lang['lpn_new_coords']='Coordinates';
 // the correct untranslated state. Whether they are debt is a judgement call and Tom's.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
 $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.';
-$ec_lang['lpn_new_coordsys_geo']='Geographic projection';
-$ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
+// **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
+// "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
+// lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
+// keeping a second copy that could drift from Convert as's own wording of the same thing.
 $ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
 $ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image, or the world map, at any time from the Map menu. Your coordinates never change when you do.';
-// ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
+// ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
-// any time." Two filters over one catalogue, and the catalogue itself is not keyed: a projection's
-// NAME is the EPSG register's own, exactly as the OpenStreetMap credit is, and a GIS reader in any
-// language looks for those characters.
-$ec_lang['lpn_new_crs']='Map projection';
+// any time." (His own words, kept verbatim; "projection" in visitor strings became "coordinate
+// system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
+// the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
+// as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
+$ec_lang['lpn_new_crs']='Coordinate system';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
 $ec_lang['lpn_crsbox_title']='Coordinate system';
@@ -1779,16 +1782,16 @@ $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the m
 $ec_lang['lpn_crs_search']='Search';
 $ec_lang['lpn_crs_name']='Coordinate system name filter';
 $ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
-$ec_lang['lpn_crs_list']='Projection';
-$ec_lang['lpn_crs_list_tip']='The projections left by the two filters above. Choose one and press Select.';
+$ec_lang['lpn_crs_list']='Coordinate system';
+$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one and press Select.';
 $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
-$ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
+$ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
 $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
-// Shown beside a projection in the chooser, and beside the chosen one in the New project box, when
-// this page has no transform for it. Short on purpose: it sits at the end of a register name that
-// can already run to 50 characters.
+// Shown beside a coordinate system in the chooser, and beside the chosen one in the New project box,
+// when this page has no transform for it. Short on purpose: it sits at the end of a register name
+// that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 // The same fact in a sentence, under the chooser's list and again if such a project is created.
 $ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.';

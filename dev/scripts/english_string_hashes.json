@@ -2818,8 +2818,6 @@
         "lpn_net_emergency": "a469bd39646afbb29e721d7974f24f83d7722838",
         "lpn_new_coords": "8ebebca0195929f0e6604560db2d6f829dc20c86",
         "lpn_new_coordsys": "8330b94c9770af7c9d2bcc391d6d8c51c2abb9e2",
-        "lpn_new_coordsys_geo": "e37ed474592583b18914ab4c29e2304d1e45ef69",
-        "lpn_new_coordsys_geo_tip": "2d1eaa1d56d47efab44dd09030de3937d2d671bf",
         "lpn_new_coordsys_local": "4ab6870721d047192251652ad7c0b7011fa76bdc",
         "lpn_new_coordsys_local_tip": "24f3fb601de22adda4c25fd55f295b7750e14034",
         "lpn_new_coordsys_tip": "26b42c81605e839b4f6435b371aaadd135964c06",
@@ -7636,14 +7634,6 @@
         "lpn_new_coordsys": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_new_coordsys_geo": {
-            "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_new_coordsys_geo_tip": {
-            "words": 12,
-            "ends_sentence": true
         },
         "lpn_new_coordsys_local": {
             "words": 4,

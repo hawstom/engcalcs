@@ -370,7 +370,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
   'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_create',
   'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si', 'lpn_new_crs_pick',
-  // The Geographic projection box (Task 641 phase 2): the two filters, the selector they narrow,
+  // The Coordinate system box (Task 641 phase 2): the two filters, the selector they narrow,
   // and the note that says which filter is doing the narrowing.
   'lpn_crsbox', 'lpn_crsbox_title', 'lpn_crsbox_close', 'lpn_crsbox_view', 'lpn_crsbox_place',
   'lpn_crsbox_search', 'lpn_crsbox_name', 'lpn_crsbox_list', 'lpn_crsbox_note', 'lpn_crsbox_ok',

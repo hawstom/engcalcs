@@ -445,7 +445,7 @@ setUnitSet('si');
 
 // ---- 9. THE BOX ITSELF: two filters, one catalogue, and the answer it hands back -----------------
 {
-	console.log('\n--- the Geographic projection box ---');
+	console.log('\n--- the Coordinate system box ---');
 	const PETALUMA = { lat: 38.2324, lon: -122.6367, extent: null };
 	const listEl = byId.lpn_crsbox_list, viewEl = byId.lpn_crsbox_view,
 		nameEl = byId.lpn_crsbox_name, noteEl = byId.lpn_crsbox_note,
