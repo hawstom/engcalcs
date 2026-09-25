@@ -5459,6 +5459,9 @@ var EngCalcs = EngCalcs || {};
 		// through here again, so a measurement that recovers is picked up with nothing to reset.
 		if (!viewNumbersUsable()) { noteMapUnmeasurable(true); return; }
 		noteMapUnmeasurable(false);
+		// An empty geographic document re-origins under the camera first; the rebase ends in its
+		// own setTransform(), which has then done everything below.
+		if (followViewWhileEmpty()) { return; }
 		// **THE STROKE SIZES RIDE THE TRANSFORM, and that is the whole of the 2026-09-09 repair.**
 		// See publishScaleSizes(): a scale that reaches the world layer without them following it
 		// paints the map as one solid colour and makes every pipe's invisible grab band cover the
@@ -11653,7 +11656,10 @@ var EngCalcs = EngCalcs || {};
 		// kind and, for a projected project, the CRS code. Changing either used to be safe because
 		// nothing survived the repaint; now something does.
 		var proj = projectedBasemapOk();
-		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
+		// ...and the ORIGIN, since a tile is placed in local units: followViewWhileEmpty() can move
+		// it under a tile that is still cached.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '') + '|' + (xg
 			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
 				'|' + xg.metersPerUnit + '|' + xg.rotDeg
 			: '');
@@ -25458,9 +25464,14 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
-	function rebaseLiveGeoDoc() {
+	//
+	// `at`, when given, is a WORLD point (longitude, Mercator y) to put the origin's cell under
+	// instead of the model's own extent -- the one caller is followViewWhileEmpty(), for a document
+	// that has no model to choose from.
+	function rebaseLiveGeoDoc(at) {
 		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
+		if (at && isFinite(at.x) && isFinite(at.y)) { minX = at.x; minY = at.y; }
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
 		// cartesianY()'s call sites for exactly this reason -- a fifth site added later without the
@@ -25472,13 +25483,15 @@ var EngCalcs = EngCalcs || {};
 		// a departure of 1e-13 could only change the answer at an exact cell boundary, and both
 		// answers there are equally valid origins. NO COORDINATE IS MOVED BY THIS ROUND TRIP; the
 		// shift below is a subtraction of the chosen origin and nothing else.
-		eachStoredPoint(doc, function (pt, get) {
-			if (get) { return; }
-			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
-			var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
-			if (X < minX) { minX = X; }
-			if (Y < minY) { minY = Y; }
-		});
+		if (!at) {
+			eachStoredPoint(doc, function (pt, get) {
+				if (get) { return; }
+				if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+				var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
+				if (X < minX) { minX = X; }
+				if (Y < minY) { minY = Y; }
+			});
+		}
 		if (!isFinite(minX) || !isFinite(minY)) { return null; }
 		org = {
 			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
@@ -25510,6 +25523,41 @@ var EngCalcs = EngCalcs || {};
 		tv = tabViews[library.openId];
 		if (tv && isFinite(tv.cx) && isFinite(tv.cy)) { tv.cx += dx; tv.cy += dy; }
 		return { dx: dx, dy: dy };
+	}
+	// **AN EMPTY GEOGRAPHIC DOCUMENT'S ORIGIN FOLLOWS THE CAMERA** (Tom, 2026-09-25, on Project1:
+	// *"There are nodes, but they are not visible, even when I zoom to fit."*). Task 439 derives a
+	// geographic origin from the MODEL, so a document with no model keeps {0, 0} -- and a camera
+	// over Novato at street zoom is then `translate(-5e7, ...)`: past Chrome's layout range, so
+	// every junction drawn there and every tile under it is laid out millions of pixels off the
+	// canvas. Nothing was wrong with the symbols or the zoom limit; the drawn numbers were too big.
+	// Project1 is born exactly there, and a wizard-made blank project or a place-name search on an
+	// empty one reaches the same state by hand.
+	//
+	// So while the document holds no model at all, a view whose centre sits more than
+	// LPN_GEO_FOLLOW_PX from the origin re-origins onto the 1/128-degree cell under that centre,
+	// with the camera compensated inside rebaseLiveGeoDoc() so nothing on screen moves. With no
+	// model there is no user number to shift, and the first junction placed is then born small.
+	// Once a model exists, Task 439's own rule (origin from the model) is left alone.
+	//
+	// The bound: after a follow the centre is within one cell (1/128 degree) of the origin, which is
+	// 434,000 px at maxScale() -- under this, so a follow can never trigger another. Chrome's layout
+	// range is about 3.3e7 px, so this keeps every drawn number more than ten times inside it.
+	// Never mid-gesture: a pan holds `tx0` from before the shift and would jump by the whole origin.
+	var LPN_GEO_FOLLOW_PX = 2e6, followingView = false;
+	function geoDocHasModel() {
+		if (doc.nodes.length) { return true; }
+		var any = false;
+		eachStoredPoint(doc, function (pt, get) { if (!get) { any = true; } });
+		return any;
+	}
+	function followViewWhileEmpty() {
+		if (followingView || drag || georef || !doc || !isLatLonProject() || geoDocHasModel()) { return false; }
+		var v = currentView();
+		if (!v || Math.max(Math.abs(v.cx), Math.abs(v.cy)) * v.s < LPN_GEO_FOLLOW_PX) { return false; }
+		followingView = true;
+		try {
+			return !!rebaseLiveGeoDoc({ x: outwardX(v.cx), y: Geom.mercY(outwardY(v.cy)) });
+		} finally { followingView = false; }
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
