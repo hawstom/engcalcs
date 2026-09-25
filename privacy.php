@@ -36,8 +36,9 @@ engineering calculators at hawsedc.com/engcalcs.</em></p>
 	<li>Our usage counts hold no IP address and no identifier of any kind.</li>
 	<li>The web server keeps an ordinary access log, and that log does record IP addresses. The two
 		are separate and we never join them.</li>
-	<li>Four optional features on one page can fetch something from OpenStreetMap or Mapbox. Each
-		asks you first.</li>
+	<li>Four optional features on one page can fetch something from OpenStreetMap or Mapbox. The
+		street map shows on the first, empty project that page opens, and you can hide it. The other
+		three ask you first.</li>
 </ul>
 
 <h2>Who we are</h2>
@@ -130,9 +131,10 @@ change your mind. Use the <strong><?=htmlspecialchars($ec_lang['consent_settings
 <p><strong>Nobody.</strong> We do not share, sell or transfer any of it. No processor, no analytics
 service, no advertising partner. Every stylesheet, script and font comes from this site.</p>
 
-<p>Four features on the Looped Pipe Network map reach outside this site. Each asks you first and
-separately, because they do not tell the same thing about you. No other page in the suite makes any
-of them.</p>
+<p>Four features on the Looped Pipe Network map reach outside this site. The street map shows on
+the first, empty project the page opens, and Map, World map, Detach hides it. The other three each
+ask you first and separately, because they do not tell the same thing about you. No other page in
+the suite makes any of them.</p>
 
 <table class="ec-legal-table">
 	<tr><th>Feature</th><th>What is sent</th><th>To</th></tr>

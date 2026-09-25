@@ -386,8 +386,11 @@ console.log('\n--- one home for the concept ---');
 	// **THE INWARD PAIR GAINS NOTHING**, and that asymmetry is the design rather than an oversight:
 	// a typed offset is converted to drawing units by DIVIDING by that same measured scale, so it
 	// never states a longitude or a latitude of its own for anything to convert.
-	ok('outwardX has one definition and 34 call sites', count(/outwardX\(/g) === 35, count(/outwardX\(/g));
-	ok('outwardY has one definition and 34 call sites', count(/outwardY\(/g) === 35, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR followViewWhileEmpty()** (Tom, 2026-09-25): an empty geographic
+	// document re-origins under the camera, and the camera's centre crosses OUTWARD to name the
+	// world cell the new origin sits in, exactly as rebaseLiveGeoDoc() reads its model's corner.
+	ok('outwardX has one definition and 35 call sites', count(/outwardX\(/g) === 36, count(/outwardX\(/g));
+	ok('outwardY has one definition and 35 call sites', count(/outwardY\(/g) === 36, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

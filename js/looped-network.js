@@ -33469,17 +33469,16 @@ var EngCalcs = EngCalcs || {};
 			// routing the visitor around it -- see `firstVisitHomeView()` above for where the
 			// numbers come from and why `LPN_GEO_HOME` itself is untouched.
 			project.coords = LPN_COORDS_GEO;
-			// **BASEMAP STAYS OFF, ON PURPOSE, EVEN THOUGH A GEOGRAPHIC PROJECT DEFAULTS ON**
-			// (`basemapOn()` is `project.basemap !== 'off'`, so an unset value already shows
-			// tiles). Every existing door to a geographic project -- the New Project wizard, Import
-			// XY to lat/lon, Map > World map > Attach -- is itself the visitor's explicit action,
-			// which is the "asks you first" `privacy.php` and CLAUDE.md's four-third-party-request
-			// list both promise. A first visit is not an action; nobody has asked for anything yet.
-			// Fetching OpenStreetMap tiles here would be a NEW third-party request with no visitor
-			// gesture behind it, so this one tab is deliberately the exception to the geographic
-			// default: positioned, but with the map behind it switched off until Map > World map >
-			// Attach (or the Background image / basemap toggle) is pressed by hand.
-			project.basemap = 'off';
+			// **AND THE STREET MAP IS ON, BEHIND THE GALLERY, FROM THE FIRST FRAME** (Tom,
+			// 2026-09-25: *"we need to have this visible on first load behind the gallery. I think
+			// we can suppress any disclosure at this time because it is a standard app request
+			// instead of a user request"*). A geographic project defaults its basemap on
+			// (`basemapOn()` is `project.basemap !== 'off'`), and this one is no longer the
+			// exception: a map application drawing its street map is the service the visitor came
+			// for. It fetches OpenStreetMap tiles with no gesture behind it, which is why
+			// privacy.php says the street map is shown on this first, empty project and can be
+			// hidden (Map, World map, Detach), while the other three outside requests still ask.
+			// It stores nothing new: `project.basemap` stays unset, as on every geographic project.
 			// **NOT `pendingView`/`pendingViewFor` HERE** -- `firstVisitHomeView()`, like
 			// `geoHomeView()`, needs the canvas's real height to compute a scale, and at this point
 			// in boot the canvas is still behind the curtain (height 0 until `applyMapHeight()` runs
