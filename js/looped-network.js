@@ -10765,16 +10765,13 @@ var EngCalcs = EngCalcs || {};
 	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
 	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
 	var lastFit = null;
-	// A pressed fit waiting on a solve that was due when it was pressed (see zoomExtent()).
-	var fitAwaitsSolve = null, LPN_FIT_AWAIT_SOLVE_MS = 8000;
-	function finishFitAfterSolve() {
-		var f = fitAwaitsSolve;
-		fitAwaitsSolve = null;
-		if (!f || Date.now() - f.at > LPN_FIT_AWAIT_SOLVE_MS) { return; }
-		setTimeout(function () {
-			if (state.s === f.s && state.tx === f.tx && state.ty === f.ty) { zoomExtent(false); }
-		}, 0);
-	}
+	// **A SOLVE FINISHING NEVER MOVES THE VIEW** (Tom, 2026-08-15, going through every automatic fit
+	// and rejecting nearly all of it: the post-solve re-fit *"illegal"*; see `view-memory-harness.js`).
+	// There used to be a `fitAwaitsSolve` here that let applySolveResult() re-run a Zoom to fit
+	// pressed just ahead of a due solve. Tom, 2026-09-25, catching that this had come back in a
+	// narrower form: *"Zoom to fit pressed before results arrive runs once more when they land: I
+	// think this is what I forbade."* Removed rather than guarded, so nobody reinstates it under a
+	// different name. See the note at the end of zoomExtent() for the fuller quote.
 	// Everything that sits OVER the map, as rectangles in canvas pixels (R-216): every occupant
 	// overlayOccupants() already lists for the legends to dodge -- the mode hint and notice strip,
 	// each cell of the bottom strip including the scale bar, the tile credit, the +/- chip -- plus
@@ -10926,16 +10923,14 @@ var EngCalcs = EngCalcs || {};
 			settleOnDrawnInk();
 		}
 		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
-		// **A PRESS THAT BEAT THE RESULTS FINISHES WHEN THEY ARRIVE** (pre-review 2026-09-24: Net2's
-		// node 1 ended 3 px under the coordinate readout). Pressed while a solve is still due, the
-		// fit frames labels that are about to gain a line -- P= appears when the answer lands -- so
-		// the label it cleared grows back under the bottom strip. The press is not finished until
-		// the drawing it was asked to fit is, so applySolveResult() runs it once more, but ONLY if
-		// the view is still exactly the one this press left and only within a few seconds of it.
-		// That is the end of a fit somebody asked for, not the automatic post-solve re-fit the note
-		// above restoreViewOrFit() forbids: a fit nobody asked for (`auto`) never sets this.
-		fitAwaitsSolve = (!auto && (solveTimer || !lastSolveResult))
-			? { s: state.s, tx: state.tx, ty: state.ty, at: Date.now() } : null;
+		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
+		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
+		// the reasoning that a label about to gain a P= line deserved a frame drawn for it (pre-
+		// review 2026-09-24: Net2's node 1 ended 3 px under the coordinate readout). Tom, 2026-09-25,
+		// on exactly that behaviour: *"Zoom to fit pressed before results arrive runs once more when
+		// they land: I think this is what I forbade."* He has forbidden the view refitting itself
+		// after a solve, full stop -- **nothing about a solve finishing ever moves the view.** A
+		// press fits once, when pressed; a solve landing later leaves the view exactly where it was.
 		if (auto) { rebaseSignatureIfClean(); }
 		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
 		// PIXELS, which is the shape a label really has: a node label is anchored at its home
@@ -50976,7 +50971,8 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
-		finishFitAfterSolve();
+		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
+		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
 			lastSolveResult = null;
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse

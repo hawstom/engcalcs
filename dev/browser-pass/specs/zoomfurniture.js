@@ -10,8 +10,9 @@
 // scenario button), the tile credit, the +/- chip and either legend.
 // (2) From one press (armed) and from two (Zoom Window), a zoom by the real wheel, a trackpad pinch,
 // the +/- chip or the keyboard puts the button back to Zoom to fit, and the next press fits.
-// (3) A press before the first results land is finished when they do. (4) A press from the view a
-// fit already settled on costs one measurement, not a relayout.
+// (3) A press before the first results land is not re-run when they arrive: the view is exactly
+// where the press left it (Tom, 2026-09-25, forbidding the earlier re-run). (4) A press from the
+// view a fit already settled on costs one measurement, not a relayout.
 
 const { Session } = require('../lib/session');
 
@@ -199,9 +200,15 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// (3) Pressed before the first results land. Net2's EPS answer takes about a second; a press in
-	// that second fitted node 1's label at three lines and the P= line then grew it 3 px into the
-	// coordinate readout (pre-review, 2026-09-24). The press finishes when the results do.
+	// (3) Pressed before the first results land, the view moves once, for the press, and is left
+	// exactly there. Tom, 2026-09-25, on the earlier build's re-run when the results caught up:
+	// *"Zoom to fit pressed before results arrive runs once more when they land: I think this is
+	// what I forbade."* He has forbidden the view refitting itself after a solve -- so this asserts
+	// the opposite of what it used to: the transform read right after the press must still be the
+	// transform in force once the (Net2 EPS) results have had time to land.
+	async function transformOf(a) {
+		return a.page.evaluate(() => document.getElementById('lpn_canvas').querySelector('g').getAttribute('transform'));
+	}
 	for (const vp of [{ width: 1280, height: 800 }, { width: 1366, height: 768 }]) {
 		const b = await Session.open(browser, 'zoomearly-' + Date.now());
 		try {
@@ -210,10 +217,11 @@ exports.run = async function ({ browser, report }) {
 			await b.answerTrainingPanel().catch(() => {});
 			await b.openExampleCard(await lang(b, 'lpn_ex_net2_title'));
 			await press(b);
+			const t0 = await transformOf(b);
 			await b.settle(3000);
-			const m = await measure(b);
-			report.ok(m.hits.length === 0, 'Net2 at ' + vp.width + 'x' + vp.height + ', pressed before the results: nothing under the furniture once they land',
-				m.hits.slice(0, 5).join('; '));
+			const t1 = await transformOf(b);
+			report.ok(t1 === t0, 'Net2 at ' + vp.width + 'x' + vp.height + ', pressed before the results: the view a solve landing later leaves untouched',
+				t0 + ' -> ' + t1);
 		} finally {
 			await b.close();
 		}

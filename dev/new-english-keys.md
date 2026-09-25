@@ -586,20 +586,20 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Zoom in
   @@ NEEDS RULING
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
+  > Zoom in one step. Shortcut: +
   @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
+  > Zoom out one step. Shortcut: -
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**54 still to read**, of 77 new keys across 12 unmerged branch(es).
+**55 still to read**, of 78 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -610,7 +610,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`ab1b2c7f`) — 29 new, 29 to read @@ NEEDS RULING
+### chore/queue-0925 (`2878d1d0`) — adds no English strings
+
+### chore/tom-edits-0925 (`9d8f81cc`) — adds no English strings
+
+### feat/convert-as (`0693cb6d`) — 29 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -688,7 +692,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   @@ NEEDS RULING
 - **`lpn_inp_report_no_crs`**
-  > This file states no coordinate system, so its numbers are not longitude and latitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
+  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
   @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
@@ -700,7 +704,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/first-project (`e012a104`) — adds no English strings
+### feat/first-project (`f3b49428`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
@@ -832,6 +836,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/property-venue (`98613d7f`) — adds no English strings
 
+### feat/select-on-focus (`11edc1ad`) — adds no English strings
+
 ### feat/table-editing (`efeaa75a`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
@@ -861,10 +867,12 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/usage-report (`5da3e7ae`) — adds no English strings
 
-### feat/zoom-control (`10687185`) — adds no English strings
+### feat/zoom-control (`c5eea7de`) — adds no English strings
 
-### fix/first-use (`1c9ba402`) — adds no English strings
+### fix/menu-cue (`07c0ed29`) — adds no English strings
 
-### fix/table-print2 (`4055de7b`) — adds no English strings
+### merge/0925 (`a6cce389`) — 1 new, 1 to read @@ NEEDS RULING
 
-### fix/zoom-fit-labels (`c32b731a`) — adds no English strings
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING
