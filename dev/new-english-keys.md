@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 182 untranslated keys, of 2030 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, all ruled)
+## lpn_  (182, 3 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -147,12 +147,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
-  > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
-  _Ruled OK 2026-09-23._
+  > Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
+  @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -369,6 +366,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_node_customers_tip`**
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  _Ruled OK 2026-09-25._
 - **`lpn_pane_goto_tip`**
   > Zoom & select
   _Ruled OK 2026-09-23._
@@ -379,14 +379,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Customers
   _Ruled OK 2026-09-17._
 - **`lpn_settings_label_always`**
-  > Always show labels
-  _Ruled OK 2026-09-23._
+  > Always show
+  @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.
-  _Ruled OK 2026-09-23._
+  > Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
+  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -578,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**61 still to read**, of 84 new keys across 14 unmerged branch(es).
+**44 still to read**, of 113 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,23 +589,35 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`b11b9dbc`) — 29 new, 29 to read @@ NEEDS RULING
+### chore/tom-edits-0925 (`9d8f81cc`) — 3 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/convert-as (`0693cb6d`) — 32 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_coordsys_tip`**
   > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_done`**
   > The converted copy is {name}. The original project is unchanged.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_epsg`**
   > EPSG coordinate system
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
-  Edited.
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 latitude/longitude (EPSG:4326).
+  @@ NEEDS RULING
 - **`lpn_convas_from`**
   > Current: {crs}
   @@ NEEDS RULING
@@ -655,57 +667,79 @@ build for that would be a gate nobody keeps. Refresh it with
   > Local coordinates in the length unit, with the world map attached at the place the project is.
   @@ NEEDS RULING
 - **`lpn_crs_latlon_display`**
-  > WGS 84 (EPSG:4326)
-  Edited. Probably no longer needed since we are not changing any of the entries.
+  > WGS 84 latitude/longitude (EPSG:4326)
+  @@ NEEDS RULING
 - **`lpn_file_convert_as`**
   > Convert as…
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_file_convert_as_tip`**
   > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_inp_report_no_crs`**
-  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
-  Edited.
+  > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
+  @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_units_mapcoords_deg`**
   > degrees
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_units_usft`**
   > US survey ft
-  OK.
+  _Ruled OK 2026-09-25._
 
-### feat/first-project (`dc5b5843`) — adds no English strings
+### feat/first-project (`8bfe1454`) — 3 new, 2 to read @@ NEEDS RULING
 
-### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`0346dc5d`) — 42 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_basemap_hide`**
   > Hide street map
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_basemap_satellite_hide`**
   > Hide satellite images
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_basemap_satellite_tip`**
-  > Photographs of the earth from Mapbox.
-  Edited.
+  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
+  @@ NEEDS RULING
 - **`lpn_basemap_tip`**
-  > Street map images from OpenStreetMap.
-  Edited.
+  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
+  @@ NEEDS RULING
 - **`lpn_clean_map`**
   > Hide map readouts
-  This is obsolete. It doesn't go anywhere. Delete key.
+  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key._
 - **`lpn_clean_map_off`**
   > Show map readouts
-  This is obsolete. It doesn't go anywhere. Delete key.
+  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key._
 - **`lpn_clean_map_tip`**
   > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
-  This is obsolete. It doesn't go anywhere. Delete key.
-  - **`lpn_confirm_labels_restore`**
+  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key. - **`lpn_confirm_labels_restore`** > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed. _Ruled OK 2026-09-23.__
+- **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
   _Ruled OK 2026-09-23._
 - **`lpn_labels_restore`**
   > Restore label defaults
@@ -718,7 +752,13 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
-  OK.
+  _Ruled OK 2026-09-25._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 - **`lpn_survey_column_n`**
   > column {n}
   _Ruled OK 2026-09-23._
@@ -732,8 +772,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > That GPX file holds no waypoints, so there is nothing to make junctions from.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_err_no_coords`**
-  > Could not find two coordinate columns in that file. Provide a header with column names and try again. The first row reads: {detail}
-  Edited. Not sure I understood. Please check.
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
 - **`lpn_survey_err_plane`**
   > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
@@ -745,25 +785,25 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 - **`lpn_survey_fmt_nez`**
   > Northing, easting, elevation (NEZ)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_fmt_nezd`**
   > Northing, easting, elevation, description (NEZD)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_fmt_penz`**
   > Point name, easting, northing, elevation (PENZ)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_fmt_penzd`**
   > Point name, easting, northing, elevation, description (PENZD)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_fmt_pnez`**
   > Point name, northing, easting, elevation (PNEZ)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_fmt_pnezd`**
   > Point name, northing, easting, elevation, description (PNEZD)
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_from_header`**
   > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  OK.
+  _Ruled OK 2026-09-25._
 - **`lpn_survey_map_gpx`**
   > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
   _Ruled OK 2026-09-17._
@@ -803,73 +843,121 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-limit (`4bcf92ab`) — adds no English strings
 
-### feat/offscreen-notice (`291bd4c7`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/offscreen-notice (`291bd4c7`) — 3 new, 2 to read @@ NEEDS RULING
 
-- **`lpn_offscreen_intact`**
-  > Your network is intact.
-  OK.
-
-### feat/property-venue (`98613d7f`) — adds no English strings
-
-### feat/select-on-focus (`66734953`) — adds no English strings
-
-### feat/table-editing (`efeaa75a`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
-  OK.
-- **`lpn_notes_6_term`**
-  > Table keyboard shortcuts
-  OK.
-- **`lpn_pane_fill_none`**
-  > Nothing in this selection can be filled down.
-  OK.
-- **`lpn_pane_filldown`**
-  > Fill down
-  OK.
-- **`lpn_pane_filled`**
-  > Filled down {n} cells. {skipped} were not changed.
-  OK.
-- **`lpn_pane_hide_col`**
-  > Hide this column
-  OK.
-- **`lpn_pane_hide_cols`**
-  > Hide these columns
-  OK.
-- **`lpn_pane_show_col`**
-  > Show {col}
-  OK.
-
-### feat/usage-report (`5da3e7ae`) — adds no English strings
-
-### feat/zoom-control (`a0784a15`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  OK.
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  OK.
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  OK.
-- **`lpn_zoom_in`**
-  > Zoom in
-  OK.
-- **`lpn_zoom_in_tip`**
-  > Zoom in one step. Shortcut: +
-  Edited.
-- **`lpn_zoom_out`**
-  > Zoom out
-  OK.
-- **`lpn_zoom_out_tip`**
-  > Zoom out one step. Shortcut: -
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
   @@ NEEDS RULING
 
-### fix/first-use (`88d8e262`) — adds no English strings
+### feat/property-venue (`98613d7f`) — 3 new, 2 to read @@ NEEDS RULING
 
-### fix/table-print2 (`4055de7b`) — adds no English strings
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
 
-### fix/zoom-fit-labels (`c32b731a`) — adds no English strings
+### feat/select-on-focus (`11edc1ad`) — 3 new, 2 to read @@ NEEDS RULING
 
-### merge/fixes-0924 (`957b4288`) — adds no English strings
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/table-editing (`efeaa75a`) — 11 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_notes_6_def`**
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
+  _Ruled OK 2026-09-25._
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_filldown`**
+  > Fill down
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_filled`**
+  > Filled down {n} cells. {skipped} were not changed.
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_hide_col`**
+  > Hide this column
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_show_col`**
+  > Show {col}
+  _Ruled OK 2026-09-25._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/usage-report (`5da3e7ae`) — 3 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+
+### feat/zoom-control (`c5eea7de`) — 10 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  _Ruled OK 2026-09-23._
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  _Ruled OK 2026-09-25._
+- **`lpn_settings_color_thematic`**
+  > Thematic map (colors only)
+  @@ NEEDS RULING
+- **`lpn_settings_color_thematic_tip`**
+  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  _Ruled OK 2026-09-25._
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_in`**
+  > Zoom in
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_in_tip`**
+  > Zoom in one step, about the middle of the map. Or press the + key.
+  @@ NEEDS RULING
+- **`lpn_zoom_out`**
+  > Zoom out
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_out_tip`**
+  > Zoom out one step, about the middle of the map. Or press the - key.
+  @@ NEEDS RULING
+
+### merge/0925 (`8e23d65a`) — adds no English strings

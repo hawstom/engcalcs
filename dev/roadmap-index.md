@@ -7,11 +7,10 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 6 · Soon (75): 20 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
+**90 open tasks.** Next (100): 5 · Soon (75): 20 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
 
-## 100 — Next (6)
+## 100 — Next (5)
 
-- Task 647 — A project that is whole but entirely off screen should say so.
 - Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
@@ -122,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 91 titles are within 4–12 words. `!` marks the rest;
+82 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

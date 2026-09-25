@@ -599,23 +599,6 @@ the block.
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
 
-- 100|647| **A project that is whole but entirely off screen should say so.**
-  Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
-  on the map and alert that project is intact, but entirely outside the current view?"*
-  - **THE ARITHMETIC ALREADY EXISTS AND IS NOT WIRED TO A MESSAGE.** `viewShowsModel()`'s third leg
-    asks exactly this question -- can the window at this scale intersect the model extent -- and on
-    a NO it silently refits. That is right at load. This task is the same question asked AFTER load,
-    when the user has panned away by hand and nothing refits.
-  - **628 CHOSE SILENCE DELIBERATELY AND THIS IS NOT A REVERSAL OF THAT.** At load the recovery is
-    indistinguishable from opening a document with no view, so there is nothing to say. Panning your
-    own work off screen is a different situation: the user did it, nothing is going to undo it, and
-    "your network is intact and off to the north west" is information they cannot get any other way.
-  - **THE DISTINCTION THAT MAKES IT WORTH BUILDING IS TOM'S OWN:** *"a blank map is equally fatal as
-    a lost project. User doesn't know the difference."* This is the message that tells them the
-    difference. Pair it with Zoom to fit as the action.
-  - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
-    nobody is looking at is measured, twice, not to work.
-
 - 50|664| **A link's status colours correctly and its legend prints numbers.**
   Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
   is a break-based numeric ramp, so status enters as 1 open / 0 closed. **The map reads correctly**
