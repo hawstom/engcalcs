@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 182 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 183 untranslated keys, of 2033 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (182, all ruled)
+## lpn_  (183, 1 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -69,6 +69,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ff_clear`**
   > Clear rings
   _Ruled OK 2026-09-23._
+- **`lpn_ff_skipped`**
+  > {n} selected elements are not junctions, so they were not tested.
+  @@ NEEDS RULING
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -578,7 +581,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**61 still to read**, of 84 new keys across 14 unmerged branch(es).
+**65 still to read**, of 88 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +592,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`b11b9dbc`) — 29 new, 29 to read @@ NEEDS RULING
+### chore/queue-0925 (`2878d1d0`) — adds no English strings
+
+### chore/tom-edits-0925 (`9d8f81cc`) — adds no English strings
+
+### feat/convert-as (`0693cb6d`) — 29 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -679,7 +686,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   @@ NEEDS RULING
 
-### feat/first-project (`dc5b5843`) — adds no English strings
+### feat/first-project (`2aa7c2c1`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 39 new, 16 to read @@ NEEDS RULING
 
@@ -809,9 +816,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > Your network is intact.
   @@ NEEDS RULING
 
-### feat/property-venue (`98613d7f`) — adds no English strings
+### feat/property-venue (`b8733c5d`) — 3 new, 3 to read @@ NEEDS RULING
 
-### feat/select-on-focus (`66734953`) — adds no English strings
+- **`lpn_find_filter_none`**
+  > No table has a property this query names.
+  @@ NEEDS RULING
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  @@ NEEDS RULING
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  @@ NEEDS RULING
+
+### feat/select-on-focus (`11edc1ad`) — adds no English strings
 
 ### feat/table-editing (`efeaa75a`) — 8 new, 8 to read @@ NEEDS RULING
 
@@ -842,7 +859,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/usage-report (`5da3e7ae`) — adds no English strings
 
-### feat/zoom-control (`a0784a15`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/zoom-control (`dc1fa5a9`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -857,19 +874,21 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   @@ NEEDS RULING
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step, about the middle of the map. Or press the + key.
+  > Zoom in one step. Shortcut: +
   @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   @@ NEEDS RULING
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step, about the middle of the map. Or press the - key.
+  > Zoom out one step. Shortcut: -
   @@ NEEDS RULING
 
-### fix/first-use (`88d8e262`) — adds no English strings
+### fix/fireflow-eps (`fbcc81f3`) — adds no English strings
 
-### fix/table-print2 (`4055de7b`) — adds no English strings
+### fix/menu-cue (`07c0ed29`) — adds no English strings
 
-### fix/zoom-fit-labels (`c32b731a`) — adds no English strings
+### merge/0925 (`013958ef`) — 1 new, 1 to read @@ NEEDS RULING
 
-### merge/fixes-0924 (`957b4288`) — adds no English strings
+- **`lpn_offscreen_intact`**
+  > Your network is intact.
+  @@ NEEDS RULING

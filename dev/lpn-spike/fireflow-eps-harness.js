@@ -215,14 +215,14 @@ async function staticEqualsMap(label, ids, times, engine) {
 	check(notice === PC.lpn_ff_skipped.replace('{n}', '2'), `the skip is said: "${notice}"`);
 
 	// ---------------------------------------------------------------------------------------------
-	head('4. ELM STREET CENTER');
+	head('4. Elm-Street-Center.lwn');
 	open('Elm-Street-Center.lwn');
 	const elmDoc = L.getDoc();
 	const elm = elmDoc.nodes.filter((n) => n.type === 'junction').map((n) => n.id);
-	check(elm.length >= 3, `Elm Street Center opened: ${elm.length} junctions`);
+	check(elm.length >= 3, `Elm-Street-Center.lwn opened: ${elm.length} junctions`);
 	if (EngCalcs.lpnTimeIsExtended(elmDoc.times)) {
 		check(await runToFrames(90000) > 0, 'and its run produced frames');
-		await staticEqualsMap('Elm Street Center', elm, [0, 3600], 'EPANET');
+		await staticEqualsMap('Elm-Street-Center.lwn', elm, [0, 3600], 'EPANET');
 	} else {
 		// One instant: the map is the page's own steady solve, so that is what is compared.
 		L.runSolve();
@@ -236,7 +236,7 @@ async function staticEqualsMap(label, ids, times, engine) {
 			if (!isFinite(d)) { d = Infinity; }
 			worst = Math.max(worst, d);
 		});
-		check(worst < 0.01 * PSI, `Elm Street Center, one instant: static = map pressure at ${elm.length} hydrants ` +
+		check(worst < 0.01 * PSI, `Elm-Street-Center.lwn, one instant: static = map pressure at ${elm.length} hydrants ` +
 			`(worst ${(worst / PSI).toFixed(4)} psi)`);
 	}
 
