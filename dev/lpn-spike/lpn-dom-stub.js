@@ -489,10 +489,6 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
 // of that rule tests nothing.
 byId.lpn_menu_popup.appendChild(byId.lpn_menu_list);
 byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
-// The Convert as box's Depth Label input ships `disabled` in Looped-Network.php (tank level has no
-// per-field label suffix to write into -- see the comment there), so the stub starts it disabled
-// too, or a harness reading `.disabled` would see a stub default rather than the shipped markup.
-byId.lpn_convas_suffix_depth.disabled = true;
 // Same reason: the credits footer really is a child of the content pane, and buildColoringSection()
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.

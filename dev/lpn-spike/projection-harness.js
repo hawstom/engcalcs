@@ -37,7 +37,8 @@ const L = loadLoopedNetwork(
 	"\t\tcrsCatalogue: crsCatalogue, crsLabel: crsLabel, crsName: crsDisplayName,\n" +
 	// Phase 2: the spatial filter, the box that drives it, and the New-project box's own answer.
 	"\t\tcrsExtent: crsExtent, crsCovers: crsCoversPoint, crsFiltered: crsFiltered,\n" +
-	"\t\tWEBMERC: LPN_CRS_WEBMERC,\n" +
+	"\t\tcrsCannotBePlaced: crsCannotBePlaced,\n" +
+	"\t\tWEBMERC: LPN_CRS_WEBMERC, GEOWGS84: LPN_CRS_GEOWGS84,\n" +
 	// Phase 4: the fetched register behind the two readers above.
 	"\t\tcrsRegisterLoad: crsRegisterLoad, crsRegisterReady: crsRegisterReady,\n" +
 	"\t\tcrsRegisterCredit: crsRegisterCredit,\n" +
@@ -95,9 +96,9 @@ setUnitSet('si');
 	const list = L.crsCatalogue();
 	// 121 shipped in phase 2: sixty WGS 84 UTM zones in each hemisphere and EPSG:3857. Phase 3 added
 	// 58 regional UTM zones on four datums and four national grids, all verified against the
-	// register on 2026-09-13.
-	ok('one hundred and twenty one WGS 84 rows and sixty two more', list.length === 183,
-		String(list.length));
+	// register on 2026-09-13. EPSG:4326 (WGS 84 itself) is the 184th, added 2026-09-25.
+	ok('one hundred and twenty one WGS 84 rows, sixty two more, and WGS 84 itself',
+		list.length === 184, String(list.length));
 	const codes = {};
 	list.forEach(c => { codes[c.code] = (codes[c.code] || 0) + 1; });
 	ok('no code appears twice', Object.keys(codes).length === list.length,
@@ -264,9 +265,12 @@ setUnitSet('si');
 	// strip names what the numbers ARE -- longitude and latitude -- never the code this page reuses
 	// internally to mark that kind of project. `crsLabel(L.WEBMERC)` below still names the register
 	// entry Pseudo-Mercator; this is the one place that speaks for a lat/lon PROJECT instead.
+	// **2026-09-25: READ OFF THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A STANDALONE STRING** -- the
+	// key this asserted against (`lpn_crs_latlon_display`) is retired; "WGS 84" is the register's
+	// own name and not a language key, the same rule every other CRS name in this file follows.
 	L.reset(L.GEO);
-	ok('a geographic project is named WGS 84 latitude/longitude, not Pseudo-Mercator',
-		L.crsName() === PC.lpn_crs_latlon_display && !/Pseudo-Mercator/.test(L.crsName()), L.crsName());
+	ok('a geographic project is named WGS 84 (EPSG:4326), not Pseudo-Mercator',
+		L.crsName() === 'WGS 84 (EPSG:4326)' && !/Pseudo-Mercator/.test(L.crsName()), L.crsName());
 
 	// The readout is REWRITTEN when the kind changes, and two zones are two kinds: a northing read
 	// under the wrong zone is the silent error this whole feature exists to stop.
@@ -303,29 +307,42 @@ setUnitSet('si');
 	console.log('\n--- phase 2: the catalogue carries the geographic answer ---');
 	const list = L.crsCatalogue();
 	ok('EPSG:3857 is in the catalogue', list.some(e => e.code === L.WEBMERC));
-	// **A COUNT IS A MEASUREMENT AND IS PINNED DELIBERATELY.** 121 until 2026-09-13, when the six
-	// regional UTM families and the four national grids landed; see dev/projection-catalogue.md.
-	ok('...one hundred and eighty three rows in all', list.length === 183, String(list.length));
-	ok('...and it is first, being the commonest answer', list[0].code === L.WEBMERC, list[0].code);
+	// **AND EPSG:4326 BESIDE IT** (Tom, 2026-09-25: WGS 84 was missing from the options and every
+	// coordinate system must be an unmodified, available option). Named as the register names it.
+	ok('EPSG:4326 is in the catalogue too', list.some(e => e.code === L.GEOWGS84));
+	ok('...named "WGS 84", the register\'s own name', L.crsLabel(L.GEOWGS84) === 'WGS 84', L.crsLabel(L.GEOWGS84));
+	// **A COUNT IS A MEASUREMENT AND IS PINNED DELIBERATELY.** 183 from 2026-09-13 to 2026-09-25,
+	// when EPSG:4326 became the 184th row; see dev/projection-catalogue.md.
+	ok('...one hundred and eighty four rows in all', list.length === 184, String(list.length));
+	ok('...and Pseudo-Mercator is still first, being the commonest answer', list[0].code === L.WEBMERC, list[0].code);
 	ok('...named as the register names it, not described',
 		/Pseudo-Mercator/.test(L.crsLabel(L.WEBMERC)), L.crsLabel(L.WEBMERC));
 	// A lon/lat document must never store it as a projected plane: its numbers are degrees, and a
-	// project.crs of EPSG:3857 would be claiming they are metres.
+	// project.crs of EPSG:3857 or EPSG:4326 would be claiming they are metres.
 	L.reset();
 	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
+	ok('...EPSG:4326 the same way', L.assignCrs(L.GEOWGS84) === false);
 	ok('...leaving the project with no projection at all', L.crsCode() === '');
-	// **THE STATUS STRIP'S GEOGRAPHIC NAME NO LONGER COMES FROM THE CATALOGUE** (R-218; Tom,
-	// 2026-09-24, resolving R-188). It used to be one string with the catalogue's own Pseudo-Mercator
-	// entry, on the argument that a geographic project's internal code IS EPSG:3857 -- true, and also
-	// what told Tom the stored numbers were projected metres, when they are longitude and latitude
-	// degrees. The strip now says what the numbers ARE, with EPSG:4326's own number, not 3857's.
+	// **THE STATUS STRIP'S GEOGRAPHIC NAME NO LONGER COMES FROM THE CATALOGUE'S 3857 ENTRY** (R-218;
+	// Tom, 2026-09-24, resolving R-188). It used to be one string with the catalogue's own
+	// Pseudo-Mercator entry, on the argument that a geographic project's internal code IS EPSG:3857
+	// -- true, and also what told Tom the stored numbers were projected metres, when they are
+	// longitude and latitude degrees. **AS OF 2026-09-25 IT READS THE CATALOGUE'S OWN EPSG:4326
+	// ENTRY INSTEAD OF A STANDALONE STRING** -- "WGS 84" is the register's own name, not a
+	// language key, on the same argument every other CRS name in this file follows.
 	L.reset(L.GEO);
-	ok('the status strip names a lat/lon project WGS 84 latitude/longitude',
-		L.crsName() === PC.lpn_crs_latlon_display, L.crsName());
+	ok('the status strip names a lat/lon project WGS 84 (EPSG:4326)',
+		L.crsName() === 'WGS 84 (EPSG:4326)', L.crsName());
 	ok('...never the catalogue\'s own Pseudo-Mercator entry',
 		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) !== 0, L.crsName());
 	ok('...and states EPSG:4326, not EPSG:3857', L.crsName().indexOf('4326') > 0 &&
 		L.crsName().indexOf(L.WEBMERC) === -1, L.crsName());
+	// **NEITHER LAT/LON CODE IS EVER MARKED "(no map)"** (Tom, 2026-09-25): both are placed with
+	// this page's own native Mercator math, never through js/lpn-crs.js's proj4 definitions, so
+	// asking lpnCrsHas() for either was always the wrong question. crsCannotBePlaced() short-
+	// circuits before it gets there, which does not depend on the register having loaded.
+	ok('EPSG:3857 is never marked unplaceable', !L.crsCannotBePlaced(L.WEBMERC));
+	ok('EPSG:4326 is never marked unplaceable', !L.crsCannotBePlaced(L.GEOWGS84));
 }
 
 // ---- 8. WHERE ON THE EARTH A PROJECTION APPLIES -------------------------------------------------
@@ -351,6 +368,8 @@ setUnitSet('si');
 	ok('...and zone 60 ends there', L.crsExtent('EPSG:32660').e === 180);
 	ok('the geographic answer covers the whole drawable world',
 		L.crsExtent(L.WEBMERC).w === -180 && L.crsExtent(L.WEBMERC).e === 180);
+	ok('...and WGS 84 itself covers the whole globe, pole to pole',
+		L.crsExtent(L.GEOWGS84).s === -90 && L.crsExtent(L.GEOWGS84).n === 90);
 	// **A CODE WE DO NOT KNOW HAS NO EXTENT, AND THAT MUST NOT EXCLUDE IT.** The honest statement
 	// about an area of use we cannot state is that we cannot state it -- so a State Plane zone in a
 	// hand-edited file is still offered rather than quietly filtered away.
@@ -363,12 +382,15 @@ setUnitSet('si');
 	ok('...and outside its own southern twin, being north of the equator',
 		L.crsCovers('EPSG:32710', PETALUMA) === false);
 	const near = L.crsFiltered(PETALUMA, '');
-	ok('a place leaves only the projections that cover it', near.length === 3, String(near.length));
-	ok('...the geographic answer and the two zone 10 norths, on their two datums',
-		near.some(e => e.code === L.WEBMERC) && near.some(e => e.code === 'EPSG:32610') &&
+	// **FOUR, NOT THREE, SINCE EPSG:4326 JOINED THE CATALOGUE** (2026-09-25): WGS 84 covers the
+	// whole globe exactly as Pseudo-Mercator does, so it is never excluded by a place filter either.
+	ok('a place leaves only the coordinate systems that cover it', near.length === 4, String(near.length));
+	ok('...both geographic answers and the two zone 10 norths, on their two datums',
+		near.some(e => e.code === L.WEBMERC) && near.some(e => e.code === L.GEOWGS84) &&
+		near.some(e => e.code === 'EPSG:32610') &&
 		near.some(e => e.code === 'EPSG:26910'), near.map(e => e.code).join(','));
 	ok('no place at all offers the whole catalogue',
-		L.crsFiltered(null, '').length === 183, String(L.crsFiltered(null, '').length));
+		L.crsFiltered(null, '').length === 184, String(L.crsFiltered(null, '').length));
 
 	console.log('\n--- phase 3: the families the numbering does NOT run through ---');
 	// **EVERY ONE OF THESE IS A ROW A FORMULA WOULD HAVE MINTED, AND NONE OF THEM IS A COORDINATE
@@ -433,7 +455,7 @@ setUnitSet('si');
 	L.openCrsBox(L.WEBMERC, null, function (code, ll) { picked = { code: code, ll: ll }; });
 	ok('it opens', byId.lpn_crsbox.style.display === 'block', byId.lpn_crsbox.style.display);
 	ok('...on the whole catalogue, because no place has been found yet',
-		listEl.children.length === 183, String(listEl.children.length));
+		listEl.children.length === 184, String(listEl.children.length));
 	ok('...and says so rather than looking broken', noteEl.textContent === PC.lpn_crs_noview,
 		noteEl.textContent);
 	ok('...opening on the projection it was handed', L.crsBoxState().code === L.WEBMERC);
@@ -441,10 +463,10 @@ setUnitSet('si');
 	// THE PLACE ARRIVES, and the list collapses. This is the whole feature.
 	L.crsBoxState().place = PETALUMA;
 	L.renderCrsBoxList();
-	ok('a place narrows the list to what covers it', listEl.children.length === 3,
+	ok('a place narrows the list to what covers it', listEl.children.length === 4,
 		String(listEl.children.length));
 	ok('...and the note counts rather than apologising',
-		noteEl.textContent === PC.lpn_crs_count.replace('{n}', '3').replace('{total}', '183'),
+		noteEl.textContent === PC.lpn_crs_count.replace('{n}', '4').replace('{total}', '184'),
 		noteEl.textContent);
 	ok('...and the choice survived the narrowing, being still on the list',
 		L.crsBoxState().code === L.WEBMERC);
@@ -452,7 +474,7 @@ setUnitSet('si');
 	// Turning the filter OFF is the other half of Tom's checkbox.
 	viewEl.checked = false;
 	L.renderCrsBoxList();
-	ok('unchecking the map filter offers the whole list again', listEl.children.length === 183);
+	ok('unchecking the map filter offers the whole list again', listEl.children.length === 184);
 	viewEl.checked = true;
 
 	// A filter that excludes the current choice must move it to something real rather than leave
@@ -500,13 +522,13 @@ setUnitSet('si');
 		onHit({ lat: PETALUMA.lat, lon: PETALUMA.lon, extent: null, label: 'Petaluma' });
 	};
 	L.openCrsBox(L.WEBMERC, null, function () {});
-	ok('it opens on the whole catalogue again', listEl.children.length === 183);
+	ok('it opens on the whole catalogue again', listEl.children.length === 184);
 	placeEl.value = '  Petaluma, California  ';
 	L.crsBoxSearch();
 	ok('the words typed reach the one geocoder, trimmed',
 		asked.length === 1 && asked[0] === 'Petaluma, California', JSON.stringify(asked));
 	ok('...and the point it answers with becomes the filter',
-		listEl.children.length === 3, String(listEl.children.length));
+		listEl.children.length === 4, String(listEl.children.length));
 	asked = [];
 	placeEl.value = '   ';
 	L.crsBoxSearch();
@@ -666,7 +688,7 @@ setUnitSet('si');
 	const doc = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 	const before = L.crsCatalogue().length;
-	ok('the built-in catalogue stands before any load', before === 183, String(before));
+	ok('the built-in catalogue stands before any load', before === 184, String(before));
 	ok('...and Alabama East is not in it yet',
 		!L.crsCatalogue().some(e => e.code === 'EPSG:26929'));
 
@@ -678,7 +700,7 @@ setUnitSet('si');
 
 	failed.then(() => {
 		ok('a failed fetch leaves the built-in catalogue, not an empty one',
-			L.crsCatalogue().length === 183, String(L.crsCatalogue().length));
+			L.crsCatalogue().length === 184, String(L.crsCatalogue().length));
 		ok('...and claims no attribution it is not displaying', L.crsRegisterCredit() === '');
 		ok('...and still answers for a built-in zone',
 			!!L.crsExtent('EPSG:32612'), JSON.stringify(L.crsExtent('EPSG:32612')));
@@ -698,13 +720,15 @@ setUnitSet('si');
 		return new Promise(res => M.crsRegisterLoad(() => res(M)));
 	}).then((M) => {
 		ok('the register loads', M.crsRegisterReady());
-		// 5,346 rows, minus Pseudo-Mercator which the catalogue already put first itself.
-		ok('the catalogue is the whole universe', M.crsCatalogue().length === 5346,
+		// 5,346 rows, minus Pseudo-Mercator which the catalogue already put first itself, plus the
+		// EPSG:4326 row the catalogue always adds beside it and which the register (projected CRS
+		// only) never states.
+		ok('the catalogue is the whole universe', M.crsCatalogue().length === 5347,
 			String(M.crsCatalogue().length));
 		ok('...addressed from the origin, not relatively',
 			typeof served === 'string' && served.charAt(0) === '/', String(served));
 
-		// **STATE PLANE, which is where this project's own users work** and the whole reason 183
+		// **STATE PLANE, which is where this project's own users work** and the whole reason 184
 		// rows was not an answer. Alabama East is Transverse Mercator; Kentucky North is the
 		// deprecation trap -- 26979 is superseded by 2205 and must not be offered.
 		ok('State Plane arrives', M.crsLabel('EPSG:26929') === 'NAD83 / Alabama East',
