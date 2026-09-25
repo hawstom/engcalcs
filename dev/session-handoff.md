@@ -86,7 +86,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-09-25
 
-### Master is 61fa16f4, pushed, verified on its own commit (not yet pulled by him)
+### Master is f9ebf891, pushed and verified (not yet pulled by him)
 
 Merged on his all-clear: label-limit, offscreen-notice, usage-report, select-on-focus (Task 647
 closed). Also: the menu cue deleted (R-203; key `lpn_menu_cue` gone from 27 files, localStorage
@@ -107,10 +107,10 @@ chore-queue-0925, fix-menu-cue, merge-0925, bisect. Their branches are merged. R
 
 ### In flight
 
-- **`fix/fireflow-eps`** f991d870 (defect track, merges on green): R-231..R-233. Time-step link
+- **`fix/fireflow-eps`** MERGED at f9ebf891 (defect track): R-231..R-233. Time-step link
   status in map, Properties, Tables; fire flow solves from the step's tank levels and statuses;
   EPANET reopens when a pump's open/shut changes; every selected junction tested. Perry: ready.
-  New key `lpn_ff_skipped`, changed `lpn_ff_scope_selected`. Suite queued on the merge-of-master.
+  New key `lpn_ff_skipped`, changed `lpn_ff_scope_selected`. Worktree fix-fireflow-eps awaits removal.
 
 ### Awaiting his pass (each green on its own check_all; Perry's verdicts in his journal)
 
