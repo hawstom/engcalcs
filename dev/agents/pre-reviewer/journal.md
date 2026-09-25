@@ -735,6 +735,80 @@ finished in this pass; and whether a UNITS change or an UNDO while a scenario ot
 snapshot was taken in is active shows the same class of gap (undo calls `refreshPaneIfOpen()`
 directly and unconditionally, so it is very likely fine, but not independently re-measured here).
 
+---
+
+## feat/label-limit (e1a19100), reviewed 2026-09-23
+
+Ask (2026-09-23, quoted): *"I noticed that we have a tip saying that 0 is never for Customer
+labels. Should we do the same for all labels and use that to replace the 'Thematic map, no
+labels' setting?"* then *"Sorry 'never show' is what I meant."*
+
+**MISSED — OBSERVED, measured in a real Chromium against the live page, not just the unit
+harness.** Typing 0 into "Show labels when zoomed to this map width or less" correctly hides node
+and link labels (confirmed: `#lpn_canvas` gains `lpn-labels-hidden`, holds it across zoom in and
+out, and clears on blanking the field) — but **the on-map labels legend (the small corner box
+listing which fields are lettered) does not hide with them.** Probe: opened Net3-Novato-CA-World
+and Net1, both starting with a label field ticked (`legendDisplay: ""`, i.e., visible), typed 0,
+and `#lpn_labels_legend`'s `style.display` stayed `""` through zoom in and zoom out — never
+`'none'`. Root cause, read in `js/looped-network.js`: the retired "Thematic map" checkbox handler
+called both `refreshValueColors()` **and** `renderLabelsLegend()`; its replacement,
+`setLabelMaxWidth()` (~line 37773), calls only `labelThresholdChanged()` and `saveToStorage()` —
+`renderLabelsLegend()` is never in that chain. The unit harness
+(`dev/lpn-spike/label-limit-zero-harness.js`) still shows "0: the labels legend hides with the
+labels" passing only because the harness calls `L.renderLabelsLegend()` itself as an explicit step
+right after setting the value — it never drives the real input's `change` handler, so it could not
+have caught this. **Practical effect Tom will see:** zoom out, type 0 for colour-only, and a
+floating box naming lettered fields (e.g. "Node labels: ID, Head...") keeps sitting in the corner
+of a map with no letters to match, until an unrelated redraw (a solve, reopening the panel) happens
+to call `renderLabelsLegend()` for some other reason. This is exactly the leak shape CLAUDE.md
+names — a control retired in favour of another control's side door, and one of the two things the
+old control did was not carried over.
+
+**MISSED — OBSERVED, a real spec throws.** `dev/browser-pass/specs/visibility.js` (§16, "The
+Settings box") was not updated for this branch and still drives the retired "Thematic map"
+checkbox by name: it asserts a checkbox exists under Node/link, ticks it, and reads
+`lpn-labels-hidden`. Ran it for real (`node run.js visibility`, real Chromium): it throws
+(`Cannot read properties of null (reading 'click')`) the moment it tries to click a checkbox that
+`#lpn_set_colors_nodelink` no longer contains, which **kills the whole visibility section — 0/1
+sections completed** — so every other, unrelated check later in that same file (the labels-legend
+index check, the labeling-threshold checks that already existed, and more) silently stopped
+running too. This branch's own last commit is titled "Fix check_all failures: stray pageConfig
+line, browser-pass spec, cites" and did fix one other browser-pass spec (`nodehit.js`'s
+`applyTomSetup`, which used the checkbox for an unrelated purpose) — so the author was in this
+exact file class and still missed `visibility.js`. `dev/browser-pass` is outside `check_all.sh`,
+so nothing caught this before push. **Confirmed the harness itself is trustworthy where it does
+run**: mutation-tested `label-limit-zero-harness.js` by swapping in the pre-branch
+`js/looped-network.js` — 8 of 26 checks genuinely fail on the old code, restored after.
+
+**CONFIRMED.** Typing 0 hides node and link labels at every zoom tried (10, 1000, 1e6, 1e9 px
+canvas widths in the unit harness; real zoom in/out in the browser). Clearing the field restores
+them. A hand-built project with `colorThematic: true` migrates to `labelMaxWidth: 0` on open, the
+old key is deleted, and 0 wins even when a positive `labelMaxWidth` was also saved (all three
+asserted in the harness and consistent with what a reader who left the map in thematic mode last
+saw). A genuine positive threshold still behaves exactly as before (a real width, exceeded, still
+hides a Text object whose own "Show at all zoom levels" is off) — this is not touched by the 0
+case, which is the one thing Tom's "never show" wording did not ask for. Grepped the whole tree,
+`~/webdev/librewaternet.org` and `~/webdev/not-epanet.org` for stray live references to "Thematic
+map" — none found outside historical code comments (which CLAUDE.md's own rule is fine with) and
+one stale mention in `dev/lpn-tip-copy-review.md` (a dev doc, not visitor-facing, naming a key that
+no longer exists — worth a note to whoever next edits that file, not a blocker). The customer row's
+tip and this row's tip read as a matched pair side by side (both say "measured across the window",
+both spell out 0 in the same shape) — no wording objection.
+
+**UNVERIFIABLE FROM HERE.** Whether a Text object placed with "Show at all zoom levels" *unticked*
+visually reads as expected at 0 (it stays drawn, per the harness and the code path
+`labelsPastThreshold()`/`labelsFullyHidden()` splitting) — I did not place a Text object through the
+real UI to see it on screen at 0; the logic is exercised by the harness only. Whether the labels
+legend gap above is the only thing besides the labels that fails to refresh live (I checked this
+one path; did not exhaustively check the colour legend or the print layout under the same 0 setting
+in a real browser).
+
+**Verdict: NOT READY.** Two real, measured leaks: the labels legend does not hide live when 0 is
+typed (only on the next unrelated redraw), and a browser-pass spec now throws and silently drops
+an entire section of unrelated coverage. Both are small, mechanical fixes — call `renderLabelsLegend()`
+from `setLabelMaxWidth()`, and update or retire the Thematic-map block in `visibility.js` — but
+neither is fixed yet, and the second means nobody would have been told about the first by any
+existing check.
 ## 2026-09-23 -- feat/property-venue at 1066860e, R-195/R-197/R-198: CONFIRMED in a real browser; one MISSED gap on translation
 
 OBSERVED, checked 2026-09-23. Mutation-confirmed `dev/lpn-spike/property-venue-find-harness.js`
