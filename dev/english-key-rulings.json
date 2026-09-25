@@ -3790,6 +3790,16 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_convas_label_col": {
+            "on": "Suffix",
+            "ruled": "2026-09-25",
+            "answer": "OK"
+        },
+        "lpn_zoom_out_tip": {
+            "on": "Zoom out one step. Shortcut: -",
+            "ruled": "2026-09-25",
+            "answer": "His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's."
         }
     }
 }

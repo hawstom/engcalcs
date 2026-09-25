@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-230.
+**An ID is permanent and never reused.** Next free: R-248.
 
 ---
 
@@ -108,7 +108,9 @@ judgement and does not belong to a script.
 ### MOD's first-use test (2026-09-23)
 
 - [?] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go
+  - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
 - [?] R-203 -- | "Our hint above the toolbar didn't help him. He suggested maybe a colored light bulb glyph. But I think that is a feeble attempt to rescue an attempt that isn't working." -- Ida agrees: retire the hint, no light bulb; she would delete it when R-202's button style ships. Delete it now instead?
+  - [TGH 2026-09-25: "Delete the toolbar hint. It failed."]
 - [ ] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached
 
 ### Requests
@@ -120,3 +122,56 @@ judgement and does not belong to a script.
 
 - [ ] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. Ensure that both 'Import' and 'Convert as ...' state clearly that files with an EPSG coordinate system that simply needs to be referenced/located can be scaled 1:1 in Step 2 of the Convert as... wizard." -- feat/convert-as 0693cb6d: button and its two keys deleted; Import report and the Step 2 Ground distance tip carry the 1:1 note. New strings need your ruling
   -  [TGH 2026-09-24: In the import report, change the coordinate system paragraph as follows: "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"]
+
+## Round of 2026-09-25 -- IOD's test, Net3 fire flow, and his pass over the ten branches
+
+### Real-world use (IOD, senior civil engineer; `dev/real-world-reviews.md`)
+
+- [ ] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25
+
+### Fire flow and Net3 Pump 10
+
+- [ ] R-231 -- | "Pump 10 is initially closed, making the pressure at node 10 -0.64 psi. But the pump opens at time step 1 ... I see that head and pressure jump at time 1. But the link still shows as closed, and Properties and Tables shows it as closed." -- fix/fireflow-eps
+- [ ] R-232 -- | "Fire flow analysis says that it works on the current time step, and its results **do** vary. But the static pressure for Junction 10 never matches the map pressure, and it's always significantly lower ... it seems clear to me that the static pressure for all hydrants should match the map." (Elm Street Center matched.) -- fix/fireflow-eps
+- [ ] R-233 -- | "I think that area selection and multi-selection succeeded fire flow analysis and fire flow analysis does not know how to handle multiple selected hydrants. Check and fix that." -- fix/fireflow-eps
+
+### Workflow
+
+- [ ] R-234 -- | "Note that this is the second time that you have listed several items under "On master (pushed; you pull when ready)", which is apparently wrong and meaningless. And it's knocking me off my feet."
+
+### feat/zoom-control (8103)
+
+- [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
+- [ ] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed
+
+### feat/convert-as (8104)
+
+- [ ] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP."
+- [ ] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here."
+
+### feat/table-editing (8105)
+
+- [ ] R-239 feat/table-editing | "There is a troublesome conflict between clicking on a column heading text to sort and clicking on a column heading to select. Is there a better way we can do this? ... Is there a conventional glyph and gesture for sort, maybe including a hover revelation?" -- Ida asked
+- [ ] R-240 feat/table-editing | "Add "Show all" to the heading right-click menu. Or maybe what we really need is a Manage columns command/box that has checkboxes for Show."
+- [ ] R-241 feat/table-editing | "Sorry I can't get a column to drag. I think it's the right thing to have. What I think is wrong is the ability to select the heading text ... Maybe a three dots menu for sorting and hiding. Maybe a grab cursor somewhere for dragging. I honestly don't know."
+
+### feat/property-venue (8106)
+
+- [ ] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected."
+
+### feat/first-project (8112)
+
+- [ ] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?"
+- [ ] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?"
+
+### Customer
+
+- [ ] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black."
+- [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0."
+- [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is."
+
+### Rulings recorded, nothing to build
+
+- File menu: "Convert as..." stays where it is ("The problem with putting it near open is that implies we are going to go get a file").
+- EPANET audit: "Make the reports roadmap tasks before EPANET++. I'd like to know the full list of what we are missing."
+- feat/label-limit, feat/offscreen-notice, feat/usage-report, feat/select-on-focus: "Close, merge, and delete branch."
