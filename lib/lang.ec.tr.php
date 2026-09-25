@@ -1806,7 +1806,6 @@ $ec_lang['lpn_crs_count']='{total} projeksiyondan {n} tanesi listelendi.';
 $ec_lang['lpn_crs_place_projected']='Projeksiyonlu bir proje, aradığınız yerde değil kendi düzleminde açılır. Bu düzlemi Dünya üzerine yerleştirmek bir koordinat dönüşümü gerektirir; bu sayfada henüz bu özellik yoktur.';
 $ec_lang['lpn_crs_none']='Coğrafi referanslı değil';
 $ec_lang['lpn_storage_unreadable']='Kaydedilmedi. Bu proje tarayıcı deposundan okunamadı. Depolanan kopyası olduğu gibi bırakılacak ve üzerine yazılmayacak, bu yüzden bu sekmede hiçbir şey kaydedilmiyor. Çalışmaya devam etmek için bir dosya açın veya yeni bir proje oluşturun.';
-$ec_lang['lpn_menu_cue']='Yukarıdaki menülerle başlayın. Hızlı erişim için araç çubuğunu kullanın.';
 $ec_lang['lpn_about_credits']='Emeği geçenler';
 $ec_lang['lpn_help_welcome']='Karşılama sayfası';
 $ec_lang['lpn_about_license']='GNU Genel Kamu Lisansı v3.0 veya sonraki bir sürümü altında lisanslanmıştır.';

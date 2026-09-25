@@ -1793,7 +1793,6 @@ $ec_lang['lpn_crs_count']='{n} din {total} proiecții listate.';
 $ec_lang['lpn_crs_place_projected']='Un proiect cu coordonate proiectate se deschide pe propriul plan, nu în locul căutat de dvs. Plasarea acelui plan pe Pământ necesită o transformare de coordonate, pe care această pagină nu o are încă.';
 $ec_lang['lpn_crs_none']='Fără georeferențiere';
 $ec_lang['lpn_storage_unreadable']='Nu s-a salvat. Acest proiect nu a putut fi citit din stocarea browserului. Copia stocată este lăsată exact așa cum este și nu va fi suprascrisă, deci nimic din acest tab nu este salvat. Deschideți un fișier sau creați un proiect nou pentru a continua lucrul.';
-$ec_lang['lpn_menu_cue']='Începeți cu meniurile de mai sus. Folosiți bara de instrumente pentru acces rapid.';
 $ec_lang['lpn_about_credits']='Mulțumiri';
 $ec_lang['lpn_help_welcome']='Pagina de bun venit';
 $ec_lang['lpn_about_license']='Licențiat sub GNU General Public License v3.0 sau o versiune ulterioară.';

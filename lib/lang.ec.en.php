@@ -2080,7 +2080,6 @@ $ec_lang['lpn_storage_unreadable']='Not saved. This project could not be read fr
 // The one-time cue that points from the toolbar up to the menu bar (Task 625). Says where the
 // menus ARE rather than what they contain: a reader who has not noticed the row does not need a
 // list of it, they need to look up once.
-$ec_lang['lpn_menu_cue']='Start with the menus above. Use the toolbar for quick access.';
 // **THE WAY HOME IS A HELP ROW NOW** (Tom, 2026-09-11). This was `lpn_menu_home_tip`, the tip on
 // a product mark at the far left of the menu bar; the mark is gone and the row replaced it, on
 // his instruction: *"Help menu to include Welcome Page ... as last item in top group."* The key

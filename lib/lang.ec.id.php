@@ -1789,7 +1789,6 @@ $ec_lang['lpn_crs_count']='{n} dari {total} proyeksi ditampilkan.';
 $ec_lang['lpn_crs_place_projected']='Proyek yang diproyeksikan terbuka pada bidangnya sendiri, bukan di tempat yang Anda cari. Menempatkan bidang itu di atas Bumi memerlukan transformasi koordinat, yang belum dimiliki halaman ini.';
 $ec_lang['lpn_crs_none']='Tidak digeoreferensi';
 $ec_lang['lpn_storage_unreadable']='Tidak tersimpan. Proyek ini tidak dapat dibaca dari penyimpanan peramban. Salinan tersimpannya dibiarkan persis seperti apa adanya dan tidak akan ditimpa, sehingga tidak ada yang sedang disimpan pada tab ini. Buka berkas atau buat proyek baru untuk terus bekerja.';
-$ec_lang['lpn_menu_cue']='Mulai dari menu di atas. Gunakan bilah alat untuk akses cepat.';
 $ec_lang['lpn_about_credits']='Kredit';
 $ec_lang['lpn_help_welcome']='Halaman sambutan';
 $ec_lang['lpn_about_license']='Dilisensikan di bawah GNU General Public License v3.0 atau versi setelahnya.';

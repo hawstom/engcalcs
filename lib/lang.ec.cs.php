@@ -1787,7 +1787,6 @@ $ec_lang['lpn_crs_count']='Zobrazeno {n} z {total} projekcí.';
 $ec_lang['lpn_crs_place_projected']='Projektovaný projekt se otevře ve své vlastní rovině, ne na místě, které jste hledali. Umístit tuto rovinu na Zemi vyžaduje souřadnicovou transformaci, kterou tato stránka zatím nemá.';
 $ec_lang['lpn_crs_none']='Bez georeferencování';
 $ec_lang['lpn_storage_unreadable']='Neuloženo. Tento projekt se nepodařilo načíst z úložiště prohlížeče. Jeho uložená kopie zůstává přesně taková, jaká je, a nebude přepsána, takže na této kartě se nic neukládá. Otevřete soubor nebo vytvořte nový projekt, abyste mohli pokračovat v práci.';
-$ec_lang['lpn_menu_cue']='Začněte nabídkami výše. Pro rychlý přístup použijte panel nástrojů.';
 $ec_lang['lpn_about_credits']='Poděkování';
 $ec_lang['lpn_help_welcome']='Uvítací stránka';
 $ec_lang['lpn_about_license']='Licencováno pod GNU General Public License v3.0 nebo novější.';

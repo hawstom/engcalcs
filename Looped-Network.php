@@ -158,10 +158,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // Placed in markup rather than built in JS so the id resolves and the string is translated
       // like every other; shown, positioned and retired by js/looped-network.js. ?>
-	<div class="d-print-none lpn-menu-cue" id="lpn_menu_cue" style="display:none" role="note">
-		<span class="lpn-menu-cue-arrow" aria-hidden="true">▲</span><span id="lpn_menu_cue_text"></span>
-		<button type="button" id="lpn_menu_cue_x" class="lpn-menu-cue-x" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<div class="d-print-none" id="lpn_tabs"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
@@ -2574,7 +2570,6 @@ EngCalcs.pageConfig = {
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
 	lpn_help_welcome: <?=json_encode($ec_lang['lpn_help_welcome'])?>,
-	lpn_menu_cue: <?=json_encode($ec_lang['lpn_menu_cue'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
