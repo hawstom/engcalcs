@@ -421,6 +421,14 @@ the block.
       DISPLAY of what the coordinate system already says, never an input that rewrites anything.
     - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
       Save-as side.
+- 100|715| **Full Report: every element at every time step, as one exportable document.**
+  Tom, 2026-09-25: *"Make the reports roadmap tasks before EPANET++."* EPANET's Report > Full, the
+  gap Mary ranked first (`dev/agents/market-researcher/epanet-gap-audit.md` §3.1). The per-step
+  results already exist in `js/lpn-time.js`; the work is layout and export. Before Task 697.
+- 100|716| **Status Report: what switched, when, in time order.**
+  EPANET's Report > Status: pump starts and stops, valve status changes, tanks filling or emptying,
+  warnings, per time step. Mary's second-ranked gap (same audit, §3.2). Read with the Net3 Pump 10
+  status defect (R-231), which is the same event stream. Before Task 697.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -441,6 +449,7 @@ the block.
     file before drafting a word of it, and expect the completeness question (never a completeness
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+  - **Tasks 715 and 716 (Full and Status Report) come first** (Tom, 2026-09-25).
 
 - 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
