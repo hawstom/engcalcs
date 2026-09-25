@@ -3298,6 +3298,12 @@ var EngCalcs = EngCalcs || {};
 	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	// **AND WHAT A lat/lon PROJECT IS, WHICH IS NOT THAT** (Tom, 2026-09-25: *"The status bar says
+	// "WGS 84 / Pseudo-Mercator (EPSG:3857)", but the coordinates are lat/lon. Isn't that wrong?
+	// Isn't EPSG:3857 meters?"*). Yes: 3857's numbers are metres. A lat/lon project STORES degrees
+	// of longitude and latitude, which is EPSG:4326 in the register's own name, and is only DRAWN
+	// in Web Mercator. The status strip names what the numbers are, so it names this one.
+	var LPN_CRS_WGS84 = 'EPSG:4326', LPN_CRS_WGS84_NAME = 'WGS 84';
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3598,7 +3604,7 @@ var EngCalcs = EngCalcs || {};
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
 		if (isLatLonProject()) {
-			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
+			return crsOptionText({ code: LPN_CRS_WGS84, name: LPN_CRS_WGS84_NAME });
 		}
 		code = projectCrsCode();
 		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
@@ -10412,6 +10418,9 @@ var EngCalcs = EngCalcs || {};
 	// (Tasks 669 and 705) and the per-pipe one that hides a label longer than its own pipe -- and
 	// both must be answered for the scale being TESTED, or the fit reserves room for labels that
 	// will not be there.
+	// What a Zoom to fit shows round a drawing that is a single point: 250 m in a geographic
+	// project, a few streets either way; 250 drawing units (feet or metres) in a grid one.
+	var LPN_POINT_FIT_M = 250;
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
@@ -10494,7 +10503,23 @@ var EngCalcs = EngCalcs || {};
 		});
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
 		// returns maxScale() on a blank canvas.
-		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
+		if (!out.length) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); return out; }
+		// **A DRAWING WITH NO EXTENT IS ONE PLACE, AND IT IS FRAMED AT STREET SCALE THERE** (Tom,
+		// 2026-09-25, a single junction on Project1). The pair above used to be added whenever
+		// there were fewer than two items, so one bare junction was fitted together with the points
+		// (0, 0) and (10, 10) -- ten DEGREES in a geographic project, so the fit showed a continent
+		// with the junction somewhere in it -- and a junction plus its own label (two items at one
+		// anchor) fitted at maxScale(). Every anchor at one point means there is no extent to fit,
+		// so the frame is LPN_POINT_FIT_M centred on it.
+		var i0, same = true;
+		for (i0 = 1; i0 < out.length && same; i0++) {
+			same = out[i0].x === out[0].x && out[i0].y === out[0].y;
+		}
+		if (same) {
+			var half = LPN_POINT_FIT_M / 2 * (isLatLonProject() ? DEG_PER_M : 1);
+			fitItem(out, out[0].x - half, out[0].y - half, 0, 0, 0, 0);
+			fitItem(out, out[0].x + half, out[0].y + half, 0, 0, 0, 0);
+		}
 		return out;
 	}
 	// The translation window for one axis at one scale. `need > room` means this scale does not fit;
@@ -31871,7 +31896,8 @@ var EngCalcs = EngCalcs || {};
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
 	 */
 	function crsCannotBePlaced(code) {
-		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+		// Degrees of longitude and latitude need no transform to reach the map; they ARE its input.
+		return !!code && String(code) !== LPN_CRS_WGS84 && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
 			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
 	}
 	function crsOptionText(entry) {

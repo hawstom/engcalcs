@@ -260,7 +260,10 @@ setUnitSet('si');
 		L.crsName());
 	ok('...and states its EPSG number', L.crsName().indexOf(ZONE12N) > 0, L.crsName());
 	L.reset(L.GEO);
-	ok('a geographic project names Pseudo-Mercator', /Pseudo-Mercator/.test(L.crsName()), L.crsName());
+	// **NOT PSEUDO-MERCATOR** (Tom, 2026-09-25): EPSG:3857's numbers are metres and a lat/lon
+	// project stores degrees. It is only DRAWN in Web Mercator; the strip names what it stores.
+	ok('a geographic project names WGS 84 (EPSG:4326)', L.crsName() === 'WGS 84 (EPSG:4326)', L.crsName());
+	ok('...and never EPSG:3857', !/3857|Pseudo-Mercator/.test(L.crsName()), L.crsName());
 
 	// The readout is REWRITTEN when the kind changes, and two zones are two kinds: a northing read
 	// under the wrong zone is the silent error this whole feature exists to stop.
@@ -308,12 +311,13 @@ setUnitSet('si');
 	L.reset();
 	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
 	ok('...leaving the project with no projection at all', L.crsCode() === '');
-	// The status strip's geographic name and the catalogue's are ONE string now -- the strip adds
-	// the EPSG number, and a geographic project has one like any other: it IS EPSG:3857.
+	// The status strip's geographic name is NOT the catalogue's 3857 row (Tom, 2026-09-25): the
+	// chooser's answer names the drawing frame, and the strip names what the numbers are, which is
+	// degrees -- EPSG:4326, numbered like every other entry.
 	L.reset(L.GEO);
-	ok('the status strip reads the geographic name out of the catalogue',
-		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) === 0, L.crsName());
-	ok('...and numbers it too', L.crsName().indexOf(L.WEBMERC) > 0, L.crsName());
+	ok('the status strip does not read the geographic name out of the 3857 row',
+		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) === -1, L.crsName());
+	ok('...and numbers it 4326', L.crsName().indexOf('EPSG:4326') > 0, L.crsName());
 }
 
 // ---- 8. WHERE ON THE EARTH A PROJECTION APPLIES -------------------------------------------------
