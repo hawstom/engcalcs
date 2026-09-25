@@ -308,20 +308,25 @@ ok('3.4 and back again', L.customerNodeId(m1) === jA.id);
 	ok('3B.4 the reach is in pixels, so zooming in releases the same station',
 		L.customerSnapT(l, nearStart) !== 0, String(L.customerSnapT(l, nearStart)));
 	st.s = wasS;
-	// **AND THE SNAP IS SAID OUT LOUD ON THE DRAWING.** A snapped connector carries a class the
-	// stylesheet colours; an unsnapped one does not, and the same one pass paints both.
+	// **THE SNAP IS NO LONGER SAID OUT LOUD IN RED ON THE DRAWING** (Tom, 2026-09-25: "Red for
+	// node-connected Customers is a bad decision. Let's leave it black."). `customerAtNodeEnd()` is
+	// still the honest signal a settled connection reads correctly; the drawing itself is silent
+	// about it now, and the CSS classes that used to mark it in red (`lpn-service-snapped`,
+	// `lpn-meter-snapped`) are gone rather than left inert.
 	{
 		L.setCustomerPerp(m1, 0, 40);
 		L.customerEdited(m1);
 		const els = L.custEls()[m1.id];
-		ok('3B.5 a service on a node is marked on the map',
-			els.stub.classList.contains('lpn-service-snapped') && L.customerAtNodeEnd(m1) === true);
+		ok('3B.5 a service exactly on a node reads as such', L.customerAtNodeEnd(m1) === true);
+		ok('3B.5b ...but is drawn with no red mark of its own',
+			!els.stub.classList.contains('lpn-service-snapped') &&
+			!els.box.classList.contains('lpn-meter-snapped'));
 		ok('3B.6 ...and it lumps at that very node',
 			L.customerNodeId(m1) === L.linkById(m1.link).from);
 		L.setCustomerPerp(m1, 0.4, 40);
 		L.customerEdited(m1);
-		ok('3B.7 ...and the mark goes when the service moves off it',
-			!els.stub.classList.contains('lpn-service-snapped') && L.customerAtNodeEnd(m1) === false);
+		ok('3B.7 ...and moving it off the node changes the read, not a class',
+			L.customerAtNodeEnd(m1) === false);
 	}
 	// **CONNECTING AT A NODE IS STILL AN ATTACHMENT TO A PIPE**, which is what keeps the document,
 	// the solver and the .inp writer unchanged. Where four pipes meet, the one taken is the one
@@ -697,9 +702,11 @@ L.renderCustomerFields(m1.id);
 // held at a legible dot beyond. A symbol drawn to scale is constant in WORLD units; one held at a
 // screen size is pixels / scale, which grows as you zoom out. So it is the larger of the two, and
 // the crossover is where 2 m equals 3 px rather than a number anybody typed.
-// **THE SYMBOL IS A QUARTER OF A JUNCTION AND FOLLOWS SYMBOL SCALE** (Tom, 2026-09-19: *"Customer
-// symbols should scale using the Symbol scale setting, but they should just be a lot smaller than a
-// node, like 0.2 to 0.3 as big, maybe 0.25."*).
+// **THE SYMBOL FOLLOWS SYMBOL SCALE, AT 0.30 OF A JUNCTION** (Tom, 2026-09-19: *"Customer symbols
+// should scale using the Symbol scale setting, but they should just be a lot smaller than a node,
+// like 0.2 to 0.3 as big, maybe 0.25."* -- shipped at 0.25. **RAISED 2026-09-25**, Tom looking at
+// the shipped drawing: *"Customer symbols appear to be 0.2 * Junction size. It's too small. Let's
+// try 0.25 * Junction size or raise it another 0.05 from where it is."* -- 0.25 plus 0.05 is 0.30).
 //
 // **THIS REPLACED A HYBRID REAL-WORLD RULE, and the three fixtures that asserted that rule are
 // gone with it.** The meter used to be drawn `max(1 m, 1.5 px)` in world units, which made it the
@@ -712,14 +719,14 @@ L.renderCustomerFields(m1.id);
 	st.s = 1000;
 	const small = L.meterHalfWorld(0, 0);
 	const node = L.nodeRadius({ type: 'junction' });
-	ok('6.1 a customer is a quarter the size of a junction', near(small / node, 0.25, 1e-9),
+	ok('6.1 a customer is 0.30 the size of a junction', near(small / node, 0.30, 1e-9),
 		String(small / node));
 	L.getSettings().symbolSize = sizeWas * 2;
 	const bigger = L.meterHalfWorld(0, 0);
 	ok('6.2 turning Symbol scale up makes the customer bigger, in step with the nodes',
 		near(bigger, small * 2, 1e-9), small + ' -> ' + bigger);
-	ok('6.3 ...and it is still a quarter of a junction at the new setting',
-		near(bigger / L.nodeRadius({ type: 'junction' }), 0.25, 1e-9));
+	ok('6.3 ...and it is still 0.30 of a junction at the new setting',
+		near(bigger / L.nodeRadius({ type: 'junction' }), 0.30, 1e-9));
 	L.getSettings().symbolSize = sizeWas;
 	// Like every other symbol here it is a SCREEN size divided by the scale, so zooming out makes
 	// its world size grow and the dot on screen stays legible.

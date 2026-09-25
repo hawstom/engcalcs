@@ -817,6 +817,11 @@ $ec_lang['lpn_field_meter_total']='Total demand';
 $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
 $ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
+// Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
+// pipe at station 0 or 100. Shown in place of lpn_field_meter_pipe/station/offset, never beside
+// them (renderCustomerFields()).
+$ec_lang['lpn_field_meter_node']='Connected to';
+$ec_lang['lpn_field_meter_node_tip']='The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.';
 $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the

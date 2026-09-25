@@ -3156,7 +3156,10 @@ var EngCalcs = EngCalcs || {};
 	// a meter symbol attached to a pipe at a station along it (`link` + `t`), carrying the same
 	// description and tag every other element carries, a per-service demand and a count. **A CUSTOMER IS NOT A NODE**: its demand is summed
 	// into the junction its pipe reaches it through, which is arithmetic on a junction the network
-	// already had. See customerNodeId() for that rule and why the junction is derived, not stored.
+	// already had. See customerNodeId() for that rule. The junction is DERIVED while the pipe is
+	// there; `node` is the one exception, a fallback holding the junction id ONLY once the pipe a
+	// node-exact connection ran through has been deleted (customerNodeFallback(), Tom, 2026-09-25) --
+	// so a Customer connected to a node cannot be detached by deleting or re-routing the main.
 	var doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
@@ -8639,10 +8642,13 @@ var EngCalcs = EngCalcs || {};
 	// stays inside the user's own project, and it must never reach a log row or a usage statistic --
 	// nothing here writes one, which is the structural half of that rule rather than a discipline.
 
-	// **A CUSTOMER IS A QUARTER OF A JUNCTION AND FOLLOWS THE SYMBOL SCALE SETTING** (Tom,
-	// 2026-09-19: *"Customer symbols should scale using the Symbol scale setting, but they should
-	// just be a lot smaller than a node, like 0.2 to 0.3 as big, maybe 0.25."*). 0.25, his own
-	// middle figure.
+	// **A CUSTOMER FOLLOWS THE SYMBOL SCALE SETTING, AT 0.30 OF A JUNCTION** (Tom, 2026-09-19:
+	// *"Customer symbols should scale using the Symbol scale setting, but they should just be a lot
+	// smaller than a node, like 0.2 to 0.3 as big, maybe 0.25."* -- shipped at 0.25, his own middle
+	// figure). **RAISED 2026-09-25** (Tom, looking at the shipped drawing: *"Customer symbols
+	// appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it
+	// another 0.05 from where it is."* -- read literally against the value actually in force, 0.25
+	// plus 0.05 is 0.30).
 	//
 	// **THIS REPLACES A HYBRID REAL-WORLD RULE, and that rule is gone rather than qualified.** The
 	// meter used to be drawn `max(1 m, 1.5 px)` in world units -- to scale on a site plan, held at a
@@ -8663,7 +8669,7 @@ var EngCalcs = EngCalcs || {};
 	// this map, so it never grows past a fraction of what the pipe itself draws at, at any zoom.
 	// **The other half of his sentence -- the line shrinking below 1px once the whole drawing
 	// stops growing -- is Task 705's maximum map size**, applied in serviceStrokeWorld().
-	var LPN_METER_NODE_FRAC = 0.25;      // of a junction's own radius -- his figure
+	var LPN_METER_NODE_FRAC = 0.30;      // of a junction's own radius -- see the ruling above
 	var LPN_SERVICE_STROKE_FRAC = 0.5;   // of settings.linkWidth, screen px
 	// **1 px IS HIS OWN FLOOR, VERBATIM** -- *"a lesser multiple of the link width or always just
 	// 1 px until we get to the zoom where everything stops growing ... at which point it shrinks
@@ -8744,12 +8750,29 @@ var EngCalcs = EngCalcs || {};
 		var t = c && c.t;
 		return (typeof t === 'number' && isFinite(t)) ? Math.max(0, Math.min(1, t)) : 0.5;
 	}
+	// **THE FALLBACK NODE, USED ONLY WHEN THERE IS NO LIVE PIPE TO DERIVE ONE FROM** (Tom,
+	// 2026-09-25: a Customer whose service is on a junction must not lose that junction when the
+	// pipe it snapped through is deleted). `c.node` is never the authoritative answer while `c.link`
+	// still resolves -- customerNodeId() and customerAttachPoint() both ask the live pipe first --
+	// so this is read only after that has already failed, and it answers null the moment the node
+	// itself is gone too (deleteNode() clears the field at that point; a stale id read here would
+	// otherwise resurrect a demand that has genuinely left the drawing).
+	function customerNodeFallback(c) {
+		return (c && c.node) ? nodeById(c.node) : null;
+	}
 	// **WHERE THE SERVICE MEETS THE PIPE**: the point that fraction of the arc length names, which on
 	// a bent pipe may be a vertex rather than the foot of a perpendicular to any one segment. Say
 	// "the nearest point on the pipe" rather than "the perpendicular foot" anywhere that can bite.
+	//
+	// **OR, WITH NO PIPE LEFT, THE NODE ITSELF** -- see customerNodeFallback(). A service caught
+	// exactly on a node when its pipe was deleted keeps its house standing where the pipe's end used
+	// to be, which is this same point: a pipe's endpoint IS the node's own position.
 	function customerAttachPoint(c) {
-		var l = customerLink(c), p;
-		if (!l) { return null; }
+		var l = customerLink(c), p, n;
+		if (!l) {
+			n = customerNodeFallback(c);
+			return n ? { x: n.x, y: n.y } : null;
+		}
 		p = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		return { x: p.x, y: p.y };
 	}
@@ -8884,11 +8907,14 @@ var EngCalcs = EngCalcs || {};
 		return { link: a.link, t: a.t, point: { x: p.x, y: p.y } };
 	}
 	// Whether this meter's service lands exactly on a node, which is what the drawing says out loud
-	// (see updateCustomerGeometry). A station of exactly 0 or 1 IS the pipe's end node, and only the
-	// snap above and a typed 0 or 100 can produce one.
+	// (see updateCustomerGeometry) and what the Properties box, the Tables pane and Find all read
+	// before deciding whether to show a pipe and a station or a "Connected to" node instead. A
+	// station of exactly 0 or 1 IS the pipe's end node, and only the snap above and a typed 0 or 100
+	// can produce one -- or, with the pipe gone, the fallback node customerNodeFallback() still
+	// answers (see the comment there).
 	function customerAtNodeEnd(c) {
 		var t;
-		if (!customerLink(c)) { return false; }
+		if (!customerLink(c)) { return !!customerNodeFallback(c); }
 		t = customerT(c);
 		return t === 0 || t === 1;
 	}
@@ -8906,6 +8932,12 @@ var EngCalcs = EngCalcs || {};
 	 * point, so a new attachment means a new offset for the SAME drawn point -- which is why the
 	 * meter's current position is read before anything is written and handed to the one offset
 	 * writer afterwards.
+	 *
+	 * **A LIVE PIPE IS ALWAYS THE FRESH ANSWER, SO THE FALLBACK NODE IS DROPPED HERE.** Whatever
+	 * `c.node` said -- from a pipe deleted out from under a node-exact connection -- this pipe is
+	 * what serves the meter now, and customerNodeId() reads it first regardless. Keeping the old
+	 * field around would be a second opinion nothing asks for until the day this pipe, too, is
+	 * deleted, at which point it would resurrect the WRONG node.
 	 */
 	function setCustomerConnection(c, l, t) {
 		var pt;
@@ -8915,6 +8947,7 @@ var EngCalcs = EngCalcs || {};
 			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
 		}
 		c.link = l.id;
+		delete c.node;
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
 		return setCustomerOffsetTo(c, l, t, pt.x, pt.y);
@@ -8985,12 +9018,15 @@ var EngCalcs = EngCalcs || {};
 		d = customerPerpDistance(c, l);
 		return { x: an.x + n.x * d, y: an.y + n.y * d };
 	}
-	// **THE JUNCTION THIS CUSTOMER LUMPS AT, DERIVED AND NEVER STORED.** The rule is one function in
-	// js/lpn-inp.js, shared with the `.inp` writer; the precedent for deriving it is `lenAuto` on a
-	// pipe length, and the reason is that a consequence which is recomputed cannot go stale when the
-	// pipe is re-routed, bent, or has its ends renamed.
+	// **THE JUNCTION THIS CUSTOMER LUMPS AT.** The rule is one function in js/lpn-inp.js, shared with
+	// the `.inp` writer; the precedent for deriving it from the pipe is `lenAuto` on a pipe length,
+	// and the reason is that a consequence which is recomputed cannot go stale when the pipe is
+	// re-routed, bent, or has its ends renamed. **DERIVED WHILE THE PIPE IS THERE; `c.node` ANSWERS
+	// ONLY WHEN IT IS NOT** (Tom, 2026-09-25) -- see customerNodeFallback() and
+	// detachCustomersFromLink(). The predicate is `nodeById` itself, so a fallback naming a node that
+	// has since been deleted too answers null rather than a stale id.
 	function customerNodeId(c) {
-		return EngCalcs.lpnCustomerNode(c, customerLink(c));
+		return EngCalcs.lpnCustomerNode(c, customerLink(c), nodeById);
 	}
 	function customerFlow(c) { return EngCalcs.lpnCustomerFlow(c); }
 	// The customer demand rows for one junction, in the shape demandRowsOf() concatenates.
@@ -9012,8 +9048,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Every customer attached to nothing. Its demand is in no junction's total and therefore in no
 	// answer, which is a fact the user has to be told rather than left to notice.
+	//
+	// **NOT `!customerLink(c)`** (Tom, 2026-09-25): a customer connected exactly to a node has no
+	// pipe once that pipe is deleted, and is still connected -- customerNodeId() is the honest
+	// question, the same one the demand rows ask.
 	function detachedCustomers() {
-		return (doc.customers || []).filter(function (c) { return !customerLink(c); });
+		return (doc.customers || []).filter(function (c) {
+			var n = customerNodeId(c);
+			return n === null || n === undefined;
+		});
 	}
 
 	// ---- drawing a meter ------------------------------------------------------------------------
@@ -9398,14 +9441,16 @@ var EngCalcs = EngCalcs || {};
 		// support. The class is the same idiom .lpn-lbl-hidden already is.
 		ce.stub.classList[an ? 'remove' : 'add']('lpn-service-off');
 		ce.box.classList[an ? 'remove' : 'add']('lpn-meter-loose');
-		// **A SNAP THAT CAUGHT SAYS SO WHILE IT IS CAUGHT** (Task 247; Tom, 2026-09-17). A service
-		// landing exactly on a node is the one attachment a reader cannot verify by eye -- a
-		// connection one pixel short of the junction draws identically and lumps by the near-miss
-		// rule instead -- so the connector is marked while it is on the node and unmarked the moment
-		// a drag takes it off. Painted here, in the one pass every move goes through, rather than at
-		// each gesture: a mark applied by a drag and cleared by nobody is the defect this avoids.
-		ce.stub.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-service-snapped');
-		ce.box.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-meter-snapped');
+		// **A SNAP THAT CAUGHT NO LONGER SAYS SO IN RED** (Task 247; Tom, 2026-09-25: *"Red for
+		// node-connected Customers is a bad decision. Let's leave it black."*). It used to mark the
+		// connector and the dot while a service landed exactly on a node, on the argument that the
+		// snap is the one attachment a reader cannot verify by eye -- but the red read as a warning
+		// about the drawing rather than as information, and it is the same red every gesture in
+		// progress on this map uses (the rubber band, the pending meter dot), which made a SETTLED
+		// connection look like one still being made. **A settled node connection is drawn exactly
+		// like any other connected customer now; the Properties box, the Tables pane and Find are
+		// where a reader confirms it, with a "Connected to" row naming the junction instead of a
+		// pipe and a station of 0 or 100 (renderCustomerFields(), paneCustomerCols()).**
 	}
 	// Every meter on this pipe, redrawn where the pipe's new shape puts it. Replayed from
 	// updateLinkGeometry(), which is the one pass every reshaping goes through -- so there is no
@@ -9571,12 +9616,29 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * Silently dropping the demand would change the answers without saying so, which is why this
 	 * returns the count and its caller says it out loud.
+	 *
+	 * **EXCEPT A CUSTOMER CONNECTED EXACTLY TO A NODE, WHICH IS NOT DETACHED AT ALL** (Tom,
+	 * 2026-09-25: *"Do we have Customers not allowed to connect directly to nodes?... it will be
+	 * happier for users to see Customer connected to a node"* -- and that connection must survive
+	 * the pipe it happened to snap through being deleted). Its junction is captured into `c.node`
+	 * -- the fallback customerNodeId() and customerAttachPoint() read once the pipe is gone -- and
+	 * its `x`/`y` is left exactly as it is, because on a node the offset is already read whole from
+	 * that junction's own position (see customerPoint()) and the junction has not moved. Only a
+	 * customer that was genuinely along the pipe, not AT either end of it, loses its connection here.
 	 */
 	function detachCustomersFromLink(linkId) {
 		var moved = 0;
 		(doc.customers || []).forEach(function (c) {
-			var pt;
+			var pt, nid;
 			if (c.link !== linkId) { return; }
+			if (customerAtNodeEnd(c)) {
+				nid = customerNodeId(c);
+				c.link = null;
+				delete c.t;
+				if (nid !== null && nid !== undefined) { c.node = nid; } else { delete c.node; }
+				if (custEls[c.id]) { updateCustomerGeometry(c.id); }
+				return;
+			}
 			// The absolute position it is drawn at NOW becomes its own, because `x`/`y` stops being
 			// an offset the moment there is nothing to be an offset from.
 			pt = customerPoint(c);
@@ -9613,8 +9675,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!id) {
 			// Detached, and drawn where it was: `x`/`y` stops being an offset the moment there is
-			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule.
-			c.link = null; delete c.t;
+			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule. An
+			// explicit detach is a real decision to serve this customer from nothing, so the node
+			// fallback goes with the pipe reference rather than quietly outliving it.
+			c.link = null; delete c.t; delete c.node;
 			c.x = pt.x; c.y = pt.y;
 			return true;
 		}
@@ -9630,6 +9694,7 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		c.link = l.id;
+		delete c.node;   // a live pipe is always the fresh answer -- see setCustomerConnection()
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
 		setCustomerAt(c, l, pt.x, pt.y);
@@ -10085,6 +10150,17 @@ var EngCalcs = EngCalcs || {};
 	// which is the stale-snapshot ruling reaching node labels the way rebuildLink() already
 	// reaches link ones: refreshOneLabelInPlace() rewrites only THIS node's own label, never a
 	// network-wide pass.
+	// **A CUSTOMER WITH NO PIPE LEFT (c.node fallback) FOLLOWS THE NODE ITSELF** (Tom, 2026-09-25).
+	// updateCustomersOnLink() is what a moving pipe replays for the customers riding on IT; this is
+	// its twin for the customer whose pipe has already been deleted -- customersByLink cannot find
+	// it, because it has no link, so updateNode() below asks by node id instead. Not indexed: this
+	// state only exists after a pipe deletion, so the scan is over however many customers a
+	// document actually has, not a hot path multiplied by node count.
+	function updateCustomersFallenBackToNode(id) {
+		(doc.customers || []).forEach(function (c) {
+			if (c.node === id && !c.link && custEls[c.id]) { updateCustomerGeometry(c.id); }
+		});
+	}
 	function updateNode(id, contentChanged) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		beginMapBoxHold();
@@ -10095,6 +10171,7 @@ var EngCalcs = EngCalcs || {};
 			positionNodeSymbol(id);
 			layoutNodeLabel(id);
 			for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
+			updateCustomersFallenBackToNode(id);
 			for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
 			if (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
@@ -17778,9 +17855,14 @@ var EngCalcs = EngCalcs || {};
 			// quantity shown three ways in two units is how two doors come to disagree. Clamped to
 			// the pipe, like the typed one; refused on a customer attached to nothing, because
 			// there is no pipe to be along or off.
+			//
+			// **AND REFUSED ON A CUSTOMER CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25). A station
+			// of 0 or 100 there is not a position along a main a bulk write should be nudging; the
+			// popup and the table both stop offering the same two cells for the same reason
+			// (renderCustomerFields(), paneCustomerCols()).
 			{ key: 'custStation', group: 'customer', field: 'station',
 				label: pc.lpn_field_meter_station || 'Station along the pipe (%)',
-				applies: function (c) { return !!customerLink(c); },
+				applies: function (c) { return !!customerLink(c) && !customerAtNodeEnd(c); },
 				get: function (c) { return customerLink(c) ? customerT(c) * 100 : undefined; },
 				set: function (c, v) {
 					if (!isFinite(v) || !customerLink(c)) { return; }
@@ -17788,7 +17870,7 @@ var EngCalcs = EngCalcs || {};
 				} },
 			{ key: 'custOffset', group: 'customer', field: 'offset',
 				label: pc.lpn_field_meter_offset || 'Offset from the pipe',
-				applies: function (c) { return !!customerLink(c); },
+				applies: function (c) { return !!customerLink(c) && !customerAtNodeEnd(c); },
 				get: function (c) { return customerLink(c) ? customerOffset(c) : undefined; },
 				set: function (c, v) {
 					if (!isFinite(v) || !customerLink(c)) { return; }
@@ -20184,6 +20266,11 @@ var EngCalcs = EngCalcs || {};
 			// somebody states one. A guess would be the invisible kind of wrong at a corner where
 			// four mains meet: the customer appears, every number calculates, and the demand is on
 			// the wrong main. Re-read after every write, because the setter may refuse the id.
+			// **BLANK WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25), the same swap
+			// renderCustomerFields() makes: the `atNode` column below names the junction, so this
+			// column stops repeating a pipe id that is, at that point, almost incidental. Still
+			// writable -- typing a pipe id here is exactly the keyboard way of dragging the
+			// connection grip off the node, and setCustomerLink() clears the node fallback itself.
 			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
 				hint: function (c) { return customerLink(c) ? '' : (suggestCustomerLink(c) || ''); },
 				hintTip: function (c) {
@@ -20192,8 +20279,11 @@ var EngCalcs = EngCalcs || {};
 						'The nearest asset is {id}. Type it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
-				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
-				refTo: function (c) { var l = customerLink(c); return l ? { group: 'link', id: l.id } : null; },
+				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
+				refTo: function (c) {
+					var l = customerLink(c);
+					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
+				},
 				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
@@ -20201,9 +20291,13 @@ var EngCalcs = EngCalcs || {};
 			// and carries the house with it, setCustomerOffset() moves the house ACROSS. A meter
 			// attached to nothing has no pipe to be along or off, so both cells read empty there and
 			// both setters refuse rather than inventing a position.
+			//
+			// **AND BLANK, LIKE THE LINK CELL BESIDE THEM, WHEN THE CONNECTION IS EXACTLY A NODE**
+			// (Tom, 2026-09-25) -- a station of 0 or 100 is not a reading a table cell should print
+			// as though it were an ordinary position along the main.
 			{ key: 'station', label: 'lpn_field_meter_station', em: 3.5,
 				get: function (c) {
-					return customerLink(c) ? +(customerT(c) * 100).toFixed(2) : '';
+					return (customerLink(c) && !customerAtNodeEnd(c)) ? +(customerT(c) * 100).toFixed(2) : '';
 				},
 				set: function (c, v) {
 					if (!customerLink(c) || !isFinite(v)) { return; }
@@ -20213,7 +20307,7 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'offset', label: 'lpn_field_meter_offset', em: 3.5,
 				unit: function () { return 'lpn_u_length'; },
 				get: function (c) {
-					return customerLink(c) ? +customerOffset(c).toFixed(3) : '';
+					return (customerLink(c) && !customerAtNodeEnd(c)) ? +customerOffset(c).toFixed(3) : '';
 				},
 				set: function (c, v) {
 					if (!isFinite(v)) { return; }
@@ -24890,9 +24984,30 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 	}
 	function deleteNode(id) {
-		var links = incidentLinks[id].slice(), i;
+		var links = incidentLinks[id].slice(), i, orphaned = 0;
 		if (isSelected('node', id)) { deselectOne('node', id); }   // see deleteLink()
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
+		// **A CUSTOMER THAT SURVIVED EACH PIPE'S OWN DELETION ABOVE, AS A NODE FALLBACK
+		// (detachCustomersFromLink()), TRULY LOSES ITS CONNECTION HERE, WHEN THE NODE ITSELF GOES.**
+		// Read and converted to an absolute position BEFORE the node's own data is removed below,
+		// because customerPoint() -> customerAttachPoint() still needs to ask where it was. Said out
+		// loud with the same notice a pipe deletion gives, on the same argument: a demand that just
+		// left every answer on the screen is not something a reader can be left to notice.
+		(doc.customers || []).forEach(function (c) {
+			var pt;
+			if (c.node !== id) { return; }
+			pt = customerPoint(c);
+			c.x = pt.x; c.y = pt.y;
+			delete c.node;
+			orphaned++;
+			if (custEls[c.id]) { updateCustomerGeometry(c.id); }
+		});
+		if (orphaned) {
+			refreshCustomerHandle();
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
+				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				.replace('{n}', String(orphaned)));
+		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
@@ -25300,7 +25415,13 @@ var EngCalcs = EngCalcs || {};
 		// A DETACHED meter's x/y is a position on the map; an attached one's is an offset from its
 		// attachment point, and an offset does not move when the frame's origin does. Same rule,
 		// same reason and same shape as the Text above it (Task 247).
-		(o.customers || []).forEach(function (c) { if (!c.link) { visit(c); } });
+		//
+		// **`c.node` IS STILL AN ATTACHMENT** (Tom, 2026-09-25): a Customer connected exactly to a
+		// node whose pipe has since been deleted reads its offset from that node's own position
+		// (customerPoint()) exactly as it did through the pipe, so its `x`/`y` must NOT be shifted
+		// here -- the node it is offset from is shifted by the `o.nodes` pass above, and shifting the
+		// offset too would move the meter twice.
+		(o.customers || []).forEach(function (c) { if (!c.link && !c.node) { visit(c); } });
 		if (o.backdrop && typeof o.backdrop.tx === 'number') {
 			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
 				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
@@ -43979,6 +44100,12 @@ var EngCalcs = EngCalcs || {};
 			if (l.to === oldId) { l.to = newId; }
 		});
 		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
+		// **AND EVERY CUSTOMER FALLING BACK TO IT** (Task 247, Tom, 2026-09-25). A customer whose
+		// pipe was deleted while it sat exactly on this node names the junction directly in `node`
+		// (customerNodeFallback()); left unrewritten here, a rename would leave it naming an id this
+		// document no longer has, which reads as detached and silently drops its demand -- the same
+		// defect applyLinkRename() already guards against for `c.link`.
+		(doc.customers || []).forEach(function (c) { if (c.node === oldId) { c.node = newId; } });
 		// A control's IF NODE condition (Task 533). See renameInControls().
 		renameInControls('node', oldId, newId);
 		// **AND EVERY SAVED PATH THAT STOPS HERE** (Task 510's `doc.profiles`). A path is a list of
@@ -45978,7 +46105,7 @@ var EngCalcs = EngCalcs || {};
 		var c = customerById(custId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
-			nd = nid ? nodeById(nid) : null,
+			nd = nid ? nodeById(nid) : null, atNode = c ? customerAtNodeEnd(c) : false,
 			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
 			stLabel, stInput, offLabel, offInput, warn;
 		if (!c) { return; }
@@ -46078,7 +46205,27 @@ var EngCalcs = EngCalcs || {};
 		readonlyField(fields, (pc.lpn_field_meter_total || 'Total demand') +
 			' (' + unitLabel('lpn_u_flow') + ')', customerFlow(c), pc.lpn_field_meter_total_tip);
 
-		if (l) {
+		// **CONNECTED EXACTLY TO A NODE READS AS A NODE, NOT AS A PIPE AT STATION 0 OR 100** (Tom,
+		// 2026-09-25: *"I think it will be happier for users to see Customer connected to a node if
+		// that is the case instead of a link at station 0."*). The pipe, the station and the offset
+		// are all about a position ALONG a main; a service that lands exactly on the junction those
+		// mains meet at is not along any one of them, so this box says which junction it serves
+		// instead of naming a main almost incidentally and reporting a station a reader has to
+		// recognise as "the whole pipe" rather than read as a number.
+		if (atNode && nd) {
+			readonlyField(fields, pc.lpn_field_meter_node || 'Connected to', nd.id,
+				pc.lpn_field_meter_node_tip);
+			// **A DEMAND ON A FIXED HEAD CHANGES NOTHING, AND IT IS REPORTED RATHER THAN REROUTED.**
+			// A reservoir's and a tank's water surface is the level the document states, so the
+			// solve is identical with or without this meter's demand.
+			if (isFixedHeadNode(nd)) {
+				warn = document.createElement('p');
+				warn.className = 'lpn-set-note';
+				warn.textContent = pc.lpn_customer_fixed_head ||
+					'⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+				fields.appendChild(warn);
+			}
+		} else if (l) {
 			readonlyField(fields, pc.lpn_field_meter_pipe || 'Connected asset', l.id,
 				pc.lpn_field_meter_pipe_tip);
 			// **THE STATION, AS A PERCENTAGE OF THE WAY ALONG THE PIPE.** A percentage rather than a
