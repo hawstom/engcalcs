@@ -120,6 +120,16 @@ const EC_HARNESS_WORDING_EXCEPT = [
             '(a) read off the shipped lpn_wrong_tip. The tip promising no reply is the whole point '
             . 'of the feedback link\'s honesty, so this is meant to go red if it stops saying it.',
     ],
+    'dev/lpn-spike/label-limit-parity-harness.js' => [
+        'This has no effect if it is larger than the similar setting for all labels' =>
+            '(a) asserted against PC.lpn_labels_customer_width_tip: the assertion IS that Tom\'s own '
+            . 'qualifier sentence, verbatim, is present in the customer row\'s shipped tip -- the '
+            . 'sentence going missing or getting paraphrased is the defect this line exists to catch.',
+        'drawn only while the map is this wide or narrower' =>
+            '(a) asserted against PC.lpn_labels_customer_width_tip: the customer tip must read as the '
+            . 'parallel sentence to lpn_settings_label_max_width_tip\'s own wording, not a different '
+            . 'shape -- this is that comparison, not a rewording pin.',
+    ],
     'dev/lpn-spike/pane-print-harness.js' => [
         'Elm Street Center' =>
             '(b) the project name this harness types in and then reads back off the printed sheet.',

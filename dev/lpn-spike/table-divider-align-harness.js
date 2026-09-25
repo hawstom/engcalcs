@@ -206,7 +206,11 @@ async function main() {
 					return {
 						x: Math.max(0, tRect.left - 4), y: Math.max(0, hRect.top - 4),
 						width: Math.min(900, tRect.width + 8), height: (lastRow.bottom - hRect.top) + 8,
-						tableLeft: tRect.left
+						tableLeft: tRect.left,
+						// The body is read 3.5px above a real row's own bottom rule, never at a fixed offset
+						// below the last one: that offset can land on a horizontal rule, which reads
+						// as "a divider at every pixel", and below the text, whose grey anti-aliasing reads as dividers.
+						bodyY: (rows[1].getBoundingClientRect().bottom - 3.5) - Math.max(0, hRect.top - 4)
 					};
 				});
 				const clip = { x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.width), height: Math.round(box.height) };
@@ -215,7 +219,7 @@ async function main() {
 
 				const tableLeftDev = (box.tableLeft - box.x) * dsf;
 				const headCols = dropLeadingFrame(greyColumns(img, Math.round(6 * dsf)), tableLeftDev);
-				const bodyCols = dropLeadingFrame(greyColumns(img, Math.round((box.height - 6) * dsf)), tableLeftDev);
+				const bodyCols = dropLeadingFrame(greyColumns(img, Math.round(box.bodyY * dsf)), tableLeftDev);
 				const match = JSON.stringify(headCols) === JSON.stringify(bodyCols);
 				results.push({ dsf, forceScrollbarGutter, match, headCols, bodyCols });
 				await a.close();

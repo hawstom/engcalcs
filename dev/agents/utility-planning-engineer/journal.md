@@ -1,3 +1,119 @@
+## 2026-09-25 — Sue: "Do we need a WaterCAD expert, or am I one?" — answered honestly, no
+
+Tom relays a senior civil engineer's (IOD's) reaction to `lpn_`: liked the name EPANET++, said "we
+need interoperability to make migration from WaterCAD easy." He asks whether this seat, or a new
+seat, is the WaterCAD migrator. Mary is researching file-format fidelity in parallel; this stays on
+the engineer's-trust side and does not duplicate her.
+
+- **My vantage, stated once, plainly: I am NOT a WaterCAD/WaterGEMS user, and I should not be
+  mistaken for one.** Everything in this journal naming WaterCAD (the Fire Flow Analysis page, the
+  Alternative/Scenario docs, the Engineering Library sync behaviour) is **CITED** — vendor
+  documentation and forum threads I fetched and read this session or a prior one — never lived
+  operation. I have never opened a real utility's `.wtg` project, never watched an export silently
+  drop a field, never learned which of WaterCAD's quirks "everybody already knows about" because
+  nobody bothers to document it. That gap is real and this seat cannot close it by reading harder.
+  **A dedicated WaterCAD-expert seat would carry exactly what I cannot: lived scar tissue, not
+  another pass of the same public documentation I already have access to.** Per this project's own
+  hiring standard (`dev/agents/README.md`: "an agent must carry something this repo does not already
+  have"), a new persona simulating a WaterCAD veteran from the same vendor docs I can already fetch
+  adds nothing — **IOD, who actually used it, already is that seat, informally, the same way Franco's
+  phone testing outranks a persona guessing at field conditions.** My recommendation: treat IOD's
+  specific, named complaints as primary evidence (log them the way Franco's field notes are logged),
+  and only stand up a dedicated seat if they recur at a volume this seat and Mary's outward research
+  cannot track — not before.
+- **What "interoperability" is worth, translated into what an engineer actually checks before trusting
+  a new tool with a real model — six things, migration-specific, not a repeat of Mary's file-format
+  brief:**
+  1. **Topology, pipes, tanks, pumps, curves — the `.inp` core.** **CITED**, Bentley's own
+     documentation states WaterGEMS/WaterCAD's native store is a proprietary `.wtg`(`.sqlite`)
+     database, and its own Import/Export EPANET help page (`docs.bentley.com`,
+     "Importing and Exporting EPANET Files") states plainly that **because EPANET does not support as
+     many features and properties as the Bentley model, some data are lost on export** — the vendor's
+     own word, not a hostile reading. `lpn_` already reads and writes `.inp`
+     (`CLAUDE.md`, `js/lpn-inp.js`) and its own stated posture — "reports every difference, never
+     rejects, never drops silently" — is the correct answer to exactly this vendor-admitted lossiness,
+     and worth Tom hearing as a genuine point of comparison rather than a defect to fix.
+  2. **Scenarios and Alternatives — the one place I would tell Tom plainly this suite is smaller, and
+     say why.** **CITED**, WaterCAD/WaterGEMS structures a model as a tree: separate Physical,
+     Demand and Operational **Alternatives**, each inheritable/overridable, combined into a
+     **Scenario** that names one of each (`docs.bentley.com`, "Understanding Scenarios and
+     Alternatives," fetched in an earlier pass, journal 2026-08-25/29). A real master-plan CIP
+     program routinely carries dozens of named alternatives (one per proposed project) layered on a
+     shared base. `lpn_`'s own Scenario (`js/looped-network.js:2236`, OBSERVED) is a **flat list of
+     per-element overrides plus, since 2026-09-02, a scalar demand multiplier** — no alternative
+     axis, no inheritance tree. An `.inp` file has no scenario concept at all — it is one snapshot —
+     so nothing about the ALTERNATIVE TREE itself will ever survive an import regardless of what this
+     suite builds; a WaterCAD engineer with 12 alternatives gets 12 flat, independent files, not a
+     tree. **This is fine, even correct, at this suite's own ~10-20-node target scope** (a handful of
+     scenarios is exactly what a subdivision job needs) **and it is a real, honest limit at the
+     master-plan CIP-program scale IOD is presumably picturing** — I would say so to Tom without
+     hedging, not sell parity that is not there.
+  3. **Fire-flow criteria (target residual, required flow per node).** **CITED**, re-confirmed from
+     the same WaterCAD Fire Flow Analysis page read in the 2026-08-26 pass: WaterCAD does not supply
+     an ISO/code-derived required-flow number automatically either — the engineer types it per node
+     or zone, and it is WaterCAD's own scenario/load metadata, not an `.inp`-native field. So this is
+     not a WaterCAD-specific loss on migration — no tool's `.inp` carries it, and `lpn_`'s own Task
+     530 fire-flow work already asks the user for it the same way, matching the market leader's own
+     practice rather than falling short of it.
+  4. **Demand allocation provenance.** **CITED**, WaterCAD's Demand Allocation Manager ties a node's
+     demand to a parcel/billing-unit spatial join (journal 2026-08-25, `proceedings.esri.com`,
+     InfoWater Pro's own equivalent). That JOIN — which parcel fed which node, at what per-capita or
+     billed rate — is WaterCAD's own metadata, never an `.inp` field; only the resulting number
+     travels. A migrating engineer who leans on this loses the audit trail entirely, on export from
+     WaterCAD, before this suite is ever involved — and this suite has correctly, deliberately cut
+     GIS/parcel import (`dev/looped-network-calculator-scope.md`, "Being a GIS"), so it cannot restore
+     what WaterCAD's own export already threw away. Not a gap to close; a fact to state to Tom.
+  5. **Controls.** `[CONTROLS]`/`[RULES]` are native `.inp` sections and travel through the format
+     itself; `lpn_` already reads/writes them (`CLAUDE.md`). I found no evidence WaterCAD's own
+     control authoring is richer than what `.inp` can express — Bentley's lossiness warning above is
+     about WaterCAD-native features that have no `.inp` counterpart at all (its own symbology,
+     GIS links, alternative structure), not about simple/rule-based control logic, which IS an
+     `.inp` concept in both tools. Not independently re-verified this pass — flag as consistent with,
+     not confirmed against, Mary's parallel format work.
+  6. **GIS asset IDs.** **CITED**, WaterCAD/WaterGEMS ties an element to a GIS record via its own
+     ModelID/GEMS-Connection sync (`docs.bentley.com`, general OpenFlows GIS-integration docs,
+     search-surfaced, secondary). An `.inp` element ID is just a label string with no linkage
+     metadata. **OBSERVED**, `dev/ROADMAP.md` Task 636 (custom properties, namespaced
+     `user_`/`custom_`, already shipping in phase 1) is exactly the seam a migrating engineer needs
+     for this — a `user_gis_id` custom property carries the number across without this suite becoming
+     a GIS. This is already queued, not a gap I am naming new.
+  7. **Calibration data.** No tool's `.inp` carries a measured-vs-modeled pair; it is a wholly
+     separate object in every tool that has it (WaterCAD's own Calibration Report, three tabs;
+     `lpn_`'s Task 601, unbuilt, OBSERVED `dev/ROADMAP.md:1156`). Migrating a calibration history
+     therefore always means re-entry, in either direction, in every tool — not a `lpn_`-specific
+     cost, and not solvable by better `.inp` fidelity.
+- **The lever I think outweighs all six of the above, and it is this suite's own already-decided
+  design, not something I am proposing:** **OBSERVED**, `dev/ROADMAP.md` Task 537 (parked, both
+  Franco and I researched it): *"a complete network topology is the document type several states
+  legislate as sensitive infrastructure information... 'nothing you draw is uploaded' is not merely a
+  privacy nicety: it is the one posture that never asks a utility's lawyer a question they must
+  refuse."* A cloud-hosted competitor asks a small utility's counsel a question every single time a
+  real model is opened in it; this suite, by having no server-side storage at all, never does. **For a
+  security-conscious utility deciding whether to trust ANY new tool with a real model, that is a
+  bigger lever than scenario-tree depth** — it is the one axis this free web tool can be MORE
+  trustworthy on than the incumbent, not merely "smaller and cheaper." Worth Tom hearing in those
+  terms when he next talks to IOD.
+- **What would make an engineer refuse, named concretely, not abstractly:** (a) a silent unit
+  reinterpretation on import — already designed against, CLAUDE.md's own rule; (b) an alternative
+  tree flattened with no notice — survivable if disclosed ("N alternatives became N independent
+  scenarios, structure not carried"), a refusal trigger if silent; (c) a result that differs from
+  what WaterCAD reported with no flag — the honest answer here is the same "reports every difference,
+  never drops silently" posture already ruled for `.inp` import generally, and I would make sure the
+  Waters-CAD-via-`.inp` path gets that same disclosure sentence specifically, not just a generic
+  per-element diff.
+- **What is realistic for a free web tool of this scope, and where I would be blunt that it is too
+  small:** the `.inp` round trip and the fire-flow report shape are genuine, already-real areas of
+  overlap — build on those. **A full Alternative/CIP-program library at dozens of layered scenarios
+  is not realistic here and I would tell an engineer planning a 2,000-node, 30-project CIP program to
+  stay in WaterCAD/WaterGEMS/InfoWater for that specific job, plainly, not hedge it.** Demand
+  allocation from GIS parcels is correctly out of scope already and should stay out. A basic
+  calibration record (Task 601, a measured/modeled pair and simple stats) is realistic; a full AWWA
+  M32-grade calibration workflow is not, and is not needed at this tool's own target scale either.
+
+— Sue
+
+---
+
 # YOUR NAME IS SUE
 
 You are **Sue**, the design-and-planning engineer inside a water utility. Tom Haws named this seat on 2026-09-08 and he was not joking:
