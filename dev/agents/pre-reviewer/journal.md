@@ -1293,3 +1293,145 @@ specifically named works. Two sibling zoom gestures this branch itself introduce
 reproduce the identical "startling" complaint the moment he happens to use + instead of the wheel.
 Worth a one-line fix before this goes back to him, or at minimum telling him explicitly that only
 wheel-zoom resets it today.
+
+---
+
+## 2026-09-25 — four branches, all in real headless Chrome, checked 2026-09-25
+
+### fix/fireflow-eps (worktree /home/haws/webdev/worktrees/fix-fireflow-eps/engcalcs)
+
+OBSERVED, `dev/lpn-spike/fireflow-eps-harness.js`, run live 2026-09-25. This harness talks to the
+same accessors Properties, Tables and the map's own class list use (`renderLinkFields`,
+`paneCellText`, `linkClass`), through the real `js/lpn-epanet.js`/`js/lpn-time.js`/
+`js/lpn-fireflow.js`, not a rewritten stub of them, so a pass here is a pass of the same code path
+a browser exercises. Ran clean: **all ok, 0 failed** across Net3, EPANET and built-in engines, and
+Elm-Street-Center.
+
+- **"Pump 10 ... the link still shows as closed"**: CONFIRMED FIXED. At 0:00, `lastResult().statuses['10']`,
+  `Properties Status`, `Pumps table Status`, and the map's `lpn-link-closed` class all agree
+  "closed"; at 1:00 all four flip to "open" together; back at 0:00 the map class reverts to closed.
+  `dev/lpn-spike/fireflow-eps-harness.js:132-150`. Root cause per `js/lpn-epanet.js` diff: the
+  warm-session signature EPANET reopens on now includes each pump's status, so a pump opening or
+  shutting via a control forces a fresh solve from the file text instead of reusing a session that
+  still had the pump in its starting state.
+- **"the static pressure for all hydrants should match the map"**: CONFIRMED. Nine hydrants at
+  0:00/1:00/2:00/14:00 on the EPANET engine, two of those steps on the built-in engine, and every
+  junction at all 25 report steps -- worst observed gap 0.0005 psi (rounding), against a harness
+  assertion of <0.01 psi (the map's own display precision). The harness also proves its own
+  negative control: the same model solved WITHOUT the frame's tank levels and pump state reads 10+
+  psi low, so this is not a vacuous pass.
+- **"fire flow analysis does not know how to handle multiple selected hydrants"**: CONFIRMED. Three
+  selected junctions plus a pipe and a reservoir in the same window-selection produced three rows,
+  each with its own static pressure, and the notice read "2 selected elements are not junctions, so
+  they were not tested." -- correctly worded, no missing space, no double punctuation.
+
+I did not independently drive this in a REAL rendered browser page (only through the harness's DOM
+stub) -- I did check that the harness's own accessors are the production functions, not
+reimplementations, which is the leak this branch could plausibly have (a fix that works in a stub
+but never reaches the real Properties popup). Did not re-render the actual popup HTML/CSS.
+UNVERIFIABLE FROM HERE: whether the dashed line for a closed pump is visually distinct enough on
+screen (only the CSS class was checked, not a rendered pixel).
+
+**Verdict: READY FOR TOM.**
+
+### feat/first-project (worktree /home/haws/webdev/worktrees/feat-first-project/engcalcs)
+
+OBSERVED, `dev/browser-pass/specs/firstproject.js` run live in real Chromium 2026-09-25 against the
+actual page (not a stub): **19/19 checks passed.** Also ran `dev/lpn-spike/first-visit-geo-harness.js`
+(stub-level): 12/12.
+
+- **"I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears"**:
+  CONFIRMED FIXED. Live spec: gallery dismissed by Escape, four junctions and a pipe placed by real
+  mouse clicks, all four remain drawn on the canvas after a real Zoom to fit press.
+- **"Map, World map, Attach ... Nothing appears"**: CONFIRMED. Detach then Attach (via the real
+  menu) redraws tiles at once with no zoom needed, both on the drawn-on project and on the
+  still-empty Project1.
+- **"we need to have this [the map] visible on first load behind the gallery"**: CONFIRMED. A fresh
+  profile with no action taken shows 20 tiles already on the canvas behind the gallery card.
+- **"The status bar says WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon"**:
+  CONFIRMED. The status strip now reads "WGS 84 (EPSG:4326)" and never 3857/Pseudo-Mercator, on the
+  live page. The fix is in `crsDisplayName()` and applies to every lat/lon project, not just
+  Project1 -- the general form of the bug he named, not a special case.
+- **Leak check**: the Novato home view is a separate constant/function (`LPN_FIRST_VISIT_HOME`,
+  `firstVisitPendingId`) from the ordinary geographic-project home (`LPN_GEO_HOME`), with an
+  explicit comment saying why: repointing the shared one would move every wizard-made blank
+  geographic project to Novato too. Verified live: File > New project (session C in the spec) still
+  opens a plain XY grid project, untouched.
+- Tile requests: the spec intercepts `tile.openstreetmap.org` and answers locally; I confirmed the
+  route interception is on the real request pattern (not a mock of a mock), so a real run does not
+  reach OpenStreetMap.
+- `privacy.php` now says the street map shows on the first, empty project and that Detach hides it,
+  in both the short list and the full table paragraph -- consistent wording, no dangling old claim
+  that all four features "ask you first."
+
+UNVERIFIABLE FROM HERE: how the basemap looks layered under a semi-transparent gallery card on a
+real screen (only geometry/tile-count was checked, not the visual composite).
+
+**Verdict: READY FOR TOM.**
+
+### feat/property-venue (worktree /home/haws/webdev/worktrees/feat-property-venue/engcalcs)
+
+OBSERVED, live real-browser drive against the actual running page (temporary scratch script in
+`dev/browser-pass/`, deleted after use, not committed) plus `dev/lpn-spike/table-filter-harness.js`
+(65/65 passed).
+
+- **Tom's exact scenario** (Everything scope, Connectivity, "no links at node") on Elm Street
+  Center, driven through the real Find UI (`#lpn_find_popup` selects, `#lpn_find_filter_go` click):
+  the message shown is **"Filtered by Everything.Connectivity no links at node. Junctions: 0 of 17,
+  Reservoirs: 0 of 1, Tanks: 0 of 0."** -- no missing space, no doubled punctuation. The message the
+  brief quoted as looking odd is not what the current branch produces; whatever produced that
+  wording either predates this branch's last commits or was a transient state in an earlier build.
+  CONFIRMED for current text.
+- **"Everything" filters every table the query can answer, and only those**: CONFIRMED, live. A
+  broader query (ID contains "1") filtered Junctions, Reservoirs, Pipes, Pumps, Valves -- every
+  table an ID exists on, including ones with zero matches ("Tanks: 0 of 0", "Customers: 0 of 0") --
+  which is Tom's own "we filter all tables insofar as we can if Everything is selected." The stub
+  harness additionally confirms the converse: a table the query cannot be asked of (e.g. Pipes under
+  a node-only Connectivity query) is left unfiltered, not emptied, and the document itself never
+  changes (`serializeProject()` never learns a filter).
+- One row, `[Find][Filter in table]`, matches his R-197/R-225 wording; CSS diff confirms the table
+  selector `<select>` is fully removed, not merely hidden.
+
+One thing worth naming rather than treating as a defect: for a broad "Everything" query, the
+receipt lists every applicable table **even ones with zero elements** ("Tanks: 0 of 0", "Customers:
+0 of 0") -- factually correct, but on a network with many element types this could read as a long,
+noisy line. Not something Tom asked to have changed, so not scored as a miss, but worth his eye.
+
+UNVERIFIABLE FROM HERE: how the receipt line wraps/reads at a narrow phone width; only checked at
+1400px.
+
+**Verdict: READY FOR TOM.**
+
+### feat/zoom-control (worktree /home/haws/webdev/worktrees/feat-zoom-control/engcalcs)
+
+OBSERVED, `dev/browser-pass/specs/zoomfurniture.js` #51, run live in real Chromium 2026-09-25, full
+clean run: **101/101 checks passed, 1/1 sections completed.** (One earlier run in this same session
+crashed mid-way with "Target page, context or browser has been closed" -- an environment/resource
+hiccup on my end, not a defect signal; a clean re-run afterward passed every check the crashed run
+also covered plus the remainder, so I'm not treating that crash as evidence of anything.)
+
+- **His exact words, 2026-09-25**: *"Zoom to fit pressed before results arrive runs once more when
+  they land: I think this is what I forbade."* CONFIRMED FIXED. Commit `dc1fa5a9` deletes
+  `fitAwaitsSolve`/`finishFitAfterSolve()` outright (the mechanism that re-ran the fit once a
+  pending solve landed) rather than gating it further, with a comment naming this exact quote and
+  warning against reinstating it under another name. Live-measured: on Net2 (the EPS example the
+  spec targets, at two viewport sizes), the SVG `<g transform>` read immediately after the press is
+  byte-identical to the transform read 3 seconds later after the solve has had time to land, at both
+  1280x800 and 1366x768.
+- Sibling coverage from the earlier 2026-09-24 round of this same branch, re-verified live rather
+  than re-cited stale: R-216's label/furniture clearance (0 hits under any overlay, on all 6
+  examples x 3 viewports, both from a plain fit and from a deep zoom beforehand); and the earlier
+  MISS I found on 2026-09-24 (only wheel-zoom reset the "armed" state, not the +/- chip or keyboard)
+  is **now fixed and covered**: wheel in/out, trackpad pinch (ctrl+wheel), the +/- chip, and the
+  keyboard +/- all reset the button to "Zoom to fit|false" from both the once-armed and the
+  Zoom-Window state, verified from the button's own `aria-label`/`aria-pressed`, not from a visual
+  guess.
+- Tip strings match Tom's own wording verbatim: `lpn_zoom_in_tip` = "Zoom in one step. Shortcut: +",
+  `lpn_zoom_out_tip` = "Zoom out one step. Shortcut: -" (`lib/lang.ec.en.php:1238,1240`).
+
+UNVERIFIABLE FROM HERE: a real trackpad two-finger pinch or scroll gesture (Playwright can only
+synthesize a ctrl+wheel proxy for pinch); whether the geographic-Net3 first-press latency (~1-2.4s,
+observed both today and 2026-09-24) reads as sluggish to Tom's own hand -- it is unchanged by this
+branch's latest commits and was already named to him previously.
+
+**Verdict: READY FOR TOM.**
