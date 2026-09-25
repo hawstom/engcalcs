@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2030,
+        "expected_key_count": 2029,
         "delta_key_count": 185,
         "exempt_key_count": 35,
         "exempt_keys": [

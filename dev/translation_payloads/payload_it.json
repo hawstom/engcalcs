@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2030,
+        "expected_key_count": 2029,
         "delta_key_count": 186,
         "exempt_key_count": 39,
         "exempt_keys": [

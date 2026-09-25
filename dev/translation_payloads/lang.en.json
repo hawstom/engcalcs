@@ -1171,7 +1171,6 @@
         "lpn_status_closed_empty": "Closed {closed}. Started a new empty project.",
         "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
         "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
-        "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
@@ -2032,7 +2031,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2030,
+    "count": 2029,
     "active_prefixes": [
         "about",
         "bpn",

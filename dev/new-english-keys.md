@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 182 untranslated keys, of 2030 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 182 untranslated keys, of 2029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -578,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**44 still to read**, of 113 new keys across 12 unmerged branch(es).
+**20 still to read**, of 47 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,19 +589,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/tom-edits-0925 (`9d8f81cc`) — 3 new, 2 to read @@ NEEDS RULING
+### chore/queue-0925 (`2878d1d0`) — adds no English strings
 
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
+### chore/tom-edits-0925 (`9d8f81cc`) — adds no English strings
 
-### feat/convert-as (`0693cb6d`) — 32 new, 21 to read @@ NEEDS RULING
+### feat/convert-as (`0693cb6d`) — 29 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -623,7 +615,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_convas_label_col`**
   > Suffix
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-25._
 - **`lpn_convas_label_depth_na`**
   > Tank depth has no map label to add this to yet.
   @@ NEEDS RULING
@@ -681,15 +673,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_report_no_crs`**
   > This file states no coordinate system, so its numbers are not a latitude and a longitude. To place it on a map, use File, Convert as…, and type 1 for Ground distance per drawing unit in Step 2 to use this file’s own numbers unchanged.
   @@ NEEDS RULING
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
 - **`lpn_units_mapcoords`**
   > Map coordinates
   _Ruled OK 2026-09-25._
@@ -700,46 +683,12 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   _Ruled OK 2026-09-25._
 
-### feat/first-project (`8bfe1454`) — 3 new, 2 to read @@ NEEDS RULING
+### feat/first-project (`f3b49428`) — adds no English strings
 
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
+### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
-### feat/label-gang-search (`0346dc5d`) — 42 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_basemap_hide`**
-  > Hide street map
-  _Ruled OK 2026-09-25._
-- **`lpn_basemap_satellite_hide`**
-  > Hide satellite images
-  _Ruled OK 2026-09-25._
-- **`lpn_basemap_satellite_tip`**
-  > Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.
-  @@ NEEDS RULING
-- **`lpn_basemap_tip`**
-  > Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.
-  @@ NEEDS RULING
-- **`lpn_clean_map`**
-  > Hide map readouts
-  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key._
-- **`lpn_clean_map_off`**
-  > Show map readouts
-  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key._
-- **`lpn_clean_map_tip`**
-  > Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.
-  _Ruled 2026-09-25: This is obsolete. It doesn't go anywhere. Delete key. - **`lpn_confirm_labels_restore`** > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed. _Ruled OK 2026-09-23.__
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
   _Ruled OK 2026-09-23._
 - **`lpn_labels_restore`**
   > Restore label defaults
@@ -747,143 +696,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_labels_restore_tip`**
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
-- **`lpn_mapgeo_replace`**
-  > This project already has the world map attached. Replace that georeferencing?
-  _Ruled OK 2026-09-23._
-- **`lpn_pane_paste_note`**
-  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.
-  _Ruled OK 2026-09-25._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
-- **`lpn_survey_column_n`**
-  > column {n}
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_confirm_pipes`**
-  > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_ambiguous_lon`**
-  > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_err_gpx_no_wpt`**
-  > That GPX file holds no waypoints, so there is nothing to make junctions from.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_err_no_coords`**
-  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
-  @@ NEEDS RULING
-- **`lpn_survey_err_plane`**
-  > That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_fmt_enz`**
-  > Easting, northing, elevation (ENZ, also written XYZ)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_enzd`**
-  > Easting, northing, elevation, description (ENZD)
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_fmt_nez`**
-  > Northing, easting, elevation (NEZ)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_fmt_nezd`**
-  > Northing, easting, elevation, description (NEZD)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_fmt_penz`**
-  > Point name, easting, northing, elevation (PENZ)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_fmt_penzd`**
-  > Point name, easting, northing, elevation, description (PENZD)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_fmt_pnez`**
-  > Point name, northing, easting, elevation (PNEZ)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_fmt_pnezd`**
-  > Point name, northing, easting, elevation, description (PNEZD)
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_from_header`**
-  > The first line of your file names its own columns, so those names were used and the column order below was not needed.
-  _Ruled OK 2026-09-25._
-- **`lpn_survey_map_gpx`**
-  > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_map_none`**
-  > not used
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_not_geo`**
-  > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_bad_lon`**
-  > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_elev_converted`**
-  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
-  _Ruled OK 2026-09-23._
-- **`lpn_survey_note_gpx_rtept`**
-  > The file also holds {detail} route point(s), which were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_gpx_trkpt`**
-  > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_note_lon_missing`**
-  > The longitude column is empty on this row, so no junction was made for it.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
-- **`lpn_survey_note_lon_range`**
-  > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_row`**
-  > row {n}
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_ft`**
-  > feet
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_unit_m`**
-  > meters
-  _Ruled OK 2026-09-17._
 
 ### feat/label-limit (`4bcf92ab`) — adds no English strings
 
-### feat/offscreen-notice (`291bd4c7`) — 3 new, 2 to read @@ NEEDS RULING
+### feat/offscreen-notice (`291bd4c7`) — adds no English strings
 
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
+### feat/property-venue (`98613d7f`) — adds no English strings
 
-### feat/property-venue (`98613d7f`) — 3 new, 2 to read @@ NEEDS RULING
+### feat/select-on-focus (`11edc1ad`) — adds no English strings
 
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
+### feat/table-editing (`efeaa75a`) — 8 new, all ruled
 
-### feat/select-on-focus (`11edc1ad`) — 3 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
-
-### feat/table-editing (`efeaa75a`) — 11 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>
   _Ruled OK 2026-09-25._
@@ -908,39 +731,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_show_col`**
   > Show {col}
   _Ruled OK 2026-09-25._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
 
-### feat/usage-report (`5da3e7ae`) — 3 new, 2 to read @@ NEEDS RULING
+### feat/usage-report (`5da3e7ae`) — adds no English strings
 
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
+### feat/zoom-control (`c5eea7de`) — 7 new, 2 to read @@ NEEDS RULING
 
-### feat/zoom-control (`c5eea7de`) — 10 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_labels_customer_width`**
-  > Widest view that attempts to display customer labels
-  _Ruled OK 2026-09-23._
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
   _Ruled OK 2026-09-25._
-- **`lpn_settings_color_thematic`**
-  > Thematic map (colors only)
-  @@ NEEDS RULING
-- **`lpn_settings_color_thematic_tip`**
-  > Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.
-  @@ NEEDS RULING
 - **`lpn_tool_zoom_window`**
   > Zoom Window
   _Ruled OK 2026-09-25._
@@ -960,4 +758,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out one step, about the middle of the map. Or press the - key.
   @@ NEEDS RULING
 
-### merge/0925 (`8e23d65a`) — adds no English strings
+### fix/menu-cue (`07c0ed29`) — adds no English strings
+
+### merge/0925 (`88e5e2d2`) — adds no English strings
