@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**29 still to read on master**, of 250 untranslated keys, of 2089 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 250 untranslated keys, of 2089 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (250, 29 to read @@ NEEDS RULING)
+## lpn_  (250, all ruled)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -53,7 +53,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
 - **`lpn_convas_no_transform`**
   > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
-  @@ NEEDS RULING
+  _Ruled 2026-09-26: I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?_
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
   _Ruled OK 2026-09-26._
@@ -98,7 +98,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
   > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
-  @@ NEEDS RULING
+  _Ruled 2026-09-26: I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?_
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
@@ -227,34 +227,34 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_full_col_id`**
   > ID
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_col_time`**
   > Time
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_col_type`**
   > Type
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_download_csv`**
   > Download CSV
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_needs_run`**
   > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_note`**
   > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_print`**
   > Print report
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_row_count`**
   > {n} rows.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_step_label`**
   > Time step
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_full_title`**
   > Full report
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
@@ -506,16 +506,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_reports_full`**
   > Full
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_reports_full_tip`**
   > Every node and every link at every reporting time step of the last run, as one table you can download or print.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_reports_status`**
   > Status
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_reports_status_tip`**
   > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_always`**
   > Always show
   _Ruled OK 2026-09-26._
@@ -545,43 +545,43 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_status_closed`**
   > {type} {id} closed
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_col_event`**
   > Event
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_col_time`**
   > Time
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_dry`**
   > {type} {id} is empty
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_empty`**
   > Nothing changed status during this run.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_emptying`**
   > {type} {id} is emptying
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_filling`**
   > {type} {id} is filling
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_full`**
   > {type} {id} is full
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_needs_run`**
   > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_no_converge`**
   > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_note`**
   > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_opened`**
   > {type} {id} opened
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_status_title`**
   > Status report
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -782,7 +782,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**4 still to read**, of 23 new keys across 3 unmerged branch(es).
+**2 still to read**, of 21 new keys across 2 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -805,19 +805,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/report (`87e15a16`) — adds no English strings
-
-### feat/table-editing (`850e3746`) — 20 new, 4 to read @@ NEEDS RULING
+### feat/table-editing (`acdbe7f8`) — 18 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
   _Ruled OK 2026-09-25._
 - **`lpn_pane_colmenu_tip`**
-  > Sort, hide, or manage columns
-  _Ruled OK 2026-09-26._
+  > Hide or manage columns
+  @@ NEEDS RULING
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
   _Ruled OK 2026-09-25._
@@ -838,7 +836,7 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_bottom`**
   > Move to end
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_down`**
   > Move down
   _Ruled OK 2026-09-26._
@@ -850,22 +848,16 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_top`**
   > Move to beginning
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_up`**
   > Move up
   _Ruled OK 2026-09-26._
 - **`lpn_pane_show_all_cols`**
   > Show all columns
   _Ruled OK 2026-09-26._
-- **`lpn_pane_show_col`**
-  > Show {col}
-  _Ruled OK 2026-09-25._
 - **`lpn_pane_sort_asc`**
   > Sort ascending
   _Ruled OK 2026-09-26._
-- **`lpn_pane_sort_desc`**
-  > Sort descending
-  _Ruled OK 2026-09-26._
 - **`lpn_pane_sortarrow_tip`**
   > Reverse the sort
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._

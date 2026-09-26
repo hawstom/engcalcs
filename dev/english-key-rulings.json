@@ -162,9 +162,9 @@
             "answer": "OK. Did we prefill with a space? I believe that SI uses no space and US uses a space."
         },
         "lpn_convas_no_transform": {
-            "on": "This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.",
+            "on": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
             "ruled": "2026-09-26",
-            "answer": "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is \"that coordinate system\"?"
+            "answer": "I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?"
         },
         "lpn_convas_none_tip": {
             "on": "Local coordinates in the length unit, with no world map for now.",
@@ -567,9 +567,9 @@
             "answer": "OK."
         },
         "lpn_crs_unplaceable": {
-            "on": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
-            "ruled": "2026-09-23",
-            "answer": "Please explain to me what this is in response to. What's the case for this tip?"
+            "on": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
+            "ruled": "2026-09-26",
+            "answer": "I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?"
         },
         "lpn_crs_unplaceable_mark": {
             "on": "(no map)",
@@ -1688,6 +1688,56 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_full_col_id": {
+            "on": "ID",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_col_time": {
+            "on": "Time",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_col_type": {
+            "on": "Type",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_download_csv": {
+            "on": "Download CSV",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_needs_run": {
+            "on": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_note": {
+            "on": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_print": {
+            "on": "Print report",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_row_count": {
+            "on": "{n} rows.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_step_label": {
+            "on": "Time step",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_full_title": {
+            "on": "Full report",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_georef_answered": {
             "on": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
             "ruled": "2026-09-25",
@@ -2545,7 +2595,7 @@
             "answer": "Edited."
         },
         "lpn_notes_6_def": {
-            "on": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>",
+            "on": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>",
             "ruled": "2026-09-26",
             "answer": "OK."
         },
@@ -2614,6 +2664,11 @@
             "ruled": "2026-09-26",
             "answer": "OK."
         },
+        "lpn_pane_manage_cols_bottom": {
+            "on": "Move to end",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_pane_manage_cols_down": {
             "on": "Move down",
             "ruled": "2026-09-26",
@@ -2626,6 +2681,11 @@
         },
         "lpn_pane_manage_cols_title": {
             "on": "Manage columns",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_top": {
+            "on": "Move to beginning",
             "ruled": "2026-09-26",
             "answer": "OK."
         },
@@ -2666,6 +2726,11 @@
         },
         "lpn_pane_sort_desc": {
             "on": "Sort descending",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_sortarrow_tip": {
+            "on": "Reverse the sort",
             "ruled": "2026-09-26",
             "answer": "OK."
         },
@@ -2898,6 +2963,16 @@
             "on": "EPANET run",
             "ruled": "2026-09-04"
         },
+        "lpn_reports_full": {
+            "on": "Full",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_reports_full_tip": {
+            "on": "Every node and every link at every reporting time step of the last run, as one table you can download or print.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_reports_menu": {
             "on": "Reports",
             "ruled": "2026-09-04"
@@ -2905,6 +2980,16 @@
         "lpn_reports_menu_tip": {
             "on": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
             "ruled": "2026-09-04"
+        },
+        "lpn_reports_status": {
+            "on": "Status",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_reports_status_tip": {
+            "on": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
         },
         "lpn_result_avg_concentration": {
             "on": "Average concentration",
@@ -3320,6 +3405,71 @@
         "lpn_source_type_tip": {
             "on": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.",
             "ruled": "2026-09-06",
+            "answer": "OK."
+        },
+        "lpn_status_closed": {
+            "on": "{type} {id} closed",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_col_event": {
+            "on": "Event",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_col_time": {
+            "on": "Time",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_dry": {
+            "on": "{type} {id} is empty",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_empty": {
+            "on": "Nothing changed status during this run.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_emptying": {
+            "on": "{type} {id} is emptying",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_filling": {
+            "on": "{type} {id} is filling",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_full": {
+            "on": "{type} {id} is full",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_needs_run": {
+            "on": "The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_no_converge": {
+            "on": "The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_note": {
+            "on": "Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_opened": {
+            "on": "{type} {id} opened",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_status_title": {
+            "on": "Status report",
+            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_storage_unreadable": {
