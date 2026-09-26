@@ -1875,6 +1875,25 @@ the block.
   valve, Spot Elevation, Turbine, Periodic Head-flow, Air Valve, Hydropneumatic Tank. Which of these
   a migrating user misses first is Mary's and Sue's question (`watercad-migration.md`).
 
+- 75|724| **System-wide available fire flow: every junction, as a table and a map colouring.**
+  Sue's wishlist §3 (`dev/agents/utility-planning-engineer/wishlist.md`): loop Task 530's per-hydrant
+  search over every junction, shown the way a master-plan appendix shows it. Reuses colour by value.
+- 50|725| **One wide fire-flow table instead of two reports.**
+  Sue's wishlist §6: available flow and design flow side by side, InfoWater's "Design Fireflow
+  Report" shape. Presentation only; one run already computes both.
+- 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
+  Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
+  says slow or metered. For the low-bandwidth audience.
+- 50|727| **Hover highlight on the element Select would pick.**
+  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
+  (Task 618). AutoCAD's selection preview is the precedent.
+- 50|728| **Import a GIS shapefile or geodatabase as a network.**
+  Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
+  migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
+- 25|729| **Type a node's location in State Plane or UTM.**
+  Declan's wishlist §6, ranked low by him: plan sets in the US are in State Plane. Read with the
+  Convert as catalogue (Task 696) before building anything.
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

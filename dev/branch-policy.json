@@ -68,7 +68,8 @@
         "feat/select-on-focus",
         "feat/first-project",
         "feat/customer-node",
-        "feat/menu-button"
+        "feat/menu-button",
+        "feat/report"
     ],
     "feature_freeze": {
         "active": false,
