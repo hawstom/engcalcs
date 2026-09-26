@@ -680,7 +680,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**31 still to read**, of 57 new keys across 6 unmerged branch(es).
+**34 still to read**, of 58 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -691,7 +691,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-node (`fbbba6c3`) — adds no English strings
+### feat/customer-node (`a521e02c`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -707,7 +707,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/report (`4fad6782`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/report (`6f961324`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_full_col_id`**
   > ID
@@ -725,7 +725,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
   @@ NEEDS RULING
 - **`lpn_full_note`**
-  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
   @@ NEEDS RULING
 - **`lpn_full_print`**
   > Print report
@@ -733,17 +733,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_full_row_count`**
   > {n} rows.
   @@ NEEDS RULING
+- **`lpn_full_step_label`**
+  > Time step
+  @@ NEEDS RULING
 - **`lpn_full_title`**
   > Full report
   @@ NEEDS RULING
 - **`lpn_reports_full`**
-  > Full report
+  > Full
   @@ NEEDS RULING
 - **`lpn_reports_full_tip`**
   > Every node and every link at every reporting time step of the last run, as one table you can download or print.
   @@ NEEDS RULING
 - **`lpn_reports_status`**
-  > Status report
+  > Status
   @@ NEEDS RULING
 - **`lpn_reports_status_tip`**
   > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
@@ -854,7 +857,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reverse the sort
   @@ NEEDS RULING
 
-### feat/zoom-control (`d95c0b27`) — 7 new, all ruled
+### feat/zoom-control (`43902998`) — 7 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -869,11 +872,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step. Shortcut: +
-  _Ruled OK 2026-09-25._
+  > Zoom in. Shortcut: +
+  @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step. Shortcut: -
-  _Ruled 2026-09-25: His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's._
+  > Zoom out. Shortcut: -
+  @@ NEEDS RULING
