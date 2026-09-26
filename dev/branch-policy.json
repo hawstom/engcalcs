@@ -73,7 +73,8 @@
         "feat/menu-button",
         "feat/report",
         "feat/placement-wizard",
-        "feat/find-coordinate"
+        "feat/find-coordinate",
+        "feat/row-paste"
     ],
     "feature_freeze": {
         "active": false,
