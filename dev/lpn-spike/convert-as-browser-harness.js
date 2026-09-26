@@ -25,6 +25,10 @@
 //   5. A grid with the world map attached -> EPSG:32610: the steps open answered FROM THE
 //      ATTACHMENT, the site plan stays with the model during a step 1 drag, and every node lands
 //      where the attachment put it. Then the satellite switch asks Mapbox for tiles.
+//   7-10. Tom's five of 2026-09-26: the site plan held at 50% or less while either wizard is open
+//      and the user's own fade back afterwards (7); both bars dragged by their title over the menu
+//      bar, clamped, and docked again on close with nothing stored (8); at Prescott Valley the
+//      chooser lists only what covers the network, on UTM zone 12N (9); and step 1 opens there (10).
 //
 // No network: OpenStreetMap and Mapbox tiles are answered locally by a route, so this counts the
 // requests the page makes and never depends on either service being up.
@@ -429,6 +433,190 @@ async function main() {
 		const satImgs = await page.$$eval('#lpn_canvas image', (els) => els.filter((i) => /mapbox\.satellite/.test(i.getAttribute('href') || '')).length);
 		ok('pressing it asks Mapbox for satellite tiles and draws them', tiles.satellite > 0 && satImgs > 0, tiles.satellite + ' requests, ' + satImgs + ' drawn');
 		await shot('6-satellite');
+
+		// ---- Tom's five, 2026-09-26 ------------------------------------------------------------
+		// Elm Street Center as a file, optionally with the world map attached near Prescott Valley,
+		// AZ -- the place he tested from -- and the site plan at a stated fade.
+		const PV = { lon: -112.32, lat: 34.61 };
+		async function openElm(name, fade, attached) {
+			const f = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', 'Elm-Street-Center.lwn'), 'utf8'));
+			let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+			f.nodes.forEach((n) => { x0 = Math.min(x0, n.x); x1 = Math.max(x1, n.x); y0 = Math.min(y0, n.y); y1 = Math.max(y1, n.y); });
+			f.project = Object.assign({}, f.project, { name: name });
+			delete f.project.gallery;
+			if (attached) {
+				f.project.georef = { anchor: { x: (x0 + x1) / 2, y: (y0 + y1) / 2 }, origin: { lon: PV.lon, lat: PV.lat }, metersPerUnit: 0.3048, rotDeg: 0 };
+				f.project.basemap = 'osm';
+			}
+			f.settings = Object.assign({}, f.settings, { backdropOpacity: fade });
+			await a.writeFile(name + '.lwn', JSON.stringify(f));
+			await a.queuePick(name + '.lwn');
+			await a.menuClick(await S('lpn_file_open'));
+			await a.settle(1500);
+			return (await index()).openId;
+		}
+		const planOpacity = () => page.evaluate(() => {
+			const g = document.querySelector('#lpn_canvas .lpn-backdrop');
+			return g ? +getComputedStyle(g).opacity : NaN;
+		});
+		const tileOpacity = () => page.evaluate(() => {
+			const g = document.querySelector('#lpn_canvas .lpn-basemap');
+			return g ? +getComputedStyle(g).opacity : NaN;
+		});
+
+		console.log('\n--- 7. Tom (1): the site plan is held at 50% or less while either wizard is open ---');
+		const fadeId = await openElm('Elm-fade', 0.9, false);
+		ok('the site plan opens at the project\'s own 90%', Math.abs(await planOpacity() - 0.9) < 1e-6, await planOpacity());
+		await a.menuClickSub(await S('lpn_map_attach_menu'), await S('lpn_map_attach_add'), 'map');
+		await page.waitForSelector('#lpn_mapgeo_bar', { state: 'visible' });
+		await a.settle(600);
+		ok('World map, Attach holds it at 50%', Math.abs(await planOpacity() - 0.5) < 1e-6, await planOpacity());
+		ok('...the street tiles keep the user\'s own fade', Math.abs(await tileOpacity() - 0.9) < 1e-6, await tileOpacity());
+		await shot('7-attach-faded');
+		await page.click('#lpn_mapgeo_cancel');
+		await a.settle(600);
+		ok('Cancel gives back the user\'s 90%', Math.abs(await planOpacity() - 0.9) < 1e-6, await planOpacity());
+		ok('...and the project still says 90%, never the capped 50%', (await stored(fadeId)).settings.backdropOpacity === 0.9,
+			(await stored(fadeId)).settings.backdropOpacity);
+		await openConvertAs();
+		await page.check('#lpn_convas_kind_epsg');
+		await convert();
+		ok('File, Convert as holds it at 50% on step 1', await barVisible() && Math.abs(await planOpacity() - 0.5) < 1e-6, await planOpacity());
+		answers.push('34.61,-112.32', '300');
+		await page.click('#lpn_georef_goto');
+		await a.settle(1200);
+		await page.click('#lpn_georef_drop');
+		await a.settle(600);
+		ok('...and on step 2', Math.abs(await planOpacity() - 0.5) < 1e-6, await planOpacity());
+		await page.click('#lpn_georef_finish');
+		await a.settle(1500);
+		ok('Keep this placement gives back the user\'s 90%', !(await barVisible()) && Math.abs(await planOpacity() - 0.9) < 1e-6, await planOpacity());
+		ok('...and the converted copy stores 90%', (await stored((await index()).openId)).settings.backdropOpacity === 0.9);
+		ok('...as does the original', (await stored(fadeId)).settings.backdropOpacity === 0.9);
+
+		console.log('\n--- 8. Tom (2): both wizard bars drag by their title, up over the menus ---');
+		const barRect = (id) => page.$eval('#' + id, (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, pos: getComputedStyle(e).position }; });
+		const menuBottom = () => page.$eval('#lpn_menubar', (e) => e.getBoundingClientRect().bottom).catch(() => 40);
+		async function dragTitle(barId, titleId, dx, dy) {
+			// Pressed on a part of the title that is ON the screen, as a person would after pushing
+			// the bar most of the way off an edge.
+			const t = await page.$eval('#' + titleId, (e) => {
+				const r = e.getBoundingClientRect(), l = Math.max(r.left, 0), rt = Math.min(r.right, window.innerWidth);
+				return { x: l + Math.min(20, (rt - l) / 2), y: r.top + r.height / 2 };
+			});
+			await page.mouse.move(t.x, t.y);
+			await page.mouse.down();
+			for (let i = 1; i <= 10; i++) { await page.mouse.move(t.x + dx * i / 10, t.y + dy * i / 10); await page.waitForTimeout(20); }
+			await page.mouse.up();
+			await a.settle(300);
+		}
+		async function barOverMenus(prefix, barId, titleId) {
+			const r0 = await barRect(barId);
+			await dragTitle(barId, titleId, -150, -(r0.y + 200));
+			const r1 = await barRect(barId);
+			ok(prefix + ': dragging the title carries the bar to the top of the page', r1.y >= 0 && r1.y < 3 && Math.abs((r0.x - 150) - r1.x) < 3,
+				JSON.stringify({ from: [Math.round(r0.x), Math.round(r0.y)], to: [Math.round(r1.x), Math.round(r1.y)] }));
+			const topHit = await page.evaluate((args) => {
+				const el = document.elementFromPoint(args.x, args.y), bar = document.getElementById(args.id);
+				return !!(el && bar.contains(el));
+			}, { x: r1.x + r1.w / 2, y: Math.min(r1.y + 6, (await menuBottom()) - 2), id: barId });
+			ok(prefix + ': ...where it is drawn OVER the menu bar, not under it', topHit);
+			await shot(prefix + '-over-menus');
+			await dragTitle(barId, titleId, -5000, -500);
+			const r2 = await barRect(barId);
+			ok(prefix + ': the title cannot leave the screen (top edge on screen, a sliver at the side)',
+				r2.y >= 0 && r2.x + r2.w >= 27, JSON.stringify({ x: Math.round(r2.x), y: Math.round(r2.y), w: Math.round(r2.w) }));
+			await dragTitle(barId, titleId, 900, 300);
+			const r3 = await barRect(barId);
+			ok(prefix + ': ...and it comes back by the same title', r3.x > r2.x + 300 && r3.y > r2.y + 200, JSON.stringify({ x: Math.round(r3.x), y: Math.round(r3.y) }));
+		}
+		const dragId = await openElm('Elm-drag', 0.5, false);
+		await openConvertAs();
+		await page.check('#lpn_convas_kind_epsg');
+		await convert();
+		await barOverMenus('8 Convert as', 'lpn_georef_bar', 'lpn_georef_step');
+		const btnOk = await page.$eval('#lpn_georef_drop', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		await page.mouse.click(btnOk.x, btnOk.y);
+		await a.settle(600);
+		ok('8 Convert as: its buttons still work where it was dragged to', await stepText() === await S('lpn_georef_step2'), await stepText());
+		await page.click('#lpn_georef_cancel');
+		await a.settle(800);
+		await switchTo('Elm-drag');
+		await openConvertAs();
+		await page.check('#lpn_convas_kind_epsg');
+		await convert();
+		const home = await barRect('lpn_georef_bar'), cv = await canvasBox();
+		ok('8 Convert as: the next wizard opens the bar back at the top of the map, nothing remembered',
+			home.pos === 'absolute' && home.y >= cv.y && home.y < cv.y + 20, JSON.stringify(home));
+		await page.click('#lpn_georef_cancel');
+		await a.settle(800);
+		await switchTo('Elm-drag');
+		ok('8: back on the plain grid', (await index()).openId === dragId);
+		await a.menuClickSub(await S('lpn_map_attach_menu'), await S('lpn_map_attach_add'), 'map');
+		await page.waitForSelector('#lpn_mapgeo_bar', { state: 'visible' });
+		await a.settle(600);
+		await barOverMenus('8 World map', 'lpn_mapgeo_bar', 'lpn_mapgeo_step');
+		await page.click('#lpn_mapgeo_cancel');
+		await a.settle(600);
+		ok('8 World map: Cancel docks the bar again', (await barRect('lpn_mapgeo_bar')).pos === 'absolute');
+		ok('8: nothing new in this browser\'s storage for a bar\'s place',
+			!(await page.evaluate(() => Object.keys(localStorage).some((k) => /georef|mapgeo|wizbar/i.test(k)))),
+			JSON.stringify(await page.evaluate(() => Object.keys(localStorage))));
+
+		console.log('\n--- 9. Tom (3) and (4): the chooser lists what covers the network, on its UTM zone ---');
+		const pvId = await openElm('Elm-PV', 0.5, true);
+		await openConvertAs();
+		await page.check('#lpn_convas_kind_epsg');
+		await page.click('#lpn_convas_crs_pick');
+		await page.waitForSelector('#lpn_crsbox', { state: 'visible' });
+		await a.settle(1500);
+		const codes = () => page.$$eval('#lpn_crsbox_list option', (o) => o.map((e) => e.value));
+		const listed = await codes();
+		const total = await page.evaluate(() => document.getElementById('lpn_crsbox_list').options.length);
+		ok('9: with the world map attached at Prescott Valley the list is filtered, not the whole register',
+			listed.length > 2 && listed.length < 100, listed.length + ' rows');
+		ok('9: ...it keeps UTM zone 12N and drops 10N', listed.includes('EPSG:32612') && !listed.includes('EPSG:32610'));
+		ok('9: ...and Arizona Central, which holds the whole network', listed.includes('EPSG:26949'));
+		ok('9: ...and the two world-wide systems always stay', listed.includes('EPSG:3857') && listed.includes('EPSG:4326'));
+		const note9 = await page.$eval('#lpn_crsbox_note', (e) => e.textContent);
+		const want9 = (await S('lpn_crs_count_network')).replace('{n}', String(total));
+		ok('9: the note says the list is what covers this network', note9.indexOf(want9.slice(0, want9.indexOf('{total}') >= 0 ? want9.indexOf('{total}') : want9.length)) === 0 || note9.indexOf(String(total)) === 0, note9);
+		ok('9 (Tom 4): the selected row is UTM zone 12N, the zone Prescott Valley is in',
+			await page.$eval('#lpn_crsbox_list', (e) => e.value) === 'EPSG:32612', await page.$eval('#lpn_crsbox_list', (e) => e.value));
+		const selVisible = await page.$eval('#lpn_crsbox_list', (e) => {
+			const o = e.options[e.selectedIndex]; if (!o) { return false; }
+			const r = e.getBoundingClientRect(), q = o.getBoundingClientRect();
+			return q.top >= r.top - 1 && q.bottom <= r.bottom + 1;
+		});
+		ok('9: ...and it is scrolled into sight', selVisible);
+		await shot('9-crsbox-filtered');
+		await page.uncheck('#lpn_crsbox_view');
+		await a.settle(300);
+		ok('9: unticking Filter by map view shows every coordinate system again', (await codes()).length > 1000, (await codes()).length + ' rows');
+		await page.check('#lpn_crsbox_view');
+		await a.settle(300);
+		await page.click('#lpn_crsbox_ok');
+		await page.waitForSelector('#lpn_crsbox', { state: 'hidden' });
+		ok('9: Select takes zone 12N into the box', /32612/.test(await page.$eval('#lpn_convas_crs_name', (e) => e.textContent)),
+			await page.$eval('#lpn_convas_crs_name', (e) => e.textContent));
+
+		console.log('\n--- 10. Tom (5): a project with the world map attached starts step 1 where it is ---');
+		await convert();
+		ok('10: step 1 opens already answered', await barVisible() && await stepText() === await S('lpn_georef_step1') &&
+			await a.notice() === await S('lpn_georef_answered'), await a.notice());
+		await fitted('10');
+		const m10 = (await rects()).model;
+		await page.mouse.move(m10.x + m10.w / 2, m10.y + m10.h / 2);
+		await a.settle(200);
+		const read10 = await page.$eval('#lpn_coords', (e) => e.textContent);
+		const nums = (read10.match(/-?\d+(\.\d+)?/g) || []).map(Number);
+		ok('10: the middle of the screen is Prescott Valley, not the whole world',
+			nums.length >= 2 && Math.abs(nums[0] - PV.lat) < 0.01 && Math.abs(nums[1] - PV.lon) < 0.01, read10);
+		await shot('10-step1-prescott');
+		await page.click('#lpn_georef_cancel');
+		await a.settle(800);
+		ok('10: the attached original is where Cancel returns', (await index()).openId === pvId);
+
 		ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await browser.close();

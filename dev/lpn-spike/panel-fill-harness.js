@@ -164,7 +164,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 			'purpose. (This wiring function also wires the fire flow BOX, which does fill.)'],
 		['wireAreaHint', 'the select-area instruction bubble (Tom, 2026-09-08: centred, on top and ' +
 			'draggable) -- two sentences over the map the reader is about to draw a ring on. Filling ' +
-			'the window with it would hide the very elements the ring is for.']
+			'the window with it would hide the very elements the ring is for.'],
+		['wireWizardBars', 'the two placement wizard bars (File, Convert as and World map, Attach; Tom, ' +
+			'2026-09-26: draggable over the menus) -- a step title, a sentence and a row of buttons over ' +
+			'the map being placed. Filling the window with one would hide the very thing it is placing.']
 	];
 	// Every panel made draggable is either opened through the seam or declared above. The count is
 	// the guard: a seventh draggable panel makes this fail until somebody decides which it is.

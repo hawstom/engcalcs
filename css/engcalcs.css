@@ -388,7 +388,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -404,7 +404,9 @@ html[lang="zh"] .ec-welcome {
    swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken
    the drawing over it -- the drawing then still reads correctly on white and in print. */
-.lpn-backdrop { opacity: var(--lpn-backdrop-opacity, 1); }
+/* The picture reads its own variable, which is the user's fade EXCEPT while a placement wizard is
+   open, when looped-network.js's backdropImageOpacity() holds it at 50% or less. */
+.lpn-backdrop { opacity: var(--lpn-backdrop-img-opacity, 1); }
 /* The OpenStreetMap tile layer (ROADMAP Task 145). pointer-events:none because it is scenery: every
    pointer gesture on this page is resolved from the SVG's own coordinates and from the element under
    the cursor, and a tile that could become an event target would sit between the user and every node
@@ -1740,6 +1742,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    arrive half-wired.
    `cursor: auto` on the same line, so a text input never shows a move cursor. */
 .lpn-dragpanel .lpn-popover-body { cursor: auto; touch-action: auto; }
+/* The two placement bars (File, Convert as and World map, Attach) are dragged by their step title
+   only, so the rest of the bar keeps an ordinary cursor and its buttons their ordinary touch. */
+.lpn-wizbar.lpn-dragpanel { cursor: auto; touch-action: auto; }
+.lpn-wizbar .lpn-wizbar-grip { cursor: move; touch-action: none; user-select: none; }
 /* The two Settings panes are nested scrollers INSIDE that body, so they say it for themselves --
    a nested scroll region is consulted on its own and is not covered by its ancestor's answer. */
 .lpn-setbox-index, .lpn-setbox-content { touch-action: auto; }

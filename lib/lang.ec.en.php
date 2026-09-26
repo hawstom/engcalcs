@@ -1788,6 +1788,10 @@ $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
+// The same count when the list is filtered by the whole network's extent (File, Convert as, Tom
+// 2026-09-26: "should automatically filter EPSG CRSes for the displayed area or network extents"),
+// so the reader knows why the list is short. The Filter by map view box above still shows them all.
+$ec_lang['lpn_crs_count_network']='{n} of {total} coordinate systems cover this network.';
 // Shown beside a coordinate system in the chooser, and beside the chosen one in the New project box,
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
