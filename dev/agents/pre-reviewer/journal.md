@@ -735,6 +735,80 @@ finished in this pass; and whether a UNITS change or an UNDO while a scenario ot
 snapshot was taken in is active shows the same class of gap (undo calls `refreshPaneIfOpen()`
 directly and unconditionally, so it is very likely fine, but not independently re-measured here).
 
+---
+
+## feat/label-limit (e1a19100), reviewed 2026-09-23
+
+Ask (2026-09-23, quoted): *"I noticed that we have a tip saying that 0 is never for Customer
+labels. Should we do the same for all labels and use that to replace the 'Thematic map, no
+labels' setting?"* then *"Sorry 'never show' is what I meant."*
+
+**MISSED — OBSERVED, measured in a real Chromium against the live page, not just the unit
+harness.** Typing 0 into "Show labels when zoomed to this map width or less" correctly hides node
+and link labels (confirmed: `#lpn_canvas` gains `lpn-labels-hidden`, holds it across zoom in and
+out, and clears on blanking the field) — but **the on-map labels legend (the small corner box
+listing which fields are lettered) does not hide with them.** Probe: opened Net3-Novato-CA-World
+and Net1, both starting with a label field ticked (`legendDisplay: ""`, i.e., visible), typed 0,
+and `#lpn_labels_legend`'s `style.display` stayed `""` through zoom in and zoom out — never
+`'none'`. Root cause, read in `js/looped-network.js`: the retired "Thematic map" checkbox handler
+called both `refreshValueColors()` **and** `renderLabelsLegend()`; its replacement,
+`setLabelMaxWidth()` (~line 37773), calls only `labelThresholdChanged()` and `saveToStorage()` —
+`renderLabelsLegend()` is never in that chain. The unit harness
+(`dev/lpn-spike/label-limit-zero-harness.js`) still shows "0: the labels legend hides with the
+labels" passing only because the harness calls `L.renderLabelsLegend()` itself as an explicit step
+right after setting the value — it never drives the real input's `change` handler, so it could not
+have caught this. **Practical effect Tom will see:** zoom out, type 0 for colour-only, and a
+floating box naming lettered fields (e.g. "Node labels: ID, Head...") keeps sitting in the corner
+of a map with no letters to match, until an unrelated redraw (a solve, reopening the panel) happens
+to call `renderLabelsLegend()` for some other reason. This is exactly the leak shape CLAUDE.md
+names — a control retired in favour of another control's side door, and one of the two things the
+old control did was not carried over.
+
+**MISSED — OBSERVED, a real spec throws.** `dev/browser-pass/specs/visibility.js` (§16, "The
+Settings box") was not updated for this branch and still drives the retired "Thematic map"
+checkbox by name: it asserts a checkbox exists under Node/link, ticks it, and reads
+`lpn-labels-hidden`. Ran it for real (`node run.js visibility`, real Chromium): it throws
+(`Cannot read properties of null (reading 'click')`) the moment it tries to click a checkbox that
+`#lpn_set_colors_nodelink` no longer contains, which **kills the whole visibility section — 0/1
+sections completed** — so every other, unrelated check later in that same file (the labels-legend
+index check, the labeling-threshold checks that already existed, and more) silently stopped
+running too. This branch's own last commit is titled "Fix check_all failures: stray pageConfig
+line, browser-pass spec, cites" and did fix one other browser-pass spec (`nodehit.js`'s
+`applyTomSetup`, which used the checkbox for an unrelated purpose) — so the author was in this
+exact file class and still missed `visibility.js`. `dev/browser-pass` is outside `check_all.sh`,
+so nothing caught this before push. **Confirmed the harness itself is trustworthy where it does
+run**: mutation-tested `label-limit-zero-harness.js` by swapping in the pre-branch
+`js/looped-network.js` — 8 of 26 checks genuinely fail on the old code, restored after.
+
+**CONFIRMED.** Typing 0 hides node and link labels at every zoom tried (10, 1000, 1e6, 1e9 px
+canvas widths in the unit harness; real zoom in/out in the browser). Clearing the field restores
+them. A hand-built project with `colorThematic: true` migrates to `labelMaxWidth: 0` on open, the
+old key is deleted, and 0 wins even when a positive `labelMaxWidth` was also saved (all three
+asserted in the harness and consistent with what a reader who left the map in thematic mode last
+saw). A genuine positive threshold still behaves exactly as before (a real width, exceeded, still
+hides a Text object whose own "Show at all zoom levels" is off) — this is not touched by the 0
+case, which is the one thing Tom's "never show" wording did not ask for. Grepped the whole tree,
+`~/webdev/librewaternet.org` and `~/webdev/not-epanet.org` for stray live references to "Thematic
+map" — none found outside historical code comments (which CLAUDE.md's own rule is fine with) and
+one stale mention in `dev/lpn-tip-copy-review.md` (a dev doc, not visitor-facing, naming a key that
+no longer exists — worth a note to whoever next edits that file, not a blocker). The customer row's
+tip and this row's tip read as a matched pair side by side (both say "measured across the window",
+both spell out 0 in the same shape) — no wording objection.
+
+**UNVERIFIABLE FROM HERE.** Whether a Text object placed with "Show at all zoom levels" *unticked*
+visually reads as expected at 0 (it stays drawn, per the harness and the code path
+`labelsPastThreshold()`/`labelsFullyHidden()` splitting) — I did not place a Text object through the
+real UI to see it on screen at 0; the logic is exercised by the harness only. Whether the labels
+legend gap above is the only thing besides the labels that fails to refresh live (I checked this
+one path; did not exhaustively check the colour legend or the print layout under the same 0 setting
+in a real browser).
+
+**Verdict: NOT READY.** Two real, measured leaks: the labels legend does not hide live when 0 is
+typed (only on the next unrelated redraw), and a browser-pass spec now throws and silently drops
+an entire section of unrelated coverage. Both are small, mechanical fixes — call `renderLabelsLegend()`
+from `setLabelMaxWidth()`, and update or retire the Thematic-map block in `visibility.js` — but
+neither is fixed yet, and the second means nobody would have been told about the first by any
+existing check.
 ## 2026-09-23 -- feat/property-venue at 1066860e, R-195/R-197/R-198: CONFIRMED in a real browser; one MISSED gap on translation
 
 OBSERVED, checked 2026-09-23. Mutation-confirmed `dev/lpn-spike/property-venue-find-harness.js`
@@ -1219,3 +1293,329 @@ specifically named works. Two sibling zoom gestures this branch itself introduce
 reproduce the identical "startling" complaint the moment he happens to use + instead of the wheel.
 Worth a one-line fix before this goes back to him, or at minimum telling him explicitly that only
 wheel-zoom resets it today.
+
+---
+
+## 2026-09-25 — four branches, all in real headless Chrome, checked 2026-09-25
+
+### fix/fireflow-eps (worktree /home/haws/webdev/worktrees/fix-fireflow-eps/engcalcs)
+
+OBSERVED, `dev/lpn-spike/fireflow-eps-harness.js`, run live 2026-09-25. This harness talks to the
+same accessors Properties, Tables and the map's own class list use (`renderLinkFields`,
+`paneCellText`, `linkClass`), through the real `js/lpn-epanet.js`/`js/lpn-time.js`/
+`js/lpn-fireflow.js`, not a rewritten stub of them, so a pass here is a pass of the same code path
+a browser exercises. Ran clean: **all ok, 0 failed** across Net3, EPANET and built-in engines, and
+Elm-Street-Center.
+
+- **"Pump 10 ... the link still shows as closed"**: CONFIRMED FIXED. At 0:00, `lastResult().statuses['10']`,
+  `Properties Status`, `Pumps table Status`, and the map's `lpn-link-closed` class all agree
+  "closed"; at 1:00 all four flip to "open" together; back at 0:00 the map class reverts to closed.
+  `dev/lpn-spike/fireflow-eps-harness.js:132-150`. Root cause per `js/lpn-epanet.js` diff: the
+  warm-session signature EPANET reopens on now includes each pump's status, so a pump opening or
+  shutting via a control forces a fresh solve from the file text instead of reusing a session that
+  still had the pump in its starting state.
+- **"the static pressure for all hydrants should match the map"**: CONFIRMED. Nine hydrants at
+  0:00/1:00/2:00/14:00 on the EPANET engine, two of those steps on the built-in engine, and every
+  junction at all 25 report steps -- worst observed gap 0.0005 psi (rounding), against a harness
+  assertion of <0.01 psi (the map's own display precision). The harness also proves its own
+  negative control: the same model solved WITHOUT the frame's tank levels and pump state reads 10+
+  psi low, so this is not a vacuous pass.
+- **"fire flow analysis does not know how to handle multiple selected hydrants"**: CONFIRMED. Three
+  selected junctions plus a pipe and a reservoir in the same window-selection produced three rows,
+  each with its own static pressure, and the notice read "2 selected elements are not junctions, so
+  they were not tested." -- correctly worded, no missing space, no double punctuation.
+
+I did not independently drive this in a REAL rendered browser page (only through the harness's DOM
+stub) -- I did check that the harness's own accessors are the production functions, not
+reimplementations, which is the leak this branch could plausibly have (a fix that works in a stub
+but never reaches the real Properties popup). Did not re-render the actual popup HTML/CSS.
+UNVERIFIABLE FROM HERE: whether the dashed line for a closed pump is visually distinct enough on
+screen (only the CSS class was checked, not a rendered pixel).
+
+**Verdict: READY FOR TOM.**
+
+### feat/first-project (worktree /home/haws/webdev/worktrees/feat-first-project/engcalcs)
+
+OBSERVED, `dev/browser-pass/specs/firstproject.js` run live in real Chromium 2026-09-25 against the
+actual page (not a stub): **19/19 checks passed.** Also ran `dev/lpn-spike/first-visit-geo-harness.js`
+(stub-level): 12/12.
+
+- **"I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears"**:
+  CONFIRMED FIXED. Live spec: gallery dismissed by Escape, four junctions and a pipe placed by real
+  mouse clicks, all four remain drawn on the canvas after a real Zoom to fit press.
+- **"Map, World map, Attach ... Nothing appears"**: CONFIRMED. Detach then Attach (via the real
+  menu) redraws tiles at once with no zoom needed, both on the drawn-on project and on the
+  still-empty Project1.
+- **"we need to have this [the map] visible on first load behind the gallery"**: CONFIRMED. A fresh
+  profile with no action taken shows 20 tiles already on the canvas behind the gallery card.
+- **"The status bar says WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon"**:
+  CONFIRMED. The status strip now reads "WGS 84 (EPSG:4326)" and never 3857/Pseudo-Mercator, on the
+  live page. The fix is in `crsDisplayName()` and applies to every lat/lon project, not just
+  Project1 -- the general form of the bug he named, not a special case.
+- **Leak check**: the Novato home view is a separate constant/function (`LPN_FIRST_VISIT_HOME`,
+  `firstVisitPendingId`) from the ordinary geographic-project home (`LPN_GEO_HOME`), with an
+  explicit comment saying why: repointing the shared one would move every wizard-made blank
+  geographic project to Novato too. Verified live: File > New project (session C in the spec) still
+  opens a plain XY grid project, untouched.
+- Tile requests: the spec intercepts `tile.openstreetmap.org` and answers locally; I confirmed the
+  route interception is on the real request pattern (not a mock of a mock), so a real run does not
+  reach OpenStreetMap.
+- `privacy.php` now says the street map shows on the first, empty project and that Detach hides it,
+  in both the short list and the full table paragraph -- consistent wording, no dangling old claim
+  that all four features "ask you first."
+
+UNVERIFIABLE FROM HERE: how the basemap looks layered under a semi-transparent gallery card on a
+real screen (only geometry/tile-count was checked, not the visual composite).
+
+**Verdict: READY FOR TOM.**
+
+### feat/property-venue (worktree /home/haws/webdev/worktrees/feat-property-venue/engcalcs)
+
+OBSERVED, live real-browser drive against the actual running page (temporary scratch script in
+`dev/browser-pass/`, deleted after use, not committed) plus `dev/lpn-spike/table-filter-harness.js`
+(65/65 passed).
+
+- **Tom's exact scenario** (Everything scope, Connectivity, "no links at node") on Elm Street
+  Center, driven through the real Find UI (`#lpn_find_popup` selects, `#lpn_find_filter_go` click):
+  the message shown is **"Filtered by Everything.Connectivity no links at node. Junctions: 0 of 17,
+  Reservoirs: 0 of 1, Tanks: 0 of 0."** -- no missing space, no doubled punctuation. The message the
+  brief quoted as looking odd is not what the current branch produces; whatever produced that
+  wording either predates this branch's last commits or was a transient state in an earlier build.
+  CONFIRMED for current text.
+- **"Everything" filters every table the query can answer, and only those**: CONFIRMED, live. A
+  broader query (ID contains "1") filtered Junctions, Reservoirs, Pipes, Pumps, Valves -- every
+  table an ID exists on, including ones with zero matches ("Tanks: 0 of 0", "Customers: 0 of 0") --
+  which is Tom's own "we filter all tables insofar as we can if Everything is selected." The stub
+  harness additionally confirms the converse: a table the query cannot be asked of (e.g. Pipes under
+  a node-only Connectivity query) is left unfiltered, not emptied, and the document itself never
+  changes (`serializeProject()` never learns a filter).
+- One row, `[Find][Filter in table]`, matches his R-197/R-225 wording; CSS diff confirms the table
+  selector `<select>` is fully removed, not merely hidden.
+
+One thing worth naming rather than treating as a defect: for a broad "Everything" query, the
+receipt lists every applicable table **even ones with zero elements** ("Tanks: 0 of 0", "Customers:
+0 of 0") -- factually correct, but on a network with many element types this could read as a long,
+noisy line. Not something Tom asked to have changed, so not scored as a miss, but worth his eye.
+
+UNVERIFIABLE FROM HERE: how the receipt line wraps/reads at a narrow phone width; only checked at
+1400px.
+
+**Verdict: READY FOR TOM.**
+
+### feat/zoom-control (worktree /home/haws/webdev/worktrees/feat-zoom-control/engcalcs)
+
+OBSERVED, `dev/browser-pass/specs/zoomfurniture.js` #51, run live in real Chromium 2026-09-25, full
+clean run: **101/101 checks passed, 1/1 sections completed.** (One earlier run in this same session
+crashed mid-way with "Target page, context or browser has been closed" -- an environment/resource
+hiccup on my end, not a defect signal; a clean re-run afterward passed every check the crashed run
+also covered plus the remainder, so I'm not treating that crash as evidence of anything.)
+
+- **His exact words, 2026-09-25**: *"Zoom to fit pressed before results arrive runs once more when
+  they land: I think this is what I forbade."* CONFIRMED FIXED. Commit `dc1fa5a9` deletes
+  `fitAwaitsSolve`/`finishFitAfterSolve()` outright (the mechanism that re-ran the fit once a
+  pending solve landed) rather than gating it further, with a comment naming this exact quote and
+  warning against reinstating it under another name. Live-measured: on Net2 (the EPS example the
+  spec targets, at two viewport sizes), the SVG `<g transform>` read immediately after the press is
+  byte-identical to the transform read 3 seconds later after the solve has had time to land, at both
+  1280x800 and 1366x768.
+- Sibling coverage from the earlier 2026-09-24 round of this same branch, re-verified live rather
+  than re-cited stale: R-216's label/furniture clearance (0 hits under any overlay, on all 6
+  examples x 3 viewports, both from a plain fit and from a deep zoom beforehand); and the earlier
+  MISS I found on 2026-09-24 (only wheel-zoom reset the "armed" state, not the +/- chip or keyboard)
+  is **now fixed and covered**: wheel in/out, trackpad pinch (ctrl+wheel), the +/- chip, and the
+  keyboard +/- all reset the button to "Zoom to fit|false" from both the once-armed and the
+  Zoom-Window state, verified from the button's own `aria-label`/`aria-pressed`, not from a visual
+  guess.
+- Tip strings match Tom's own wording verbatim: `lpn_zoom_in_tip` = "Zoom in one step. Shortcut: +",
+  `lpn_zoom_out_tip` = "Zoom out one step. Shortcut: -" (`lib/lang.ec.en.php:1238,1240`).
+
+UNVERIFIABLE FROM HERE: a real trackpad two-finger pinch or scroll gesture (Playwright can only
+synthesize a ctrl+wheel proxy for pinch); whether the geographic-Net3 first-press latency (~1-2.4s,
+observed both today and 2026-09-24) reads as sluggish to Tom's own hand -- it is unchanged by this
+branch's latest commits and was already named to him previously.
+
+**Verdict: READY FOR TOM.**
+
+---
+
+## 2026-09-25, second round -- four more branches, real headless Chrome
+
+### feat/table-editing (worktree /home/haws/webdev/worktrees/feat-table-editing/engcalcs)
+
+OBSERVED, real Chromium, scratch scripts against the real `Looped-Network.php` served by the
+worktree's own `dev/browser-pass/lib/env.js` (not the branch's own `colselect.js`/`colmanage.js`
+specs, which I read but did not re-run, since they are the branch author's own evidence and Tom's
+task specifically asked me to try to reproduce the drag failure independently, in real Chrome, with
+real `page.mouse` events, on BOTH master and the branch).
+
+- **R-241, "Sorry I can't get a column to drag": REPRODUCED, and the cause is bigger than the
+  branch's own diagnosis.** The branch's commit (`a1209984`) explains the report as one missing
+  `preventDefault()` on a mousedown that lands on an ALREADY-SELECTED heading. That fix is real and
+  correct as far as it goes -- but it treats the wrong gesture. I drove the plain, unmodified gesture
+  a first-time user actually makes: press an UNSELECTED heading and drag it onto another, in one
+  motion, real `page.mouse.move` in 15 steps + `down`/`up`, no Ctrl, no prior click.
+  - **On master** (`/home/haws/webdev/hawsedc.com/engcalcs`, read-only): that one motion moves the
+    column. `before` keys `[...,"axis2","desc","tag","active",...]` become
+    `[...,"desc","tag","active","axis2",...]` -- `axis2` landed where `active` was. One gesture, no
+    modifier, done.
+  - **On feat/table-editing**: the identical gesture does **nothing**. `before` and `after` keys are
+    byte-identical; no page error. The branch's own R-221 commit (`5ddf79d0`, same branch, earlier
+    today) changed the heading's `mousedown` handler so a column can only be REORDERED once it is
+    already selected -- an unselected press now starts a SELECTION drag instead (`paneStartHeadSelDrag`),
+    and only a second press, after the heading is already lit, calls `paneStartColDrag`. Master never
+    had this two-step requirement; this branch introduced it in the same round that also introduced
+    the preventDefault bug the commit fixed.
+  - **This reads exactly as Tom's own words.** He did not say "dragging a selected column doesn't
+    work" (the bug the commit fixes); he said he could not get a column to drag AT ALL, which is what
+    a user meets on first try, every time, on this branch: the single natural gesture master supported
+    directly now silently does nothing (or silently starts a range-selection, which looks like
+    nothing happened if the reader is not watching for header shading).
+  - Scripts used, kept in scratch for reference, not committed:
+    `/tmp/claude-1000/.../scratchpad/drag_probe.js` (run against each tree's own
+    `dev/browser-pass/lib/env.js` and `lib/session.js`, so this is the real production
+    `paneStartColDrag`/`paneStartHeadSelDrag` code path, not a reimplementation).
+  - **This is the single highest-cost item in this round.** The build agent believed it had found
+    and fixed "why Tom could not get a column to drag," reported so, and the harness it wrote
+    (`colselect.js` point 7) only ever tests dragging a heading that was ALREADY selected by a prior
+    Ctrl+click -- so its own suite is green while the naive, undocumented, most-likely-to-be-tried
+    gesture is broken. This is the R-054/R-027 shape exactly: checked that the intended fix worked,
+    never checked the plain case a visitor actually hits first.
+- **The "..." column menu glyph overlaps wrapped heading text on a narrow column, confirmed
+  visually.** Measured every heading's own text-node bounding box against the `.lpn-pane-colmenu`
+  button's box on Net3's Junctions table: on `demand` ("Base demand (gpm)", wraps to 3 lines), the
+  rendered text's own right edge (647px) sits to the right of the menu button's left edge (631px) --
+  a real overlap, not a rounding artifact. Same for `active`, `fireFlow`, `elev` -- every column
+  whose heading wraps to its full 3-line height on this table. A screenshot at 3x device pixel ratio,
+  cropped tight to the button's own rect while it was genuinely hovered (`getComputedStyle` confirmed
+  `opacity:1`, `content:"⋯"`, `color: rgb(102,102,119)`), shows the glyph is there but nearly
+  illegible: pale grey, 14px square, sitting directly over the tail of the wrapped word "demand" and
+  the top of "(gpm)". `dev/lpn-spike` has no existing check for this; screenshot kept at
+  `/tmp/claude-1000/.../scratchpad/ellipsis-tight.png` (not committed, per instructions).
+- I did not run the branch's own `colselect.js`/`colmanage.js` (65 checks between them by their own
+  file listing) as a pass/fail gate -- reading them was enough to see what they do and do not cover,
+  and running someone's own harness as the proof of their own fix is exactly the self-review this
+  seat exists to avoid.
+
+**Verdict: NOT READY.** The plain drag gesture is provably broken by this branch's own change, not
+merely under-fixed; the "..." glyph is visually compromised on any column whose heading wraps. Both
+need Tom to see them named, not to discover them himself in a browser pass that was supposed to be
+clean.
+
+### feat/customer-node (worktree /home/haws/webdev/worktrees/feat-customer-node/engcalcs)
+
+OBSERVED. `dev/lpn-spike/customer-node-harness.js` run live, 2026-09-25: **56/56 checks passed**
+(sections 3-7, node-fallback-on-pipe-delete section 6 and legacy-file section 7 in particular).
+
+- **"Red for node-connected Customers is a bad decision. Let's leave it black."** CONFIRMED. CSS
+  diff: `.lpn-service-snapped` / `.lpn-meter-snapped` are deleted outright, not merely unused --
+  `grep` across `js/` and `css/` finds them nowhere except the comment explaining why they are gone.
+  A settled node connection now paints with no class of its own, i.e. plain black, matching every
+  other settled customer.
+- **"Customer symbols appear to be 0.2 * Junction size ... raise it another 0.05."** CONFIRMED.
+  `LPN_METER_NODE_FRAC = 0.30` in `js/looped-network.js:8672`, with a comment doing the arithmetic
+  Tom asked for explicitly (0.25 shipped + 0.05 = 0.30) rather than silently picking a different
+  number.
+- **"Do we have Customers not allowed to connect directly to nodes? ... Customer connected to a node
+  instead of a link at station 0."** CONFIRMED as a real feature, not just a display change: the
+  harness's section 6 places a service pressed onto a node, confirms Properties reads "Connected to"
+  and names the junction (not a pipe id or a station), confirms no pipe id or station heading is
+  printed, then DELETES the pipe entirely and confirms the customer still reads as connected to the
+  same node (now via a stored fallback), still lumps its demand there, survives a node RENAME, and
+  correctly detaches only when the node itself is deleted -- with the un-accounted-demand notice
+  worded correctly on the map.
+- **Leak check on the string wiring**: commit `cd7640b1` (within this same branch) fixes a real gap
+  its own author found on a second pass -- `lpn_field_meter_node`/`_tip` were defined in the language
+  file but never wired into `Looped-Network.php`'s `pageConfig`, so the "Connected to" row would have
+  rendered the raw key or nothing at all in production. Caught and fixed before I got to it, but
+  worth noting as the kind of self-review gap this seat exists to catch when a branch does NOT catch
+  it itself.
+- UNVERIFIABLE FROM HERE: how the black customer dot at 0.30 actually reads on screen next to a
+  0.30-scaled junction at typical zoom -- I did not render the map and screenshot it for this branch,
+  given time spent reproducing the table-editing drag defect; a browser pass should still glance at
+  the sizing ratio directly rather than trust the arithmetic alone.
+
+**Verdict: READY FOR TOM**, with that one sizing screenshot named as unchecked.
+
+### feat/menu-button (worktree /home/haws/webdev/worktrees/feat-menu-button/engcalcs)
+
+OBSERVED, real Chromium, two ways: the branch's own `dev/lpn-spike/menu-button-harness.js` (run
+live, ALL GREEN, both `solid` and `outline` variants at a desktop and a phone viewport), and my own
+direct look at its two screenshots (`menu-solid-desktop.png`, `menu-outline-desktop.png`) -- not
+just trusting the harness's verdict.
+
+- **"testers ... very slow to find the menus ... colors only for now ... thematic blue rounded
+  rectangles."** CONFIRMED, by eye: the menu bar (File/Edit/Map/Water/Help/English) is solid accent
+  blue (`#0645ad`, the same blue the consent banner's own buttons already use -- visibly consistent
+  in the screenshot, not just asserted in a comment) with rounded corners, white text, in both
+  variants.
+- **`?menustyle=outline` as the FIRST query parameter**: CONFIRMED by direct regex test outside the
+  page (`/[?&]menustyle=outline\b/.test('?menustyle=outline')` -> `true`), matching how
+  `window.location.search` actually begins with `?` rather than `&`.
+- **"nothing but the menu bar changed"**: CONFIRMED by reading, not just running the harness --
+  `.lpn-menubar-item` is used nowhere outside `buildMenuBar()`'s own bar items (`grep` across
+  `js/looped-network.js` and `css/engcalcs.css`), so no toolbar icon, popup or other button shares the
+  class. The harness's own three "toolbar button ... unchanged" checks passed live, and I read the
+  screenshot myself and confirm the toolbar icon row directly below the menu bar is visually
+  untouched.
+- **Process note, not a defect**: I ran `menu-button-harness.js` once without wrapping it in
+  `flock /tmp/engcalcs-browser.lock` (a mistake on my part -- CLAUDE.md and this task both say never
+  do this). It happened to complete cleanly because the lock was briefly free, but it is exactly the
+  kind of contention risk the rule exists to prevent (I later fought a genuinely-stuck queue on
+  another script for several minutes, caused by another agent's own harness holding the lock). Not
+  repeated after I noticed it.
+
+**Verdict: READY FOR TOM.** This is a preview switch behind a URL parameter that changes nothing
+outside the menu bar; both variants render as described.
+
+### feat/convert-as (worktree /home/haws/webdev/worktrees/feat-convert-as/engcalcs)
+
+OBSERVED, real Chromium, driven through the actual Convert as box and the actual coordinate-system
+picker it opens (`#lpn_crsbox`), not read from source alone.
+
+- **R-237(1a), "WGS 84 (EPSG:4326) missing from the options"**: CONFIRMED FIXED, live. The picker's
+  own `<select>` lists 5347 options; `WGS 84 (EPSG:4326)` is the second entry, right beside
+  `WGS 84 / Pseudo-Mercator (EPSG:3857)`, both in the register's own unmodified names.
+- **R-237(1b), "(no map)" after 3857's name**: CONFIRMED FIXED, live -- zero of the 5347 rendered
+  option strings contain "(no map)". Root cause in the code matches what the live DOM shows: a
+  comment dated 2026-09-25 states neither lat/lon code (3857 or 4326) is ever asked of the
+  `lpnCrsHas()` check that used to wrongly mark 3857 unplaceable.
+- **R-237(2a-c), tip wording**: CONFIRMED by diffing `lib/lang.ec.en.php` against its own history --
+  `lpn_convas_epsg_tip` had "WGS 84 latitude/longitude (EPSG:4326)" and now reads "WGS 84
+  (EPSG:4326)" (the duplicated "latitude/longitude" phrase removed, exactly as asked);
+  `lpn_convas_unnamed_tip` now ends "...with the world map attached." (dropped "at the place the
+  project is"); `lpn_convas_none_tip` now ends "...with no world map for now."
+- **R-237(3a-d)**: CONFIRMED live. The picker's own title reads "Coordinate system"
+  (`lpn_crsbox_title`), matching both callers (New project and Convert as) rather than either one's
+  own radio label. `lpn_crs_view_tip` and `lpn_crs_name`/`lpn_crs_name_tip` say "coordinate
+  system(s)", never "projection" -- confirmed both by reading the key values and by a live
+  case-insensitive text search of the whole rendered picker box (`0` hits for "projection"). The
+  bottom message is confirmed by reading `js/looped-network.js:32472-32484`: the IOGP credit line is
+  now the last thing appended to the note, with an explicit comment naming Tom's "nonsense" complaint
+  and where the old trailing sentence used to come from.
+- **R-237, "no visitor-facing 'projection' remains"**: CONFIRMED, live, on both the Convert as panel
+  text (full `innerText` search) and the coordinate-system picker's text -- `0` hits in either.
+- **R-238, tank Water depth coverage**: CONFIRMED, live. The Convert as box's own "Suffix" rounding
+  section lists four rows -- Diameter, **Water depth**, Demand and flow, Head -- where Tom's
+  complaint was that Water depth was disabled there instead of being given the coverage it was
+  missing. `LPN_CONVAS_SUFFIX_UNIT` in `js/looped-network.js:29109` carries a `depth` entry
+  (`lpn_u_elevhead`, the same unit family Head uses), and it renders enabled in the live box, not
+  greyed out.
+- I could not get the picker to open my first several attempts (it requires the EPSG radio checked
+  first, since the "..." button starts disabled on a plain local project -- not documented anywhere
+  I could find outside the source, which cost real time here) -- once that was accounted for, the
+  live picker opened and confirmed every wording claim above.
+- UNVERIFIABLE FROM HERE: how the picker's very long option list (5347 rows) scrolls and performs on
+  a real trackpad/phone, and whether "Filter by map view" narrows it usefully in a real session with
+  a real map position -- I exercised the unfiltered list only, not the filter itself.
+
+**Verdict: READY FOR TOM**, with the filter behaviour named as unchecked.
+
+**A general note on this round**: the shared `/tmp/engcalcs-browser.lock` was under real contention
+from at least one other agent's own harness (`table-divider-align-harness.js`,
+`node-shed-harness.js`) working in the `feat-convert-as`/`feat-table-editing` worktrees at the same
+time. Several of my own probes queued for 5-13 minutes waiting for the lock, and Node's own stdout
+buffering when redirected to a file meant a queued-then-running script showed no output at all until
+it exited, which looked identical to a genuine hang from the outside. Worth remembering next time
+before concluding something is stuck: check who actually holds the lock
+(`for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && cat
+$p/cmdline; done`) before killing anything.

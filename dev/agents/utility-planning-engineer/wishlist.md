@@ -23,6 +23,46 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-25 — not a want, a ruling request: WaterCAD-migrator seat and interoperability trust, answered
+
+Tom asked whether this seat is a WaterCAD/WaterGEMS user or migrator, after IOD (a senior civil
+engineer testing `lpn_`) named "interoperability" as the thing migration off WaterCAD needs. Full
+reasoning and citations: journal, 2026-09-25 entry. Short form: **no, I am not a WaterCAD user — my
+WaterCAD knowledge is entirely CITED (vendor docs, forum threads), never lived operation — and a new
+persona built the same way would carry nothing this seat does not already have. IOD, who actually
+used the software, already is the migrator seat this project needs, informally; log specific,
+recurring complaints from IOD as primary evidence before standing up a dedicated seat, not instead
+of it.** Ranked case for what a migrating engineer needs to trust a new tool, in order of how much I
+would weight it myself:
+
+1. **No-upload/no-login posture (Task 537, already parked, not built by my asking) outweighs every
+   data-fidelity question below it.** A utility's counsel can refuse a cloud tool on FOIA/critical-
+   infrastructure grounds before a single field is compared; this suite never asks that question.
+   Worth stating to Tom as this project's actual strongest interoperability-adjacent asset, not a
+   feature to build — it already exists and is under-sold in this framing.
+2. **`.inp` round-trip fidelity is Mary's territory; I did not duplicate it.** My own citation:
+   Bentley's own Import/Export EPANET help page admits its own export is lossy against `.wtg` — the
+   vendor's own word, not a hostile reading. `lpn_`'s "report every difference, never drop silently"
+   posture is the right answer to that vendor-admitted gap and is already policy.
+3. **GIS asset ID carriage — already queued, not a new row.** Task 636's namespaced custom properties
+   (`user_gis_id`) is the correct, cheap seam for this; I am not asking for anything new, only naming
+   that it answers a real migration data-requirement Tom's question raised.
+4. **The one place I would be blunt this suite is genuinely smaller, and say so without hedging:**
+   WaterCAD's Physical/Demand/Operational Alternative tree, layered into dozens of named alternatives
+   for a real CIP program, has no analog here and none of it survives an `.inp` export regardless of
+   what this suite builds — `.inp` has no scenario concept at all. Fine at this suite's own ~10-20
+   node target; genuinely too small for a 2,000-node, 30-project CIP program, and I would tell an
+   engineer doing that specific job to stay in WaterCAD/WaterGEMS/InfoWater, plainly.
+5. **Demand-allocation provenance and calibration data are not `lpn_`-specific costs.** Neither
+   survives an `.inp` export from ANY tool (WaterCAD's own parcel-join metadata and its Calibration
+   Report objects are both outside `.inp` entirely) — re-entry is universal, not a gap this suite
+   introduces. Task 601 (calibration files, open at 75) is the right-shaped, already-queued answer to
+   the calibration half; demand allocation stays correctly out of scope (no CRS, no shapefile import).
+
+**No re-rank of the built rows above.** This did not change my order; it answers a direct question
+about what "interoperability" should mean when Tom next talks to IOD, and names two things (the
+no-upload posture, the Alternative-tree honesty) I would want said in exactly those words.
+
 ### 2026-09-17 — not a want, a ruling request: perpendicular-only service connections, answered
 
 Not a row — Tom tested `feat/customer-demands` and asked whether a non-perpendicular service

@@ -241,16 +241,19 @@ console.log('\n--- with the repair taken out, section 1 must go red ---');
 	ok('...nor --lpn-hit', !r.hit, r.p.hit || '(unset)');
 	ok('...nor --lpn-hit-coarse', !r.hitCoarse, r.p.hitCoarse || '(unset)');
 	// **WHAT IT LEAVES BEHIND IS A STALE VALUE, NOT AN ABSENT ONE, AND THAT IS THE FAITHFUL SHAPE.**
-	// init() publishes once at the boot scale of 1, so the mutated page carries 2 and 12 WORLD units
-	// into a view at 6,478 px per degree. The stylesheet's own fallbacks (0.7 and 12) are the same
-	// arithmetic where nothing published at all. Either way the reader gets pipes and grab bands
-	// thousands of screen pixels across, which is the map MJH could not click on.
-	ok('...and what it leaves behind is a width of thousands of screen pixels',
-		+r.p.lw * 6478.7497871167825 > 4000, Math.round(+r.p.lw * 6478.7497871167825) + ' px');
-	// The stale grab band is the COARSE one now: --lpn-hit carries the pipe's 3 px floor in world
-	// units and --lpn-hit-coarse the 12, and either is thousands of screen pixels at this scale.
-	ok('...and a grab band of tens of thousands',
-		+r.p.hitCoarse * 6478.7497871167825 > 40000, Math.round(+r.p.hitCoarse * 6478.7497871167825) + ' px');
+	// init() publishes once at the BOOT scale and the mutated page then carries those world units
+	// into a view at 6,478 px per degree. Which way it is wrong depends on the boot scale: a grid
+	// boot at scale 1 left pipes thousands of pixels wide (the map MJH could not click on), and a
+	// first visit now boots on Project1 at street zoom over Novato (R-208, 250,000 px per degree),
+	// which leaves them a small fraction of a pixel -- invisible. Either is off by far more than
+	// ten times, so that is what is asserted, in both directions.
+	const set = M.settings();
+	const lwPx = +r.p.lw * 6478.7497871167825, hitPx = +r.p.hitCoarse * 6478.7497871167825;
+	const off = (got, want) => got > 0 && (got / want > 10 || want / got > 10);
+	ok('...and what it leaves behind is a pipe width wrong by more than ten times',
+		off(lwPx, set.linkWidth), lwPx.toFixed(3) + ' px against ' + set.linkWidth + ' px');
+	ok('...and a grab band wrong by more than ten times',
+		off(hitPx, M.LINK_HIT_PX), hitPx.toFixed(3) + ' px against ' + M.LINK_HIT_PX + ' px');
 	ok('...while the world layer is at the geographic scale regardless', r.transform, worldTransform(M));
 }
 
