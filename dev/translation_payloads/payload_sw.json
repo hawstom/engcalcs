@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2032,
-        "delta_key_count": 182,
+        "expected_key_count": 2030,
+        "delta_key_count": 183,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -558,6 +558,7 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_offscreen_intact": "Your network is intact.",
         "lpn_copy_of": "Copy of {name}",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
@@ -640,8 +641,8 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
-        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_always": "Always show",
         "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
         "lpn_settings_symbol_cap_mid": "times the length of the",
         "lpn_settings_symbol_cap_post": "percentile pipe",
@@ -649,8 +650,7 @@
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
-        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -671,6 +671,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -742,6 +743,7 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_offscreen_intact": "Your network is intact.",
         "lpn_copy_of": "Copy of {name}",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
@@ -824,8 +826,8 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
-        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_always": "Always show",
         "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
         "lpn_settings_symbol_cap_mid": "times the length of the",
         "lpn_settings_symbol_cap_post": "percentile pipe",
@@ -833,8 +835,7 @@
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
-        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -855,6 +856,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -1403,6 +1405,22 @@
                     "key": "lpn_area_hint_window_start",
                     "value": "Bofya kona moja ya dirisha.",
                     "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_offscreen_intact": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Tumia Faili, Mradi Mpya ili kufungua mfano. Au anza kwa kuongeza hifadhi ya maji, muunganiko, na bomba kutoka kwenye upau wa zana.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_examples_welcome",
+                    "value": "Karibu kwenye uigaji wa mtandao wa usambazaji maji, ukitumia kitatuzi cha EPANET",
+                    "english": "Welcome to water supply network modelling"
                 }
             }
         },
@@ -2862,22 +2880,6 @@
                 }
             }
         },
-        "lpn_labels_customer_width": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Alama za viungo",
-                    "english": "Link"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_page",
-                    "value": "Ukurasa",
-                    "english": "Page"
-                }
-            }
-        },
         "lpn_labels_customer_width_tip": {
             "reason": "missing",
             "current_value": null,
@@ -3211,6 +3213,22 @@
                     "key": "lpn_terrain_done",
                     "value": "Miinuko {n} imejazwa.",
                     "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_ff_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_no_selection",
+                    "value": "Hakuna muunganiko uliochaguliwa. Chagua mmoja kwenye ramani, au jaribu kila muunganiko.",
+                    "english": "No junction is selected. Choose one on the map, or test every junction."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_required",
+                    "value": "Mtiririko wa moto unaohitajika",
+                    "english": "Required fire flow"
                 }
             }
         },

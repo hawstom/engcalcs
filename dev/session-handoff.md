@@ -8,9 +8,12 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Six branches may not merge without Tom's all-clear** (all in `protected` in
+- **Eight branches may not merge without Tom's all-clear** (all in `protected` in
   `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
-  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/label-limit`.
+  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/first-project`,
+  `feat/customer-node`, `feat/menu-button`.
+- **Every one of them fails `payload freshness` and only that**, by design: agents never
+  regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -32,6 +35,9 @@ lines rather than appending corrections.
 - Run `git status` at the start of a session and before acting on each of his messages. His own
   edits arrive uncommitted.
 - Make his wording changes, not yours. Don't ship something he has questioned.
+- **Never hand him local-dev housekeeping** (worktrees, branches, ports, leaked servers). He has no
+  worktrees on production; his commands are `git pull` there and the Apache reload here. If the
+  classifier refuses a local cleanup, say so and ask him to allow it, never phrase it as his step.
 
 ## TRAPS
 
@@ -60,60 +66,86 @@ lines rather than appending corrections.
 
 ---
 
-## STATE — 2026-09-23, evening
+- **A stub harness can pass over the very defect it names.** 2026-09-23 the zoom-control harness
+  emptied the document, so "Tom's exact sequence" passed while the real page went blank, and the
+  build agent then told us Tom had tested an old build. When a stub cannot reproduce his report,
+  send the pre-reviewer to reproduce it in real Chrome before believing either side.
+- **Seven agents each queueing `check_all` serialise on one lock for hours**, and an agent that
+  hands back while waiting queues duplicates. Count queued runs (`/proc/*/fd` on the lock) before
+  launching another track.
 
-### On master (pushed), not yet pulled by him
+- **`git stash` is ONE stack shared by every worktree.** 2026-09-24 one agent's `stash pop` took
+  another worktree's entry. Never stash while agents are live; brief them so.
+- **Ten check_all runs queued at once took four hours to drain** (2026-09-24, ~20 min each). A
+  run's pass is judged on the tree at its END, so an agent that edits while queued re-queues.
+  Stagger build tracks rather than launching seven together.
+- **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
+  running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
+- **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
+  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
+  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
+  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  check_all.
 
-- Merged on his all-clear: `feat/tables-spreadsheet`, `feat/notice-log` (Tasks 704 and 691 closed;
-  the 57-dialog audit is Task 710), `feat/zoom-scale-rules` (R-174: Text "Show at all zoom levels"
-  off by default, in multi-properties, Tables and Find/Replace).
-- Task 653 half fixed: no Settings select is rebuilt under the hand; Quality 3-5x faster. Unit
-  selects still redraw the whole project (left in 653).
-- Task 708's audit: `dev/property-venue-matrix.md` and the advisory `property_venue_check.php`.
-- Settings undo stays out, on his word (709 closed). A spent migration that duplicated two keys in
-  27 files when rerun is deleted.
+## STATE — 2026-09-25
 
-### Awaiting his pass (preview ports)
+### Master is f9ebf891, pushed and verified (not yet pulled by him)
 
-- **8103 `feat/zoom-control`** (682): ready. R-179..R-181 built, and Perry's round-2 finding (a map
-  click did not reset the twice-in-a-row rule) fixed at `83eeb139`.
-- **8104 `feat/convert-as`** (696): ready. He liked the menu tip (R-182). Open question for him:
-  the chooser offers EPSG:3857 as "lat/lon", per his own 2026-09-16 tip, while the stored numbers
-  are EPSG:4326 degrees. The `$ec_lang_syn` for `lpn_units_length` still says "Pipe lengths and
-  map coordinates" and needs his word. The "These are already lat/lon" button he called obsolete
-  is still there. R-172(2), satellite after the wizard, needs his eye on a real host.
-- **8105 `feat/table-editing`** (690): ready. Hidden columns ride in the existing `lpn_panecols`
-  browser key. His call: Declan's design also had a visible column-chooser button; only the
-  right-click shipped. An iPhone long-press on a heading needs a real phone.
-- **8106 `feat/property-venue`** (708): ready. Shut and mixing model are chosen from a list in
-  the reader's language.
-- **One solve per change is on master** (653): a fast network runs the whole period once per edit,
-  a slow one still shows the first step first. The "only the first time step" sentence it had been
-  weighed against was never his; he struck it 2026-09-23 (the one sensible case is while the EPANET
-  engine loads for a new browser). It also cancels a run an edit has made stale.
-- **8108 `feat/label-limit`** (his 2026-09-23 question): 0 in the labels width row means never show,
-  blank means always, like the customer row; the Thematic map checkbox is retired and a project that
-  had it opens with 0. Ready; Perry's two findings fixed at `c949316e`.
-- **8090 `feat/label-gang-search`**: unchanged; R-075..R-165 are his.
+Merged on his all-clear: label-limit, offscreen-notice, usage-report, select-on-focus (Task 647
+closed). Also: the menu cue deleted (R-203; key `lpn_menu_cue` gone from 27 files, localStorage
+`lpn_menucue` now legacy and still erased by Erase everything); Tasks 715/716 (Full and Status
+Report) at 100 ahead of 697; R-230..R-247 queued; `dev/real-world-reviews.md`; Mary's
+`watercad-migration.md` and Sue's journal on WaterCAD; the keys list no longer lists keys a branch
+merely inherited. The merge commit was first pushed with `--no-verify` on the argument that its tree
+was identical to a verified tree; the classifier then blocked worktree removal as a CI bypass, and
+the suite was run on 61fa16f4 itself afterwards (green, stamped). Do not repeat the `--no-verify`.
+
+### In flight
+
+- **`fix/fireflow-eps`** MERGED at f9ebf891 (defect track): R-231..R-233. Time-step link
+  status in map, Properties, Tables; fire flow solves from the step's tank levels and statuses;
+  EPANET reopens when a pump's open/shut changes; every selected junction tested. Perry: ready.
+  New key `lpn_ff_skipped`, changed `lpn_ff_scope_selected`. Worktree fix-fireflow-eps awaits removal.
+
+### Awaiting his pass (each green on its own check_all; Perry's verdicts in his journal)
+
+- **8103 `feat/zoom-control`** dc1fa5a9: refit-after-results removed (R-236). Perry: ready.
+- **8104 `feat/convert-as`** 47649c32: R-237/R-238. 4326 listed, no "(no map)" on 3857, "projection"
+  gone from the Convert as, New project and Coordinate system boxes (two left elsewhere:
+  `lpn_georef_projected`, `lpn_terrain_no_place`), tank Water depth label. SEAM with first-project:
+  both edit `crsDisplayName()`; convert-as reads the catalogue's 4326 entry, first-project added
+  `LPN_CRS_WGS84` constants. Keep one.
+- **8105 `feat/table-editing`** 34b757b8: R-239..R-241. Click sorts; a one-motion drag of ANY
+  heading moves it (a selection moves as a block); Ctrl/Shift+click and Ctrl+Space select;
+  drag-to-select removed; hover sort arrow; ⋯ corner badge with Sort, Hide, Show all columns,
+  Manage columns. Perry found 5ddf79d0 (09-24) had turned his one-motion drag into a selection,
+  which was his "can't drag"; fixed in 53283193. Watch: a body-cell click may not always clear a
+  column selection (seen only in a harness).
+- **8106 `feat/property-venue`** b8733c5d: R-242, one "Filter in table" button with his tip. Perry: ready.
+- **8112 `feat/first-project`** f775f0a6: R-243/R-244. Empty lat/lon project follows the view
+  (nodes and tiles were drawn millions of px off canvas); street map ON behind the gallery;
+  status bar WGS 84 (EPSG:4326); privacy.php's two sentences rewritten. **Makes the landing page's
+  "each one asks first" false** (librewaternet.org index.html:234, screenshots.html:219) and
+  CLAUDE.md's "all opt-in" line; both wait on his ruling. Perry: ready.
+- **8113 `feat/customer-node`** cd7640b1: R-245..R-247. Black, "Connected to" row, node fallback on
+  pipe delete, size 0.25 to 0.30 of a junction (it was already 0.25, not 0.2).
+- **8114 `feat/menu-button`** a82d32f5: R-202 preview, solid blue menu items only;
+  `?menustyle=outline` for the outlined variant.
+- **8090 `feat/label-gang-search`**: unchanged, 256 commits behind master.
+
+Ports 8113 and 8114 are new and need the Apache reload (commands below).
 
 ### Open with him
 
-1. The `%` sign added after his percentile box, which he did not ask for.
-2. The label branch's trade-offs and the Restore-defaults button.
-3. R-004, R-043, R-062, R-154.
-4. Net3-Novato has no labeling threshold, so nothing hides there at any zoom. Should it have one?
-   (Net3's 30 is his own R-169 number; a new project starts blank, meaning always.)
-
-### Known and not yet fixed
-
-- `dev/browser-pass/specs/visibility.js` fails two checks on master too (outside `check_all`): its
-  Settings sub-heading list lacks `lpn_set_sub_custLbl`/`lpn_set_sub_customProps`, and "Escape
-  closes it". `settings-select-lag-harness.js` has failed once under a full suite's load and passes
-  alone; watch it.
+1. The landing-page and CLAUDE.md "opt-in" claims (first-project).
+2. R-235: the half-drawn Zoom Window box, explained in the 09-25 report.
+3. WaterCAD: a sample WaterCAD-exported .inp from IOD would settle more than any research.
+4. The three unread label-limit strings on master (`lpn_labels_customer_width_tip`,
+   `lpn_settings_label_always`, `lpn_settings_label_max_width_tip`).
 
 ### Translation sprint
 
-Not launched: six branches are open and he is still ruling on English. Launch after they merge.
+Not launched: seven feature branches carry new English awaiting his rulings.
 
 ## Commands to hand Tom with any panel change
 

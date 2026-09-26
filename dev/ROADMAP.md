@@ -239,20 +239,6 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 99|685| **Name every unit dropdown for a screen reader.**
-  **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
-  survey's finding.
-  - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
-    **272** carry no accessible name, and **226 of those are the unit selects** -- essentially every
-    one in the suite. A screen reader announces *"combo box, feet"* with no way to know which field
-    it belongs to.
-  - **IT IS NOT THE SURVEY'S USUAL PATTERN and that is why it is a task rather than a check.**
-    Nothing here was decided two ways: `echoUnitSelect()` has simply never been handed the label
-    sitting beside it. There is no ratchet to set, because there is no correct half to ratchet to.
-  - **NO NEW WORDING IN ANY LANGUAGE, which is what makes his answer cheap.** The name is the
-    field's own existing label, already written and already translated 26 times. If a design turns
-    out to need new words, stop -- that is a different decision and a different price.
-
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
   undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,
@@ -435,6 +421,14 @@ the block.
       DISPLAY of what the coordinate system already says, never an input that rewrites anything.
     - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
       Save-as side.
+- 100|715| **Full Report: every element at every time step, as one exportable document.**
+  Tom, 2026-09-25: *"Make the reports roadmap tasks before EPANET++."* EPANET's Report > Full, the
+  gap Mary ranked first (`dev/agents/market-researcher/epanet-gap-audit.md` §3.1). The per-step
+  results already exist in `js/lpn-time.js`; the work is layout and export. Before Task 697.
+- 100|716| **Status Report: what switched, when, in time order.**
+  EPANET's Report > Status: pump starts and stops, valve status changes, tanks filling or emptying,
+  warnings, per time step. Mary's second-ranked gap (same audit, §3.2). Read with the Net3 Pump 10
+  status defect (R-231), which is the same event stream. Before Task 697.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -455,6 +449,7 @@ the block.
     file before drafting a word of it, and expect the completeness question (never a completeness
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+  - **Tasks 715 and 716 (Full and Status Report) come first** (Tom, 2026-09-25).
 
 - 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
@@ -612,23 +607,6 @@ the block.
   - **(e) CONCURRENT EDITING, THE GOOGLE DOCS SHAPE.** Tom already priced it himself in the
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
-
-- 100|647| **A project that is whole but entirely off screen should say so.**
-  Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
-  on the map and alert that project is intact, but entirely outside the current view?"*
-  - **THE ARITHMETIC ALREADY EXISTS AND IS NOT WIRED TO A MESSAGE.** `viewShowsModel()`'s third leg
-    asks exactly this question -- can the window at this scale intersect the model extent -- and on
-    a NO it silently refits. That is right at load. This task is the same question asked AFTER load,
-    when the user has panned away by hand and nothing refits.
-  - **628 CHOSE SILENCE DELIBERATELY AND THIS IS NOT A REVERSAL OF THAT.** At load the recovery is
-    indistinguishable from opening a document with no view, so there is nothing to say. Panning your
-    own work off screen is a different situation: the user did it, nothing is going to undo it, and
-    "your network is intact and off to the north west" is information they cannot get any other way.
-  - **THE DISTINCTION THAT MAKES IT WORTH BUILDING IS TOM'S OWN:** *"a blank map is equally fatal as
-    a lost project. User doesn't know the difference."* This is the message that tells them the
-    difference. Pair it with Zoom to fit as the action.
-  - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
-    nobody is looking at is measured, twice, not to work.
 
 - 50|664| **A link's status colours correctly and its legend prints numbers.**
   Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
@@ -823,39 +801,6 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
-- 100|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
-  **HALF FIXED 2026-09-23 (`fix/settings-select-lag`, merged):** no Settings select is rebuilt under
-  the hand any more, label refreshes coalesce into one pass per frame, and Quality skips the pass when
-  no label shows quality: its handler went from 290-500 ms to 70-180 ms. **LEFT:** a UNIT select
-  still costs 0.4-0.8 s, because `afterUnitChange()` redraws the whole project; and one change
-  applies TWO solves (steady state, then the EPS run a second later), each a full label pass.
-  Applying one result instead of two is the cheaper step before his background-service idea.
-  **THE DOUBLE SOLVE IS FIXED** (`fix/one-solve-per-change`, 2026-09-23): one change, one result, one
-  label pass on a network whose run takes under 1 s; busy time about halved. Unit selects remain.
-  2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
-  responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
-  BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
-  so it is not a Firefox defect and not Task 636's. The CPU profile puts 89% of it in
-  `refreshLabelText()`: `getBBox` per label plus `lpn-collide`'s overlap pass, on all 97 nodes,
-  every time. Rebuilding the whole box is 4.6% and is the design the code argues for. Task 651 took
-  the one free 15% (`unitEl()` was a `document.querySelector` per unit read); what is left is the
-  label engine, which is why this is its own task and not a patch. The user-visible half is that
-  the box is rebuilt under an open dropdown, so the control reads as broken rather than as slow --
-  `refreshLabelText()` has 40 call sites and coalescing it into a frame is the shape of the fix.
-  - **TOM, 2026-09-21, OFFERING A DIFFERENT SHAPE ENTIRELY:** *"Maybe we could make everything
-    better by making label placement a background service? You get what you get until better is
-    available?"*
-    - **It is a real proposal and it changes the acceptance test rather than the algorithm.** Today
-      a pass must finish before the drawing is right, so every improvement to the search is paid for
-      in waiting. As a background service the drawing is never blocked: labels appear where the last
-      answer put them and improve as a better answer arrives.
-    - **What it buys is the thing three tasks are separately chasing** -- 680's keep, 681's
-      economies, 683's per-zoom bank -- because none of them matters if nobody is waiting.
-    - **What it costs is honesty about motion.** A label that improves after you have started
-      reading is a label that MOVES under your eye, and his own standing worry about banked
-      placements is exactly that: they jump, and the likeliest moment is the half-second before a
-      tap. So the design question is not whether it can run in the background; it is **what is
-      allowed to change once a reader is looking at it.**
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
@@ -1018,7 +963,7 @@ the block.
       drawing from the splash screen, which can carry detail. Do not let one drawing be scaled to
       serve both -- that is what makes the big one look empty.
     - See also Task 648 and Task 679.
-- 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
+- 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
   as a thumbnail with the current window box placed on it for 'Where am I?'"*
@@ -1863,6 +1808,14 @@ the block.
     has already passed in the browser. The limitation is now written at the top of the harness so it
     no longer implies coverage it does not have.
 
+- 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
+  important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
+  colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
+  hard-coded chrome colour; phases 2-3 are a dark token set and the Settings row (a browser setting).
+  - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
+    toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
+
 - 100|708| **Every property in every venue: an audit, then a check.**
   Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
   multi-properties. Should we do an audit to ensure that all properties are represented in all
@@ -1896,6 +1849,31 @@ the block.
   (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
+
+- 75|718| **File menu: Recents just above Exit, and an Import submenu.**
+  Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
+  items. It's probably time for an Import sub-menu."*
+- 50|717| **EPANET-MSX, multi-species water quality.**
+  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
+  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
+- 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
+  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
+  Junction, Pipe, etc until escape."*
+- 50|720| **Background layers from a GIS server.**
+  Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
+  A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
+- 50|721| **Scenarios as layered alternatives, with ready-made scenarios.**
+  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm. I am comfortable with it from
+  HEC-RAS, but it could be threatening to new users. What seems very welcoming is the set of
+  pre-configured scenarios and the ironclad rule that you are always editing only the specific data
+  layers (Alternatives) mapped to that Active Scenario."* Read against our scenario model first.
+- 50|722| **Change and revision tracking.**
+  Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
+- 25|723| **WaterCAD's element list, against ours.**
+  Tom, 2026-09-25, listing WaterCAD's elements: Pipe, Junction, Hydrant, Tank, Reservoir, Customer,
+  SCADA, Pump, Pump Station, Variable Speed Pump Battery, PRV, PSV, PBV, FCV, TCV, GPV, Isolation
+  valve, Spot Elevation, Turbine, Periodic Head-flow, Air Valve, Hydropneumatic Tank. Which of these
+  a migrating user misses first is Mary's and Sue's question (`watercad-migration.md`).
 
 # Reference
 

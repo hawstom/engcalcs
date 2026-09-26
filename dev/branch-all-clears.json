@@ -110,6 +110,41 @@
             "words": "feat/zoom-scale-rules\n- Done. Close, merge, and delete branch.",
             "context": "Said after his pass over R-174 (Show at all zoom levels off by default, on only for the largest text in each example, and present in multi-properties, Tables and Find/Replace), with R-167 to R-170 from the earlier round.",
             "pin_note": "Pinned to 53ae1a15, one commit past the R-174 build: that commit is the pre-reviewer's journal entry and touches nothing the page renders."
+        },
+        "feat/label-limit": {
+            "head": "4bcf92abc077fad0cb4fc2b7c0fab70aa2dec746",
+            "date": "2026-09-25",
+            "words": "Good. Close, merge, and delete branch.",
+            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+        },
+        "feat/offscreen-notice": {
+            "head": "291bd4c7a4bec26b5c7fcb1c38588c1e36c42a0a",
+            "date": "2026-09-25",
+            "words": "Good. Close, merge, and delete branch.",
+            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+        },
+        "feat/select-on-focus": {
+            "head": "11edc1ad1a7bdb1b66aebff7132ffe3f60bbd360",
+            "date": "2026-09-25",
+            "words": "Good. Close, merge, and delete branch.",
+            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+        },
+        "feat/usage-report": {
+            "head": "5da3e7aefac50bf60f4cafde385d475013ae882d",
+            "date": "2026-09-25",
+            "words": "It doesn't make all my wildest dreams come true. And we probably will need to tweak it later to make it really compelling for me to use. But for now the only thing we can do is deploy it. Close, merge, and delete branch.",
+            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+            "pin_note": "Pinned at the head he tested; merged through merge/0925."
+        },
+        "feat/first-project": {
+            "head": "f6760e1e",
+            "date": "2026-09-25",
+            "words": "feat/first-project: (1) On the gallery welcome, end it \"Or start here\". (2) With that, we can close, merge, and delete the branch. Nice work.",
+            "context": "Said after his browser pass on port 8112, in the same message as his decision \"Street map on at first load: Yes.\"",
+            "pin_note": "HE CLEARED IT AT f775f0a6 ON THE CONDITION OF ONE WORDING CHANGE, AND THE PIN IS THREE COMMITS LATER: a merge of master (d0eef965), his own \"Or start here\" (8aa04872), and CLAUDE.md's third-party line rewritten to match his street-map ruling (f6760e1e). Nothing else changed."
         }
     }
 }

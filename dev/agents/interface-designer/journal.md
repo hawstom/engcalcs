@@ -2863,3 +2863,376 @@ told after the fact" vs "never let the fit produce a fully-blank result" are dif
 only one of them was actually described in the 2026-09-13 quote this task is built on.
 
 No shipped file touched.
+
+---
+
+## 2026-09-24 — the round of six: theming, offscreen-notice style, phone-button paradigm, select-all, Project1, File menu order
+
+Answering `dev/tom-review-queue.md` R-211, R-227, R-202/R-203, R-207, R-208, R-213 in one sitting,
+Tom's words quoted from that file. **No shipped file touched.** Full theming inventory and phased
+plan written to `dev/theming-plan.md` (a new doc, per the invocation's own allowance); everything
+else lives here.
+
+### R-211 — theming, phased plan in `dev/theming-plan.md`
+
+OBSERVED: zero colour design tokens exist (`css/engcalcs.css` has nine `--lpn-*` custom properties,
+all layout, none a colour system); 303 hard-coded hex colours in that one CSS file; of 1,114 hex
+literals across `js/*.js`, 1,025 are `js/lpn-ramps.js`'s colour-ramp DATA (out of scope — a ramp is
+drawn content, not chrome) leaving under 90 real chrome-colour literals in JS; exactly one
+`prefers-color-scheme` block exists, two rules, theming one component (`.lpn-example-card`) out of
+at least nine independently-declared "box" styles (`.lpn-setbox`, `.lpn-propbox`, `.lpn-findbox`,
+`.lpn-runbox`, `.lpn-libbox`, `.lpn-ffbox`, `.lpn-msglog-panel`, `.lpn-color-legend`,
+`.lpn-dragpanel`). Tom is right that this forces discipline — there is currently none to force.
+
+**Plan, phase-first:** Phase 1 (medium, 1-2 weeks) declares semantic tokens, consolidates the box
+styles onto them, and adds a check that refuses a new hard-coded chrome colour outside an explicit
+allow-list (`lpn-ramps.js` named as the one deliberate exemption) — no visible change, done-test is
+a byte-identical screenshot before/after plus the new check passing. Phase 2 (small, only possible
+once phase 1 is real) writes one dark token set under the existing `prefers-color-scheme` query,
+excluding the map's own drawing ink by the same reasoning the example-thumbnail comment already
+states (a network's drawing is data, like a printed sheet; theming it would make a shared screenshot
+look like two different networks). Phase 3 (small) is the visible payoff: one Settings row
+(System/Light/Dark).
+
+**Storage:** SPECULATION-turned-OBSERVED by CLAUDE.md's own rule — a theme choice is a BROWSER
+setting (`localStorage`, alongside `lpn_pane`/`lpn_setbox`), never a project setting, because it is
+a fact about the reader's screen, not the model. No consent-text change: `dev/storage-rulings.md`'s
+exemption test already passes an explicit preference with no gate (its own worked example is
+`ec_language`), and `consent_body` (`lib/lang.ec.en.php:100`) names only the one-digit analytics
+cookie today and needs no new sentence for this, exactly as it needed none for the other furniture
+keys already shipped.
+
+### R-227 — the offscreen-notice's "new style"
+
+OBSERVED: `Looped-Network.php:633-637` (worktree `~/webdev/worktrees/feat-offscreen-notice/engcalcs`)
+already reuses the suite's ONE existing warning palette — `background:#fffbe6;border:1px solid #a80`
+— the same pair `#lpn_map_notice` (`Looped-Network.php:378`) and `#lpn_status`
+(`Looped-Network.php:413`) use. So the colours are not new; what is new, and what I read as Tom's
+actual objection, is the FORM: a centred, rounded-corner (`border-radius:4px`), padded
+(`10px 16px`) card floating in the middle of the canvas with a button inside it — a shape that
+matches none of the suite's existing "amber strip" notices (all thin, edge-anchored, `2px 6px`
+padding, no radius, no button). Two colour roles are being asked to mean two different things with
+the same paint: the amber pair means WARNING everywhere else it appears (a diagnostic, a lock, a
+kept-message flag); this card's content ("Your network is intact.") is neutral, reassuring
+information, not a warning, and painting it in the warning colour borrows a signal it does not
+mean.
+
+**Recommendation: do not invent a fourth notice shape and do not wait for theming.** Two moves,
+independent of each other:
+
+1. **Reuse `.lpn-panel`-style neutral chrome (the setbox/findbox/runbox family's plain white panel
+   with a grey `#bbb`-class border, e.g. `.lpn-msglog-panel-empty`'s
+   `background:rgba(255,255,255,.8);border:1px solid #bbb;border-radius:3px;padding:2px 6px`),
+   NOT the amber warning pair — this is a wording/colour fix only, on the branch, before merge. It
+   is small enough to make on `feat/offscreen-notice` directly rather than folding into theming.
+2. **Fold the SHAPE (centred card with a button) into theming's phase 1**, because it is exactly
+   the "one more independently-declared box style" the inventory above already counts, and phase
+   1's whole job is stopping that count from growing. Recorded there rather than blocking this
+   merge on it — a demo-week branch should not wait on a multi-week discipline project, but the
+   next centred-card need (and there will be one — Task 616's own history shows this suite reaches
+   for a new box shape under pressure more than once) should draw from the phase-1 panel primitive,
+   not invent a fifth.
+
+**Answer to "which existing style, so it can merge before theming exists":** the neutral
+`rgba(255,255,255,.8)` / `#bbb` panel pair, not the amber warning pair. It should NOT wait for
+theming to merge.
+
+### R-202 / R-203 — the phone-app-button paradigm, and the hint that failed twice
+
+**The hint (`#lpn_menu_cue`, `js/looped-network.js:37070-37096`, `css/engcalcs.css:1471-1486`,
+string `lpn_menu_cue`) is my own 2026-09-10 recommendation from
+`dev/app-chrome-postdivorce-recommendations.md` §F item 4** — a standing, dismissible, first-visit
+arrow anchored at the toolbar's top edge, pointing up at File, explicitly designed NOT to repeat
+the Hide-titles highlight's failure (a mark on a row nobody is looking at). MOD not finding it is
+the SAME failure mode one layer up: the cue itself is small, quiet, monochrome text with a thin
+blue arrow — dismissible chrome sitting where the eye already stops (the toolbar), asking the eye
+to then move somewhere it demonstrably does not go on its own. **Tom's read — "a feeble attempt to
+rescue an attempt that isn't working" — is correct, and I concur with retiring it rather than
+patching it with a lightbulb glyph**, which would be a fifth iteration of the identical shape
+(decorate the same underused row a little more) rather than a structural fix. Do not build the
+lightbulb.
+
+**On the paradigm question itself, with evidence.** CITED (own general knowledge of shipped
+products, named): consumer and prosumer web apps that have moved away from a text menu bar as the
+PRIMARY discovery surface converge on one of two shapes, neither of which is "no menu bar" —
+(a) Figma's single app-icon menu (all File/Edit/View commands collapse under one icon-button in the
+corner) paired with a prominent, always-icon TOOLBAR carrying the high-use tools, or (b) Google's
+own Material Design filled/outlined "chip" buttons and bottom-navigation bars on mobile, where
+every destination is a same-sized, same-shape, bright or outlined button with an icon, never a
+plain text link. Google Sheets and Docs on desktop keep a conventional text menu bar AND a below-it
+icon toolbar (the shape this page already has); their MOBILE apps drop the menu bar to a hamburger
+and promote a bottom icon bar. **The pattern across all of them: nobody merges the genres — a
+command-rich surface stays text, and the frequently-reached-for surface becomes uniform bright
+buttons.** `dev/app-chrome-postdivorce-recommendations.md` §F already measured why: this page's
+menu bar (5 items, 401px of ink) and toolbar (22 buttons, 1,260px) are structurally different
+counts, and treating both as one paradigm was flagged there as "a genuine judgement-level tension...
+worth one direct question to Tom rather than a unilateral pick." He has now answered it.
+
+**What Tom is asking for reads as a genre unification, not a menu-bar redesign in isolation**: make
+EVERY top-level control — menu-bar items AND toolbar buttons — a same-family button (solid blue or
+rounded-outline blue), closing the "nav-list vs tool-palette" genre gap §F identified as the
+strongest single cause of the menu bar reading as belonging to the site (MAH's own words) rather
+than the app. This is a real, evidence-backed direction, not merely following fashion: it directly
+answers §F's measured diagnosis (icon size, count, ink-width and GENRE all currently separate the
+two rows) by removing the genre difference rather than trying to make the menu bar win an attention
+contest it cannot win on size or count.
+
+**Recommendation: preview it on a branch, and yes — it belongs inside theming's phase 1, not
+beside it.** The blue accent colour, the pill/chip shape, the border-radius, and the "one button
+style for every kind of pressable chrome" are exactly the token-and-one-component-style work phase
+1 already does for panels; doing the button unification as a SEPARATE effort would build the same
+kind of token twice. Concretely: a `feature/chrome-button-style` branch (name singular per
+`dev/git-workflow.md`) that (a) gives every `.lpn-menubar-item` and `#lpn_toolbar button` the same
+`.ec-btn` base — border-radius, one accent colour family, same height — merging the genre gap
+without merging the DOM rows (§A's own finding stands: a literal one-row merge breaks below
+~1750px, still true and untouched by this), and (b) is judged by Tom on a real render before any
+theming work proceeds, since it fixes the token PALETTE's central colour choice, which everything
+downstream in phase 1 would otherwise pick provisionally and re-litigate. **Do this preview before
+starting theming's token declaration, not after** — the accent-colour choice this makes is exactly
+`--ec-accent`, phase 1's own first token.
+
+**Delete the hint:** yes, once the button-style branch ships (it is very likely made unnecessary by
+the button style itself — a bright, obviously-pressable File button needs no arrow pointing at it).
+Until then, leave `#lpn_menu_cue` running rather than removing it with nothing to replace it — a
+small, known-weak instrument beats a gap, and MOD not seeing it is not evidence it helps nobody,
+only that it does not help everybody.
+
+### R-207 — select-all on focus, confirmed, specified
+
+**Confirmed**, on the same grounds Tom names ("it checks out for me, and it was his natural
+expectation") — this is the standard behaviour of a browser address bar and of ordinary desktop-app
+property fields (Windows/macOS "select all text in this field when it gains focus" convention,
+CITED as the general OS-level convention rather than one product's), and this page's own Properties
+and Settings boxes are exactly that class of field: short, single-value, meant to be overwritten
+whole, not edited character-by-character.
+
+**Which inputs:** every `<input type="text">` and `<input type="number">` inside the Properties box
+(`.lpn-propbox`), the Settings box (`.lpn-setbox`), the Find and replace popup, and any other
+one-line field outside spreadsheet mode (ID prefix boxes, curve-point single fields when NOT inside
+the table, the new-project wizard's text fields). **Search boxes** (Settings search, Find's own
+query box) — include; a search box is overwritten-whole exactly like a property field. **Not
+`<textarea>`** — Notes/Description fields are edited incrementally (a sentence appended to existing
+text), and select-all-on-focus there would delete a paragraph on an accidental Tab, which is the
+opposite of the courtesy this row is trying to add.
+
+**Trigger:**
+- **Tab focus and programmatic focus** (a dialog opening and calling `.focus()` on its first field):
+  call `.select()` in the plain `focus` event handler — no conflict to resolve, nothing else is
+  moving the caret at the same instant.
+- **Mouse click:** the click's own native behaviour places a caret at the pointer, which fights a
+  `focus`-handler `.select()` unless sequenced correctly. Standard fix (the same one browsers use
+  for their own address bar): on `mousedown`, check whether the target is ALREADY
+  `document.activeElement`; if it is NOT, call `preventDefault()` on the mousedown (stopping the
+  browser's own click-to-caret) and do the focus + select programmatically. If it IS already the
+  active element, do nothing special — let the click place the caret normally.
+- **Second click in an already-focused field:** by the rule just above, this is the "do nothing
+  special" branch — the browser's own default caret-at-pointer behaviour applies, exactly matching
+  the address-bar convention Tom is describing (first arrival selects all; a further click inside
+  an already-focused field just moves the cursor).
+
+**Exclusion:** any input that is a spreadsheet-mode table cell (the Tables pane / `feat/table-editing`
+work — identify by containment, e.g. inside `#lpn_table_pane`/whatever wraps the pane's editable
+cells, or by a dedicated class such as `.lpn-cell-input` if the table editor already tags its inputs
+that way) is explicitly OUT of this behaviour — a spreadsheet cell's own convention (typing replaces
+the cell outright without needing `.select()`; Enter/Tab navigate rather than edit-in-place) is a
+different, already-decided model and must not be touched by this change.
+
+### R-208 — the empty Project1 tab
+
+**Recommendation: open Project1 as an empty WGS84 project viewing Downtown Novato Center, not a
+funnel screen.** Reasons, weighed against the funnel alternative:
+
+- **No new interstitial chrome.** A "choose gallery or New project" screen is itself a fifth thing
+  competing with the drawing for attention, on the exact page whose diagnosed defect (Task 616) is
+  already too much competing chrome — building a wall to fix a different first-visit complaint would
+  cut against the whole thrust of this brief.
+- **It directly fixes the reported defect, not just its symptom.** The complaint is specifically that
+  attaching the world map ERRORS on the schematic default — that is a coordinate-system problem
+  (Project1 has no CRS), and making Project1 geographic from birth removes the error at its source
+  rather than routing the user around it.
+- **The existing empty-state gallery (`#lpn_empty_hint`, `Looped-Network.php:613`,
+  `showExamplesOverlay()`) is UNCHANGED by this** — its condition is "no elements," not "no
+  coordinate system," so a first-time visitor still sees the examples gallery overlaid on top of
+  the (now-geographic) empty canvas exactly as today. The two fixes stack rather than compete: the
+  gallery still offers "start from an example"; the map underneath it now actually accepts a
+  background image if the visitor closes the gallery and tries anyway.
+
+**Where a build agent should look:** the true first-visit path bypasses `newProject()` entirely —
+`js/looped-network.js:33296-33298` (`if (!indexEntry(library.openId)) { var firstId =
+newProjectId(), firstName = nextProjectName(); ... }`, inside `init()`) is where Project1's `doc`/
+`project` state is actually born, not `newProject()` (`:27148`), which only fires for the SECOND and
+later tabs. `newProject(coords, crs)` already has the geographic branch to imitate
+(`:27176-27182`: sets `project.coords = LPN_COORDS_GEO`, calls `geoHomeView()` for
+`pendingView`/`pendingViewFor`). `geoHomeView()` (`:3844-3855`) and its constant `LPN_GEO_HOME =
+{lon:0, lat:0}` (`:3843`) currently point at the middle of the Atlantic at world zoom — **do not
+repoint `LPN_GEO_HOME` itself**, which would move every wizard-created blank geographic project
+to Novato and surprise a user who explicitly chose "start blank, geographic" from the New Project
+box; instead give the first-visit path (`:33296-33298`) its OWN pending view (Downtown Novato
+Center's lon/lat, at a street-scale zoom rather than world zoom — the exact numbers are whatever
+Tom's own Mapbox/Nominatim search for "Downtown Novato Center, Novato, CA" returns) and its own
+`project.coords = LPN_COORDS_GEO` assignment, parallel to but independent from `newProject()`'s.
+
+**Also touches, and needs deciding alongside the code change:**
+- **`project.basemap` default** for Project1 specifically needs a value (OSM street tiles, per
+  CLAUDE.md's ungated default) or the geographic canvas shows nothing behind the empty grid — a
+  geographic project with no basemap set is not obviously better than a schematic one for a
+  first-time viewer.
+- **The wizard's own defaults are untouched.** New Project's radio choice (R-209's "Coordinate
+  system" wording) stays whatever it is today — this changes only the IMPLICIT, no-choice-made
+  first tab, not the explicit path through the wizard.
+- **The "attach world map on schematic project" error path itself stays** — it still needs to exist
+  and still needs to be correct for any project a user explicitly makes Local/schematic through the
+  wizard; this fix only stops the error from firing on the one project nobody chose to make
+  schematic.
+
+### R-213 — Convert coordinates as… in the File menu
+
+OBSERVED, `js/looped-network.js:32018-32096`: the current File menu build is one array — New
+project, Open, Open example, **Convert coordinates as…** (third, with its own three-paragraph
+comment justifying that position as "the fallback, listed after the two doors people reach for
+first"), Import surveyed points, Import EPANET, Export EPANET, Import libraries — then, after a
+`{ separator: true }`, the second block: Save, Save as…, Save all, Revert, another separator, Close.
+
+Tom's ask is specific and small: move Convert coordinates as… to directly after Save as…. **Doing
+this literally argues against itself on the menu's own stated logic** — the surrounding comment
+block explains at length why Convert coordinates as… sits where it is now (third, "below both rows
+it rescues," Open and Open example), and every one of the six rows around it that stays in the
+first block does so because they all share one property Save/Save as do not: they end in a NEW TAB
+(a project switch) rather than acting on the one already open. Convert coordinates as… is exactly
+that kind of row — it always opens a fresh project from a file, never touches the one on screen —
+so moving it into the Save block groups it with rows about a DIFFERENT verb (writing the current
+document out) rather than the ones it shares an outcome with.
+
+**Specifics, if Tom still wants the move after that:**
+- **Position:** immediately after the `Save as…` row (`:32096`) and before `Save all` (`:32106`) —
+  "directly after Save as…" read literally, not after the whole Save/Save as/Save all/Revert
+  cluster.
+- **No new separator around it.** A lone command wedged inside an unbroken Save-family block would
+  read as a fifth member of that family; Tom's own reasoning for the move ("there is nothing else
+  about converting, and it's not about importing or exporting") argues it should stand apart, which
+  a bare row (no separator on either side, just its position) already achieves without adding a
+  bar that then needs justifying to a translator asking "why is this file split into four groups."
+- **Label unchanged** — "Convert coordinates as…" already carries its own meaning; nothing about
+  its neighbours changes what the row itself needs to say.
+- **What is lost:** the comment's own "third, below both rows it rescues" placement, which read
+  Convert coordinates as… as a FALLBACK from Open/Open example specifically. Moved beside Save as…,
+  it instead reads as a sibling of "ways to end up with a file," which is a real, defensible framing
+  — but a different one, and the code comment at `:32018-32041` needs rewriting to state the new
+  reasoning rather than leaving the old one to contradict where the row now sits.
+
+**My own read, offered since asked "any specifics" rather than "do it":** I would leave it where it
+is. The existing three-paragraph justification is not decoration — it argues from the row's actual
+behaviour (does it open a new tab, yes; does it act on the document on screen, no), and Save as… is
+squarely in the second category. But this is a small, reversible, single-menu change with no
+translation cost beyond nothing (label unchanged), so if Tom's felt sense after using the app is
+stronger than the written argument, moving it costs little; the placement above is exactly how to
+do it with the least collateral damage to the rows around it.
+
+No shipped file touched.
+
+## 2026-09-25 — Tables pane heading: sort vs select vs move vs hide (feat/table-editing)
+
+**The bug under the complaint.** `paneStartColDrag()` (the branch on a SELECTED heading) never
+calls `ev.preventDefault()` before attaching its mousemove/mouseup listeners — unlike
+`paneStartColResize()` and the sibling `paneStartHeadSelDrag()` path, which both do.
+OBSERVED: js/looped-network.js:21212-21226 (function body), vs. the guarded call site at
+js/looped-network.js:21416 (`if (paneHeadSel(spec).indexOf(c.key) !== -1) { paneStartColDrag(spec,
+c.key, ev); return; }` — no preventDefault on this branch, only on the sibling one three lines
+later). This is very likely why Tom could not get a column to drag: the browser's native
+mousedown handling (focus/press ring, and on a `<button>` whose row runs into adjacent `<th>`
+text, sometimes drag-select of neighboring cell text) fights the custom drag. **Fix this line
+first, regardless of anything else below** — it is a one-line, zero-cost repair of a real defect,
+not a design change.
+
+**Does `user-select: none` on the heading fix it?** Tom's suspicion is half right. The sort label
+is already inside a `<button>` (js/looped-network.js:21386), and buttons suppress native text
+selection in every evergreen browser by default — so the heading TEXT was never really the
+draggable culprit. OBSERVED: css/engcalcs.css has no explicit `user-select` rule on
+`.lpn-pane-sort`. Add one anyway (`user-select: none` on `.lpn-pane-sort` and `.lpn-pane-table
+thead th`) as cheap insurance against a drag that overshoots into a neighboring `<th>`'s padding —
+but it is not the fix for "can't drag"; the missing `preventDefault()` is.
+
+**Survey of established grids.** CITED, from documented/observed behavior of each product:
+- **Excel / Google Sheets**: clicking a header never sorts. Sort lives in a separate command
+  (Data > Sort, or the AutoFilter dropdown arrow). A plain click on the header selects the whole
+  column; Sheets' own keyboard equivalent is Ctrl+Space with a cell in that column focused. This
+  is how spreadsheets avoid this exact conflict — sort and select are never on the same click.
+- **AG Grid**: click header = sort; the *same* header is also the drag handle for column reorder,
+  distinguished by movement distance — a press that never leaves the header is a sort, a press
+  that travels is a move. This branch already uses that exact distinction (click with no drag =
+  sort; drag = select or move, gated on `spec.headDragged`). A separate hover-revealed icon
+  (angle/menu glyph, only rendered on `:hover`, no layout width cost) opens AG Grid's column menu
+  for pin/autosize/hide.
+- **MUI DataGrid**: click header sorts; a hover-revealed sort caret hints sortability before the
+  click; a separate "⋮" icon (also hover-revealed) opens a menu with Sort, Filter, Hide column,
+  Manage columns.
+- **Airtable**: no click-to-sort at all — clicking a header opens its field menu (edit, sort, hide,
+  duplicate); reordering is a drag on the header.
+- **QGIS attribute table**: click header sorts (toggles asc/desc, same as this branch); right-click
+  offers "Hide column"; a separate **"Organize columns"** dialog offers checkboxes for
+  show/hide plus reorder — the closest existing precedent for Tom's "Manage columns" idea.
+
+**Recommendation.** Keep this branch's existing click/drag-distance split — it already matches
+AG Grid's proven resolution and needs no redesign. Do not zone the heading cell into a "text
+sorts, margin selects" split (Tom's own tentative idea): no surveyed grid does this, a boundary
+inside a heading this narrow (CLAUDE.md, "width is king") has no visible edge, and it doubles the
+discovery burden instead of resolving it. Reject it explicitly if re-proposed.
+
+Instead, three additions, cheapest first:
+1. **Fix the missing `preventDefault()`** at js/looped-network.js:21416 — the actual drag bug.
+2. **Add "Show all columns" to the existing hide/show context menu**, shown only when at least one
+   column is hidden, alongside the per-column "Show {col}" entries already there
+   (js/looped-network.js:22952-22958). Do not reuse the filter's "Show all" string
+   (`lpn_pane_filter_clear`) — it means something else (clear the row filter) and appears in the
+   same UI region; reusing it across two different commands on the same table would be the exact
+   kind of reuse CLAUDE.md's label-normalization rule forbids ("reuse stops at sentences," and this
+   is two different actions, not one label two places).
+3. **Add a hover-revealed "⋮" icon at the trailing edge of every heading** (no layout width; drawn
+   absolutely over the grip's margin, visible only on `:hover`/`:focus-within`, same treatment as
+   AG Grid's and MUI's column-menu glyph) that opens the *same* context menu right-click/long-press
+   already opens. This is the fix for "I honestly don't know [about] a grab cursor somewhere" —
+   it gives desktop users a visible, clickable affordance for Hide/Show/Manage instead of requiring
+   they already know to right-click, while leaving long-press as the touch equivalent unchanged.
+   Add one new menu item, **"Manage columns…"**, opening a small dialog: one row per column
+   (including hidden ones), a checkbox for Show, and up/down reorder buttons — this is the touch
+   and keyboard path for reorder and multi-hide that the mouse-drag gesture does not cover
+   (paralleling QGIS's Organize columns).
+
+**Cursors, stated plainly** (mostly already correct, OBSERVED css/engcalcs.css:2566-2568):
+sort button = `pointer`; a selected heading = `grab`, `grabbing` while held; resize grip =
+`col-resize`; the new "⋮" menu glyph = `pointer`. No new cursor is needed.
+
+**Keyboard.** Tab reaches each heading button; Enter/Space already sorts (native button behavior).
+Add Ctrl+Space (a cell focused in that column, or the heading itself focused) to toggle that
+column into the selection, matching Google Sheets' own shortcut (CITED) rather than inventing one.
+Column reorder and hide/show by keyboard both route through the new "Manage columns…" dialog
+(item 3 above) rather than a bespoke arrow-key drag — nobody surveyed ships keyboard column-drag,
+and a dialog with ordinary Tab/Space/Up/Down controls is the accessible answer for free.
+
+**Touch.** Long-press already opens the hide/show menu (unchanged) — add "Show all columns" and
+"Manage columns…" to it, same as desktop. Do not attempt touch drag-to-reorder or drag-to-select:
+it competes with page/pane scroll and no surveyed grid solves that well on a narrow heading, so
+route every touch column operation through the menu and the dialog.
+
+**New English strings needed** (plain American English, no em dashes):
+- `lpn_pane_show_all_cols` = "Show all columns"
+- `lpn_pane_manage_cols` = "Manage columns…"
+- `lpn_pane_manage_cols_title` = "Manage columns" (dialog title)
+- `lpn_pane_manage_cols_show` = "Show" (checkbox column heading in the dialog)
+- (Optional, only if the dialog needs empty-state text) `lpn_pane_manage_cols_hint` = "Check a
+  column to show it. Drag or use the arrows to reorder."
+
+**Rejected alternative, most likely to be re-proposed**: splitting the heading cell into a
+text zone (sorts) and a margin zone (selects/drags). Loses because: (a) no surveyed grid does it —
+each resolves the same conflict with either a movement-distance threshold (AG Grid, and this
+branch already) or by taking sort off the plain click entirely (Excel, Sheets, Airtable); (b) a
+column this narrow ("width is king," CLAUDE.md) has no room to show the boundary, so the split
+would be undiscoverable by definition; (c) it does not fix Tom's actual failure, which is the
+missing `preventDefault()`, not a click/drag ambiguity.
+
+Provenance: bug location and current behavior are OBSERVED against
+`js/looped-network.js` and `css/engcalcs.css` on branch `feat/table-editing`
+(worktree `/home/haws/webdev/worktrees/feat-table-editing/engcalcs`) as of 2026-09-25. Grid
+conventions (Excel, Google Sheets, AG Grid, MUI DataGrid, Airtable, QGIS) are CITED from general
+product knowledge, not fetched fresh this session — flag for a follow-up web check before this is
+built if any single claim needs to be load-bearing.

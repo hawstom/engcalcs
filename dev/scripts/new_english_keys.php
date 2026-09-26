@@ -221,6 +221,22 @@ function ecBranchNewKeys(string $root): array {
                 $keys[$m[1]] = str_replace(array("\\'", "\\\\"), array("'", "\\"), $m[2]);
             }
         }
+        // **A KEY MASTER DELETED AFTER THE BRANCH WAS CUT IS NOT NEW** (2026-09-25). A branch far
+        // behind master still carries every key master has since removed, and listing those asked
+        // Tom to rule on some twenty strings that no longer exist anywhere he could see them. A key
+        // present at the merge base is the branch's inheritance, not its authorship, so it is
+        // dropped here; the merge will remove it.
+        $base = array();
+        exec('cd ' . escapeshellarg($root) . ' && git merge-base HEAD ' . escapeshellarg($b) . ' 2>/dev/null', $base);
+        if (isset($base[0]) && $base[0] !== '') {
+            $bsrc = array();
+            exec('cd ' . escapeshellarg($root) . ' && git show ' . escapeshellarg(trim($base[0]) . ':lib/lang.ec.en.php') . ' 2>/dev/null', $bsrc);
+            foreach ($bsrc as $line) {
+                if (preg_match('/^\$ec_lang\[\'([A-Za-z0-9_]+)\'\]\s*=/', $line, $m) && isset($keys[$m[1]])) {
+                    unset($keys[$m[1]]);
+                }
+            }
+        }
         $out[$b] = array('sha' => isset($sha[0]) ? $sha[0] : '?', 'keys' => $keys);
     }
     ksort($out);
