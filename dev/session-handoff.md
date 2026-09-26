@@ -107,8 +107,8 @@ does not have yet.
   fixed), R-265 tips in his exact words.
 - **8105 `feat/table-editing`**: R-254..R-259, the spreadsheet heading (click selects, ⋮ menu,
   arrow under ⋮, Manage columns applies on OK, move-to-beginning/end, print names the PDF
-  `{project}-{table}`). 7f3661a6: duplicate Cancel key removed; the divider harness now hides
-  the ⋮ glyph while it measures, since it was reading the glyph as a divider. No Perry pass yet.
+  `{project}-{table}`). 850e3746, green: Perry's two defects (a 22 px click strip in a 72 px
+  cell; the ⋮ clipping two wrapped headings) fixed and harnessed, not re-reviewed by Perry.
 - **8113 `feat/customer-node`** 105d9f68: R-267..R-270. Perry's grip-over-junction defect fixed.
 - **8114 `feat/menu-button`** eceab3ab: outlined only, R-271. Needs his all-clear; merge master first.
 - **8115 `feat/report`** 87e15a16 (new port, needs the Apache reload): Tasks 715/716, Water >
