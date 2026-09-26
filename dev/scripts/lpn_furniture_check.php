@@ -124,6 +124,8 @@ const EC_LPN_FURNITURE = [
     'lpn_energybox'   => 'position, size and openness of the Pump energy report',
     'lpn_cmpbox'      => 'position, size and openness of the Scenario comparison box',
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
+    'lpn_statusbox'   => 'position, size and openness of the Status report box (Task 716)',
+    'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about
     // the person at the screen. A colleague opening the file would otherwise inherit the answer.

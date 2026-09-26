@@ -252,6 +252,12 @@ input.ec-spin[type=number] {
 	font-size: 11px;
 	padding: 1px 6px;
 }
+/* THE FULL REPORT BOX CARRIES TWO OF THESE, NOT ONE (ROADMAP Task 715), so each needs its own
+   offset from the close button rather than sharing lpn-rptbox-copy's single `right`. Print sits
+   immediately left of the X, as Copy does everywhere else; Download CSV sits left of Print, with
+   enough room for its own longer label. */
+#lpn_full_print { right: 34px; }
+#lpn_full_csv { right: 128px; }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-status-notes { transition: none; }
 }
@@ -1063,12 +1069,15 @@ html[lang="zh"] .ec-welcome {
 /* The preview dot of a half-placed meter, which is view state and not an element yet. The same
    red the rubber band it hangs off is, so the two read as one gesture in progress. */
 .lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
-/* A SERVICE CONNECTED EXACTLY TO A NODE SAYS SO WHILE IT IS (Task 247; Tom, 2026-09-17: "a very
-   close connection should snap to the nearest node"). A snap that catches and looks identical to
-   one that missed by a pixel is a snap nobody can trust, so the connector and the dot take the same
-   red the other temporary marks on this map use, and both lose it the moment a drag pulls away. */
-.lpn-service-snapped { stroke: #d32f2f; }
-.lpn-meter-snapped { fill: #d32f2f; stroke: #d32f2f; }
+/* **A SERVICE CONNECTED EXACTLY TO A NODE USED TO SAY SO IN RED, AND THAT RULE IS RETIRED**
+   (Task 247; Tom, 2026-09-25: "Red for node-connected Customers is a bad decision. Let's leave it
+   black."). `.lpn-service-snapped` / `.lpn-meter-snapped` painted the connector and the dot the
+   same red every gesture-in-progress mark on this map uses, so a SETTLED connection read as one
+   still being made. A settled node connection now draws exactly like any other connected customer,
+   in plain black; the Properties box, the Tables pane and Find name the junction in a "Connected
+   to" row instead (renderCustomerFields(), paneCustomerCols() in js/looped-network.js). The two
+   classes are gone rather than left inert, so they cannot be found and re-lit by mistake.
+   `.lpn-meter-pending` above keeps its red: that is a gesture in progress, not a settled state. */
 /* **A SELECTED CUSTOMER IS A HIGHLIGHTED DOT** (Tom, 2026-09-18: dragging one works "except that
    it's highlighted wrong (red circle instead of highlighted dot)"). It wore no mark of its own at
    all: the class was applied, and nothing here answered it, so the only thing that changed on
@@ -1076,17 +1085,15 @@ html[lang="zh"] .ec-welcome {
    ring was being read as. The selection blue every other selected thing on this map takes
    (.lpn-node.lpn-selected above), on the symbol itself.
 
-   Two classes, so it outranks the snap red and the loose white above it while a customer is
-   selected, and they come back the moment it is not. Neither signal is lost meanwhile: a service
-   connected at a node keeps the snap red on its LINE (.lpn-service-snapped), and a customer
-   connected to nothing keeps its dashes, which is the half of each signal a reader is looking
-   at anyway. */
+   Two classes, so it outranks the loose white above it while a customer is selected, and that
+   comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
+   which is the half of that signal a reader is looking at anyway. */
 .lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
 /* THE CONNECTION GRIP: on the pipe, only while its customer is selected, and grabbable.
 
    **IT WAS RED, AND RED IS WHAT MADE IT UNREADABLE** (Tom, 2026-09-18: "The red circle at the pipe
-   is confusing to me. It's not selectable."). Every other red mark on this map is a temporary
-   state -- a gesture in progress, a service snapped to a node -- so a permanent red ring beside a
+   is confusing to me. It's not selectable."). Every other red mark on this map is a gesture in
+   progress -- the rubber band, the pending meter dot -- so a permanent red ring beside a
    selected customer read as a warning about the drawing rather than as a control. It is a GRIP,
    and it takes the selection blue for the same reason the selected dot does: it exists because
    something is selected and it disappears with the selection.
@@ -1455,7 +1462,36 @@ html[lang="zh"] .ec-welcome {
    own -- the same trap recorded above for #lpn_menubar. It changes no layout. */
 nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
-.lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
+/* **THE MENU-BAR ITEMS READ AS OUTLINED BUTTONS, in the suite's own accent blue** (#0645ad,
+   already this page's one accent colour -- the profile HGL trace, the georeference tack, the
+   current-cell outline in Tables all use it; nothing new is invented here). Tom, 2026-09-25,
+   closing R-202/R-203: testers were slow to find the MENUS, never the toolbar; "promoting the
+   menus and toolbar equally is counterproductive," and he asked for colour only -- no new icon,
+   no size change, no layout change. So padding, gap and font are UNCHANGED from the flat-text
+   rule above; only background, border and text colour move.
+
+   **OUTLINED, NOT SOLID** (Tom, 2026-09-25, choosing between two previews: "I love the outlined
+   version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the
+   toolbar black."). White fill, blue text and border -- the toolbar above stays black and gets no
+   button paint of its own. `color: #0645ad` also repaints the icon, which draws with
+   `stroke: currentColor` (see .ec-icon above) -- so the icon-only phone row (640px breakpoint,
+   below) stays legible without a rule of its own. The three states only need to stay clearly
+   distinct from each other, not fight for contrast against the white bar:
+     default   #0645ad text/border on #fff  the accent blue as everywhere else on the page
+     hover     #eaf1fc fill, #1f58b5 border/text -- "the pointer is here"
+     open      #d7e6fb fill, #05378a border/text -- aria-expanded="true", set by
+                         openMenu()/closeMenu() already, so no new JS wiring; the pressed/open
+                         item reads as pushed IN, not lit up
+   `border-radius` makes the rounded-rectangle Tom leaned toward; the border is the same colour as
+   the text in every state (so the rule reads as one outlined shape, not a box with a stray ring),
+   and both move together on hover and open. */
+.lpn-menubar-item {
+	background: #fff; color: #0645ad; border: 1px solid #0645ad; border-radius: 5px;
+	font: inherit; padding: 3px 10px; cursor: pointer;
+}
+.lpn-menubar-item:hover { background: #eaf1fc; border-color: #1f58b5; color: #1f58b5; }
+.lpn-menubar-item[aria-expanded="true"] { background: #d7e6fb; border-color: #05378a; color: #05378a; }
+.lpn-menubar-item:focus-visible { outline: 2px solid #0645ad; outline-offset: 2px; }
 /* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
    pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
    it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
@@ -1470,7 +1506,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The colour mark is an <img>, not an inline glyph (Tom chose colour here, 2026-09-11). Sized to
    the heading like its mono predecessor; `flex: none` so a long site name cannot squash it. */
 .lpn-about-name .lpn-about-mark { width: 1.5em; height: 1.5em; flex: none; }
-.lpn-menubar-item:hover { background: #def; border-color: #9bd; }
+/* .lpn-menubar-item's own hover/open/focus rules moved up next to its base rule, above, when this
+   branch (feat/menu-button) gave the menu bar its blue button paint -- kept together so the whole
+   state set reads in one place instead of two. */
 /* ---- Project tab strip (ROADMAP Task 211) ----
    Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first
    version rendered): with a real menu bar in the chrome above, the strip belongs against the thing
@@ -4335,7 +4373,29 @@ tr.lpn-ff-error { background: #f2f2f2; }
 		max-height: 33svh;
 		overflow-y: auto;
 	}
+
+	/* 9. THE ON-MAP ZOOM CHIP GOES BELOW ITS OWN BREAKPOINT (ROADMAP Task 682; Ida, 2026-09-17):
+	   the whole reason it exists is a visitor with no wheel and no pinch surface, and a
+	   touchscreen supplies one of its own -- Tom, 2026-08-22: "on a phone, zoom in is the answer.
+	   You can't see through your finger... A finger is not a mouse!" Hidden at the same width the
+	   toolbar's non-transport groups already collapse at, not a new figure. */
+	html:has(#lpn_canvas) #lpn_zoom_control { display: none; }
 }
+
+/* The on-map zoom chip's layout lives here, not inline, so the phone rule above can hide it: an
+   inline display would beat any stylesheet rule (Perry, 2026-09-23). */
+#lpn_zoom_control { display: flex; flex-direction: column; }
+
+/* R-179 (Tom, 2026-09-23): "The + and - glyphs are not centered in their boxes." Each button had
+   no layout of its own, so the icon fell back to being an ordinary inline glyph -- `button >
+   .ec-icon`'s `margin-inline-end: 0.4em` (the gap it earns everywhere it prefixes a WORD) shoved
+   it left of centre here, where there is no word to gap from, and `.ec-icon`'s
+   `vertical-align: -0.16em` (tuned to sit on a line of TEXT's optical centre) had no baseline to
+   sit on in an otherwise-empty button. Flex centring on the button answers both axes at once, and
+   the margin is zeroed the same way the lpn menu's icon column already zeroes it for its own
+   icon-only cells. */
+#lpn_zoom_in, #lpn_zoom_out { display: flex; align-items: center; justify-content: center; }
+#lpn_zoom_in > .ec-icon, #lpn_zoom_out > .ec-icon { margin-inline-end: 0; }
 
 /* ---- The profile's path chooser (Tasks 433, 504) ---------------------------------------------
    The line that says what the next press does. It lives in the profile panel's control row, which

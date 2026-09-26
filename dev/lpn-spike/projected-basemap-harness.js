@@ -97,7 +97,7 @@ const L = loadLoopedNetwork(
 	"\t\tviewLonLat: viewLonLat,\n" +
 	"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
-	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced,\n" +
+	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced, crsLabel: crsLabel,\n" +
 	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
 	"\t\tsyncNewBoxCrsPick: syncNewBoxCrsPick,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -557,7 +557,8 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		L.createProjectFrom({ geo: false, crs: ACCRA, units: {}, method: 'hw', place: PHOENIX });
 		await new Promise((res) => setTimeout(res, 20));
 		ok('creating one anyway states the projection\'s own limit',
-			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable,
+			// Tom, 2026-09-26: the sentence now names the system ({crs}).
+			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable.replace('{crs}', L.crsLabel(ACCRA)),
 			byId.lpn_map_notice.textContent);
 	}
 

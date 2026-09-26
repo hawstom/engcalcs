@@ -224,6 +224,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
 		[/marker\.style\.display = 'none';/, 'the column-drag insertion marker (2026-09-26, fourth '
 			+ 'pass), declared with its reason beside NOT_A_PANEL_SHOW above'],
+		[/zoomWinEl\.style\.display = 'none'; return;/, 'the Zoom Window drag box on the map (Task 682), the same kind of shape as the select-area marquee above'],
 		[/box\.style\.display = 'none'; box\.textContent = '';/, 'the select-area instruction bubble, which holds no control'],
 		[/el\.style\.display = 'none'; \}\n\t\ttry \{ localStorage\.setItem\(MENU_CUE_KEY/,
 			'the one-time menu cue (Task 625): a line of text and a dismiss button, with no drag, '

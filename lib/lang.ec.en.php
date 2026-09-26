@@ -817,6 +817,11 @@ $ec_lang['lpn_field_meter_total']='Total demand';
 $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
 $ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
+// Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
+// pipe at station 0 or 100. Shown in place of lpn_field_meter_pipe/station/offset, never beside
+// them (renderCustomerFields()).
+$ec_lang['lpn_field_meter_node']='Connected to';
+$ec_lang['lpn_field_meter_node_tip']='The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.';
 $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
@@ -884,6 +889,9 @@ $ec_lang['lpn_tool_area_polygon']='Select a polygon';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
+$ec_lang['lpn_tool_zoom_window']='Zoom Window';
+$ec_lang['lpn_zoom_in']='Zoom in';
+$ec_lang['lpn_zoom_out']='Zoom out';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
 $ec_lang['lpn_field_text_bold']='Bold text';
@@ -1234,7 +1242,7 @@ $ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an un
 $ec_lang['lpn_convas_ok']='Convert';
 // {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
 // 2026-09-25: "What, specifically, is 'that coordinate system'?").
-$ec_lang['lpn_convas_no_transform']='This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.';
+$ec_lang['lpn_convas_no_transform']='{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.';
 // {name} is the new project's name.
 $ec_lang['lpn_convas_done']='The converted copy is {name}. The original project is unchanged.';
 $ec_lang['lpn_convas_cancelled']='Nothing was converted. The copy is closed, and the original project is unchanged.';
@@ -1288,7 +1296,12 @@ $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Click a pipe to
 $ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
 $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map.';
+$ec_lang['lpn_tool_zoom_window_tip']='Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.';
+// Tom's wording, 2026-09-25.
+$ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
+// Tom's wording, 2026-09-25.
+$ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
@@ -1830,7 +1843,7 @@ $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane,
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 // The same fact in a sentence, under the chooser's list and again if such a project is created.
-$ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.';
+$ec_lang['lpn_crs_unplaceable']='{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 // **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
@@ -2444,6 +2457,7 @@ $ec_lang['lpn_mode_select']='Mode: Select. Click an asset or a label to see or c
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an asset to remove it.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode.';
+$ec_lang['lpn_mode_zoom_window']='Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='Nothing is selected. Click an asset on the map first, then press Delete.';
@@ -2965,7 +2979,7 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
-$ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
+$ec_lang['lpn_settings_link_width']='Link line width (pixels)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
@@ -3323,7 +3337,7 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, and the EPANET solver report.';
+$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, and, after an extended period simulation, the status report and the full report.';
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
@@ -3378,6 +3392,43 @@ $ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
 $ec_lang['lpn_energy_peak_kw']='Peak power usage';
 $ec_lang['lpn_energy_total_demand_charge']='Cost of peak demand';
 $ec_lang['lpn_energy_total_cost']='Total cost';
+
+// ---- The Status report (ROADMAP Task 716) and the Full report (ROADMAP Task 715) --------------
+// EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
+// simulation, in time order; Full lists every node and every link at every reporting time step.
+// Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
+// **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
+// has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
+// lpn_status_title, keeps the full name.
+$ec_lang['lpn_reports_status']='Status';
+$ec_lang['lpn_reports_status_tip']='What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.';
+$ec_lang['lpn_status_title']='Status report';
+$ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
+$ec_lang['lpn_status_empty']='Nothing changed status during this run.';
+$ec_lang['lpn_status_col_time']='Time';
+$ec_lang['lpn_status_col_event']='Event';
+$ec_lang['lpn_status_opened']='{type} {id} opened';
+$ec_lang['lpn_status_closed']='{type} {id} closed';
+$ec_lang['lpn_status_filling']='{type} {id} is filling';
+$ec_lang['lpn_status_emptying']='{type} {id} is emptying';
+$ec_lang['lpn_status_full']='{type} {id} is full';
+$ec_lang['lpn_status_dry']='{type} {id} is empty';
+$ec_lang['lpn_status_no_converge']='The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.';
+$ec_lang['lpn_status_note']='Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.';
+
+// Same rule as Status above: the row says "Full", the box says "Full report".
+$ec_lang['lpn_reports_full']='Full';
+$ec_lang['lpn_reports_full_tip']='Every node and every link at every reporting time step of the last run, as one table you can download or print.';
+$ec_lang['lpn_full_title']='Full report';
+$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.';
+$ec_lang['lpn_full_step_label']='Time step';
+$ec_lang['lpn_full_download_csv']='Download CSV';
+$ec_lang['lpn_full_print']='Print report';
+$ec_lang['lpn_full_col_time']='Time';
+$ec_lang['lpn_full_col_type']='Type';
+$ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_full_row_count']='{n} rows.';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
 // The sibling of the line above, and the difference between them is the whole of Task 581: a file
 // that states a price of zero is not a file that states no price, and the report must not say the

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2053,
-        "delta_key_count": 214,
+        "expected_key_count": 2089,
+        "delta_key_count": 250,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -535,6 +535,8 @@
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_field_meter_node": "Connected to",
+        "lpn_field_meter_node_tip": "The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
         "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.",
         "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
@@ -554,6 +556,9 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_tool_zoom_window": "Zoom Window",
+        "lpn_zoom_in": "Zoom in",
+        "lpn_zoom_out": "Zoom out",
         "lpn_offscreen_intact": "Your network is intact.",
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
@@ -577,11 +582,14 @@
         "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
         "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
         "lpn_convas_ok": "Convert",
-        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
         "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
+        "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
+        "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
+        "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
         "lpn_find_filter_row": "{table}: {n} of {all}",
@@ -605,7 +613,7 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
+        "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
         "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
@@ -633,6 +641,7 @@
         "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
+        "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
@@ -679,6 +688,33 @@
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_reports_status": "Status",
+        "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
+        "lpn_status_title": "Status report",
+        "lpn_status_needs_run": "The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.",
+        "lpn_status_empty": "Nothing changed status during this run.",
+        "lpn_status_col_time": "Time",
+        "lpn_status_col_event": "Event",
+        "lpn_status_opened": "{type} {id} opened",
+        "lpn_status_closed": "{type} {id} closed",
+        "lpn_status_filling": "{type} {id} is filling",
+        "lpn_status_emptying": "{type} {id} is emptying",
+        "lpn_status_full": "{type} {id} is full",
+        "lpn_status_dry": "{type} {id} is empty",
+        "lpn_status_no_converge": "The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.",
+        "lpn_status_note": "Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.",
+        "lpn_reports_full": "Full",
+        "lpn_reports_full_tip": "Every node and every link at every reporting time step of the last run, as one table you can download or print.",
+        "lpn_full_title": "Full report",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.",
+        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.",
+        "lpn_full_step_label": "Time step",
+        "lpn_full_download_csv": "Download CSV",
+        "lpn_full_print": "Print report",
+        "lpn_full_col_time": "Time",
+        "lpn_full_col_type": "Type",
+        "lpn_full_col_id": "ID",
+        "lpn_full_row_count": "{n} rows.",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -751,6 +787,8 @@
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_field_meter_node": "Connected to",
+        "lpn_field_meter_node_tip": "The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
         "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.",
         "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
@@ -770,6 +808,9 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_tool_zoom_window": "Zoom Window",
+        "lpn_zoom_in": "Zoom in",
+        "lpn_zoom_out": "Zoom out",
         "lpn_offscreen_intact": "Your network is intact.",
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
@@ -793,11 +834,14 @@
         "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
         "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
         "lpn_convas_ok": "Convert",
-        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
         "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
+        "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
+        "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
+        "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
         "lpn_find_filter_row": "{table}: {n} of {all}",
@@ -821,7 +865,7 @@
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
+        "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
         "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
@@ -849,6 +893,7 @@
         "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
+        "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
@@ -895,6 +940,33 @@
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_reports_status": "Status",
+        "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
+        "lpn_status_title": "Status report",
+        "lpn_status_needs_run": "The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.",
+        "lpn_status_empty": "Nothing changed status during this run.",
+        "lpn_status_col_time": "Time",
+        "lpn_status_col_event": "Event",
+        "lpn_status_opened": "{type} {id} opened",
+        "lpn_status_closed": "{type} {id} closed",
+        "lpn_status_filling": "{type} {id} is filling",
+        "lpn_status_emptying": "{type} {id} is emptying",
+        "lpn_status_full": "{type} {id} is full",
+        "lpn_status_dry": "{type} {id} is empty",
+        "lpn_status_no_converge": "The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.",
+        "lpn_status_note": "Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.",
+        "lpn_reports_full": "Full",
+        "lpn_reports_full_tip": "Every node and every link at every reporting time step of the last run, as one table you can download or print.",
+        "lpn_full_title": "Full report",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.",
+        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.",
+        "lpn_full_step_label": "Time step",
+        "lpn_full_download_csv": "Download CSV",
+        "lpn_full_print": "Print report",
+        "lpn_full_col_time": "Time",
+        "lpn_full_col_type": "Type",
+        "lpn_full_col_id": "ID",
+        "lpn_full_row_count": "{n} rows.",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
@@ -1147,6 +1219,38 @@
             }
         },
         "lpn_field_meter_pipe_suggest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершини",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Клацніть по одному куту вікна.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершини",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Клацніть по одному куту вікна.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_node_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1463,6 +1567,54 @@
                     "key": "lpn_area_hint_window_start",
                     "value": "Клацніть по одному куту вікна.",
                     "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_tool_zoom_window": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Показати все",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Текст",
+                    "english": "Text"
+                }
+            }
+        },
+        "lpn_zoom_in": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Показати все",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Текст",
+                    "english": "Text"
+                }
+            }
+        },
+        "lpn_zoom_out": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Показати все",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Текст",
+                    "english": "Text"
                 }
             }
         },
@@ -1911,6 +2063,54 @@
                     "key": "lpn_georef_intro",
                     "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
                     "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_tool_zoom_window_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Вписати всю мережу у вікно.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Відкрити налаштування цього проєкту.",
+                    "english": "Open the settings for this project."
+                }
+            }
+        },
+        "lpn_zoom_in_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Вписати всю мережу у вікно.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Відкрити налаштування цього проєкту.",
+                    "english": "Open the settings for this project."
+                }
+            }
+        },
+        "lpn_zoom_out_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Вписати всю мережу у вікно.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Відкрити налаштування цього проєкту.",
+                    "english": "Open the settings for this project."
                 }
             }
         },
@@ -2730,6 +2930,22 @@
                 }
             }
         },
+        "lpn_mode_zoom_window": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_vertices",
+                    "value": "Режим: Вершини. Вершини кожної труби показано як маленькі квадратні маркери. Клацніть на трубі, щоб додати вершину, клацніть на маркері, щоб прибрати його, або перетягніть маркер, щоб перемістити його. Більше нічого на карті в цьому режимі не змінюється.",
+                    "english": "Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode."
+                },
+                "next_translated": {
+                    "key": "lpn_select_first",
+                    "value": "Нічого не вибрано. Спочатку клацніть елемент на карті, потім натисніть Delete.",
+                    "english": "Nothing is selected. Click an asset on the map first, then press Delete."
+                }
+            }
+        },
         "lpn_field_coord_tip": {
             "reason": "missing",
             "current_value": null,
@@ -3463,6 +3679,438 @@
                     "key": "lpn_settings_page",
                     "value": "Сторінка",
                     "english": "Page"
+                }
+            }
+        },
+        "lpn_reports_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_status_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_col_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_col_event": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_filling": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_emptying": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_full": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_dry": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_no_converge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_full": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_full_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_step_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_download_csv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_print": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_row_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Загальна вартість",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Ціну електроенергії не вказано, тож кожна вартість тут дорівнює нулю. Задайте її в «Налаштування, Енергія».",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
                 }
             }
         },

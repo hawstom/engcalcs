@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 232 untranslated keys, of 2070 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 268 untranslated keys, of 2106 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (232, 7 to read @@ NEEDS RULING)
+## lpn_  (268, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -52,8 +52,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
 - **`lpn_convas_no_transform`**
-  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
-  @@ NEEDS RULING
+  > {crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.
+  _Ruled 2026-09-26: His own wording, 2026-09-26 ("cannot be convert" corrected to "converted")._
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
   _Ruled OK 2026-09-26._
@@ -97,8 +97,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > unnamed
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
-  > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
-  @@ NEEDS RULING
+  > {crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.
+  _Ruled 2026-09-26: His own wording, 2026-09-26._
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
@@ -162,6 +162,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_meter_lumped_tip`**
   > Nearest node; this customer's demands are added there.
   _Ruled OK 2026-09-23._
+- **`lpn_field_meter_node`**
+  > Connected to
+  _Ruled OK 2026-09-26._
+- **`lpn_field_meter_node_tip`**
+  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
+  _Ruled OK 2026-09-26._
 - **`lpn_field_meter_offset`**
   > Offset from the pipe
   _Ruled OK 2026-09-23._
@@ -218,6 +224,36 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_find_filter_summary`**
   > Filtered by {q}. {rows}.
+  _Ruled OK 2026-09-26._
+- **`lpn_full_col_id`**
+  > ID
+  _Ruled OK 2026-09-26._
+- **`lpn_full_col_time`**
+  > Time
+  _Ruled OK 2026-09-26._
+- **`lpn_full_col_type`**
+  > Type
+  _Ruled OK 2026-09-26._
+- **`lpn_full_download_csv`**
+  > Download CSV
+  _Ruled OK 2026-09-26._
+- **`lpn_full_needs_run`**
+  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
+  _Ruled OK 2026-09-26._
+- **`lpn_full_note`**
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
+  _Ruled OK 2026-09-26._
+- **`lpn_full_print`**
+  > Print report
+  _Ruled OK 2026-09-26._
+- **`lpn_full_row_count`**
+  > {n} rows.
+  _Ruled OK 2026-09-26._
+- **`lpn_full_step_label`**
+  > Time step
+  _Ruled OK 2026-09-26._
+- **`lpn_full_title`**
+  > Full report
   _Ruled OK 2026-09-26._
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
@@ -429,6 +465,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  _Ruled OK 2026-09-25._
 - **`lpn_msglog_ago`**
   > {x} ago
   _Ruled OK 2026-09-23._
@@ -488,7 +527,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_bottom`**
   > Move to end
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_down`**
   > Move down
   _Ruled OK 2026-09-26._
@@ -500,7 +539,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_top`**
   > Move to beginning
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_up`**
   > Move up
   _Ruled OK 2026-09-26._
@@ -515,10 +554,22 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_pane_sortarrow_tip`**
   > Reverse the sort
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_reports_full`**
+  > Full
+  _Ruled OK 2026-09-26._
+- **`lpn_reports_full_tip`**
+  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
+  _Ruled OK 2026-09-26._
+- **`lpn_reports_status`**
+  > Status
+  _Ruled OK 2026-09-26._
+- **`lpn_reports_status_tip`**
+  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_always`**
   > Always show
   _Ruled OK 2026-09-26._
@@ -546,6 +597,45 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   _Ruled OK 2026-09-23._
+- **`lpn_status_closed`**
+  > {type} {id} closed
+  _Ruled OK 2026-09-26._
+- **`lpn_status_col_event`**
+  > Event
+  _Ruled OK 2026-09-26._
+- **`lpn_status_col_time`**
+  > Time
+  _Ruled OK 2026-09-26._
+- **`lpn_status_dry`**
+  > {type} {id} is empty
+  _Ruled OK 2026-09-26._
+- **`lpn_status_empty`**
+  > Nothing changed status during this run.
+  _Ruled OK 2026-09-26._
+- **`lpn_status_emptying`**
+  > {type} {id} is emptying
+  _Ruled OK 2026-09-26._
+- **`lpn_status_filling`**
+  > {type} {id} is filling
+  _Ruled OK 2026-09-26._
+- **`lpn_status_full`**
+  > {type} {id} is full
+  _Ruled OK 2026-09-26._
+- **`lpn_status_needs_run`**
+  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
+  _Ruled OK 2026-09-26._
+- **`lpn_status_no_converge`**
+  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
+  _Ruled OK 2026-09-26._
+- **`lpn_status_note`**
+  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
+  _Ruled OK 2026-09-26._
+- **`lpn_status_opened`**
+  > {type} {id} opened
+  _Ruled OK 2026-09-26._
+- **`lpn_status_title`**
+  > Status report
+  _Ruled OK 2026-09-26._
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -666,6 +756,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  _Ruled OK 2026-09-25._
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  _Ruled OK 2026-09-25._
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -723,120 +819,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_units_usft`**
   > US survey ft
   _Ruled OK 2026-09-25._
-
----
-
-# Strings waiting on a branch
-
-**27 still to read**, of 39 new keys across 3 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/queue-0926 (`06b7976e`) — 36 new, 27 to read @@ NEEDS RULING
-
-- **`lpn_field_meter_node`**
-  > Connected to
-  _Ruled OK 2026-09-26._
-- **`lpn_field_meter_node_tip`**
-  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
-  _Ruled OK 2026-09-26._
-- **`lpn_full_col_id`**
-  > ID
-  @@ NEEDS RULING
-- **`lpn_full_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_full_col_type`**
-  > Type
-  @@ NEEDS RULING
-- **`lpn_full_download_csv`**
-  > Download CSV
-  @@ NEEDS RULING
-- **`lpn_full_needs_run`**
-  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
-  @@ NEEDS RULING
-- **`lpn_full_note`**
-  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
-  @@ NEEDS RULING
-- **`lpn_full_print`**
-  > Print report
-  @@ NEEDS RULING
-- **`lpn_full_row_count`**
-  > {n} rows.
-  @@ NEEDS RULING
-- **`lpn_full_step_label`**
-  > Time step
-  @@ NEEDS RULING
-- **`lpn_full_title`**
-  > Full report
-  @@ NEEDS RULING
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  _Ruled OK 2026-09-25._
-- **`lpn_reports_full`**
-  > Full
-  @@ NEEDS RULING
-- **`lpn_reports_full_tip`**
-  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
-  @@ NEEDS RULING
-- **`lpn_reports_status`**
-  > Status
-  @@ NEEDS RULING
-- **`lpn_reports_status_tip`**
-  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
-  @@ NEEDS RULING
-- **`lpn_status_closed`**
-  > {type} {id} closed
-  @@ NEEDS RULING
-- **`lpn_status_col_event`**
-  > Event
-  @@ NEEDS RULING
-- **`lpn_status_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_status_dry`**
-  > {type} {id} is empty
-  @@ NEEDS RULING
-- **`lpn_status_empty`**
-  > Nothing changed status during this run.
-  @@ NEEDS RULING
-- **`lpn_status_emptying`**
-  > {type} {id} is emptying
-  @@ NEEDS RULING
-- **`lpn_status_filling`**
-  > {type} {id} is filling
-  @@ NEEDS RULING
-- **`lpn_status_full`**
-  > {type} {id} is full
-  @@ NEEDS RULING
-- **`lpn_status_needs_run`**
-  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
-  @@ NEEDS RULING
-- **`lpn_status_no_converge`**
-  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
-  @@ NEEDS RULING
-- **`lpn_status_note`**
-  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
-  @@ NEEDS RULING
-- **`lpn_status_opened`**
-  > {type} {id} opened
-  @@ NEEDS RULING
-- **`lpn_status_title`**
-  > Status report
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  _Ruled OK 2026-09-25._
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  _Ruled OK 2026-09-25._
 - **`lpn_zoom_in`**
   > Zoom in
   _Ruled OK 2026-09-25._
@@ -850,6 +832,21 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom out. Shortcut: -
   _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
 
+---
+
+# Strings waiting on a branch
+
+**0 still to read**, of 3 new keys across 2 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -862,4 +859,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/table-editing (`acdbe7f8`) — adds no English strings
+### feat/table-editing (`410ddadc`) — adds no English strings

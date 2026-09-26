@@ -597,6 +597,27 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
 		      // 2026-07-30; default 'top-right' reproduces this div's original hardcoded position). ?>
 		<div id="lpn_labels_legend" style="display:none;position:absolute;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
+		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
+		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
+		      // (the one mapping vendor already on this page) puts its zoom stack in by default.
+		      //
+		      // TOP-RIGHT IS THE ONLY CALM CORNER (Ida, 2026-09-17): top-left already carries a
+		      // growing status column, bottom-left holds seven things, bottom-right is the
+		      // non-dismissible tile attribution. Styled like every other chip in that population --
+		      // rgba(255,255,255,.85), a thin border, nothing new drawn on the page.
+		      //
+		      // HIDDEN BELOW THE 640PX BREAKPOINT (css/engcalcs.css) -- a finger pinches instead.
+		      //
+		      // EMPTY IN THE MARKUP: filled by wireZoomControl() in js/looped-network.js, through the
+		      // same icon+aria-label+tip door every toolbar icon button already uses
+		      // (EngCalcs.setIconLabel()), so this gets an accessible name and a touch-reachable tip
+		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
+		      // labels legend dodges under it instead of through it. ?>
+		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:rgba(255,255,255,.85);border:1px solid #999">
+			<button type="button" id="lpn_zoom_in" style="width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
+		</div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>
@@ -1323,6 +1344,33 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
+<?php // THE STATUS REPORT (ROADMAP Task 716). EPANET's Report > Status: what changed, in time
+      // order, over the last extended period simulation -- pumps and valves opening or closing,
+      // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
+      // borrows the same box shell as the reports above it; the list is built in JS
+      // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_statusbox_title">
+	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
+	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_status_report" class="lpn-ff-report"></div>
+	</div>
+</div>
+<?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
+      // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
+      // frames the Status report and the Tables pane read, so the three cannot disagree. Download
+      // and Print sit beside the close button, the same placement the run report's Copy button
+      // uses, because this table can run to thousands of rows and a button that scrolls away with
+      // it is a button nobody finds. ?>
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_fullbox_title">
+	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
+	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
+	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
+	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_full_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -1725,6 +1773,8 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_pipe: <?=json_encode($ec_lang['lpn_field_meter_pipe'])?>,
 	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
 	lpn_field_meter_pipe_suggest: <?=json_encode($ec_lang['lpn_field_meter_pipe_suggest'])?>,
+	lpn_field_meter_node: <?=json_encode($ec_lang['lpn_field_meter_node'])?>,
+	lpn_field_meter_node_tip: <?=json_encode($ec_lang['lpn_field_meter_node_tip'])?>,
 	lpn_meter_pipe_unknown: <?=json_encode($ec_lang['lpn_meter_pipe_unknown'])?>,
 	lpn_field_meter_pattern_tip: <?=json_encode($ec_lang['lpn_field_meter_pattern_tip'])?>,
 	lpn_meter_pattern_unknown: <?=json_encode($ec_lang['lpn_meter_pattern_unknown'])?>,
@@ -1784,6 +1834,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_vertices_tip: <?=json_encode($ec_lang['lpn_tool_vertices_tip'])?>,
 	lpn_tool_delete: <?=json_encode($ec_lang['lpn_tool_delete'])?>,
 	lpn_tool_zoom_extent: <?=json_encode($ec_lang['lpn_tool_zoom_extent'])?>,
+	lpn_tool_zoom_window: <?=json_encode($ec_lang['lpn_tool_zoom_window'])?>,
+	lpn_zoom_in: <?=json_encode($ec_lang['lpn_zoom_in'])?>,
+	lpn_zoom_out: <?=json_encode($ec_lang['lpn_zoom_out'])?>,
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
@@ -2316,6 +2369,7 @@ EngCalcs.pageConfig = {
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
 	lpn_mode_vertices: <?=json_encode($ec_lang['lpn_mode_vertices'])?>,
+	lpn_mode_zoom_window: <?=json_encode($ec_lang['lpn_mode_zoom_window'])?>,
 	lpn_select_first: <?=json_encode($ec_lang['lpn_select_first'])?>,
 	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
 	lpn_mode_add_reservoir: <?=json_encode($ec_lang['lpn_mode_add_reservoir'])?>,
@@ -2464,6 +2518,33 @@ EngCalcs.pageConfig = {
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_menu_tip: <?=json_encode($ec_lang['lpn_reports_menu_tip'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,
+	lpn_reports_status: <?=json_encode($ec_lang['lpn_reports_status'])?>,
+	lpn_reports_status_tip: <?=json_encode($ec_lang['lpn_reports_status_tip'])?>,
+	lpn_status_title: <?=json_encode($ec_lang['lpn_status_title'])?>,
+	lpn_status_needs_run: <?=json_encode($ec_lang['lpn_status_needs_run'])?>,
+	lpn_status_empty: <?=json_encode($ec_lang['lpn_status_empty'])?>,
+	lpn_status_col_time: <?=json_encode($ec_lang['lpn_status_col_time'])?>,
+	lpn_status_col_event: <?=json_encode($ec_lang['lpn_status_col_event'])?>,
+	lpn_status_opened: <?=json_encode($ec_lang['lpn_status_opened'])?>,
+	lpn_status_closed: <?=json_encode($ec_lang['lpn_status_closed'])?>,
+	lpn_status_filling: <?=json_encode($ec_lang['lpn_status_filling'])?>,
+	lpn_status_emptying: <?=json_encode($ec_lang['lpn_status_emptying'])?>,
+	lpn_status_full: <?=json_encode($ec_lang['lpn_status_full'])?>,
+	lpn_status_dry: <?=json_encode($ec_lang['lpn_status_dry'])?>,
+	lpn_status_no_converge: <?=json_encode($ec_lang['lpn_status_no_converge'])?>,
+	lpn_status_note: <?=json_encode($ec_lang['lpn_status_note'])?>,
+	lpn_reports_full: <?=json_encode($ec_lang['lpn_reports_full'])?>,
+	lpn_reports_full_tip: <?=json_encode($ec_lang['lpn_reports_full_tip'])?>,
+	lpn_full_title: <?=json_encode($ec_lang['lpn_full_title'])?>,
+	lpn_full_needs_run: <?=json_encode($ec_lang['lpn_full_needs_run'])?>,
+	lpn_full_note: <?=json_encode($ec_lang['lpn_full_note'])?>,
+	lpn_full_download_csv: <?=json_encode($ec_lang['lpn_full_download_csv'])?>,
+	lpn_full_print: <?=json_encode($ec_lang['lpn_full_print'])?>,
+	lpn_full_col_time: <?=json_encode($ec_lang['lpn_full_col_time'])?>,
+	lpn_full_col_type: <?=json_encode($ec_lang['lpn_full_col_type'])?>,
+	lpn_full_col_id: <?=json_encode($ec_lang['lpn_full_col_id'])?>,
+	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
+	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
 	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
 	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
 	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,
@@ -2543,6 +2624,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_delete_tip: <?=json_encode($ec_lang['lpn_tool_delete_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
+	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
+	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
 	lpn_tool_settings_tip: <?=json_encode($ec_lang['lpn_tool_settings_tip'])?>,
 	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
 	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,

@@ -832,6 +832,166 @@ Scripts used, not committed (this machine's temp paths, gone with the session): 
 mutation copy at `/tmp/claude-*/scratchpad/mutcopy` — all deleted after use, the finding is what to
 keep.
 
+## feat/zoom-control (Task 682), 2026-09-23, head 2d08c5b2
+
+**MISSED, OBSERVED by rendering: the on-map +/- chip cannot hide, at any width, on any pointer
+type, because an inline style beats the media-query rule meant to hide it.** Looped-Network.php
+writes `<div id="lpn_zoom_control" ... style="...display:flex;...">` (line 511) — an inline style,
+which wins the cascade over any external stylesheet rule short of `!important`. The hiding rule
+lives in `css/engcalcs.css` at `@media (max-width: 640px) { @media (hover: none) and
+(pointer: coarse) { html:has(#lpn_canvas) #lpn_zoom_control { display: none; } } }`. I drove a
+real Chromium (via `dev/browser-pass`'s own `lib/env.js`/`lib/session.js`, against a `php -S`
+server over this checkout) to a 390×800 context with `hasTouch: true, isMobile: true` and read
+`matchMedia()` directly: `hoverNone: true, pointerCoarse: true, maxWidth640: true` — every
+condition the CSS asks for is true — yet `getComputedStyle(el).display` was still `"flex"` and
+the element rendered at 28×54px, screenshotted sitting over the example gallery. This is exactly
+Ida's own placement rule failing ("hidden entirely at the 640px breakpoint, because fingers
+pinch," dev/ROADMAP.md Task 682) and the build agent's own claim ("hidden at the 640px breakpoint")
+— both false as rendered. `dev/lpn-spike/zoom-control-harness.js` section 4 cannot catch this: it
+only checks that the CSS text for the rule sits inside the right `@media` block; it never renders
+the page, so it never meets the inline style that defeats it. Screenshots:
+`390-en.png` (chip visible over the gallery even without touch emulation).
+
+**CONFIRMED, OBSERVED by rendering, everything else Tom and Ida asked for:**
+- Chip visible top-right at 1280 wide, English (`1280-en-topright.png`): `#lpn_zoom_control`
+  `display:flex`, 28×54px, at `left:1247,top:144` in a 1280-wide viewport.
+- + and − keys zoom about the view centre through the wheel's own math: pressing `+` took the
+  world transform from `s=1` to `s=1.1` (a wheel notch), `-` brought it back down; both read off
+  the SVG's own `transform` attribute on the world group, not asserted against `zoomAbout()`
+  directly.
+- The "not while typing" guard is real against a genuinely focused, visible text field
+  (`#lpn_crsbox_name`, made visible and focused, `document.activeElement` confirmed): `+` did
+  nothing to the scale while it had focus. (My first attempt used a hidden dialog input Chromium
+  never actually focuses — that gave a false FAIL and was thrown out once I checked
+  `document.activeElement`; worth remembering for the next spec that tries this shortcut.)
+- The toolbar button's two-step double duty matches Tom's own words exactly: first click performs
+  Zoom to fit (view's `s`/`tx` changed) and repaints the button to read "Zoom Window"
+  (`aria-label`), without yet entering `zoom-window` mode (`aria-pressed` stayed `false`); second
+  click sets `aria-pressed="true"` and a real pointer drag on the canvas (mousedown/move/up) then
+  changed the view's scale (a box-fit, `232.05` from `69.8`, matching a magnification of the
+  dragged box); after the completed drag the button read "Zoom to fit" again and `aria-pressed`
+  returned to `false` — the same one-shot return-to-Select the harness's node test already
+  asserted, now shown live in a real browser rather than through the exported primitives.
+- The chip stays at the right edge (`left:1247` of 1280) in Arabic RTL exactly as in English — it
+  does not flip to the left. (Its vertical position was ~110px lower in Arabic than English,
+  109px; not investigated further — likely a taller top-left status/mode-hint stack under Arabic
+  text metrics pushing nothing that matters here, but I did not trace it, so treat as a curiosity
+  not a claim.)
+- No overlap detected, at 1280 wide English, between the chip and any element matching
+  `#lpn_legend, .lpn-legend, [id*=legend]`, `#lpn_scale, .lpn-scale, [id*=scale]`, `#lpn_rpane`, or
+  an attribution control — all four came back `null` (no bounding-box intersection). This was
+  checked on the default example (no legend actually showing), so it does not exercise the
+  `overlayOccupants()` dodge path Tom's brief described (a labels legend parked top-right); I did
+  read that code (js/looped-network.js ~36660) and it does register `#lpn_zoom_control` as an
+  occupant a legend dodges under, but I did not render a project with the labels legend on to
+  measure the dodge in pixels — **UNVERIFIABLE FROM HERE without a person opening a project with
+  the labels legend set to top-right and confirming by eye that it sits below the chip, not
+  under it.**
+
+**UNVERIFIABLE FROM HERE (visual only):** whether the chip's own look (the 28px button size, the
+divider line, the background tint against a busy map, and the little corner triangle on the
+toolbar button Tom asked for) reads well is something only a person looking at the rendered page
+can judge — I can confirm elements exist, are sized, and are positioned, not that they look right.
+
+**Harness note:** `dev/lpn-spike/zoom-control-harness.js` (29 checks) passes cleanly and is honest
+about what it proves — its own comment says a harness that called `zoomAbout()` directly would
+prove nothing new, and it drives the real keydown/pointer listeners instead. I did not mutation-test
+it (did not revert the fix and rerun), for lack of time; its own file did not exist before this
+branch so there is no "does it fail on old code" question to ask — the branch that would fail it
+does not exist.
+
+---
+
+## feat/zoom-control, second round, 2026-09-23, head c6c5b2e0 (merged master at f95f9450): NOT READY — R-181's own stated fix does not survive an ordinary click
+
+Reviewing R-179 (glyph centring), R-180 (click-click idiom for Zoom Window) and R-181 (arm on
+second consecutive press) against the build's own report and Ida's spec. The phone-hide defect
+from my first pass (`Perry, 2026-09-23`, cited in this same commit's own CSS comment) is fixed:
+`Looped-Network.php` no longer writes an inline `display:` on `#lpn_zoom_in`/`#lpn_zoom_out`, and
+`dev/lpn-spike/zoom-control-harness.js` sections 4-6 (58 checks) all pass against the live tree.
+
+**MISSED — R-181's own claim "any other action in between resets" is false, confirmed in real
+Chromium.** Read the code first: `setMode()`'s new reset line is `if (newMode !== mode) {
+zoomToolArmed = false; }` (`js/looped-network.js:24672`) — it only fires on a change of MODE.
+Selecting, deselecting, or clicking any element on the map while the tool is `'select'` never calls
+`setMode()` at all (`openPopup()` at `:44913` has no `setMode` call anywhere in it; the plain-click
+branches under `mode === 'select'` around `:34808-34871` just open a popup or toggle a selection).
+So "click a map element" — the exact sequence named in the review brief — does **not** un-arm the
+button.
+
+Measured live, with the cookie-consent banner genuinely dismissed and the click verified (via
+`document.elementFromPoint`) to land on `#lpn_canvas` and not on the banner or gallery:
+1. Press the Zoom to fit / Zoom Window button once → face reads "Zoom to fit" (correct, R-181).
+2. Click on the open map (an ordinary deselect click, no drag, mode stays `'select'` throughout).
+3. Press the same button again → face reads **"Zoom Window"** and the tool enters `zoom-window`
+   mode immediately — it does **not** refit and stay on "Zoom to fit" as a genuine "first press
+   after something else happened" should.
+
+That is a script, run against the live worktree, not an argument:
+```
+after press 1, face reads Zoom to fit ......... ok
+clicking element id: lpn_canvas
+after press / unrelated map click / press 2 -- should STILL read Zoom to fit ... FAIL, got "Zoom Window"
+```
+In practice: a reader presses Zoom to fit once, looks at their network, selects a junction to check
+its elevation (a completely ordinary thing to do, not "another tool"), then presses the same button
+again meaning "fit the view again" — and gets thrown into Zoom Window instead, with no drag or
+click-click ever asked for. The harness's own section 6 never catches this because its "intervening
+action" is `L.setMode('select-area')` — a genuine tool change — never an ordinary click that stays
+in `'select'`. The gap is exactly the shape CLAUDE.md warns about: the build checked the one
+intervening action it modeled (another tool) and not the far more common one (touching the map
+without leaving Select).
+
+**CONFIRMED, in real Chromium, with the consent banner properly dismissed (my first attempt at this
+same measurement was itself fooled by the banner covering the lower map and had to be redone —
+recorded so the same trap isn't repeated): R-180's click-click and press-drag-release reach BYTE-
+IDENTICAL views.** Two fresh sessions, same box corners: dragging (200-ish px in from each corner)
+and clicking the same two corners produced the identical SVG transform,
+`translate(161.325...,-9.750...) scale(107.335...)`, to full floating-point precision. Escape after
+one click drops the half-open box and returns the button's face to "Zoom to fit," matching
+select-area's own Escape behaviour.
+
+**A real but smaller gap on R-180's disclosure, not its mechanism:** neither
+`lpn_tool_zoom_extent_tip` nor `lpn_tool_zoom_window_tip` nor the map's own mode-hint text
+(`"Mode: Zoom window. Drag a box on the map to zoom in on it."`) ever mentions that two clicks now
+do the same thing — both still say only "Drag a box." Select-area's own tip
+(`lpn_tool_area_tip`) says "Click on the map as instructed," which already covers a click-based
+gesture. A reader who never opens this journal or the harness has no way to discover the
+click-click alternative Tom explicitly asked for from the button's own words. Not a broken
+mechanism — a broken advertisement of it.
+
+**A judgment call, not a defect, worth naming for Tom:** select-area's own first press already
+enters `select-area` mode (`setSelectAreaShape()` calls `setMode('select-area')` unconditionally,
+`:15604`) — the face just doesn't change because the shape shown is the shape it already had. Zoom's
+first press, by contrast, does not enter `zoom-window` mode at all; it only performs the fit and
+sits in `'select'`. The visible result (face unchanged) is the same, matching what Tom asked for,
+but the two tools reach it by different means — select-area is "already in the tool, same
+disclosure," zoom is "not in the tool yet at all." This is very likely deliberate (Zoom to Fit's
+first press already completes an action; Select's first press must start a drag with nowhere else
+to put it) and I would not change it on my own reading, but it means "act exactly like Select area"
+undersells a real difference in mechanism that a future reader touching this code should know is
+intentional rather than assume is a leftover of R-181's fix.
+
+**R-179 CONFIRMED, in real Chromium, en and ar, 1280px width, at both 100% and 125% browser zoom
+(`deviceScaleFactor`)**: both `+` and `-` glyph bounding-box centres land within 0.5px of their
+button's own centre in all four combinations (`+`: dx/dy ≈ 0.01/0.01px in en, 0.01/0.01px mirrored
+in ar; `-`: dx ≈ 0.01px, dy ≈ 0.49px, unchanged across zoom and language) — matching the numbers the
+build's own report already claimed, not just a source-level check this time.
+
+**Phone hide, re-confirmed:** `#lpn_zoom_control` reads `display: none` via `getComputedStyle` at a
+390×844 context with `hasTouch: true, isMobile: true` — the fix from my first pass holds.
+
+**Not checked:** the labels-legend dodge around the chip with a legend actually parked top-right
+(still needs a person, as I said in my first pass); the chip's own visual appearance; any language
+besides en/ar for R-179; RTL mirroring of the zoom toolbar button itself (only the on-map chip was
+checked for RTL in my first pass).
+
+**Verdict: NOT READY.** R-179 and R-180 are both real and hold up under measurement. R-181 does not
+do what its own comment and the build's report both claim — an ordinary click on the map between
+two presses of the Zoom to fit / Zoom Window button silently arms the second press into Zoom Window,
+which is the exact "acts confusing on the first change" complaint Tom filed this round to fix, just
+moved one interaction later. The fix needs the reset condition to cover "anything that is not a
+genuine second, consecutive press of this same button," not merely "a change of mode."
 ---
 
 ## 2026-09-23 — feat/convert-as (Task 696), head 263e0351

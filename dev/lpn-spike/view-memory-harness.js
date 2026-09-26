@@ -264,8 +264,14 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	const doors = (code.match(/restoreViewOrFit\(\)/g) || []).length;
 	ok('both open paths restore the view rather than fitting outright', doors >= 3,
 		doors + ' call site(s): the function, refreshAllFromDocument, and boot');
+	// **THE TOOLBAR BUTTON STOPPED CALLING zoomExtent BY REFERENCE WHEN IT GAINED A SECOND MODE**
+	// (ROADMAP Task 682: the same press now also has to decide Zoom to fit vs Zoom Window). What
+	// this assertion still owes Tom's sentence is that the fit-shaped press explicitly says
+	// `false` rather than leaving the flag to be inferred -- see the `bare === 0` assertion above,
+	// which is the other half of the same rule. The Map menu row is untouched and still passes
+	// zoomExtent BY REFERENCE, exactly as before.
 	ok('...and the button the user presses is NOT marked automatic, since that one is an edit',
-		/fn: zoomExtent\b/.test(code) && /addEventListener\('click', zoomExtent\)/.test(code));
+		/fn: zoomExtent\b/.test(code) && /extentBtn\.addEventListener\('click', function \(\) \{[\s\S]*?zoomExtent\(false\);/.test(code));
 	ok('...with a re-baseline that only ever fires on an already-clean project',
 		/function rebaseSignatureIfClean/.test(code) && /if \(e && !e\.dirty\)/.test(code));
 }

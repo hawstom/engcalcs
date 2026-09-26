@@ -123,7 +123,10 @@ head('--- 2. every shipped example: exactly one Text kept on, and it is the larg
 		const labels = L.getDoc().labels;
 		if (!labels.length) { ok('2.x ' + ex.file + ' has no Text objects to check', true); return; }
 		const on = labels.filter(function (lb) { return lb.allZoom === true; });
-		ok('2.1 ' + ex.file + ': exactly one Text is kept on', on.length === 1,
+		// **AT MOST ONE, NOT EXACTLY ONE** (Tom, 2026-09-26: "Remove the 'Zoom to see labels' text
+		// from the Net2 example" -- which left Net2 with none kept on, and its remaining texts all
+		// the same size). An example may keep none; if it keeps one, it is the largest.
+		ok('2.1 ' + ex.file + ': at most one Text is kept on', on.length <= 1,
 			on.map(function (lb) { return lb.id; }).join(','));
 		if (on.length !== 1) { return; }
 		const maxSize = Math.max.apply(null, labels.map(function (lb) { return lb.sizeMult || 1; }));
