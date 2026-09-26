@@ -855,7 +855,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`ea46cc60`) — adds no English strings
+### feat/table-editing (`de8b77de`) — adds no English strings
 
 ### feat/zoom-control (`43902998`) — 7 new, 2 to read @@ NEEDS RULING
 
