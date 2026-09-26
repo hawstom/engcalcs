@@ -2883,7 +2883,7 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
-$ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
+$ec_lang['lpn_settings_link_width']='Link line width (pixels)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
