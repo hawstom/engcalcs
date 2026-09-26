@@ -1853,6 +1853,12 @@ the block.
 - 75|718| **File menu: Recents just above Exit, and an Import submenu.**
   Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
   items. It's probably time for an Import sub-menu."*
+- 75|724| **Re-verify: Edit, Find, Everything, ID, "is empty" reportedly matched Lake and River.**
+  Tom: those reservoir IDs are not empty. NOT REPRODUCED on the merged 2026-09-25 build: a headless
+  run against Net3-Novato-CA-World (`findMatches()` with scope `all`, prop `id`, op `empty`) returns
+  only the two Text labels (which correctly have no id), never the reservoirs. Likely already fixed
+  by this branch's own R-197/R-224/R-225 rework of Find/Filter. Ask Tom to retest on the current
+  build before spending more time; if it recurs, get the exact network and dropdown values.
 - 50|717| **EPANET-MSX, multi-species water quality.**
   Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
   Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.

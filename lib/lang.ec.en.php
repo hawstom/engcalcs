@@ -1485,7 +1485,7 @@ $ec_lang['lpn_find_filter_summary']='Filtered by {q}. {rows}.';
 // The one case a typed query can reach with no table left to fill: every property it names is one
 // no table on this page carries (Everything.Connectivity, filtering junctions and reservoirs and
 // tanks, does not reach this line; it is here for a future property that names nothing at all).
-$ec_lang['lpn_find_filter_none']='No table has a property this query names.';
+$ec_lang['lpn_find_filter_none']='This query doesn\'t apply to any table.';
 // The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
 // (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
