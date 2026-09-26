@@ -482,9 +482,9 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 11,
-		"symbolSize": 7,
-		"linkWidth": 2,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,

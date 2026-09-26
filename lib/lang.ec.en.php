@@ -817,6 +817,11 @@ $ec_lang['lpn_field_meter_total']='Total demand';
 $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
 $ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
+// Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
+// pipe at station 0 or 100. Shown in place of lpn_field_meter_pipe/station/offset, never beside
+// them (renderCustomerFields()).
+$ec_lang['lpn_field_meter_node']='Connected to';
+$ec_lang['lpn_field_meter_node_tip']='The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.';
 $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
@@ -2957,7 +2962,7 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
-$ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
+$ec_lang['lpn_settings_link_width']='Link line width (pixels)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the

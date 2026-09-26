@@ -314,10 +314,22 @@
 	// state (see the detach rule in js/looped-network.js) and not an error.
 	//
 	// `link` is passed in rather than looked up, because this file holds no document.
-	EngCalcs.lpnCustomerNode = function (c, link) {
-		if (!c || !link || !c.link || c.link !== link.id) { return null; }
-		if (!EngCalcs.lpnGeom || !EngCalcs.lpnGeom.arcEndNearer) { return null; }
-		return EngCalcs.lpnGeom.arcEndNearer(c.t) === 'from' ? link.from : link.to;
+	//
+	// **WITH NO LIVE PIPE, `c.node` IS THE FALLBACK ANSWER** (Task 247; Tom, 2026-09-25). A
+	// Customer connected exactly to a node keeps lumping its demand there even after the pipe it
+	// snapped through is deleted -- js/looped-network.js's detachCustomersFromLink() is what writes
+	// `c.node` at the moment that pipe goes, and this is the one reader every consumer of a
+	// customer's demand shares (the resolved Demand, both solvers, the `.inp` writer). `nodeExists`
+	// is optional so a caller that has not built a lookup yet still gets the pre-fallback answer;
+	// EngCalcs.lpnCustomerRowsByNode() below always passes one, because a `c.node` naming a junction
+	// that has ALSO since been deleted must answer null, not a stale id.
+	EngCalcs.lpnCustomerNode = function (c, link, nodeExists) {
+		if (c && link && c.link && c.link === link.id) {
+			if (!EngCalcs.lpnGeom || !EngCalcs.lpnGeom.arcEndNearer) { return null; }
+			return EngCalcs.lpnGeom.arcEndNearer(c.t) === 'from' ? link.from : link.to;
+		}
+		if (c && c.node && (typeof nodeExists !== 'function' || nodeExists(c.node))) { return c.node; }
+		return null;
 	};
 	/**
 	 * Every junction's customer demand rows, keyed by node id: `{nodeId: [row, ...]}`.
@@ -343,11 +355,12 @@
 	 * Blank where the meter has no tag, which leaves a nameless row rather than a fabricated name.
 	 */
 	EngCalcs.lpnCustomerRowsByNode = function (docLike) {
-		var out = {}, byId = {}, list = (docLike && docLike.customers) || [];
+		var out = {}, byId = {}, nodeIds = {}, list = (docLike && docLike.customers) || [];
 		(((docLike && docLike.links) || [])).forEach(function (l) { if (l && l.id !== undefined) { byId[l.id] = l; } });
+		(((docLike && docLike.nodes) || [])).forEach(function (n) { if (n && n.id !== undefined) { nodeIds[n.id] = true; } });
 		list.forEach(function (c) {
 			var link = c && c.link ? byId[c.link] : null,
-				nid = EngCalcs.lpnCustomerNode(c, link);
+				nid = EngCalcs.lpnCustomerNode(c, link, function (id) { return !!nodeIds[id]; });
 			if (nid === null || nid === undefined) { return; }
 			if (!out[nid]) { out[nid] = []; }
 			out[nid].push({

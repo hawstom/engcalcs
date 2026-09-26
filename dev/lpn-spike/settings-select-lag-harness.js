@@ -90,6 +90,10 @@ L.setCanvas(1400, 900);
 // harness counts passes, so it switches the threshold off on its own copy.
 const net3 = JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net3.lwn', 'utf8'));
 if (net3.settings) { net3.settings.labelMaxWidth = null; }
+// It also counts a label's ROWS, so it pins the display sizes it was written against: at the
+// examples' shopper sizes (text 12, symbol 12, link 4, Tom 2026-09-25) the probe junction sheds its
+// third row, and switching one row off lets the shed row back in, leaving the count unchanged.
+if (net3.settings) { net3.settings.textSize = 8; net3.settings.symbolSize = 8; net3.settings.linkWidth = 2; }
 L.applySaved(net3);
 L.buildDom();
 L.fit();
