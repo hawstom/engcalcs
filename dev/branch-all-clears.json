@@ -145,6 +145,20 @@
             "words": "feat/first-project: (1) On the gallery welcome, end it \"Or start here\". (2) With that, we can close, merge, and delete the branch. Nice work.",
             "context": "Said after his browser pass on port 8112, in the same message as his decision \"Street map on at first load: Yes.\"",
             "pin_note": "HE CLEARED IT AT f775f0a6 ON THE CONDITION OF ONE WORDING CHANGE, AND THE PIN IS THREE COMMITS LATER: a merge of master (d0eef965), his own \"Or start here\" (8aa04872), and CLAUDE.md's third-party line rewritten to match his street-map ruling (f6760e1e). Nothing else changed."
+        },
+        "feat/convert-as": {
+            "head": "1f5ae0a0",
+            "date": "2026-09-25",
+            "words": "feat/convert-as: (1) For Water depth, initial default prefix can be 'Y='. (2) With that, we can close, merge, and delete the branch. Nice work!",
+            "context": "Said after his browser pass on port 8104, in the same message as his string rulings on the Convert as keys.",
+            "pin_note": "HE CLEARED IT AT 47649c32 ON ONE CONDITION, AND THE PIN IS LATER: two merges of master (the second resolves the EPSG:4326 constant it shared with feat/first-project, keeping this branch's catalogue lookup), the Y= prefix he asked for, his own rewrite of lpn_convas_units_tip, and lpn_convas_no_transform reworded to name the coordinate system, which answers his question about it and is flagged for his ruling."
+        },
+        "feat/property-venue": {
+            "head": "f76a98e1",
+            "date": "2026-09-25",
+            "words": "(1) I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap. (2) It works! We can close, merge, and delete the branch. Nice work.",
+            "context": "His bullet was headed feat/table-editing, but its content is this branch's Find box, and his other feat/table-editing bullet in the same message says that branch is not ready. Read as property-venue; say so in the report.",
+            "pin_note": "HE CLEARED IT AT b8733c5d AND THE PIN IS LATER: a merge of master, his own rewrite of lpn_find_filter_none, and a harness probe of his Lake/River report, which did not reproduce; that item went back to him (R-260) rather than to the roadmap."
         }
     }
 }
