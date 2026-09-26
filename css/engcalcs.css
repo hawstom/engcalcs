@@ -2309,17 +2309,15 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
-/* **THE AUTOFILL DOT, AND IT DOES NOTHING YET.** Tom named it as modern spreadsheet practice
-   beside the border highlight (2026-09-19): *"a dot at lower right of current cell or range/block
-   for Autofill."* It is drawn here as a mark on the current cell and is INERT -- there is no
-   handler on it, no cursor of its own, and dragging it does nothing, because fill-down is still an
-   open task under ROADMAP 690. Pure CSS on a pseudo-element, so there is no element to catch a
-   pointer and nothing to unhook. When fill-down is built this is the mark it attaches to. */
-.lpn-pane-table tbody td.lpn-pane-cur { position: relative; }
-.lpn-pane-table tbody td.lpn-pane-cur::after {
-	content: ""; position: absolute; inset-inline-end: 0; bottom: 0;
-	width: 5px; height: 5px; background: #0645ad; pointer-events: none;
-}
+/* **THE AUTOFILL DOT WAS REMOVED, NOT WIRED UP** (Tom: *"Autofill with the little square button is
+   yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once
+   implemented) where autofill is not offered, that would be nice."*). Fill-down shipped since the
+   dot was drawn -- Ctrl+D and the right-click menu's Fill down both do the same job the dot was
+   meant for -- but drag-to-fill from the dot is a different interaction, not a smaller version of
+   the same one: it needs its own drag state, row hit-testing as the pointer moves, autoscroll past
+   the pane's edge, and the same one-undo-step guarantee Ctrl+D already gives, none of which the
+   dot's CSS-only mark carries. Rather than leave a mark that promises a drag it cannot do, it is
+   gone; Ctrl+D and the menu are the affordance until dragging is built as its own piece of work. */
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
@@ -2365,6 +2363,27 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
    declared exactly this `relative` and broke the sticky heading, because back then it was
    overriding the `sticky` that lived here; it is safe now for the same reason it was not then. */
 .lpn-pane-table thead tr { position: sticky; top: 0; z-index: 2; }
+/* A long-press on a heading opens Hide/Show; iOS Safari shows its own copy callout instead unless
+   told not to, as #lpn_canvas already is (Perry, 2026-09-23). */
+.lpn-pane-table thead th { -webkit-touch-callout: none; }
+/* Insurance beside the real fix (the missing preventDefault() on a selected heading's mousedown,
+   js/looped-network.js paneStartColDrag's call site): a drag that overshoots into a neighbouring
+   heading's padding must never leave the browser's own text selected behind it. The sort button was
+   never the culprit -- a <button> already suppresses this -- but the heading cell itself was not
+   covered, and neither was the sort glyph now living beside its label. */
+.lpn-pane-table thead th, .lpn-pane-sort { user-select: none; }
+/* **THE WHOLE CELL IS THE TARGET, DOWN TO THE PIXEL** (pre-review, 2026-09-25, second pass: Tom's
+   "one cursor for a heading... that is the entire cell" was not yet true -- on a single-line
+   heading the row is drawn as tall as the tallest WRAPPED heading beside it, so `.lpn-pane-sort`
+   sat as a ~22px button centred in a cell that could be 70px+, and a press in the dead top/bottom
+   padding or the left inset did nothing). **THE FIRST FIX TRIED WAS STRETCHING THE BUTTON ITSELF**
+   (`height: 100%`) and measured wrong in real Chromium: a percentage height on a table cell's
+   child resolves against the cell's SPECIFIED height, which for a row sized by its tallest
+   sibling is `auto`, not a number -- CSS2.1 10.5, and confirmed by measuring the button at 28.6px
+   tall inside a 91.3px cell. So the click, mousedown and drag-start listeners are wired on the
+   `<th>` itself instead (below, after `grip`/`menuBtn`/`arrow` exist to except them by identity),
+   which the browser DOES give the row's real height -- padding stays on the `<th>` exactly as it
+   always was, and the button (`.lpn-pane-sort`) is sized to its own content, same as before. */
 .lpn-pane-table thead th {
 	position: relative; background: #fff;
 	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
@@ -2381,6 +2400,15 @@ html[dir="rtl"] .lpn-pane-table thead th {
 html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	box-shadow: inset 1px 0 0 #ddd, inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
 }
+/* **SEVERAL HEADINGS, MARKED BEFORE THE RIGHT-CLICK THAT HIDES THEM** (Tom: *"can we select
+   multiple heading cells to hide multiple columns at once?"*). The same wash the body cells use
+   for their own selection (`.lpn-pane-table tbody td.lpn-pane-sel`), so a reader who already knows
+   what a selected cell looks like recognises a selected heading without being told twice. */
+/* **A SELECTED HEADING IS SOLID BLUE** (Tom, 2026-09-26, fifth pass: *"Turn an entire heading
+   solid blue on select."*), as Google Sheets draws a selected column's letter: the cells beneath
+   keep the light wash, the heading above them is the one solid block, and its text turns white.
+   #0b57d0 against white text is 6.6:1. */
+.lpn-pane-table thead th.lpn-pane-head-sel { background: #0b57d0; color: #fff; }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
    <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
@@ -2455,6 +2483,11 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
    native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
 .lpn-pane-table tbody td input[readonly] { user-select: none; }
+/* **AND TAB'S OWN SELECT-ALL IS NEVER SEEN** (Tom, 2026-09-26, fifth pass: *"When I tab from cell
+   to cell, the only indicator I should see is cell outline."*). Chromium selects the whole value of
+   a text input it tabs into, `user-select: none` or not; the focusin handler in paneWireTable()
+   collapses it, and this is the second half for the frame before that runs. */
+.lpn-pane-table tbody td input[readonly]::selection { background: transparent; color: inherit; }
 /* **EVERY ROW IS A WHOLE NUMBER OF PIXELS TALL, SO A SCROLL CAN LAND EXACTLY ON ONE** (Tom,
    2026-09-21, R-112: *"There is a slight calculation error that makes the top border of the top
    cell row not quite coincide with the bottom border of the headings, and vary in that from about
@@ -2488,9 +2521,22 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
 	text-align: inherit;
 }
-.lpn-pane-sort { font-weight: bold; }
-/* A tint rather than a colour: it says "this responds" without claiming a meaning of its own. */
-.lpn-pane-sort:hover, .lpn-pane-goto:hover { background: #eef1f4; }
+/* **THE TEXT IS A NON-ENTITY** (Tom, 2026-09-26, third pass: *"The headings text is still acting
+   like text... It should be a non-entity as far as the cursor and the display changes go. No
+   hover shading, no cursor change."*). `cursor: inherit` so the button never overrides the `<th>`'s
+   own uniform pointer with a button's native one, and no `:hover` rule at all -- the tint this
+   heading used to gain under the pointer is gone, on purpose, not merely unstyled. `display:
+   block; width: 100%` so the button (inline by default) spans the cell's own content width; no
+   space is reserved for the "..." glyph or the sort arrow any more (both moved to `position:
+   absolute`, overlaying the text at zero layout cost -- see their own rules). Padding stays off
+   the button and on the `<th>` -- see that rule's own comment on why a click-area fix could not
+   live here (percentage heights on a table cell's child do not resolve to the cell's real
+   height). */
+.lpn-pane-sort { font-weight: bold; display: block; width: 100%; cursor: inherit; }
+/* The browser's OWN default focus ring on a focused `<button>` is not "unstyled", it is a second
+   ring drawn tight around the text -- exactly the thing point (1) objects to, just undoing the fix
+   a different way. The `<th>`'s own `:has(:focus-visible)` rule is the only ring this table draws. */
+.lpn-pane-sort:focus-visible { outline: none; }
 /* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
    text alignment with it -- it sits after the box, in its own ink. */
 .lpn-pane-goto {
@@ -2508,7 +2554,23 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: #0645ad; }
 /* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
    press does not leave a ring behind on a control whose whole job is to move the map. */
-.lpn-pane-sort:focus-visible, .lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+.lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+/* **THE RING BELONGS TO THE WHOLE HEADING, NEVER TO THE TEXT INSIDE IT** (Tom, 2026-09-26,
+   fourth pass: *"I still see special highlighting on the text"* -- a screenshot of a dark
+   rectangle drawn tight around the word "Longitude", which was `.lpn-pane-sort:focus-visible`'s
+   own outline on the inner button. The text is a non-entity (see `.lpn-pane-sort`'s own comment);
+   it draws nothing of its own, focus ring included. `:has(:focus-visible)` puts the ring on the
+   `<th>` itself instead, whichever of its own controls (the heading button, the "..." glyph, the
+   arrow) actually holds keyboard focus -- inset so it never adds a pixel to the cell's box, and
+   still exactly what Tab reveals. Browsers without `:has()` simply show no ring here, the same
+   graceful drop this file already uses it for elsewhere. */
+/* **NO RING AT ALL, SINCE THE FIFTH PASS** (Tom, 2026-09-26: *"The blue outline for a selected
+   (tabbed) heading isn't great, and it conflicts with the column dragging wide blue line."*). A
+   heading that holds keyboard focus wears the light selection wash instead -- still exactly what
+   Tab reveals, and nothing drawn round the text -- and a SELECTED heading stays solid blue whether
+   it has focus or not. */
+.lpn-pane-table thead th:has(:focus-visible) { outline: 0; background: #e8f0fe; }
+.lpn-pane-table thead th.lpn-pane-head-sel:has(:focus-visible) { background: #0b57d0; }
 /* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
    because its `left`/`top` are the pointer's own client coordinates, which are already relative to
    the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
@@ -2519,9 +2581,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; min-width: 9em;
 }
 .lpn-pane-ctxmenu button {
-	display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit;
+	display: flex; justify-content: space-between; align-items: center; gap: 1.5em; width: 100%;
+	text-align: left; background: none; border: 0; font: inherit;
 	padding: 5px 10px; cursor: pointer; color: inherit; border-radius: 2px;
 }
+/* The keyboard equivalent, named beside its row the way a desktop menu does (Tom: "I did not know
+   about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
+.lpn-pane-ctxmenu-accel { color: #888; font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: #eef1f4; outline: 0; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
@@ -2563,10 +2629,162 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	cursor: col-resize; user-select: none;
 }
 .lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, #8ab 5px, #8ab 6px, transparent 6px); }
-/* A heading is draggable left and right (his point (e)), so it says so under the pointer. `grab`
-   rather than `move`: the column is not going anywhere until it is picked up. */
-.lpn-pane-sort { cursor: grab; }
-.lpn-pane-sort:active { cursor: grabbing; }
+/* **A PLAIN CLICK NO LONGER SORTS -- IT SELECTS** (Tom, 2026-09-25, second pass: *"there is only
+   one selection possible and one cursor for a heading... A click anywhere on the cell selects the
+   column."*). The whole heading is one target, like a spreadsheet's own column letter: no text
+   selection anywhere in it (`.lpn-pane-table thead th, .lpn-pane-sort` already declare
+   `user-select: none` above), and the ordinary pointer everywhere except a heading that is part of
+   a standing selection, which is the one that picks up and moves (his point (e)) and says so under
+   the pointer. `grab` rather than `move`: the column is not going anywhere until it is picked up.
+   **THE CURSOR IS ON THE `<th>`, NOT THE BUTTON** -- the click/mousedown listeners moved there
+   (see the `<th>` rule's own comment on why), and a cursor declared only on the ~28px button would
+   have left the rest of the cell showing whatever the browser's own default is, which is exactly
+   the "not one cursor for the whole cell" Tom named. `.lpn-pane-colgrip`/`.lpn-pane-colmenu`/
+   `.lpn-pane-sortarrow` are all more specific selectors than a bare `th`, so they keep their own
+   cursor over this one without needing `!important`. */
+.lpn-pane-table thead th { cursor: pointer; position: relative; }
+.lpn-pane-table thead th.lpn-pane-head-sel { cursor: grab; }
+.lpn-pane-table thead th.lpn-pane-head-sel:active { cursor: grabbing; }
+/* **`cursor: inherit` ON THE BUTTON DOES NOT ACTUALLY INHERIT, MEASURED** (Tom, 2026-09-26, fourth
+   pass, point (3): *"The grab cursor is a pointer on the heading text."*). `.lpn-pane-sort`
+   declares `cursor: inherit` and the cascade order says it should win over its own earlier
+   `cursor: pointer` -- and in a real Chromium it does not: a selected heading's `<th>` measured
+   `grab` while its own text button measured `pointer`, the exact split Tom saw. Real, buttons are
+   documented (and other browsers agree) to special-case an inherited `cursor` differently from a
+   plain `<div>`; rather than chase the exact spec paragraph, these three rules just say the same
+   thing `.lpn-pane-head-sel` above says, explicitly, for the one child that would not listen to
+   `inherit`. `:active` needs the same explicit repeat for the same reason. */
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
+.lpn-pane-table thead th.lpn-pane-head-sel:active .lpn-pane-sort { cursor: grabbing; }
+/* **AND WHILE AN ACTUAL DRAG IS RUNNING, THE WHOLE PAGE STAYS "grabbing"** (Tom, 2026-09-26,
+   fourth pass, point (2): *"I lose the grab cursor instead of pulling the column... I don't know
+   where the column will end up."*). `:active` is a CSS state that Chromium (like other engines)
+   drops the instant the pointer leaves the element that was pressed, even with the mouse button
+   still down -- which is exactly "I lose the grab cursor... when I leave the column". CSS alone
+   cannot hold a state across elements the pointer is no longer over; `paneStartColDrag()` sets this
+   class on `<body>` for the life of the drag instead, and JS -- not `:active` -- is what takes it
+   off again on `mouseup`. The universal child selector needs to OUTRANK every other cursor rule in
+   this file for the duration, which is what earns the one `!important` in this stylesheet. */
+.lpn-pane-col-dragging, .lpn-pane-col-dragging * { cursor: grabbing !important; }
+/* **THE GHOST IS THE WHOLE COLUMN, SHADED** (Tom, 2026-09-26, fifth pass: *"Drag a column (not
+   heading) shaded outline (see Google Sheets)."*). A translucent grey block from the heading to the
+   foot of the visible table, carried sideways under the pointer; `paneStartColDrag()` sizes and
+   places it from rects read once when the drag begins. `pointer-events: none` so it is never what
+   a `mousemove` lands on. */
+.lpn-pane-col-ghost {
+	position: fixed; z-index: 2000; pointer-events: none; box-sizing: border-box;
+	background: rgba(60, 64, 67, .14); border: 1px solid rgba(60, 64, 67, .5);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+}
+/* **THE DESTINATION IS A WIDE DARK LINE DOWN THE WHOLE DIVIDER** (fifth pass: *"Make a wide black
+   or dark gray destination line on entire column (not heading) divider when middle of drag
+   rectangle (not cursor) is between middle of two columns."*). Drawn only once the ghost's middle
+   has passed a neighbour's middle; at the column's own two edges there is none, because dropping
+   there does nothing. Dark grey rather than the page's blue, so it cannot be read as a selection. */
+.lpn-pane-col-marker {
+	position: fixed; z-index: 2001; pointer-events: none; width: 4px; background: #3c4043;
+}
+/* **AND NOTHING ELSE ON THE HEADINGS SHOWS WHILE A COLUMN IS IN THE HAND** (fifth pass: *"Suppress
+   the menu and sort arrow during dragging."*) -- the sorted column's standing arrow included. */
+.lpn-pane-col-dragging .lpn-pane-colmenu,
+.lpn-pane-col-dragging .lpn-pane-sortarrow { visibility: hidden; }
+/* **THE "..." COLUMN MENU, HIDDEN UNTIL HOVER, FOCUS OR TOUCH** (Tom, 2026-09-26, third pass,
+   reversing the second pass's "always visible": *"Possibly the arrow and the menu can take up
+   zero space and appear with 100% opacity over any heading text on hover. Try that."*). Opens the
+   same menu the right-click/long-press does (`paneHeadMenuTrigger()`), so it is a second door onto
+   one room rather than a second menu to keep in step. `position: absolute` for "no extra heading
+   width": an out-of-flow box contributes nothing to the button's own min-content, so
+   `.lpn-pane-sort` above declares `position: relative` for this (and the arrow below it) to sit
+   against -- **OVERLAYING THE TEXT ON PURPOSE, NOT BESIDE IT**: no space is reserved for either
+   glyph any more (the floated gutter spacer a pre-review round added is gone), which is what "zero
+   space" means here.
+   **PINNED TO THE TOP-RIGHT CORNER OF THE CELL, NOT ITS FULL HEIGHT, AND OPAQUE** (pre-review,
+   2026-09-25: on a narrow column -- "Base demand (gpm)" wraps to four lines at its declared 3.5em
+   -- a full-height, transparent glyph sat centred over the SECOND line of wrapped text, which read
+   as a stray mark through the middle of "demand"). A small badge at the corner instead, the same
+   background as the heading itself (`#fff`, matching `.lpn-pane-table thead th`) so it covers
+   rather than blends with whatever text is under it, and short enough (1.1em) to never reach past
+   the first line no matter how many lines the heading wraps to. */
+.lpn-pane-colmenu {
+	position: absolute; inset-inline-end: 1px; top: 2px; height: 1.1em; width: 15px;
+	display: flex; align-items: center; justify-content: center;
+	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
+	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
+}
+/* The glyph itself, same reasoning as the sort arrow below: `content:` rather than a text node, so
+   print.js's per-text-node line count never sees it. */
+.lpn-pane-colmenu::after { content: '⋮'; }
+/* **THE ARROW, ON EVERY HEADING, BELOW THE "..." GLYPH, WITH AIR BETWEEN THEM** (Tom, 2026-09-26,
+   third pass: *"clicking the arrow sorts (ascending first, then toggles)"*; fifth pass: *"Put a
+   little vertical space between the ellipsis menu and the sort arrow."*). Same corner-badge shape
+   and `content:`-not-text-node reasoning as the menu glyph -- **EXCEPT the column that IS sorted**,
+   whose arrow stays visible (`.lpn-pane-sortarrow-active`) so the table says which column is
+   sorted, and which way, without being touched.
+   **THE AIR IS PADDING, NOT A GAP**: the button starts where the ⋮ ends and its top 5px are
+   transparent (`background-clip: content-box`), so the eye sees two separate marks while the
+   pointer crosses from one to the other without ever leaving the pair -- a real gap would flash
+   both out of sight halfway across it. `top` and the glyph's size are in the HEADING's em (the
+   glyph's `.8em` is on `::after`, not the button), so the space holds at every text size. */
+.lpn-pane-sortarrow {
+	position: absolute; inset-inline-end: 1px; top: calc(2px + 1.1em); height: calc(5px + 1.05em);
+	width: 15px; box-sizing: border-box; padding: 5px 0 0; margin: 0;
+	display: flex; align-items: center; justify-content: center;
+	background: #fff; background-clip: content-box; border: 0; border-radius: 2px; font: inherit;
+	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
+}
+.lpn-pane-sortarrow::after { content: '▲'; font-size: .8em; }
+.lpn-pane-sortarrow-desc::after { content: '▼'; }
+/* **SHOWN ONLY WHEN THE POINTER IS OVER THEIR OWN CORNER** (fifth pass: *"I think that the menu and
+   arrow are too eager to show. Can we make them show only when the cursor is directly over their
+   area of the cell?"*). Hovering the heading at large no longer reveals them; hovering either mark's
+   own box reveals the pair (`:has()`; a browser without it reveals just the one under the pointer).
+   The keyboard equivalent is `:focus-visible` inside the heading -- not `:focus-within`, which a
+   plain click on the heading also satisfies, and which is how a click used to leave both showing.
+   A touch screen never fires `:hover`, so `(hover: none)` shows them there unconditionally -- the
+   one place a mouse and a finger are told apart in this file. */
+.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover,
+.lpn-pane-table thead th:has(.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover) .lpn-pane-colmenu,
+.lpn-pane-table thead th:has(.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover) .lpn-pane-sortarrow,
+.lpn-pane-table thead th:has(:focus-visible) .lpn-pane-colmenu,
+.lpn-pane-table thead th:has(:focus-visible) .lpn-pane-sortarrow,
+.lpn-pane-sortarrow-active { opacity: 1; }
+.lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible,
+.lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: #0b57d0; outline: 0; }
+/* On a solid-blue selected heading the badges turn blue with it, and their marks white. */
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu,
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow { background-color: #0b57d0; color: #fff; }
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu:hover,
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow:hover { color: #d3e3fd; }
+/* A focused heading wears the light wash (above), and so do its badges, rather than two white
+   patches on it. */
+.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-colmenu,
+.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-sortarrow { background-color: #e8f0fe; }
+@media (hover: none) { .lpn-pane-colmenu, .lpn-pane-sortarrow { opacity: 1; } }
+/* The Manage columns dialog (openDialog(), #lpn_dialog): one row per column, a Show checkbox and
+   two reorder buttons. Plain and compact -- this dialog is open for a few seconds, not a page of
+   its own. **REWORKED TO A SELECTABLE LIST WITH BUTTONS OUTSIDE IT** (Tom, 2026-09-25, second
+   pass: point (4)(b)(i)): a row no longer carries its own move arrows -- it carries a checkbox and
+   a label, selectable by click/Ctrl+click/Shift+click like any other list, and four buttons beside
+   the list move the whole selection as a block. */
+.lpn-managecols-wrap { display: flex; gap: 10px; align-items: flex-start; }
+.lpn-managecols-list {
+	flex: 1 1 auto; max-height: 16em; overflow-y: auto; border: 1px solid #ccc; border-radius: 3px;
+	user-select: none;
+}
+.lpn-managecols-list:focus-visible { outline: 2px solid #0645ad; outline-offset: -2px; }
+.lpn-managecols-row {
+	display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-bottom: 1px solid #eee;
+	cursor: pointer;
+}
+.lpn-managecols-row:last-child { border-bottom: 0; }
+.lpn-managecols-row-sel { background: #d3e3fd; }
+.lpn-managecols-row-focus { box-shadow: inset 0 0 0 1px #667; }
+.lpn-managecols-btns { display: flex; flex-direction: column; gap: 4px; flex: 0 0 auto; }
+.lpn-managecols-btns button {
+	background: none; border: 1px solid #ccc; border-radius: 2px; cursor: pointer;
+	padding: 3px 8px; font: inherit; white-space: nowrap;
+}
+.lpn-managecols-btns button:disabled { color: #bbb; border-color: #eee; cursor: default; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
@@ -2586,6 +2804,19 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 
    The map's own printing is untouched: without .lpn-printing-table on the body nothing below
    applies, so Ctrl+P still prints the drawing exactly as it did. */
+/* **THE TABLE COLUMNS AND KEYBOARD-SHORTCUTS NOTES ARE EACH A TWO-COLUMN TABLE, ONE ROW A
+   GESTURE, THE ACTION THEN HOW TO DO IT** (Tom, 2026-09-26: reorganize the one list into two
+   tables). A real <table> rather than a styled list, so it still reads as a table with no CSS at
+   all -- in Find-in-page, in print, and to a screen reader. Narrow first column, full-width
+   second, stacked to one column per phone width, matching the list rule it replaces. */
+table.lpn-notes-table { border-collapse: collapse; margin: .25em 0 0; width: 100%; }
+table.lpn-notes-table td { padding: 0 .75em .3em 0; vertical-align: top; }
+table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
+@media (max-width: 480px) {
+	table.lpn-notes-table, table.lpn-notes-table tbody, table.lpn-notes-table tr, table.lpn-notes-table td { display: block; width: auto; }
+	table.lpn-notes-table tr { margin-bottom: .4em; }
+	table.lpn-notes-table td { padding: 0; }
+}
 #lpn_print_area { display: none; }
 @media print {
 	body.lpn-printing-table > *:not(#lpn_print_area) { display: none !important; }

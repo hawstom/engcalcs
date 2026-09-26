@@ -74,6 +74,26 @@
 const EC_VENUE_ADVISORY = true;
 
 /**
+ * The Task 708 gaps closed on 2026-09-26 (Active/Closed, emitter coefficient, a tank's levels,
+ * diameter and mixing, pump speed and energy price, pipe length): NOT advisory. A regression on
+ * any of these -- the property vanishing from findPropDefs() for its group, or the editable table
+ * column itself disappearing -- fails the check outright, ratchet-style, regardless of
+ * EC_VENUE_ADVISORY. New, still-undecided gaps stay advisory; these do not go back to being one.
+ */
+const EC_VENUE_REQUIRED = [
+    'junction/emitter', 'tank/level', 'tank/minLevel', 'tank/maxLevel', 'tank/tankDiameter',
+    'tank/mixingModel', 'pump/speed', 'pump/energyPrice', 'pipe/length',
+];
+
+/**
+ * The three key-name-mismatch exemptions above (pipe/pump/valve `closed`) only prove their case
+ * while Find truly offers `status` for the link group under that name -- EC_VENUE_EXEMPT's own
+ * bypass does not check that, so a regression removing `status` from findPropDefs() would pass
+ * silently through the exemption. Checked hard, not advisory, alongside EC_VENUE_REQUIRED.
+ */
+const EC_VENUE_REQUIRED_FIND_KEY = ['link' => 'status'];
+
+/**
  * Table/Find pairs that are NOT findings, keyed `<type>/<label identity>`, with the reason each.
  * A declaration matching nothing FAILS -- see the docblock.
  */
@@ -329,6 +349,30 @@ foreach (array_keys(EC_VENUE_EXEMPT) as $k) {
             . "watched: delete it.\n");
         exit(1);
     }
+}
+
+// A ratchet, checked before anything advisory: these Task 708 gaps were closed on 2026-09-26 and
+// must not reopen, whether the editable column vanished (never counted, so absent from `$editable`
+// entirely) or findPropDefs() stopped offering the property (present in `$gaps`).
+$regressed = [];
+foreach (EC_VENUE_REQUIRED as $k) {
+    [$t, $id] = explode('/', $k, 2);
+    if (!isset($editable[$t][$id])) { $regressed[] = "$k -- its editable table column is gone"; }
+    elseif (isset($gaps[$k])) { $regressed[] = "$k -- no longer offered by Find for its group"; }
+}
+foreach (EC_VENUE_REQUIRED_FIND_KEY as $group => $key) {
+    if (!in_array($key, $find[$group], true)) {
+        $regressed[] = "$group/$key -- Find no longer offers this key, which pipe/pump/valve `closed` "
+            . "is exempted on the strength of";
+    }
+}
+if ($regressed) {
+    echo "table/Find parity (ROADMAP Task 708): a closed gap has reopened -- NOT advisory\n\n";
+    foreach ($regressed as $r) { echo "  $r\n"; }
+    echo "\nThese were ranked, closed and are held here so they cannot regress unnoticed. If the\n";
+    echo "property or its Find row was deliberately renamed or removed, update EC_VENUE_REQUIRED\n";
+    echo "(and dev/property-venue-matrix.md) rather than silencing this.\n";
+    exit(1);
 }
 
 if ($gaps) {

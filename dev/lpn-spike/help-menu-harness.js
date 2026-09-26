@@ -43,8 +43,25 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 	// Every note is still a real <dt>/<dd> pair emitted by PHP from a lang key. If these ever move
 	// into JS they leave the indexable document, and no other check would notice.
 	const dts = (page.match(/<dt><\?=\$ec_lang\['lpn_notes_/g) || []).length;
-	report(dts >= 6, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
+	report(dts >= 7, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
 	report(page.indexOf("$ec_lang['ws_notes_heading']") > 0, 'and it keeps the suite-wide Notes heading');
+	// **THE TABLE NOTE SPLIT INTO TWO TABLES** (Tom, 2026-09-26: reorganize the one list into two
+	// two-column tables, "Table columns help" and "Table keyboard shortcuts"). lpn_notes_6 is the
+	// columns table, lpn_notes_7 the keyboard-shortcuts table, and the page must show both.
+	report(page.indexOf("$ec_lang['lpn_notes_7_term']") > 0, 'lpn_notes_7 (keyboard shortcuts) is on the page');
+	report(en.indexOf("$ec_lang['lpn_notes_6_term']='Table columns help'") > 0,
+		'lpn_notes_6 is now the columns-help table');
+	report(en.indexOf("$ec_lang['lpn_notes_7_term']='Table keyboard shortcuts'") > 0,
+		'lpn_notes_7 is the keyboard-shortcuts table');
+	const colsDefMatch = en.match(/\$ec_lang\['lpn_notes_6_def'\]='([^\n]*)';/);
+	const keysDefMatch = en.match(/\$ec_lang\['lpn_notes_7_def'\]='([^\n]*)';/);
+	report(!!colsDefMatch && (colsDefMatch[1].match(/<tr>/g) || []).length === 6,
+		'the columns table has all six rows Tom wrote');
+	report(!!keysDefMatch && (keysDefMatch[1].match(/<tr>/g) || []).length === 10,
+		'the keyboard-shortcuts table has all ten rows Tom wrote');
+	report(!!colsDefMatch && colsDefMatch[1].indexOf('lpn-notes-table') > 0 &&
+		!!keysDefMatch && keysDefMatch[1].indexOf('lpn-notes-table') > 0,
+		'both are real <table class="lpn-notes-table">, not a styled list');
 	// Inside the popover, not floating loose: the popover opens with display:none, so the content
 	// is present but not occupying the page.
 	const at = page.indexOf('id="lpn_notes_popup"');

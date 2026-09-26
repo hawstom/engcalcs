@@ -76,8 +76,12 @@ if (defined('EC_USAGE_REPORT_DIRS')) {
     $dirs[] = $liveDir;
 }
 
-$data = ecUsageReadAll($dirs);
-list($firstDay, $lastDay) = ecUsageSpan($data);
+// Reading the whole record twice, streaming both times, and never materialising a row array: the
+// first pass (ecUsageStreamSpan) finds the first/last day at O(1) memory so the window below can be
+// computed; the second (ecUsageReportBuild) folds every row straight into the aggregates this page
+// prints. Peak memory is bounded by the OUTPUT -- days x distinct field values -- never by how many
+// lines engcalcs-lang.log holds, which is what lets "all" run on an 11+ MB, ever-growing log.
+list($firstDay, $lastDay) = ecUsageStreamSpan($dirs);
 
 // The window. A plain query parameter, no form and no stored preference: this page remembers
 // nothing about anybody.
@@ -95,26 +99,23 @@ if ($days > 0) {
 }
 $range = ecUsageDayRange($from, $to);
 
-/** Rows of one kind inside the window. */
-function ur_rows($data, $kind, $from, $to)
-{
-    return ecUsageWindow(isset($data[$kind]) ? $data[$kind] : array(), $from, $to);
-}
+$report = ecUsageReportBuild($dirs, $from, $to);
+$series = $report['series'];
 
-$view   = ur_rows($data, 'view',   $from, $to);
-$calc   = ur_rows($data, 'calc',   $from, $to);
-$reach  = ur_rows($data, 'reach',  $from, $to);
-$naming = ur_rows($data, 'naming', $from, $to);
-$signal = ur_rows($data, 'signal', $from, $to);
-$send   = ur_rows($data, 'send',   $from, $to);
+$view   = $series['view'];
+$calc   = $series['calc'];
+$reach  = $series['reach'];
+$naming = $series['naming'];
+$signal = $series['signal'];
+$send   = $series['send'];
 
 function ur_h($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 
-/** The two charts of one series, side by side, each with its own scale and its own unit. */
-function ur_charts($rows, $range, $caption, $source)
+/** The two charts of one pre-built series, side by side, each with its own scale and its own unit. */
+function ur_charts($series, $range, $caption, $source)
 {
-    $daily = ecUsageDaily($rows, $range);
-    $tot   = ecUsageBucketTotals($rows);
+    $daily = ecUsageFinalizeDaily($series['daily'], $range);
+    $tot   = $series['bucketTotals'];
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     echo '<div class="pair">';
@@ -125,10 +126,10 @@ function ur_charts($rows, $range, $caption, $source)
     echo '</div>';
 }
 
-/** One table of a field's values, two bucket columns, no total column anywhere. */
-function ur_table($rows, $field, $caption, $source, $limit = 40)
+/** One table of a pre-built series' field tally, two bucket columns, no total column anywhere. */
+function ur_table($series, $field, $caption, $source, $limit = 40)
 {
-    $c = ecUsageCountBy($rows, $field);
+    $c = $series['countBy'][$field];
     $keys = array_keys($c['visitor'] + $c['visit']);
     // Ordered by the people column, then by page loads, so the strongest signal leads.
     usort($keys, function ($a, $b) use ($c) {
@@ -153,19 +154,18 @@ function ur_table($rows, $field, $caption, $source, $limit = 40)
     echo '</tbody></table>';
 }
 
-// The preset clicks are one event value inside the signal log, so they are filtered here rather
-// than counted as a column of their own.
-$presets = array();
-foreach ($signal as $r) {
-    if ($r['event'] === 'units' && strpos($r['detail'], 'preset:') === 0) { $presets[] = $r; }
-}
-$sends = ecUsageBucketTotals($send);
-$contactViews = array();
-foreach ($view as $r) { if ($r['page'] === 'contact') { $contactViews[] = $r; } }
-$contactTot = ecUsageBucketTotals($contactViews);
+// The preset clicks (one event value inside the signal log) and the contact-page views (one page
+// value inside the human-view log) were split out while streaming, by ecUsageReportBuild(), rather
+// than filtered here out of a row array.
+$presets      = $report['presets'];
+$contactViews = $report['contactViews'];
+$sends        = $send['bucketTotals'];
+$contactTot   = $contactViews['bucketTotals'];
 
-$reachClassified = 0;
-foreach ($reach as $r) { if ($r['classified']) { $reachClassified++; } }
+$reachClassified = $report['reachClassified'];
+// A plain line count of the windowed reach rows -- not a bucket total presented as a metric, just
+// how many lines matched, so it is the two bucket totals added for that description only.
+$reachWindowCount = $reach['bucketTotals']['visitor'] + $reach['bucketTotals']['visit'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -224,10 +224,10 @@ total column on this page for that reason.
 
 <h2>Where the rows came from</h2>
 <table><thead><tr><th>directory</th><th>rows read</th></tr></thead><tbody>
-<?php foreach ($data['_sources'] as $s): ?>
+<?php foreach ($report['sources'] as $s): ?>
 <tr><td><?= ur_h(str_replace($root . '/', '', $s['dir'])) ?></td><td><?= $s['rows'] ?></td></tr>
 <?php endforeach; ?>
-<?php if (!$data['_sources']): ?>
+<?php if (!$report['sources']): ?>
 <tr><td colspan="2" class="none">No log rows found in log/ or spock/.</td></tr>
 <?php endif; ?>
 </tbody></table>
@@ -265,7 +265,7 @@ ur_table($naming, 'page', 'Naming events by page',
 ?>
 
 <h2>Language reach</h2>
-<p class="src">log/engcalcs-lang.log. <?= count($reach) ?> row(s) in this window,
+<p class="src">log/engcalcs-lang.log. <?= $reachWindowCount ?> row(s) in this window,
 <?= $reachClassified ?> carrying the served/asked pair (fields 5 and 6), the rest written before
 that pair existed and reported as older format rather than guessed at.</p>
 <?php

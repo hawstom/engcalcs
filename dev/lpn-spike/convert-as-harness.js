@@ -228,6 +228,11 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:3857', units: sameUnits(), rounding: {} });
 		const g = L.georef();
 		ok('the wizard opens at step 1', !!g && g.step === 1);
+		// R-172 (1), the answered half: the site plan is drawn where the copy's own numbers put it
+		// from the first frame, not at the whole-world opening size until the first settle.
+		const cs = stored(lib.openId).backdrop;
+		ok('...with the site plan already drawn at the copy\'s own size, before any drag',
+			!!cs && near(L.getBackdrop().s, cs.s, cs.s * 1e-9), L.getBackdrop().s + ' vs ' + (cs && cs.s));
 		// R-172 (1): dragging the map in step 1 must carry the background image with the MODEL,
 		// held still on the screen, rather than with the map.
 		const v0 = L.currentView();

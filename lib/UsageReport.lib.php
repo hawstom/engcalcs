@@ -247,6 +247,175 @@ function ecUsageSpan(array $kinds)
 }
 
 /**
+ * MEMORY-BOUNDED READING. Everything below this point exists because ecUsageReadAll() materialises
+ * one PHP array per row, and on production engcalcs-lang.log alone is 11+ MB and growing daily --
+ * the same log that grows forever, since every uncached page load writes to it. A window's memory
+ * must be bounded by what it PRINTS (days x distinct field values), never by how many lines
+ * produced it, or "all" fails on the day the live log outgrows the host's memory_limit.
+ *
+ * spock.php uses these; ecUsageReadAll() and friends above are unchanged and stay in use by
+ * dev/scripts/usage_report_selftest.php, which drives them on a fixture measured in dozens of rows.
+ */
+
+/** The day (first 10 characters of the timestamp) of one raw log line, or null when it is not a
+ * row at all -- the same ts validity test ecUsageParseRow() applies, without building a row array. */
+function ecUsageLineDay($line)
+{
+    $line = rtrim($line, "\r\n");
+    if ($line === '') { return null; }
+    $tab = strpos($line, "\t");
+    $ts = ($tab === false) ? $line : substr($line, 0, $tab);
+    if (strlen($ts) !== 20 || $ts[4] !== '-' || substr($ts, -1) !== 'Z') { return null; }
+    return substr($ts, 0, 10);
+}
+
+/**
+ * The earliest and latest day across every log in every directory, read a line at a time and
+ * keeping only the two day strings seen so far -- O(1) memory regardless of log size.
+ *
+ * @return array [$firstDay, $lastDay], or ['',''] when there are no rows anywhere.
+ */
+function ecUsageStreamSpan(array $dirs)
+{
+    $first = ''; $last = '';
+    foreach ($dirs as $dir) {
+        foreach (ecUsageLogKinds() as $name => $kind) {
+            $path = rtrim($dir, '/') . '/' . $name;
+            if (!is_file($path)) { continue; }
+            $fh = @fopen($path, 'rb');
+            if (!$fh) { continue; }
+            while (($line = fgets($fh)) !== false) {
+                $day = ecUsageLineDay($line);
+                if ($day === null) { continue; }
+                if ($first === '' || $day < $first) { $first = $day; }
+                if ($last === ''  || $day > $last)  { $last  = $day; }
+            }
+            fclose($fh);
+        }
+    }
+    return array($first, $last);
+}
+
+/** True when a parsed row's day falls in [$from, $to] inclusive; '' on either side means unbounded. */
+function ecUsageRowInWindow(array $row, $from, $to)
+{
+    if ($from !== '' && $row['day'] < $from) { return false; }
+    if ($to   !== '' && $row['day'] > $to)   { return false; }
+    return true;
+}
+
+/** A blank per-bucket accumulator: totals, a daily series, and named field tallies -- everything a
+ * table or a chart on spock.php reads, and nothing a row array is needed for afterward. */
+function ecUsageNewSeries(array $fields)
+{
+    $s = array(
+        'bucketTotals' => array('visitor' => 0, 'visit' => 0),
+        'daily'        => array('visitor' => array(), 'visit' => array()),
+        'countBy'      => array(),
+    );
+    foreach ($fields as $f) { $s['countBy'][$f] = array('visitor' => array(), 'visit' => array()); }
+    return $s;
+}
+
+/** Folds one parsed row into a series accumulator, if its day is in the window. The three things
+ * this file promises never to lose stay true here: two buckets, never summed; a day outside the
+ * window contributes nothing; a field the row does not carry counts as '(none)'. */
+function ecUsageFeedSeries(array &$s, array $row, $from, $to)
+{
+    if (!ecUsageRowInWindow($row, $from, $to)) { return; }
+    $b = $row['bucket'];
+    $s['bucketTotals'][$b]++;
+    if (!isset($s['daily'][$b][$row['day']])) { $s['daily'][$b][$row['day']] = 0; }
+    $s['daily'][$b][$row['day']]++;
+    foreach (array_keys($s['countBy']) as $field) {
+        $v = isset($row[$field]) ? $row[$field] : '';
+        if ($v === '') { $v = '(none)'; }
+        if (!isset($s['countBy'][$field][$b][$v])) { $s['countBy'][$field][$b][$v] = 0; }
+        $s['countBy'][$field][$b][$v]++;
+    }
+}
+
+/** A series' daily counts over a fixed day list, so a quiet day is a zero rather than a gap --
+ * the same guarantee ecUsageDaily() makes for a row array, made here from the partial map
+ * ecUsageFeedSeries() built (which holds only the days that actually had a row). */
+function ecUsageFinalizeDaily(array $daily, array $days)
+{
+    $out = array('visitor' => array(), 'visit' => array());
+    foreach ($days as $d) {
+        $out['visitor'][$d] = isset($daily['visitor'][$d]) ? $daily['visitor'][$d] : 0;
+        $out['visit'][$d]   = isset($daily['visit'][$d])   ? $daily['visit'][$d]   : 0;
+    }
+    return $out;
+}
+
+/**
+ * Streams every log in every directory exactly once and returns only the aggregates spock.php
+ * prints -- bucket totals, a daily series and named field tallies per kind, plus the two derived
+ * series the page filters out of 'signal' and 'view' (preset clicks; contact-page views) and the
+ * reach log's classified-row count. No row is kept once it has been folded into its series, so
+ * peak memory is bounded by the OUTPUT (days x distinct field values across the six logs), never
+ * by how many lines the logs hold.
+ *
+ * @param array $dirs directories, oldest first (see ecUsageReadAll).
+ * @param string $from string $to the day window, both 'YYYY-MM-DD'; '' means unbounded.
+ */
+function ecUsageReportBuild(array $dirs, $from, $to)
+{
+    $fieldsByKind = array(
+        'view'   => array('page', 'lang', 'pointer'),
+        'calc'   => array('page'),
+        'naming' => array('field', 'page'),
+        'reach'  => array('lang', 'source', 'asked'),
+        'signal' => array('event', 'detail'),
+        'send'   => array(),
+    );
+    $series = array();
+    foreach ($fieldsByKind as $kind => $fields) { $series[$kind] = ecUsageNewSeries($fields); }
+    $presets         = ecUsageNewSeries(array('detail', 'asked'));
+    $contactViews    = ecUsageNewSeries(array());
+    $reachClassified = 0;
+    $sources         = array();
+
+    foreach ($dirs as $dir) {
+        $any = 0;
+        foreach (ecUsageLogKinds() as $name => $kind) {
+            $path = rtrim($dir, '/') . '/' . $name;
+            if (!is_file($path)) { continue; }
+            $fh = @fopen($path, 'rb');
+            if (!$fh) { continue; }
+            while (($line = fgets($fh)) !== false) {
+                $row = ecUsageParseRow($kind, $line);
+                if ($row === null) { continue; }
+                $any++;
+                if (!isset($series[$kind])) { continue; }
+                ecUsageFeedSeries($series[$kind], $row, $from, $to);
+
+                if ($kind === 'reach' && $row['classified'] && ecUsageRowInWindow($row, $from, $to)) {
+                    $reachClassified++;
+                }
+                if ($kind === 'signal' && $row['event'] === 'units'
+                    && strpos($row['detail'], 'preset:') === 0) {
+                    ecUsageFeedSeries($presets, $row, $from, $to);
+                }
+                if ($kind === 'view' && $row['page'] === 'contact') {
+                    ecUsageFeedSeries($contactViews, $row, $from, $to);
+                }
+            }
+            fclose($fh);
+        }
+        if ($any) { $sources[] = array('dir' => $dir, 'rows' => $any); }
+    }
+
+    return array(
+        'series'          => $series,
+        'presets'         => $presets,
+        'contactViews'    => $contactViews,
+        'reachClassified' => $reachClassified,
+        'sources'         => $sources,
+    );
+}
+
+/**
  * One bar chart as inline SVG. Server-side, self-contained, no script and no external library:
  * the suite makes exactly four third-party requests, all on the map page and all opt-in, and this
  * page makes a fifth of nothing.
