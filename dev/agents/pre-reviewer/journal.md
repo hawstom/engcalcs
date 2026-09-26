@@ -2280,3 +2280,32 @@ would survive (git merge is additive here), so the all-clear gate is not actuall
 still tell the orchestrator to merge master in first, on the standing rule.
 
 CITED: dev/tom-review-queue.md R-172 (2026-09-19), Tom's own three complaints, folded into Task 696.
+
+## 2026-09-26 — feat/find-coordinate (a75480e0)
+
+
+OBSERVED: dev/lpn-spike/replace-harness.js sections 8-9 (node position, Text words) ran ALL PASS
+at a75480e0 (js/looped-network.js). Re-ran with js/looped-network.js reverted to 155fc0f9^ (same
+harness kept) via a throwaway `git worktree add --detach` scratch checkout (removed after): 13
+FAILED, all in the coordinate/Text sections. Mutation coverage is real, not decorative.
+
+OBSERVED: axisNames() (js/looped-network.js:3663) is the single resolver read by the property
+popup (line 3851), the Tables column (20962, 21434), the status strip (45980/46003), and now
+Find/Replace (16920, 19048) -- so the dropdown label cannot drift from Properties' own wording.
+
+OBSERVED: setNodeCoordAxis()->writeNodeCoord() writes only the one axis (n.x or n.y) named by
+`isY`; the untouched axis is structurally never touched by a Replace on the other axis. Confirmed
+by reading, not by a dedicated harness assertion (harness section 8 checks the moved axis and the
+incident pipes, not explicitly that axis2 survives a same-write).
+
+OBSERVED: Customer (group 'customer') is NOT covered by nodeCoordReplaceSpecs() (gated to
+`d.group === 'node'`); its own position analogue is Station/Offset along a pipe, added earlier
+(Tom, 2026-09-19, per dev/property-venue-matrix.md gap notes) and unaffected by this branch.
+Text (group 'label') has no x/y Find/Replace row either -- only its words -- and CLAUDE.md/Tom's
+quotes for this branch never asked for a Text's own position, only its words.
+
+OBSERVED: property_venue_check.php exits 0 (advisory) on this branch; no 'axis'/'coord' line
+appears in its remaining-gaps list, and the matrix's #7/#8 entries are marked CLOSED with Tom's
+quotes attached correctly.
+
+SPECULATION: none needed; this branch matched its own claims on every point checked.
