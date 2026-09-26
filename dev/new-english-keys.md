@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**27 still to read on master**, of 210 untranslated keys, of 2057 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 241 untranslated keys, of 2080 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,68 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (210, 27 to read @@ NEEDS RULING)
+## lpn_  (241, 29 to read @@ NEEDS RULING)
 
+- **`lpn_convas_cancelled`**
+  > Nothing was converted. The copy is closed, and the original project is unchanged.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_coordsys_tip`**
+  > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_done`**
+  > The converted copy is {name}. The original project is unchanged.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_epsg`**
+  > EPSG coordinate system
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_epsg_tip`**
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_from`**
+  > Current: {crs}
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_label_col`**
+  > Suffix
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
+  _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
+- **`lpn_convas_no_transform`**
+  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
+  @@ NEEDS RULING
+- **`lpn_convas_none_tip`**
+  > Local coordinates in the length unit, with no world map for now.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_ok`**
+  > Convert
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_oneway`**
+  > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round`**
+  > Round converted values
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_flow`**
+  > Demand and flow
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_none`**
+  > No rounding
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_tip`**
+  > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_title`**
+  > Convert as
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_units_tip`**
+  > The units the copy is converted to. The original keeps its own numbers and units.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_unnamed`**
+  > Unnamed (local) georeference
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_unnamed_tip`**
+  > Local coordinates in the length unit, with the world map attached.
+  _Ruled OK 2026-09-26._
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
@@ -37,11 +97,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > unnamed
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
-  > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
-  _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this tip?_
+  > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
+  @@ NEEDS RULING
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
+- **`lpn_crsbox_title`**
+  > Coordinate system
+  _Ruled OK 2026-09-26._
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
   _Ruled OK 2026-09-23._
@@ -135,12 +198,27 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_text_all_zoom_tip`**
   > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
   _Ruled 2026-09-23: Default needs to be off. I see that you turned it on by default, and that already has caused me grief. Only a few texts would be privileged to have this on. Otherwise ok._
+- **`lpn_file_convert_as`**
+  > Convert as…
+  _Ruled OK 2026-09-25._
+- **`lpn_file_convert_as_tip`**
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  _Ruled OK 2026-09-25._
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
 - **`lpn_file_import_survey_tip`**
   > Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.
   _Ruled OK 2026-09-23._
+- **`lpn_find_filter_none`**
+  > This query doesn't apply to any table.
+  _Ruled 2026-09-26: Edited. Is this even possible?_
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  _Ruled OK 2026-09-26._
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  _Ruled OK 2026-09-26._
 - **`lpn_full_col_id`**
   > ID
   @@ NEEDS RULING
@@ -171,12 +249,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_full_title`**
   > Full report
   @@ NEEDS RULING
+- **`lpn_georef_answered`**
+  > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  _Ruled OK 2026-09-25._
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
 - **`lpn_inp_export_flat_customers`**
   > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
   _Ruled OK 2026-09-23._
+- **`lpn_inp_report_no_crs`**
+  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
+  _Ruled OK 2026-09-25._
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
@@ -657,6 +741,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
+- **`lpn_units_mapcoords`**
+  > Map coordinates
+  _Ruled OK 2026-09-25._
+- **`lpn_units_mapcoords_deg`**
+  > degrees
+  _Ruled OK 2026-09-25._
+- **`lpn_units_usft`**
+  > US survey ft
+  _Ruled OK 2026-09-25._
 
 ---
 
@@ -673,7 +766,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-node (`da75608c`) — 2 new, all ruled
+### feat/customer-node (`d29a2c2c`) — 2 new, all ruled
 
 - **`lpn_field_meter_node`**
   > Connected to
@@ -696,7 +789,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/report (`4fad6782`) — adds no English strings
+### feat/report (`d3be5817`) — adds no English strings
 
 ### feat/table-editing (`39d3b3f8`) — 21 new, 5 to read @@ NEEDS RULING
 

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2030,
-        "delta_key_count": 186,
+        "expected_key_count": 2053,
+        "delta_key_count": 217,
         "exempt_key_count": 45,
         "exempt_keys": [
             "u_imgd",
@@ -569,9 +569,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -588,9 +617,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -757,9 +788,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -776,9 +836,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -1440,19 +1502,435 @@
                 }
             }
         },
+        "lpn_units_mapcoords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_mapcoords_deg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_usft": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_file_convert_as": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
         "lpn_copy_of": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Buka berkas xy di peta…",
-                    "english": "Convert coordinates as…"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_file_import_geo_tip",
-                    "value": "Membuka berkas proyek atau berkas EPANET pada tab proyek baru di halaman ini, di atas peta jalan. Anda menempatkan gambar pada dunia secara manual: geser dan perbesar ke lokasi, lalu ubah ukuran dan putar agar sesuai. Jika x dan y pada berkas sudah berupa garis bujur dan garis lintang, tekan tombol Ini sudah lat\/lon dan jaringan akan langsung berpindah ke tempatnya. Setiap angka yang Anda ketik tetap seperti semula.",
-                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_coordsys_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_none_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_oneway": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_no_transform": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_file_convert_as_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_georef_answered": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Menempatkan model dilakukan dalam dua langkah. Langkah 1 adalah langkah cepat: model tetap diam dan Anda menggerakkan peta di belakangnya, sampai lokasi Anda berada di bawah model dengan ukuran yang kira-kira tepat. Belum ada rotasi pada tahap ini. Langkah 2 adalah langkah presisi: Anda menyeret, mengubah ukuran, dan memutar model itu sendiri. Proyek Anda pada mulanya berada di atas peta seluruh dunia, jadi temukan lokasi Anda terlebih dahulu, lalu tekan tombol Letakkan model di sini.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1485,6 +1963,54 @@
                     "key": "lpn_pane_print",
                     "value": "Cetak tabel",
                     "english": "Print table"
+                }
+            }
+        },
+        "lpn_find_filter_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
                 }
             }
         },
@@ -1744,6 +2270,22 @@
                 }
             }
         },
+        "lpn_crsbox_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_crs",
+                    "value": "Proyeksi peta",
+                    "english": "Coordinate system"
+                },
+                "next_translated": {
+                    "key": "lpn_crs_view",
+                    "value": "Saring berdasarkan tampilan peta",
+                    "english": "Filter by map view"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,
@@ -1789,6 +2331,22 @@
                     "key": "lpn_crs_none",
                     "value": "Tidak digeoreferensi",
                     "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_inp_report_no_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_label_anchor",
+                    "value": "Label teks ditempatkan sebagaimana EPANET menempatkannya, dari sudut kiri atasnya.",
+                    "english": "Text labels are placed as EPANET places them, from their top left corner."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Halaman ini tidak menggunakan semua yang digunakan EPANET, tetapi tidak ada apa pun dalam berkas Anda yang dibuang. Berikut adalah apa yang disimpan berkas Anda tanpa digunakan oleh halaman ini, dan apa yang diubah saat berkas dibaca:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
                 }
             }
         },

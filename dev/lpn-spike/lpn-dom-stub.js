@@ -371,11 +371,19 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
   'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_create',
   'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si', 'lpn_new_crs_pick',
-  // The Geographic projection box (Task 641 phase 2): the two filters, the selector they narrow,
+  // The Coordinate system box (Task 641 phase 2): the two filters, the selector they narrow,
   // and the note that says which filter is doing the narrowing.
   'lpn_crsbox', 'lpn_crsbox_title', 'lpn_crsbox_close', 'lpn_crsbox_view', 'lpn_crsbox_place',
   'lpn_crsbox_search', 'lpn_crsbox_name', 'lpn_crsbox_list', 'lpn_crsbox_note', 'lpn_crsbox_ok',
   'lpn_crsbox_cancel',
+  // The File, Convert as box (Task 696). Its three coordinate radios are read by id, and its unit
+  // selects are cloned into #lpn_convas_units_fields exactly as the New-project box clones its own.
+  'lpn_convas_panel', 'lpn_convas_units_fields', 'lpn_convas_kind_epsg', 'lpn_convas_kind_unnamed',
+  'lpn_convas_kind_none', 'lpn_convas_crs_pick', 'lpn_convas_crs_name', 'lpn_convas_from',
+  'lpn_convas_ok', 'lpn_convas_cancel', 'lpn_convas_close', 'lpn_convas_si', 'lpn_convas_us',
+  'lpn_u_mapcoords', 'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
+  // The Label column beside the rounding selects (Task 696 part 2): one suffix box per row.
+  'lpn_convas_suffix_diameter', 'lpn_convas_suffix_depth', 'lpn_convas_suffix_flow', 'lpn_convas_suffix_head',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span
@@ -558,6 +566,25 @@ const unitSelects = {};
 // `family` is NOT decoration: echoUnitSelect() puts data-family on every real select, and Task
 // 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
 // that function skip every select and vacuously report "us", which is a test agreeing with itself.
+// **AN OPTION'S textContent IS THE TRANSLATED LABEL, NEVER THE UNIT'S NAME** -- echoUnitSelect()
+// (lib/Calculators.lib.php) prints `$ec_lang['u_' . $unit]` as the option's text, so 'fth2o' reads
+// "ft H2O" on the real page. A stub whose textContent equalled the value could not tell a caller
+// that reads the display text from one that (wrongly) reads the value: the two would agree by
+// construction. Found this way, 2026-09-23: pre-review reported a Convert as Label box pre-filling
+// with the raw unit id, and a stub with this bug in it would have shown the same result for either
+// a correct read or an incorrect one.
+const unitLabels = (function () {
+  const src = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+  const out = {};
+  for (const m of src.matchAll(/\$ec_lang\['u_([a-zA-Z0-9_]+)'\]\s*=\s*'((?:[^'\\]|\\.)*)'\s*;/g)) {
+    out[m[1]] = m[2].replace(/\\'/g, "'");
+  }
+  return out;
+}());
+function unitLabelText(name) {
+  if (!(name in unitLabels)) { throw new Error("lpn-dom-stub.js: no \$ec_lang['u_" + name + "'] in lib/lang.ec.en.php"); }
+  return unitLabels[name];
+}
 function mkUnitSelect(name, family, opts, chosen) {
   // **A REPLACED SELECT IS DETACHED, BECAUSE THAT IS WHAT REPLACING ONE DOES** (Task 651).
   // setUnitSet() calls this again for every name, and the old object used to keep its parentNode
@@ -571,7 +598,7 @@ function mkUnitSelect(name, family, opts, chosen) {
   s.name = name;
   s.id = name;   // echoUnitSelect() emits id=name since Task 685
   s.dataset.family = family;
-  s.options = opts.map(n => ({ value: n, textContent: n }));
+  s.options = opts.map(n => ({ value: n, textContent: unitLabelText(n) }));
   s.selectedIndex = opts.indexOf(chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
   Object.defineProperty(s, 'value', { get() { return this.options[this.selectedIndex].value; } });

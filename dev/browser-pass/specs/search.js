@@ -337,18 +337,14 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 		// The wizard starts from a FILE now (Task 447): the drawing on screen is written out and
-		// opened again through File > the lat/lon row (`lpn_file_import_geo`), which lands it in a new tab, in step 1.
-		{
-			const text = await a.page.evaluate(() => {
-				const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
-				return localStorage.getItem('lpn_project_' + idx.openId);
-			});
-			const [chooser] = await Promise.all([
-				a.page.waitForEvent('filechooser'),
-				a.menuClick(await a.lang('lpn_file_import_geo'))
-			]);
-			await chooser.setFiles({ name: 'search.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
-		}
+		// opened again through File > the lat/lon row (`lpn_file_convert_as`), which lands it in a new tab, in step 1.
+		await a.menuClick(await a.lang('lpn_file_convert_as'));
+		await a.settle(300);
+		// File, Convert as (Task 696) opens its box first: choose lat/lon, which is EPSG:3857, and Convert.
+		await a.page.evaluate(() => {
+			const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');
+			if (r && ok) { r.checked = true; ok.click(); }
+		});
 		await a.settle(900);
 		report.ok(await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_georef_search');

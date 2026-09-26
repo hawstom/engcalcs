@@ -204,8 +204,20 @@ ok('...and the placed coordinates are the ones that survive',
 ok('...on a local origin, which is what makes them drawable at street zoom',
 	L.docOrigin().x !== 0 || L.docOrigin().y !== 0, JSON.stringify(L.docOrigin()));
 
+// **NOT REFUSED ANY MORE** (Task 696, Tom 2026-09-23): lat/lon is one coordinate system among
+// hundreds, so being on it is no reason to refuse converting to another. It opens at step 1 with the
+// model already where its coordinates say, so nothing has to be placed again.
+const placedAgain = JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)]));
 L.georefStart();
-ok('a project already on the GeoMap is refused, not re-placed', L.georefState() === null);
+ok('a project already on the GeoMap opens the wizard, already answered, at step 1',
+	L.georefState() !== null && L.georefState().step === 1);
+const answered = doc.nodes.map(n => [L.outwardX(n.x), L.outwardY(n.y)]);
+ok('...with every node where its own coordinates already put it',
+	JSON.parse(placedAgain).every((p, i) => Math.abs(p[1] - answered[i][0]) < 1e-9 &&
+		Math.abs(p[2] - answered[i][1]) < 1e-9), JSON.stringify(answered));
+L.georefCancel();
+ok('...and Cancel leaves it exactly as it was',
+	JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)])) === placedAgain);
 
 // ---------------------------------------------------------------------------
 // 6. The command stays FINDABLE, and the coordinate box takes what people paste.
@@ -224,10 +236,15 @@ ok('a project already on the GeoMap is refused, not re-placed', L.georefState() 
 console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
 {
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_import_geo'),
-		lnSrc.indexOf('label: pc.lpn_file_import_geo') + 200);
+	// **BOUNDED TO THE OBJECT LITERAL'S OWN CLOSING BRACE, NOT A FIXED CHARACTER COUNT** (R-213
+	// moved this row to sit right before Save all's own comment, which starts "disabled when it
+	// would do nothing" -- a fixed 200-character window reached past this row's own `}` into that
+	// unrelated text and read its "disabled" as this row's own, though nothing here moved the
+	// property itself). This row's own text has no nested `{`, so its first `}` is its own close.
+	const start = lnSrc.indexOf('label: pc.lpn_file_convert_as');
+	const row = lnSrc.slice(start, lnSrc.indexOf('}', start) + 1);
 	ok('File carries the row, and it converts the open project into a copy',
-		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: convertCoordsAs/.test(row),
+		/label: pc\.lpn_file_convert_as \|\|/.test(lnSrc) && /fn: convertAs/.test(row),
 		row.split('\n')[1]);
 	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
 		!/disabled/.test(row));
@@ -248,7 +265,7 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 	// the half that still applies: the fallback sits BELOW Open. **If Tom would rather keep the
 	// August order, the menu changes back and this comment is the record of what that costs.**
 	ok('...the xy fallback sits below Open, and Import EPANET sits against Export',
-		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_open |') &&
+		lnSrc.indexOf('pc.lpn_file_convert_as') > lnSrc.indexOf('pc.lpn_file_open |') &&
 		lnSrc.indexOf('pc.lpn_file_import_inp') < lnSrc.indexOf('pc.lpn_file_export_inp'));
 	ok('the in-place "Convert to lat/lon" command is gone, key and all',
 		lnSrc.indexOf('lpn_georef_menu') === -1 && lnSrc.indexOf('lpn_georef_tip') === -1);

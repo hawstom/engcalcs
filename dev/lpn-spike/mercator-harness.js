@@ -303,13 +303,14 @@ ok('...and its inverse likewise',
 // rebaseLiveGeoDoc() since Task 439, which projects the model's extent to decide which 1/128 cell
 // a geographic document's origin sits in. That last one is a real use of the seam rather than a way
 // round it: it reads through outwardY() and moves no coordinate. Every site is named in a comment
-// beside it. And ONE in followViewWhileEmpty() (Tom, 2026-09-25): an EMPTY geographic document has
-// no model to choose a cell from, so it projects the camera's centre instead, through outwardY(),
-// exactly as rebaseLiveGeoDoc() projects the model's corner. A TENTH is a site nobody wrote a
-// reason for, and a site that should have projected and did not is wrong only in a geographic
-// project and only away from the equator.
-ok('mercY/mercLat are called from nine places in js/looped-network.js and no more',
-	count(/Geom\.mercY\(|Geom\.mercLat\(/g) === 9, count(/Geom\.mercY\(|Geom\.mercLat\(/g));
+// beside it; TWO MORE since Task 696, in convertSavedGeometry(), which reads a SAVED lat/lon document
+// (latitude positions, Mercator drawing y) exactly as the seam does in memory. And ONE in
+// followViewWhileEmpty() (Tom, 2026-09-25): an EMPTY geographic document has no model to choose a
+// cell from, so it projects the camera's centre instead, through outwardY(). A TWELFTH is a site
+// nobody wrote a reason for, and a site that should have projected and did not is wrong only in a
+// geographic project and only away from the equator.
+ok('mercY/mercLat are called from eleven places in js/looped-network.js and no more',
+	count(/Geom\.mercY\(|Geom\.mercLat\(/g) === 11, count(/Geom\.mercY\(|Geom\.mercLat\(/g));
 ok('...and the tile grid uses the RADIAN form, which is what keeps its numbers unchanged',
 	count(/Geom\.mercRadY\(|Geom\.mercLatFromRad\(/g) === 2,
 	count(/Geom\.mercRadY\(|Geom\.mercLatFromRad\(/g));

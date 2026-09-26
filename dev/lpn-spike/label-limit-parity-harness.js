@@ -193,7 +193,8 @@ console.log('== (c): tips ==');
 		'(c) the misleading last sentence is gone from the all-labels tip');
 	ok(custTip.indexOf('This has no effect if it is larger than the similar setting for all labels') >= 0,
 		'(c) the customer tip carries Tom\'s own qualifier sentence, verbatim');
-	ok(custTip.indexOf('drawn only while the map view is this wide or narrower') >= 0,
+	function whileClause(t) { var m = /drawn only while ([^.]*)\./.exec(t); return m && m[1]; }
+	ok(!!whileClause(custTip) && whileClause(custTip) === whileClause(allTip),
 		'(c) the customer tip is otherwise the parallel sentence, not a different shape');
 }
 
