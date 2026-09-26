@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2089,
-        "delta_key_count": 252,
+        "expected_key_count": 2106,
+        "delta_key_count": 270,
         "exempt_key_count": 35,
         "exempt_keys": [
             "calc_units_us",
@@ -560,6 +560,22 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
+        "lpn_pane_filldown": "Fill down",
+        "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_hide_col": "Hide this column",
+        "lpn_pane_hide_cols": "Hide these columns",
+        "lpn_pane_show_all_cols": "Show all columns",
+        "lpn_pane_sort_asc": "Sort ascending",
+        "lpn_pane_manage_cols": "Manage columns…",
+        "lpn_pane_manage_cols_title": "Manage columns",
+        "lpn_pane_manage_cols_show": "Show",
+        "lpn_pane_manage_cols_up": "Move up",
+        "lpn_pane_manage_cols_down": "Move down",
+        "lpn_pane_manage_cols_top": "Move to beginning",
+        "lpn_pane_manage_cols_bottom": "Move to end",
+        "lpn_pane_colmenu_tip": "Hide or manage columns",
+        "lpn_pane_sortarrow_tip": "Reverse the sort",
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
@@ -639,6 +655,8 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
+        "lpn_notes_6_term": "Table keyboard shortcuts",
+        "lpn_notes_6_def": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys<\/strong> Move the selection.<\/li><li><strong>Tab, Enter<\/strong> Move the selection after you type.<\/li><li><strong>Shift+Tab, Shift+Enter<\/strong> Move it backward.<\/li><li><strong>Shift+arrow keys<\/strong> Extend the selection.<\/li><li><strong>Ctrl+C<\/strong> Copy the selection.<\/li><li><strong>Ctrl+D<\/strong> Fill the selection down from its top row.<\/li><li><strong>Ctrl+A<\/strong> Select the whole table.<\/li><li><strong>Delete<\/strong> Clear a cell.<\/li><li><strong>F2<\/strong> Open a cell to edit it.<\/li><li><strong>Esc<\/strong> Cancel an edit.<\/li><li><strong>Click a column heading<\/strong> Select that column.<\/li><li><strong>Ctrl+click, Shift+click a heading<\/strong> Add a column to the selection, or extend it.<\/li><li><strong>Drag a column heading<\/strong> Move that column, or the whole selection if it is part of one.<\/li><li><strong>Right-click a heading, or long-press it<\/strong> Hide the selected columns.<\/li><li><strong>Hover a heading's top corner, or Tab into it<\/strong> Shows its ⋮ menu and its sort arrow.<\/li><li><strong>The ⋮<\/strong> Hide, show all, or manage columns.<\/li><li><strong>The arrow<\/strong> Sort by that column. Click again to reverse it.<\/li><\/ul>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -814,6 +832,22 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
+        "lpn_pane_filldown": "Fill down",
+        "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_hide_col": "Hide this column",
+        "lpn_pane_hide_cols": "Hide these columns",
+        "lpn_pane_show_all_cols": "Show all columns",
+        "lpn_pane_sort_asc": "Sort ascending",
+        "lpn_pane_manage_cols": "Manage columns…",
+        "lpn_pane_manage_cols_title": "Manage columns",
+        "lpn_pane_manage_cols_show": "Show",
+        "lpn_pane_manage_cols_up": "Move up",
+        "lpn_pane_manage_cols_down": "Move down",
+        "lpn_pane_manage_cols_top": "Move to beginning",
+        "lpn_pane_manage_cols_bottom": "Move to end",
+        "lpn_pane_colmenu_tip": "Hide or manage columns",
+        "lpn_pane_sortarrow_tip": "Reverse the sort",
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
@@ -893,6 +927,8 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
+        "lpn_notes_6_term": "Table keyboard shortcuts",
+        "lpn_notes_6_def": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys<\/strong> Move the selection.<\/li><li><strong>Tab, Enter<\/strong> Move the selection after you type.<\/li><li><strong>Shift+Tab, Shift+Enter<\/strong> Move it backward.<\/li><li><strong>Shift+arrow keys<\/strong> Extend the selection.<\/li><li><strong>Ctrl+C<\/strong> Copy the selection.<\/li><li><strong>Ctrl+D<\/strong> Fill the selection down from its top row.<\/li><li><strong>Ctrl+A<\/strong> Select the whole table.<\/li><li><strong>Delete<\/strong> Clear a cell.<\/li><li><strong>F2<\/strong> Open a cell to edit it.<\/li><li><strong>Esc<\/strong> Cancel an edit.<\/li><li><strong>Click a column heading<\/strong> Select that column.<\/li><li><strong>Ctrl+click, Shift+click a heading<\/strong> Add a column to the selection, or extend it.<\/li><li><strong>Drag a column heading<\/strong> Move that column, or the whole selection if it is part of one.<\/li><li><strong>Right-click a heading, or long-press it<\/strong> Hide the selected columns.<\/li><li><strong>Hover a heading's top corner, or Tab into it<\/strong> Shows its ⋮ menu and its sort arrow.<\/li><li><strong>The ⋮<\/strong> Hide, show all, or manage columns.<\/li><li><strong>The arrow<\/strong> Sort by that column. Click again to reverse it.<\/li><\/ul>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -1578,6 +1614,262 @@
                 }
             }
         },
+        "lpn_pane_filled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_filldown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_fill_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_hide_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_hide_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_show_all_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_sort_asc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_up": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_down": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_top": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_bottom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_colmenu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_sortarrow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
         "lpn_tool_zoom_window": {
             "reason": "missing",
             "current_value": null,
@@ -2143,9 +2435,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pane_sort_tip",
-                    "value": "Seřadí podle tohoto sloupce. Dalším kliknutím pořadí obrátíte.",
-                    "english": "Sort by this column. Click again to reverse it."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Ničemu v této tabulce filtr neodpovídá.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
                     "key": "lpn_pane_print",
@@ -2839,6 +3131,38 @@
                     "key": "lpn_lock_readonly_banner",
                     "value": "Jen pro čtení: {name} má tento soubor otevřený. Zde můžete měnit cokoli chcete, ale nemůžete ukládat. Použijte Soubor, Uložit jako a uložte do jiného souboru.",
                     "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_notes_6_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Projekt může ležet na skutečném terénu s mapou ulic v pozadí. Soubory EPANET .inp lze načítat i zapisovat. Spodní panel kreslí profil podél trasy a vypisuje uzly. Prvky lze obarvit podle výsledků a Najít vybere každý prvek, který splňuje vámi zadanou podmínku.",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "Hranice barevných pásem zůstávají stejné",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_6_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Projekt může ležet na skutečném terénu s mapou ulic v pozadí. Soubory EPANET .inp lze načítat i zapisovat. Spodní panel kreslí profil podél trasy a vypisuje uzly. Prvky lze obarvit podle výsledků a Najít vybere každý prvek, který splňuje vámi zadanou podmínku.",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "Hranice barevných pásem zůstávají stejné",
+                    "english": "Color band boundaries stay the same"
                 }
             }
         },
