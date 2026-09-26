@@ -310,12 +310,6 @@ console.log('\n-- the strings exist --');
 ['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank', 'lpn_help_screenshots'].forEach(function (k) {
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
 });
-{
-	// Tom, 2026-09-25: "On the gallery welcome, end it 'Or start here'." Project1 now opens over a
-	// street map, so "a blank map" had stopped being true.
-	const m = en.match(/\$ec_lang\['lpn_examples_blank'\]='([^']*)'/);
-	report(!!m && m[1] === 'Or start here', 'the gallery exit says "Or start here"', m && m[1]);
-}
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

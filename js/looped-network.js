@@ -36326,7 +36326,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
