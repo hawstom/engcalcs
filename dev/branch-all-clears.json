@@ -159,6 +159,34 @@
             "words": "(1) I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap. (2) It works! We can close, merge, and delete the branch. Nice work.",
             "context": "His bullet was headed feat/table-editing, but its content is this branch's Find box, and his other feat/table-editing bullet in the same message says that branch is not ready. Read as property-venue; say so in the report.",
             "pin_note": "HE CLEARED IT AT b8733c5d AND THE PIN IS LATER: a merge of master, his own rewrite of lpn_find_filter_none, and a harness probe of his Lake/River report, which did not reproduce; that item went back to him (R-260) rather than to the roadmap."
+        },
+        "feat/zoom-control": {
+            "head": "43902998",
+            "date": "2026-09-26",
+            "words": "8103 zoom-control: Merge",
+            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+        },
+        "feat/customer-node": {
+            "head": "105d9f68",
+            "date": "2026-09-26",
+            "words": "8113 customer-node: Merge. Nice!",
+            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+        },
+        "feat/menu-button": {
+            "head": "eceab3ab",
+            "date": "2026-09-26",
+            "words": "8114 menu-button: Merge.",
+            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+        },
+        "feat/report": {
+            "head": "87e15a16",
+            "date": "2026-09-26",
+            "words": "8115 reports: Merge. Very nice. And the file name was good.",
+            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
         }
     }
 }
