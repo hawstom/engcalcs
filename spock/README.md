@@ -10,6 +10,11 @@ Tom, 2026-08-22:
 Written down because an unexplained directory name gets "cleaned up" by a future reader. It is not
 a typo, it is not Star Trek, and it is not to be renamed.
 
+**This directory is not `spock.php`.** `spock.php`, at the suite root, is the private usage report
+page itself (`dev/usage-report-page.md`); this directory is where its data lives when rotated, plus
+the one aggregate copy Tom approved publishing (`public/`, below). The two share a name on purpose
+and are otherwise unrelated files.
+
 ## Layout
 
 ```

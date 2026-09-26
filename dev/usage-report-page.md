@@ -6,54 +6,40 @@ Tom, 2026-09-17:
 > or public. I'm feeling a bit private at the moment, so password protection might be nice.
 > Historical graphs might be nice.
 
-`usage-report/index.php`, behind HTTP Basic, drawing the six usage logs over time.
+Tom, 2026-09-24 (R-212):
 
-## Turning the password on
+> I would like a URL I can visit that gives scripted views of our logs. This is a long project
+> where I will ask for clarifications over the long term. And I love graphs. But phase 1 is to
+> create the URL and the script. It doesn't have to be secret, but we won't publish or link it. How
+> about `engcalcs/spock.php` or `engcalcs/spock-cast.php`?
 
-Three commands on the server, in order. Nothing here is a script; paste them one at a time.
+`spock.php`, at the suite root, no password, drawing the six usage logs over time.
 
-```
-ssh jconstru
-htpasswd -c ~/.htpasswd-engcalcs tom
-chmod 600 ~/.htpasswd-engcalcs
-```
+## Where it lives, and where it used to live
 
-`htpasswd -c` asks for the password twice and creates the file. **The `-c` creates it from
-scratch, so use it once.** To change the password later, or to add a second name, leave `-c` off:
+Phase 1 shipped this as `usage-report/index.php`, in a directory of its own so an HTTP Basic
+directive could not 500 the whole suite where the host refused `AllowOverride AuthConfig`. R-212
+dropped the password ("it doesn't have to be secret"), so there is no auth directive that could
+500 anything, and the page moved to the suite root as `spock.php`. That directory and its
+`.htaccess` are gone; nothing redirects from the old path, since nothing outside this repository
+ever linked it.
 
-```
-htpasswd ~/.htpasswd-engcalcs tom
-```
+**It is a different thing from `spock/`, the sibling directory.** `spock/` holds rotated log
+archives (denied outright) plus `spock/public/`, the one aggregate report Tom separately approved
+publishing ("spock: Make it reachable", 2026-08-23). A request for the exact file `spock.php` does
+not fall back to the `spock/` directory index under Apache; the archives stay denied by
+`spock/.htaccess` regardless. See `spock/README.md`.
 
-To check what the file holds (it shows names and hashes, never passwords):
+Open `https://hawsedc.com/engcalcs/spock.php`. Nobody publishes or links it, and it carries no
+form, no menu entry and no password: the page tells nobody about itself, and only somebody who
+already has the URL reaches it.
 
-```
-cat ~/.htpasswd-engcalcs
-```
+### Keeping it unindexed with no `.htaccess` to help
 
-Then open `https://hawsedc.com/engcalcs/usage-report/` and the browser asks for the name and
-password. Log out by quitting the browser: HTTP Basic has no other sign-out, and that is the price
-of a scheme that stores nothing of ours.
-
-### If the page answers 500 instead of asking for a password
-
-Two causes, both fail-closed by design and neither of them touching any other page:
-
-1. **The password file is not there yet**, or Apache cannot read it. Run the three commands above.
-2. **The host does not grant `AllowOverride AuthConfig`** for this directory. That is a separate
-   grant from the `FileInfo`/`Limit` the rest of the suite's `.htaccess` files rely on, and it is
-   the same trap the root `.htaccess` records about `Options -Indexes`. Ask the host to add
-   `AuthConfig`, or move the whole directory behind cPanel's own Directory Privacy, which writes
-   the same directives from the control panel.
-
-The page lives in a directory of its own for exactly this reason: an auth directive Apache refuses
-500s the directory that holds it, so the blast radius is this one page rather than all 28.
-
-### If the path is not `/home/jconstru`
-
-`AuthUserFile` in `usage-report/.htaccess` is an absolute server path and is currently
-`/home/jconstru/.htpasswd-engcalcs`. Confirm with `echo $HOME` after `ssh jconstru`, and edit that
-one line if it differs. It must stay outside the document root.
+Since it is no longer behind HTTP Basic in a directory of its own, it carries `noindex, nofollow`
+two ways: a `<meta name="robots">` tag in the page and an `X-Robots-Tag` header sent by
+`header()` in `spock.php` itself, because there is no `.htaccess` beside a root-level file to add
+that header the way `usage-report/.htaccess` and `spock/public/.htaccess` once did.
 
 ## What the page shows, and where each number comes from
 
@@ -66,11 +52,15 @@ Every heading on the page names its own log file and field number. In summary:
 | Language the page was served in | `log/engcalcs-human-view.log` | 3 |
 | Device pointer | `log/engcalcs-human-view.log` | 5 |
 | Confirmed calculations per day, and by calculator | `log/engcalcs-calc-usage.log` | 1, 2 |
-| Naming events by kind and by page | `log/engcalcs-title.log` | 5, 2 |
+| Naming events per day, by kind and by page | `log/engcalcs-title.log` | 1, 5, 2 |
 | Language reach, how it was decided, raw tag | `log/engcalcs-lang.log` | 2, 3, 6 |
-| Unit preset clicks, and by raw tag | `log/engcalcs-signal.log` | 5 and 6, 4 |
-| Behaviour signals | `log/engcalcs-signal.log` | 5, 6 |
-| Contact funnel | `log/engcalcs-human-view.log` + `log/engcalcs-contact-send.log` | 2 |
+| Unit preset clicks per day, and by raw tag | `log/engcalcs-signal.log` | 1, 5 and 6, 4 |
+| Behaviour signals per day, by kind and detail | `log/engcalcs-signal.log` | 1, 5, 6 |
+| Contact funnel, viewed and sent per day | `log/engcalcs-human-view.log` + `log/engcalcs-contact-send.log` | 1, 2 |
+
+Every section above draws a PEOPLE chart and a PAGE LOADS chart, each an inline SVG bar chart with
+no external library and no script: an x-axis labelled with the first and last day in the window, a
+y-axis labelled with 0 and the day's peak, and a title on each bar giving the exact day and count.
 
 It reads the live `log/` directory **and every archive under `spock/`**, oldest first, which is what
 makes a window older than the last rotation drawable at all. The directory table at the top says
@@ -98,12 +88,13 @@ a total, sum, combined or all column, and that no row carries more than three ce
 
 Nothing. No cookie, no local storage, no session, no script of any kind on the page, and it does
 not even `require` `lib/config.inc.php`, whose load-time behaviour reads and can clear analytics
-cookies. The credential is HTTP Basic, which the browser holds. So `consent_body` stays true,
-`EC_CONSENT_VERSION` does not move, and nobody is re-asked anything.
+cookies. So `consent_body` stays true, `EC_CONSENT_VERSION` does not move, and nobody is re-asked
+anything.
 
 It is also not a suite page: no nav link, no menu row, no sitemap entry (`generate_sitemap.php`
 excludes anything with no page header call, which this has), no manifest entry, no service-worker
-precache, and a `noindex, nofollow` robots meta plus an `X-Robots-Tag` header beside it.
+precache (`ecSwPageExclusions()` in `lib/ServiceWorker.lib.php`), and a `noindex, nofollow` robots
+meta plus an `X-Robots-Tag` header sent by the page itself.
 
 ## What the logs could not support
 
@@ -116,3 +107,9 @@ precache, and a `noindex, nofollow` robots meta plus an `X-Robots-Tag` header be
   means.
 * **Anything about who.** No row in any of these files names anybody, and nothing here changes
   that.
+
+## Phase 2 and beyond
+
+R-212 is a long project Tom will keep adding to. Phase 1 is the URL and the script above; further
+"scripted views" and graph requests belong in `dev/tom-review-queue.md` / `dev/ROADMAP.md` as they
+come, not anticipated here.

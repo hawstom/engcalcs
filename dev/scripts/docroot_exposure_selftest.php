@@ -107,11 +107,7 @@ $fullNonWeb = array('log/.htaccess' => $DENY, 'log/x.log' => "x\n",
                     'spock/.htaccess' => $DENY, 'spock/x.php' => "<?php\n",
                     'css/a.css' => "a{}\n", 'icons/a.png' => "x\n",
                     'examples/a.lwn' => "{}\n", 'lib/a.inc.php' => "<?php\n",
-                    'spreadsheet/a.php' => "<?php\n",
-                    // Web-served and password protected, so it needs files but no denial: its
-                    // .htaccess carries HTTP Basic rather than `Require all denied`.
-                    'usage-report/index.php' => "<?php\n",
-                    'usage-report/.htaccess' => "AuthType Basic\nRequire valid-user\n");
+                    'spreadsheet/a.php' => "<?php\n");
 foreach ($cases as $i => $c) {
     if ($c['name'] === 'declaration matching no tracked files') { continue; }
     $cases[$i]['files'] = $c['files'] + $fullNonWeb;

@@ -1763,3 +1763,57 @@ copy naming those EPANET features by their EPANET names, the same discipline Tas
 imposed on itself for the Calibration Report.
 
 — Mary
+
+## 2026-09-25 — WaterCAD migration, after IOD's session
+
+Tom's note, relayed by the orchestrator: IOD (a senior civil engineer) tested `lpn_`, was impressed,
+latched onto "EPANET++," and said *"we need to make migration from WaterCAD easy... import WaterCAD
+files."* Tom asked whether this needs a dedicated WaterCAD-expert seat or is Mary-plus-Sue, and
+whether any of it is answerable without buying WaterCAD, a demo, or a video. Full answer, all six
+questions, fully cited: `dev/agents/market-researcher/watercad-migration.md`. Summary of what
+carries forward:
+
+**The governing tension, stated up front in that file: `dev/positioning.md:88` already says "We are
+not running a migration campaign," and lines 85-87 reserve any WaterCAD-vs-us comparison page as
+undecided.** This research answers IOD's technical question; it is not itself a green light to
+publish migration copy — that is still Tom's call, unmade.
+
+**What I found, in one paragraph:** WaterCAD's model lives in `.wtg.sqlite` (plain SQLite, CITED,
+Bentley's own help page — but its schema is undocumented anywhere I could find, and no open-source
+reader exists, three searches, zero hits); WaterCAD has exported/imported `.inp` since the
+Haestad-Methods era, and this repo's own `js/lpn-inp.js` already has a purpose-built family of
+`lpn_inp_drop_*` sentences (OBSERVED, `lib/lang.ec.en.php:1830-1871`) that report every difference on
+import — including, directly on point, that pressure-driven-analysis flags are dropped
+(`lpn_inp_drop_demand_model`). **Pressure-dependent demand is the gap a WaterCAD migrator would hit
+fastest**; Darwin Designer, Darwin Calibrator, and Criticality analysis are three whole capabilities
+`lpn_` has no analogue of at all (not a gap in degree, a gap in kind — CITED via Bentley help-page
+titles and two Bentley/Haestad patents naming Criticality and PDD explicitly). The forum evidence on
+WaterCAD's `.inp` export quality (labels with spaces failing, tank dimensions and pump controls not
+surviving) is all **2001-2003, pre-Bentley-acquisition** — too old to trust as current, and I could
+not read Bentley's own current-version limitations KB (JS-rendered ServiceNow portal, returned only
+page chrome twice) or the one PDF that likely has the answer (Autodesk's own WaterGEMS/WaterCAD-to-
+InfoWater-Pro conversion procedure — no PDF text tool available in this environment, same gap as the
+2026-09-22 entry).
+
+**The one thing that actually unblocks progress is not ours to build: a real WaterCAD-exported
+`.inp` file from IOD or a friendly utility.** Running it through the existing importer and reading
+its own drop-messages is half a day of engineering, once the file exists — cheaper and more direct
+than buying, demoing, or watching a video of WaterCAD, none of which would answer the one live
+question (does the current export still have the old quirks) anyway.
+
+**A second, independently promising path this pass surfaced: WaterCAD models are frequently built
+FROM a utility's own GIS layer (shapefile/geodatabase) via Bentley's own ModelBuilder tool** (CITED,
+Bentley's ModelBuilder help pages) — meaning a shapefile importer would open a WaterCAD-independent
+on-ramp, sidestepping both the reverse-engineering legal question (§2 of the migration file) and the
+Task-296 trademark-naming ban, since the public claim would be "reads your GIS asset layer," not
+"reads WaterCAD."
+
+**Who:** recommended no new seat. This is answerable from documentation plus one artifact (a sample
+`.inp`, or better, a GIS shapefile). Whether "Sue" is herself a WaterCAD migrator is a question only
+Tom or Sue can answer — not discoverable externally, and I did not invent an answer to it.
+
+Wishlist rows added (both provisional pending the one artifact): a GIS shapefile importer, and
+verifying `js/lpn-inp.js` against a real WaterCAD `.inp` export. Full sizing in
+`dev/agents/market-researcher/wishlist.md`.
+
+— Mary

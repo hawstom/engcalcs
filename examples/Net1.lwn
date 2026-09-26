@@ -485,7 +485,7 @@
 		"symbolSize": 7,
 		"linkWidth": 2,
 		"symbolOpacity": 1,
-		"backdropOpacity": 1,
+		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,

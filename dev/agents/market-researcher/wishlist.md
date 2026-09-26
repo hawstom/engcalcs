@@ -5,6 +5,34 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0b1. Get one real WaterCAD-exported `.inp` and run it through `js/lpn-inp.js` — cheapest possible unlock
+
+2026-09-25, answering Tom's WaterCAD-migration question (`dev/agents/market-researcher/
+watercad-migration.md`). This is not a build item — it's a request for one artifact. The importer
+and its full `lpn_inp_drop_*` message family already exist and already report a pressure-driven-
+analysis flag being dropped (`lib/lang.ec.en.php:1863`); what's missing is knowing whether current
+(CONNECT Edition, 2023+) WaterCAD export still has the fidelity problems a 2002-2003 Haestad-era
+forum reported (labels with spaces, tank dimensions, pump controls, pipe vertices — all CITED,
+dated, in the migration file). **Cost: half a day of engineering, given the file; zero without it.**
+Ask IOD directly, since he raised the question and plausibly has a model to export from. Ranked
+first because it is the one thing that actually unblocks every other WaterCAD-migration question,
+and it costs Tom one email, not us any engineering time until the file exists.
+
+## 0b2. A GIS shapefile/geodatabase importer — a WaterCAD-independent on-ramp, lower legal and naming risk
+
+2026-09-25, same source. Bentley's own ModelBuilder documentation (CITED) confirms WaterCAD models
+are frequently built FROM a utility's own GIS asset layer, not authored by hand — meaning a
+shapefile importer would let a migrating utility bring the same underlying data WaterCAD itself was
+built from, without touching WaterCAD's proprietary `.wtg.sqlite` (undocumented schema, EULA
+reverse-engineering clause, §2 of the migration file) or naming WaterCAD in public copy at all (Task
+296's trademark ban, `dev/positioning.md:43-45`). **Sized honestly as SPECULATION on scope/cost** — I
+have not scoped what "read a shapefile" would take against `lpn_`'s current `.inp`-only import
+(`js/lpn-inp.js`), and this is a build recommendation for the roadmap-holder to size properly, not a
+research finding with a cost attached. Ranked second, above the `.wtg.sqlite` idea (not listed at
+all — actively recommended against, per the migration file §2), because it is useful independent of
+the WaterCAD question and carries the least legal or positioning risk of anything this pass turned
+up.
+
 ## 0c. Document "point Save at your synced Drive/OneDrive/Dropbox folder" — likely already true, costs a sentence
 
 2026-09-15, answering Task 667(d): the suite's existing `showSaveFilePicker()`/`showOpenFilePicker()`

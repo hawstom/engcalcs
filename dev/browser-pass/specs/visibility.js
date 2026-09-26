@@ -128,42 +128,59 @@ exports.run = async function ({ browser, report }) {
 				.some(h => /^\s*settings\s*$/i.test(h.textContent)))),
 			'no heading inside the box says "Settings" — the box is Settings');
 
-		// **THEMATIC MAP IS UNDER "Node and link"** (Tom, 2026-08-19: "Move Thematic map to the Node
-		// and link section"). It hides EVERY label, node and link alike, so filed inside either
-		// colouring group it read as belonging to that one kind of element.
+		// **"Thematic map (colors only)" IS RETIRED** (2026-09-23, Tom: "I noticed that we have a
+		// tip saying that 0 is never for Customer labels. Should we do the same for all labels and
+		// use that to replace the 'Thematic map, no labels' setting?"). Typing 0 into the labeling-
+		// threshold row (Map display) now does everything the checkbox did. The row is found by its
+		// own pageConfig key, never by English text or the retired control's id.
 		//
-		// **AND IT IS STILL A MODE, NOT A DEFAULT** (Task 327), which is the half a placement check
-		// cannot see: it must suppress the labels WITHOUT touching the user's label choices, so that
-		// switching it off brings them back exactly as they were. That is what the row's tip
-		// promises, and it is the reason moving the row had to be a move and not a rebuild.
-		const thematic = await a.page.evaluate(() => {
-			const host = document.getElementById('lpn_set_colors_nodelink');
-			const sub = host && host.closest('.lpn-set-subbody');
+		// **AND IT IS STILL A MODE, NOT A DEFAULT.** 0 must suppress the labels WITHOUT touching the
+		// user's label choices, so that clearing it back to blank brings them back exactly as they
+		// were. That is what the row's tip promises now, in the customer row's own wording.
+		const lmwLabel = await a.lang('lpn_settings_label_max_width');
+		const lmw = await a.page.evaluate((label) => {
+			const row = [...document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')]
+				.find((r) => r.textContent.indexOf(label) >= 0);
+			const input = row && row.querySelector('input[type="number"]');
 			return {
-				inNodeLink: !!(sub && sub.previousElementSibling &&
-					sub.previousElementSibling.id === 'lpn_set_sub_nodeLink'),
-				controls: host ? host.querySelectorAll('input[type="checkbox"]').length : 0,
+				found: !!input,
 				// Bootstrap MOVES a title it has taken over into data-bs-original-title, so reading
 				// `title` alone says a tipped control has no tip -- the same trap that had made this
 				// very tip invisible to the box's own search.
 				tip: (function () {
-					const t = host && host.querySelector('[title], [data-bs-original-title]');
+					const t = row && row.querySelector('[title], [data-bs-original-title]');
 					return t ? (t.getAttribute('title') || t.getAttribute('data-bs-original-title') || '') : '';
 				}())
 			};
-		});
-		report.ok(thematic.inNodeLink, 'the Thematic map row stands under the Node and link heading');
-		report.eq(thematic.controls, 1, '...as exactly one checkbox, and only there');
-		report.ok(/label/i.test(thematic.tip),
-			'...and its tip travelled with it — the sentence that makes it safe to try',
-			thematic.tip.slice(0, 60));
+		}, lmwLabel);
+		report.ok(lmw.found, 'the labeling-threshold row is on the Settings box, under Map display');
+		report.eq(lmw.tip, await a.lang('lpn_settings_label_max_width_tip'),
+			'...and its tip is the one that explains blank and 0', lmw.tip.slice(0, 60));
 
+		// **A FIELD HAS TO BE SWITCHED ON FOR THE LEGEND CHECK BELOW TO MEAN ANYTHING.** The legend
+		// is empty and hidden when no label field is showing, which is its own correct behaviour --
+		// so a naive before/after comparison would read "hidden" both times and pass on a page that
+		// had lost the legend entirely (the trap the retired thematic-checkbox version of this check
+		// was written to avoid). One node field is switched on here, and left on, so there is a
+		// legend at all.
+		await a.page.evaluate(() => {
+			const field = document.querySelector('#lpn_labels_node_fields input[type="checkbox"]');
+			if (field && !field.checked) { field.click(); }
+		});
+		await a.settle(200);
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_labels_legend').style.display !== 'none'),
+			'with a field on and the threshold blank, the labels key is showing');
 		const beforeThematic = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_labels_node_fields input[type="checkbox"], ' +
 				'#lpn_labels_link_fields input[type="checkbox"]')].map(c => c.checked).join(','));
-		await a.page.evaluate(() => {
-			document.querySelector('#lpn_set_colors_nodelink input[type="checkbox"]').click();
-		});
+		await a.page.evaluate((label) => {
+			const row = [...document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')]
+				.find((r) => r.textContent.indexOf(label) >= 0);
+			const input = row.querySelector('input[type="number"]');
+			input.value = '0';
+			input.dispatchEvent(new Event('change', { bubbles: true }));
+		}, lmwLabel);
 		await a.settle(400);
 		// **THE MODE'S CLASS IS `lpn-labels-hidden`, NOT `lpn-thematic`** (Task 428, re-found by
 		// Task 511). `.lpn-thematic` was deleted on purpose: it hid labels through the CSS selector
@@ -176,22 +193,34 @@ exports.run = async function ({ browser, report }) {
 		// So this reads the seam that survived rather than the mechanism that was the defect.
 		const onState = await a.page.evaluate(() => ({
 			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'),
+			legendHidden: document.getElementById('lpn_labels_legend').style.display === 'none',
 			boxes: [...document.querySelectorAll('#lpn_labels_node_fields input[type="checkbox"], ' +
 				'#lpn_labels_link_fields input[type="checkbox"]')].map(c => c.checked).join(',')
 		}));
-		report.ok(onState.thematic, 'ticking it puts the map into thematic mode');
+		report.ok(onState.thematic, 'typing 0 puts the map into "labels off" (colour-only) mode');
+		// The labels legend has to follow the same 0, through the same real change event — the
+		// pre-review finding this rewrite exists to cover (2026-09-23): setLabelMaxWidth() must
+		// itself re-render the legend, not leave it to whoever last called renderLabelsLegend().
+		report.ok(onState.legendHidden, '...and the labels legend hides with it');
 		report.eq(onState.boxes, beforeThematic,
 			'...and does NOT reach in and change the label settings — it is a mode, not a default');
-		await a.page.evaluate(() => {
-			document.querySelector('#lpn_set_colors_nodelink input[type="checkbox"]').click();
-		});
+		await a.page.evaluate((label) => {
+			const row = [...document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')]
+				.find((r) => r.textContent.indexOf(label) >= 0);
+			const input = row.querySelector('input[type="number"]');
+			input.value = '';
+			input.dispatchEvent(new Event('change', { bubbles: true }));
+		}, lmwLabel);
 		await a.settle(400);
 		const offState = await a.page.evaluate(() => ({
 			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'),
+			legendHidden: document.getElementById('lpn_labels_legend').style.display === 'none',
 			boxes: [...document.querySelectorAll('#lpn_labels_node_fields input[type="checkbox"], ' +
 				'#lpn_labels_link_fields input[type="checkbox"]')].map(c => c.checked).join(',')
 		}));
-		report.ok(!offState.thematic, 'and unticking it takes the map back out');
+		report.ok(!offState.thematic, 'and clearing it back to blank takes the map back out');
+		report.ok(!offState.legendHidden,
+			'...and the legend comes back too, through the same real change event');
 		report.eq(offState.boxes, beforeThematic, '...with every label choice exactly as it was');
 
 		// **THE INDEX IS DERIVED, NEVER WRITTEN.** Every section head and every sub-heading has a
@@ -418,6 +447,52 @@ exports.run = async function ({ browser, report }) {
 			});
 			report.eq(extrema.rows, 1, `"${word}" — a word only in a tip — finds its row, and only it`,
 				extrema.text);
+		}
+		await a.page.evaluate(() => {
+			const f = document.getElementById('lpn_setbox_filter');
+			f.value = '';
+			f.dispatchEvent(new Event('input', { bubbles: true }));
+		});
+		await a.settle(300);
+
+		// **R-226 (2026-09-24): A MATCHING ROW MUST NOT DRAG ITS UNRELATED SIBLINGS ALONG.** Tom:
+		// "when I filter on 'view zoom' or 'zoom', I see a bunch of Customer settings that don't
+		// match. It seems that they are lumped together." Reproduced: #lpn_labels_customer_fields
+		// (and the Node/Link field lists beside it) were the only field groups in the box missing
+		// the `lpn-set-part` class every sibling group (colours, units, ids, defaults...) already
+		// carried, so filterSetboxContainer() (js/looped-network.js) matched the group's AGGREGATE
+		// text as one leaf instead of recursing row by row -- a search that hit only the Customer
+		// zoom-limit row lit up the whole group, dragging ID/Demand/Base demand/etc. along with it.
+		// Fixed in Looped-Network.php by adding the class the correctly-behaving groups already had.
+		for (const word of ['zoom', 'view zoom']) {
+			await a.page.evaluate((w) => {
+				const f = document.getElementById('lpn_setbox_filter');
+				f.value = w;
+				f.dispatchEvent(new Event('input', { bubbles: true }));
+			}, word);
+			await a.settle(300);
+			for (const hostId of ['lpn_labels_customer_fields', 'lpn_labels_node_fields', 'lpn_labels_link_fields']) {
+				const rows = await a.page.evaluate((id) => {
+					const host = document.getElementById(id);
+					if (!host) { return null; }
+					return [...host.querySelectorAll(':scope > *')].map((c) => ({
+						shown: c.style.display !== 'none',
+						text: (c.textContent || '').trim().replace(/\s+/g, ' ')
+					}));
+				}, hostId);
+				report.ok(!!rows, `${hostId} is on the page`);
+				if (!rows) { continue; }
+				const shown = rows.filter((r) => r.shown);
+				const words = word.toLowerCase().split(/\s+/);
+				report.ok(shown.every((r) => words.every((w) => r.text.toLowerCase().indexOf(w) !== -1)),
+					`"${word}" in ${hostId}: every shown row contains every word typed`,
+					shown.map((r) => r.text.slice(0, 40)).join(' | ') || '(none shown)');
+				// The group itself is never all-or-nothing once ANY of its rows fails to match --
+				// the dragged-along bug showed every row in the group the instant one of them hit.
+				report.ok(shown.length === 0 || shown.length < rows.length || rows.every((r) => words.every((w) => r.text.toLowerCase().indexOf(w) !== -1)),
+					`"${word}" in ${hostId}: not an all-or-nothing group match`,
+					`${shown.length} of ${rows.length}`);
+			}
 		}
 		await a.page.evaluate(() => {
 			const f = document.getElementById('lpn_setbox_filter');
@@ -838,43 +913,10 @@ exports.run = async function ({ browser, report }) {
 		report.eq(strip.slice(-2).join(' | '), 'Find and replace | Bottom panel',
 			'...and the strip ends where Tom put the two view controls');
 
-		// **THEMATIC MODE HIDES THE LABELS KEY** (Tom, 2026-08-20). Thematic already switches the
-		// data labels off, so a key naming label fields is a key to lettering that is not drawn.
-		// Asserted through the real checkbox, and asserted to come BACK -- a hide that never
-		// reverses would pass a one-way check and lose the legend for good.
-		// **A FIELD HAS TO BE SWITCHED ON FOR THIS TO MEAN ANYTHING.** The legend is empty and
-		// hidden when no label field is showing, which is its own correct behaviour -- so a naive
-		// on/off comparison reads "hidden" both times and would pass on a page that had lost the
-		// legend entirely. The first draft of this check did exactly that.
-		const themLegend = await a.page.evaluate(() => {
-			const box = document.getElementById('lpn_labels_legend');
-			// The SAME selector the thematic check above uses, so the two cannot drift apart.
-			// **RE-QUERIED EVERY TIME, because the handler rebuilds the box.** Toggling this
-			// checkbox ends in syncColorControls(), which replaces the control -- so a handle
-			// taken once and clicked twice clicks a DETACHED element the second time and
-			// silently does nothing. That is what the first draft of this check did, and it
-			// read as the page failing to restore the legend.
-			const cb = () => document.querySelector('#lpn_set_colors_nodelink input[type="checkbox"]');
-			const field = document.querySelector('#lpn_labels_node_fields input[type="checkbox"]');
-			if (!box || !cb() || !field) { return null; }
-			const shown = () => box.style.display !== 'none';
-			if (cb().checked) { cb().click(); }    // thematic off to start
-			if (!field.checked) { field.click(); } // and one field on, so there is a legend at all
-			const base = shown();
-			cb().click();
-			const on = shown();
-			cb().click();
-			return { base, on, off: shown() };
-		});
-		if (themLegend) {
-			report.ok(themLegend.base, 'with a field on and thematic off, the labels key is showing',
-				JSON.stringify(themLegend));
-			report.ok(!themLegend.on, '...thematic mode hides it', JSON.stringify(themLegend));
-			report.ok(themLegend.off, '...and turning thematic off puts it back',
-				JSON.stringify(themLegend));
-		} else {
-			report.skip('thematic mode hides the labels key', 'no thematic checkbox found');
-		}
+		// **"THEMATIC MODE HIDES THE LABELS KEY" (Tom, 2026-08-20) MOVED, 2026-09-23.** The checkbox
+		// this used to click is retired; the same claim, through the same real change event on the
+		// labeling-threshold row, and against the same "a field has to be on for this to mean
+		// anything" trap, is asserted earlier in this file (search "labeling-threshold row").
 
 		report.ok(a.errors.length === 0, 'no uncaught JavaScript', a.errors.join(' | '));
 	} finally {

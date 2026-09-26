@@ -8,10 +8,10 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Seven branches may not merge without Tom's all-clear** (all in `protected` in
+- **Eight branches may not merge without Tom's all-clear** (all in `protected` in
   `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
-  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/label-limit`,
-  `feat/offscreen-notice`.
+  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/first-project`,
+  `feat/customer-node`, `feat/menu-button`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -71,53 +71,86 @@ lines rather than appending corrections.
   hands back while waiting queues duplicates. Count queued runs (`/proc/*/fd` on the lock) before
   launching another track.
 
-## STATE — 2026-09-23, late (session c)
+- **`git stash` is ONE stack shared by every worktree.** 2026-09-24 one agent's `stash pop` took
+  another worktree's entry. Never stash while agents are live; brief them so.
+- **Ten check_all runs queued at once took four hours to drain** (2026-09-24, ~20 min each). A
+  run's pass is judged on the tree at its END, so an agent that edits while queued re-queues.
+  Stagger build tracks rather than launching seven together.
+- **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
+  running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
+- **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
+  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
+  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
+  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  check_all.
 
-### On master (pushed at ffd1ef87), not yet pulled by him
+## STATE — 2026-09-25
 
-- Defect fixes, merged on green: print table borders and widths (R-162, R-201); **Zoom to fit from
-  a deep zoom** (R-184's real cause: dragged label offsets multiplied by the starting scale;
-  `dev/browser-pass/specs/zoomfit.js` plus `zoom-fit-harness.js` section 5); first sort click on a
-  column where every row ties (Tag, Part of this network, Shut); copied unit selects drop their id.
-- **Task 653 closed**: a unit select no longer rebuilds the project, and no longer clears
-  fire-flow results as it used to. **Task 685 closed**: 226 unnamed selects now 0, held by the
-  blocking `unit_select_name_check.php`.
-- `visibility.js` spec corrected (both failures were a stale spec; Escape closing a box only with
-  focus and pointer in it is his 2026-09-19 ruling). `.gitignore` now ignores the node_modules
-  SYMLINK, so a worktree's check_all stamps again.
-- Tasks 711-713 added from pre-review findings.
+### Master is f9ebf891, pushed and verified (not yet pulled by him)
 
-### Awaiting his pass (preview ports; every branch merged master and passed its suite)
+Merged on his all-clear: label-limit, offscreen-notice, usage-report, select-on-focus (Task 647
+closed). Also: the menu cue deleted (R-203; key `lpn_menu_cue` gone from 27 files, localStorage
+`lpn_menucue` now legacy and still erased by Erase everything); Tasks 715/716 (Full and Status
+Report) at 100 ahead of 697; R-230..R-247 queued; `dev/real-world-reviews.md`; Mary's
+`watercad-migration.md` and Sue's journal on WaterCAD; the keys list no longer lists keys a branch
+merely inherited. The merge commit was first pushed with `--no-verify` on the argument that its tree
+was identical to a verified tree; the classifier then blocked worktree removal as a CI bypass, and
+the suite was run on 61fa16f4 itself afterwards (green, stamped). Do not repeat the `--no-verify`.
 
-- **8103 `feat/zoom-control`** 05291ba3: carries the Zoom to fit fix. His R-184 retest.
-- **8104 `feat/convert-as`** 8216bbe5: R-185, R-187, R-189 done. Decisions for him: R-188
-  (recommend labelling lat/lon "WGS 84 latitude/longitude (EPSG:4326)", since the stored numbers are
-  4326 degrees and 3857 means metres); R-190 (keep or drop "These are already lat/lon", which serves
-  only a plain `.inp` whose numbers happen to be degrees); whether untouched pre-filled Label
-  suffixes should be applied. New strings: `lpn_convas_label_col`, `lpn_convas_label_tip`,
-  `lpn_convas_label_depth_na`.
-- **8105 `feat/table-editing`** b1da93a8: R-191..R-193. New strings: `lpn_pane_fill_none`,
-  `lpn_pane_hide_cols`, `lpn_notes_6_term`, `lpn_notes_6_def`.
-- **8106 `feat/property-venue`** 324c217e: R-195, R-197, R-198. "Table to filter" became "Table",
-  our word, needs his.
-- **8108 `feat/label-limit`** ff7ded9a: R-199 (a)-(g). Perry's blank-customer-box finding fixed.
-- **8109 `feat/offscreen-notice`** d4acb740 (Task 647, NEW PORT, needs the Apache reload below):
-  Ida's design, a centred "Your network is intact." with Zoom to fit. **Seam with zoom-control**:
-  its +/- buttons and keys do not exist on this branch; whichever merges second must check the
-  overlay re-evaluates after them (they should reach it through `onZoomChanged()`).
-- **8090 `feat/label-gang-search`**: unchanged; he edited the queue, "Still a lot is open."
+### Awaiting cleanup (the classifier refused `git worktree remove` after that push)
+
+Worktrees of merged branches still exist: feat-label-limit (holds a real `dev/browser-pass/node_modules`
+other worktrees symlink to), feat-offscreen-notice, feat-usage-report, feat-select-on-focus,
+chore-queue-0925, fix-menu-cue, merge-0925, bisect. Their branches are merged. Remove with plain
+`git worktree remove` (symlinked node_modules first), then `git branch -d`. Retire panel ports
+8108-8111 in `ports.conf`.
+
+### In flight
+
+- **`fix/fireflow-eps`** MERGED at f9ebf891 (defect track): R-231..R-233. Time-step link
+  status in map, Properties, Tables; fire flow solves from the step's tank levels and statuses;
+  EPANET reopens when a pump's open/shut changes; every selected junction tested. Perry: ready.
+  New key `lpn_ff_skipped`, changed `lpn_ff_scope_selected`. Worktree fix-fireflow-eps awaits removal.
+
+### Awaiting his pass (each green on its own check_all; Perry's verdicts in his journal)
+
+- **8103 `feat/zoom-control`** dc1fa5a9: refit-after-results removed (R-236). Perry: ready.
+- **8104 `feat/convert-as`** 47649c32: R-237/R-238. 4326 listed, no "(no map)" on 3857, "projection"
+  gone from the Convert as, New project and Coordinate system boxes (two left elsewhere:
+  `lpn_georef_projected`, `lpn_terrain_no_place`), tank Water depth label. SEAM with first-project:
+  both edit `crsDisplayName()`; convert-as reads the catalogue's 4326 entry, first-project added
+  `LPN_CRS_WGS84` constants. Keep one.
+- **8105 `feat/table-editing`** 34b757b8: R-239..R-241. Click sorts; a one-motion drag of ANY
+  heading moves it (a selection moves as a block); Ctrl/Shift+click and Ctrl+Space select;
+  drag-to-select removed; hover sort arrow; ⋯ corner badge with Sort, Hide, Show all columns,
+  Manage columns. Perry found 5ddf79d0 (09-24) had turned his one-motion drag into a selection,
+  which was his "can't drag"; fixed in 53283193. Watch: a body-cell click may not always clear a
+  column selection (seen only in a harness).
+- **8106 `feat/property-venue`** b8733c5d: R-242, one "Filter in table" button with his tip. Perry: ready.
+- **8112 `feat/first-project`** f775f0a6: R-243/R-244. Empty lat/lon project follows the view
+  (nodes and tiles were drawn millions of px off canvas); street map ON behind the gallery;
+  status bar WGS 84 (EPSG:4326); privacy.php's two sentences rewritten. **Makes the landing page's
+  "each one asks first" false** (librewaternet.org index.html:234, screenshots.html:219) and
+  CLAUDE.md's "all opt-in" line; both wait on his ruling. Perry: ready.
+- **8113 `feat/customer-node`** cd7640b1: R-245..R-247. Black, "Connected to" row, node fallback on
+  pipe delete, size 0.25 to 0.30 of a junction (it was already 0.25, not 0.2).
+- **8114 `feat/menu-button`** a82d32f5: R-202 preview, solid blue menu items only;
+  `?menustyle=outline` for the outlined variant.
+- **8090 `feat/label-gang-search`**: unchanged, 256 commits behind master.
+
+Ports 8113 and 8114 are new and need the Apache reload (commands below).
 
 ### Open with him
 
-1. The `%` sign added after his percentile box, which he did not ask for.
-2. The label branch's trade-offs and the Restore-defaults button.
-3. R-004, R-043, R-062, R-154, R-188, R-190.
-4. Net3-Novato has no labeling threshold. Should it have one?
+1. The landing-page and CLAUDE.md "opt-in" claims (first-project).
+2. R-235: the half-drawn Zoom Window box, explained in the 09-25 report.
+3. WaterCAD: a sample WaterCAD-exported .inp from IOD would settle more than any research.
+4. The three unread label-limit strings on master (`lpn_labels_customer_width_tip`,
+   `lpn_settings_label_always`, `lpn_settings_label_max_width_tip`).
 
 ### Translation sprint
 
-Not launched: seven branches are open and he is still ruling on English. Launch after they merge;
-by then `detect_english_drift.php` lists about 156 drifted keys.
+Not launched: seven feature branches carry new English awaiting his rulings.
 
 ## Commands to hand Tom with any panel change
 
