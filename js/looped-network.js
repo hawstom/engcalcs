@@ -4624,8 +4624,9 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
-	// THE REPORTS FLY-OUT (Tom, 2026-09-04). Three finished answers, each of which opens and is
-	// simply there -- no criteria to set, nothing to press.
+	// THE REPORTS FLY-OUT (Tom, 2026-09-04; the Status and Full rows added for ROADMAP Tasks 716
+	// and 715). Five finished answers, each of which opens and is simply there -- no criteria to
+	// set, nothing to press.
 	//
 	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
 	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
