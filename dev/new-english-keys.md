@@ -734,7 +734,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**29 still to read**, of 39 new keys across 7 unmerged branch(es).
+**0 still to read**, of 3 new keys across 2 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -744,17 +744,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/handoff-0925d (`baea1c8e`) — adds no English strings
-
-### feat/customer-node (`105d9f68`) — 2 new, all ruled
-
-- **`lpn_field_meter_node`**
-  > Connected to
-  _Ruled OK 2026-09-26._
-- **`lpn_field_meter_node_tip`**
-  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
-  _Ruled OK 2026-09-26._
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -768,114 +757,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/menu-button (`eceab3ab`) — adds no English strings
-
-### feat/report (`87e15a16`) — 27 new, 27 to read @@ NEEDS RULING
-
-- **`lpn_full_col_id`**
-  > ID
-  @@ NEEDS RULING
-- **`lpn_full_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_full_col_type`**
-  > Type
-  @@ NEEDS RULING
-- **`lpn_full_download_csv`**
-  > Download CSV
-  @@ NEEDS RULING
-- **`lpn_full_needs_run`**
-  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
-  @@ NEEDS RULING
-- **`lpn_full_note`**
-  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
-  @@ NEEDS RULING
-- **`lpn_full_print`**
-  > Print report
-  @@ NEEDS RULING
-- **`lpn_full_row_count`**
-  > {n} rows.
-  @@ NEEDS RULING
-- **`lpn_full_step_label`**
-  > Time step
-  @@ NEEDS RULING
-- **`lpn_full_title`**
-  > Full report
-  @@ NEEDS RULING
-- **`lpn_reports_full`**
-  > Full
-  @@ NEEDS RULING
-- **`lpn_reports_full_tip`**
-  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
-  @@ NEEDS RULING
-- **`lpn_reports_status`**
-  > Status
-  @@ NEEDS RULING
-- **`lpn_reports_status_tip`**
-  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
-  @@ NEEDS RULING
-- **`lpn_status_closed`**
-  > {type} {id} closed
-  @@ NEEDS RULING
-- **`lpn_status_col_event`**
-  > Event
-  @@ NEEDS RULING
-- **`lpn_status_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_status_dry`**
-  > {type} {id} is empty
-  @@ NEEDS RULING
-- **`lpn_status_empty`**
-  > Nothing changed status during this run.
-  @@ NEEDS RULING
-- **`lpn_status_emptying`**
-  > {type} {id} is emptying
-  @@ NEEDS RULING
-- **`lpn_status_filling`**
-  > {type} {id} is filling
-  @@ NEEDS RULING
-- **`lpn_status_full`**
-  > {type} {id} is full
-  @@ NEEDS RULING
-- **`lpn_status_needs_run`**
-  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
-  @@ NEEDS RULING
-- **`lpn_status_no_converge`**
-  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
-  @@ NEEDS RULING
-- **`lpn_status_note`**
-  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
-  @@ NEEDS RULING
-- **`lpn_status_opened`**
-  > {type} {id} opened
-  @@ NEEDS RULING
-- **`lpn_status_title`**
-  > Status report
-  @@ NEEDS RULING
-
-### feat/table-editing (`0e0739c1`) — adds no English strings
-
-### feat/zoom-control (`43902998`) — 7 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  _Ruled OK 2026-09-25._
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  _Ruled OK 2026-09-25._
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_in`**
-  > Zoom in
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_in_tip`**
-  > Zoom in. Shortcut: +
-  @@ NEEDS RULING
-- **`lpn_zoom_out`**
-  > Zoom out
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_out_tip`**
-  > Zoom out. Shortcut: -
-  @@ NEEDS RULING
+### feat/table-editing (`850e3746`) — adds no English strings

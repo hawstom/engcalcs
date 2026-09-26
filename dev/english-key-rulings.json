@@ -3905,9 +3905,9 @@
             "answer": "OK."
         },
         "lpn_zoom_in_tip": {
-            "on": "Zoom in one step. Shortcut: +",
+            "on": "Zoom in. Shortcut: +",
             "ruled": "2026-09-25",
-            "answer": "Edited."
+            "answer": "His own wording: \"Use this form: 'Zoom in. Shortcut: +'.\""
         },
         "lpn_zoom_out": {
             "on": "Zoom out",
@@ -3915,9 +3915,9 @@
             "answer": "OK."
         },
         "lpn_zoom_out_tip": {
-            "on": "Zoom out one step. Shortcut: -",
+            "on": "Zoom out. Shortcut: -",
             "ruled": "2026-09-25",
-            "answer": "His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's."
+            "answer": "His own wording: \"Use this form: 'Zoom in. Shortcut: +'.\""
         },
         "mhp_annual_kwh": {
             "on": "P as annual energy",

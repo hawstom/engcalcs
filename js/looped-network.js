@@ -10845,7 +10845,10 @@ var EngCalcs = EngCalcs || {};
 		// the scale from the canvas, so there is no number here to judge.
 		if (!isFinite(v.s) || v.s <= 0) { return true; }
 		sc = Math.max(minScale(), Math.min(maxScale(), v.s));
-		if (Math.max(ext.w, ext.h) * sc < LPN_VIEW_MIN_MODEL_PX) { return false; }
+		// A lone node, or nodes all at one point, has no extent to be "too small to see"; only its
+		// position can put it off screen (Tom, 2026-09-25: one junction and no pipes, Zoom to fit,
+		// and "Your network is intact" would not go away). minScale() exempts zero span the same way.
+		if (Math.max(ext.w, ext.h) > 0 && Math.max(ext.w, ext.h) * sc < LPN_VIEW_MIN_MODEL_PX) { return false; }
 		w = svg && svg.clientWidth ? svg.clientWidth : 0;
 		h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		if (!w || !h) { return true; }
