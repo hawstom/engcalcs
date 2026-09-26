@@ -919,7 +919,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!specs.length) { return []; }
 		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
-			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
+			{ pad: fs * LPN_ALIGNED_PAD_FRAC, rescue: { left: labelRescueWork() } });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
@@ -2749,6 +2749,13 @@ var EngCalcs = EngCalcs || {};
 		if (gone >= order.length - 1) { return null; }
 		return { lbl: lbl, n: n, ne: ne, all: all, order: order, gone: gone };
 	}
+	// **ONE RESCUE BUDGET PER LAYOUT PASS** (R-290), shared by the first placement and every shed
+	// rung after it, in obstacle tests (js/lpn-collide.js says why counted, not timed). Measured
+	// 2026-09-26: Net3-Novato-CA-World at 2x of master's fit spends about 2e6 (1e6 starved it to 63
+	// labels giving a value up and 14 hidden, worse than no rescue budget at all); the 480-pipe
+	// grid spends all of it, about 0.4 s of a 5 s pass that is mostly link-label shedding.
+	var LPN_RESCUE_WORK_PER_PASS = 3e6, passRescueBudget = null;
+	function labelRescueWork() { return LPN_RESCUE_WORK_PER_PASS; }
 	function shedNodeLabelsForCrowding(nodeLabels, placed, obs, pad, fsNow) {
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
@@ -2790,7 +2797,7 @@ var EngCalcs = EngCalcs || {};
 				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
 				rec.lbl.lines = labelRowWidths(rec.ne);
 			});
-			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, rescue: passRescueBudget });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -3007,6 +3014,7 @@ var EngCalcs = EngCalcs || {};
 	// back.
 	var lastCrossingShed = null;
 	function runLabelCollisionAvoidance(shedNodes) {
+		passRescueBudget = { left: labelRescueWork() };
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = staticObstacles(), holders = {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
@@ -3090,7 +3098,7 @@ var EngCalcs = EngCalcs || {};
 		// which is a handful of labels on a crowded view and none at all on most drawings. It is a
 		// pure function of the drawing either way, so the pass stays idempotent.
 		for (;;) {
-		nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, rescue: passRescueBudget });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//

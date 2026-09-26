@@ -558,6 +558,10 @@ EngCalcs.lpnCollide = (function () {
 	// preference. With three fields on, level 3 is the better of the two (93 drawn against 92),
 	// which is what says this is a bound on CROWDING and not a fact about the geometry.
 	var WIDEN_SHIPPED_LEVELS = Math.min(2, WIDEN_MAX_LEVEL);
+	// The rescue's work allowance for ONE placement, in obstacle tests -- see placeLabelsFirstFit().
+	// Net3-Novato-CA-World at 2x of master's fit needs about this much per placement for its 24
+	// rescues (R-290); beyond it the remaining labels are dropped as though the rescue had not run.
+	var RESCUE_WORK_PER_CALL = 3e5;
 	// **POLAR, NOT RECTANGULAR, AND THAT FOLLOWS FROM THE SHAPE OF WHAT IS BEING SAMPLED.** A sector
 	// is bounded by two angles and a radius, so a polar grid needs no rejection step at all, where a
 	// rectangular one samples a square and throws most of it away. Radii are geometric inner->outer
@@ -1776,26 +1780,97 @@ EngCalcs.lpnCollide = (function () {
 		// measured apart. Tiers widest first within one level, exactly as above, and the bare-box
 		// search below is what a label falls back to, so one that can only stand somewhere tight
 		// still stands there.
+		// **EACH CANDIDATE IS TESTED ONLY AGAINST WHAT LIES BESIDE IT** (R-290). The widened disc
+		// holds most of a dense drawing by its outer rings, and testing every candidate against all
+		// of it was nearly all of a Novato content pass. So the disc's boxes are sorted by x once per
+		// ring and a candidate reads only the slice within reach -- two boxes further apart in x than
+		// their half-diagonals together cannot overlap -- and only the leaders among the segments,
+		// the one kind these tests read. The slice is a superset of every obstacle that can answer,
+		// so every verdict is the one the whole disc gave.
+		// A box much bigger than the label (a large Text, a long pipe label) would widen every slice
+		// to its own size, so those few ride in `big` and are handed to every candidate whole.
+		var sweep = { boxes: [], xs: [], maxR: 0, big: [], leaders: [] }, slice = { boxes: [], segments: [] };
+		function sweepOf(wide, lbl) {
+			var i, r, o, lim = Math.hypot(lbl.w, lbl.h) * 2, small = [];
+			sweep.big = []; sweep.maxR = 0;
+			for (i = 0; i < wide.boxes.length; i++) {
+				o = wide.boxes[i]; r = Math.hypot(o.w, o.h) / 2;
+				if (r > lim) { sweep.big.push(o); continue; }
+				small.push(o);
+				if (r > sweep.maxR) { sweep.maxR = r; }
+			}
+			sweep.boxes = small.sort(function (a, b) { return a.cx - b.cx; });
+			sweep.xs = sweep.boxes.map(function (q) { return q.cx; });
+			sweep.leaders = wide.segments.filter(function (g) { return g.kind === 'leader'; });
+		}
+		function sweepNear(boxes) {
+			var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, i, b, r, lo, hi, mid,
+				xs = sweep.xs, o;
+			for (i = 0; i < boxes.length; i++) {
+				b = boxes[i]; r = Math.hypot(b.w + 2 * pad, b.h + 2 * pad) / 2;
+				if (b.cx - r < x0) { x0 = b.cx - r; }
+				if (b.cx + r > x1) { x1 = b.cx + r; }
+				if (b.cy - r < y0) { y0 = b.cy - r; }
+				if (b.cy + r > y1) { y1 = b.cy + r; }
+			}
+			slice.segments = [];
+			for (i = 0; i < sweep.leaders.length; i++) {
+				o = sweep.leaders[i];
+				if (Math.max(o.ax, o.bx) < x0 || Math.min(o.ax, o.bx) > x1
+					|| Math.max(o.ay, o.by) < y0 || Math.min(o.ay, o.by) > y1) { continue; }
+				slice.segments.push(o);
+			}
+			x0 -= sweep.maxR; x1 += sweep.maxR; y0 -= sweep.maxR; y1 += sweep.maxR;
+			lo = 0; hi = xs.length;
+			while (lo < hi) { mid = (lo + hi) >> 1; if (xs[mid] < x0) { lo = mid + 1; } else { hi = mid; } }
+			slice.boxes.length = 0;
+			for (i = 0; i < sweep.big.length; i++) { slice.boxes.push(sweep.big[i]); }
+			for (i = lo; i < xs.length && xs[i] <= x1; i++) {
+				o = sweep.boxes[i];
+				if (o.cy >= y0 && o.cy <= y1) { slice.boxes.push(o); }
+			}
+			rescueWork += slice.boxes.length + slice.segments.length;
+			return slice;
+		}
+		// **AND THE RESCUE HAS A HARD BUDGET, COUNTED IN OBSTACLE TESTS, NOT MILLISECONDS** (R-290).
+		// A caller passes `opts.rescue = { left: n }` and shares that one object across every
+		// placement of a layout pass, so the shed rungs that re-run this cannot multiply it. When it
+		// runs out, the labels still waiting are dropped exactly as they were before the rescue
+		// existed. Counted rather than timed so the same drawing always gets the same answer.
+		// Without a budget a call gets RESCUE_WORK_DEFAULT on its own.
+		var rescueWork = 0, rescueCap = Math.min(RESCUE_WORK_PER_CALL,
+			(opts.rescue && opts.rescue.left >= 0) ? opts.rescue.left : RESCUE_WORK_PER_CALL);
 		function rescue(lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
 				chosen = null, chosenBox = null, level, more, far, i, b,
 				tiers = lbl.dragged ? [] : growTiers(lbl), t, room, claimed = null, claimedW = 0,
-				wide = { boxes: [], segments: [] };
-			for (level = 1; level <= WIDEN_SHIPPED_LEVELS && !chosen; level++) {
+				wide = { boxes: [], segments: [] }, rings = [];
+			// **EVERY RING FIRST, THEN ONE GATHER FOR ALL OF THEM** (R-290). Nothing is committed
+			// until a place is chosen, so the obstacles are the same at every ring and one disc wide
+			// enough for the outermost serves them all; gathering and sorting it again per ring was
+			// nine linear scans of the whole drawing per label.
+			far = 0;
+			for (level = 1; level <= WIDEN_SHIPPED_LEVELS; level++) {
 				more = widenSides(lbl.anchor, lbl.widen.offset, lbl.widen.arcs,
 					lbl.widen.outer, level);
 				if (!more || !more.length) { break; }
-				far = 0;
+				rings.push(more);
 				for (i = 0; i < more.length; i++) {
 					far = Math.max(far, Math.hypot(more[i].x - lbl.anchor.x,
 						more[i].y - lbl.anchor.y));
 				}
+			}
+			if (rings.length) {
 				farNear(lbl.anchor.x, lbl.anchor.y, far + Math.hypot(lbl.w, lbl.h) + pad, wide);
+				sweepOf(wide, lbl);
+			}
+			for (level = 1; level <= rings.length && !chosen && rescueWork <= rescueCap; level++) {
+				more = rings[level - 1];
 				sides = sides.concat(more);   // a COPY: the caller's own array is never touched
 				for (t = 0; t < tiers.length && !chosen; t++) {
 					for (i = sides.length - more.length; i < sides.length; i++) {
 						room = growBoxAt(lbl, sides[i], tiers[t]);
-						if (!roomClearOf(room, wide, pad, lbl.id)) { continue; }
+						if (!roomClearOf(room, sweepNear([room]), pad, lbl.id)) { continue; }
 						chosen = sides[i]; chosenBox = labelLineBoxes(lbl, sides[i]);
 						claimed = room; claimedW = tiers[t];
 						break;
@@ -1803,7 +1878,7 @@ EngCalcs.lpnCollide = (function () {
 				}
 				for (i = sides.length - more.length; i < sides.length && !chosen; i++) {
 					b = labelLineBoxes(lbl, sides[i]);
-					if (boxesClearOf(b, wide, pad, lbl.id) === 'clear') {
+					if (boxesClearOf(b, sweepNear(b), pad, lbl.id) === 'clear') {
 						chosen = sides[i]; chosenBox = b;
 					}
 				}
@@ -1821,27 +1896,28 @@ EngCalcs.lpnCollide = (function () {
 				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null,
 				room: claimedW > 0 ? claimedW : undefined });
 		}
-		// **AND THE RESCUE IS NOT OFFERED AT ALL ON A DRAWING THAT IS SIMPLY FULL** (2026-09-22).
-		// A longer leader is the answer when a few labels cannot find a place on a drawing that has
-		// room elsewhere. When a QUARTER of the labels could not be placed, that is not what is
-		// happening: there is no elsewhere, every rescued label stands a long way out, crosses
-		// somebody, and the crossing shed at the end of the pass hides one of the pair -- measured
-		// on Net3-World with every node field on, 26 labels hidden against 14 with no rescue at all.
-		// **It is also where the rescue costs the most**: the same drawing took 53 seconds through
-		// dev/lpn-spike/node-shed-harness.js with the rescue off and over 900 with it on, because
-		// every one of forty-odd deferred labels re-searches hundreds of points against a widened
-		// neighbourhood. Both halves of that say the same thing, so the bound is one test.
-		// `opts.widenCrowd` is the fraction, for a caller that wants to see the rescue on a drawing
-		// this would refuse -- a harness fixture built to be full on purpose. The page never sets it.
+		// **AT MOST A QUARTER OF THE LABELS ARE RESCUED, THE HIGHEST RANKED FIRST** (2026-09-22,
+		// graded 2026-09-26 under R-290). A longer leader is the answer when a few labels cannot find
+		// a place on a drawing that has room elsewhere; on a drawing that is simply full every
+		// rescued label stands a long way out and crosses somebody, and it is also where the rescue
+		// costs most. The bound used to be all or nothing -- past a quarter deferred, rescue nobody
+		// -- and that cliff is what turned master's slightly bigger lettering into a collapse:
+		// Net3-Novato-CA-World at 2x went from 22 labels giving a value up to 72 because 47 were
+		// deferred instead of 23, so none were rescued. Graded, the first quarter in drop order is
+		// rescued and the rest drop as before: 72 -> 49 on that view, hidden unchanged at 7. The
+		// work budgets (RESCUE_WORK_PER_CALL, `opts.rescue`) bound the cost that the cliff used to.
+		// `opts.widenCrowd` is the fraction, for a harness fixture built to be full on purpose.
 		var crowdFrac = (opts && opts.widenCrowd > 0) ? opts.widenCrowd : 0.25;
-		if (deferred.length > labels.length * crowdFrac) {
-			deferred.forEach(function (lbl) {
+		var budget = Math.floor(labels.length * crowdFrac);
+		if (deferred.length > budget) {
+			deferred.slice(budget).forEach(function (lbl) {
 				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
 					dropped: true, side: -1, box: null, leader: null });
 			});
-			deferred.length = 0;
+			deferred.length = budget;
 		}
 		deferred.forEach(rescue);
+		if (opts.rescue) { opts.rescue.left = Math.max(0, opts.rescue.left - rescueWork); }
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
