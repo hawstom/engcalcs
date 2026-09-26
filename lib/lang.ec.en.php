@@ -867,6 +867,28 @@ $ec_lang['lpn_multi_varies']='Various';
 $ec_lang['lpn_multi_applied']='Set {prop} on {n}.';
 $ec_lang['lpn_multi_no_fields']='These have nothing that can be set together here.';
 $ec_lang['lpn_pane_pasted']='Pasted {n} cells. {skipped} were not changed.';
+// PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
+// junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
+// {skipped} how many cells were left as they were.
+$ec_lang['lpn_pane_pasted_rows']='Pasted {n} rows and added {created} of them to the network.';
+$ec_lang['lpn_pane_pasted_rows_skipped']='Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.';
+// Added after "This network has none of these yet." on an empty table, which is where a paste lands.
+$ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to add them.';
+// A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
+// Row sentences below, each naming the row of the pasted block, counted from 1.
+$ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';
+$ec_lang['lpn_pane_paste_more']='{n} more rows have problems too.';
+$ec_lang['lpn_pane_paste_no_id']='Row {row}: a new row needs an ID.';
+$ec_lang['lpn_pane_paste_bad_id']='Row {row}: the ID {id} has a space or a quotation mark in it.';
+$ec_lang['lpn_pane_paste_id_taken']='Row {row}: the ID {id} is already in use.';
+$ec_lang['lpn_pane_paste_id_twice']='Row {row}: the ID {id} is used twice in this paste.';
+// {first} and {second} are the project's two coordinate names, such as Latitude and Longitude.
+$ec_lang['lpn_pane_paste_no_position']='Row {row}: a new node needs both {first} and {second}.';
+$ec_lang['lpn_pane_paste_no_ends']='Row {row}: a new link needs a From node and a To node.';
+$ec_lang['lpn_pane_paste_no_node']='Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.';
+$ec_lang['lpn_pane_paste_same_ends']='Row {row}: From and To are the same node.';
+// {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
+$ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
