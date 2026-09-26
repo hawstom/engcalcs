@@ -70,7 +70,7 @@ by design.
 | Coordinates | ✓ | — | — | n/a | n/a | `[COORDINATES]` |
 | Active / included | ✓ | — | — | n/a | n/a | n/a |
 | Elevation | ✓ | ✓ *(shared node band)* | ✓ | ✓ | ✓ | `[TANKS]` |
-| Level (current) | ✓ | — | — | — | — | `[TANKS]` (`InitLvl`) |
+| Level (current) | ✓ | — | — | — | ✓ *(Task 696, 2026-09-25)* | `[TANKS]` (`InitLvl`) |
 | Min / max level | ✓ | — | — | — | — | `[TANKS]` |
 | Tank diameter | ✓ | — | — | — | — | `[TANKS]` |
 | Mixing model / fraction | ✓ | — | — | n/a *(categorical)* | n/a | `[MIXING]` |

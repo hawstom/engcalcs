@@ -2493,16 +2493,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_new_coordsys_geo": {
-            "on": "Geographic projection",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
-        "lpn_new_coordsys_geo_tip": {
-            "on": "Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
         "lpn_new_coordsys_local": {
             "on": "Local, schematic, or custom",
             "ruled": "2026-09-14",
@@ -2526,11 +2516,6 @@
             "on": "Map projection",
             "ruled": "2026-09-14",
             "answer": "OK"
-        },
-        "lpn_new_crs_tip": {
-            "on": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
-            "ruled": "2026-09-14",
-            "answer": "Edited."
         },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",

@@ -737,6 +737,62 @@ directly and unconditionally, so it is very likely fine, but not independently r
 
 ---
 
+## 2026-09-23 — feat/convert-as (Task 696), head 263e0351
+
+OBSERVED unless marked otherwise, checked 2026-09-23 at this SHA.
+
+**Headless harness (`dev/lpn-spike/convert-as-harness.js`) is real and not decorated.** Ran it
+against `263e0351`: all 33 checks PASS, including byte-identical original, unit conversion +
+rounding on the right fields, the lat/lon wizard opening pre-answered, R-172(1)'s backdrop hold,
+and Cancel discarding the copy. Sanity-checked the harness itself by running it, unmodified,
+against `9a3eb379` (pre-696): it throws `ReferenceError: openConvertAsBox is not defined` before a
+single assertion runs — the harness genuinely depends on the new code and is not a green light
+wired to nothing.
+
+**Drove the real thing in Chromium** (`dev/browser-pass` + a scratch driver, ad hoc, not committed
+— `/tmp/.../scratchpad/convas-drive.js`): empty-tab Convert As correctly clicks the plain
+`<input type=file>` (`#lpn_geo_file`) rather than the fragile File System Access picker — reliable
+across browsers, matches "opens a file picker first". On Elm Street Center, chose the EPSG target:
+wizard opened at "Step 1 of 2 — quick"; dragged the map 80px mid-gesture; both a model node and the
+backdrop image held within 1px of their starting screen position (image jitter for depth) —
+R-172(1) is fixed, measured live, not just in the stub. Finished the wizard, opened Settings: the
+new "Map coordinates" row reads "degrees" on the now-lat/lon copy, confirming Task 693. Clicked the
+satellite corner button: it fired a real request to Mapbox with the real token and got **403**,
+which is the token's own domain restriction (127.0.0.1 is not an allowed referrer) and not a code
+defect — the request is correctly formed; whether it actually paints for a visitor at hawsedc.com
+needs a person there, not this environment. Confirmed `EngCalcs.pageConfig` never emits
+`lpn_georef_drop`/`lpn_georef_finish` as JS-string constants (they're only inline PHP button
+labels) — cost me one retry, not a defect.
+
+**THE MISS, and it is the one to lead with.** `git diff master -- lib/lang.ec.*.php` renamed the
+key `lpn_file_import_geo` to `lpn_file_convert_as` in all 26 non-English files (mechanical rename,
+correct per CLAUDE.md's tool), but **left the old translated VALUE in place** — every one of the 26
+still reads its own language's version of "Open an xy file on the map…", with a tip describing the
+old drag-only behaviour, no coordinate/units/rounding questions, and a button that no longer
+exists in this flow ("These are already lat/lon"/"Esto ya son lat/lon" per language). Verified
+directly in es, fr, pt, tr, de, ru, ar, zh. This is worse than an untranslated key (which falls
+back cleanly to English per `lib/base.inc.php`'s "load English first" merge) — the key is PRESENT
+so the fallback never fires, and a non-English visitor reads a menu row that promises the old
+paradigm and gets the new one. `lpn_` is core in all 26 languages per CLAUDE.md. None of the ~20
+brand-new keys this box needs (`lpn_convas_*`, `lpn_units_mapcoords*`, `lpn_georef_answered`) exist
+in any non-English file either — that part is fine, ordinary untranslated-key debt with a correct
+English fallback, not a defect.
+
+**Confirmed clean on vocabulary:** none of this branch's OWN new strings say "projection"; the
+refusal Tom named ("This project is already on lat/lon") no longer gates `File, Convert as…`
+(`georefStart()` at `js/looped-network.js:13706` explicitly overrides it for this path; the old
+refusal survives only on `Map, Custom georeference`'s own door, `mapgeoStart()`, where a
+lat/lon project genuinely has nothing to attach). The pre-existing New Project box (`lpn_new_crs`,
+`lpn_new_coordsys_geo`, etc.) still says "projection" repeatedly — untouched by this branch's diff,
+so not a regression here, but it is the same paradigm gap Tom's ruling covers and will read oddly
+placed one menu item away from a box that no longer says it.
+
+**Known, documented, and not re-litigated:** the "These are already lat/lon" button
+(`lpn_georef_asdeg_btn`) still exists on the shared placement bar and can appear mid-Convert-As-wizard
+for a small grid whose numbers happen to fall in ±180/±90 — inherited from the pre-existing georef
+bar, named as a leftover in the task brief, not a new defect. Emitter coefficients and tank volume
+curves are confirmed NOT touched by `convertSavedGeometry`/`convasApplyUnits` — matches the stated
+gap, not silently broader or narrower than advertised.
 ## feat/label-limit (e1a19100), reviewed 2026-09-23
 
 Ask (2026-09-23, quoted): *"I noticed that we have a tip saying that 0 is never for Customer

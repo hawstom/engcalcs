@@ -1070,8 +1070,15 @@ $ec_lang['lpn_tool_color_tip']='Color the network by one quantity, so a large ma
 // English is for when an English reader would stumble, and here one would not.
 $ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
 $ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
-$ec_lang['lpn_units_length']='Length and map coordinates';
-$ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';
+// **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
+// unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
+$ec_lang['lpn_units_length']='Length';
+// The derived line: degrees for lat/lon, the coordinate system's own unit for an EPSG plane, and
+// the length unit for a local grid. A display of what the coordinate system says, never an input.
+$ec_lang['lpn_units_mapcoords']='Map coordinates';
+$ec_lang['lpn_units_mapcoords_deg']='degrees';
+$ec_lang['lpn_units_usft']='US survey ft';
+$ec_lang_syn['lpn_units_length']='Pipe lengths, tank diameters, etc.';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
 $ec_lang['lpn_units_flow']='Flow';
@@ -1182,12 +1189,41 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Convert coordinates as…';
+// **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
+// as a single wizard"*). The placement steps follow only when the coordinate system changes.
+$ec_lang['lpn_file_convert_as']='Convert as…';
 // **HIS OWN NAME FOR THE COPY** (Tom, 2026-09-18): the command belongs to the Save as family,
 // so its result is a second version of this project and is named the way a second version is.
 $ec_lang['lpn_copy_of']='Copy of {name}';
+// ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
+// The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
+// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+$ec_lang['lpn_convas_title']='Convert as';
+$ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted to. When it differs from this project\'s, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.';
+// {crs} is the name the map status strip shows for this project's coordinate system.
+$ec_lang['lpn_convas_from']='Current: {crs}';
+$ec_lang['lpn_convas_epsg']='EPSG coordinate system';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
+$ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
+$ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
+$ec_lang['lpn_convas_units_tip']='The units the copy is converted to. The original keeps its own numbers and units.';
+$ec_lang['lpn_convas_round']='Round converted values';
+$ec_lang['lpn_convas_round_tip']='Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.';
+$ec_lang['lpn_convas_round_none']='No rounding';
+$ec_lang['lpn_convas_round_flow']='Demand and flow';
+$ec_lang['lpn_convas_label_col']='Suffix';
+$ec_lang['lpn_convas_label_tip']='Text added after this value on the copy\'s map labels, such as \' mm\' or \' gpm\'. Pre-filled from the unit chosen above; clear it for no suffix.';
+$ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.';
+$ec_lang['lpn_convas_ok']='Convert';
+// {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
+// 2026-09-25: "What, specifically, is 'that coordinate system'?").
+$ec_lang['lpn_convas_no_transform']='This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.';
+// {name} is the new project's name.
+$ec_lang['lpn_convas_done']='The converted copy is {name}. The original project is unchanged.';
+$ec_lang['lpn_convas_cancelled']='Nothing was converted. The copy is closed, and the original project is unchanged.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
+$ec_lang['lpn_file_convert_as_tip']='Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
@@ -1197,9 +1233,11 @@ $ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts
 // convention and it is why this said lon/lat, but it is a convention about STORAGE, and this button
 // is read by a person. The internal code keeps naming its variables {lon, lat} in x,y order; that is
 // invisible and stays.
-$ec_lang['lpn_georef_asdeg_btn']='These are already lat/lon';
-$ec_lang['lpn_georef_asdeg_tip']='Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.';
 $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.';
+// Task 696: a project that already knows where it is (lat/lon, an EPSG coordinate system, or an
+// attached world map) opens the placement steps already answered. Tom's own sentence for this case
+// from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
+$ec_lang['lpn_georef_answered']='This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.';
 $ec_lang['lpn_georef_intro']='Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.';
 $ec_lang['lpn_georef_adjust']='The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';
@@ -1281,12 +1319,17 @@ $ec_lang['lpn_georef_finish']='Keep this placement';
 $ec_lang['lpn_georef_cancel']='Cancel';
 $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change.';
+// R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
+// already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
+// whose own numbers should be used unchanged.
+$ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change. Type 1 to use a file\'s own numbers unchanged as ground distance, such as one with no coordinate system of its own.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model counterclockwise to align with the world map.';
-$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
-$ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any asset to move it closer to where it really is.';
+// Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
+// the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.';
+$ec_lang['lpn_georef_done']='This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.';
 $ec_lang['lpn_georef_backdrop_unrotated']='The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 // The same refusal for the other coordinate system that is already on the Earth (Task 641). Said
@@ -1719,46 +1762,46 @@ $ec_lang['lpn_new_coords']='Coordinates';
 // the correct untranslated state. Whether they are debt is a judgement call and Tom's.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
 $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.';
-$ec_lang['lpn_new_coordsys_geo']='Coordinate system';
-$ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
-$ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom coordinate system';
+// **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
+// "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
+// lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
+// keeping a second copy that could drift from Convert as's own wording of the same thing.
+$ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
 $ec_lang['lpn_new_coordsys_local_tip']='You can attach your own background image, or the world map, at any time from the Map menu. Your coordinates never change when you do.';
-// ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
+// ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
-// any time." Two filters over one catalogue, and the catalogue itself is not keyed: a projection's
-// NAME is the EPSG register's own, exactly as the OpenStreetMap credit is, and a GIS reader in any
-// language looks for those characters.
-$ec_lang['lpn_new_crs']='Map projection';
-// **WHAT IT PROMISES AND WHAT IT REFUSES.** The promise is that nothing is converted, which is this
-// suite's own rule about the user's numbers. The refusal is that the choice is final, and it is
-// stated here because this control is the only place it can be read before it binds.
-//
-// Nothing here claims anything about how accurate a length is: that claim waits on Task 643.
-$ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
+// any time." (His own words, kept verbatim; "projection" in visitor strings became "coordinate
+// system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
+// the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
+// as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
+$ec_lang['lpn_new_crs']='Coordinate system';
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
+// it names the box's own subject rather than either caller's radio label.
+$ec_lang['lpn_crsbox_title']='Coordinate system';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Filter by map view';
-$ec_lang['lpn_crs_view_tip']='Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.';
+$ec_lang['lpn_crs_view_tip']='Offers only the coordinate systems that cover the place the map is looking at. Turn it off to read the whole list.';
 $ec_lang['lpn_crs_place']='Place name search';
 $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.';
 $ec_lang['lpn_crs_search']='Search';
-$ec_lang['lpn_crs_name']='Projection name filter';
-$ec_lang['lpn_crs_name_tip']='Shows only the projections whose name or EPSG code contains what you type. Try a zone number, or UTM, or Mercator.';
-$ec_lang['lpn_crs_list']='Projection';
-$ec_lang['lpn_crs_list_tip']='The projections left by the two filters above. Choose one and press Select.';
+$ec_lang['lpn_crs_name']='Coordinate system name filter';
+$ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
+$ec_lang['lpn_crs_list']='Coordinate system';
+$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one and press Select.';
 $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
-$ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
+$ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
 $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
-// Shown beside a projection in the chooser, and beside the chosen one in the New project box, when
-// this page has no transform for it. Short on purpose: it sits at the end of a register name that
-// can already run to 50 characters.
+// Shown beside a coordinate system in the chooser, and beside the chosen one in the New project box,
+// when this page has no transform for it. Short on purpose: it sits at the end of a register name
+// that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 // The same fact in a sentence, under the chooser's list and again if such a project is created.
-$ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
+$ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 // **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
@@ -1767,6 +1810,11 @@ $ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection,
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
+// **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218/2026-09-25: Tom
+// asked for WGS 84 (EPSG:4326) as an ordinary catalogue entry, so this now reads that entry
+// (`crsDisplayName()` in js/looped-network.js) instead of carrying its own wording -- the register's
+// own name for 4326 already says what R-218 needed said, and a second string that could drift from
+// the catalogue's is one this page no longer needs.
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
@@ -1833,6 +1881,12 @@ $ec_lang['lpn_inp_report_heading']='Imported {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
 $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places them, from their top left corner.';
+// **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
+// favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
+// that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
+// or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
+// system either. See showInpReport() in js/looped-network.js.
+$ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
