@@ -23819,10 +23819,15 @@ var EngCalcs = EngCalcs || {};
 	 * is a custom application we would be justified to restrict copying among columns. But I don't
 	 * know that we need to do that."* We do not, so we do not.
 	 *
-	 * **IT GROWS THE TABLE, BY APPENDING, AND ONLY ON THE CLERK'S TERMS** (ROADMAP Task 610,
-	 * built to dev/paste-creates-rows-spec.md). A pasted row that runs past the last row is a NEW
-	 * junction, pipe, tank... There is no blank "new row" to click: the gesture is the one a
-	 * spreadsheet already has, a block pasted past the used range extends it. Tom's conditions are
+	 * **AN ORDINARY PASTE NEVER CREATES AN ELEMENT.** Standing on a cell, a paste writes cells, and
+	 * what runs past the last row or column is dropped and COUNTED. Tom, 2026-09-26: *"we can't let
+	 * user sit on an existing cell and expect it not to be overwritten. So we need some sort of 'Add
+	 * row' or 'Paste append' action."*
+	 *
+	 * **ADDING ROWS IS ITS OWN, NAMED ACTION** (ROADMAP Task 610, dev/paste-creates-rows-spec.md):
+	 * Paste as new rows, on the cell and heading menus and on Ctrl+Shift+V, or a paste into an
+	 * empty table's note. Every pasted line is then a NEW junction, pipe, tank... appended below
+	 * the last row, and no existing row is touched (`opts.append`). Tom's conditions are
 	 * the whole of the rule, and panePlanCreates() holds them: every new row carries an ID that
 	 * collides with nothing, in the network or in the same paste; a new node states where it is;
 	 * a new link names two nodes that already exist.
@@ -23832,8 +23837,7 @@ var EngCalcs = EngCalcs || {};
 	 * rows and why. A partial create at 400 rows leaves the clerk no way to tell which rows landed.
 	 *
 	 * Text and Customer rows are not created this way (a Text is placed and a customer is served
-	 * from a pipe, neither by typing an ID), so on those two tables anything past the last row is
-	 * still dropped and COUNTED, as is anything past the last column everywhere.
+	 * from a pipe, neither by typing an ID), so those two tables offer no such action.
 	 */
 	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link'; }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
@@ -23958,16 +23962,54 @@ var EngCalcs = EngCalcs || {};
 		});
 		return { el: el, skipped: skipped + plan.ignored };
 	}
+	/**
+	 * **PASTE AS NEW ROWS, FROM A MENU, WAITS FOR CTRL+V** rather than reading the clipboard
+	 * itself. A menu click can only read it through navigator.clipboard.readText(), which Chrome
+	 * puts behind a permission prompt (measured in headless Chromium: refused outright without the
+	 * permission), so the item ARMS the table instead: the table shows it is waiting, the notice
+	 * says to press Ctrl+V, and Escape cancels. The ordinary `paste` event then carries the text,
+	 * which needs no permission at all. Ctrl+Shift+V skips the arming (see paneHandleKey()).
+	 */
+	function paneArmAppend(spec) {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById(spec.panel),
+			rows = paneTableRowsInOrder(spec), cols = paneCols(spec), box = paneSelBox(spec, rows, cols);
+		if (!paneCanCreate(spec)) { return false; }
+		spec.appendArmed = true;
+		if (host) { host.classList.add('lpn-pane-appending'); }
+		// The keystroke has to reach this table, so the caret goes back to its current cell.
+		if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
+		else if (rows.length && cols.length) { paneFocusCell(spec, rows[0].id, cols[0].key); }
+		setNotice(pc.lpn_pane_paste_armed ||
+			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.');
+		return true;
+	}
+	function paneDisarmAppend(spec, said) {
+		var host = document.getElementById(spec.panel);
+		spec.appendArmed = false;
+		if (host) { host.classList.remove('lpn-pane-appending'); }
+		if (said) { setNotice(''); }
+	}
+	// Whether THIS paste appends: an armed table, or a Ctrl+Shift+V pressed a moment ago. Asking
+	// consumes both, so the next ordinary Ctrl+V is ordinary again.
+	function paneTakeAppend(spec) {
+		var yes = !!spec.appendArmed || (spec._appendKeyAt && Date.now() - spec._appendKeyAt < 2000);
+		spec._appendKeyAt = 0;
+		if (spec.appendArmed) { paneDisarmAppend(spec, false); }
+		return !!yes && paneCanCreate(spec);
+	}
 	function panePasteAt(spec, cells, opts) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
 			creates = [], plan, made, created = [], firstId, errs, shown, i;
-		// **AN EMPTY TABLE HAS NO CELL TO STAND ON**, so the note in its place takes the paste
-		// (renderPaneTable()) and it lands from the first column as a block of new rows.
-		if (!box && opts && opts.append && canCreate && !rows.length && cols.length) {
-			box = { r0: 0, r1: 0, c0: 0, c1: 0 };
+		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
+		// begins past the last existing row so not one of them can be written.
+		if (opts && opts.append) {
+			if (!canCreate || !cols.length) { return null; }
+			box = { r0: rows.length, r1: rows.length, c0: 0, c1: 0 };
+		} else {
+			canCreate = false;   // an ordinary paste writes cells and never makes an element
 		}
 		if (!box || !cells.length) { return null; }
 		if (cells.length > 1 && paneIsHeadingLine(cells[0], cols, box.c0)) { cells = cells.slice(1); lineOffset = 1; }
@@ -24122,6 +24164,16 @@ var EngCalcs = EngCalcs || {};
 		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
+		// **CTRL+SHIFT+V IS PASTE AS NEW ROWS** (Task 610). The keydown only marks the paste that
+		// follows; the key is left to the browser, which then raises an ordinary `paste` event with
+		// the clipboard's text -- measured in headless Chromium on a read-only cell, with no
+		// clipboard permission needed. Inside a cell being typed in it stays the browser's own.
+		if (jump && e.shiftKey && (key === 'V' || key === 'v') && !editing && paneCanCreate(spec)) {
+			spec._appendKeyAt = Date.now();
+			return false;
+		}
+		// Escape first disarms a waiting Paste as new rows, which is the thing on screen to cancel.
+		if ((key === 'Escape' || key === 'Esc') && spec.appendArmed) { paneDisarmAppend(spec, true); return true; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
 		// it must work whatever else the key handler would have made of the moment.
 		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
@@ -24438,7 +24490,7 @@ var EngCalcs = EngCalcs || {};
 			cells = libPasteCells(text);
 			if (!cells.length) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
-			panePasteAt(spec, cells);
+			panePasteAt(spec, cells, paneTakeAppend(spec) ? { append: true } : undefined);
 		});
 		table.addEventListener('copy', function (e) {
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
@@ -24639,6 +24691,9 @@ var EngCalcs = EngCalcs || {};
 				}
 			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
 		});
+		if (paneCanCreate(spec)) {
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows', function () { paneArmAppend(spec); }, 'Ctrl+Shift+V');
+		}
 		aim = paneCtxTarget(spec, td, rows, box);
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
 			findGoTo(aim.group, aim.id);
@@ -24719,6 +24774,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		mk(pc.lpn_pane_manage_cols || 'Manage columns…', function () { paneOpenManageColsDialog(spec); });
+		// The table's own action, offered from its headings too, so it is findable without first
+		// standing on a cell.
+		if (paneCanCreate(spec)) {
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows', function () { paneArmAppend(spec); });
+		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.

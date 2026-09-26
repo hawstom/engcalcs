@@ -366,12 +366,14 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	let menu = openMenuOn(ids[1], 'elev');
 	report(!!menu, 'a right press on a cell opens a menu');
 	const labels = (menu.children || []).map((b) => labelText(b));
-	report(labels.length === 4, 'exactly four rows', labels.join(' | '));
+	// Paste as new rows (Task 610) sits after Paste on a table that can create rows.
+	report(labels.length === 5, 'exactly five rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
-	report(labels[2] === PC.lpn_pane_goto_tip,
-		'Select in map reuses the pin’s own tip, not a new string', labels[2]);
-	report(labels[3] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[3]);
+	report(labels[2] === PC.lpn_pane_paste_append, 'Paste as new rows follows Paste', labels[2]);
+	report(labels[3] === PC.lpn_pane_goto_tip,
+		'Select in map reuses the pin’s own tip, not a new string', labels[3]);
+	report(labels[4] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[4]);
 
 	// Copy: writes the cell to the clipboard, the same as Ctrl+C.
 	clipboard = null;
@@ -382,7 +384,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	// Select in map: the same door the pin uses -- setSelection() through findGoTo().
 	openMenuOn(ids[2], 'elev');
 	menu = menuEl();
-	fire(menu.children[2], 'click', {});
+	fire(menu.children[3], 'click', {});
 	const refs = L.selectedRefs();
 	report(refs.length === 1 && refs[0].kind === 'node' && refs[0].id === ids[2],
 		'Select in map selects the element the row is about', JSON.stringify(refs));
@@ -397,7 +399,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	const d0 = L.undoDepth();
 	openMenuOn(ids[3], 'tag');
 	menu = menuEl();
-	fire(menu.children[3], 'click', {});
+	fire(menu.children[4], 'click', {});
 	report(L.cellText('junctions', ids[3], 'tag') === '', 'Delete clears the cell’s value',
 		L.cellText('junctions', ids[3], 'tag'));
 	report(L.undoDepth() === d0 + 1, '...as one undoable edit', d0 + ' -> ' + L.undoDepth());

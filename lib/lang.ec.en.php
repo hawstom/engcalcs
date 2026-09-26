@@ -874,6 +874,11 @@ $ec_lang['lpn_pane_pasted_rows']='Pasted {n} rows and added {created} of them to
 $ec_lang['lpn_pane_pasted_rows_skipped']='Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to add them.';
+// The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
+// paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu.
+$ec_lang['lpn_pane_paste_append']='Paste as new rows';
+// Shown after choosing Paste as new rows from a menu: the page waits for the paste keystroke.
+$ec_lang['lpn_pane_paste_armed']='Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';

@@ -445,16 +445,15 @@ console.log("\n--- pasting, and the fractional repeat ---");
 		'three rows into one selected cell all land',
 		ids2.slice(0, 3).map((id) => L.cellText('junctions', id, 'demand')).join(','));
 
-	// A PASTE PAST THE LAST ROW ADDS ROWS NOW (Task 610), but only rows that carry an ID: this
-	// block has none, so the whole paste is refused and even the one existing row it covers keeps
-	// its value. pane-row-paste-harness.js covers the paste that does add rows.
-	const before = doc.nodes.length, was3 = L.cellText('junctions', ids2[3], 'demand');
+	// AN ORDINARY PASTE CANNOT GROW THE TABLE. A row is an element on the map; adding rows is its
+	// own named action, Paste as new rows (Task 610, pane-row-paste-harness.js), and a paste that
+	// runs off the bottom drops the overflow and counts it.
+	const before = doc.nodes.length;
 	clickCell(ids2[3], 'demand');
 	const off = L.pasteAt('junctions', [['5'], ['6'], ['7']]);
-	report(doc.nodes.length === before, 'a paste past the last row with no IDs invents no elements');
-	report(off && off.refused === true && L.cellText('junctions', ids2[3], 'demand') === was3,
-		'...and is refused whole, the covered existing row included',
-		off && JSON.stringify(off.errors));
+	report(doc.nodes.length === before, 'a paste past the last row invents no elements');
+	report(off && off.dropped === 2, '...and counts what it dropped rather than dropping it quietly',
+		off && String(off.dropped));
 
 	// A RESULT COLUMN REFUSES A PASTE EXACTLY AS IT REFUSES A KEYSTROKE.
 	clickCell(ids2[0], 'head');
