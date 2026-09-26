@@ -1347,7 +1347,6 @@ $ec_lang['lpn_profile_delete_confirm']='Izbrisati spremljenu rutu {name}? Sam cr
 $ec_lang['lpn_profile_none_saved']='Još nema spremljenih ruta';
 $ec_lang['lpn_profile_missing']='Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}';
 $ec_lang['lpn_new_title']='Novi projekt';
-$ec_lang['lpn_new_coords']='Koordinate';
 $ec_lang['lpn_new_place_hint']='Petaluma, Kalifornija';
 $ec_lang['lpn_new_create']='Stvori';
 $ec_lang['lpn_inp_drop_rules']='Ova datoteka ima kontrole temeljene na pravilima. Ova ih stranica čita i koristi. Izračunajte model EPANET rješavačem i pravila se primjenjuju, uz svaku razinu, tlak i protok u njima pretvorene u jedinice koje ovaj projekt prikazuje. Otvorite Pravila pod Knjižnice da pročitate ili promijenite neko od njih. Zadržavaju se točno onako kako ih datoteka navodi, i zapisuju se natrag ako spremite EPANET datoteku.';

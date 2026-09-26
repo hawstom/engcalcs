@@ -1356,7 +1356,6 @@ $ec_lang['lpn_profile_delete_confirm']='{name} kaydedilmiş yolu silinsin mi? Ç
 $ec_lang['lpn_profile_none_saved']='Henüz kaydedilmiş yol yok';
 $ec_lang['lpn_profile_missing']='Kaydedilmiş {name} yolu bu projede olmayan düğümler kullanıyor: {ids}';
 $ec_lang['lpn_new_title']='Yeni proje';
-$ec_lang['lpn_new_coords']='Koordinatlar';
 $ec_lang['lpn_new_place_hint']='Petaluma, Kaliforniya';
 $ec_lang['lpn_new_create']='Oluştur';
 $ec_lang['lpn_inp_drop_rules']='Bu dosyada kural tabanlı kontroller var. Bu sayfa bunları okur ve kullanır. Modeli EPANET motoruyla çalıştırın; kurallar uygulanır ve içlerindeki her seviye, basınç ve debi bu projenin gösterdiği birimlere çevrilir. Bir kuralı okumak veya değiştirmek için Kitaplıklar altında Kurallar\'ı açın. Dosyanın belirttiği haliyle aynen korunurlar ve bir EPANET dosyası kaydederseniz geri yazılırlar.';

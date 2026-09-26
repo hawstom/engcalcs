@@ -1346,7 +1346,6 @@ $ec_lang['lpn_profile_delete_confirm']='Den gespeicherten Weg {name} löschen? D
 $ec_lang['lpn_profile_none_saved']='Noch keine gespeicherten Wege';
 $ec_lang['lpn_profile_missing']='Der gespeicherte Weg {name} verwendet Knoten, die in diesem Projekt nicht vorhanden sind: {ids}';
 $ec_lang['lpn_new_title']='Neues Projekt';
-$ec_lang['lpn_new_coords']='Koordinaten';
 $ec_lang['lpn_new_place_hint']='Petaluma, Kalifornien';
 $ec_lang['lpn_new_create']='Erstellen';
 $ec_lang['lpn_inp_drop_rules']='Diese Datei enthält regelbasierte Steuerungen. Diese Seite liest sie und verwendet sie. Rechnen Sie das Modell mit dem EPANET-Solver durch, dann werden die Regeln angewendet, wobei jeder Wasserstand, jeder Druck und jeder Durchfluss darin in die von diesem Projekt angezeigten Einheiten umgerechnet wird. Öffnen Sie Regeln unter Bibliotheken, um eine zu lesen oder zu ändern. Sie werden genau so beibehalten, wie die Datei sie angibt, und beim Speichern als EPANET-Datei zurückgeschrieben.';

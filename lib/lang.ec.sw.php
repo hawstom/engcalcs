@@ -1354,7 +1354,6 @@ $ec_lang['lpn_profile_delete_confirm']='Futa njia iliyohifadhiwa {name}? Mchoro 
 $ec_lang['lpn_profile_none_saved']='Bado hakuna njia zilizohifadhiwa';
 $ec_lang['lpn_profile_missing']='Njia iliyohifadhiwa {name} inatumia vifundo ambavyo havimo kwenye mradi huu: {ids}';
 $ec_lang['lpn_new_title']='Mradi mpya';
-$ec_lang['lpn_new_coords']='Kuratibu';
 $ec_lang['lpn_new_place_hint']='Zanzibar, Tanzania';
 $ec_lang['lpn_new_create']='Unda';
 $ec_lang['lpn_inp_drop_rules']='Faili hili lina vidhibiti vya msingi wa kanuni. Ukurasa huu unavisoma na kuvitumia. Endesha muundo kwa kutumia injini ya EPANET na kanuni zinatumika, huku kila kiwango, shinikizo na mtiririko ndani yake vikibadilishwa kwenda kwenye vipimo anavyoonyesha mradi huu. Fungua Kanuni chini ya Maktaba ili kusoma au kubadilisha moja. Zinahifadhiwa sawasawa na jinsi faili linavyozitaja, na zinaandikwa tena ukihifadhi faili la EPANET.';

@@ -1749,29 +1749,10 @@ $ec_lang['lpn_file_new']='New project…';
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
 $ec_lang['lpn_new_title']='New project';
-// The first question, and the one the whole box is arranged around.
-$ec_lang['lpn_new_coords']='Coordinates';
-// **THE TWO NAMES ARE `xy` AND `lat/lon`, LOWER CASE** -- Tom's ruling of 2026-08-18, "no caps so
-// as not to imply any proper names", and the same two words the File menu and the georeferencing
-// gesture already use. Do not spell either of them out here; a third wording for the same choice is
-// how a reader stops being sure they are the same choice.
-// What each choice really means, and the fact that picking xy is not final. Said on the group
-// rather than on each radio: one tip, one "?", and the two options are only meaningful against
-// each other.
-// The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
-// blank one makes the project and moves nothing.
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
-// **TWO ANSWERS, NOT THREE.** Phase 1 asked xy / lat/lon / projected, which split one question in
-// two: lat/lon IS a projection on this page -- the drawing frame is Web Mercator and the register
-// has a name for it, EPSG:3857 -- so "geographic projection" covers it and every zoned system
-// alike, and what is left over is the project that sits on no part of the Earth at all. Tom's own
-// wording throughout, including the capital L of "Lat/Lon".
-//
-// **THE SIX KEYS THE THREE-RADIO BOX USED ARE LEFT DEFINED AND ARE NOW RENDERED BY NOTHING** --
-// lpn_new_coords, _tip, _xy, _geo, lpn_new_place and lpn_new_place_tip. New keys rather than
-// reworded ones on purpose: those six are translated into 26 languages, and a repointed key would
-// show 26 confident translations of the OLD question, where an absent key shows English, which is
-// the correct untranslated state. Whether they are debt is a judgement call and Tom's.
+// **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
+// them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
+// its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
 $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word

@@ -1345,7 +1345,6 @@ $ec_lang['lpn_profile_delete_confirm']='Smazat uloženou trasu {name}? Samotný 
 $ec_lang['lpn_profile_none_saved']='Zatím žádné uložené trasy';
 $ec_lang['lpn_profile_missing']='Uložená trasa {name} používá uzly, které v tomto projektu nejsou: {ids}';
 $ec_lang['lpn_new_title']='Nový projekt';
-$ec_lang['lpn_new_coords']='Souřadnice';
 $ec_lang['lpn_new_place_hint']='Petaluma, Kalifornie';
 $ec_lang['lpn_new_create']='Vytvořit';
 $ec_lang['lpn_inp_drop_rules']='Tento soubor obsahuje pravidlová ovládání. Tato stránka je čte a používá. Spusťte model řešičem EPANET a pravidla se použijí, přičemž každá hladina, tlak a průtok v nich se převedou do jednotek, které projekt zobrazuje. Otevřete Pravidla pod Knihovny, kde jedno přečtete nebo změníte. Jsou zachována přesně tak, jak je uvádí soubor, a při uložení souboru EPANET se zapíší zpět.';

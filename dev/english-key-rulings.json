@@ -2524,10 +2524,6 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
-        "lpn_new_coords": {
-            "on": "Coordinates",
-            "ruled": "2026-08-29"
-        },
         "lpn_new_coordsys": {
             "on": "Coordinate system",
             "ruled": "2026-09-14",

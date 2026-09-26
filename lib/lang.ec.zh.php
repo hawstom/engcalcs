@@ -1261,7 +1261,6 @@ $ec_lang['lpn_profile_delete_confirm']='删除保存的路线“{name}”？图�
 $ec_lang['lpn_profile_none_saved']='尚无已保存的路线';
 $ec_lang['lpn_profile_missing']='已保存的路线“{name}”使用了本项目中不存在的节点：{ids}';
 $ec_lang['lpn_new_title']='新建项目';
-$ec_lang['lpn_new_coords']='坐标';
 $ec_lang['lpn_new_place_hint']='杭州市西湖区';
 $ec_lang['lpn_new_create']='创建';
 $ec_lang['lpn_inp_drop_rules']='此文件包含基于规则的控制。本页面会读取并使用它们。使用 EPANET 引擎运行模型后，这些规则会被执行，其中的每一个水位、压力和流量都会换算为本项目当前显示的单位。请在“库”下打开“规则”来查看或修改其中一条。它们会按文件中原本的写法完整保留，如果您保存为 EPANET 文件，也会被写回。';

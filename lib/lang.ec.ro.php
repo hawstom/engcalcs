@@ -1346,7 +1346,6 @@ $ec_lang['lpn_profile_delete_confirm']='Ștergeți traseul salvat {name}? Desenu
 $ec_lang['lpn_profile_none_saved']='Niciun traseu salvat încă';
 $ec_lang['lpn_profile_missing']='Traseul salvat {name} folosește noduri care nu se află în acest proiect: {ids}';
 $ec_lang['lpn_new_title']='Proiect nou';
-$ec_lang['lpn_new_coords']='Coordonate';
 $ec_lang['lpn_new_place_hint']='Sibiu, România';
 $ec_lang['lpn_new_create']='Creează';
 $ec_lang['lpn_inp_drop_rules']='Acest fișier conține comenzi bazate pe reguli. Această pagină le citește și le folosește. Rulați modelul cu motorul EPANET și regulile sunt aplicate, fiecare nivel, presiune și debit din ele fiind convertite în unitățile pe care le arată acest proiect. Deschideți Reguli la Biblioteci pentru a citi sau modifica una. Sunt păstrate exact așa cum le precizează fișierul și sunt scrise înapoi dacă salvați un fișier EPANET.';

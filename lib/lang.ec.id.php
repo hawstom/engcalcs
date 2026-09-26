@@ -1346,7 +1346,6 @@ $ec_lang['lpn_profile_delete_confirm']='Hapus rute tersimpan {name}? Gambar itu 
 $ec_lang['lpn_profile_none_saved']='Belum ada rute tersimpan';
 $ec_lang['lpn_profile_missing']='Rute tersimpan {name} menggunakan simpul yang tidak ada dalam proyek ini: {ids}';
 $ec_lang['lpn_new_title']='Proyek baru';
-$ec_lang['lpn_new_coords']='Koordinat';
 $ec_lang['lpn_new_place_hint']='Bandung, Jawa Barat';
 $ec_lang['lpn_new_create']='Buat';
 $ec_lang['lpn_inp_drop_rules']='Berkas ini memiliki kendali berbasis aturan. Halaman ini membaca dan menggunakannya. Jalankan model dengan penyelesai EPANET dan aturan itu diterapkan, dengan setiap muka air, tekanan, dan debit di dalamnya dikonversi ke satuan yang ditampilkan proyek ini. Buka Aturan di bawah Pustaka untuk membaca atau mengubah salah satunya. Aturan itu tetap disimpan persis seperti yang dinyatakan berkas, dan akan ditulis kembali jika Anda menyimpan berkas EPANET.';

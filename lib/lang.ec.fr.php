@@ -1347,7 +1347,6 @@ $ec_lang['lpn_profile_delete_confirm']='Supprimer le trajet enregistré {name} ?
 $ec_lang['lpn_profile_none_saved']='Aucun trajet enregistré pour l\'instant';
 $ec_lang['lpn_profile_missing']='Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}';
 $ec_lang['lpn_new_title']='Nouveau projet';
-$ec_lang['lpn_new_coords']='Coordonnées';
 $ec_lang['lpn_new_place_hint']='Petaluma, Californie';
 $ec_lang['lpn_new_create']='Créer';
 $ec_lang['lpn_inp_drop_rules']='Ce fichier contient des contrôles basés sur des règles. Cette page les lit et les utilise. Calculez le modèle avec le moteur EPANET et les règles sont appliquées, chaque niveau, pression et débit qu\'elles contiennent étant converti dans les unités affichées par ce projet. Ouvrez Règles sous Bibliothèques pour en lire une ou la modifier. Elles sont conservées exactement telles que le fichier les énonce, et elles sont réécrites si vous enregistrez un fichier EPANET.';

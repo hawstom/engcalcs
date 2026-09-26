@@ -1345,7 +1345,6 @@ $ec_lang['lpn_profile_delete_confirm']='Eliminare il percorso salvato {name}? Il
 $ec_lang['lpn_profile_none_saved']='Nessun percorso salvato ancora';
 $ec_lang['lpn_profile_missing']='Il percorso salvato {name} usa nodi che non sono in questo progetto: {ids}';
 $ec_lang['lpn_new_title']='Nuovo progetto';
-$ec_lang['lpn_new_coords']='Coordinate';
 $ec_lang['lpn_new_place_hint']='Roma, Italia';
 $ec_lang['lpn_new_create']='Crea';
 $ec_lang['lpn_inp_drop_rules']='Questo file contiene controlli basati su regole. Questa pagina li legge e li usa. Calcola il modello con il motore EPANET e le regole vengono applicate, con ogni livello, pressione e portata in esse convertiti nelle unità mostrate da questo progetto. Apri Regole in Librerie per leggerne una o modificarla. Sono conservate esattamente come le indica il file, e sono riscritte se salvi un file EPANET.';

@@ -1428,7 +1428,6 @@ $ec_lang['lpn_profile_delete_confirm']='¿Eliminar la ruta guardada {name}? El d
 $ec_lang['lpn_profile_none_saved']='Todavía no hay rutas guardadas';
 $ec_lang['lpn_profile_missing']='La ruta guardada {name} usa nodos que no están en este proyecto: {ids}';
 $ec_lang['lpn_new_title']='Proyecto nuevo';
-$ec_lang['lpn_new_coords']='Coordenadas';
 $ec_lang['lpn_new_coordsys']='Sistema de coordenadas';
 $ec_lang['lpn_new_coordsys_tip']='Seleccione el sistema de coordenadas de su red. Esto es permanente; la única forma de convertir una red a otras coordenadas es con «Archivo, Abrir con nuevas coordenadas», y es aproximada.';
 $ec_lang['lpn_new_coordsys_local']='Local, esquemática o personalizada';

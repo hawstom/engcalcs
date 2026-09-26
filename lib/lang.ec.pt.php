@@ -1348,7 +1348,6 @@ $ec_lang['lpn_profile_delete_confirm']='Excluir o caminho salvo {name}? O desenh
 $ec_lang['lpn_profile_none_saved']='Nenhum caminho salvo ainda';
 $ec_lang['lpn_profile_missing']='O caminho salvo {name} usa nós que não estão neste projeto: {ids}';
 $ec_lang['lpn_new_title']='Novo projeto';
-$ec_lang['lpn_new_coords']='Coordenadas';
 $ec_lang['lpn_new_place_hint']='Petaluma, Califórnia';
 $ec_lang['lpn_new_create']='Criar';
 $ec_lang['lpn_inp_drop_rules']='Este arquivo tem controles baseados em regras. Esta página as lê e as usa. Execute o modelo com o motor EPANET e as regras são aplicadas, com cada nível, pressão e vazão nelas convertidos para as unidades que este projeto está mostrando. Abra Regras em Bibliotecas para ler ou alterar uma. Elas são mantidas exatamente como o arquivo as indica, e são gravadas de volta se você salvar um arquivo EPANET.';

@@ -1349,7 +1349,6 @@ $ec_lang['lpn_profile_delete_confirm']='{name} የተባለውን የተቀመ�
 $ec_lang['lpn_profile_none_saved']='እስካሁን የተቀመጠ መንገድ የለም';
 $ec_lang['lpn_profile_missing']='{name} የተባለው የተቀመጠ መንገድ በዚህ ፕሮጀክት ውስጥ የሌሉ ነጥቦችን ይጠቀማል፦ {ids}';
 $ec_lang['lpn_new_title']='አዲስ ፕሮጀክት';
-$ec_lang['lpn_new_coords']='መጋጠሚያዎች';
 $ec_lang['lpn_new_place_hint']='ፔታሉማ፣ ካሊፎርኒያ';
 $ec_lang['lpn_new_create']='ፍጠር';
 $ec_lang['lpn_inp_drop_rules']='ይህ ፋይል በህግ ላይ የተመሰረቱ መቆጣጠሪያዎች አሉት። ይህ ገጽ ያነብባቸዋል፣ ይጠቀምባቸዋልም። ሞዴሉን በEPANET ፈታች ያስኩ፣ ህጎቹም ይተገበራሉ፣ በውስጣቸው ያለው እያንዳንዱ ደረጃ፣ ግፊትና ፍሰትም ይህ ፕሮጀክት እያሳየ ባለው አሃድ ይለወጣል። አንዱን ለማንበብ ወይም ለመቀየር በቤተመዛግብት ስር ህጎችን ይክፈቱ። ፋይሉ በገለጻቸው መንገድ በትክክል ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።';
