@@ -135,8 +135,8 @@ const EngCalcs = global.EngCalcs;
 	const tankEvents = events.filter((e) => tankNames.some((id) =>
 		e.text.indexOf((PC.lpn_tool_add_tank || 'Tank') + ' ' + id) >= 0));
 	check(tankEvents.length > 0, `the status report carries ${tankEvents.length} tank events`);
-	const fillingWord = (PC.lpn_status_filling || '{type} {id} is filling').replace('{type} {id} ', '');
-	const emptyingWord = (PC.lpn_status_emptying || '{type} {id} is emptying').replace('{type} {id} ', '');
+	const fillingWord = PC.lpn_status_filling.replace('{type} {id} ', '');
+	const emptyingWord = PC.lpn_status_emptying.replace('{type} {id} ', '');
 	check(tankEvents.some((e) => e.text.indexOf(fillingWord) >= 0)
 		|| tankEvents.some((e) => e.text.indexOf(emptyingWord) >= 0),
 		'and at least one of them is a fill or a drain transition');

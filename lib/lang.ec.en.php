@@ -3319,7 +3319,6 @@ $ec_lang['lpn_full_needs_run']='The full report lists every node and every link 
 $ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.';
 $ec_lang['lpn_full_download_csv']='Download CSV';
 $ec_lang['lpn_full_print']='Print report';
-$ec_lang['lpn_full_building']='Building the report…';
 $ec_lang['lpn_full_col_time']='Time';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
