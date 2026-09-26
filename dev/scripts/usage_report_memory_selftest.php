@@ -11,14 +11,14 @@
  * was ecUsageReadAll() building one PHP associative array per log ROW, and engcalcs-lang.log grows
  * every day (it is 11+ MB on production and never rotates on its own). This generates a synthetic
  * engcalcs-lang.log of the same size (215,000 rows, mixed vintage) and runs the real spock.php over
- * it, once each with the library and page AS THEY STOOD BEFORE THIS FIX (read from `master` with
- * `git show`, since this branch exists only to change them) and once with the CURRENT working tree,
+ * it, once each with the library and page AS THEY STOOD BEFORE THIS FIX (read with `git show` from
+ * EC_URM_PREFIX_SHA, the last master commit before it) and once with the CURRENT working tree,
  * both under `php -d memory_limit=128M` -- the production limit -- so this fails the moment either
  * file regresses to materialising rows instead of streaming aggregates.
  *
  * It touches nothing shipped: the fixture is a temporary directory, the page is driven through the
  * EC_USAGE_REPORT_DIRS constant, and log/ is never read or written. It never pushes or reads from
- * origin -- `git show master:...` reads this same repository's local history.
+ * origin -- `git show <sha>:...` reads this same repository's local history.
  *
  *   php dev/scripts/usage_report_memory_selftest.php
  */
@@ -85,22 +85,23 @@ file_put_contents("$dir/engcalcs-signal.log",
 file_put_contents("$dir/engcalcs-contact-send.log",
     "2026-01-01T00:00:05Z{$T}contact{$T}en{$T}en-us{$T}visitor\n");
 
-// ---- 2. the library AS IT STOOD BEFORE THIS FIX, from master ----------------------------------
-// This branch exists only to change lib/UsageReport.lib.php and spock.php, so `master` is the
-// pre-fix code -- the same method dev/scripts/usage_report_selftest.php could not use, because that
+// ---- 2. the library AS IT STOOD BEFORE THIS FIX, pinned to a commit ---------------------------
+// A SHA, never `master`: once the fix merged, `master` WAS the fix and this before-run passed within
+// 2 MB, failing the suite that stamps the merge. EC_URM_PREFIX_SHA is the pre-fix code -- the same method dev/scripts/usage_report_selftest.php could not use, because that
 // selftest is about correctness on a small fixture, not about a regression to unbounded memory.
+const EC_URM_PREFIX_SHA = '3bb08eae571fd24c9708f9bd334936f65ada5697';
 $oldRoot = "$dir/oldroot";
 @mkdir("$oldRoot/lib", 0700, true);
-$oldLib  = shell_exec('git -C ' . escapeshellarg($root) . ' show master:lib/UsageReport.lib.php 2>&1');
-$oldPage = shell_exec('git -C ' . escapeshellarg($root) . ' show master:spock.php 2>&1');
+$oldLib  = shell_exec('git -C ' . escapeshellarg($root) . ' show ' . EC_URM_PREFIX_SHA . ':lib/UsageReport.lib.php 2>&1');
+$oldPage = shell_exec('git -C ' . escapeshellarg($root) . ' show ' . EC_URM_PREFIX_SHA . ':spock.php 2>&1');
 $haveOld = is_string($oldLib) && strpos($oldLib, '<?php') === 0
         && is_string($oldPage) && strpos($oldPage, '<?php') === 0;
 if ($haveOld) {
     file_put_contents("$oldRoot/lib/UsageReport.lib.php", $oldLib);
     file_put_contents("$oldRoot/spock.php", $oldPage);
 }
-ec_urm_expect('master:lib/UsageReport.lib.php and master:spock.php are readable for the before/after run',
-    $haveOld, 'git show failed -- is this a shallow clone, or is master missing those files?');
+ec_urm_expect('the pre-fix lib/UsageReport.lib.php and spock.php are readable for the before/after run',
+    $haveOld, 'git show failed -- is this a shallow clone, or is EC_URM_PREFIX_SHA missing?');
 
 function ec_urm_boot($file, $root, $dir)
 {
@@ -135,7 +136,7 @@ function ec_urm_run($root, $dir, $limit, $label)
 if ($haveOld) {
     // ---- 3. THE DEFECT REPRODUCED: the pre-fix code exhausts 128 MB on this fixture ------------
     list($oldExit, $oldHtml, $oldPeak) = ec_urm_run($oldRoot, $dir, $MEMORY_LIMIT, 'old');
-    ec_urm_expect('the PRE-FIX code (master) fails under the 128 MB production limit on an '
+    ec_urm_expect('the PRE-FIX code fails under the 128 MB production limit on an '
         . '11+ MB log -- reproducing the 2026-09-26 production error_log',
         $oldExit !== 0 && stripos($oldHtml, 'Allowed memory size') !== false,
         'exit=' . $oldExit . ' peak=' . ($oldPeak === null ? 'n/a (crashed before reporting)' : $oldPeak)
@@ -175,7 +176,7 @@ ec_urm_expect('the two buckets on the page still total to the hand-computed visi
 // ---- report, whether or not everything passed ---------------------------------------------------
 echo "\nPeak memory, " . number_format($ROW_COUNT) . " reach rows (" . round($logBytes / 1048576, 1)
    . " MB log), limit $MEMORY_LIMIT:\n";
-echo '  before (master)  : ' . ($oldPeak !== null ? round($oldPeak / 1048576, 1) . ' MB'
+echo '  before (pre-fix) : ' . ($oldPeak !== null ? round($oldPeak / 1048576, 1) . ' MB'
     : ($haveOld ? 'exhausted the limit before it could report its own peak' : 'not run')) . "\n";
 echo '  after  (this fix): ' . ($newPeak !== null ? round($newPeak / 1048576, 1) . ' MB' : 'not recorded') . "\n";
 
