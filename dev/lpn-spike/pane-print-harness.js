@@ -205,14 +205,17 @@ console.log('\n--- the headings carry the units ---');
 			got.join(' | '));
 	});
 	// And absolutely, not only relatively: a comparison of two readings of one function would pass
-	// with the unit missing from both.
+	// with the unit missing from both. The printed unit is the DISPLAY text a reader sees in the
+	// unit dropdown ('ft H2O'), never the internal unit id ('fth2o') the page stores -- checked
+	// against the raw id here would have passed against a stub bug that made the two agree by
+	// construction, the exact shape a 2026-09-23 pre-review caught in Convert as's own Label column.
 	const jh = sheetOf('junctions').headings;
-	report(jh.some((h) => /\(fth2o\)/.test(h)), 'a US junction table prints an elevation in feet', jh.join(' | '));
+	report(jh.some((h) => /\(ft H2O\)/.test(h)), 'a US junction table prints an elevation in feet', jh.join(' | '));
 	report(jh.some((h) => /\(gpm\)/.test(h)), '...and a demand in (gpm)', jh.join(' | '));
 	setUnitSet('si');
 	L.renderTable('junctions');
 	const jm = sheetOf('junctions').headings;
-	report(jm.some((h) => /\(mh2o\)/.test(h)) && jm.some((h) => /\(lps\)/.test(h)),
+	report(jm.some((h) => /\(m H2O\)/.test(h)) && jm.some((h) => /\(L\/s\)/.test(h)),
 		'and an SI one prints metres and litres per second', jm.join(' | '));
 	setUnitSet('us');
 	L.renderTable('junctions');

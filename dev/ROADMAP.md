@@ -963,7 +963,7 @@ the block.
       drawing from the splash screen, which can carry detail. Do not let one drawing be scaled to
       serve both -- that is what makes the big one look empty.
     - See also Task 648 and Task 679.
-- 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
+- 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
   as a thumbnail with the current window box placed on it for 'Where am I?'"*
@@ -1825,7 +1825,7 @@ the block.
   popup-vs-table half.
   - **AUDIT SHIPPED 2026-09-23:** `dev/property-venue-matrix.md` (8 element types x 8 venues) and
     `property_venue_check.php` (advisory, 42 table columns with no Find row). Top gaps a user would
-    hit: Active/Shut not findable on any link; emitter coefficient; a tank's levels, diameter and
+    hit: Active/Closed not findable on any link; emitter coefficient; a tank's levels, diameter and
     mixing; pump speed and energy price; pipe length findable but not replaceable. Filling them is
     the next step, a branch of its own; Text's allZoom is in flight on `feat/zoom-scale-rules`.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
@@ -1849,6 +1849,50 @@ the block.
   (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
+
+- 75|718| **File menu: Recents just above Exit, and an Import submenu.**
+  Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
+  items. It's probably time for an Import sub-menu."*
+- 50|717| **EPANET-MSX, multi-species water quality.**
+  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
+  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
+- 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
+  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
+  Junction, Pipe, etc until escape."*
+- 50|720| **Background layers from a GIS server.**
+  Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
+  A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
+- 50|721| **Scenarios as layered alternatives, with ready-made scenarios.**
+  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm. I am comfortable with it from
+  HEC-RAS, but it could be threatening to new users. What seems very welcoming is the set of
+  pre-configured scenarios and the ironclad rule that you are always editing only the specific data
+  layers (Alternatives) mapped to that Active Scenario."* Read against our scenario model first.
+- 50|722| **Change and revision tracking.**
+  Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
+- 25|723| **WaterCAD's element list, against ours.**
+  Tom, 2026-09-25, listing WaterCAD's elements: Pipe, Junction, Hydrant, Tank, Reservoir, Customer,
+  SCADA, Pump, Pump Station, Variable Speed Pump Battery, PRV, PSV, PBV, FCV, TCV, GPV, Isolation
+  valve, Spot Elevation, Turbine, Periodic Head-flow, Air Valve, Hydropneumatic Tank. Which of these
+  a migrating user misses first is Mary's and Sue's question (`watercad-migration.md`).
+
+- 75|724| **System-wide available fire flow: every junction, as a table and a map colouring.**
+  Sue's wishlist §3 (`dev/agents/utility-planning-engineer/wishlist.md`): loop Task 530's per-hydrant
+  search over every junction, shown the way a master-plan appendix shows it. Reuses colour by value.
+- 50|725| **One wide fire-flow table instead of two reports.**
+  Sue's wishlist §6: available flow and design flow side by side, InfoWater's "Design Fireflow
+  Report" shape. Presentation only; one run already computes both.
+- 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
+  Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
+  says slow or metered. For the low-bandwidth audience.
+- 50|727| **Hover highlight on the element Select would pick.**
+  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
+  (Task 618). AutoCAD's selection preview is the precedent.
+- 50|728| **Import a GIS shapefile or geodatabase as a network.**
+  Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
+  migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
+- 25|729| **Type a node's location in State Plane or UTM.**
+  Declan's wishlist §6, ranked low by him: plan sets in the US are in State Plane. Read with the
+  Convert as catalogue (Task 696) before building anything.
 
 # Reference
 

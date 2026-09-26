@@ -221,7 +221,22 @@
 		return { tl: tl, tr: tr, bl: bl };
 	}
 
+	/**
+	 * The plane's own unit, read out of its definition: `{ units: 'm' | 'us-ft' | 'ft' | ... }`, or
+	 * `{ toMeter: n }` for the few stated as a bare factor, or null while not loaded or unknown.
+	 * For the read-only Map coordinates line in Settings (Task 693); nothing converts through it.
+	 */
+	function unitOf(code) {
+		var k = key(code), d = ready() ? defs[k] : null, m;
+		if (!d) { return null; }
+		m = /\+units=(\S+)/.exec(d);
+		if (m) { return { units: m[1] }; }
+		m = /\+to_meter=(\S+)/.exec(d);
+		return m ? { toMeter: parseFloat(m[1]) } : { units: 'm' };
+	}
+
 	EngCalcs.lpnCrsLoad = load;
+	EngCalcs.lpnCrsUnit = unitOf;
 	EngCalcs.lpnCrsReady = ready;
 	EngCalcs.lpnCrsHas = has;
 	EngCalcs.lpnCrsForward = forward;

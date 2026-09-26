@@ -516,17 +516,21 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 				.indexOf(PC.lpn_crs_unplaceable_mark) < 0,
 			L.crsOptionText({ code: ZONE12N, name: 'WGS 84 / UTM zone 12N' }));
 
-		// And the sentence under the list, for the row that is actually selected.
+		// **THE NOTE UNDER THE LIST NO LONGER CARRIES THE LONG SENTENCE, EITHER WAY** (Tom,
+		// 2026-09-25: "The message at the bottom is nonsense to me. End it after IOGP."). The
+		// "(no map)" mark in the row itself (asserted above) is what a person scanning the list
+		// sees; the long sentence now speaks only at the moment of actual consequence -- creating a
+		// project on the row anyway, asserted below against lpn_map_notice.
 		byId.lpn_crsbox_name.value = '2136';
 		L.crsBoxState().code = ACCRA;
 		L.renderCrsBoxList();
-		ok('the note under the list says what such a project loses',
-			byId.lpn_crsbox_note.textContent.indexOf(PC.lpn_crs_unplaceable) >= 0,
+		ok('the note under the list ends after the IOGP credit, even for an unplaceable row',
+			byId.lpn_crsbox_note.textContent.indexOf(PC.lpn_crs_unplaceable) < 0,
 			byId.lpn_crsbox_note.textContent);
 		byId.lpn_crsbox_name.value = '32612';
 		L.crsBoxState().code = ZONE12N;
 		L.renderCrsBoxList();
-		ok('...and says nothing of the kind about a projection that works',
+		ok('...and says nothing of the kind about a projection that works either',
 			byId.lpn_crsbox_note.textContent.indexOf(PC.lpn_crs_unplaceable) < 0,
 			byId.lpn_crsbox_note.textContent);
 

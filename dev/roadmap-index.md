@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**92 open tasks.** Next (100): 7 · Soon (75): 20 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
+**105 open tasks.** Next (100): 7 · Soon (75): 22 · Someday (50): 38 · Maybe (25): 14 · Parked (5): 18 · priority 99 (99): 6
 
 ## 100 — Next (7)
 
@@ -28,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 
-## 75 — Soon (20)
+## 75 — Soon (22)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -50,10 +50,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 711 — A pan is lost when File, New project opens beside it.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
+- Task 718 — File menu: Recents just above Exit, and an Import submenu.
+- ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
 
-## 50 — Someday (29)
+## 50 — Someday (38)
 
-- ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
+- ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
@@ -82,8 +84,17 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 707 — Five minutes of a real browser on the Task 706 repair.
 - Task 712 — Tank water depth as a map label field.
 - Task 713 — Say Cmd, not Ctrl, to a Mac reader.
+- Task 717 — EPANET-MSX, multi-species water quality.
+- Task 719 — Draw a chain: junction, pipe, junction, pipe, until Escape.
+- Task 720 — Background layers from a GIS server.
+- Task 721 — Scenarios as layered alternatives, with ready-made scenarios.
+- Task 722 — Change and revision tracking.
+- Task 725 — One wide fire-flow table instead of two reports.
+- Task 726 — Show progress while the EPANET engine downloads, and prefetch it when idle.
+- Task 727 — Hover highlight on the element Select would pick.
+- Task 728 — Import a GIS shapefile or geodatabase as a network.
 
-## 25 — Maybe (12)
+## 25 — Maybe (14)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -97,6 +108,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 619 — [H] · The map cursor reverts to an arrow on Chrome at fractional display scaling.
 - Task 621 — [H] · A command search: KDH went looking for one.
 - Task 672 — The placement wizard degrades and then crashes after a few pans.
+- Task 723 — WaterCAD's element list, against ours.
+- Task 729 — Type a node's location in State Plane or UTM.
 
 ## 5 — Parked (18)
 
@@ -123,5 +136,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-84 of 92 titles are within 4–12 words. `!` marks the rest;
+96 of 105 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

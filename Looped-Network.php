@@ -114,6 +114,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="d-print-none" id="lpn_units_strip">
 		<div id="lpn_units_all" class="lpn-units-group">
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', '', $ec_lang['lpn_units_length']); ?></span>
+		<?php // DERIVED AND READ-ONLY (Task 693, in 696): what the coordinates are in, which is a fact
+		      // the coordinate system states rather than a choice. No select, so nothing clones it
+		      // and nothing converts through it. Filled by refreshMapCoordsUnit(). ?>
+		<span class="lpn-units-item" id="lpn_u_mapcoords_row"><span class="lpn-units-name"><?=$ec_lang['lpn_units_mapcoords']?></span><span id="lpn_u_mapcoords" class="lpn-units-derived"></span></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', '', $ec_lang['lpn_field_diameter']); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', '', $ec_lang['lpn_units_elevhead']); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', '', $ec_lang['lpn_units_pressure']); ?></span>
@@ -482,10 +486,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // than by dragging -- and because picking a point off the drawing needs the model to be
 			      // on the ground, which is what step 2 means. ?>
 			<button type="button" id="lpn_georef_twopt" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_twopt'], $ec_lang['lpn_georef_twopt_tip'])?></button>
-			<?php // Shown in step 1 only, and only when every coordinate could also be a lon/lat pair
-			      // (georefRefreshBar). It is the reinterpret case, which used to be a range test
-			      // deciding for the user -- and deciding wrong for any drawing on a small grid. ?>
-			<button type="button" id="lpn_georef_asdeg" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_asdeg_btn'], $ec_lang['lpn_georef_asdeg_tip'])?></button>
+			<?php // **THE "THESE ARE ALREADY lat/lon" BUTTON IS GONE** (R-219; Tom, 2026-09-24,
+			      // answering R-190: "We have 'Ground distance per drawing unit' on Step 2 ... That
+			      // can be set to 1 to use project coordinates. So I say drop it"). It offered, on a
+			      // range-test guess, to reinterpret a small XY drawing's own numbers as degrees rather
+			      // than place it; the same effect -- the file's numbers used unchanged as ground
+			      // distance -- is reached by typing 1 into the Ground distance field the step-2
+			      // controls above already carry, so the guess-and-button pair bought nothing a
+			      // visitor could not already do. georefArmAsDegrees() itself stays: a project that
+			      // ALREADY states it is georeferenced still lands through it automatically
+			      // (georefOpenAnswered()), which is a known fact about that file, never a guess. ?>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
@@ -1406,7 +1416,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<fieldset class="lpn-new-block">
 			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
 			<div>
-				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_coordsys_geo_tip'])?></label>
+				<?php // Reuses Convert as's own lpn_convas_epsg / lpn_convas_epsg_tip (2026-09-25):
+				      // once "projection" left both strings, this radio's own wording was identical
+				      // to Convert as's, and a second copy of the same sentence is the one that
+				      // could drift from it. ?>
+				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
 				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
 				      // *"The button is not a good place for the full projection name. How about an
 				      // ellipsis button followed by the name?"*). It used to be one control doing both
@@ -1459,6 +1473,95 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	</div>
 </div>
 
+<?php // ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing 688 and 693) ------------------------
+      //
+      // Tom's shape, 2026-09-22/23: *"(a) Project and units (maybe this one menu row as 'Convert
+      // as...' can handle both units and coordinates), (b) step 1 (if CRS changed), (c) step 2 (if
+      // CRS changed)."* And: *"The first thing it needs to do is ask what coordinate system we are
+      // going to."* So this box is page (a), and the coordinate system is its first question. The
+      // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
+      // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
+      // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
+<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
+	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></legend>
+			<div id="lpn_convas_from"></div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+				<button type="button" id="lpn_convas_crs_pick" aria-describedby="lpn_convas_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_epsg']))?>">&hellip;</button>
+				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span>
+			</div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed"> <?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label>
+			</div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none"> <?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label>
+			</div>
+		</fieldset>
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></legend>
+			<div class="lpn-new-presets">
+				<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
+				<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
+			</div>
+			<div id="lpn_convas_units_fields" class="lpn-units-group"></div>
+		</fieldset>
+		<?php // Tom's rounding request (Task 688): "Diameter, Depth, Demand and Flow, Head", each a
+		      // selector of nearest 100, 10, 1, 0.1, 0.01, 0.001. The steps are numbers, not words, so
+		      // they are not language keys. "No rounding" is the default: rounding changes a number
+		      // beyond what the conversion itself does, so it is something a person asks for.
+		      //
+		      // Two columns (Tom, 2026-09-23): Round converted values, unchanged, and Label -- a
+		      // suffix appended after that quantity on the copy's own map labels, through the same
+		      // per-field labelSettings.suffix a Labels row already writes (js/looped-network.js
+		      // setLabelAffix()), pre-filled from the unit chosen above.
+		      //
+		      // **DEPTH (TANK LEVEL) HAS NO SUCH FIELD, AND ITS BOX IS DISABLED RATHER THAN
+		      // INVENTING ONE.** `level` is not one of nodeFieldDefs()'s rows. Making it one was
+		      // measured, not guessed: it touches defaultLabelSettings() in four places (the node
+		      // on/off map, its decimals map, and a RENUMBER of the seven-entry node priority rank
+		      // -- Task 445's drop order, which dev/lpn-spike/label-priority-harness.js and
+		      // node-shed-harness.js assert invariants over and would need new fixtures for), a new
+		      // LPN_NODE_DROP_RULE classification (a judgement call among 'like'/'low'/'extreme',
+		      // not mechanical), nodeFieldDefs() itself, and the value computed and pushed in BOTH
+		      // node label render paths (refreshLabelTextPass() and the single-element
+		      // refreshOneLabelInPlace() the stale-snapshot ruling requires) -- eight-plus touch
+		      // points across the map's core render and collision path, for a feature (a new kind of
+		      // map label) Tom has not asked for. That is Tom's call, not this wizard's. ?>
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></legend>
+			<div class="lpn-convas-round-head">
+				<span></span>
+				<span class="lpn-convas-round-col"><?=$ec_lang['lpn_convas_round']?></span>
+				<span class="lpn-convas-round-col"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></span>
+			</div>
+			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
+				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
+			<div class="lpn-convas-round-row">
+				<label for="lpn_convas_round_<?=$rk?>"><?=$ec_lang[$rkey]?></label>
+				<select id="lpn_convas_round_<?=$rk?>">
+					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
+					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
+				</select>
+				<?php // R-217 (Tom, 2026-09-24) dropped this row's own tip glyph for alignment; that
+				      // stands. Depth's suffix box is no longer disabled -- tank water depth is now a
+				      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three
+				      // (Tom, 2026-09-25). ?>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
+			</div>
+			<?php } ?>
+		</fieldset>
+		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
+		<div class="lpn-new-actions">
+			<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
+			<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
+		</div>
+	</div>
+</div>
+
 <?php // ---- THE GEOGRAPHIC PROJECTION BOX (ROADMAP Task 641 phase 2) ----------------------------
       //
       // Tom's summary, 2026-09-13: it *"uses the map view as a UX element to filter the universe of
@@ -1479,10 +1582,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
 <div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
-	<?php // The title carries the tip that says what choosing one COMMITS you to -- that nothing of
-	      // yours is converted, and that the choice is final. It is the phase-1 wording, moved from
-	      // the control that is gone to the box that replaced it. ?>
-	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_crs_tip'])?></div>
+	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
+	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
+	      // permanence-warning tip this title used to carry had no other reader and is retired
+	      // with it. ?>
+	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crsbox_title']?></div>
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
@@ -1753,8 +1857,10 @@ EngCalcs.pageConfig = {
 	lpn_find_value: <?=json_encode($ec_lang['lpn_find_value'])?>,
 	lpn_find_btn: <?=json_encode($ec_lang['lpn_find_btn'])?>,
 	lpn_find_filter_btn: <?=json_encode($ec_lang['lpn_find_filter_btn'])?>,
-	lpn_find_filter_table: <?=json_encode($ec_lang['lpn_find_filter_table'])?>,
 	lpn_find_filter_tip: <?=json_encode($ec_lang['lpn_find_filter_tip'])?>,
+	lpn_find_filter_row: <?=json_encode($ec_lang['lpn_find_filter_row'])?>,
+	lpn_find_filter_summary: <?=json_encode($ec_lang['lpn_find_filter_summary'])?>,
+	lpn_find_filter_none: <?=json_encode($ec_lang['lpn_find_filter_none'])?>,
 	lpn_find_op_contains: <?=json_encode($ec_lang['lpn_find_op_contains'])?>,
 	lpn_find_op_equals: <?=json_encode($ec_lang['lpn_find_op_equals'])?>,
 	lpn_find_op_gt: <?=json_encode($ec_lang['lpn_find_op_gt'])?>,
@@ -1994,6 +2100,10 @@ EngCalcs.pageConfig = {
       // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
       // already supplied further up this object; the elevation one was not supplied by anything. ?>
 	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
+	lpn_units_mapcoords_deg: <?=json_encode($ec_lang['lpn_units_mapcoords_deg'])?>,
+	lpn_units_usft: <?=json_encode($ec_lang['lpn_units_usft'])?>,
+	u_m: <?=json_encode($ec_lang['u_m'])?>,
+	u_ft: <?=json_encode($ec_lang['u_ft'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
@@ -2407,9 +2517,13 @@ EngCalcs.pageConfig = {
 	lpn_menu_map: <?=json_encode($ec_lang['lpn_menu_map'])?>,
 	lpn_basemap_show: <?=json_encode($ec_lang['lpn_basemap_show'])?>,
 	lpn_basemap_satellite_show: <?=json_encode($ec_lang['lpn_basemap_satellite_show'])?>,
-	lpn_file_import_geo: <?=json_encode($ec_lang['lpn_file_import_geo'])?>,
+	lpn_file_convert_as: <?=json_encode($ec_lang['lpn_file_convert_as'])?>,
 	lpn_copy_of: <?=json_encode($ec_lang['lpn_copy_of'])?>,
-	lpn_file_import_geo_tip: <?=json_encode($ec_lang['lpn_file_import_geo_tip'])?>,
+	lpn_convas_from: <?=json_encode($ec_lang['lpn_convas_from'])?>,
+	lpn_convas_no_transform: <?=json_encode($ec_lang['lpn_convas_no_transform'])?>,
+	lpn_convas_done: <?=json_encode($ec_lang['lpn_convas_done'])?>,
+	lpn_convas_cancelled: <?=json_encode($ec_lang['lpn_convas_cancelled'])?>,
+	lpn_file_convert_as_tip: <?=json_encode($ec_lang['lpn_file_convert_as_tip'])?>,
 	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
 	lpn_georef_step1: <?=json_encode($ec_lang['lpn_georef_step1'])?>,
 	lpn_georef_step2: <?=json_encode($ec_lang['lpn_georef_step2'])?>,
@@ -2467,6 +2581,7 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
 	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
+	lpn_georef_answered: <?=json_encode($ec_lang['lpn_georef_answered'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
@@ -2636,6 +2751,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_report_counts: <?=json_encode($ec_lang['lpn_inp_report_counts'])?>,
 	lpn_inp_report_clean: <?=json_encode($ec_lang['lpn_inp_report_clean'])?>,
 	lpn_inp_report_label_anchor: <?=json_encode($ec_lang['lpn_inp_report_label_anchor'])?>,
+	lpn_inp_report_no_crs: <?=json_encode($ec_lang['lpn_inp_report_no_crs'])?>,
 	lpn_inp_report_lead: <?=json_encode($ec_lang['lpn_inp_report_lead'])?>,
 	lpn_inp_drop_headloss: <?=json_encode($ec_lang['lpn_inp_drop_headloss'])?>,
 	lpn_inp_drop_tank_curve: <?=json_encode($ec_lang['lpn_inp_drop_tank_curve'])?>,

@@ -399,7 +399,7 @@ console.log('\n4. The file is written in the project\'s own units');
 	const sec = tokensBySection(out.inp);
 	ok('its length is the project\'s metres', sec.PIPES[0][3] === '300', sec.PIPES[0][3]);
 	ok('its diameter is the project\'s millimetres', sec.PIPES[0][4] === '200', sec.PIPES[0][4]);
-	ok('nothing was converted', !out.differences.some((d) => d.code === 'unit-converted'));
+	ok('no unit was rewritten', !out.differences.some((d) => d.code === 'unit-converted'));
 
 	// A US project writes GPM, and the SAME numbers -- the writer must not be quietly normalising.
 	const us = JSON.parse(JSON.stringify(doc));
