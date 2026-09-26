@@ -4669,13 +4669,17 @@ var EngCalcs = EngCalcs || {};
 			// extended period run's own frames (js/lpn-time.js) rather than computing anything of
 			// their own, so they sit with the EPANET run report rather than above the divider with
 			// Run and Fire flow -- nothing here is a criterion to set or a sweep to start.
+			//
+			// **THE ROW SAYS "Status"/"Full", NOT "Status report"/"Full report"** -- the parent
+			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
+			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status report',
+				icon: 'info', label: pc.lpn_reports_status || 'Status',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_full || 'Full report',
+				icon: 'info', label: pc.lpn_reports_full || 'Full',
 				tip: pc.lpn_reports_full_tip,
 				fn: function () { closeMenu(); openFullReportBox(); }
 			}
@@ -36344,7 +36348,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
@@ -51195,22 +51199,21 @@ var EngCalcs = EngCalcs || {};
 		if (fullPrintArea && fullPrintArea.parentNode) { fullPrintArea.parentNode.removeChild(fullPrintArea); }
 		fullPrintArea = null;
 	}
+	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
+	// does for the Tables pane; neither function touches the tab at all.
 	function printFullReport() {
-		var wasTitle = document.title;
 		if (!document.body) { return; }
 		endFullPrint();
 		fullPrintArea = fullReportPrintable(fullReportRows());
 		document.body.appendChild(fullPrintArea);
 		document.body.classList.add('lpn-printing-table');
-		// The suggested filename a browser's own "Save as PDF" offers is its document.title, so this
-		// is set to the same name the CSV download carries and restored once the dialog is done.
-		document.title = fullReportFilename('pdf').replace(/\.pdf$/, '');
-		function restore() { document.title = wasTitle; endFullPrint(); }
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
-			window.addEventListener('afterprint', restore, { once: true });
+			window.addEventListener('afterprint', endFullPrint);
 			window.print();
 		} else {
-			try { window.print(); } finally { restore(); }
+			try { window.print(); } finally { endFullPrint(); }
 		}
 	}
 	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
@@ -51218,8 +51221,27 @@ var EngCalcs = EngCalcs || {};
 		var box = fullBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
+	/**
+	 * **WHICH TIME STEP THE BOX SHOWS A TABLE OF.** Remembered across a rebuild (an edit, a new run)
+	 * so the reader is not thrown back to the first step every time the box repaints; not persisted
+	 * anywhere else, because which step somebody was reading is not a fact worth carrying past this
+	 * page load.
+	 */
+	var fullReportStepIndex = 0;
+	/**
+	 * **ONE STEP ON SCREEN AT A TIME, EVERY STEP IN THE DOWNLOAD.** Net3's 5,400 rows build and CSV
+	 * in well under 20 ms (dev/lpn-spike/report-harness.js), but a browser laying out 5,400 real
+	 * table rows -- 60,000-odd cells, with borders and padding -- is a different cost from building
+	 * the array, and a bigger network or a shorter reporting step multiplies both the row count and
+	 * that layout cost together. EPANET's own Full report is a text FILE meant to be scrolled or
+	 * searched in an editor, not a live web table repainted on every edit; the closest live-page
+	 * equivalent that stays responsive at any network size is one reporting step's rows on screen,
+	 * with a control to change which step -- so Download and Print (which build the whole document
+	 * once, off screen) carry every step, and the table in the box carries one.
+	 */
 	function rebuildFullReport() {
-		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_full_report'), rows;
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_full_report'),
+			rows, frames, stepRows, sel, body;
 		if (!host) { return; }
 		host.innerHTML = '';
 		rows = fullReportRows();
@@ -51227,8 +51249,36 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
 			return;
 		}
-		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.', host);
+		frames = reportFrames();
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || '{n} rows.').replace('{n}', String(rows.length)), host);
+		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
+		if (frames.length > 1) {
+			sel = document.createElement('select');
+			sel.id = 'lpn_full_step';
+			frames.forEach(function (f, i) {
+				var opt = document.createElement('option');
+				opt.value = String(i);
+				opt.textContent = EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(f.t) : String(f.t);
+				sel.appendChild(opt);
+			});
+			sel.value = String(fullReportStepIndex);
+			sel.addEventListener('change', function () {
+				fullReportStepIndex = +sel.value;
+				rebuildFullReport();
+			});
+			ffRow(host, pc.lpn_full_step_label || 'Time step', null, sel, '');
+		}
+		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
+		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+		stepRows.forEach(function (r) {
+			var tr = ffEl('tr', null, null, body);
+			ffCell(tr, r.type);
+			ffCell(tr, r.id);
+			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
+		});
 	}
 	function openFullReportBox() {
 		var box = fullBoxEl();

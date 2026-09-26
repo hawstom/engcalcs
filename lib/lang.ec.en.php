@@ -3296,7 +3296,10 @@ $ec_lang['lpn_energy_total_cost']='Total cost';
 // EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
 // simulation, in time order; Full lists every node and every link at every reporting time step.
 // Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
-$ec_lang['lpn_reports_status']='Status report';
+// **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
+// has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
+// lpn_status_title, keeps the full name.
+$ec_lang['lpn_reports_status']='Status';
 $ec_lang['lpn_reports_status_tip']='What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.';
 $ec_lang['lpn_status_title']='Status report';
 $ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
@@ -3312,11 +3315,13 @@ $ec_lang['lpn_status_dry']='{type} {id} is empty';
 $ec_lang['lpn_status_no_converge']='The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.';
 $ec_lang['lpn_status_note']='Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.';
 
-$ec_lang['lpn_reports_full']='Full report';
+// Same rule as Status above: the row says "Full", the box says "Full report".
+$ec_lang['lpn_reports_full']='Full';
 $ec_lang['lpn_reports_full_tip']='Every node and every link at every reporting time step of the last run, as one table you can download or print.';
 $ec_lang['lpn_full_title']='Full report';
 $ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
-$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.';
+$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.';
+$ec_lang['lpn_full_step_label']='Time step';
 $ec_lang['lpn_full_download_csv']='Download CSV';
 $ec_lang['lpn_full_print']='Print report';
 $ec_lang['lpn_full_col_time']='Time';

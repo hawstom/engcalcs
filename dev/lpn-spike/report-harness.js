@@ -202,6 +202,76 @@ const EngCalcs = global.EngCalcs;
 	check(junctionSpec && colOf(junctionSpec, 'pressure') && pipeSpec && colOf(pipeSpec, 'flow'),
 		'and the Tables pane\'s own column defs call the same accessors (paneColNodeResult / paneColLinkResult)');
 
+	// ---- 5. THE BOXES THEMSELVES: WHAT IS ACTUALLY IN THE DOM ------------------------------------
+	//
+	// **THE DEFECT PERRY'S PRE-REVIEW FOUND** (2026-09-25): rebuildFullReport() built the note and
+	// the row count and never inserted a table -- the box opened onto two sentences and nothing a
+	// reader could read. Section 4 above proved the DATA is right; this section proves the BOX shows
+	// it, by walking the real elements rebuildStatusReport()/rebuildFullReport() build, the way
+	// dev/lpn-spike/time-series-harness.js walks the chart rather than trusting the state behind it.
+	function walk(root, fn) {
+		(function w(e) { if (!e) { return; } fn(e); (e.children || []).forEach(w); }(root));
+	}
+	function byTag(root, name) {
+		const out = [];
+		walk(root, (e) => { if (String(e.tagName || '').toUpperCase() === name.toUpperCase()) { out.push(e); } });
+		return out;
+	}
+	function fire(el, type) {
+		((el && el._listeners && el._listeners[type]) || []).forEach((f) => f({ type: type, target: el }));
+	}
+
+	head('5. THE STATUS REPORT BOX: A TABLE, NOT JUST A SENTENCE');
+	L.openStatusReportBox();
+	check(byId.lpn_status_box.style.display === 'flex', 'the box actually opens');
+	let statusTable = byTag(byId.lpn_status_report, 'TABLE')[0];
+	check(!!statusTable, 'and it contains a table');
+	let statusRows = statusTable ? byTag(byTag(statusTable, 'TBODY')[0], 'TR') : [];
+	check(statusRows.length === events.length,
+		`with one row per event: ${statusRows.length} rows for ${events.length} events`);
+	const firstCells = statusRows.length ? byTag(statusRows[0], 'TD') : [];
+	check(firstCells.length === 2 && firstCells[1].textContent === events[0].text,
+		`and the first row reads the first event: "${firstCells[1] && firstCells[1].textContent}"`);
+
+	head('6. THE FULL REPORT BOX: A TABLE FOR ONE STEP, EVERY STEP REACHABLE');
+	L.openFullReportBox();
+	check(byId.lpn_full_box.style.display === 'flex', 'the box actually opens');
+	const perStep = d.nodes.length + d.links.length;
+	function fullTableRows() {
+		const t = byTag(byId.lpn_full_report, 'TABLE')[0];
+		return t ? byTag(byTag(t, 'TBODY')[0], 'TR') : [];
+	}
+	let fullRows = fullTableRows();
+	check(fullRows.length === perStep,
+		`the box shows one step at a time: ${fullRows.length} rows for ${perStep} elements, not all ${rows.length}`);
+	const fullHead = byTag(byId.lpn_full_report, 'TABLE')[0];
+	const headCells = fullHead ? byTag(byTag(fullHead, 'THEAD')[0], 'TH') : [];
+	check(headCells.length === 10 && headCells[0].textContent === (PC.lpn_full_col_type || 'Type')
+		&& headCells[1].textContent === (PC.lpn_full_col_id || 'ID'),
+		`the per-step table's own header is Type, ID and the eight result columns: ${headCells.map((c) => c.textContent).join(' | ')}`);
+	const stepSel = byTag(byId.lpn_full_report, 'SELECT')[0];
+	check(!!stepSel, 'a time-step selector is offered, since the whole run will not fit on screen at once');
+	check(stepSel && stepSel.children.length === frames.length,
+		`one option per reporting step: ${stepSel && stepSel.children.length} / ${frames.length}`);
+	// Switching steps must actually change what is drawn, not just the selector's own value.
+	const beforeFirstRow = fullRows.length ? fullRows[0].textContent : '';
+	stepSel.value = String(frames.length - 1);
+	fire(stepSel, 'change');
+	fullRows = fullTableRows();
+	check(fullRows.length === perStep, `still one row per element after switching steps: ${fullRows.length}`);
+	check(fullRows.length && fullRows[0].textContent !== beforeFirstRow,
+		'and the table redraws with the new step\'s own numbers, not the old ones');
+
+	// **RESPONSIVE ON NET3, MEASURED, NOT ASSUMED.** One step's table (nodes + links) is what a real
+	// browser lays out on every rebuild; the whole run's worth (Section 4) is what CSV/Print build
+	// off screen once. Both are timed so a future, bigger network has a number to compare against.
+	const t6 = Date.now();
+	for (let i = 0; i < frames.length; i++) {
+		stepSel.value = String(i);
+		fire(stepSel, 'change');
+	}
+	console.log(`  ..   stepped through all ${frames.length} steps of the per-step table in ${Date.now() - t6} ms`);
+
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);
 }());

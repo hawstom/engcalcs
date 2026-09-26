@@ -466,6 +466,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
   // harness -- the same silent hole the two boxes above it describe.
   'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_report',
+  // The Status report and Full report boxes (ROADMAP Tasks 716, 715). Same silent hole as the
+  // three boxes above: absent from this list, rebuildStatusReport()/rebuildFullReport() return at
+  // their first line and both reports are invisible to every harness.
+  'lpn_status_box', 'lpn_status_close', 'lpn_status_report',
+  'lpn_full_box', 'lpn_full_close', 'lpn_full_csv', 'lpn_full_print', 'lpn_full_report',
   // The Libraries box -- patterns, controls and curves (Tasks 462/460), and since 2026-09-05 the
   // fourth box that remembers where it was left, how big it was made and whether it was open.
   // Absent from this list, wireLibraryBox() and openLibraryBox() both return at their first line,
