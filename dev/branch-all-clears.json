@@ -187,6 +187,13 @@
             "words": "8115 reports: Merge. Very nice. And the file name was good.",
             "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
             "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+        },
+        "feat/table-editing": {
+            "head": "23535175",
+            "date": "2026-09-26",
+            "words": "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete.",
+            "context": "Said 2026-09-26 evening after his browser pass on port 8105, in the same message as R-285 (\"Yes. It's perfect. We are gold now.\"). Recorded on his explicit approval, the permission guard having refused the edit.",
+            "pin_note": "HE CLEARED IT AT c28c6f3c AND THE PIN IS LATER: a merge of master and the regenerated translation payloads, nothing of the branch's own."
         }
     }
 }
