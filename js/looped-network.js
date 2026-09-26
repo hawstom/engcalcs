@@ -23877,7 +23877,16 @@ var EngCalcs = EngCalcs || {};
 		// Tab, a click, or anything else that lands the caret in a cell IS a selection -- so the
 		// keyboard picks up where the hand left off, with no separate act of selecting.
 		table.addEventListener('focusin', function (e) {
-			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c, t = e.target;
+			// **TAB SELECTS THE WHOLE VALUE, AND READY MODE MUST NOT SHOW IT** (Tom, 2026-09-26,
+			// fifth pass: *"spreadsheets don't highlight cell contents in Navigation (Ready) mode.
+			// When I tab from cell to cell, the only indicator I should see is cell outline."*).
+			// paneFocusCell() already selects no characters; native Tab does -- Chromium selects all
+			// of a text input it tabs into, read-only or not (measured: 0..5 of "38.68"). Collapsed
+			// here, for every way in, so a cell that is not being typed in never looks like one.
+			if (t && t.tagName === 'INPUT' && t.type === 'text' && t.readOnly && t.setSelectionRange) {
+				try { t.setSelectionRange(0, 0); } catch (e2) { /* a detached input has no range */ }
+			}
 			if (!td || spec._selMoving) { return; }
 			// **A RIGHT PRESS INSIDE THE SELECTION HAS ALREADY SAID "LEAVE IT ALONE"** -- see the
 			// mousedown below. A right-click focuses the box under the pointer exactly as a left

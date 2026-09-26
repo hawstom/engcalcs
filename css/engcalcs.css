@@ -2481,6 +2481,11 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
    native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
 .lpn-pane-table tbody td input[readonly] { user-select: none; }
+/* **AND TAB'S OWN SELECT-ALL IS NEVER SEEN** (Tom, 2026-09-26, fifth pass: *"When I tab from cell
+   to cell, the only indicator I should see is cell outline."*). Chromium selects the whole value of
+   a text input it tabs into, `user-select: none` or not; the focusin handler in paneWireTable()
+   collapses it, and this is the second half for the frame before that runs. */
+.lpn-pane-table tbody td input[readonly]::selection { background: transparent; color: inherit; }
 /* **EVERY ROW IS A WHOLE NUMBER OF PIXELS TALL, SO A SCROLL CAN LAND EXACTLY ON ONE** (Tom,
    2026-09-21, R-112: *"There is a slight calculation error that makes the top border of the top
    cell row not quite coincide with the bottom border of the headings, and vary in that from about
