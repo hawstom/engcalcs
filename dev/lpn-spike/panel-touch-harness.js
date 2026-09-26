@@ -170,7 +170,13 @@ console.log('\n--- a panel that opens comes to the front ---');
 		[/^panel @/, 'openPanelAtAnchor(): the menus, their fly-outs and the panels that hang off a '
 			+ 'control. These live in the CHROME band by Tom\'s 2026-08-24 ruling and must NOT be '
 			+ 'raised into the 1200 band -- a menu belongs to the button that opened it. The six '
-			+ 'standing boxes that ALSO hang off a control go through placePanelForScreen().']
+			+ 'standing boxes that ALSO hang off a control go through placePanelForScreen().'],
+		[/^marker @/, 'paneStartColDrag() (2026-09-26, fourth pass): the column-drag insertion '
+			+ 'marker, a thin line at the edge of the heading the pointer is nearest. It holds no '
+			+ 'control, has no drag of its own, no resize, no stored geometry and nothing '
+			+ 'focusable to trap -- the same reasoning as the select-area marquee below -- and it '
+			+ 'is built and destroyed with the drag itself, never left standing for hidePanel() to '
+			+ 'find.']
 	];
 	const undeclared = shows.filter(function (s) {
 		return !NOT_A_PANEL_SHOW.some(function (r) { return r[0].test(s); });
@@ -216,6 +222,8 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
+		[/marker\.style\.display = 'none';/, 'the column-drag insertion marker (2026-09-26, fourth '
+			+ 'pass), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/box\.style\.display = 'none'; box\.textContent = '';/, 'the select-area instruction bubble, which holds no control'],
 		[/el\.style\.display = 'none'; \}\n\t\ttry \{ localStorage\.setItem\(MENU_CUE_KEY/,
 			'the one-time menu cue (Task 625): a line of text and a dismiss button, with no drag, '
