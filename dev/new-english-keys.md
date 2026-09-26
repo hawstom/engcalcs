@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 268 untranslated keys, of 2106 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read on master**, of 271 untranslated keys, of 2102 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (268, 2 to read @@ NEEDS RULING)
+## lpn_  (271, 6 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -93,6 +93,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_copy_of`**
   > Copy of {name}
   _Ruled OK 2026-09-23._
+- **`lpn_crs_count_network`**
+  > {n} of {total} coordinate systems cover this network.
+  @@ NEEDS RULING
 - **`lpn_crs_unnamed`**
   > unnamed
   _Ruled OK 2026-09-23._
@@ -208,8 +211,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Convert as…
   _Ruled OK 2026-09-25._
 - **`lpn_file_convert_as_tip`**
-  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  _Ruled OK 2026-09-25._
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.
+  @@ NEEDS RULING
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
@@ -255,6 +258,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_full_title`**
   > Full report
   _Ruled OK 2026-09-26._
+- **`lpn_geomap`**
+  > georeferenced
+  @@ NEEDS RULING
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
@@ -819,6 +825,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_units_usft`**
   > US survey ft
   _Ruled OK 2026-09-25._
+- **`lpn_xymap`**
+  > local
+  @@ NEEDS RULING
 - **`lpn_zoom_in`**
   > Zoom in
   _Ruled OK 2026-09-25._
@@ -836,7 +845,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 5 unmerged branch(es).
+**2 still to read**, of 5 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -847,9 +856,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`6f14fcdc`) — adds no English strings
+### chore/handoff-0926c (`588e5257`) — adds no English strings
 
-### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
+### feat/label-gang-search (`c0104534`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -861,8 +870,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/property-venue (`fd490dd0`) — adds no English strings
+### feat/placement-wizard (`a71841ad`) — adds no English strings
 
-### feat/table-editing (`b7bfdc95`) — adds no English strings
+### fix/table-help (`ae43f013`) — 2 new, 2 to read @@ NEEDS RULING
 
-### fix/usage-report-memory (`bbdac569`) — adds no English strings
+- **`lpn_notes_7_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_notes_7_term`**
+  > Table keyboard shortcuts
+  @@ NEEDS RULING
