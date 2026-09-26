@@ -52,7 +52,7 @@
 
 // Measured 2026-09-09: 199 when this check was written, 52 the same day once the sweep below the
 // three heaviest files had been done. It may fall; it may not rise.
-const EC_HARNESS_WORDING_BASELINE = 49;   // 51 -> 49 on 2026-09-17: the two initials-box pins went with the box (Task 667(b)).
+const EC_HARNESS_WORDING_BASELINE = 47;   // 49 -> 47 on 2026-09-22: two pins went with the retired Map-menu rows' browser specs (feat/map-menu).
 
 /**
  * THE DECLARED EXCEPTIONS, keyed on the file and the EXACT literal, with the reason each one is
@@ -119,6 +119,12 @@ const EC_HARNESS_WORDING_EXCEPT = [
         'nobody can write back' =>
             '(a) read off the shipped lpn_wrong_tip. The tip promising no reply is the whole point '
             . 'of the feedback link\'s honesty, so this is meant to go red if it stops saying it.',
+    ],
+    'dev/lpn-spike/label-limit-parity-harness.js' => [
+        'This has no effect if it is larger than the similar setting for all labels' =>
+            '(a) asserted against PC.lpn_labels_customer_width_tip: the assertion IS that Tom\'s own '
+            . 'qualifier sentence, verbatim, is present in the customer row\'s shipped tip -- the '
+            . 'sentence going missing or getting paraphrased is the defect this line exists to catch.',
     ],
     'dev/lpn-spike/pane-print-harness.js' => [
         'Elm Street Center' =>

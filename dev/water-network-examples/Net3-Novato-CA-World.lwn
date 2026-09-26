@@ -2493,6 +2493,15 @@
 				"x": "25.00",
 				"y": "31.10"
 			}
+		},
+		{
+			"id": "X3",
+			"text": "Zoom in to see labels",
+			"x": -122.53577278426837,
+			"y": 38.09628931881564,
+			"anchorNode": null,
+			"sizeMult": 4,
+			"allZoom": true
 		}
 	],
 	"nextId": {
@@ -2641,11 +2650,12 @@
 			"computation": false,
 			"files": false
 		},
-		"textSize": 11,
+		"textSize": 12,
 		"symbolSize": 12,
-		"linkWidth": 6,
+		"linkWidth": 4,
 		"symbolOpacity": 1,
-		"backdropOpacity": 1,
+		"backdropOpacity": 0.5,
+		"labelMaxWidth": 65000,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,
@@ -2660,7 +2670,6 @@
 		"colorClassesLink": 7,
 		"colorReverseNode": false,
 		"colorReverseLink": false,
-		"colorThematic": false,
 		"colorLegendPosition": "middle-right",
 		"colorBreaks": {
 			"node.demand": [

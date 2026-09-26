@@ -110,10 +110,6 @@ function ecJsFunctionBody(string $js, string $name): ?string
  * The four CLAUDE.md names, plus the two it does not.
  */
 const EC_LPN_FURNITURE = [
-    // **WHETHER ONE READER HAS FOUND THE MENU BAR IS A FACT ABOUT THAT READER** (Task 625). The
-    // cue retires when they open any menu; a colleague opening the same file has not found it yet
-    // and must still be shown it, which is exactly why this cannot ride in the project.
-    'lpn_menucue'     => 'whether the one-time cue pointing up at the menu bar has been retired',
     'lpn_pane'        => 'height and open tab of the bottom pane',
     'lpn_rpane'       => 'width of the right pane',
     'lpn_setbox'      => 'position and size of the Settings box',
@@ -122,9 +118,14 @@ const EC_LPN_FURNITURE = [
     // The four report boxes, on Tom's word (2026-09-08: *"only Settings and Libraries survive a
     // reload... Fix this."*). Same purpose and the same shape of record as the three boxes above.
     'lpn_ffbox'       => 'position, size and openness of the Fire flow box',
+    'lpn_panecols'    => 'how wide each table column was dragged and what order the reader put the '
+        . 'columns in -- a fact about the screen and about this afternoon\'s job, not about the '
+        . 'network (Task 690, Tom\'s spreadsheet points (d) and (e))',
     'lpn_energybox'   => 'position, size and openness of the Pump energy report',
     'lpn_cmpbox'      => 'position, size and openness of the Scenario comparison box',
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
+    'lpn_statusbox'   => 'position, size and openness of the Status report box (Task 716)',
+    'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about
     // the person at the screen. A colleague opening the file would otherwise inherit the answer.

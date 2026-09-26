@@ -120,6 +120,12 @@ const ls = L.labelSettings();
 Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
 L.settings().alignPipeLabels = true;
+// R-205 (2026-09-24) gave this SHIPPED example its own labelMaxWidth of 65000 ft (~19.8 km), so
+// this file's own zoom of 5000 (a ~24.5 km view) now falls beyond it and hides every label outright
+// -- a different mechanism from the property-shedding this harness exists to test. Neutralised
+// here, on the fixture's IN-MEMORY copy only (the shipped file itself is untouched), so this harness
+// keeps testing the thing its name says.
+L.settings().labelMaxWidth = null;
 
 let doc = L.getDoc(), nodeEls = L.nodeEls();
 let cx = 0, cy = 0;

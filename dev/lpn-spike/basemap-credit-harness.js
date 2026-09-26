@@ -202,8 +202,8 @@ async function main() {
 	ok('and no number of presses can leave the map bare', L.basemapOn(),
 		'on=' + L.basemapOn() + ' style=' + L.style());
 	// Hand section 2 the state it starts from. The presses above end on satellite, and the next
-	// block's first assertion is that ASKING for satellite fetches Mapbox tiles -- which the OFF
-	// toggle would defeat. Reset explicitly rather than by counting presses.
+	// block's first assertion is that ASKING for satellite fetches Mapbox tiles. Reset explicitly
+	// rather than by counting presses.
 	L.setStyle('osm');
 
 	// ---- 2. the other ways the tiles change ---------------------------------------------------------
@@ -213,8 +213,8 @@ async function main() {
 		tileHosts().length > 0 && tileHosts().every(h => h === 'api.mapbox.com'), tileHosts()[0]);
 	invariant('after switching to satellite');
 
-	L.setStyle('satellite');   // the same style again is the OFF toggle
-	ok('asking for the style already showing turns the basemap off', !L.basemapOn());
+	L.setStyle('off');   // off is asked for by name since 2026-09-22; the same-style toggle is gone
+	ok('turning the basemap off', !L.basemapOn());
 	invariant('with the basemap off');
 
 	L.setStyle('osm');

@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-157.
+**An ID is permanent and never reused.** Next free: R-283.
 
 ---
 
@@ -37,102 +37,15 @@ judgement and does not belong to a script.
 
 - [ ] R-004 -- | "A name given once for one purpose becomes a standing per-browser label": Confirmed. And we are adding "Not you? Change this" opportunities. -- Task 698 ruled; his answer to handoff decision 9
   - TGH testing 2026-09-18 22:01 UTC · 37f05c7e: (1) The banner message about "We asked your colleague to close the file" disappeared too fast and unrecoverable "Help! What did I miss!" We need a better messaging system. We talked about the QGIS system. Maybe open a feature branch for Error and notice messaging system.
-
-### feat/customer-find-labels
-
-- [x] R-011 feat/customer-find-labels | Reword this alert: "The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation." -- feat/customer-find-labels 4f15643b -- HIS EXACT WORDS, which carry no glyph, so the caution mark came off with the old sentence. One edit to restore it if he wants it
-  - Restore the glyph.
-  - DONE f299377c: the value leads with the caution glyph again and carries no marker word, which is the convention. `customer-harness.js` asserts the INVARIANT -- one glyph, leading, with text after it -- rather than pinning his sentence as a literal
-- [x] R-013 feat/customer-find-labels | Widest view: Add a "Use current view" button like the other one we restored in a different branch. -- feat/customer-find-labels 4f15643b -- same words, same key, same behaviour as the one on feat/label-gang-search, rounding the width UP
-  - I can't find this in this branch.
-  - 2026-09-21: "'Use current view' button of 'Widest view that attempts to display customer labels' uses height (I think), not width. Then it's applied as advertised, to width. So it appears not to work."
-  - DONE: the button was there and he is right about both halves. It captured `mapSpan('min')`, which on a landscape window is the HEIGHT (1,000 ft on a 2,000 ft view), and in WORLD units, which on a geographic project are DEGREES (0.005 against the 2,880 ft the box is read as). It now captures the same quantity the gate compares against. `dev/lpn-spike/customer-view-capture-harness.js`
-
-### feat/xy-world-map
-
-- [x] R-019 feat/xy-world-map | Mapbox satellite is connected and working, a little. I am getting huge hesitance to load tiles I need. I see tiles around the edges of my map. Zooming in and out coaxes the tiles slowly to load, but it's a slow and uncertain slog. Frustratingly, it's the area I care about most that disappears when I zoom in, while peripheral tiles keep showing. Can you please debug this? How can we get what we need from Mapbox? -- feat/xy-world-map 4505b5db -- MEASURED: tiles were requested from the WEST EDGE across, so the middle of the screen sat about 35th in a queue of up to 192; and every wheel nudge deleted the whole picture and restarted the queue from that same corner. Centre-out now, and the old picture stays up underneath -- **CLOSED BY HIM 2026-09-21: *"?debug=tiles: I think we are good now."*** Five measured causes in all, and the readout is on master
-  - TGH 2026-09-19 23:55 UTC · 731ab367: Still missing some tiles. Usable, but frustrating. Not good for my reputation. I pasted an image in chat.
-  - INSTRUMENT, not a fifth guess: add `?debug=tiles` to the page URL and a panel in the lower right says, for the view on screen, how many tiles were wanted, came from the cache, were requested, arrived, were drawn, failed, were retried and are still outstanding -- and names every failure with the answer the network gave. Please read it off the screen where you see the white squares and tell us the numbers.
-
-### feat/tables-spreadsheet
-
-- [x] R-032 feat/tables-spreadsheet | I think that there is a fourth mode: Navigation, the part of what I called Entry when no characters are being typed. Check the literature. I will refer to this, but set me straight so we aren't inventing things we shouldn't invent. -- ANSWERED: your fourth mode is real. Excel calls it Ready; W3C calls it navigation mode. dev/tables-spreadsheet-modes.md. His call: rename our Select mode to Ready -- ANSWERED BY HIM: *"There is another mode, and it is Select. So there are four modes. Call them what you want: Ready/Navigate, Enter/Entry, Edit, Select."* See R-063
-- [x] R-035 feat/tables-spreadsheet | When I type into any cell after any Undo and press Enter, Tab, or Arrow, my entry is reverted, which is bad. -- **SHIPPED**, feat/tables-spreadsheet `23a57157`. An Undo makes a fresh copy of the network and every cell on screen still pointed at the discarded one. **He confirmed it 2026-09-21: *"Successful: Entry is fast and undo works."***
-- [x] R-037 feat/tables-spreadsheet | Right-clicking anywhere in a selection should not perturb the selection. But I see it changing the selection to the right-clicked cell. -- feat/tables-spreadsheet f688970a
-- [x] R-038 feat/tables-spreadsheet | A selection should highlight cells, not characters. But I see characters highlighting as in Entry mode when selecting by mouse. -- feat/tables-spreadsheet f688970a -- **SHIPPED**, feat/tables-spreadsheet `4fc86c07` + `4cfbd343` + `03ffb466`. Three commits because the first fix OVERREACHED -- it blocked the browser press on every cell including the one being typed in, so the mouse could no longer place the caret. Perry found that; it is repaired and mutation-tested four ways. He did not re-report it on his 2026-09-21 pass
-  - TGH: Still manifesting 2026-09-20 00:39 UTC · abf10dc1
-
-### Defects found while reviewing
-
+  - TGH 2026-09-22 I hope to test later.
 
 ### Standing work he named
 
 - [ ] R-043 -- | I still need to test (and admire) label placement, solver bar, etc.
 - [x] R-044 -- | The label work is a debugging job he has forbidden papering over, and "let labels look further" is ranked third, behind the switchboard and the sector question. -- carried from the previous session; the three handoff decisions remain his
 
-### Raised by the work, and his to decide
-
-- [x] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build -- HIS RULING: *"Sorry. I will have to trust you. Hopefully it is done right so that it does not manifest later. If you really want me to see it, hold my hand and take me there."* So it is OURS TO BUILD, and it must come with a regression check so it cannot come back unseen. See R-066
-
-### On master -- the recalculate-off fix overreached
-
-- [x] R-046 fix/recalc-trust-user | **ALL THREE OF HIS NOTES ARE SHIPPED, on master at `2d718fd4` (`fix/stale-is-a-snapshot`), and he has not pulled it yet.** An edit now rewrites only its OWN label and moves only that one label; Tables hears Properties, a direction that was simply missing; every stale result stays put in Tables, Properties, the status bar and the run report; and the fire flow rings survive an edit and gained the Clear button he asked for (`lpn_ff_clear`). Recalc off Old values: Leave in place stale. Don't clear. Trust the user. -- fix/recalc-trust-user 313a8656 -- stale numbers stay exactly where they are, and the page says nothing about them. Key `lpn_manual_results_cleared` DELETED
-  - Any input we edit must be reflected wherever it shows, Table, Properties, and map labels. We can make an exception to label placement passes for this label update, and we can have tunnel vision on only the label we change.
-  - Tables and Properties—*everything*—should show the stale results while user continues to work. Keep on showing and let user decide when to recalculate. Off means Off, but it doesn't mean Hide or Delete. It means Snapshot in time.
-  - CC asked TGH: "Fire flow rings still clear themselves on edit and still say so. That predates today and has its own sentence in 27 languages. It left it alone rather than quietly extend your ruling. Want it to follow "leave it stale" too?" TGH: Yes. The reason I am saying Yes to everything is that if we clear these things prematurely, it robs the user of an important point of reference. It's important to leave some value in the model when we have it. That said, for fire flow rings, we could provide a button in that box to clear the rings.
-
-### Process
-
-- [x] R-048 -- | Reviewer: I didn't have in mind a review assistant. I had in mind a pre-reviewer, but I guess you already do the best you can with that. I just want independent review, not self-review, of all work before I see it. This could save me review time. But if you have a vision for a review assistant, that could be helpful too. -- SEAT HIRED: `.claude/agents/pre-reviewer.md`. It reviews work it did not write, on every branch, before he is told the branch is ready, and it REPORTS rather than fixes. **It needs a name from him.**
-  - TGH: Perry the pre-reviewer.
-
-### feat/customer-find-labels
-
-- [x] R-051 feat/customer-find-labels | The labels are hiding the service line. They need to be moved away about 1px or 2px or their halo needs to be that much smaller. -- feat/customer-find-labels ffd11548 -- the LABEL moved, not the halo, because the halo style is shared by every label on the page. Clearance was EXACTLY ZERO and is now about 1.4 px. CONFIRMED by the pre-reviewer, mutation-tested independently
-  - (1) The labels are not taking into account the width of the service line. So at close zoom, they are on the service line. (2) The service line is fixed map width. It should be a lesser multiple of the link width or always just 1 px until we get to the zoom where everything stops growing (see 2026-09-21 request about new zoom rules), at which point it shrinks below 1px. 
-  - DONE 64344765: (1) the label's clearance now adds the service line's own half drawn width at the current zoom, so it is not a constant. (2) the line is `max(0.5 x link width, 1 px)` on SCREEN at every zoom -- his floor, capped so a service is never as heavy as the main it hangs off -- at a 1 px pipe a 1 px floor drew them equal, and the Settings box accepted a typed 0.5 against its own declared minimum, which drew the service THICKER. Both fixed. The third clause, shrinking BELOW a pixel, waits on Task 705 and is his to discuss. `dev/lpn-spike/customer-view-capture-harness.js` section 4
-- [x] R-053 feat/customer-find-labels | Like most of the label placement, I see a mystery. I see a row of labels along the service lines with a few beyond the meter. I see that these would conflict with a link label, but if so, maybe we should calculate the standard location for all to accomodate a link label. -- **YOU WERE RIGHT AND THE BRANCH SAID YOU WERE WRONG.** A first answer concluded the blocker is never a link label; the pre-reviewer found its test drawing put customers at round numbers while a long pipe REPEATS its label at two other points, so the case was never tested. One customer placed at a repeat point: `DROPPED -- first blocked by label of L1`. **A link label does block, and when it does the customer label disappears entirely rather than moving.** Back with the build agent
-  - TGH: 2026-09-19 Still need to "calculate the standard location for all to accomodate a link label" as above so nothing has to dodge a link label.
-  - DONE a84da469: position 1 reserves the room a link label could occupy IN ADVANCE, whether or not one falls at that station, so no customer label dodges one. `customer-label-cause-harness.js` stands its customers ON the repeat stations, which the first fixture never did: 0 of 28 dropped, 0 of 6 blockers a link label. The ordinary-street drop rate is now **0.0% to 1.6% per side, median 0.8%, pooled 0.8% of 2,500 services across ten seeds** -- reported as a RANGE because one seed of it is not the rate; an earlier note here quoted a single draw. The two sides are the same now, which is itself the result: the pipe-label side used to be the worse one
-
-### feat/xy-world-map
-
-- [x] R-056 feat/xy-world-map | There are still a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw these tiles. -- feat/xy-world-map 448533f6 -- MEASURED: the wheel is NOT the cause; four burst gestures at four speeds produced zero blanks. **A tile whose request FAILED was never asked for again.** With 33 of 105 knocked out and a perfect network restored, all 33 were still blank after 30 seconds and 18.8% of the map was white; only a gesture needing different tiles ever repaired it. His own phrase was the lead: "as if we decided not to draw these tiles" -- we did. Three retries now, widening, then stop. 100% filled after fifteen seconds with no gesture -- **CLOSED BY HIM 2026-09-21 together with R-019: *"I think we are good now."***
-  - This is still happening 2026-09-19. See 2026-09-21 chat.
-
-### feat/tables-spreadsheet
-
-
-## Round of 2026-09-19, fourth pass
-
-### feat/tables-spreadsheet
-
-- [x] R-065 feat/tables-spreadsheet | There is still an unbelievable delay when speed-entering a column. It's not huge. It's small. But it's unbelievable because nothing else should be happening. There's no recalculation, no reformatting, etc. And this worries me very deeply because it is a sign of pervasive bad coding. -- **CLOSED.** His own follow-up: *"This is getting better. It is fast enough for me now. But is it fast enough for Declan?"* Declan answered YES with numbers (R-080). What he found on the way is Task 706, now built and closed
-  - TGH: This is getting better. It's fast enough for me now. But is it fast enough for Declan?
-
-### The one that is bigger than a branch
-
-- [?] R-062 -- | I want your advice about how I can spend some significant resources to do a deep code review to ensure we don't have a code base full of AI techno-slop.
-  - **ADVICE, 2026-09-21, and it is a plan rather than a product recommendation.** The tool already exists and **only you can start it**: `/code-review ultra` launches a multi-agent cloud review of the current branch, or `/code-review ultra <PR#>` for a GitHub pull request. It is billed. No AI here can launch it, and none should pretend to.
-  - **DO NOT POINT IT AT THE WHOLE TREE.** `js/looped-network.js` alone is tens of thousands of lines; a review of everything at once returns a list nobody acts on, and an unactioned list is worse than no review because it reads as a clean bill of health afterwards. **One area per run, on a branch, with the findings worked before the next run.**
-  - **THE ORDER I WOULD SPEND IT IN, highest value first, with the reason:**
-    1. **`js/looped-network.js`'s write seams** -- `setProp()`, `afterPropertyEdit()`, `updateNode()`, the save path. Every expensive defect this project has had lived at a seam two callers disagreed about, and the free tier cannot see design.
-    2. **The unit and conversion boundary** -- `js/Calculators.lib.js`'s three seams and `EngCalcs.unitFactor()`. Silent, wrong by a factor, and only for half the world.
-    3. **The solver and the EPANET bridge** -- `lpn-solver.js`, `lpn-epanet.js`. Numerically checked against EPANET already, so what a review buys here is structure rather than correctness. Lowest of the three.
-  - **AND THE CHEAPER THING FIRST, because it costs nothing and would change what the paid review finds:** the 41 rules in `CLAUDE.md` that no check holds (`dev/enforceable-rules-survey.md`, 75 enforced, 4 holdable, 41 permanently prose). Every rule that became a script stopped being violated. A paid review that finds violations of rules a script could have held is money spent on a problem with a free fix.
-  - **What it will NOT tell you:** whether the FEATURE is finished. That is still only you. Perry covers the middle ground for free, on every branch, and has earned it five rounds running.
-
-### feat/xy-world-map
-
-  - I would like you to try to show this problem to me unless it has been fixed. If it has been fixed, please delete this.
-
 ## Round of 2026-09-21 -- after two days of his own testing
 
-- [x] R-070 -- | Site check: why am I getting this? I thought I was getting only an email at 8:00 every day. -- **ANSWERED, and the failure is spurious.** Two different cron jobs. The 8:00 one is the DAILY REPORT (22:00 CDT on the server, which is 20:00 in Phoenix). The 2:22 AM one is the PAGE CHECK (04:20 CDT = 02:20 Phoenix), and **it mails only when something is wrong** -- so receiving it at all means a failure. The failure is `https://librewaternet.org/tools/build-chrome.php HTTP 403`, and **403 is the correct and desired state**: that directory is the remote-execution exposure closed on 2026-09-18. **The server's copies of the check config are STALE.** This repository excludes the whole `/tools/` directory and asserts it unreachable in `check.mustblock`; the server's `~/check.exclude` names only `build-features.php` and its `~/check.mustblock` names neither. `host_script_parity_check.php` reports both as DIFFERS. One command from him fixes it
-- [x] R-071 -- | About: add the fact that HawsEDC Engineering Calculators have been offered freely online since 2010 (established via the Internet Archive Wayback Machine). -- the Mission paragraph now opens *"HawsEDC Engineering Calculators have been online since 2010."*
-- [x] R-072 -- | About: revise to "The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run." -- his exact sentence, in place
-- [x] R-073 -- | Reviewer's name: "Perry the pre-reviewer." -- `.claude/agents/pre-reviewer.md` and the roster
-- [x] R-074 -- | Roadmap: eleven closed or deleted, twenty moved, his notes on 696, 653 and the water tower added, three new tasks opened (703 satellite tiles, 704 messaging, 705 zoom rules)
 - [ ] R-075 feat/label-gang-search | I am never going to be happy until I can add 12345678 to the node ID prefix without moving or hiding any of the labels shown. Any such moving or hiding is a blatant bug since adding that string **however** causes no conflicts with anything all the way to Japan. May as well not dodge it, hide it, or paper over it. Find out why it's happening and fix the bad rules.
   - 15065f26 (2026-09-22): now TRUE at 4x and 8x on Net3 and Net3-World, zero moved and zero hidden, asserted by dev/lpn-spike/label-prefix-acceptance-harness.js. NOT yet at the fit view: Net3-World moves 18 and hides 27 (was 36 and 30), where 29 genuinely had nowhere to grow.
   - 1210139e (2026-09-22, after master's symbol cap), empty prefix -> 12345678, of labels the short layout drew: **fit view Net3-World 5 moved / 18 hidden, Net3 7 / 16; 2x 5 / 11 and 3 / 6; 4x and 8x 0 / 0 on both.** At the fit view 18 and 19 labels had nowhere to stay whatever the placer did. Open until the fit view is zero or you rule that floor acceptable.
@@ -140,133 +53,12 @@ judgement and does not belong to a script.
 - [ ] R-077 feat/label-gang-search | The four corner positions: I assume they are relatively cheap, and that we can record the zoom at which they are no longer effective (and clear that when Symbology or Appearance is changed?).
 - [ ] R-078 feat/label-gang-search | Based on the switchboard, I guess spot route is not yet programmed since it doesn't do anything. I can't get anything to work except the checkboxes; from those it looks like corners and ring combined are producing nice results.
 - [ ] R-079 feat/label-gang-search | "Publishing those gaps as a ranked list instead of a single winner is a change where it's consumed, not a new model." Do that? Or we already did?
-- [x] R-080 -- | Is it fast enough for Declan? -- **HIS ANSWER IS YES.** About 10 ms of work behind one committed cell on a 400-element network, against the fastest pace a person can sustain (a quarter to a third of a second a row) -- 3 to 4% overhead, which does not register. **And the cost is PER CELL COMMIT, never per keystroke**: nothing fires while you type. He also refused to let a performance win read as the bigger story -- his top item is still Task 610, paste that CREATES rows, *"because the network has to exist first"*. What he found on the way is Task 706
-- [x] R-081 -- | WaterModels.jl: what is it and what can we do with it? -- **MARY'S ANSWER IS "NOTHING", CLEANLY.** It is **not a file format**: it is a Julia package from Los Alamos, DOE-funded, doing OPTIMIZATION on water networks (best pump schedule, best pipe design under a budget) rather than simulation. It READS EPANET `.inp`, which we already read and write byte-identically, so it unlocks nothing there; its own JSON is a private wire format for a math solver and **nothing outside its own sibling packages reads it**. Modified BSD, LANL-ANSI, 77 stars, last push April 2025, research-paced. **No utility adoption found anywhere** -- every result naming it was itself a national-lab paper. Not an importer, not a dependency, not a citation on `dev/positioning.md`, which is for tools our users actually choose between. The one idea she kept, as speculation only, is its named *candidate, not-yet-built pipe* state, which `lpn_` has no equivalent of
-- [x] R-082 feat/tables-spreadsheet | **PERRY FOUND A CRASH, not Tom.** Open a node's Properties, then rename that same node in the table below it: the page throws. The table's rename calls the same FUNCTION as Properties but not the same DOOR -- Properties updates the popup's own id before refreshing, the table does not, so the popup re-renders by an id that no longer exists. Back with the build agent -- **SHIPPED**, feat/tables-spreadsheet `10f1277e`, with the exact steps asserted in `pane-review-harness.js`
-- [x] R-083 feat/tables-spreadsheet | **PERRY FOUND A SECOND ONE.** Delete on a selection that includes the ID column fires one blocking dialog PER ROW -- three rows, three dialogs; dozens of rows, dozens of dialogs before the page is usable. No data is lost. Back with the build agent -- **SHIPPED**, feat/tables-spreadsheet `10f1277e`. One question for the whole selection
-
-## Round of 2026-09-21b -- his list after the branch previews
-
-### Production and the host
-
-- [x] R-084 -- | "Note that the command you gave me is invalid. Please ssh into production, clean up (git status is dirty), and do what you need to do for this `cd ~/webdev/hawsedc.com/engcalcs && sh dev/host/install.sh`" -- **HE WAS RIGHT AND THE COMMAND COULD NOT HAVE WORKED.** `~/webdev/...` is a path on HIS machine and does not exist on the server; and `install.sh` did not copy `check.mustblock` at all, which is the file the R-070 fix lives in. Both fixed: the installer now installs it, and it was run on the host out of `~/tgh/engcalcs-report` (the report checkout, which is the one allowed to pull -- production may never fetch). `~/check.exclude` and `~/check.mustblock` were both stale and are now current; `sh ~/check.sh` exits 0 and silent. **Neither production checkout was dirty:** `~/addon_html/hawsedc.com/engcalcs` is clean on master at 2751faba and `~/dev_html/hawsedc.com/engcalcs` is clean on feat/lock-initials-later at 37f05c7e
-
-### feat/tables-spreadsheet -- his fourth round
-
-- [x] R-085 feat/tables-spreadsheet | Left and right arrows get stuck at selectors **unless** I first skip over them with Ctrl; interesting. -- **SHIPPED**, feat/tables-spreadsheet. The cursor lands on the pull-down itself now rather than the cell around it, which nothing had made able to hold focus, so it fell off the table entirely. Ctrl escaped it because Ctrl+arrow runs straight through
-- [x] R-086 feat/tables-spreadsheet | (a) We have a gratuitous space waster at ID where the goto map icon (nice unsolicited touch!) is a line break below the ID number. Put on same line, and possibly in a separate column (exreme left or transcendent left of the table) to keep the paradigm pure. (b) But I should point out that the right-click menu may upstage this feature, and also (c) an interesting possibility that when we right-click on a support column (like From and To) that contains an asset, we can Show on map that asset instead of the row's asset. -- **SHIPPED**, feat/tables-spreadsheet. (a) on one line; (c) built, and it falls back cleanly on a dangling link id or a customer with no link. (b) is his own observation and nothing was built from it: moving the pin to its own leftmost column changes the column model, so that is his call
-- [x] R-087 feat/tables-spreadsheet | When I right-click on a cell near the bottom of the screen, the right-click menu goes off the bottom of the screen. Oops. Fix that. -- **SHIPPED**, feat/tables-spreadsheet. It flips above the pointer rather than sliding under it, on both axes, and clamps only when the menu is taller than the window. All four edges asserted
-- [x] R-088 feat/tables-spreadsheet | Whole-cell near vs left/top. Spreadsheet software chooses a paradigm for where—near or left/top—to maintain exactly a whole cell when arrowing past the edge of the screen. (a) What we have seems to be a split opinion, with sometimes whole cell at the top and sometimes at the bottom when I am arrowing down; we need to choose and do what we do well; and my vote is whole cell at top. (b) When I arrow down to the bottom of the screen and past the bottom whole visible cell, the next down movement brings exactly a whole cell to the bottom, then the next down movement jumps my cursor to the top of the view, which is disorienting and needs to be fixed. The cursor (active cell) needs to stay near the direction I am moving. This bug doesn't happen when moving up, and it seems that we are closer to the whole-cell-at-top paradigm, for what it's worth. -- **SHIPPED**, feat/tables-spreadsheet. There were two rules, one per direction; there is one now, and the scroll always rests on a row boundary. **He is still seeing a 0 to 3 px variation at the heading, which is his 2026-09-21 item (4) and is back with the build agent**
-- [x] R-089 feat/tables-spreadsheet | It might be nice to develop the tab paradigm of the tables list across the top of the bottom pane. Currently, all the non-active tables are undecorated plain text, which doesn't really say "I'm an inactive tab." -- **SHIPPED**, feat/tables-spreadsheet. A hairline, a light ground and two rounded top corners: the least that reads as a card behind the front one, not a raised button, which would read as a second toolbar
-
-### feat/customer-find-labels
-
-- [x] R-090 feat/customer-find-labels | "Use current view" button of "Widest view that attempts to display customer labels" uses height (I think), not width. Then it's applied as advertised, to width. So it appears not to work. -- **SHIPPED**, feat/customer-find-labels `bd620e4f`, merged to master on his all-clear. He was right on both halves: it captured the SMALLER of window width and height, and on a map project wrote raw degrees where the gate reads feet, out by about 576,000x
-
-### The branches he asked about
-
-- [x] R-091 feat/xy-world-map | Why is this branch still present? The task has been closed. Merge, delete, and update? -- **MERGED ON HIS ALL-CLEAR AND DELETED**, master `fe9f2106`; Task 646 closed
-- [x] R-092 feat/lock-initials-later | Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task? -- **MERGED ON HIS ALL-CLEAR AND DELETED**, master `83ce8391`; Task 698 closed. The one thing he named as not done, the messaging system, is Task 704 on its own branch
-- [x] R-093 feat/engine-fetch-wait | Why is this branch still present? Is there something to do? Or merge, delete, and update? -- **MERGED ON HIS ALL-CLEAR AND DELETED**, master `97c27380`; Task 608 was already closed on his word, and the previous handoff had wrongly said this branch was merged, which is why he kept seeing it
-
-### About
-
-- [x] R-094 -- | About, Mission paragraph 1 sentence 1: Revise to "...offered freely online since 2010." -- it now reads *"HawsEDC Engineering Calculators have been offered freely online since 2010."* **A PUBLIC CLAIM, and the string is in drift in 26 languages**
-- [x] R-095 -- | About, License paragraph 2: Remove everything but the last sentence. -- the paragraph is now the single sentence *"The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run."* Four sentences deleted, including *"There is no paid tier"* and the promise-about-the-software sentence
-
-### Roadmap
-
-- [x] R-096 -- | 610: Promote to 100. -- done, with his reason recorded on the task
-- [x] R-097 -- | 706: "I think this would be cheap enough to fix that we should fix it without waiting for measurement... My intuition is that we would always just save the entry at hand and only save the whole project... when there is a pause. See Off Means Off." -- promoted to 100 and his intuition written in as the design. The browser measurement is no longer a gate
-
-### Research
-
-- [x] R-098 -- | Messaging / Messenger: I think I agree with Ida. Proceed. -- Task 704 is being built
-- [x] R-099 -- | WaterModels.jl: Mary's report accepted.
-- [x] R-100 -- | Perry's crashes: Grateful. Nice.
-
-### Placement -- his three questions, which are questions and not builds
-
-- [x] R-101 feat/label-gang-search | Given your explanation, how do all those labels get stacked when narrow? What is it about being single and narrow that uniquely makes/lets them stack neatly and endlessly? -- **ANSWERED, AND HE RULED ON THE ANSWER 2026-09-21: *"Clearly this is a bug."*** See R-108
-  - **ANSWERED 2026-09-21, and the answer is one sentence: the SPOTS do not move, the BOXES grow into each other.** Measured, not argued: the candidate set is identical at both widths on all 97 labels, so where a label may be offered a place never reads its text. Those spots sit at a fixed geometric spacing around the node -- its own gaps between its pipes, plus a resting offset -- and that spacing knows nothing about how long the string is. **So two labels at neighbouring spots collide exactly when their two half-widths together exceed the spacing between the spots.** Narrow: the spacing wins, every spot stays usable, and they stack as far as you like -- that is the "endlessly" you are seeing, and it is not a special talent of narrow labels, it is the ordinary case. Wide: the box wins, so taking one spot POISONS its neighbours, one label knocks out several, and the next label has to go somewhere else -- which is the 41-of-60 cascade. **It is not that a wide label fails to fit a gap; it is that a wide label occupies spots it is not standing on.**
-  - **What would settle it beyond argument, and it is cheap:** a histogram of spot spacing against box width on your own drawing. Say the word and it gets measured rather than reasoned.
-- [x] R-102 feat/label-gang-search | "Nineteen real collisions shove fifty-one labels": You say nineteen real collisions. But if there were dozens neatly stacked while short-stringed (ID alone), then there are zero real collisions. This is the mystery I will not let rest. You say nineteen while I say zero. -- **ANSWERED, AND HE WAS RIGHT.** Nineteen counted labels that TOUCHED a node symbol; zero is the count that HAD to move, and his is the question that decides what gets built
-  - **ANSWERED 2026-09-21: YOU AND THE NUMBER ARE ANSWERING TWO DIFFERENT QUESTIONS, AND YOURS IS THE ONE THAT MATTERS.** Nineteen is the count of labels whose grown edge OVERLAPPED a node symbol on the side it grew towards -- 0.07 to 1.11 label-heights deep, a drawn circle, a real object. That fact is right and "zero" is wrong as stated. **But touching something is not a reason to move.** A label only has to move if, having touched something, the search cannot find it another place -- and the other measurement says the search gives up after 28 spots inside one gap while 36 of 97 had room just outside it. **So the number of labels that HAD TO move is zero, which is your answer, and it is the one that decides what gets built.** Nineteen is a weaker fact wearing a stronger word, and calling them "real collisions" made it sound like a justification. It was not one. You have now asked this three times; the rule here is that a repeated question means the rule is the suspect, and it was.
-- [x] R-103 feat/label-gang-search | The fix is built: OK. But I don't understand why we are spending effort on the rings model instead of giving the spot-prime box model a good college try. -- **ANSWERED, and the answer cost something to admit:** only step 4 of his four-step sketch was ever built, and nobody ever reported back on the one part he flagged himself. Task 539 carries it; the work is R-108
-  - **ANSWERED 2026-09-21, and the honest answer is that nobody gave it one.** `dev/label-placement-algorithms.md` §9d records the reason and it is not a good one: of your four steps, step 4 -- ordering a stack by the angle of the node each label belongs to -- was built and shipped as the gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were NOT, because the file says *"Not settled, and his own flag: how `spot_prime` is found. Report back before building it"* -- and nobody ever reported back. You had written *"I waved my wand over finding spot-prime; if it's hard, let me know."* **You were never told either way.** The rings work got the effort because it was reachable, which is a reason about us and not about the two models.
-  - **AND THE RAW MATERIAL IS ALREADY THERE, which is R-079's answer too:** the node's table of every gap between its pipes is already computed and already survives a zoom, and the code then throws all but the biggest away. Publishing it as a RANKED LIST instead of a single winner is a change where it is consumed, not a new model -- **so it is not built yet, and it is the first step of your spot_prime hunt rather than a separate errand.**
-
-### Off means Off
-
-- [?] R-104 -- | If Off means Snapshot, does this help Declan's speed? Is "Save whole project" related to Automatic Recalculate?
-  - **ANSWERED 2026-09-21. They are two different clocks, and the honest answer to the second question is NO.** Automatic Recalculate governs the SOLVE. The whole-project save is the STORE, and it runs on every committed cell whether that switch is on or off -- so turning it off buys nothing at all against Task 706. That is exactly why 706 had to be its own fix, and it is being built now to your own intuition: write the one entry at hand immediately, defer the whole-project write to a pause.
-  - **But Off-means-Snapshot DID help the speed, by a different route, and that is worth separating.** Before it, one edit recomputed every label on the map and re-ran collision avoidance across the whole drawing. Now an edit rewrites its OWN label and moves only that one. That was the slowness you had been complaining about all week, and it is on master already.
-  - **And the two ARE related in design, which is what your "See Off Means Off" was pointing at:** do the cheap local thing now, do the expensive whole-model thing at a pause. Same rule, two places.
-
-### Misc, from his own browser passes
-
-- [x] R-105 -- | **SHIPPED on master (`faf7216b` + `a10e5894`).** A step now reads `24:00 - 25:00` and keeps climbing past a day; nothing wraps, however many days the run covers. **The clock reading did not vanish, it moved into the row's tip** -- the old label was `elapsed  ·  clock`, two readings of ONE instant, which you read as a range and were right to. | The time step selector on the toolbar (need the transport) lists time ranges. Starting at 24:00, the step end time is normalized back to clock time instead of staying at run time. So we get 24:00 - 0:00. Fix it to say 24:00 - 25:00, and fix all subsequent steps.
-- [x] R-106 -- | **SHIPPED on master (`faf7216b`), all nine, for a NEW project only** -- a saved project that had customized its own suffix or decimal keeps exactly what it had. | Initial values: Settings.Symbology.Node.Source share.After = '%' and Decimal = 0; Water age.After = ' hr'; Initial quality.After = ' mg/L'; Concentration.After = ' mg/L'; Average source share.After = '%' and Decimal = 0; Link.Average water age.After = ' hr'; Node.Average concentration.After = ' mg/L'
-- [x] R-107 -- | **SHIPPED on master (`faf7216b`).** It is a row in a pipe's Properties just after Head loss gradient, and a column in the Pipes table, both reading the same number Settings > Symbology > Link already reads. | Reaction rate does not appear in Properties or Tables. I see it only in Settings.Symbology.Link.
 
 ## Round of 2026-09-21c -- his pass over the reloaded preview panel
 
 ### Placement -- the ruling that reframes the whole label job
 
 - [x] R-108 feat/label-gang-search | (on being told "The spots don't move; the boxes grow into each other" / "Two labels at neighbouring spots collide exactly when their half-widths together exceed the spacing between spots" / "Narrow: spacing wins, every spot stays usable. Wide: the box wins, so a wide label occupies spots it is not standing on") **"Clearly this is a bug. But you say it without batting an eyelash. If you don't understand why it's a bug, ask me. If you do, fix it. I'm just grateful that magically this endless stack happened so that I know it's possible; We just have to find out how it's possible and empower that."** -- HE IS RIGHT AND THE EXPLANATION WAS BEING OFFERED AS A DEFENCE. A placement lattice whose spacing is blind to the size of the thing being placed is a defect, not a constraint, and the narrow case working is the existence proof that a correct layout is available on that drawing. Two halves, both with the build agent: find out how the endless stack is possible and write it down, then make the wide case use the same mechanism. His acceptance test is R-075 unchanged -- feat/label-gang-search 15065f26: the stack is the gang repair's column, which width cannot touch; node labels now claim room to grow before they stand anywhere, and your 12345678 test moves and hides nothing at 4x and 8x (the fit view still moves 18)
-
-### feat/tables-spreadsheet -- his fifth pass
-
-- [ ] R-109 feat/tables-spreadsheet | The page loads with the current table blank. I have to switch away and back to see that table.
-- [ ] R-110 feat/tables-spreadsheet | Sometimes the column widths are unreasonable. For example, Pumps.Date installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price pattern, width = 3em (due to selector?)
-- [ ] R-111 feat/tables-spreadsheet | Switching to Junctions the first time and some subsequent times delayed about 3 seconds or more. This is the worst issue I found.
-- [ ] R-112 feat/tables-spreadsheet | There is a slight calculation error that makes the top border of the top cell row not quite coincide with the bottom border of the headings, and vary in that from about 0px to 3px (maybe 2px), as I arrow up or down.
-- [ ] R-113 feat/tables-spreadsheet | Switching tables (tabs) leaves the tab selected instead of the currently highlighted cell.
-- [x] R-114 feat/tables-spreadsheet | Successful: Entry is fast and undo works. -- **HIS OWN PASS**, and it closes R-035. Nothing to do; it is asserted so it cannot regress
-- [ ] R-115 feat/tables-spreadsheet | If right-click "Show on map" is "Select on map" instead of just "Go to" or "Zoom to" (which is what I expected), then we should label it "Zoom & select".
-
-### feat/notice-log -- his four
-
-- [ ] R-116 feat/notice-log | This will need some finesse before it's done.
-- [ ] R-117 feat/notice-log | For now, I know that the button/glyph must be where the messages appear, and it must appear and possibly highlight while a message displays. -- **IDA CONFIRMS THIS IS A DEFECT AND NOT A PREFERENCE**: the messages render top-left, on top of the mode line, and the glyph was put in the bottom-left footer strip. She says she should have caught it before he did
-- [ ] R-118 feat/notice-log | Possibly the messages and the glyph need to be coincident with the mode message at the top of the map so that we see something like [his screenshot: one top-of-map strip carrying a circled glyph then "Mode: Select. Click an asset or a label to see..."]. -- **IDA: YES, MERGE THEM, AND IT REMOVES A ROW RATHER THAN ADDING ONE.** But never put the message text and the mode sentence on the SAME LINE: keep them stacked in one top-left column with the notice covering the mode line as it already does, and anchor the glyph at that column's fixed left edge so it survives both states
-- [ ] R-119 feat/notice-log | The i info glyph doesn't seem quite right to me. Is it what Ida recommended? How about a + expand glyph or a history glyph? Show me something creative. We need to evolve on this. -- **IT WAS NOT HERS AND SHE SAYS IT IS WRONG**: the circled-i already names five other rows on this page (Welcome, Privacy, Terms, About, Reports), every one a reference fact about the software, where this is a personal growing feed. **Her recommendation is a PLAIN CLOCK FACE, no surrounding arrow**, drawn new in `lib/Icons.lib.php` as `history`. She argues AGAINST the circular arrow (already means Revert and Restore on this page, the opposite job), against a bell (imports an unread-and-urgent category this page's two severities do not have), and against his `+` (means "create" everywhere else, and is close to this suite's own `new` glyph)
-
-### Map menu
-
-- [x] R-120 -- | World map: The menu is context-sensitive. I don't know if that's good. But it is. I found what I was looking for. -- **FOUND IT.** The row is offered only on a plain grid project, which is why it was not on the map he was looking at. **His "I don't know if that's good" is left standing as his own open question about context-sensitive menus generally**, not closed by this row
-
-### The daily mail
-
-- [x] R-121 -- | The "rank by shopping" table is hard to read. Can you add headings? I don't know what the numbers represent. -- ea551c6c
-- [x] R-122 -- | I assume that "PAGE LOADS" includes robots. Maybe clarify that "(includes robots)" if so. -- ea551c6c. **His guess was wrong**: this table's rows already require 10+ seconds on the page before counting at all, so it already excludes nearly all robots by behaviour; the mail now says so instead of "(includes robots)"
-- [x] R-123 -- | Is "PEOPLE" non-robot (long-dwell) visits? Maybe clarify that. -- ea551c6c. **Also not quite right**: PEOPLE is the consented bucket (accepted the cookie banner, counted once per person per page), unrelated to dwell time; the mail now says that plainly
-
-### Production
-
-- [x] R-124 -- | There is a git repository on `~/`. Its git status is dirty. Clean up that one. -- **DONE AND PUSHED**, host commit `9565205`. It is a DIFFERENT repository -- `constructionnotesmanager.com` on Bitbucket, with the home directory as its working tree -- and this session had made it dirty by installing the cron scripts. Committed: the three updated scripts, the two new ones (`check.mustblock`, `daily-report-cron.sh`), and a cPanel reshuffle of `public_html/.htaccess`. Ignored rather than tracked: `tgh*`, which holds the engcalcs mirror clone and the report checkout (separate repositories; tracking one file of them makes two repositories disagree about who owns it) and `daily-report.last`, a runtime marker like `check.last`. The two `.before-install` backups were deleted
-- [x] R-125 -- | dev: I will checkout master and pull that one. Thanks. -- his call, nothing owed
-
-## Round of 2026-09-22 -- the same pass, resent after Claude froze
-
-### Map menu
-
-- [ ] R-126 feat/map-menu | Keep all rows visible always. But disable what's not applicable. (1) Maybe 'World map...' should be enabled for all projects. Even an EPSG project should have the option to detach and reattach the world map, I think. But when they attach, they don't have to do the wizard. And for EPSG projects, Re-adjust and Scale should be disabled unless there's user demand to expose them. (2) I think we can retire the Hide/Show street map and satellite images rows. Detach and attach provide the same functionality. (3) Hide map readouts was a print prep command. But it isn't very useful any more. Let's remove it. -- **SUPERSEDES his R-120 question** about whether a context-sensitive menu is good: his answer is always visible, disabled when not applicable
-- [ ] R-127 feat/map-menu | That got tidy. Only three rows left. Zoom to fit, Background image, and World map.
-- [ ] R-128 feat/map-menu | georeference xy: I don't see this work merged to master. The map menu should have parallel Background image and attach world map rows. But I don't see that. -- **IT DID MERGE** (`feat/xy-world-map`, on his all-clear of 2026-09-21); the World map row was offered only on a plain grid project, so it was not on the map he was looking at. R-126 makes it always visible, which answers this by construction
-
-### Open example
-
-- [x] R-129 fix/example-open | When opening an example, there was a delay during which I clicked repeatedly. Unbeknownst to me, I was asking for repeated new projects. To avoid this, close the gallery as soon as we start to open an example project. -- **SHIPPED** `b043a319`: the gallery closes on the first click, and further clicks are ignored until that example has opened; a failed download brings the gallery back so you can retry. `example-open-guard-harness.js`
-- [ ] R-130 fix/example-open | The delay in opening the Net3 lat/lon example when Net3 was already open was over 25 seconds. This is a failure for a new shopper. This was on hawsedc.local on the current master branch. That said, I may have been experiencing high CPU load from CC WSL.
-  - MEASURED 2026-09-22, real headless Chrome with other work loading the machine: Net3 lat/lon opened over Net3 in 2.0 to 4.2 s (six runs); the page's own work was 0.6 to 0.9 s of that, the rest is OpenStreetMap tiles arriving. **No 25-second phase reproduced.** The likeliest account is R-129 itself: five clicks during a 4 s wait each started an open. Please retry on the merged build and say whether it is still slow
-
-### Closed on his word
-
-- [x] R-131 -- | ?debug=tiles: I think we are good now. -- **Task 703 CLOSED**
-- [x] R-132 -- | 705: Title "Limit zoom symbol mapwise size growth" -- retitled in `6ae7f2d4`
-- [x] R-133 feat/customer-find-labels | I think this is done. Merge and delete? -- **MERGED** `7afe1d20` on his all-clear, branch and worktree deleted 2026-09-22
-- [ ] R-134 feat/zoom-symbol-size | New zoom rules: If you have no questions or objections, you can proceed to implement this in a branch for me to test.
 
 ## Round of 2026-09-22b -- his pass over the six branches
 
@@ -276,25 +68,171 @@ judgement and does not belong to a script.
   - 3bf1ade7 + b4024748 (2026-09-22): answered in dev/label-placement-algorithms.md 20d. The labels that find room to grow ignore the text length; the ones that find none fall back to the exact-width search, and a gang column could only hang from a spot one member already held, so its top jumped with whichever member moved. Columns now also slide as one piece toward their nodes and the pass judges a room-claiming label by its room. Worst top-of-column leader over 0-10 characters 5.7 -> 3.5 text heights (fit and 2x); zero moved at 4x up to 9 characters, at 8x up to 10. Flatter, not flat: at the fit view the hidden count still climbs 29 -> 47 because that cluster has no room
 - [x] R-137 feat/label-gang-search | Moving to a different test case than that notorious southwest area, let's look at the northwest area with three properties turned on and we are zoomed in closer. [his screenshot: labels for nodes 120 and 25x at A, well away from their nodes; empty ground at B, nearer them] A human would have slid the two labels at A toward B, shortening the leaders without any bad effects. Could our algorithm be smart enough not to be gratuitously distant like this?
   - 3bf1ade7 + 1210139e + b25f9c78 (2026-09-22): each leader first moves its label to the nearest clear spot along itself, round until nothing moves; a label still over four text heights out may then take the nearest clear spot at any angle round its node, provided its new leader crosses no leader and runs through no label. His corner, ID + elevation + demand + pressure, at 2x (his screenshot's zoom): node 251 28.0 -> 3.4 text heights, 257 1.4 -> 1.1, 120 0.8 (already close after master's symbol cap); longest leader on the view 28.0 -> 9.1 at 2x, 23.8 -> 3.8 at 3x. No new contacts, leader crossings included; no fewer labels drawn. dev/lpn-spike/label-slide-harness.js
-- [ ] R-138 feat/tables-spreadsheet | Most column widths are nice (maybe I set them), but some of the initial column widths are unreasonable. We talked about limiting words to breaking into three pieces (just an idea), but I see words broken into five pieces of one or two characters each.
-- [ ] R-139 feat/tables-spreadsheet | Switching tables can delay over 8 seconds. -- same defect as R-111, measured worse
-- [ ] R-140 feat/tables-spreadsheet | There is a message about "rows that already exist". When I scroll past the last visible row, that message disappears, and the headings jump upward. This is startling. The message uses precious head room. Maybe we should remove it since we are soon working on Declan's request to allow creation by pasting.
-- [ ] R-141 feat/tables-spreadsheet | With this branch released, the tip for these tables tabs can now say "assets of this kind as a spreadsheet-like table. Result...."
-- [ ] R-142 feat/tables-spreadsheet | I think that "Print table" has not been revisited since we added column resizing. And I think that it's important to use the column widths adjusted by the user. Can we implement that for me to test? By the way, I appreciate that the "Print table" feature was added without my request and that it generally has worked well from the first time I saw it. Good work.
-- [ ] R-143 feat/tables-spreadsheet | Right-click "Show this on the map" was requested to change to "Zoom & select". Please do that. -- repeats R-115
-- [ ] R-144 feat/notice-log | I like the down arrow glyph. -- the clock drawing reads to him as a down arrow / Expand glyph, and he likes it: KEEP IT, do not redraw the hands
-- [ ] R-145 feat/notice-log | The messenger needs to print message 1 over the Mode status so that all is at the top of the map and so that the Expand glyph is in line with messages. The user doesn't intuitively see a difference between the Mode status and other messages, so we can use this naivety to improve the UX by aligning everything at the top.
-- [ ] R-146 feat/notice-log | There is a brief flash of a word behind the glyph. I can't read it, but it's similar to POWER. That needs to stop happening.
-- [ ] R-147 feat/notice-log | On load I see two messages, (a) Working out the EPS and (b) EPANET solver. But when I click the expando button, I get an alert "No messages yet". **All** messages now need to go through this messenger system.
-- [ ] R-148 feat/notice-log | The alert paradigm is not a good UX for showing past messages. User expects them to descend below the glyph, below the Mode status in similar appearance that they originally had. This should not be hard to do, fill the map below the Mode status line with old messages with oldest at the bottom, I assume?
-- [ ] R-149 feat/zoom-symbol-size | Peripheral issue: Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?
-- [ ] R-150 feat/zoom-symbol-size | I think this feature works for now and can be closed, merged, and the branch deleted. Good work. -- HIS ALL-CLEAR for Task 705
-- [ ] R-151 feat/map-menu | The last two menu rows showing for EPSG projects, Goto and Search, were not requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map is not attached (no georeference).
-- [ ] R-152 fix/example-open | I think this is good. Close, merge, and delete the branch. -- HIS ALL-CLEAR
 
-## Round of 2026-09-22c -- his fourth pass over the label work
+### feat/label-gang-search
 
-- [x] R-153 feat/label-gang-search | Things have changed so much that I am disoriented. This may be good to undo. -- **NOTHING WAS UNDONE; that is his call and he has not made it.** What a reader would notice, written for him in the session report: the node ID can now be dropped from a label (his own instruction of 2026-09-18), labels reserve room to grow so they sit further apart than their text needs, labels slide back along their leaders toward their nodes, and the shipped examples lost their saved label columns so they open on the new defaults. **One thing on the branch nobody asked for: the "Restore label defaults" button** in the Labels box (`lpn_labels_restore`), added as a way back after the Drop columns changed. It is three strings and one control and is the cheapest thing here to withdraw if it is what is crowding the box.
-- [x] R-154 feat/label-gang-search | I am seeing dropping when I would have preferred to see longer leaders. -- **BUILT, and it was the wrong way round.** The value shed fired when the first-fit could not place a label, which was BEFORE the search was ever allowed to look further out; and the crossing shed at the end of the pass had no rung under it and could only hide. The order is now: whole label near its node, whole label on a longer leader, label with a value given up, label gone. Measured on Net3-World at 2x with his three properties: 51 labels gave a value up, now 18; 8 hidden, now 5; 408 value rows on the screen, now 524. `dev/lpn-spike/label-drop-order-harness.js` holds it with both new rungs mutated away.
-- [x] R-155 feat/label-gang-search | Here is a strange example where (a) we could have had all requested properties and (b) we could have had a shorter leader. [his screenshot `_label-mystery.PNG`: one label reading `P=55.70` alone on a long leader, open ground nearer its node] -- **MEASURED, not guessed, and he was right twice.** That label had not run out of room: 23 labels failed to place at that view, and the shed enlists the failures AND every label standing on ground they could have used, so 50 of 97 labels gave up two of their three values -- most of them, his circled one included, for somebody else's failure. Four were still hidden afterwards. The same view now sheds 18 and hides 5.
-- [x] R-156 feat/label-gang-search | (R-075 against today's ruling) -- **THEY LOOKED LIKE A CONFLICT AND THEY ARE NOT.** Offering the longer leader to EVERY label took his `12345678` test from 10 labels moving to 43. But his ruling is about a label giving up a PROPERTY, and a label showing the node ID alone has no property to give -- so the longer leader is now offered only to a label that has something to lose. R-075 is back to 10 moved, the width-stability ceilings FELL (27 -> 8 at the fit view), and 4x and 8x still move and hide nothing.
+- [x] R-163 feat/label-gang-search | Things have changed so much that I am disoriented. This may be good to undo. -- **NOTHING WAS UNDONE; that is his call and he has not made it.** What a reader would notice, written for him in the session report: the node ID can now be dropped from a label (his own instruction of 2026-09-18), labels reserve room to grow so they sit further apart than their text needs, labels slide back along their leaders toward their nodes, and the shipped examples lost their saved label columns so they open on the new defaults. **One thing on the branch nobody asked for: the "Restore label defaults" button** in the Labels box (`lpn_labels_restore`), added as a way back after the Drop columns changed. It is three strings and one control and is the cheapest thing here to withdraw if it is what is crowding the box.
+- [x] R-164 feat/label-gang-search | I am seeing dropping when I would have preferred to see longer leaders. -- **BUILT, and it was the wrong way round.** The value shed fired when the first-fit could not place a label, which was BEFORE the search was ever allowed to look further out; and the crossing shed at the end of the pass had no rung under it and could only hide. The order is now: whole label near its node, whole label on a longer leader, label with a value given up, label gone. Measured on Net3-World at 2x with his three properties: 51 labels gave a value up, now 18; 8 hidden, now 5; 408 value rows on the screen, now 524. `dev/lpn-spike/label-drop-order-harness.js` holds it with both new rungs mutated away.
+- [x] R-165 feat/label-gang-search | Here is a strange example where (a) we could have had all requested properties and (b) we could have had a shorter leader. [his screenshot `_label-mystery.PNG`: one label reading `P=55.70` alone on a long leader, open ground nearer its node] -- **MEASURED, not guessed, and he was right twice.** That label had not run out of room: 23 labels failed to place at that view, and the shed enlists the failures AND every label standing on ground they could have used, so 50 of 97 labels gave up two of their three values -- most of them, his circled one included, for somebody else's failure. Four were still hidden afterwards. The same view now sheds 18 and hides 5.
+- [x] R-282 feat/label-gang-search | (R-075 against today's ruling) -- **THEY LOOKED LIKE A CONFLICT AND THEY ARE NOT.** Offering the longer leader to EVERY label took his `12345678` test from 10 labels moving to 43. But his ruling is about a label giving up a PROPERTY, and a label showing the node ID alone has no property to give -- so the longer leader is now offered only to a label that has something to lose. R-075 is back to 10 moved, the width-stability ceilings FELL (27 -> 8 at the fit view), and 4x and 8x still move and hide nothing.
+
+### Calculation and time steps
+
+- [ ] R-171 -- | When I change Base demand in Properties, Demand, Pressure etc. change on the node label, but not in Properties.
+
+### Task 696, the coordinate conversion wizard
+
+- [ ] R-172 -- | (1) In Step 1, a background image gets dragged around with the map (then snaps back on release of drag) instead of always staying with the project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center example, the world map worked, but the satellite view didn't. (3) I completely missed this until now, but this wizard is out of date with our current CRS paradigm. The first thing it needs to do is ask what coordinate system we are going to. -- folded into Task 696, which stays OPEN at 100 rather than closing, because his point (3) reopens the paradigm
+
+## Round of 2026-09-23b -- two all-clears and the zoom-control pass
+
+- [ ] R-182 feat/convert-as | I didn't review, but I read the menu tip, and I like where it's headed.
+
+## Round of 2026-09-23c -- his pass over the six preview ports
+
+### feat/convert-as (8104)
+
+- [?] R-190 feat/convert-as | (the "These are already lat/lon" button) "I don't understand. I can't find the context. Give me more information." -- re-explained in the 2026-09-23c report; the handoff had conflated it with lpn_transform_georefed_btn
+  - [TGH: Sorry I still don't understand. Where is this?]
+
+### feat/table-editing (8105)
+
+- [ ] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build
+
+### feat/label-gang-search (8090)
+
+- [ ] R-200 feat/label-gang-search | "I edited the file. Still a lot is open."
+
+## Round of 2026-09-24 -- MOD's test, his notes, and his pass over the six preview ports
+
+### MOD's first-use test (2026-09-23)
+
+- [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one
+  - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
+- [x] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached -- merged, master 017ee4de
+
+### feat/convert-as (8104)
+
+- [x] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. Ensure that both 'Import' and 'Convert as ...' state clearly that files with an EPSG coordinate system that simply needs to be referenced/located can be scaled 1:1 in Step 2 of the Convert as... wizard." -- feat/convert-as 0693cb6d: button and its two keys deleted; Import report and the Step 2 Ground distance tip carry the 1:1 note. New strings need your ruling -- merged, master 017ee4de
+  -  [TGH 2026-09-24: In the import report, change the coordinate system paragraph as follows: "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"]
+
+## Round of 2026-09-25 -- IOD's test, Net3 fire flow, and his pass over the ten branches
+
+### Real-world use (IOD, senior civil engineer; `dev/real-world-reviews.md`)
+
+- [x] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25 -- Mary: dev/agents/market-researcher/watercad-migration.md; Sue: her journal. Both: no WaterCAD-expert seat; one WaterCAD-exported .inp from IOD is the next step
+
+### Workflow
+
+- [ ] R-234 -- | "Note that this is the second time that you have listed several items under "On master (pushed; you pull when ready)", which is apparently wrong and meaningless. And it's knocking me off my feet."
+
+### feat/zoom-control (8103)
+
+- [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
+- [ ] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass
+
+### feat/convert-as (8104)
+
+- [x] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP." -- feat/convert-as 47649c32, awaiting your pass -- merged, master 017ee4de
+- [x] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here." -- feat/convert-as: tank Water depth is a label now; awaiting your pass -- merged, master 017ee4de
+
+### feat/table-editing (8105)
+
+- [ ] R-239 feat/table-editing | "There is a troublesome conflict between clicking on a column heading text to sort and clicking on a column heading to select. Is there a better way we can do this? ... Is there a conventional glyph and gesture for sort, maybe including a hover revelation?" -- Ida asked
+- [ ] R-240 feat/table-editing | "Add "Show all" to the heading right-click menu. Or maybe what we really need is a Manage columns command/box that has checkboxes for Show."
+- [ ] R-241 feat/table-editing | "Sorry I can't get a column to drag. I think it's the right thing to have. What I think is wrong is the ability to select the heading text ... Maybe a three dots menu for sorting and hiding. Maybe a grab cursor somewhere for dragging. I honestly don't know."
+
+### feat/property-venue (8106)
+
+- [x] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected." -- feat/property-venue b8733c5d, built as you proposed; awaiting your pass -- merged, master 017ee4de
+
+### feat/first-project (8112)
+
+- [x] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?" -- feat/first-project f775f0a6: street map on at first load; privacy.php changed; landing page claim needs your ruling -- merged, master 017ee4de
+- [x] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?" -- feat/first-project: WGS 84 (EPSG:4326) -- merged, master 017ee4de
+
+### Customer
+
+- [ ] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black." -- feat/customer-node cd7640b1, awaiting your pass
+- [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass
+- [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass
+
+## Round of 2026-09-25, second pass -- his pass over the preview ports
+
+### Workflow
+
+- [x] R-248 -- | "You told me 'After you pull, run: ... git worktree remove ../../worktrees/...' That is partly misinformed since there is no such path at the production server, and there are no worktrees there. This bad advice has happened before. What can I do to prevent it? Am I giving you too much? As for the worktrees, of course you can clean them up on local dev." -- worktrees removed on local dev 2026-09-25; the handoff now says local housekeeping is never handed to him
+
+### feat/first-project (8112)
+
+- [x] R-249 feat/first-project | "On the gallery welcome, end it 'Or start here'. With that, we can close, merge, and delete the branch. Nice work." -- feat/first-project 8aa04872 -- merged, master 017ee4de
+- [x] R-250 -- | Decision: "Street map on at first load: Yes." -- landing pages and CLAUDE.md reworded to match -- street map on; librewaternet.org eef380e, not-epanet.org a058b5d, privacy.php and CLAUDE.md say so
+
+### feat/convert-as (8104)
+
+- [x] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!" -- merged, master 017ee4de
+- [x] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space." -- the prefill is always one space. The SI Brochure and NIST SP 811 both put a space between number and unit symbol ("10 mm"), so one space is right for SI and US alike. Keep it?
+  - [TGH 2026-09-26: "OK." One space stays.]
+- [?] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?" -- it fires when a chosen EPSG system has no transform in this page's catalogue; reworded to name it: "This page has no coordinate transform for {crs}, ..." -- merged, awaiting your ruling
+
+### feat/table-editing (8105)
+
+- [ ] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice." -- feat/table-editing: whole cell is one target, click selects the column, ⋮ glyph opens the menu; awaiting your pass
+- [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed
+- [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it
+- [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list
+- [x] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
+  - [TGH 2026-09-26: "Let's remove it and park it in our roadmap. 'More trouble to debug than the feature is worth.'" -- removed on feat/table-editing; parked as Task 730]
+- [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf
+
+### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
+
+- [x] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap." -- not reproduced on the merged code: Everything, ID, is empty finds only Text items on Net3-Novato. Which project was open? A retest after you pull would settle it
+  - [TGH 2026-09-26: "You are right. It found text 'LAKE' and 'RIVER'. My bad." -- they are Text items with no ID; nothing to fix]
+- [x] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work." -- merged, master 017ee4de
+- [x] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?" -- yes, rarely: a typed query naming a node-only and a link-only property together fits no single table
+  - [TGH 2026-09-26: "OK."]
+
+### feat/zoom-control (8103)
+
+- [ ] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side] -- feat/zoom-control 43902998: one cause fixed (a fit that hid labels kept room for them); your exact screenshot not reproduced, see the report
+- [ ] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant." -- feat/zoom-control 43902998: the dragged label leapt to 2.2x its leader; fixed
+- [ ] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'." -- feat/zoom-control 43902998: exactly your words
+- [x] R-266 feat/zoom-control | "The zoom window can be very nice for some users. ... 'Don't zoom again after results' seems to work fine." -- nothing to build
+
+### feat/customer-node (8113)
+
+- [ ] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?" -- feat/customer-node 105d9f68: customers draw under links and junctions; a click on the junction under a selected customer's grip opens the junction
+- [ ] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)" -- feat/customer-node 105d9f68: outside a bend the customer connects at the bend, and a drag tracks onto it and off again
+- [ ] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers." -- feat/customer-node 105d9f68: all 7 examples
+- [ ] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'." -- feat/customer-node 105d9f68
+
+### feat/menu-button (8114)
+
+- [ ] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'." -- feat/menu-button eceab3ab: outlined only; the cue was already deleted on master and is gone from the branch after merging master
+
+### Fire flow
+
+- [x] R-272 -- | "Remember that I am testing locally almost always. I am not pulling to test. ... We can close, merge, and delete the branch." -- fix/fireflow-eps was already merged (f9ebf891); branch and worktree deleted 2026-09-25
+
+### WaterCAD and EPANET, his notes
+
+- [x] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool." -- Tasks 718-723
+- [x] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!" -- 146.09 retitled "An inset overview map"; Task 717 at 50
+
+## Round of 2026-09-26 -- merges, and feat/table-editing's third and fourth passes
+
+- [x] R-275 -- | "8103 zoom-control: Merge", "8113 customer-node: Merge. Nice!", "8114 menu-button: Merge.", "8115 reports: Merge. Very nice. And the file name was good." -- merged; production 83bf02d5
+- [x] R-276 -- | "Can you copy the 'Zoom in to see labels' text from the ungeoreferenced Net3 to the lat/lon Net3? Remove the 'Zoom to see labels' text from the Net2 example." -- master 3a4bb054, fccaaa67
+- [ ] R-277 feat/table-editing | "(1) The headings text is still acting like text ... (a) No hover shading, (b) No cursor change. (2) Sorting still feels schizophrenic. Either the dots or the arrow, not both ... Possibly the arrow and the menu can take up zero space and appear with 100% opacity over any heading text on hover. (3) ... remove the sort rows from the column menu. (4) Remove the itemized Show {column} rows ... Leave only Hide this, Show all, and Manage." -- feat/table-editing acdbe7f8, awaiting your pass
+- [ ] R-278 feat/table-editing | "I still see special highlighting on the text." [his screenshot: a box round 'Longitude'] -- 410ddadc: the ring is on the whole cell
+- [ ] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc
+- [ ] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback
+- [x] R-281 feat/table-editing | "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click selects, drag moves. -- recorded in the handoff
+
+### Rulings recorded, nothing to build
+
+- File menu: "Convert as..." stays where it is ("The problem with putting it near open is that implies we are going to go get a file").
+- EPANET audit: "Make the reports roadmap tasks before EPANET++. I'd like to know the full list of what we are missing."
+- feat/label-limit, feat/offscreen-notice, feat/usage-report, feat/select-on-focus: "Close, merge, and delete branch."
+- Strings: "The selected junctions"; "{n} selected elements are not junctions, so they were not tested." -- "OK."

@@ -2557,3 +2557,833 @@ unclaimed shape in the current 61-name table) is the correct new mark for "a lis
 precisely because it does not borrow either taken shape.
 
 No shipped file touched; nothing in the worktree touched either.
+
+---
+
+## 2026-09-22 — The "clock" is being read as a down arrow, and the read is not baseless
+
+Tom, twice: *"I like the down arrow glyph"* (R-144) and today, *"I like the down arrow or a +
+better than the clock."* He is looking at `'history'` after Perry's 2026-09-22 redraw and reading
+it as something it was never drawn to be. Worktree `feat/notice-log`, read only, at `cd98ae4e`.
+
+**A. What is actually drawn, and why a down-arrow reading is not a stray misread.** OBSERVED
+`lib/Icons.lib.php:824`: `<circle/><path d="M12 12V8"/><path d="M12 12H17"/>` — one stroke from the
+circle's center straight UP, one stroke from the same center straight RIGHT, a bare right angle
+with no arrowhead drawn on either end. OBSERVED, the same file's own comment directly above it
+(`:804-808`, Perry's review note): the shallow-angle version that preceded this one already
+"reads as a chevron or checkmark in a circle" at 14-16px — Perry's fix widened the angle to 90° to
+stop the two strokes fusing into one bent line, and a bare bent line with no hands-of-different-
+length cue left in it *is* the generic shape of a chevron. **The interaction makes the same read
+functionally apt, not just visually plausible**: OBSERVED `js/looped-network.js:45161`
+(`toggleMessageLogPanel`) — pressing this glyph opens a panel that appears below it, which is
+structurally identical to what this exact page's own disclosure caret already does at two other
+sites: OBSERVED `js/looped-network.js:18258` and `:28836`, both `m.textContent = '▾'`, both "click
+this glyph, a panel/menu appears below" (the pane-tab-menu caret and the project-tab caret). A
+third site, OBSERVED `js/looped-network.js:20183`, uses `▼` as a state indicator ("this column is
+sorted descending") rather than a button, but it is the identical shape carrying the identical
+directional idea one more time on the same page. **So a down-arrow reading of the message-log
+glyph is not confusion about clock hands — it is Tom correctly recognizing "press this, something
+appears below" and reaching for the mark this page already uses twice for exactly that gesture.**
+Building the glyph to actually be a down arrow/chevron would put a THIRD, different meaning
+("read my history") on a shape that already means "there is a menu here" and "this is how this
+column is sorted" — the one-shape-one-job collision this seat has flagged before on this same page
+(`select` vs `select-area`, `info` vs this control, both above in this file). **Recommendation: do
+not build a literal down arrow/chevron for this control.** The read is legitimate; the shape is
+already spoken for.
+
+**B. The `+`, re-argued from scratch rather than cited.** A plus sign on this page means "make a
+new one," checked directly rather than assumed: OBSERVED `lib/Icons.lib.php:53`, `'insert'` IS a
+plain plus sign (`M12 5v14M5 12h14`), and OBSERVED `js/looped-network.js:4646` and `:21693` — it is
+the icon on "New scenario…" and "New saved path…", i.e. it already carries "create a fresh one" as
+its live job on THIS page, not merely in the abstract. OBSERVED `js/looped-network.js:28871`, a
+second, independent `+`: a literal typed plus-character button for a new project tab, drawn the way
+Chrome's own new-tab `+` is (comment at `:28862` cites Chrome's placement directly). **The message
+log is the opposite kind of thing from either of those: it creates nothing, it is a read-only
+window onto things that already happened.** A `+` on it would tell a reader "press here to add a
+message," which is not what the control does and contradicts a live, load-bearing convention two
+call sites deep on the very same page. This is not a wording nuance to weigh against the down-arrow
+option — it is a plainer collision than the down-arrow one, because the down-arrow's problem is
+that its shape says the same true thing ("a panel opens below") that two other controls say for a
+different job, while the `+`'s problem is that its shape says something actively FALSE about this
+control's job. **Recommendation: do not build a `+` either, and more confidently than the
+down-arrow refusal above.**
+
+**C. Does removing the tooltip change which glyph is right?** Tom: *"I don't think we need a tip on
+the down arrow glyph... more trouble than help."* Yes, it changes the calculus, and in the direction
+of MORE caution about shape, not less. OBSERVED `js/looped-network.js:45174-45176`
+(`wireMessageLogButton`) currently still calls `setIconLabel(btn, 'history', ..., tip)`, so the tip
+is drawn but not yet removed in this worktree — the removal is Tom's instruction, not yet built.
+With no tooltip, the drawing is the ONLY thing naming the control: there is no hover text and no
+adjacent label to arrive at once a reader is already confused, so a shape that already has a claimed
+meaning elsewhere on the page (a down arrow, a plus) will resolve to THAT meaning with nothing left
+to correct it. A shape that is merely unfamiliar (a clock nobody has learned to name yet) costs a
+moment of "what is that," which a first click answers for good; a shape that is familiar but WRONG
+(a down arrow that isn't a menu, a plus that isn't a create) costs a *wrong* first click, or worse,
+a reader who never clicks because they've already filed it under "sort control" or "add row" and
+moved on. **Removing the tip raises the bar for shape correctness — it does not lower it — and is
+an argument for a mark whose only competing readings are "unfamiliar" rather than "familiar and
+wrong."**
+
+**D. Three candidate drawings, in words, ranked.**
+
+1. **Redraw the clock's hands, not its idea — fix what Perry's note diagnosed, without abandoning
+   the shape.** Put a small filled dot at the center pivot and separate the two hands to roughly a
+   50-60° spread (say, hour hand leaning left of noon, minute hand leaning right past 2) rather than
+   the 20° that fused into a checkmark or the 90° that reads as a bent line/arrow. The dot at the
+   hub breaks the two strokes into two visibly separate spokes radiating from a point, which is what
+   a clock face needs to read as hands-and-not-a-single-bent-line even at 14-16px; the wider, more
+   even spread keeps it a two-thing composition instead of a corner. **Cost: smallest of the three —
+   one more edit to a shape already drawn for this exact job, no new name, no new string, nothing
+   for `icon_name_check.php` to learn.** This is the one I would build first: it repairs the actual
+   defect (two strokes fusing into a false shape) at its source instead of trading it for a
+   different false shape.
+2. **A short stack of three ragged bars — a compact "list/feed" mark**, like three horizontal dashes
+   of decreasing length (top longest, bottom shortest, or vice versa), inside or beside the same
+   circle frame the toolbar's round buttons already use. This reads as "a list of short entries,"
+   which is literally what the panel holds, and is more literal than a clock about the CONTENT
+   rather than the act of logging it. OBSERVED: no existing icon in `lib/Icons.lib.php` draws three
+   stacked bars, so it collides with nothing drawn on this page. **Cost: real but moderate** — new
+   geometry to draw and check at 14-32px, and a caution rather than a blocker: three horizontal bars
+   is the web's own well-worn "hamburger menu" shape everywhere OUTSIDE this suite, so a visitor
+   arriving with that habit may read "menu" rather than "list of messages" on first sight, even
+   though nothing on THIS page currently uses that shape for a menu. Worth building only if the
+   clock repair (candidate 1) is tried and still reads wrong to him.
+3. **An open envelope or speech-bubble outline** — the generic "notification/message" family used
+   by mail and chat apps generally. Ruled last, not first, because this suite already has a real
+   envelope (`lib/Icons.lib.php:796`, `'mail'`) drawn for actual outbound contact/feedback ("Fix
+   something"), so reusing that family would put "read my own machine-generated log" and "send Tom a
+   message" under kin shapes on the same page — a softer version of the same one-shape-many-jobs
+   problem this whole diagnosis is about. **Cost: same order as candidate 2 (new geometry, new
+   render checks), bought for a shape that has to be drawn carefully unlike `mail`'s to avoid that
+   kinship.** Not recommended unless both above are tried and rejected.
+
+**E. The one paragraph.** The clock is not what Tom is seeing — the shape Perry widened into a
+right angle to fix a checkmark problem now reads, correctly for what the control DOES, as a down
+arrow, and that is a real collision: this exact page already uses a down-triangle twice to mean "a
+menu opens below" and once more to mean "this column sorts this way," so a third meaning on the
+same shape is the wrong fix even though the impulse ("it looks like it opens something below") is
+right. The `+` is a clearer no — this page already spends `+` twice on "make something new," and
+the message log makes nothing; it reads. Since the tooltip is being dropped, the drawing carries
+the whole job alone, which is a reason to want a shape that is at worst unfamiliar rather than one
+that is familiar and wrong. My recommendation is not "keep what you have" and not "build a real
+arrow or a plus" — it is a small further repair to the same clock: separate the two hands more and
+add a dot at the pivot so it reads as two hands from a hub rather than one bent line, which costs a
+few more path edits and no new name or string, before reaching for a different picture entirely.
+
+No shipped file touched; nothing in the worktree touched.
+
+---
+
+## 2026-09-23 — Undo for Settings: should the stack hold preference changes at all
+
+Tom asked me and the build seat together, off `dev/undo-audit.md`'s findings #3 and #4 (new-asset
+defaults + ID prefixes, and map-coloring: both save immediately with no undo snapshot). His question
+in his own words: *"I'd like your and Ida's advice about undo for Settings. It sounds nice."*
+
+### First check: is this actually a project-vs-furniture question? No — both sides are project data
+
+OBSERVED (`js/looped-network.js:24067`, `serializeProject()`): the entire `settings` object —
+`idPrefixes`, `defaults`, `colorNodeField`/`colorLinkField`, units, hydraulics, quality, energy,
+custom property designs, everything the Settings box edits except the one `Page` sub-heading it
+labels as excluded — rides in the saved file. CLAUDE.md's `lpn_` furniture rule (window position,
+pane width — the browser's business) does not apply here at all; every Settings row this audit is
+about is modelling data, same axis as a pipe's diameter. **So "is it project data" cannot be the
+test that separates the sections, because the answer is yes for all of them.** I went in expecting
+this to settle it and it does the opposite — it removes the one clean dividing line CLAUDE.md
+supplies and leaves the actual product judgment fully open.
+
+### The dividing line that actually exists in the code today: visible effect at the moment of the edit
+
+OBSERVED (`js/looped-network.js:35608`, `defaultRow()`; `:35645`, the ID-prefix `input`): typing a
+new default diameter or a new ID prefix changes `settings.defaults[key]` / `settings.idPrefixes[key]`
+and calls `saveToStorage()`. **Nothing on screen moves.** No element redraws, no label changes,
+because nothing existing reads these values — they are read once, later, at the moment a NEW element
+is created (`seedDefaultInputs()`, `niceDefault()`). Pressing Ctrl+Z the instant after typing one
+would have nothing visible to restore even if it worked.
+
+OBSERVED (`js/looped-network.js:19011-19070`, `buildColoringSection()`, the `fieldSelect()` handler
+at `:19063`): choosing a thematic color field calls `refreshValueColors()` before `saveToStorage()`
+— **every existing node or link on the map recolors immediately.** This is the one Settings control
+in the audit's scope whose edit has an on-canvas, visible-right-now effect, which is exactly the
+property every genuinely-undoable action in this app already shares (`snapshotDragOnce()` for a
+drag, `saveUndoSnapshot()` before a delete or an add). Colouring is architecturally closer to those
+than to the defaults/prefix boxes sitting one section over from it.
+
+OBSERVED (`js/looped-network.js:42185-42237`, `applyIdPrefixToAll()`): the "Apply to all" button
+beside each ID-prefix box — which actually RENAMES every matching element's id — already calls
+`saveUndoSnapshot()` at `:42221`, correctly, because it is a real document rewrite with a visible
+result (every affected element's printed ID changes). **The audit's #3 finding is precise: the
+PREFERENCE (what a *future* element will be called) has no snapshot; the one operation in that same
+section that actually touches *existing* elements already has one.** The gap is exactly at the
+boundary this section argues for, not evidence the boundary is wrong.
+
+### Precedent: does established software put preference changes on the main undo stack
+
+CITED (Autodesk, "UNDO (Command)," help.autodesk.com, read 2026-09-23 — the official command
+reference, fetched directly): *"UNDO has no effect on some commands and system variables, including
+those that open, close, or save a window or a drawing, display information, change the graphics
+display, regenerate the drawing, or export the drawing in a different format."* Community threads
+confirm this by naming the concrete cases: `CLAYER` (current layer) and `CECOLOR` (current color) —
+the settings that decide what a *newly drawn* entity gets — are excluded from `U`/`UNDO` by design.
+**That is the exact shape of our new-asset defaults and ID prefixes**: a value read only at the
+moment something new is created, not a property of anything already on the sheet. AutoCAD's own
+documented answer to "should changing a new-entity default be undoable" is no.
+
+CITED (QGIS issue tracker, `github.com/qgis/QGIS` issue #50110, read 2026-09-23, and the Layer
+Styling panel documentation it references): a QGIS layer's SYMBOLOGY — its thematic coloring, the
+closest existing-software analog to this page's map-coloring section — has *"a History tab available
+in the Layer Styling panel"* that is a **separate undo history scoped to the styling panel itself**,
+distinct from the map canvas's own edit undo/redo. QGIS did not decide between "on the main stack" or
+"no undo at all" for this exact category of thing; it built a **third, local history** the audit's
+brief asked me to weigh and that is real, shipping precedent for it rather than an invention.
+
+### Weighed against Tom's own worry, and against mine
+
+Tom's brief already names the danger correctly: a stack mixing "I moved a pipe" with "I changed the
+default diameter for new junctions" makes Ctrl+Z unpredictable, because a press restores whatever is
+NEXT on the stack, not whatever the reader is looking at. For the defaults/prefix boxes this is worse
+than unpredictable — it is invisible: even if undone correctly, nothing on screen would change, so a
+reader who pressed Ctrl+Z expecting to see something happen would see nothing and reasonably conclude
+undo is broken again, which is the exact complaint this whole audit started from. **An invisible undo
+is a worse defect than no undo**, not a smaller version of the same feature.
+
+For coloring the danger is smaller but not zero: it is visible, but it would still sit on the same
+stack as ordinary drawing edits, so a reader who changes the color field and then edits a pipe and
+then presses Ctrl+Z twice gets the pipe edit back first and the recoloring back second (or the
+reverse), in an order that has nothing to do with which one they meant to undo. Joining the main
+stack buys visibility at the cost of the same interleaving problem, for a control that is used rarely
+compared to drawing edits.
+
+### The recommendation
+
+**Do not put any Settings section on the main Ctrl+Z stack. Leave findings #3 and #4 exactly as they
+are.** Both are consistent with how the rest of the Settings box already behaves — units, hydraulics,
+energy, quality, custom-property design all save immediately with no snapshot too, and #3/#4 are not
+outliers against that pattern, they are the pattern. Making colouring undoable while every other
+Settings row stays immediate-save would be the actual new inconsistency, not a fix for one.
+
+**If Tom wants a safety net specifically for map-coloring** — the one section where the argument for
+it is real, because the effect is visible — the right shape, on QGIS's own precedent, is a small
+**local control scoped to that section alone** ("Reset color settings," reverting `colorNodeField` /
+`colorLinkField` / the ramp to what they were when the Settings box was last opened), never a join
+onto the global stack. That is a few hours of work, one new string, and it cannot collide with a
+drawing edit's own Ctrl+Z the way a shared stack would. Not urgent, and not recommended as more than
+an option — nobody has reported losing a color scheme by accident the way Tom reported losing a Base
+demand value.
+
+**One paragraph for Tom, in his language, as asked:** Leave Settings out of Undo — it sounds nicer
+than it would feel. Everything in the Settings box already saves the moment you change it, on
+purpose and consistently, and that is correct: a "default diameter for new junctions" or an ID
+prefix has no effect on anything already drawn, so pressing Ctrl+Z after changing one would show you
+nothing happening even if it worked — which reads as "undo is broken" again, the exact complaint
+that started this. AutoCAD draws this same line in its own official documentation: the "what a new
+entity gets" settings are explicitly excluded from Undo, by design, industry-wide. The one Settings
+control that's genuinely different is map-coloring, because it repaints the whole drawing the moment
+you touch it — if you ever want a safety net there, the right shape (borrowed from how QGIS handles
+the same kind of control) is a small "Reset" link local to that one section, not a join onto the
+drawing's own Ctrl+Z — never mix "I changed how the map is colored" onto the same stack as "I moved a
+pipe," because pressing Ctrl+Z then stops reliably undoing the last thing you actually did.
+
+No shipped file touched.
+
+---
+
+## Task 682 follow-up: Zoom Window's gesture, and the toolbar button's first-click behavior
+
+Tom, 2026-09-23, testing branch `feat/zoom-control`: *"It seems inconsistent for us to use click
+for selection, but drag for zoom. I think we should have a consistent idiom. Maybe Ida has
+insight."* And: *"With Select area, the first time you click, it does not change modes. Changing
+the first time you click is confusing. I think that it should act like Select area. Click twice in
+a row to get mode change."*
+
+### What Select area actually does (OBSERVED)
+
+Select area's window shape is **click-a-corner, move, click-the-opposite-corner — but a
+press-drag-release also works**, because both gestures are read by the same handlers:
+`areaPress()` opens the ring on pointer-down (`js/looped-network.js:15547`); `areaMove()` just
+follows the pointer; a **second ordinary click** commits it (`areaPress()`'s second call falls
+through to `commitArea()`, `:15567-15569`), and separately `areaPointerUp()` (`:15612-15621`)
+commits it on release **only if the pointer travelled past the tap threshold**, so a plain
+click-release-click-release sequence and a press-hold-drag-release sequence both draw the same
+box. This is deliberate and dated: *"Instead of dragging, make all three of them click and
+rubber band"* (Tom, 2026-09-07, quoted at `:13340`), with the press-drag-release path added
+afterward as a second door onto the same commit, not a replacement (`:15605-15611`).
+
+The toolbar button (`js/looped-network.js:33613-33636`) is a single click handler:
+```
+areaBtn.addEventListener('click', function () {
+    setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
+});
+```
+Read exactly: **if you are not already in the tool, one click enters it, showing whichever of
+window/lasso/polygon it was already showing** (no cycling). **If you are already in the tool,
+that same click cycles the shown shape** and re-enters with the new one. So the button's outward
+face — which of the two/three things it will do — changes only on a click that lands while the
+tool is already active: i.e., "twice in a row." The very first click never changes what the
+button shows; it just does what it already showed.
+
+### What Zoom Window currently does, and where it breaks that pattern (OBSERVED)
+
+`extentBtn`'s handler (`:33689-33707`):
+```
+if (mode === 'zoom-window') { setMode('select'); return; }
+if (zoomToolShape === 'fit') {
+    zoomExtent(false);
+    zoomToolShape = 'window';
+    paintZoomToolButton();   // <-- flips the icon to "Zoom Window" right here
+    return;
+}
+setMode('zoom-window');
+```
+**The first click already changes what the button shows** — it fires Zoom to fit *and*
+repaints the icon to Zoom Window in the same click, before the user has done anything to ask for
+that second thing. That is the one concrete difference from Select area's button, and it is
+exactly what produces the "changing on the first click is confusing" complaint: two outwardly
+identical disclosure-triangle buttons sit side by side, and only one of them visibly changes on
+a single press.
+
+The canvas gesture is also a real inconsistency, separately from the button: `zoomWinBegin()` is
+called straight from `pointerdown` in `zoom-window` mode (`:34013-34014`) with no click-click
+door at all. A plain click (down, no movement, up) does not commit anything —
+`zoomWinFinish()`'s zero-distance guard (`:15352... `at `13405-13406`) just discards it and
+leaves the mode armed — so a user who tries the exact click-click gesture that works for Select
+area gets nothing, silently, on Zoom Window.
+
+### External idiom, cited
+
+- **EPANET's own Zoom-In tool is click-click, not drag**: "move the mouse... to where you want a
+  corner of the zoom window to begin, then click... Next move the mouse until the outline box...
+  encompasses the area... Then click... once again." CITED,
+  [EPANET 2.2 documentation, §7 Working with the Map](https://epanet22.readthedocs.io/en/latest/7_map.html).
+  This matters more than the others here because the suite already defers to EPANET's vocabulary
+  and conventions everywhere it can (CLAUDE.md, `lpn_` section).
+- **AutoCAD's ZOOM Window option is also two picks**: "pick one corner... pick the opposite
+  corner." CITED, [AutoCAD 2022 Help, ZOOM (Command)](https://help.autodesk.com/view/ACD/2022/ENU/?guid=GUID-66E7DB72-B2A7-4166-9970-9E19CC06F739).
+  (AutoCAD's *selection* window, a different command, accepts both a press-drag and two picks —
+  I did not find that stated for ZOOM Window specifically, so I am not citing it for ZOOM.)
+- **QGIS's zoom tool is drag-only**: "left-click and hold, then drag the mouse to create a
+  rectangle... release." CITED, [QGIS Documentation, General Tools](https://docs.qgis.org/3.10/en/docs/user_manual/introduction/general_tools.html).
+- **Web maps use shift-drag**, not a dedicated tool: Leaflet's `boxZoom`, OpenLayers' shift-drag
+  rectangle, ArcGIS's Shift+drag all key the gesture off a held modifier rather than a toolbar
+  mode. CITED, [Leaflet reference](https://leafletjs.com/reference.html) and search-summarized
+  OpenLayers/ArcGIS behavior above. Not directly applicable here — `lpn_` has no held-modifier
+  zoom gesture and Shift is already spoken for (it toggles Select area's keep-selection).
+
+So the field splits: EPANET and AutoCAD (click-click), QGIS (drag), web maps (modifier-drag). No
+single external authority settles it. What does settle it is what already sits on this
+toolbar.
+
+### Answer 1 — ranked
+
+**Do this: make Zoom Window accept both click-click and press-drag-release, by reusing exactly
+the gesture-handling shape Select area's window already uses (down opens the box, move follows
+it, a click-release-click-release OR a press-drag-release both commit it).** Reasoning: a reader
+who has just used the click-click idiom on the button to its left (Select area) and reaches for
+the button to its right (Zoom Window, same `.lpn-tool-more` triangle styling) has every reason to
+expect the same gesture to work, because nothing on the toolbar tells them otherwise — Tom's own
+"inconsistent" is the correct read of two adjacent, visually identical controls answering to
+different physical actions. This also happens to match EPANET's own zoom tool (click-click),
+which is the stronger of the two citable precedents here since the suite already defers to
+EPANET terminology and behavior wherever it can, and it does not cost the drag gesture anything:
+`areaPointerUp()`'s pattern (commit on release only past the tap threshold, else this is a
+"clicked open" ring waiting for its second click) covers both without asking the user to choose.
+Cost: a build agent needs to either extract Select area's press/move/commit trio into a shared
+helper or duplicate it against `zoomWinDrag`'s own state (the code already argues, at
+`:13369-13373`, for keeping the two states separate, which I read as still correct — a Zoom
+Window drag should not be able to bleed into what Select area draws next). Estimate: small, a
+few hours, no new strings, no translation cost.
+
+Second-ranked, if the first is judged too much for before 2026-09-16 — wait, that demonstration
+already passed; if judged too much for whatever the next freeze is: **leave Zoom Window as
+drag-only, but say so once**, e.g. a hover tip that already exists (`lpn_tool_zoom_window_tip`)
+could earn a sentence contrasting it from Select area. This is strictly worse: it spends a
+translated string to explain an inconsistency instead of removing it, which is exactly backwards
+from "a proposal that adds words has a real price; one that removes a bar does not" — the same
+principle, applied to a gesture instead of a bar. I would not do this.
+
+Not recommended at all: matching Select area to Zoom Window's drag-only instead (i.e., making
+Select area drag-only) — this breaks the already-shipped, already-explained rubber-band idiom
+that exists specifically because a held drag was unusable for tracing a lasso (Tom, 2026-09-07,
+quoted above), and would be a regression on a settled decision, not a fix.
+
+### Answer 2 — the precise button rule, for a build agent
+
+**Select area's rule, stated exactly enough to copy:** the button shows one of a fixed list of
+sub-choices (for Select area: window/lasso/polygon). A click, while the tool the button belongs
+to is **not currently active, performs whatever sub-choice is currently shown and enters the
+tool — the shown sub-choice never changes on this click.** A click **while the tool is already
+active** advances to the next sub-choice in the list and re-enters with it. There is no other
+state to track — `mode === 'select-area'` at the moment of the click is the entire test
+(`:33635`).
+
+**Zoom to fit / Zoom Window does not yet follow that rule, because 'fit' is a one-shot action
+and not a mode you can "already be in."** To make it follow the identical rule: the button must
+not repaint its icon to "Zoom Window" as a side effect of firing "Zoom to fit" — that repaint is
+the one visible thing happening on a first click that Select area's button never does. The
+fix is to gate the icon flip (and the `setMode('zoom-window')` call) on the click being a
+**second, consecutive** press of this same button, tracked the same way Select area tracks it —
+by whether the tool is presently active — except here the tool being "active" has to be a
+new one-shot flag (e.g. `zoomToolArmed`), since "fit" leaves no mode behind to test. Concretely:
+first press with `zoomToolArmed` false → fire `zoomExtent(false)`, set `zoomToolArmed = true`,
+**leave the icon showing "Zoom to fit."** Second press with `zoomToolArmed` true and nothing else
+having intervened → **now** flip the icon to "Zoom Window" and call `setMode('zoom-window')`,
+clearing `zoomToolArmed`. Any other toolbar action, mode change, or menu use in between clears
+`zoomToolArmed` back to false, the same way `zoomToolShape` already resets to `'fit'` on exit
+(`:15486-15488`) — reuse that same reset hook rather than adding a second one.
+
+Net effect for the person at the mouse: press once — the view fits, nothing about the button
+changes. Press again, right after — now you're in Zoom Window, and the icon says so. That is
+"click twice in a row to get mode change," read the way I believe Tom meant "mode" — the
+button's outward face, not the internal `mode` variable, which already changes on Select area's
+very first click and is not what he was describing.
+
+---
+
+## Task 647 — instrument for "network intact, off screen"
+
+**The two facts that decide this are already in the repo, and they point the same direction.**
+
+OBSERVED (`dev/tom-review-queue.md:616-625`, Task 647): Tom's own framing pairs the alert with
+Zoom to fit as the action, and flags Task 616's finding as the thing to weigh against any transient
+instrument.
+
+OBSERVED (`js/looped-network.js:47487-47488`, Task 704, Tom 2026-09-22): "**All** messages now need
+to go through this messenger system" — and Task 691 (`dev/roadmap-closed-ids.md:632`) closed by
+*replacing* a timed banner with a log "the user controls rather than a banner that leaves on a
+timer." Tom rejected the timed-banner shape for messages generally, one day before this task's
+ranking exercise, on the adjacent feature.
+
+OBSERVED (`js/looped-network.js:47484-47487`): `#lpn_map_notice` is `position:absolute`, transient,
+and explicitly NOT allowed to affect layout ("a transient must not change the fit, or every save
+would re-zoom the map") — i.e. the existing notice strip is architecturally the row nobody is
+looking at, the same row Task 616 measured MJH not seeing at 120 seconds.
+
+**Recommendation: a persistent centred overlay on the empty map, not the notice strip, not the
+Messenger.** Words, kept to Tom's economy: a two-line block —
+"Your network is intact." / "[Zoom to fit]" — the button IS the second line, not prose beside it;
+one tap does the job `zoomExtent` (already wired to the toolbar's Zoom to fit,
+`js/looped-network.js:2253`) already does. No "off to the north-west" clause in v1: direction text
+in 27 languages is real cost (CLAUDE.md's translation-price rule) for a payload an arrow can carry
+free — see runner-up below.
+
+**Why the overlay and not the notice strip or the Messenger:** the notice strip is disqualified by
+its own doc comment (transient by architecture) and by Task 616's finding, twice-measured, on this
+exact page. The Messenger is disqualified because it is a log of what ALREADY HAPPENED, opened by a
+glyph the user must remember exists and chooses to open — this is a fact about the CURRENT state of
+the view, always true until the user acts, and belongs where the emptiness is: centred in the one
+thing on the page that IS empty. An overlay sitting where the drawing should be is not competing
+with the drawing for attention the way chrome does — there is nothing to compete with. That is also
+why it does not need to be loud: a plain box, no color-coded severity, because the state is neutral
+information, not a warning.
+
+**Show/hide rule:** compute after any pan or zoom settles (never mid-drag, matching the `viewShowsModel()` "at rest" discipline already used for the load-time case, Task 628,
+`dev/roadmap-closed-ids.md:590`) — zero elements of the model intersect the current window. Hide the
+instant that test fails again, including as a direct RESULT of the user's own Zoom to fit press, with
+no fade and no delay: the moment the network reappears, the box has nothing left to say. Do NOT show
+it for "only a sliver visible" (Tom already leans "probably not") — a sliver is not the same failure
+mode as blank-equals-lost; a partly-visible network still answers its own question by being partly
+visible, and a coverage-fraction threshold is a second number to tune and defend where a boolean
+(zero vs. not-zero) is not.
+
+**Phone (390px) / RTL:** the box centres on the canvas regardless of writing direction — it has no
+inherent side. Button-first (Zoom to fit) reads fine centred in either direction since it is not a
+sentence with a start and end, just a label. On a phone the notice strip and Zoom to fit itself
+already survive at that width (`js/looped-network.js:47231`, mode hint goes `display:none` under
+640px but the toolbar's own zoom control persists); the overlay should follow the same rule as the
+toolbar's other overlays already do at small width — no new phone-specific case needed if it is
+built as a variant of the existing overlay layer, not the flow layer the mode hint lives in.
+
+**Ranked runners-up, one line each:**
+1. Edge arrow/chevron pointing toward the off-screen network, badge-style at the canvas edge nearest
+   the model's centroid — better than the overlay ONLY if Tom wants directional information kept
+   (it can encode direction without new translated strings, using rotation), but it is a second new
+   visual idiom the suite has never used, more code, and untested on RTL canvas edges; hold in
+   reserve if he asks for direction back.
+2. Highlighting the Zoom to fit button — cheapest, but fails Task 616's own lesson on its face: a
+   highlight IS a transient mark on a row (the toolbar) that PCW and MJH already demonstrated they
+   do not fixate on; it is the same failure mode relocated, not solved.
+3. A notice in the Messenger strip — wrong tier entirely (see above); also silently satisfies nobody
+   because the user never had a reason to open the log for a state, not an event.
+
+**What would make me wrong:** if Tom's real objection on 2026-09-23 was to the SURPRISE of the blank
+screen rather than to not knowing where the network went — i.e. if what he wants is to never reach
+a blank state at all (Zoom to fit / Zoom Window always guaranteeing at least a sliver stays in view)
+— then this is the wrong layer to fix it at, and the right move is upstream in the zoom-control
+branch's own logic, not a new overlay. Ask him directly before shipping: "intact but off-screen,
+told after the fact" vs "never let the fit produce a fully-blank result" are different fixes, and
+only one of them was actually described in the 2026-09-13 quote this task is built on.
+
+No shipped file touched.
+
+---
+
+## 2026-09-24 — the round of six: theming, offscreen-notice style, phone-button paradigm, select-all, Project1, File menu order
+
+Answering `dev/tom-review-queue.md` R-211, R-227, R-202/R-203, R-207, R-208, R-213 in one sitting,
+Tom's words quoted from that file. **No shipped file touched.** Full theming inventory and phased
+plan written to `dev/theming-plan.md` (a new doc, per the invocation's own allowance); everything
+else lives here.
+
+### R-211 — theming, phased plan in `dev/theming-plan.md`
+
+OBSERVED: zero colour design tokens exist (`css/engcalcs.css` has nine `--lpn-*` custom properties,
+all layout, none a colour system); 303 hard-coded hex colours in that one CSS file; of 1,114 hex
+literals across `js/*.js`, 1,025 are `js/lpn-ramps.js`'s colour-ramp DATA (out of scope — a ramp is
+drawn content, not chrome) leaving under 90 real chrome-colour literals in JS; exactly one
+`prefers-color-scheme` block exists, two rules, theming one component (`.lpn-example-card`) out of
+at least nine independently-declared "box" styles (`.lpn-setbox`, `.lpn-propbox`, `.lpn-findbox`,
+`.lpn-runbox`, `.lpn-libbox`, `.lpn-ffbox`, `.lpn-msglog-panel`, `.lpn-color-legend`,
+`.lpn-dragpanel`). Tom is right that this forces discipline — there is currently none to force.
+
+**Plan, phase-first:** Phase 1 (medium, 1-2 weeks) declares semantic tokens, consolidates the box
+styles onto them, and adds a check that refuses a new hard-coded chrome colour outside an explicit
+allow-list (`lpn-ramps.js` named as the one deliberate exemption) — no visible change, done-test is
+a byte-identical screenshot before/after plus the new check passing. Phase 2 (small, only possible
+once phase 1 is real) writes one dark token set under the existing `prefers-color-scheme` query,
+excluding the map's own drawing ink by the same reasoning the example-thumbnail comment already
+states (a network's drawing is data, like a printed sheet; theming it would make a shared screenshot
+look like two different networks). Phase 3 (small) is the visible payoff: one Settings row
+(System/Light/Dark).
+
+**Storage:** SPECULATION-turned-OBSERVED by CLAUDE.md's own rule — a theme choice is a BROWSER
+setting (`localStorage`, alongside `lpn_pane`/`lpn_setbox`), never a project setting, because it is
+a fact about the reader's screen, not the model. No consent-text change: `dev/storage-rulings.md`'s
+exemption test already passes an explicit preference with no gate (its own worked example is
+`ec_language`), and `consent_body` (`lib/lang.ec.en.php:100`) names only the one-digit analytics
+cookie today and needs no new sentence for this, exactly as it needed none for the other furniture
+keys already shipped.
+
+### R-227 — the offscreen-notice's "new style"
+
+OBSERVED: `Looped-Network.php:633-637` (worktree `~/webdev/worktrees/feat-offscreen-notice/engcalcs`)
+already reuses the suite's ONE existing warning palette — `background:#fffbe6;border:1px solid #a80`
+— the same pair `#lpn_map_notice` (`Looped-Network.php:378`) and `#lpn_status`
+(`Looped-Network.php:413`) use. So the colours are not new; what is new, and what I read as Tom's
+actual objection, is the FORM: a centred, rounded-corner (`border-radius:4px`), padded
+(`10px 16px`) card floating in the middle of the canvas with a button inside it — a shape that
+matches none of the suite's existing "amber strip" notices (all thin, edge-anchored, `2px 6px`
+padding, no radius, no button). Two colour roles are being asked to mean two different things with
+the same paint: the amber pair means WARNING everywhere else it appears (a diagnostic, a lock, a
+kept-message flag); this card's content ("Your network is intact.") is neutral, reassuring
+information, not a warning, and painting it in the warning colour borrows a signal it does not
+mean.
+
+**Recommendation: do not invent a fourth notice shape and do not wait for theming.** Two moves,
+independent of each other:
+
+1. **Reuse `.lpn-panel`-style neutral chrome (the setbox/findbox/runbox family's plain white panel
+   with a grey `#bbb`-class border, e.g. `.lpn-msglog-panel-empty`'s
+   `background:rgba(255,255,255,.8);border:1px solid #bbb;border-radius:3px;padding:2px 6px`),
+   NOT the amber warning pair — this is a wording/colour fix only, on the branch, before merge. It
+   is small enough to make on `feat/offscreen-notice` directly rather than folding into theming.
+2. **Fold the SHAPE (centred card with a button) into theming's phase 1**, because it is exactly
+   the "one more independently-declared box style" the inventory above already counts, and phase
+   1's whole job is stopping that count from growing. Recorded there rather than blocking this
+   merge on it — a demo-week branch should not wait on a multi-week discipline project, but the
+   next centred-card need (and there will be one — Task 616's own history shows this suite reaches
+   for a new box shape under pressure more than once) should draw from the phase-1 panel primitive,
+   not invent a fifth.
+
+**Answer to "which existing style, so it can merge before theming exists":** the neutral
+`rgba(255,255,255,.8)` / `#bbb` panel pair, not the amber warning pair. It should NOT wait for
+theming to merge.
+
+### R-202 / R-203 — the phone-app-button paradigm, and the hint that failed twice
+
+**The hint (`#lpn_menu_cue`, `js/looped-network.js:37070-37096`, `css/engcalcs.css:1471-1486`,
+string `lpn_menu_cue`) is my own 2026-09-10 recommendation from
+`dev/app-chrome-postdivorce-recommendations.md` §F item 4** — a standing, dismissible, first-visit
+arrow anchored at the toolbar's top edge, pointing up at File, explicitly designed NOT to repeat
+the Hide-titles highlight's failure (a mark on a row nobody is looking at). MOD not finding it is
+the SAME failure mode one layer up: the cue itself is small, quiet, monochrome text with a thin
+blue arrow — dismissible chrome sitting where the eye already stops (the toolbar), asking the eye
+to then move somewhere it demonstrably does not go on its own. **Tom's read — "a feeble attempt to
+rescue an attempt that isn't working" — is correct, and I concur with retiring it rather than
+patching it with a lightbulb glyph**, which would be a fifth iteration of the identical shape
+(decorate the same underused row a little more) rather than a structural fix. Do not build the
+lightbulb.
+
+**On the paradigm question itself, with evidence.** CITED (own general knowledge of shipped
+products, named): consumer and prosumer web apps that have moved away from a text menu bar as the
+PRIMARY discovery surface converge on one of two shapes, neither of which is "no menu bar" —
+(a) Figma's single app-icon menu (all File/Edit/View commands collapse under one icon-button in the
+corner) paired with a prominent, always-icon TOOLBAR carrying the high-use tools, or (b) Google's
+own Material Design filled/outlined "chip" buttons and bottom-navigation bars on mobile, where
+every destination is a same-sized, same-shape, bright or outlined button with an icon, never a
+plain text link. Google Sheets and Docs on desktop keep a conventional text menu bar AND a below-it
+icon toolbar (the shape this page already has); their MOBILE apps drop the menu bar to a hamburger
+and promote a bottom icon bar. **The pattern across all of them: nobody merges the genres — a
+command-rich surface stays text, and the frequently-reached-for surface becomes uniform bright
+buttons.** `dev/app-chrome-postdivorce-recommendations.md` §F already measured why: this page's
+menu bar (5 items, 401px of ink) and toolbar (22 buttons, 1,260px) are structurally different
+counts, and treating both as one paradigm was flagged there as "a genuine judgement-level tension...
+worth one direct question to Tom rather than a unilateral pick." He has now answered it.
+
+**What Tom is asking for reads as a genre unification, not a menu-bar redesign in isolation**: make
+EVERY top-level control — menu-bar items AND toolbar buttons — a same-family button (solid blue or
+rounded-outline blue), closing the "nav-list vs tool-palette" genre gap §F identified as the
+strongest single cause of the menu bar reading as belonging to the site (MAH's own words) rather
+than the app. This is a real, evidence-backed direction, not merely following fashion: it directly
+answers §F's measured diagnosis (icon size, count, ink-width and GENRE all currently separate the
+two rows) by removing the genre difference rather than trying to make the menu bar win an attention
+contest it cannot win on size or count.
+
+**Recommendation: preview it on a branch, and yes — it belongs inside theming's phase 1, not
+beside it.** The blue accent colour, the pill/chip shape, the border-radius, and the "one button
+style for every kind of pressable chrome" are exactly the token-and-one-component-style work phase
+1 already does for panels; doing the button unification as a SEPARATE effort would build the same
+kind of token twice. Concretely: a `feature/chrome-button-style` branch (name singular per
+`dev/git-workflow.md`) that (a) gives every `.lpn-menubar-item` and `#lpn_toolbar button` the same
+`.ec-btn` base — border-radius, one accent colour family, same height — merging the genre gap
+without merging the DOM rows (§A's own finding stands: a literal one-row merge breaks below
+~1750px, still true and untouched by this), and (b) is judged by Tom on a real render before any
+theming work proceeds, since it fixes the token PALETTE's central colour choice, which everything
+downstream in phase 1 would otherwise pick provisionally and re-litigate. **Do this preview before
+starting theming's token declaration, not after** — the accent-colour choice this makes is exactly
+`--ec-accent`, phase 1's own first token.
+
+**Delete the hint:** yes, once the button-style branch ships (it is very likely made unnecessary by
+the button style itself — a bright, obviously-pressable File button needs no arrow pointing at it).
+Until then, leave `#lpn_menu_cue` running rather than removing it with nothing to replace it — a
+small, known-weak instrument beats a gap, and MOD not seeing it is not evidence it helps nobody,
+only that it does not help everybody.
+
+### R-207 — select-all on focus, confirmed, specified
+
+**Confirmed**, on the same grounds Tom names ("it checks out for me, and it was his natural
+expectation") — this is the standard behaviour of a browser address bar and of ordinary desktop-app
+property fields (Windows/macOS "select all text in this field when it gains focus" convention,
+CITED as the general OS-level convention rather than one product's), and this page's own Properties
+and Settings boxes are exactly that class of field: short, single-value, meant to be overwritten
+whole, not edited character-by-character.
+
+**Which inputs:** every `<input type="text">` and `<input type="number">` inside the Properties box
+(`.lpn-propbox`), the Settings box (`.lpn-setbox`), the Find and replace popup, and any other
+one-line field outside spreadsheet mode (ID prefix boxes, curve-point single fields when NOT inside
+the table, the new-project wizard's text fields). **Search boxes** (Settings search, Find's own
+query box) — include; a search box is overwritten-whole exactly like a property field. **Not
+`<textarea>`** — Notes/Description fields are edited incrementally (a sentence appended to existing
+text), and select-all-on-focus there would delete a paragraph on an accidental Tab, which is the
+opposite of the courtesy this row is trying to add.
+
+**Trigger:**
+- **Tab focus and programmatic focus** (a dialog opening and calling `.focus()` on its first field):
+  call `.select()` in the plain `focus` event handler — no conflict to resolve, nothing else is
+  moving the caret at the same instant.
+- **Mouse click:** the click's own native behaviour places a caret at the pointer, which fights a
+  `focus`-handler `.select()` unless sequenced correctly. Standard fix (the same one browsers use
+  for their own address bar): on `mousedown`, check whether the target is ALREADY
+  `document.activeElement`; if it is NOT, call `preventDefault()` on the mousedown (stopping the
+  browser's own click-to-caret) and do the focus + select programmatically. If it IS already the
+  active element, do nothing special — let the click place the caret normally.
+- **Second click in an already-focused field:** by the rule just above, this is the "do nothing
+  special" branch — the browser's own default caret-at-pointer behaviour applies, exactly matching
+  the address-bar convention Tom is describing (first arrival selects all; a further click inside
+  an already-focused field just moves the cursor).
+
+**Exclusion:** any input that is a spreadsheet-mode table cell (the Tables pane / `feat/table-editing`
+work — identify by containment, e.g. inside `#lpn_table_pane`/whatever wraps the pane's editable
+cells, or by a dedicated class such as `.lpn-cell-input` if the table editor already tags its inputs
+that way) is explicitly OUT of this behaviour — a spreadsheet cell's own convention (typing replaces
+the cell outright without needing `.select()`; Enter/Tab navigate rather than edit-in-place) is a
+different, already-decided model and must not be touched by this change.
+
+### R-208 — the empty Project1 tab
+
+**Recommendation: open Project1 as an empty WGS84 project viewing Downtown Novato Center, not a
+funnel screen.** Reasons, weighed against the funnel alternative:
+
+- **No new interstitial chrome.** A "choose gallery or New project" screen is itself a fifth thing
+  competing with the drawing for attention, on the exact page whose diagnosed defect (Task 616) is
+  already too much competing chrome — building a wall to fix a different first-visit complaint would
+  cut against the whole thrust of this brief.
+- **It directly fixes the reported defect, not just its symptom.** The complaint is specifically that
+  attaching the world map ERRORS on the schematic default — that is a coordinate-system problem
+  (Project1 has no CRS), and making Project1 geographic from birth removes the error at its source
+  rather than routing the user around it.
+- **The existing empty-state gallery (`#lpn_empty_hint`, `Looped-Network.php:613`,
+  `showExamplesOverlay()`) is UNCHANGED by this** — its condition is "no elements," not "no
+  coordinate system," so a first-time visitor still sees the examples gallery overlaid on top of
+  the (now-geographic) empty canvas exactly as today. The two fixes stack rather than compete: the
+  gallery still offers "start from an example"; the map underneath it now actually accepts a
+  background image if the visitor closes the gallery and tries anyway.
+
+**Where a build agent should look:** the true first-visit path bypasses `newProject()` entirely —
+`js/looped-network.js:33296-33298` (`if (!indexEntry(library.openId)) { var firstId =
+newProjectId(), firstName = nextProjectName(); ... }`, inside `init()`) is where Project1's `doc`/
+`project` state is actually born, not `newProject()` (`:27148`), which only fires for the SECOND and
+later tabs. `newProject(coords, crs)` already has the geographic branch to imitate
+(`:27176-27182`: sets `project.coords = LPN_COORDS_GEO`, calls `geoHomeView()` for
+`pendingView`/`pendingViewFor`). `geoHomeView()` (`:3844-3855`) and its constant `LPN_GEO_HOME =
+{lon:0, lat:0}` (`:3843`) currently point at the middle of the Atlantic at world zoom — **do not
+repoint `LPN_GEO_HOME` itself**, which would move every wizard-created blank geographic project
+to Novato and surprise a user who explicitly chose "start blank, geographic" from the New Project
+box; instead give the first-visit path (`:33296-33298`) its OWN pending view (Downtown Novato
+Center's lon/lat, at a street-scale zoom rather than world zoom — the exact numbers are whatever
+Tom's own Mapbox/Nominatim search for "Downtown Novato Center, Novato, CA" returns) and its own
+`project.coords = LPN_COORDS_GEO` assignment, parallel to but independent from `newProject()`'s.
+
+**Also touches, and needs deciding alongside the code change:**
+- **`project.basemap` default** for Project1 specifically needs a value (OSM street tiles, per
+  CLAUDE.md's ungated default) or the geographic canvas shows nothing behind the empty grid — a
+  geographic project with no basemap set is not obviously better than a schematic one for a
+  first-time viewer.
+- **The wizard's own defaults are untouched.** New Project's radio choice (R-209's "Coordinate
+  system" wording) stays whatever it is today — this changes only the IMPLICIT, no-choice-made
+  first tab, not the explicit path through the wizard.
+- **The "attach world map on schematic project" error path itself stays** — it still needs to exist
+  and still needs to be correct for any project a user explicitly makes Local/schematic through the
+  wizard; this fix only stops the error from firing on the one project nobody chose to make
+  schematic.
+
+### R-213 — Convert coordinates as… in the File menu
+
+OBSERVED, `js/looped-network.js:32018-32096`: the current File menu build is one array — New
+project, Open, Open example, **Convert coordinates as…** (third, with its own three-paragraph
+comment justifying that position as "the fallback, listed after the two doors people reach for
+first"), Import surveyed points, Import EPANET, Export EPANET, Import libraries — then, after a
+`{ separator: true }`, the second block: Save, Save as…, Save all, Revert, another separator, Close.
+
+Tom's ask is specific and small: move Convert coordinates as… to directly after Save as…. **Doing
+this literally argues against itself on the menu's own stated logic** — the surrounding comment
+block explains at length why Convert coordinates as… sits where it is now (third, "below both rows
+it rescues," Open and Open example), and every one of the six rows around it that stays in the
+first block does so because they all share one property Save/Save as do not: they end in a NEW TAB
+(a project switch) rather than acting on the one already open. Convert coordinates as… is exactly
+that kind of row — it always opens a fresh project from a file, never touches the one on screen —
+so moving it into the Save block groups it with rows about a DIFFERENT verb (writing the current
+document out) rather than the ones it shares an outcome with.
+
+**Specifics, if Tom still wants the move after that:**
+- **Position:** immediately after the `Save as…` row (`:32096`) and before `Save all` (`:32106`) —
+  "directly after Save as…" read literally, not after the whole Save/Save as/Save all/Revert
+  cluster.
+- **No new separator around it.** A lone command wedged inside an unbroken Save-family block would
+  read as a fifth member of that family; Tom's own reasoning for the move ("there is nothing else
+  about converting, and it's not about importing or exporting") argues it should stand apart, which
+  a bare row (no separator on either side, just its position) already achieves without adding a
+  bar that then needs justifying to a translator asking "why is this file split into four groups."
+- **Label unchanged** — "Convert coordinates as…" already carries its own meaning; nothing about
+  its neighbours changes what the row itself needs to say.
+- **What is lost:** the comment's own "third, below both rows it rescues" placement, which read
+  Convert coordinates as… as a FALLBACK from Open/Open example specifically. Moved beside Save as…,
+  it instead reads as a sibling of "ways to end up with a file," which is a real, defensible framing
+  — but a different one, and the code comment at `:32018-32041` needs rewriting to state the new
+  reasoning rather than leaving the old one to contradict where the row now sits.
+
+**My own read, offered since asked "any specifics" rather than "do it":** I would leave it where it
+is. The existing three-paragraph justification is not decoration — it argues from the row's actual
+behaviour (does it open a new tab, yes; does it act on the document on screen, no), and Save as… is
+squarely in the second category. But this is a small, reversible, single-menu change with no
+translation cost beyond nothing (label unchanged), so if Tom's felt sense after using the app is
+stronger than the written argument, moving it costs little; the placement above is exactly how to
+do it with the least collateral damage to the rows around it.
+
+No shipped file touched.
+
+## 2026-09-25 — Tables pane heading: sort vs select vs move vs hide (feat/table-editing)
+
+**The bug under the complaint.** `paneStartColDrag()` (the branch on a SELECTED heading) never
+calls `ev.preventDefault()` before attaching its mousemove/mouseup listeners — unlike
+`paneStartColResize()` and the sibling `paneStartHeadSelDrag()` path, which both do.
+OBSERVED: js/looped-network.js:21212-21226 (function body), vs. the guarded call site at
+js/looped-network.js:21416 (`if (paneHeadSel(spec).indexOf(c.key) !== -1) { paneStartColDrag(spec,
+c.key, ev); return; }` — no preventDefault on this branch, only on the sibling one three lines
+later). This is very likely why Tom could not get a column to drag: the browser's native
+mousedown handling (focus/press ring, and on a `<button>` whose row runs into adjacent `<th>`
+text, sometimes drag-select of neighboring cell text) fights the custom drag. **Fix this line
+first, regardless of anything else below** — it is a one-line, zero-cost repair of a real defect,
+not a design change.
+
+**Does `user-select: none` on the heading fix it?** Tom's suspicion is half right. The sort label
+is already inside a `<button>` (js/looped-network.js:21386), and buttons suppress native text
+selection in every evergreen browser by default — so the heading TEXT was never really the
+draggable culprit. OBSERVED: css/engcalcs.css has no explicit `user-select` rule on
+`.lpn-pane-sort`. Add one anyway (`user-select: none` on `.lpn-pane-sort` and `.lpn-pane-table
+thead th`) as cheap insurance against a drag that overshoots into a neighboring `<th>`'s padding —
+but it is not the fix for "can't drag"; the missing `preventDefault()` is.
+
+**Survey of established grids.** CITED, from documented/observed behavior of each product:
+- **Excel / Google Sheets**: clicking a header never sorts. Sort lives in a separate command
+  (Data > Sort, or the AutoFilter dropdown arrow). A plain click on the header selects the whole
+  column; Sheets' own keyboard equivalent is Ctrl+Space with a cell in that column focused. This
+  is how spreadsheets avoid this exact conflict — sort and select are never on the same click.
+- **AG Grid**: click header = sort; the *same* header is also the drag handle for column reorder,
+  distinguished by movement distance — a press that never leaves the header is a sort, a press
+  that travels is a move. This branch already uses that exact distinction (click with no drag =
+  sort; drag = select or move, gated on `spec.headDragged`). A separate hover-revealed icon
+  (angle/menu glyph, only rendered on `:hover`, no layout width cost) opens AG Grid's column menu
+  for pin/autosize/hide.
+- **MUI DataGrid**: click header sorts; a hover-revealed sort caret hints sortability before the
+  click; a separate "⋮" icon (also hover-revealed) opens a menu with Sort, Filter, Hide column,
+  Manage columns.
+- **Airtable**: no click-to-sort at all — clicking a header opens its field menu (edit, sort, hide,
+  duplicate); reordering is a drag on the header.
+- **QGIS attribute table**: click header sorts (toggles asc/desc, same as this branch); right-click
+  offers "Hide column"; a separate **"Organize columns"** dialog offers checkboxes for
+  show/hide plus reorder — the closest existing precedent for Tom's "Manage columns" idea.
+
+**Recommendation.** Keep this branch's existing click/drag-distance split — it already matches
+AG Grid's proven resolution and needs no redesign. Do not zone the heading cell into a "text
+sorts, margin selects" split (Tom's own tentative idea): no surveyed grid does this, a boundary
+inside a heading this narrow (CLAUDE.md, "width is king") has no visible edge, and it doubles the
+discovery burden instead of resolving it. Reject it explicitly if re-proposed.
+
+Instead, three additions, cheapest first:
+1. **Fix the missing `preventDefault()`** at js/looped-network.js:21416 — the actual drag bug.
+2. **Add "Show all columns" to the existing hide/show context menu**, shown only when at least one
+   column is hidden, alongside the per-column "Show {col}" entries already there
+   (js/looped-network.js:22952-22958). Do not reuse the filter's "Show all" string
+   (`lpn_pane_filter_clear`) — it means something else (clear the row filter) and appears in the
+   same UI region; reusing it across two different commands on the same table would be the exact
+   kind of reuse CLAUDE.md's label-normalization rule forbids ("reuse stops at sentences," and this
+   is two different actions, not one label two places).
+3. **Add a hover-revealed "⋮" icon at the trailing edge of every heading** (no layout width; drawn
+   absolutely over the grip's margin, visible only on `:hover`/`:focus-within`, same treatment as
+   AG Grid's and MUI's column-menu glyph) that opens the *same* context menu right-click/long-press
+   already opens. This is the fix for "I honestly don't know [about] a grab cursor somewhere" —
+   it gives desktop users a visible, clickable affordance for Hide/Show/Manage instead of requiring
+   they already know to right-click, while leaving long-press as the touch equivalent unchanged.
+   Add one new menu item, **"Manage columns…"**, opening a small dialog: one row per column
+   (including hidden ones), a checkbox for Show, and up/down reorder buttons — this is the touch
+   and keyboard path for reorder and multi-hide that the mouse-drag gesture does not cover
+   (paralleling QGIS's Organize columns).
+
+**Cursors, stated plainly** (mostly already correct, OBSERVED css/engcalcs.css:2566-2568):
+sort button = `pointer`; a selected heading = `grab`, `grabbing` while held; resize grip =
+`col-resize`; the new "⋮" menu glyph = `pointer`. No new cursor is needed.
+
+**Keyboard.** Tab reaches each heading button; Enter/Space already sorts (native button behavior).
+Add Ctrl+Space (a cell focused in that column, or the heading itself focused) to toggle that
+column into the selection, matching Google Sheets' own shortcut (CITED) rather than inventing one.
+Column reorder and hide/show by keyboard both route through the new "Manage columns…" dialog
+(item 3 above) rather than a bespoke arrow-key drag — nobody surveyed ships keyboard column-drag,
+and a dialog with ordinary Tab/Space/Up/Down controls is the accessible answer for free.
+
+**Touch.** Long-press already opens the hide/show menu (unchanged) — add "Show all columns" and
+"Manage columns…" to it, same as desktop. Do not attempt touch drag-to-reorder or drag-to-select:
+it competes with page/pane scroll and no surveyed grid solves that well on a narrow heading, so
+route every touch column operation through the menu and the dialog.
+
+**New English strings needed** (plain American English, no em dashes):
+- `lpn_pane_show_all_cols` = "Show all columns"
+- `lpn_pane_manage_cols` = "Manage columns…"
+- `lpn_pane_manage_cols_title` = "Manage columns" (dialog title)
+- `lpn_pane_manage_cols_show` = "Show" (checkbox column heading in the dialog)
+- (Optional, only if the dialog needs empty-state text) `lpn_pane_manage_cols_hint` = "Check a
+  column to show it. Drag or use the arrows to reorder."
+
+**Rejected alternative, most likely to be re-proposed**: splitting the heading cell into a
+text zone (sorts) and a margin zone (selects/drags). Loses because: (a) no surveyed grid does it —
+each resolves the same conflict with either a movement-distance threshold (AG Grid, and this
+branch already) or by taking sort off the plain click entirely (Excel, Sheets, Airtable); (b) a
+column this narrow ("width is king," CLAUDE.md) has no room to show the boundary, so the split
+would be undiscoverable by definition; (c) it does not fix Tom's actual failure, which is the
+missing `preventDefault()`, not a click/drag ambiguity.
+
+Provenance: bug location and current behavior are OBSERVED against
+`js/looped-network.js` and `css/engcalcs.css` on branch `feat/table-editing`
+(worktree `/home/haws/webdev/worktrees/feat-table-editing/engcalcs`) as of 2026-09-25. Grid
+conventions (Excel, Google Sheets, AG Grid, MUI DataGrid, Airtable, QGIS) are CITED from general
+product knowledge, not fetched fresh this session — flag for a follow-up web check before this is
+built if any single claim needs to be load-bearing.

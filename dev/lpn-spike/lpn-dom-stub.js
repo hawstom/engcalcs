@@ -102,7 +102,19 @@ function mkEl(tag, svgNS) {
     getAttribute(k) { return k === 'style' ? this._styleAttr : this[k]; },
     removeAttribute(k) { delete this[k]; if (k.indexOf('data-') === 0) { delete this.dataset[dataKey(k)]; } },
     addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); },
-    removeEventListener() {},
+    // **REMOVAL IS REAL, AND IT WAS A NO-OP UNTIL 2026-09-19.** A handler that hangs itself on
+    // mousedown and takes itself down on mouseup -- which is how every drag on this page works,
+    // and how the column resize and column move of Task 690's points (d) and (e) work -- then
+    // accumulated one live copy per drag. The SECOND drag ran the first one's ending as well, so a
+    // press that should have changed nothing moved a column, and the harness failed for a reason
+    // that does not exist in a browser. That is the stub removing a coupling rather than modelling
+    // one, which dev/testing-notes.md names as the first thing to suspect.
+    removeEventListener(t, f) {
+      const a = this._listeners[t];
+      if (!a) { return; }
+      const i = a.indexOf(f);
+      if (i >= 0) { a.splice(i, 1); }
+    },
     querySelectorAll() { return []; },
     // **ONE SELECTOR SHAPE, A BARE TAG NAME**, and nothing more -- enough for the New-project box's
     // `copy.querySelector('select')` (Task 477) and honest about the rest. A stub that answered
@@ -341,6 +353,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_backdrop_file', 'lpn_backdrop_menu', 'lpn_backdrop_target_continue',
   'lpn_backdrop_target_mode', 'lpn_backdrop_target_panel', 'lpn_canvas', 'lpn_coords',
   'lpn_empty_hint', 'lpn_labels_legend', 'lpn_labels_link_fields', 'lpn_labels_node_fields',
+  'lpn_labels_customer_fields',
   'lpn_area_hint', 'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice', 'lpn_map_overlay_tl',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
@@ -348,6 +361,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
+  // The message log's icon button and its on-map panel (ROADMAP Task 704).
+  'lpn_msglog_btn', 'lpn_msglog_panel',
   // The lock/warning banner (Task 195), which is page chrome in FLOW above the canvas -- so its
   // appearing changes the map's height (Task 552). A stub without it made renderBanner() return at
   // its first line and every banner rule untestable.
@@ -356,11 +371,19 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
   'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_create',
   'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si', 'lpn_new_crs_pick',
-  // The Geographic projection box (Task 641 phase 2): the two filters, the selector they narrow,
+  // The Coordinate system box (Task 641 phase 2): the two filters, the selector they narrow,
   // and the note that says which filter is doing the narrowing.
   'lpn_crsbox', 'lpn_crsbox_title', 'lpn_crsbox_close', 'lpn_crsbox_view', 'lpn_crsbox_place',
   'lpn_crsbox_search', 'lpn_crsbox_name', 'lpn_crsbox_list', 'lpn_crsbox_note', 'lpn_crsbox_ok',
   'lpn_crsbox_cancel',
+  // The File, Convert as box (Task 696). Its three coordinate radios are read by id, and its unit
+  // selects are cloned into #lpn_convas_units_fields exactly as the New-project box clones its own.
+  'lpn_convas_panel', 'lpn_convas_units_fields', 'lpn_convas_kind_epsg', 'lpn_convas_kind_unnamed',
+  'lpn_convas_kind_none', 'lpn_convas_crs_pick', 'lpn_convas_crs_name', 'lpn_convas_from',
+  'lpn_convas_ok', 'lpn_convas_cancel', 'lpn_convas_close', 'lpn_convas_si', 'lpn_convas_us',
+  'lpn_u_mapcoords', 'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
+  // The Label column beside the rounding selects (Task 696 part 2): one suffix box per row.
+  'lpn_convas_suffix_diameter', 'lpn_convas_suffix_depth', 'lpn_convas_suffix_flow', 'lpn_convas_suffix_head',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span
@@ -451,6 +474,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
   // harness -- the same silent hole the two boxes above it describe.
   'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_report',
+  // The Status report and Full report boxes (ROADMAP Tasks 716, 715). Same silent hole as the
+  // three boxes above: absent from this list, rebuildStatusReport()/rebuildFullReport() return at
+  // their first line and both reports are invisible to every harness.
+  'lpn_status_box', 'lpn_status_close', 'lpn_status_report',
+  'lpn_full_box', 'lpn_full_close', 'lpn_full_csv', 'lpn_full_print', 'lpn_full_report',
   // The Libraries box -- patterns, controls and curves (Tasks 462/460), and since 2026-09-05 the
   // fourth box that remembers where it was left, how big it was made and whether it was open.
   // Absent from this list, wireLibraryBox() and openLibraryBox() both return at their first line,
@@ -459,7 +487,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The Libraries box's own hidden file picker (Task 611). Its own input rather than a second use
   // of #lpn_project_file, because the two feed different readers; absent from this list,
   // libImportPick() returns at its first line and the plumbing cannot be asked anything.
-  'lpn_library_file'
+  'lpn_library_file',
+  // The "network intact, off screen" overlay (ROADMAP Task 647). Absent from this list,
+  // updateOffscreenNotice() and wireOffscreenNotice() both return/no-op at their `getElementById`
+  // guard and the whole feature is invisible to every harness.
+  'lpn_offscreen_notice', 'lpn_offscreen_notice_text', 'lpn_offscreen_zoom_btn'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -534,6 +566,25 @@ const unitSelects = {};
 // `family` is NOT decoration: echoUnitSelect() puts data-family on every real select, and Task
 // 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
 // that function skip every select and vacuously report "us", which is a test agreeing with itself.
+// **AN OPTION'S textContent IS THE TRANSLATED LABEL, NEVER THE UNIT'S NAME** -- echoUnitSelect()
+// (lib/Calculators.lib.php) prints `$ec_lang['u_' . $unit]` as the option's text, so 'fth2o' reads
+// "ft H2O" on the real page. A stub whose textContent equalled the value could not tell a caller
+// that reads the display text from one that (wrongly) reads the value: the two would agree by
+// construction. Found this way, 2026-09-23: pre-review reported a Convert as Label box pre-filling
+// with the raw unit id, and a stub with this bug in it would have shown the same result for either
+// a correct read or an incorrect one.
+const unitLabels = (function () {
+  const src = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+  const out = {};
+  for (const m of src.matchAll(/\$ec_lang\['u_([a-zA-Z0-9_]+)'\]\s*=\s*'((?:[^'\\]|\\.)*)'\s*;/g)) {
+    out[m[1]] = m[2].replace(/\\'/g, "'");
+  }
+  return out;
+}());
+function unitLabelText(name) {
+  if (!(name in unitLabels)) { throw new Error("lpn-dom-stub.js: no \$ec_lang['u_" + name + "'] in lib/lang.ec.en.php"); }
+  return unitLabels[name];
+}
 function mkUnitSelect(name, family, opts, chosen) {
   // **A REPLACED SELECT IS DETACHED, BECAUSE THAT IS WHAT REPLACING ONE DOES** (Task 651).
   // setUnitSet() calls this again for every name, and the old object used to keep its parentNode
@@ -545,8 +596,9 @@ function mkUnitSelect(name, family, opts, chosen) {
   if (unitSelects[name]) { unitSelects[name].parentNode = null; }
   const s = mkEl('select');
   s.name = name;
+  s.id = name;   // echoUnitSelect() emits id=name since Task 685
   s.dataset.family = family;
-  s.options = opts.map(n => ({ value: n, textContent: n }));
+  s.options = opts.map(n => ({ value: n, textContent: unitLabelText(n) }));
   s.selectedIndex = opts.indexOf(chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
   Object.defineProperty(s, 'value', { get() { return this.options[this.selectedIndex].value; } });
@@ -687,7 +739,14 @@ global.document = {
   // line. Recording a listener changes nothing on its own; only a test that dispatches sees them.
   _listeners: {},
   addEventListener(t, f) { (global.document._listeners[t] = global.document._listeners[t] || []).push(f); },
-  removeEventListener() {},
+  // Real removal, for the reason the element's own removeEventListener() above states: a drag that
+  // hangs a document-level move/up pair and takes it down again is the commonest shape on this page.
+  removeEventListener(t, f) {
+    const a = global.document._listeners[t];
+    if (!a) { return; }
+    const i = a.indexOf(f);
+    if (i >= 0) { a.splice(i, 1); }
+  },
   dispatchEvent(e) {
     (global.document._listeners[e && e.type] || []).slice().forEach(function (f) { f(e); });
     return true;

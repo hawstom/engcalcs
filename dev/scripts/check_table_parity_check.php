@@ -1,6 +1,6 @@
 <?php
 /**
- * check_table_parity_check.php — CLAUDE.md's "Automated checks" table and check_all.sh name the
+ * check_table_parity_check.php — dev/automated-checks.md's "Automated checks" table (moved out of CLAUDE.md 2026-09-23) and check_all.sh name the
  * same set of checks. BLOCKING (pass --advisory to demote it).
  *
  * Copyright 2009 Thomas Gail Haws
@@ -167,7 +167,7 @@ if (defined('CHECK_TABLE_PARITY_LIB_ONLY')) {
 $advisory = in_array('--advisory', array_slice($_SERVER['argv'], 1), true);
 $root = dirname(__DIR__, 2);
 $sh = (string) file_get_contents($root . '/dev/scripts/check_all.sh');
-$md = (string) file_get_contents($root . '/CLAUDE.md');
+$md = (string) file_get_contents($root . '/dev/automated-checks.md');
 
 $runs = ecRunChecks($sh);
 $claims = ecCheckTableClaims($md);
@@ -177,7 +177,7 @@ if (!$runs) {
     exit(2);
 }
 if (!$claims['cells']) {
-    fwrite(STDERR, "Could not find the Automated checks table in CLAUDE.md. It is the table whose\n"
+    fwrite(STDERR, "Could not find the Automated checks table in dev/automated-checks.md. It is the table whose\n"
         . "first column names each check; this reads it under the '## Automated checks' heading.\n");
     exit(2);
 }
@@ -229,7 +229,7 @@ $problems = count($missingFromTable) + count($missingFromRunner) + count($absent
     + count($undeclared) + count($deadDeclarations) + count($claims['undeducible']);
 
 if ($missingFromTable) {
-    echo 'Checks that RUN and are not in the CLAUDE.md table: ' . count($missingFromTable) . "\n\n";
+    echo 'Checks that RUN and are not in the dev/automated-checks.md table: ' . count($missingFromTable) . "\n\n";
     foreach ($missingFromTable as $script => $label) {
         echo "  $script   (run as \"$label\")\n";
     }
@@ -240,7 +240,7 @@ if ($missingFromTable) {
 }
 
 if ($missingFromRunner) {
-    echo 'Rows in the CLAUDE.md table that nothing in check_all.sh runs: '
+    echo 'Rows in the dev/automated-checks.md table that nothing in check_all.sh runs: '
         . count($missingFromRunner) . "\n\n";
     foreach ($missingFromRunner as $script) { echo "  $script\n"; }
     echo "\nThis is the expensive direction: the table reads as a guarantee, so a row for a check\n";
@@ -274,7 +274,7 @@ if ($claims['undeducible']) {
 }
 
 if ($problems) {
-    echo "check_all.sh is what runs; the CLAUDE.md table is what everybody reads. They are allowed\n";
+    echo "check_all.sh is what runs; the dev/automated-checks.md table is what everybody reads. They are allowed\n";
     echo "to word a check differently -- this matches on FILENAMES, not labels -- but they must\n";
     echo "name the same set.\n";
     if ($advisory) {

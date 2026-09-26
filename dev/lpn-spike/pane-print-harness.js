@@ -91,6 +91,9 @@ const L = loadLoopedNetwork(
 	// paneCols(), never `spec.cols` -- a column may stand down; see pane-harness.js.
 	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
 	"\t\tpaneCols: paneCols,\n" +
+	"\t\theadCells: function (id) { return paneTableById(id).headCells; },\n" +
+	"\t\tsetUserWidth: function (id, key, em) { paneSetColWidth(paneTableById(id), key, em); },\n" +
+	"\t\tforgetWidths: function (id) { var s = paneTableById(id); paneCols(s).forEach(function (c) { paneResetColWidth(s, c.key); }); },\n" +
 	"\t\tsetProjectName: function (n) { project.name = n; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -196,14 +199,17 @@ console.log('\n--- the headings carry the units ---');
 			got.join(' | '));
 	});
 	// And absolutely, not only relatively: a comparison of two readings of one function would pass
-	// with the unit missing from both.
+	// with the unit missing from both. The printed unit is the DISPLAY text a reader sees in the
+	// unit dropdown ('ft H2O'), never the internal unit id ('fth2o') the page stores -- checked
+	// against the raw id here would have passed against a stub bug that made the two agree by
+	// construction, the exact shape a 2026-09-23 pre-review caught in Convert as's own Label column.
 	const jh = sheetOf('junctions').headings;
-	report(jh.some((h) => /\(fth2o\)/.test(h)), 'a US junction table prints an elevation in feet', jh.join(' | '));
+	report(jh.some((h) => /\(ft H2O\)/.test(h)), 'a US junction table prints an elevation in feet', jh.join(' | '));
 	report(jh.some((h) => /\(gpm\)/.test(h)), '...and a demand in (gpm)', jh.join(' | '));
 	setUnitSet('si');
 	L.renderTable('junctions');
 	const jm = sheetOf('junctions').headings;
-	report(jm.some((h) => /\(mh2o\)/.test(h)) && jm.some((h) => /\(lps\)/.test(h)),
+	report(jm.some((h) => /\(m H2O\)/.test(h)) && jm.some((h) => /\(L\/s\)/.test(h)),
 		'and an SI one prints metres and litres per second', jm.join(' | '));
 	setUnitSet('us');
 	L.renderTable('junctions');
@@ -267,8 +273,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 	});
 	// One seam decides what a cell says. Two would be two roundings of one number.
 	report(src.split('function paneCellText(').length === 2, 'one function decides a cell’s text');
-	report(/target\.textContent = paneCellText\(c, el\);/.test(src) &&
-		/target\.value = paneCellText\(c, el\);/.test(src),
+	// (R-111: the refill now writes a cell only when its text changed, so the value arrives through
+	// a local -- still paneCellText()'s, and still the only thing either write is handed.)
+	report(/text = paneCellText\(c, el\);\s*if \(target\.textContent !== text\) \{ target\.textContent = text; \}/.test(src) &&
+		/text = paneCellText\(c, el\);\s*if \(target\.value !== text\) \{ target\.value = text; \}/.test(src),
 		'...and the live table fills its cells through it too');
 }
 
@@ -398,9 +406,50 @@ console.log('\n--- what the print stylesheet promises ---');
 		unqualified.join(' / '));
 	report(/\.lpn-print-table thead \{ display: table-header-group; \}/.test(css),
 		'the heading row repeats on every sheet of a long table');
-	report(/\.lpn-print-table thead th \{ position: static/.test(css),
+	report(/#lpn_print_area \.lpn-print-table thead th \{\s*position: static/.test(css),
 		'...and is not the screen’s sticky row, which has no meaning on paper');
 	report(/\.lpn-pane-print \{/.test(css), 'the button has a style of its own');
+}
+
+// **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to
+// use the column widths adjusted by the user"*; 2026-09-22: *"Print is not respecting on-screen
+// column widths"*; 2026-09-24, R-215: *"Widths seem to be trying, but not succeeding (tighter fit
+// on print than on screen)"*). This stub holds only what the code WRITES: every column its DRAWN
+// width in em plus its 1px rule, and a font that is the screen's or the sheet's width divided by
+// the table's, whichever is smaller. Whether the browser then draws the screen at one scale is a
+// layout question this stub cannot answer; dev/browser-pass/specs/print.js measures it in Chromium.
+console.log('\n--- the sheet is the screen table at one scale ---');
+{
+	const cg = (sheetEl) => {
+		const t = (sheetEl.children || []).filter((c) => c._tag === 'table')[0];
+		return { t, cols: t ? ((t.children || []).filter((c) => c._tag === 'colgroup')[0] || { children: [] }).children : [] };
+	};
+	const spec = L.paneTables().filter((s) => s.id === 'junctions')[0];
+	const keys = L.paneCols(spec).map((c) => c.key);
+	L.forgetWidths('junctions');
+	L.setUserWidth('junctions', keys[1], 20);
+	L.renderTable('junctions');
+	// The stub's em is 16px. Column 1 is drawn at 80px (5em) and every other at 32px (2em) -- the
+	// DRAWN width wins over the stored 20em, because the drawn one is what the reader is looking at.
+	const heads = L.headCells('junctions');
+	Object.keys(heads).forEach((k, i) => {
+		const w = k === keys[1] ? 80 : 32;
+		heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: w, bottom: 20, width: w, height: 20 });
+	});
+	const got = cg(L.buildPrintable('junctions'));
+	const parsed = got.cols.map((c) => /^calc\(([\d.]+)em \+ 1px\)$/.exec(c.style.width));
+	report(got.cols.length === keys.length && String(got.t.className).indexOf('lpn-print-fixed') >= 0,
+		'every printed column is given a width, fixed layout', got.cols.length + ' / ' + keys.length);
+	report(parsed.every(Boolean), '...each one its drawn em plus its 1px rule', got.cols.map((c) => c.style.width).slice(0, 3).join(' '));
+	const ems = parsed.map((m) => m ? parseFloat(m[1]) : NaN);
+	report(ems[1] === 5 && ems.every((e, i) => i === 1 || e === 2), '...at the width it is DRAWN, dragged or not', ems.join(','));
+	const sum = ems.reduce((x, y) => x + y, 0), n = keys.length + 1;
+	report(got.t.style.width === 'calc(' + sum + 'em + ' + n + 'px)', 'the table is the sum of those widths', got.t.style.width);
+	report(got.t.style.fontSize === 'min(16px, calc((100cqw - ' + n + 'px) / ' + sum + '))',
+		'...and its font is the screen\u2019s, or the size at which it exactly fills the sheet', got.t.style.fontSize);
+	report(/body\.lpn-printing-table #lpn_print_area \{ container-type: inline-size; \}/.test(css),
+		'...measured against the print area, which is the container `cqw` needs');
+	L.forgetWidths('junctions');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

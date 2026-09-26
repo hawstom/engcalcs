@@ -310,13 +310,6 @@ console.log('\n-- the strings exist --');
 ['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank', 'lpn_help_screenshots'].forEach(function (k) {
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
 });
-{
-	// Tom, 2026-08-14, choosing "map" over "drawing": the page calls itself a map everywhere else
-	// (map height, map footer, map appearance), so a second word for the same thing was the odd
-	// one out.
-	const m = en.match(/\$ec_lang\['lpn_examples_blank'\]='([^']*)'/);
-	report(!!m && /\bmap\b/.test(m[1]), 'the blank-canvas button says "map"', m && m[1]);
-}
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

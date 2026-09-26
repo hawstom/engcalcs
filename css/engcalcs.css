@@ -252,6 +252,12 @@ input.ec-spin[type=number] {
 	font-size: 11px;
 	padding: 1px 6px;
 }
+/* THE FULL REPORT BOX CARRIES TWO OF THESE, NOT ONE (ROADMAP Task 715), so each needs its own
+   offset from the close button rather than sharing lpn-rptbox-copy's single `right`. Print sits
+   immediately left of the X, as Copy does everywhere else; Download CSV sits left of Print, with
+   enough room for its own longer label. */
+#lpn_full_print { right: 34px; }
+#lpn_full_csv { right: 128px; }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-status-notes { transition: none; }
 }
@@ -1063,12 +1069,15 @@ html[lang="zh"] .ec-welcome {
 /* The preview dot of a half-placed meter, which is view state and not an element yet. The same
    red the rubber band it hangs off is, so the two read as one gesture in progress. */
 .lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
-/* A SERVICE CONNECTED EXACTLY TO A NODE SAYS SO WHILE IT IS (Task 247; Tom, 2026-09-17: "a very
-   close connection should snap to the nearest node"). A snap that catches and looks identical to
-   one that missed by a pixel is a snap nobody can trust, so the connector and the dot take the same
-   red the other temporary marks on this map use, and both lose it the moment a drag pulls away. */
-.lpn-service-snapped { stroke: #d32f2f; }
-.lpn-meter-snapped { fill: #d32f2f; stroke: #d32f2f; }
+/* **A SERVICE CONNECTED EXACTLY TO A NODE USED TO SAY SO IN RED, AND THAT RULE IS RETIRED**
+   (Task 247; Tom, 2026-09-25: "Red for node-connected Customers is a bad decision. Let's leave it
+   black."). `.lpn-service-snapped` / `.lpn-meter-snapped` painted the connector and the dot the
+   same red every gesture-in-progress mark on this map uses, so a SETTLED connection read as one
+   still being made. A settled node connection now draws exactly like any other connected customer,
+   in plain black; the Properties box, the Tables pane and Find name the junction in a "Connected
+   to" row instead (renderCustomerFields(), paneCustomerCols() in js/looped-network.js). The two
+   classes are gone rather than left inert, so they cannot be found and re-lit by mistake.
+   `.lpn-meter-pending` above keeps its red: that is a gesture in progress, not a settled state. */
 /* **A SELECTED CUSTOMER IS A HIGHLIGHTED DOT** (Tom, 2026-09-18: dragging one works "except that
    it's highlighted wrong (red circle instead of highlighted dot)"). It wore no mark of its own at
    all: the class was applied, and nothing here answered it, so the only thing that changed on
@@ -1076,17 +1085,15 @@ html[lang="zh"] .ec-welcome {
    ring was being read as. The selection blue every other selected thing on this map takes
    (.lpn-node.lpn-selected above), on the symbol itself.
 
-   Two classes, so it outranks the snap red and the loose white above it while a customer is
-   selected, and they come back the moment it is not. Neither signal is lost meanwhile: a service
-   connected at a node keeps the snap red on its LINE (.lpn-service-snapped), and a customer
-   connected to nothing keeps its dashes, which is the half of each signal a reader is looking
-   at anyway. */
+   Two classes, so it outranks the loose white above it while a customer is selected, and that
+   comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
+   which is the half of that signal a reader is looking at anyway. */
 .lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
 /* THE CONNECTION GRIP: on the pipe, only while its customer is selected, and grabbable.
 
    **IT WAS RED, AND RED IS WHAT MADE IT UNREADABLE** (Tom, 2026-09-18: "The red circle at the pipe
-   is confusing to me. It's not selectable."). Every other red mark on this map is a temporary
-   state -- a gesture in progress, a service snapped to a node -- so a permanent red ring beside a
+   is confusing to me. It's not selectable."). Every other red mark on this map is a gesture in
+   progress -- the rubber band, the pending meter dot -- so a permanent red ring beside a
    selected customer read as a warning about the drawing rather than as a control. It is a GRIP,
    and it takes the selection blue for the same reason the selected dot does: it exists because
    something is selected and it disappears with the selection.
@@ -1271,11 +1278,15 @@ html[lang="zh"] .ec-welcome {
    he saw was the table's own blue frame outside the first row's blue rule -- two lines, 1px apart,
    round a compact input grid inside a floating popup.
    Written once for the two popup grids, whose own comments already claimed they "must not inherit
-   those borders" and did. **`.lpn-pane-table` is deliberately NOT in this list**: it has the same
-   unreset frame, but its blue row rules are the separators of a data grid a person reads every
-   day, and nobody has said they are wrong. Removing them is a look, not a defect fix. */
+   those borders" and did. **`.lpn-pane-table` JOINED THE LIST ON 2026-09-19 and the note that kept
+   it out is struck.** That note said nobody had called the blue wrong; Tom then did, in the same
+   browser pass as the grip collision above: *"The blue border at the top is unbalanced by anything.
+   Everything else is gray or black."* It was never a chosen colour -- it is the suite-wide default
+   arriving at a grid whose own cells had been given #ddd, so one frame was blue and everything
+   inside it was gray. */
 .lpn-curve-table, .lpn-curve-table tr,
-.lpn-demand-table, .lpn-demand-table tr { border: 0; }
+.lpn-demand-table, .lpn-demand-table tr,
+.lpn-pane-table, .lpn-pane-table tr { border: 0; }
 .lpn-curve-table { border-collapse: collapse; width: auto; margin: 2px 0; }
 .lpn-curve-table th, .lpn-curve-table td { padding: 1px 4px 1px 0; text-align: left; font-weight: normal; border: 0; }
 .lpn-curve-table thead th { font-weight: bold; }
@@ -1451,7 +1462,36 @@ html[lang="zh"] .ec-welcome {
    own -- the same trap recorded above for #lpn_menubar. It changes no layout. */
 nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
-.lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
+/* **THE MENU-BAR ITEMS READ AS OUTLINED BUTTONS, in the suite's own accent blue** (#0645ad,
+   already this page's one accent colour -- the profile HGL trace, the georeference tack, the
+   current-cell outline in Tables all use it; nothing new is invented here). Tom, 2026-09-25,
+   closing R-202/R-203: testers were slow to find the MENUS, never the toolbar; "promoting the
+   menus and toolbar equally is counterproductive," and he asked for colour only -- no new icon,
+   no size change, no layout change. So padding, gap and font are UNCHANGED from the flat-text
+   rule above; only background, border and text colour move.
+
+   **OUTLINED, NOT SOLID** (Tom, 2026-09-25, choosing between two previews: "I love the outlined
+   version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the
+   toolbar black."). White fill, blue text and border -- the toolbar above stays black and gets no
+   button paint of its own. `color: #0645ad` also repaints the icon, which draws with
+   `stroke: currentColor` (see .ec-icon above) -- so the icon-only phone row (640px breakpoint,
+   below) stays legible without a rule of its own. The three states only need to stay clearly
+   distinct from each other, not fight for contrast against the white bar:
+     default   #0645ad text/border on #fff  the accent blue as everywhere else on the page
+     hover     #eaf1fc fill, #1f58b5 border/text -- "the pointer is here"
+     open      #d7e6fb fill, #05378a border/text -- aria-expanded="true", set by
+                         openMenu()/closeMenu() already, so no new JS wiring; the pressed/open
+                         item reads as pushed IN, not lit up
+   `border-radius` makes the rounded-rectangle Tom leaned toward; the border is the same colour as
+   the text in every state (so the rule reads as one outlined shape, not a box with a stray ring),
+   and both move together on hover and open. */
+.lpn-menubar-item {
+	background: #fff; color: #0645ad; border: 1px solid #0645ad; border-radius: 5px;
+	font: inherit; padding: 3px 10px; cursor: pointer;
+}
+.lpn-menubar-item:hover { background: #eaf1fc; border-color: #1f58b5; color: #1f58b5; }
+.lpn-menubar-item[aria-expanded="true"] { background: #d7e6fb; border-color: #05378a; color: #05378a; }
+.lpn-menubar-item:focus-visible { outline: 2px solid #0645ad; outline-offset: 2px; }
 /* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
    pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
    it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
@@ -1459,27 +1499,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    deliberately has no dividers (see the note above #lpn_menubar). The anchor rules that used to be
    here went with the <a>. */
 .lpn-menubar-mark { margin-right: 6px; }
-/* THE MENU CUE (Task 625). Sits in the flow BETWEEN the two bars, hard against the toolbar's top
-   edge, with an arrow aimed at the bar above -- it starts where the eye lands and points up,
-   rather than trying to make the menu bar outshine 22 icons it cannot outshine. Deliberately quiet
-   (no shadow, no saturated fill): it must be noticed once, not compete forever. Removed from the
-   flow entirely when retired, so it costs no headroom on the page whose headroom is the point. */
-.lpn-menu-cue { display: flex; align-items: center; gap: .4em;
-	font-size: 12px; line-height: 1.3; margin: 0 0 3px; padding: 2px 6px;
-	border: 1px solid #9bd; border-radius: 3px; background: #eef6fd; color: #12211f;
-	width: fit-content; max-width: 100%; }
-.lpn-menu-cue-arrow { color: #0645ad; font-size: 10px; }
-.lpn-menu-cue-x { background: none; border: 0; font-size: 15px; line-height: 1;
-	padding: 0 0 0 .3em; cursor: pointer; color: inherit; opacity: .7; }
-.lpn-menu-cue-x:hover { opacity: 1; }
-/* **NOT ON A PHONE AT ALL** (Tom, 2026-09-11: *"Menus cue: Do not show on phone."*). It shipped
-   merely smaller here, which was the wrong instinct: below this breakpoint the menu bar is already
-   icon-only and the toolbar already keeps nothing but the transport, so the two rows the cue
-   mediates between are a handful of glyphs a thumb's width apart -- there is no attention contest
-   left to referee. What there IS is the scarcest headroom on any screen we serve, and a strip of
-   prose spending it to explain a bar the reader can see all of is the opposite of the trade this
-   cue exists to make. `display: none`, not a size tweak. */
-@media (max-width: 640px) { html:has(#lpn_canvas) .lpn-menu-cue { display: none; } }
 /* The About box leads with the same mark that opened it (Task 625). Sized to the heading rather
    than to .ec-icon's 1.05em base, so the glyph and the name read as one lockup. */
 .lpn-about-name { display: flex; align-items: center; gap: .45em; }
@@ -1487,7 +1506,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The colour mark is an <img>, not an inline glyph (Tom chose colour here, 2026-09-11). Sized to
    the heading like its mono predecessor; `flex: none` so a long site name cannot squash it. */
 .lpn-about-name .lpn-about-mark { width: 1.5em; height: 1.5em; flex: none; }
-.lpn-menubar-item:hover { background: #def; border-color: #9bd; }
+/* .lpn-menubar-item's own hover/open/focus rules moved up next to its base rule, above, when this
+   branch (feat/menu-button) gave the menu bar its blue button paint -- kept together so the whole
+   state set reads in one place instead of two. */
 /* ---- Project tab strip (ROADMAP Task 211) ----
    Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first
    version rendered): with a real menu bar in the chrome above, the strip belongs against the thing
@@ -1655,12 +1676,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
 .lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
 .lpn-find-pair select { max-width: 100%; }
-/* The table filter's own line, under the Find button (ROADMAP Task 597): a select saying which
-   table and the button that applies the query to it. `flex-end` so the button's baseline sits with
-   the select's box rather than with its label, which is the same alignment .lpn-find-pair uses. */
-.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; margin: 6px 0 0; }
-.lpn-find-filter > div { flex: 1 1 0; min-width: 0; margin: 0; }
-.lpn-find-filter select { max-width: 100%; }
+/* ONE ROW: the Find button, then the Filter in table button (ROADMAP Task 597; row layout, Tom
+   2026-09-23; the table selector cut R-197, 2026-09-25). Both buttons keep their natural width. */
+.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin: 6px 0 0; }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
    sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
    Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of
@@ -2032,6 +2050,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    otherwise set the width of the whole column. It is the same 9rem the setting rows give a control,
    so the strip and the rows are one design. */
 .lpn-units-item > select { max-width: 9rem; }
+/* The derived Map coordinates line (Task 693): read, not chosen, so it is plain text at a select's height. */
+.lpn-units-derived { max-width: 9rem; padding: 3px 2px; min-height: 1.6em; opacity: .8; }
 
 /* ==== The profile view (ROADMAP Task 409) ====================================================
    A chart, not a map: it shares no symbol, scale or colour rule with the drawing. The suite's
@@ -2113,16 +2133,26 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* A TAB, not a push-button: flat, with the selected one joined to the panel below it by having no
    bottom border of its own. Same reasoning as the menu bar's flat items -- a row of raised
    buttons here would read as a second toolbar. */
+/* **AN INACTIVE TAB HAS TO LOOK LIKE A TAB** (Tom, 2026-09-21: *"It might be nice to develop the
+   tab paradigm of the tables list across the top of the bottom pane. Currently, all the non-active
+   tables are undecorated plain text, which doesn't really say 'I'm an inactive tab.'"*). They were
+   transparent-bordered and background-less, so a row of six read as a row of six words.
+   **RESTRAINED, BECAUSE THE STRIP IS ALREADY BUSY** (his own note, and Ida's standing one about the
+   bottom pane): a hairline, a very light ground and the top two corners rounded -- the minimum that
+   says "card behind the front one" -- and NOT a raised button, which would read as a second
+   toolbar. The selected tab keeps the whole of its distinction: white, a darker edge, bold, and no
+   bottom border, so it alone is joined to the panel below. */
 .lpn-pane-tab {
-	background: none; border: 1px solid transparent; border-bottom: 0; font: inherit;
+	background: #f0f0f0; border: 1px solid #dcdcdc; border-bottom: 0; font: inherit;
+	border-radius: 3px 3px 0 0; color: #444;
 	padding: 3px 12px; cursor: pointer;
 }
-.lpn-pane-tab:hover { background: #f2f2f2; }
+.lpn-pane-tab:hover { background: #f7f7f7; }
 /* The tabs give up their side padding before they give up a line. A narrow window fits more of
    them per row, so the strip wraps to two lines later and to three never. */
 @media (max-width: 60rem) { .lpn-pane-tab { padding: 3px 7px; } }
 @media (max-width: 40rem) { .lpn-pane-tab { padding: 3px 5px; } }
-.lpn-pane-tab[aria-selected="true"] { background: #fff; border-color: #bbb; font-weight: bold; }
+.lpn-pane-tab[aria-selected="true"] { background: #fff; border-color: #bbb; font-weight: bold; color: inherit; }
 .lpn-pane-x {
 	flex: 0 0 auto; align-self: flex-start; width: 2.2rem; height: 1.7rem; padding: 0; border: 0;
 	background: transparent; font-size: 18px; line-height: 1; color: #333; cursor: pointer;
@@ -2154,6 +2184,24 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    rule comes later in this file. */
 .lpn-pane-panel.lpn-pane-scroll { overflow: auto; }
 .lpn-pane-panel.lpn-pane-scroll.on { display: block; }
+/* **A TABLE THAT IS NOT ON SHOW KEEPS ITS LAYOUT** (Tom, 2026-09-21, R-111: *"Switching to
+   Junctions the first time and some subsequent times delayed about 3 seconds or more. This is the
+   worst issue I found."*). `display: none` throws a panel's style and layout away, so every tab
+   click re-derived both for ~1,300 form controls from nothing -- measured as the larger part of a
+   switch once the table itself stopped being rebuilt. `content-visibility: hidden` is the property
+   made for exactly this: the subtree is skipped for style, layout, paint and hit-testing while
+   hidden, and its last rendering is KEPT, so showing it again costs only what changed. The panels
+   are stacked in one box so a hidden one takes no room, and a hidden one sits BENEATH everything
+   else in the pane with a z-index -- not `pointer-events` or `visibility`, which are inherited and
+   would restyle every cell on every switch, undoing the point. `isolation` makes the pane body its
+   own stacking context so "beneath" means beneath the Profile and Time series panels, which stay
+   in normal flow, and never beneath the page. (Without it an empty positioned box lay over the
+   Profile panel and ate its clicks.) Its scroll position survives the round trip too. */
+.lpn-pane-body { position: relative; isolation: isolate; }
+.lpn-pane-panel.lpn-pane-scroll {
+	display: block; position: absolute; inset: 0; z-index: -1; content-visibility: hidden;
+}
+.lpn-pane-panel.lpn-pane-scroll.on { z-index: 1; content-visibility: visible; }
 /* **NO TOP PADDING ON A SCROLLING PANEL, AND THAT IS THE WHOLE OF THE SLIVER FIX** (Tom,
    2026-08-23: "when you scroll a table, a tiny sliver of the data is visible scrolling above the
    headings. It's a little bit cool and a little bit embarrassing"). A sticky `top: 0` sticks to
@@ -2164,7 +2212,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-panel.lpn-pane-scroll { padding-top: 0; }
 /* The tabular editors. Column width is king: headings stay narrow and cells stay tight. The
    heading row STICKS, because a table you scroll is a table whose headings you lose. */
-.lpn-pane-table { border-collapse: collapse; font-size: .9em; }
+/* **THE TABLE IS ITS OWN WIDTH, NOT THE PANEL'S** (2026-09-19, with the width relaxation further
+   down). Letting a heading break at any character makes a column's MINIMUM one character wide,
+   which is exactly what a drag needs -- and it also lets the browser squeeze every column toward
+   that minimum the moment the table is wider than the pane, so seventeen columns arrived wrapped
+   to two and three lines with room to spare. `max-content` says: lay each column out at the width
+   it wants, and let the panel scroll, which is what it did before the relaxation. The floor is
+   then the drag's business and nothing else's. */
+.lpn-pane-table { border-collapse: collapse; font-size: .9em; width: max-content; }
 /* **A FILTERED TABLE SAYS SO ABOVE ITS ROWS** (Task 597). Hidden rows with no visible cause is the
    one way a filter can mislead, so this line is not decoration and never scrolls away with the
    rows: it sits outside the table, in the panel, above the scrollport. The query is printed in the
@@ -2189,8 +2244,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    overruled: it is right for a column of numerals in isolation and wrong here, where what the
    reader is looking at is the boxes they type in.
    THE CLASS COMES FROM THE COLUMN'S POSITION, not from what it holds, so a table that gains a
-   column cannot acquire a second left one. The printed sheet keeps the old names-left,
-   figures-right split -- restated in @media print below. */
+   column cannot acquire a second left one. The printed sheet aligns exactly as the screen does
+   (R-215, 2026-09-24). */
 /* **THE CELLS ABUT EACH OTHER, AS A SPREADSHEET'S DO** (Tom, 2026-09-06, Task 186 part 1: "cells
    abut each other like Google Sheets, in appearance and not only in behaviour"). What was there
    was two nested boxes per cell -- a padded <td> holding a bordered <input> -- so the grid a
@@ -2199,8 +2254,25 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    between two cells rather than two lines and a gutter. The padding moves inside the control, so
    the figures sit exactly where they did. */
 .lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: center; border: 0; }
-.lpn-pane-table tbody td { padding: 0; border: 1px solid #ddd; }
-.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; }
+/* **A REAL `border` AND A BOX-SHADOW ARE POSITIONED BY DIFFERENT MACHINERY, AND THAT IS THE 1PX
+   MISALIGNMENT TOM REPORTED, MEASURED 2026-09-23 AGAINST HIS OWN COMBINATION** (125% Windows
+   display scaling = device pixel ratio 1.25, scrollbar showing, 100% browser zoom). A `border`
+   under `border-collapse`-style abutment is resolved once, by the table's own collapsed-border
+   grid, shared by every row including the sticky header; the heading's divider was drawn instead
+   as an `inset` `box-shadow` on the TH itself (see the block below), positioned from that cell's
+   own box edge and NOT through that shared grid. The two pipelines agree in CSS-pixel geometry
+   (`getBoundingClientRect` shows 0px difference at every ratio, which is why two earlier sessions
+   could not find this) and disagree by 1-2 DEVICE pixels once the ratio is fractional, because a
+   composited sticky layer's bounds are snapped to whole device pixels on their own schedule.
+   Reproduced in headless Chromium at DPR 1.25, 1.5 and 2 alike, on Net3's 92-row Junctions table
+   (a real vertical scrollbar, not merely a narrowed pane) -- `dev/lpn-spike/table-divider-align-
+   harness.js`. **The fix is to stop mixing the two mechanisms**: the body cell's divider is now an
+   `inset box-shadow` too, the same kind of paint as the heading's, so both are positioned by the
+   same cell-box-edge arithmetic and inherit the same rounding whatever it is. */
+.lpn-pane-table tbody td { padding: 0; border: 0; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
+.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset 1px 0 0 #ddd; }
+html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
+html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset -1px 0 0 #ddd; }
 .lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)) { padding: 1px 6px; }
 /* The control IS the cell: no border of its own, no background of its own, and the cell's own
    padding rather than the browser's. Its width is still the column's, so nothing Tom approved
@@ -2208,26 +2280,106 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-table tbody td input {
 	border: 0; background: transparent; padding: 1px 4px; margin: 0; border-radius: 0;
 }
-/* The focused cell is outlined and not shaded, which is where a spreadsheet puts the eye. The
-   outline is INSET so it does not push the row apart, and it is on the cell rather than on the
+/* **THE CURRENT CELL IS A BORDER AND THE SELECTED RANGE IS A WASH, AND THE TWO NEVER MEAN THE
+   SAME THING** (Tom, 2026-09-19, correcting his own mode spec: *"in Select mode they should be
+   shaded blue and in Entry mode the single current cell should be merely border highlighted"*;
+   *"a blue border highlight (double-wide inward) should indicate the current cell"*; and
+   *"In Navigate mode, there should be no blue shading, since that's reserved for Select mode."*).
+   So one cell is never washed -- moving the caret from cell to cell paints a border and nothing
+   else -- and a wash on screen always means a RANGE somebody selected. js/looped-network.js
+   decides which of the two a cell is wearing; this file only says what each looks like.
+   The border is INSET so it does not push the row apart, and it is on the cell rather than on the
    control so a read-only cell can wear it too. */
-.lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
+/* **ONE CLASS SAYS WHICH CELL IS CURRENT, AND `:focus-within` NO LONGER GETS A VOTE** (Tom,
+   2026-09-19: *"At column A there is a strange highlighting around the ID."*). This rule used to
+   end `, td:focus, td:focus-within`, which meant ANY focused descendant made its cell wear the
+   current-cell mark -- so clicking the ID button, whose whole job was to jump to the map, left
+   that cell looking like the cell you were standing in. It was belt and braces from before the
+   modes existed and it is now neither: `paneSelPaint()` paints `.lpn-pane-cur` from the focusin
+   handler, so every cell the caret reaches has the class before the browser has finished the
+   focus change.
+   **AND IT WAS EXPENSIVE, WHICH IS A SECOND REASON AND AN INDEPENDENT ONE.** `:focus-within`
+   matches up the ancestor chain, so every focus change invalidates style for the row and the
+   table around it. Measured on a 92-junction Net3 with recalculation off: dropping it took one
+   committed cell from 19.2 ms to 15.0 ms, about a fifth of what typing a value cost. */
+.lpn-pane-table tbody td.lpn-pane-cur {
 	outline: 2px solid #0645ad; outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
-   block; the focused cell keeps its outline on top of it. */
+   block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
+/* **THE AUTOFILL DOT, AND IT DOES NOTHING YET.** Tom named it as modern spreadsheet practice
+   beside the border highlight (2026-09-19): *"a dot at lower right of current cell or range/block
+   for Autofill."* It is drawn here as a mark on the current cell and is INERT -- there is no
+   handler on it, no cursor of its own, and dragging it does nothing, because fill-down is still an
+   open task under ROADMAP 690. Pure CSS on a pseudo-element, so there is no element to catch a
+   pointer and nothing to unhook. When fill-down is built this is the mark it attaches to. */
+.lpn-pane-table tbody td.lpn-pane-cur { position: relative; }
+.lpn-pane-table tbody td.lpn-pane-cur::after {
+	content: ""; position: absolute; inset-inline-end: 0; bottom: 0;
+	width: 5px; height: 5px; background: #0645ad; pointer-events: none;
+}
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
-/* z-index, because a sticky cell only outranks the rows by paint order and one positioned thing in
-   a row would beat it; padding-top, because the panel's own is gone; and the rule under the
-   headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border
-   belongs to the table, not to the cell, so it scrolls away from the heading that owns it. */
+/* padding-top, because the panel's own is gone; and every rule around a heading is an INSET SHADOW
+   rather than a border -- under `border-collapse: collapse` the border belongs to the table, not to
+   the cell, so it scrolls away from the heading that owns it.
+   **THE HEADING SEPARATORS ARE THE BODY'S, IN THE BODY'S COLOUR AND WIDTH** (Tom, 2026-09-19:
+   *"The heading separators are offset (misaligned) from the column separators about 2px"* and
+   *"The headings vertical and horizontal borders are gray and wider than expected, while the table
+   body borders are as expected."*). What he was seeing was the grip collision above -- a 7px gray
+   band sitting 3px past the heading's trailing edge, which is neither the body's colour nor its
+   width nor its position. With the grip drawing nothing again the headings had no separators at
+   all, so they are drawn here instead: one line on the trailing inside edge of each heading, #ddd,
+   1px, which is exactly what `tbody td` carries.
+
+   **THE GRID IS CLOSED ON ALL FOUR SIDES, AND IT TOOK TWO MORE LINES** (Tom, 2026-09-19: *"Top
+   border is missing."*). Turning off the suite-wide blue frame on `.lpn-pane-table` took the top
+   edge away and nothing replaced it; the heading's LEADING edge went with it and nobody looked.
+   The body was never affected -- `tbody td` carried a `border` on all four sides at the time, so
+   left, right and bottom closed themselves -- which is why only the heading row had open edges.
+   `inset 0 1px 0 #ddd` is the top for every heading and `inset 1px 0 0` the leading edge for the
+   first one, both in the body's own #ddd; the bottom stays #ccc, being the rule that separates head
+   from body rather than one cell from the next. **`tbody td`'s own `border` is gone since
+   2026-09-23** (the 1px misalignment fix above), replaced by the equivalent two box-shadow insets
+   plus, on `.lpn-pane-first`, a third for the leading edge -- so the grid is still closed on all
+   four sides, by the same reasoning, through the new mechanism.
+
+   **STICKINESS IS ON THE ROW AND NOT ON THE CELL, AND THAT IS WHAT MAKES A SEPARATOR RELIABLE**
+   (Tom, 2026-09-19: *"Strange missing heading border between Tanks Mixing model and Mixing
+   fraction."*). A `position: sticky` TABLE CELL is composited in a layer of its own whose bounds
+   are snapped to whole device pixels, and where the cell's sub-pixel trailing edge rounds inward
+   the last pixel column of that cell is simply not painted -- so whatever is drawn there goes with
+   it. Measured in Chromium over 660 heading boundaries across five tables and eleven text sizes:
+   with the cells sticky, separators vanish; with `position: static` on the cells, none does, at any
+   size. It is a sub-pixel lottery that moves with the text size, the zoom and the data, which is
+   why it took his column and two others here. **A border and a pseudo-element were both tried and
+   both lose the same pixel** -- the mechanism is the layer, not the paint -- so the fix is to stop
+   giving each heading cell a layer: `thead tr` sticks instead, one layer for the whole row, and
+   each cell paints its own edges inside it.
+   `position: relative` on the cell is then REQUIRED rather than tidy: the grip is absolutely
+   positioned against its own heading, and with the cell unpositioned its containing block would
+   become the sticky ROW, putting every grip on the right-hand end of the table. An earlier pass
+   declared exactly this `relative` and broke the sticky heading, because back then it was
+   overriding the `sticky` that lived here; it is safe now for the same reason it was not then. */
+.lpn-pane-table thead tr { position: sticky; top: 0; z-index: 2; }
 .lpn-pane-table thead th {
-	position: sticky; top: 0; z-index: 2; background: #fff;
-	padding-top: 6px; box-shadow: inset 0 -1px 0 #ccc;
+	position: relative; background: #fff;
+	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+.lpn-pane-table thead th:first-child {
+	box-shadow: inset -1px 0 0 #ddd, inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+/* A box-shadow offset is PHYSICAL and these edges are not: in Arabic, Farsi, Hebrew, Pashto and
+   Urdu the trailing edge of a heading is its left one and the first column is on the right. Mirrored
+   here rather than written with a logical property, because box-shadow has none. */
+html[dir="rtl"] .lpn-pane-table thead th {
+	box-shadow: inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+html[dir="rtl"] .lpn-pane-table thead th:first-child {
+	box-shadow: inset 1px 0 0 #ddd, inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
 }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
@@ -2257,15 +2409,164 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    stylesheet there is -- including the 360px widths below, which Tom has already approved and
    which this must not move. */
 .lpn-pane-table input { width: var(--lpn-pane-col-w, 7em); text-align: inherit; }
-/* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
-   cell, not a control sitting in it. */
+/* **A COLUMN MAY BE DRAGGED NARROWER THAN THE THINGS IN IT** (Tom, 2026-09-19: *"They are
+   constrained from causing any word breaks or selector truncations, and this may be unwelcome by
+   users. Let's relax that constraint and see how it plays for the public. Let selectors and inputs
+   be truncated and headings be wrapped to the character level."*). The constraint was never a rule
+   anybody wrote -- it is the browser's: a table column cannot be laid out narrower than the widest
+   MIN-CONTENT in it, and for a heading that is its longest word, for a <select> the widest option
+   it offers. Three declarations answer all three:
+     * the heading and its sort button break ANYWHERE, so a heading's min-content is one character;
+     * a <select> takes the column's own width like an <input> does, which it never did -- nothing
+       gave it one, so it sized itself to its widest option and held the column open;
+     * `min-width: 0` on both, so the declared width is the floor rather than the content.
+   Truncation is then the browser's own: an over-long option or value is clipped by its control.
+   THIS IS A TRIAL AND HE SAID SO. If it reads badly in public, the thing to change is these three
+   lines, not the drag. */
+.lpn-pane-table thead th.lpn-pane-tight,
+.lpn-pane-table thead th.lpn-pane-tight .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
+.lpn-pane-table tbody td select {
+	/* NO 7em FALLBACK HERE, and that is deliberate: an unset custom property with no fallback
+	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
+	   width it has always been. Only a column that names an em -- or that the reader has
+	   dragged -- pulls its pull-down in with it. */
+	width: var(--lpn-pane-col-w); max-width: 100%; min-width: max-content;
+	border: 0; background: transparent; padding: 1px 2px; margin: 0; font: inherit;
+	text-align: inherit;
+}
+/* **AND A PULL-DOWN NOBODY HAS DRAGGED HOLDS ITS COLUMN OPEN TO ITS OWN WIDEST CHOICE** (Tom,
+   2026-09-21, R-110: *"Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
+   pattern, width = 3em (due to selector?)"*). He was right that it was the selector. The trial
+   above made `min-width: 0` unconditional, and a control with a percentage `max-width` and no
+   minimum contributes NOTHING to an automatic table column's width -- so an untouched pull-down
+   column was as wide as its heading's longest word and no wider, and clipped "No fittings list
+   selected" to "No fittings" on first sight, before anybody had asked for a narrow column at all.
+   Measured on Net3: four pull-down columns clipped their own shown choice. `max-content` gives
+   it back its natural width; the truncation his trial asked for is kept for exactly the case he
+   described -- a column he has DRAGGED, which js/looped-network.js marks on the control. */
+.lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
+.lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
+.lpn-pane-table tbody td { overflow: hidden; }
+/* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
+   highlight cells, not characters. But I see characters highlighting as in Entry mode."*). Every
+   editable cell here is an <input>, and dragging across one leaves the browser's own text
+   selection inside it -- blue characters, under our own blue wash, saying something we did not
+   mean. A cell that is not being typed in is `readOnly`, which is exactly the set of cells whose
+   text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
+   native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
+.lpn-pane-table tbody td input[readonly] { user-select: none; }
+/* **EVERY ROW IS A WHOLE NUMBER OF PIXELS TALL, SO A SCROLL CAN LAND EXACTLY ON ONE** (Tom,
+   2026-09-21, R-112: *"There is a slight calculation error that makes the top border of the top
+   cell row not quite coincide with the bottom border of the headings, and vary in that from about
+   0px to 3px (maybe 2px), as I arrow up or down."*). There was no calculation error to find:
+   paneScrollTopFor() asks for exactly the row boundary, and the browser rounds `scrollTop` to a
+   whole pixel. A row was 26.609 px tall at the default text size, so the boundary it asked for
+   was a different fraction of a pixel on every row -- measured in Chromium as a gap cycling
+   between -0.47 and +0.48 px while arrowing, which is the difference between the row's top rule
+   hiding under the heading's bottom rule and standing a pixel clear of it. A row's height is its
+   line height plus whole-pixel paddings and borders, so rounding the LINE HEIGHT up to a whole
+   pixel makes every row, of one line or two, a whole number of pixels. The table's own top offset
+   is part of every boundary too, which is one more reason the paste note above it had to go.
+   1.35em is chosen to sit between the two system fonts' own "normal" -- about 1.5 on Linux and 1.33
+   with Segoe UI -- so a row moves by a pixel or so either way and not by a line. `round()` is
+   ignored by a browser too old to know it, which then behaves exactly as before. */
+.lpn-pane-table tbody td, .lpn-pane-table tbody td input, .lpn-pane-table tbody td select { line-height: round(up, 1.35em, 1px); }
+/* **NEITHER OF THESE IS A HYPERLINK, AND THEY BOTH LOOKED LIKE ONE** (Tom, 2026-09-19: *"we have
+   blue text links"* on the sort headings, and the *"strange highlighting around the ID"*).
+   The MARKUP was never wrong -- a sortable heading here is already a real `<button>` carrying
+   `aria-sort` on the sorted column only, which is what the ARIA authoring practices ask for and
+   what Excel, Sheets, Finder and Explorer all do. The PAINT was: the sort button turned #0645ad
+   under the pointer, which is the browser's own visited-link colour, and the ID button was
+   underlined at rest in the same blue. Ida's reading, 2026-09-19, is that this is a false promise
+   rather than a style preference -- blue and underlined is the one vocabulary thirty years of the
+   web has trained every reader to read as LEAVING, and a sort reorders what is already on screen.
+   Worse, #0645ad had just been given a specific meaning in this very table: the current cell.
+   So: a neutral hover for the sort heading, no underline anywhere, and that blue reserved for the
+   one thing it now means. The ID's own control is a pin icon beside an ordinary editable cell --
+   see paneTableRow() -- so it has no text to underline in the first place. */
 .lpn-pane-sort, .lpn-pane-goto {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
 	text-align: inherit;
 }
 .lpn-pane-sort { font-weight: bold; }
-.lpn-pane-goto { text-decoration: underline; }
-.lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+/* A tint rather than a colour: it says "this responds" without claiming a meaning of its own. */
+.lpn-pane-sort:hover, .lpn-pane-goto:hover { background: #eef1f4; }
+/* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
+   text alignment with it -- it sits after the box, in its own ink. */
+.lpn-pane-goto {
+	display: inline-flex; align-items: center; margin-inline-start: 4px; padding: 1px;
+	color: #667; vertical-align: middle; line-height: 0;
+}
+/* **ONE LINE, NOT TWO** (Tom, 2026-09-21: *"We have a gratuitous space waster at ID where the goto
+   map icon (nice unsolicited touch!) is a line break below the ID number. Put on same line"*). The
+   ID cell holds two inline boxes inside a 5em column, so the browser did the ordinary thing and
+   wrapped the second one -- which doubles the height of EVERY row of EVERY table to carry one
+   icon. `nowrap` on the cell keeps them together; the box beside it already has `max-width: 100%`
+   and `min-width: 0`, so the input gives up its own width first and the pin stays in view. */
+.lpn-pane-table tbody td.lpn-pane-idcell { white-space: nowrap; }
+.lpn-pane-goto svg { width: 0.95em; height: 0.95em; }
+.lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: #0645ad; }
+/* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
+   press does not leave a ring behind on a control whose whole job is to move the map. */
+.lpn-pane-sort:focus-visible, .lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+/* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
+   because its `left`/`top` are the pointer's own client coordinates, which are already relative to
+   the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
+   uses. A plain list of full-width buttons, not a `<ul>`: a menu item here is a button that runs an
+   action and never a link, exactly the sort heading's own reasoning two rules up. */
+.lpn-pane-ctxmenu {
+	position: fixed; z-index: 1900; background: #fff; border: 1px solid #999; border-radius: 3px;
+	box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; min-width: 9em;
+}
+.lpn-pane-ctxmenu button {
+	display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit;
+	padding: 5px 10px; cursor: pointer; color: inherit; border-radius: 2px;
+}
+.lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: #eef1f4; outline: 0; }
+/* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
+   (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
+   heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
+   announces itself by the pointer changing, with no affordance drawn on a strip that is already
+   busy. `position: relative` on the th is what it is positioned against; the heading keeps its own
+   padding, so the grip overlaps nothing the reader is trying to read. A thin line appears under the
+   pointer rather than always, for the same reason: six of these drawn permanently across a narrow
+   pane read as a border nobody chose.
+
+   **IT IS POSITIONED AGAINST ITS OWN HEADING, AND SINCE 2026-09-19 THAT COSTS A DECLARATION.**
+   While the CELL was the sticky one it established a containing block for free, and an early pass
+   that added `position: relative` for the purpose broke the sticky heading instead -- the same rule
+   at the same specificity, overriding it. Stickiness has moved to `thead tr` (see the heading block
+   above, and the missing separator that forced it), so the cell now DECLARES `position: relative`
+   and the grip needs it: without it the containing block would be the sticky ROW, and
+   `inset-inline-end: 0` would stack every grip on the right-hand end of the table.
+   pane-harness.js still asserts the heading sticks.
+
+   **IT IS `lpn-pane-colgrip` AND NOT `lpn-pane-grip`, AND THE RENAME IS THE WHOLE OF THREE OF
+   TOM'S FINDINGS** (2026-09-19, browser pass: a blip on every column separator 2px below the top
+   line, a gray line running 15px past the last column, heading separators offset 2px from the
+   column ones, and heading borders gray and wider than the body's). `.lpn-pane-grip` was ALREADY
+   TAKEN -- it is the bottom pane's own row-resize handle at the top of the panel, 35 lines up this
+   file -- so every column grip inherited that handle's `background: #f2f2f2`, its
+   `border-bottom: 1px solid #e0e0e0` and, worst, its `::after`: a 3rem x 2px #bbb bar centred 3px
+   below the top. Seven pixels of grip cannot hold 48 pixels of bar, so it overflowed each side of
+   every separator (the blips) and ran clear off the end of the last column (the line past the
+   table). A name collision, drawing furniture nobody asked for, with no rule of its own to read. */
+.lpn-pane-colgrip {
+	/* **IT SITS INSIDE ITS OWN HEADING, NOT ASTRIDE THE BOUNDARY.** Straddling reads better on
+	   paper and half of it was dead: while every heading was its own `sticky; z-index: 2` stacking
+	   context, the NEXT heading painted over whatever spilled past the edge, so the outer three
+	   pixels of this grip answered no pointer at all. Stickiness has since moved to the row, so a
+	   straddling grip could now be made to work -- and it is deliberately not, because seven pixels
+	   on the near side of the line is a target the reader has already learned, and the one thing
+	   that must never happen is two grips fighting over the same pixel. */
+	position: absolute; top: 0; inset-inline-end: 0; width: 7px; height: 100%;
+	cursor: col-resize; user-select: none;
+}
+.lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, #8ab 5px, #8ab 6px, transparent 6px); }
+/* A heading is draggable left and right (his point (e)), so it says so under the pointer. `grab`
+   rather than `move`: the column is not going anywhere until it is picked up. */
+.lpn-pane-sort { cursor: grab; }
+.lpn-pane-sort:active { cursor: grabbing; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
@@ -2299,18 +2600,43 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	   four-column table across the sheet and put inches of white between a label and its
 	   number. .lpn-pane-table carries no width at all on screen; the print copy now matches. */
 	.lpn-print-table { border-collapse: collapse; font-size: 9pt; }
-	/* **THE SHEET KEEPS THE OLD SPLIT: names left, figures right.** The screen went to centred
-	   columns because the reader is aiming at the boxes they type in; nobody types on paper, and a
-	   printed column of figures reads as one only when it is right-aligned. Restated rather than
-	   inherited, because the screen rules above are the same selectors at the same specificity --
-	   these win by coming later, and the first column is left in both places either way. */
-	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; text-align: left; }
-	.lpn-print-table th.lpn-pane-num, .lpn-print-table td.lpn-pane-num {
-		text-align: right; font-variant-numeric: tabular-nums;
-	}
+	/* **THE SHEET IS THE SCREEN, SCALED -- ALIGNMENT, BORDERS AND PADDING INCLUDED** (Tom,
+	   2026-09-24, R-215: *"No heading borders, Widths seem to be trying, but not succeeding (tighter
+	   fit on print than on screen), and the print horiz alignments are differen than the on-screen
+	   alighments"*). Three print-only rules made the sheet a different table from the one on screen:
+	   a names-left/figures-right split (the screen centres every column but the first), a heading
+	   drawn with a bottom rule only, and padding in `pt`, which does not shrink when the sheet's font
+	   does -- so a scaled-down sheet spent a larger share of every column on padding and its headings
+	   broke mid-word where the screen's did not. Alignment is now the screen's own rules, which carry
+	   no media condition; borders are the screen's grid drawn as real borders (a box-shadow is
+	   background paint, which a browser drops when "Background graphics" is off); and padding is in
+	   `em`, the screen's pixels divided by its 14.4px font, so it scales with everything else. The
+	   `#lpn_print_area` prefix is what lets these beat the screen's cell rules, several of which
+	   (`:not(:has(input))`, `:first-child`) out-rank a bare class pair.
+	   Measured in real Chromium by dev/browser-pass/specs/print.js. */
+	#lpn_print_area .lpn-print-table tbody td { padding: .07em .42em; }
+	#lpn_print_area .lpn-print-table thead th { padding: .42em .42em .07em 0; }
 	.lpn-print-table thead { display: table-header-group; }
-	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
+	#lpn_print_area .lpn-print-table thead th {
+		position: static; box-shadow: none; border: 1px solid #ddd; border-bottom-color: #ccc;
+	}
+	#lpn_print_area .lpn-print-table tbody td { box-shadow: none; border: 1px solid #ddd; }
+	#lpn_print_area .lpn-print-table tbody td.lpn-pane-first { padding: .07em .42em .07em .28em; }
 	.lpn-print-table tr { page-break-inside: avoid; }
+	/* **ONE SCALE FACTOR FOR EVERY COLUMN, TAKEN FROM THE PAPER THE BROWSER IS ACTUALLY USING.**
+	   panePrintWidths() gives each column its on-screen width in `em` and the table a font-size of
+	   `min(<screen font>, 100cqw x <screen font / screen table width>)`: the screen's own size when
+	   the sheet has room, and otherwise exactly the size at which the table's width is the sheet's.
+	   `cqw` needs a container, which is this one. Every width, padding and letter is then in `em`, so
+	   all of them shrink by the one factor and the wrapping is the screen's wrapping. */
+	body.lpn-printing-table #lpn_print_area { container-type: inline-size; }
+	.lpn-print-table.lpn-print-fixed { table-layout: fixed; }
+	.lpn-print-table.lpn-print-fixed th, .lpn-print-table.lpn-print-fixed td { overflow-wrap: anywhere; }
+	/* The letters are 3% smaller than the columns they sit in. A glyph's advance does not scale
+	   exactly linearly at 5-8px, and a heading that exactly fills its column on screen (every one
+	   does: the table is `max-content`) then wraps on paper for want of a fraction of a pixel. The
+	   column widths are in the TABLE's em, so this moves no column. */
+	#lpn_print_area .lpn-print-table.lpn-print-fixed th, #lpn_print_area .lpn-print-table.lpn-print-fixed td { font-size: .97em; }
 }
 
 /* ==== The Settings box (ROADMAP Task 441) ====================================================
@@ -2354,8 +2680,25 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    lesson, as Task 435: the box model is not addable by hand. Height has no such floor -- a short
    box just scrolls -- so 18rem is only enough to keep the search field and a row of content in
    view. */
+/* **34rem -> 26.965rem, PC ONLY (R-204; Tom, 2026-09-24): "the main pane could be 70% of what it
+   now is ... It has a hard minimum that seems perfectly acceptable to me, and maybe we could use
+   that as the initial default."** Measured in Chromium rather than argued, the same way 25rem
+   above was: at the shipped 34rem the content pane is 410.4 px; the box's own 25rem floor squeezes
+   it to 266.4 px (16.65rem) when the index (below) still took its OLD 6.6rem. 0.7 x 410.4 = 287.3 px
+   (17.955rem), which is LARGER than that floor, so 70% is what ships -- the floor stays exactly
+   where it was, only the STARTING width moves.
+
+   26.965rem is 7.26rem of index (its own new figure, below) + 1.75rem of fixed overhead (16 px
+   padding + 2 px border + the 10 px effective gap the divider's negative margins reduce to, all
+   measured on the rule above's own numbers) + 17.955rem of content: 7.26 + 1.75 + 17.955 = 26.965.
+
+   THE FIRST-TIME WIDTH ONLY, exactly as 34rem was: setboxLayout.w remembers whatever the user has
+   already dragged, and this rule never fires against a stored width. PC only, the same viewport
+   split every other PC/phone difference in this box uses -- @media (max-width: 640px) below
+   overrides the index unconditionally and the box's own min(_, 94vw) already governs a phone, so
+   this base rule only ever reaches a screen wider than that. */
 .lpn-setbox {
-	width: min(34rem, 94vw);
+	width: min(26.965rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -2441,6 +2784,26 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    button or pushing the row off a narrow box. */
 .lpn-new-crs-name { margin-left: .5em; overflow-wrap: anywhere; }
 .lpn-new-crs-name.lpn-dim { opacity: .55; }
+#lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
+#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
+/* **THE LABEL COLUMN TAKES THE FLEXIBLE SPACE, THE OTHER TWO ARE FIXED-WIDTH** (R-217, Tom,
+   2026-09-24: "All the rounding selectors are misaligned with each other and their label
+   heading."). `justify-content: space-between` on a row whose first child sizes to its own text
+   put a different amount of space in front of the select on every row -- Diameter, Depth, Flow and
+   Head are not the same width -- so the select's left edge moved row to row and never lined up
+   under its heading. Matching the header's own layout (label flexes, the two value columns are a
+   fixed width) fixes both at once: every select's left edge sits at the same x, and so does every
+   suffix box's. */
+.lpn-convas-round-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.lpn-convas-round-row label { flex: 1 1 auto; }
+.lpn-convas-round-row select { flex: 0 0 auto; width: 6.5rem; }
+.lpn-convas-suffix { flex: 0 0 auto; width: 5rem; box-sizing: border-box; padding: 2px 4px; }
+/* The two column headings over the rounding selects and the suffix boxes (Tom, 2026-09-23):
+   same widths as the row cells below them, so the two columns line up. */
+.lpn-convas-round-head { display: flex; align-items: flex-end; gap: 8px; font-size: .85em; margin: 2px 0; }
+.lpn-convas-round-head span:first-child { flex: 1 1 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(2) { width: 6.5rem; flex: 0 0 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: #f2f2f2; color: #777; cursor: not-allowed; }
@@ -2467,9 +2830,13 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    **AND IT GAVE BACK A TENTH, 6.6rem** (Tom, 2026-08-23, having now used the narrowed box on a PC:
    "Settings.index 1.1"). The 0.8 above was decided sight-unseen; this is the correction after
    looking at it. PC ONLY -- the phone figure he asked about in the same breath went the other way
-   and is unchanged at 4.5rem. */
+   and is unchanged at 4.5rem.
+
+   **AND 10% WIDER AGAIN, 7.26rem** (R-204; Tom, 2026-09-24: "the index pane 10% wider than now").
+   6.6 x 1.1 = 7.26. PC only, same as the step above -- the phone override at the foot of this file
+   derives its own figure from ITS OWN 4.5rem and is untouched. */
 .lpn-setbox-index {
-	flex: 0 0 6.6rem; min-width: 0; overflow: auto;
+	flex: 0 0 7.26rem; min-width: 0; overflow: auto;
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
@@ -2951,6 +3318,92 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
+/* ---- The message log button and list (ROADMAP Task 704) ----
+   Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
+   button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the
+   mode text next to it carries** (Tom, R-157: "I discovered what is appearing behind the glyph. It
+   is the text 'RIVER' from the model... It's a Text object, not a label."). A partial-alpha
+   background over the map canvas lets whatever is drawn underneath bleed through the glyph itself,
+   the same defect .lpn-msglog-panel was already given a solid background to avoid -- this button
+   gets the same remedy. pointer-events:auto because the row it sits in is otherwise inert like
+   every map overlay. */
+.lpn-msglog-btn {
+	pointer-events: auto;
+	display: inline-flex; align-items: center;
+	background: #fff;
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 1px 4px; font: inherit; font-size: 11px; line-height: 1;
+	color: #555; cursor: pointer;
+}
+.lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: #222; border-color: #888; }
+/* HIGHLIGHTED WHILE A MESSAGE IS ON SCREEN (Tom: "it must appear and possibly highlight while a
+   message displays"), toggled by markMsglogActive() in js/looped-network.js. Blue rather than
+   amber or red -- both of those already mean "something is wrong" on this page (the diagnostic
+   box, the warning banner), and this says only "something is being shown," which is also true of
+   an ordinary save confirmation. */
+.lpn-msglog-btn.lpn-msglog-active { background: #05a; border-color: #05a; color: #fff; }
+.lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: #fff; border-color: #037; }
+/* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
+   short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
+   takes the Close button with it. */
+/* ---- The on-map message list (superseded the dialog above, Tom 2026-09-22, live on port 8099:
+   "The alert paradigm is not a good UX ... User expects them to descend below the glyph, below
+   the Mode status, in similar appearance that they originally had.") ----
+   **CORRECTED 2026-09-22: this used to say "no rule for the panel itself here," relying on JS
+   setting bare `display:flex`.** `display:flex` alone defaults to `flex-direction:row`, so the
+   rows laid out SIDE BY SIDE and ran off the right edge of the map (Tom: "the simultaneous
+   messages on open ... appear on one line instead of on three. This is a bug."). `flex-direction:
+   column` belongs on the container that draws the list, not on the display toggle that only opens
+   and closes it, so it is a CSS rule rather than one more thing openMessageLogPanel() has to set.
+   **AND THE GAPS BETWEEN ROWS PAINTED NOTHING**, so a Text object on the map underneath (Tom: "I
+   discovered what is appearing behind the glyph. It is the text 'RIVER' from the model.") showed
+   through those gaps at full strength -- each row is its own translucent
+   `rgba(255,255,255,.8)` pill, which is fine for ONE isolated readout but leaves the space BETWEEN
+   pills fully transparent once there is more than one. `#lpn_msglog_panel` now paints a solid,
+   fully opaque backing behind the whole stack, so nothing on the canvas can ever show through any
+   part of this box, gaps included -- the same reasoning `background-color` gets on
+   `.lpn-basemap-teaser` two rules up, applied to a list instead of a single tile. */
+.lpn-msglog-panel {
+	box-sizing: border-box;
+	flex-direction: column;
+	gap: 4px;
+	background: #fff;
+	border-radius: 3px;
+	padding: 4px;
+}
+.lpn-msglog-panel-row {
+	display: flex; gap: 8px; align-items: baseline;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px;
+}
+/* The age leads the row and is a fixed column, so thirty rows read as a column of times against a
+   column of sentences rather than as ragged prose. It is the quieter of the two: the message is
+   what the reader came back for. */
+.lpn-msglog-panel-when { flex: none; color: #666; }
+.lpn-msglog-panel-text { flex: 1 1 auto; min-width: 0; }
+/* THE SECOND OF EXACTLY TWO LEVELS, painted the same amber #lpn_map_notice and #lpn_status
+   already use for a warning -- the log says the same thing the map said; a marker WORD would be a
+   word to translate and one more thing to get wrong in five right-to-left languages. */
+.lpn-msglog-panel-warn { background: #fffbe6; border-color: #a80; }
+/* The empty state, deliberately NOT .lpn-msglog-panel-row -- it is not itself a kept message. */
+.lpn-msglog-panel-empty {
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 2px 6px; font-size: 11px; color: #666;
+}
+/* "Your network is intact." (Task 647) wears the suite's NEUTRAL panel pair, the one above, not the
+   #fffbe6/#a80 warning pair: it is reassurance, not a warning (Ida, R-227). Theming phase 1
+   (Task 714) turns both into one token rather than two copies of the same two values. */
+.lpn-offscreen-card {
+	pointer-events: auto;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 10px 16px;
+}
+/* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
+   on why. No background of its own: it is a caption under the pills, not one more of them. */
+.lpn-msglog-panel-note { font-size: 0.85em; color: #666; padding: 2px 6px; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;
@@ -3726,7 +4179,29 @@ tr.lpn-ff-error { background: #f2f2f2; }
 		max-height: 33svh;
 		overflow-y: auto;
 	}
+
+	/* 9. THE ON-MAP ZOOM CHIP GOES BELOW ITS OWN BREAKPOINT (ROADMAP Task 682; Ida, 2026-09-17):
+	   the whole reason it exists is a visitor with no wheel and no pinch surface, and a
+	   touchscreen supplies one of its own -- Tom, 2026-08-22: "on a phone, zoom in is the answer.
+	   You can't see through your finger... A finger is not a mouse!" Hidden at the same width the
+	   toolbar's non-transport groups already collapse at, not a new figure. */
+	html:has(#lpn_canvas) #lpn_zoom_control { display: none; }
 }
+
+/* The on-map zoom chip's layout lives here, not inline, so the phone rule above can hide it: an
+   inline display would beat any stylesheet rule (Perry, 2026-09-23). */
+#lpn_zoom_control { display: flex; flex-direction: column; }
+
+/* R-179 (Tom, 2026-09-23): "The + and - glyphs are not centered in their boxes." Each button had
+   no layout of its own, so the icon fell back to being an ordinary inline glyph -- `button >
+   .ec-icon`'s `margin-inline-end: 0.4em` (the gap it earns everywhere it prefixes a WORD) shoved
+   it left of centre here, where there is no word to gap from, and `.ec-icon`'s
+   `vertical-align: -0.16em` (tuned to sit on a line of TEXT's optical centre) had no baseline to
+   sit on in an otherwise-empty button. Flex centring on the button answers both axes at once, and
+   the margin is zeroed the same way the lpn menu's icon column already zeroes it for its own
+   icon-only cells. */
+#lpn_zoom_in, #lpn_zoom_out { display: flex; align-items: center; justify-content: center; }
+#lpn_zoom_in > .ec-icon, #lpn_zoom_out > .ec-icon { margin-inline-end: 0; }
 
 /* ---- The profile's path chooser (Tasks 433, 504) ---------------------------------------------
    The line that says what the next press does. It lives in the profile panel's control row, which
@@ -3840,8 +4315,10 @@ tr.lpn-ff-error { background: #f2f2f2; }
    it -- so the width floor rises to 44px below 40rem while the tabs beside it are giving padding
    up. It grows sideways rather than downward on purpose: the strip sits above a chart that has the
    least height to spare on a phone (Task 527), and a taller row would be paid for out of that. */
+/* The arrow rides on its tab's own card, so a tab with one does not read as a tab plus a stray
+   button -- the same reason .lpn-pane-tab-menu-current below matches the selected tab. */
 .lpn-pane-tab-menu {
-	background: none; border: 1px solid transparent; border-bottom: 0;
+	background: #f0f0f0; border: 1px solid #dcdcdc; border-bottom: 0;
 	border-inline-start: 1px solid #ccc; font: inherit;
 	padding: 3px 8px; margin-inline-start: -2px; min-width: 2rem;
 	cursor: pointer; color: #333;

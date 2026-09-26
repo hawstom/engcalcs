@@ -36,8 +36,11 @@ const PC = global.EngCalcs.pageConfig;
 function msgRe(key, fill) {
 	var t = PC[key];
 	Object.keys(fill || {}).forEach(function (k) { t = t.replace('{' + k + '}', fill[k]); });
+	// A left-open placeholder -- {u} here is a unit's DISPLAY TEXT ('ft H2O'), which carries a
+	// space, so it cannot be matched by a run of non-space characters. Lazy `.+?` instead, which
+	// still stops at the next literal the template states (the following space, or the period).
 	return new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-		.replace(/\\\{\w+\\\}/g, '[^ ]+'));
+		.replace(/\\\{\w+\\\}/g, '.+?'));
 }
 
 let fails = 0;

@@ -54,12 +54,12 @@ const L = loadLoopedNetwork(
 	"\t\tmiss: function () { return keptLayoutMiss; },\n" +
 	"\t\tsetKeepLayout: function (v) { keepLayoutEnabled = v; },\n" +
 	// **THIS DRAWING ALWAYS SHOWS ITS LABELS, said out loud** (Task 669, 2026-09-18). The labeling
-	// threshold gained an automatic default -- the view at which the lettering is twice the median
-	// pipe length -- and this harness views a drawing a few units across in a 700-unit window,
+	// threshold can suppress every label on a view this wide, and this harness views a drawing a
+	// few units across in a 700-unit window,
 	// because it never zooms and does not need to: what it is testing is whether a layout survives a
 	// project switch. Left alone, every label here is suppressed and the layout it compares is empty.
-	// 0 is the setting's own "always show", which is what an empty box writes.
-	"\t\talwaysLabel: function () { settings.labelMaxWidth = 0; },\n" +
+	// `null` is the setting's own "always show", which is what an empty box writes.
+	"\t\talwaysLabel: function () { settings.labelMaxWidth = null; },\n" +
 	"\t\tsegIndexBuilds: function () { return linkSegIndexBuilds; }"
 );
 
@@ -157,13 +157,19 @@ console.log('\n--- a restored layout equals a computed one, label by label ---')
 	// different questions and the comparison would be about that rather than about the restore.
 	L.setSolve(null);
 	// A real drawing, because the interesting decisions (shedding, crowding, leaders) need a crowd.
-	L.applySaved(JSON.parse(fs2.readFileSync(
-		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
-	// **SAID AFTER THE LOAD, BECAUSE A PROJECT CARRIES ITS OWN SETTINGS.** Net3's pipes are about
-	// 1.5 units long and this harness never zooms -- it is testing whether a layout survives a
-	// project switch, not what a view shows -- so the automatic labeling threshold suppresses every
-	// label here and the layout it compares would be empty. Stored with the project below, so the
-	// switch away and back keeps it.
+	// **THE SHIPPED FILE'S OWN labelMaxWidth (Task 705, set to 30 ft 2026-09-22) IS CLEARED HERE.**
+	// That threshold is a fact about the LABELING FEATURE and has nothing to do with what this
+	// harness is testing -- whether a restored layout matches a computed one -- and at 30 ft on a
+	// network this size it hides every label outright, which would make every position compare
+	// equal for the wrong reason (nothing drawn, not "restored correctly"). A shared example file is
+	// a shared fixture; this harness needs "always show labels", not whatever Net3.lwn ships today.
+	const net3Doc = JSON.parse(fs2.readFileSync(
+		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8'));
+	if (net3Doc.settings) { net3Doc.settings.labelMaxWidth = null; }
+	L.applySaved(net3Doc);
+	// **SAID AGAIN AFTER THE LOAD, BECAUSE A PROJECT CARRIES ITS OWN SETTINGS.** This harness never
+	// zooms, so any labeling threshold the load brings would suppress every label and the layout it
+	// compares would be empty. `null` is "always label"; 0 is "never" since the thematic fold.
 	L.alwaysLabel();
 	L.refreshAll();
 	const ls = L.labelSettings();

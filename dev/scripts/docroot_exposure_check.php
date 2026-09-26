@@ -66,12 +66,6 @@ $WEB_SERVED = array(
     'lib'         => 'includes. Fetched directly they define functions and print nothing; '
                    . 'the suite is GPL v3, so this is source we publish anyway',
     'spreadsheet' => 'the one-page spreadsheet variant of Manning Pipe Flow',
-    // WEB-SERVED AND PASSWORD PROTECTED, which is a third state this list does not model and did
-    // not need to until now. It is here rather than in $NON_WEB because it is genuinely fetched
-    // over HTTP -- by one person, behind HTTP Basic declared in its own .htaccess. It has a
-    // directory of its own precisely so that auth declaration cannot 500 the whole suite the way
-    // `Options` can; see usage-report/.htaccess and dev/usage-report-page.md.
-    'usage-report' => 'the private usage report page, behind HTTP Basic in its own .htaccess',
 );
 
 // Directories blocked from the web, each with the reason a visitor has no business there.

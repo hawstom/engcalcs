@@ -143,7 +143,7 @@ console.log('--- the fit does not depend on the view it started from ---');
 	// Arrive from somewhere wildly different -- which is what switching projects does, since the
 	// previous project leaves its own scale behind.
 	L.setZoom(37);
-	L.zoomExtent();
+	const fromElsewhere = L.countLayouts(() => L.zoomExtent());
 	ok('fitting from a 37x view lands where fitting from 1x did', same(view(), fromOne),
 		fromOne + ' vs ' + view());
 	L.setZoom(0.02);
@@ -168,8 +168,14 @@ console.log('--- the fit does not depend on the view it started from ---');
 	// form and the item list is built from the model, so nothing in the answer depends on a layout
 	// -- which leaves exactly one re-layout, the one that draws the labels at the new scale. The
 	// version this replaced spent eight, one per convergence pass.
-	const layouts = L.countLayouts(() => L.zoomExtent());
-	ok('a fit costs ONE re-layout, not eight', layouts === 1, layouts + ' re-layout(s)');
+	//
+	// **AND A PRESS FROM THE VIEW A FIT ALREADY SETTLED ON COSTS NONE** (pre-review 2026-09-24:
+	// ~1.2 s a press on the geographic Net3). It is answered by measuring what is drawn, so the
+	// one-layout budget is asked of a fit that really moves the view.
+	const again = L.countLayouts(() => L.zoomExtent());
+	ok('a press from the view a fit settled on costs no re-layout', again === 0, again + ' re-layout(s)');
+	ok('a fit from elsewhere costs a bounded number of re-layouts, not eight',
+		fromElsewhere >= 1 && fromElsewhere <= 2, fromElsewhere + ' re-layout(s)');
 	// TOM'S OWN TEST, 2026-08-15: "open, reload, or switch and then zoom extents. Ideally nothing
 	// happens." Nothing happening is IDEMPOTENCE, and it is a stronger property than the
 	// start-independence above: a fit must be a fixed point of itself, to the last bit, or every
@@ -321,6 +327,42 @@ console.log('\n--- a big local drawing fits a laptop window, and can be pulled b
 	ok('...and no drawing is given a TIGHTER floor than the old fixed one',
 		L.minScale() <= 0.05, String(L.minScale()));
 	L.setCanvas(1400, 700);
+}
+
+// ---- 5. A DRAGGED LABEL DOES NOT THROW THE FIT OFF THE DRAWING (R-184) ------------------------
+// Tom, 2026-09-23: after zooming in hard, *"Zoom to fit ... doesn't work. This presents as a
+// catastrophic loss because my screen is blank."* Net1 as shipped carries dragged node labels, whose
+// `lx`/`ly` are DRAWING UNITS; fitItems() counted them in the pixel reach at the scale it started
+// from, so from scale 500 ten units of offset became 5,000 px and the fit framed empty paper. Section
+// 1 missed it because nothing there had been dragged. Asserted from starting scales across the whole
+// range, up to the ceiling: every node on the canvas, and the same scale as a fit from 1x.
+console.log('\n--- a fit from any starting zoom, with dragged labels, shows every node ---');
+{
+	L.getDoc().nodes.length = 0; L.getDoc().links.length = 0;
+	const p = L.addNode('junction', 0, 0), q = L.addNode('junction', 600, 0),
+		r = L.addNode('junction', 600, 400), t = L.addNode('junction', 0, 400);
+	L.addLink('pipe', p.id, q.id); L.addLink('pipe', q.id, r.id);
+	const lk = L.addLink('pipe', r.id, t.id);
+	// World offsets of the size a shipped example carries relative to its extent.
+	p.lx = 30; p.ly = -25; q.lx = -40; q.ly = 20; r.lx = 25; r.ly = 30; lk.lx = 10; lk.ly = -35;
+	L.refreshLabelText();
+	L.setZoom(1);
+	L.zoomExtent();
+	const ref = L.view(), nodes = L.getDoc().nodes;
+	const inside = (v) => nodes.every((n) => {
+		const x = v.tx + v.s * n.x, y = v.ty + v.s * n.y;
+		return x >= 0 && x <= 1400 && y >= 0 && y <= 700;
+	});
+	ok('fitting from 1x shows every node', inside(ref), JSON.stringify(ref));
+	[0.05, 0.3, 3, 10, 30, 100, 250, 500].forEach((z) => {
+		L.setZoom(z);
+		L.zoomExtent();
+		const v = L.view(), rel = Math.abs(v.s - ref.s) / ref.s;
+		ok('from scale ' + z + ': every node on the canvas, scale within 2% of the 1x fit',
+			inside(v) && rel < 0.02, 'scale ' + v.s.toFixed(4) + ' vs ' + ref.s.toFixed(4)
+				+ ', tx ' + v.tx.toFixed(1) + ' vs ' + ref.tx.toFixed(1));
+	});
+	L.getDoc().nodes.length = 0; L.getDoc().links.length = 0;
 }
 
 console.log('\n--- every "map size" names its own dimension ---');

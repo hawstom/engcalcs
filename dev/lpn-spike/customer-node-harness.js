@@ -53,7 +53,12 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, addNode: addNode, addLink: addLink,\n" +
 	"\t\taddCustomer: addCustomer, customerEdited: customerEdited,\n" +
 	"\t\tcustomerFlow: customerFlow, customerNodeId: customerNodeId,\n" +
-	"\t\tcustomerPoint: customerPoint,\n" +
+	"\t\tcustomerPoint: customerPoint, customerLink: customerLink,\n" +
+	"\t\tcustomerAtNodeEnd: customerAtNodeEnd, customerT: customerT,\n" +
+	"\t\tnodeById: nodeById, linkById: linkById,\n" +
+	"\t\tdeleteLink: deleteLink, deleteNode: deleteNode, applyNodeRename: applyNodeRename,\n" +
+	"\t\tcustEls: function () { return custEls; },\n" +
+	"\t\tnoticeText: function () { return document.getElementById('lpn_map_notice').textContent || ''; },\n" +
 	"\t\tresolvedDemand: resolvedDemand, baseDemandTotal: baseDemandTotal,\n" +
 	"\t\tdemandRowsOf: demandRowsOf, assembleModel: assembleModel,\n" +
 	"\t\tlibRepointPattern: libRepointPattern,\n" +
@@ -799,6 +804,169 @@ L.customerEdited(c2);
 	// field that comes back on the next open.
 	ok('5.8 the document written back states no account on any customer',
 		(L.serializeProject().customers || []).every(c => c.account === undefined));
+}
+
+// ================================================================================================
+// 6. A CUSTOMER CONNECTED TO A NODE SURVIVES THE PIPE (Tom, 2026-09-25)
+// ================================================================================================
+//
+// *"Do we have Customers not allowed to connect directly to nodes? I think it will be happier for
+// users to see Customer connected to a node if that is the case instead of a link at station 0."*
+//
+// The junction a service lumps at was DERIVED from its pipe alone until now, which is honest right
+// up to the day that pipe is deleted -- at which point a customer that was genuinely AT the node,
+// not merely along its main, lost the node too. `c.node` is the fallback that keeps it: written the
+// moment the pipe goes (detachCustomersFromLink(), deleteNode()), read only when there is no live
+// pipe left to ask (customerNodeFallback()).
+function popupText6() {
+	let out = '';
+	(function walk(el) {
+		if (el.textContent) { out += ' ' + el.textContent; }
+		(el.children || []).forEach(walk);
+	})(L.popupFields());
+	return out;
+}
+{
+	const jA = L.addNode('junction', 0, 0), jB = L.addNode('junction', 500, 0);
+	const main = L.addLink('pipe', jA.id, jB.id);
+	const cust = L.addCustomer(0, 60, { link: main.id, t: 0 });
+	cust.demand = 7; cust.tag = 'SNAP-1';
+	L.customerEdited(cust);
+
+	ok('6.1 a service pressed onto a node reads as connected to it',
+		L.customerAtNodeEnd(cust) === true && L.customerNodeId(cust) === jA.id);
+	ok('6.2 ...through the live pipe, not yet through the fallback',
+		cust.node === undefined, JSON.stringify(cust.node));
+
+	// **THE POPUP NAMES THE JUNCTION, NOT A PIPE AT STATION 0.**
+	L.renderCustomerFields(cust.id);
+	{
+		const txt = popupText6();
+		ok('6.3 the popup states "Connected to" and the junction, not the pipe or a station',
+			txt.indexOf(PC.lpn_field_meter_node) >= 0 && txt.indexOf(jA.id) >= 0);
+		ok('6.4 ...and it does not also print the pipe id or a station heading',
+			txt.indexOf(main.id) < 0 && txt.indexOf(PC.lpn_field_meter_station) < 0);
+	}
+	// **THE TABLE LEAVES THE PIPE, STATION AND OFFSET CELLS BLANK FOR IT.**
+	{
+		const spec = L.paneTableById('customers');
+		const cols = L.paneCols(spec);
+		const linkCol = cols.filter(c => c.key === 'link')[0];
+		const stCol = cols.filter(c => c.key === 'station')[0];
+		const offCol = cols.filter(c => c.key === 'offset')[0];
+		const atCol = cols.filter(c => c.key === 'atNode')[0];
+		ok('6.5 the link cell is blank for a node-exact connection', linkCol.get(cust) === '');
+		ok('6.6 ...and so are station and offset',
+			stCol.get(cust) === '' && offCol.get(cust) === '');
+		ok('6.7 ...while the node column still names the junction', atCol.get(cust) === jA.id);
+	}
+	// **THE MAP CARRIES NO RED MARK OF ITS OWN.**
+	{
+		const els = L.custEls()[cust.id];
+		ok('6.8 no red snap class on a settled node connection',
+			!els.stub.classList.contains('lpn-service-snapped') &&
+			!els.box.classList.contains('lpn-meter-snapped'));
+	}
+
+	// **DELETING THE PIPE KEEPS IT CONNECTED TO THE NODE.**
+	const ptBefore = L.customerPoint(cust);
+	L.deleteLink(main.id);
+	ok('6.9 the pipe is gone', !L.linkById(main.id));
+	ok('6.10 the customer still reads as connected to the same node',
+		L.customerAtNodeEnd(cust) === true && L.customerNodeId(cust) === jA.id);
+	ok('6.11 ...now through the stored fallback', cust.node === jA.id, String(cust.node));
+	ok('6.12 ...and it did not jump on screen', near(L.customerPoint(cust).x, ptBefore.x, 1e-9) &&
+		near(L.customerPoint(cust).y, ptBefore.y, 1e-9));
+	ok('6.13 its demand is still lumped at the node (EngCalcs.lpnCustomerRowsByNode)',
+		(global.EngCalcs.lpnCustomerRowsByNode(L.getDoc())[jA.id] || [])
+			.some(r => r.customer === cust));
+	ok('6.14 ...and the total is still added there in the resolved demand',
+		L.resolvedDemand(L.nodeById(jA.id)) >= 7);
+
+	// **THE POPUP STILL NAMES THE JUNCTION, WITH NO PIPE LEFT TO NAME.**
+	L.renderCustomerFields(cust.id);
+	ok('6.15 the popup still says "Connected to" that junction with the pipe gone',
+		popupText6().indexOf(PC.lpn_field_meter_node) >= 0 && popupText6().indexOf(jA.id) >= 0);
+	ok('6.16 ...and it is not read as a detached customer',
+		popupText6().indexOf(PC.lpn_customer_detached) < 0);
+
+	// **RENAMING THE NODE CARRIES THE FALLBACK WITH IT**, the same rule applyLinkRename() already
+	// keeps for `c.link`.
+	L.applyNodeRename(jA.id, 'RENAMED-J');
+	ok('6.17 a node rename updates a customer\'s fallback', cust.node === 'RENAMED-J',
+		String(cust.node));
+	ok('6.18 ...and it still lumps correctly under the new name',
+		L.customerNodeId(cust) === 'RENAMED-J');
+
+	// **DRAGGING THE CONNECTION BACK ONTO A PIPE WORKS**, even from the fallback state: a fresh main
+	// reattaches it and the fallback is dropped, exactly as it is for a customer that was never
+	// snapped to begin with.
+	const jC = L.addNode('junction', 250, 0);
+	const spur = L.addLink('pipe', L.nodeById('RENAMED-J').id, jC.id);
+	// setCustomerConnection() is not exported (it is one of two write seams entirely internal to
+	// js/looped-network.js); setCustomerLink() -- the keyboard/table door onto the SAME seam -- is,
+	// through the Customers table's own 'link' column.
+	{
+		const spec = L.paneTableById('customers');
+		const linkCol = L.paneCols(spec).filter(c => c.key === 'link')[0];
+		linkCol.set(cust, spur.id);
+	}
+	ok('6.19 typing a new pipe re-attaches it', L.customerLink(cust) && L.customerLink(cust).id === spur.id);
+	ok('6.20 ...and drops the stale node fallback', cust.node === undefined, String(cust.node));
+
+	// **AND DELETING THE NODE ITSELF, WITH A FALLBACK CUSTOMER STILL ON IT, TRULY DETACHES IT --
+	// SAID OUT LOUD.** A second junction (`jD`), so the fallback survives ITS pipe's own deletion
+	// and then loses its connection only when the junction it was hanging onto is removed too.
+	const jD = L.addNode('junction', 0, -200);
+	const spur2 = L.addLink('pipe', jD.id, jC.id);
+	const cust2 = L.addCustomer(0, -140, { link: spur2.id, t: 0 });
+	cust2.demand = 3;
+	L.customerEdited(cust2);
+	L.deleteLink(spur2.id);
+	ok('6.21 the second customer also fell back to its node',
+		cust2.node === jD.id, String(cust2.node));
+	L.deleteNode(jD.id);
+	ok('6.22 deleting the node itself finally detaches it',
+		cust2.node === undefined && L.customerNodeId(cust2) === null);
+	ok('6.23 ...said out loud on the map',
+		L.noticeText() === String(PC.lpn_customer_detached_count).replace('{n}', '1'),
+		L.noticeText());
+}
+
+// ================================================================================================
+// 7. A LEGACY FILE (`t` OF EXACTLY 0 OR 1, NO `node` FIELD) OPENS AS NODE-CONNECTED, AND AN
+//    UNEDITED SAVE IS BYTE-IDENTICAL ("only the user touches a file's numbers")
+// ================================================================================================
+{
+	const jA = L.addNode('junction', 1000, 1000), jB = L.addNode('junction', 1400, 1000);
+	const main = L.addLink('pipe', jA.id, jB.id);
+	const before = L.serializeProject();
+	const legacy = JSON.parse(JSON.stringify(before));
+	legacy.customers = [
+		{ id: 'M80', link: main.id, t: 1, demand: 4, count: 1, x: 0, y: 30, tag: 'LEGACY-END' }
+	];
+	// Captured as TEXT, before prepareDocument()/applySaved() touch it: they hold no promise of
+	// leaving the fixture's own object alone (flipStoredY()'s load-side twin un-flips Y in place,
+	// exactly as it flips it back on the way out), so a live reference would silently compare a
+	// mutated fixture against itself and pass on nothing.
+	const legacyText = JSON.stringify(legacy.customers[0]);
+	L.applySaved(L.prepareDocument(legacy));
+	const opened = (L.getDoc().customers || []).filter(c => c.id === 'M80')[0];
+	ok('7.1 a legacy file with t=1 opened', !!opened);
+	ok('7.2 ...and reads as connected to the node at that end',
+		L.customerAtNodeEnd(opened) === true && L.customerNodeId(opened) === jB.id);
+	ok('7.3 ...WITHOUT a stored node field -- still derived, the pipe is still there',
+		opened.node === undefined, JSON.stringify(opened.node));
+	const resaved = L.serializeProject().customers.filter(c => c.id === 'M80')[0];
+	ok('7.4 an unedited open-and-save is byte-identical',
+		JSON.stringify(resaved) === legacyText,
+		JSON.stringify(resaved) + ' vs ' + legacyText);
+
+	// And the ordinary case survives it: deleting that same pipe now converts the legacy customer
+	// to the stored fallback exactly as a freshly-snapped one would.
+	L.deleteLink(main.id);
+	ok('7.5 deleting the pipe under a legacy node-exact customer falls back the same way',
+		opened.node === jB.id, String(opened.node));
 }
 
 console.log(fails ? '\nFAILED ' + fails : '\nAll customer pseudo-node checks passed.');

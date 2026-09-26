@@ -35,7 +35,16 @@ const INJECT =
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
-	"\t\tseedDefaultInputs: seedDefaultInputs,\n";
+	"\t\tseedDefaultInputs: seedDefaultInputs,\n" +
+	// **THE FLASH GUARD IS OFF HERE ON PURPOSE.** refreshEpanetBanner() (ROADMAP Task 704, Perry's
+	// review 2026-09-22) will not show anything for the first ENGINE_BANNER_SHOW_DELAY_MS of a
+	// wait, which is exactly what this file is NOT testing -- it is testing the byte/percent
+	// arithmetic, which must be visible on the very next call. `<= 0` is the documented escape
+	// hatch (see the comment beside it in js/looped-network.js): it makes every show synchronous,
+	// with no timer at all. dev/lpn-spike/notice-log-harness.js is where the guard itself, and the
+	// flash it exists to stop, are actually asserted.
+	"\t\tsetEngineBannerTiming: function (showMs, minMs) {\n" +
+	"\t\t\tENGINE_BANNER_SHOW_DELAY_MS = showMs; ENGINE_BANNER_MIN_SHOWN_MS = minMs; },\n";
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -202,6 +211,7 @@ function fresh() {
 	const L = loadLoopedNetwork(INJECT);
 	L.buildLayers();
 	L.seedDefaultInputs();
+	L.setEngineBannerTiming(0, 0);
 	delete global.EngCalcs.lpnSolveEpanet;   // the page must not reach the real bridge here
 	if (bannerEl) { bannerEl.textContent = ''; }
 	return L;

@@ -140,9 +140,11 @@ ok(def.priority.link.velocity === Math.max.apply(null, Object.keys(def.priority.
 // "Source share" and "Concentration" are the SAME row, `quality`, whose name follows the quality
 // analysis and can only ever be one of them at once, so it takes the first number he gave it and 14
 // is unused. Everything else is his number.
+// Tank water depth (`level`) takes the gap between head and elevation (Task 696): head is DERIVED
+// from elevation and depth, so it is still the first of the three to give up its space.
 eq(dropOrderOf(def.priority.node),
-	['head', 'elev', 'demand', 'initQuality', 'id', 'quality', 'demandActual', 'pressure'],
-	'node drop order is Tom\'s own 2026-09-18 list, row for row');
+	['head', 'level', 'elev', 'demand', 'initQuality', 'id', 'quality', 'demandActual', 'pressure'],
+	'node drop order is Tom\'s own 2026-09-18 list, row for row, with depth between head and elevation');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,

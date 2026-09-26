@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2054,
-        "delta_key_count": 199,
+        "expected_key_count": 2089,
+        "delta_key_count": 253,
         "exempt_key_count": 45,
         "exempt_keys": [
             "u_imgd",
@@ -538,37 +538,77 @@
     "keys_to_translate": {
         "lpn_tool_add_meter": "Customer",
         "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
-        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
         "lpn_pane_tab_customers": "Customers",
         "lpn_customer_heading": "Customer {id}",
         "lpn_field_meter_demand": "Demand per service",
-        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_demand_tip": "What each service at this customer requires. Find and replace can leverage the distinction between blank and 0.",
         "lpn_field_meter_count": "Number of services",
         "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
         "lpn_field_meter_total": "Total demand",
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_field_meter_node": "Connected to",
+        "lpn_field_meter_node_tip": "The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
-        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.",
+        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.",
         "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
         "lpn_meter_placed": "Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.",
-        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, or drag the connection point to a different asset.",
         "lpn_field_meter_station": "Station along the pipe (%)",
         "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
         "lpn_field_meter_offset": "Offset from the pipe",
-        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_offset_tip": "Positive is to the right of the pipe looking from its first node toward its second. Typing a value here can move the customer to the other side of the main, and it always squares the service line to the main.",
         "lpn_field_meter_lumped": "Added to node",
-        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_field_meter_lumped_tip": "Nearest node; this customer's demands are added there.",
         "lpn_node_customers": "Customer demands",
-        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_tip": "List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.",
         "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
         "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
         "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.",
-        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_tool_zoom_window": "Zoom Window",
+        "lpn_zoom_in": "Zoom in",
+        "lpn_zoom_out": "Zoom out",
+        "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
+        "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
+        "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
+        "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -585,9 +625,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -600,14 +642,21 @@
         "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_msglog_name": "Messages",
+        "lpn_msglog_heading": "Recent messages",
+        "lpn_msglog_empty": "No messages yet.",
+        "lpn_msglog_ago": "{x} ago",
+        "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
-        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_tag": "Tag",
+        "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
@@ -621,39 +670,70 @@
         "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
         "lpn_map_attach_scale_from": "Scale from the current size…",
         "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
-        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_bad": "Type a single number greater than zero.",
         "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
         "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
         "lpn_map_attach_remove": "Detach",
         "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
         "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
         "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
-        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
         "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
-        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn": "Rotate the map",
         "lpn_mapgeo_dial_turn_read": "{d} degrees",
         "lpn_mapgeo_dial_size": "Map size",
         "lpn_mapgeo_dial_size_read": "{f} times",
-        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
         "lpn_mapgeo_place": "Place approximately",
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
-        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_always": "Always show",
+        "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
+        "lpn_settings_symbol_cap_mid": "times the length of the",
+        "lpn_settings_symbol_cap_post": "percentile pipe",
+        "lpn_settings_symbol_cap_tip": "A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
-        "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
-        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_reports_status": "Status",
+        "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
+        "lpn_status_title": "Status report",
+        "lpn_status_needs_run": "The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.",
+        "lpn_status_empty": "Nothing changed status during this run.",
+        "lpn_status_col_time": "Time",
+        "lpn_status_col_event": "Event",
+        "lpn_status_opened": "{type} {id} opened",
+        "lpn_status_closed": "{type} {id} closed",
+        "lpn_status_filling": "{type} {id} is filling",
+        "lpn_status_emptying": "{type} {id} is emptying",
+        "lpn_status_full": "{type} {id} is full",
+        "lpn_status_dry": "{type} {id} is empty",
+        "lpn_status_no_converge": "The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.",
+        "lpn_status_note": "Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.",
+        "lpn_reports_full": "Full",
+        "lpn_reports_full_tip": "Every node and every link at every reporting time step of the last run, as one table you can download or print.",
+        "lpn_full_title": "Full report",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.",
+        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.",
+        "lpn_full_step_label": "Time step",
+        "lpn_full_download_csv": "Download CSV",
+        "lpn_full_print": "Print report",
+        "lpn_full_col_time": "Time",
+        "lpn_full_col_type": "Type",
+        "lpn_full_col_id": "ID",
+        "lpn_full_row_count": "{n} rows.",
         "lpn_library_import": "Import libraries…",
-        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
         "lpn_library_import_count": "{name} ({count})",
         "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
@@ -671,46 +751,26 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
-        "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
         "lpn_survey_read_error": "That file could not be read from your disk.",
         "lpn_survey_cancelled": "Nothing was created and nothing was changed.",
-        "lpn_survey_row": "row {n}",
         "lpn_survey_axis_north": "Northing",
         "lpn_survey_axis_east": "Easting",
-        "lpn_survey_column_n": "column {n}",
         "lpn_survey_err_empty": "That file has nothing in it.",
         "lpn_survey_err_unreadable": "That file could not be read as a surveyed point list.",
-        "lpn_survey_err_no_coords": "This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}",
         "lpn_survey_err_ambiguous_coord": "More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.",
-        "lpn_survey_err_ambiguous_lon": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
-        "lpn_survey_err_plane": "That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.",
-        "lpn_survey_err_gpx_no_wpt": "That GPX file holds no waypoints, so there is nothing to make junctions from.",
         "lpn_survey_err_no_points": "Not one row of that file could be read as a surveyed point. Rows read: {detail}",
         "lpn_survey_format_label": "File format:",
         "lpn_survey_format_internal": "specified internally",
         "lpn_survey_create": "Create nodes",
-        "lpn_survey_fmt_pnezd": "Point name, northing, easting, elevation, description (PNEZD)",
-        "lpn_survey_fmt_penzd": "Point name, easting, northing, elevation, description (PENZD)",
-        "lpn_survey_fmt_pnez": "Point name, northing, easting, elevation (PNEZ)",
-        "lpn_survey_fmt_penz": "Point name, easting, northing, elevation (PENZ)",
-        "lpn_survey_fmt_nezd": "Northing, easting, elevation, description (NEZD)",
-        "lpn_survey_fmt_enzd": "Easting, northing, elevation, description (ENZD)",
-        "lpn_survey_fmt_nez": "Northing, easting, elevation (NEZ)",
-        "lpn_survey_fmt_enz": "Easting, northing, elevation (ENZ, also written XYZ)",
-        "lpn_survey_from_header": "The first line of your file names its own columns, so those names were used and the column order below was not needed.",
-        "lpn_survey_note_header_unread": "The first line was passed over: it names no columns this page knows.",
+        "lpn_survey_note_header_unread": "The first line was skipped: it names no columns this page knows.",
         "lpn_survey_type_label": "Asset type:",
         "lpn_survey_confirm_junction": "{n} junction(s) found. Proceed?",
         "lpn_survey_confirm_reservoir": "{n} reservoir(s) found. Proceed?",
         "lpn_survey_confirm_tank": "{n} tank(s) found. Proceed?",
-        "lpn_survey_map_gpx": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
-        "lpn_survey_map_none": "not used",
-        "lpn_survey_unit_m": "meters",
-        "lpn_survey_unit_ft": "feet",
-        "lpn_survey_confirm_pipes": "No pipes are drawn. A surveyed list says where the points are, not which of them are joined.",
         "lpn_survey_report_junction": "{n} junction(s) imported, {m} with elevation.",
         "lpn_survey_report_reservoir": "{n} reservoir(s) imported, {m} with elevation.",
         "lpn_survey_report_tank": "{n} tank(s) imported, {m} with elevation.",
@@ -721,55 +781,89 @@
         "lpn_survey_note_line": "Line {line}: {sev}: {code}: {text}",
         "lpn_survey_note_row_short": "Too few columns for the file format above.",
         "lpn_survey_note_coord_missing": "The {axis} cell is empty.",
-        "lpn_survey_note_lon_missing": "The longitude column is empty on this row, so no junction was made for it.",
         "lpn_survey_note_bad_coord": "The {axis} does not read as a number.",
-        "lpn_survey_note_bad_lon": "The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
         "lpn_survey_note_coord_range": "The {axis} is outside the range this project allows.",
-        "lpn_survey_note_lon_range": "This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.",
         "lpn_survey_note_bad_elev": "Non-numeric elevation. Imported without elevation.",
         "lpn_survey_note_ambiguous_elev": "More than one column could be the elevation, so none of them was read.",
-        "lpn_survey_note_blank_rows": "Blank lines passed over: {detail}.",
+        "lpn_survey_note_blank_rows": "Blank lines skipped: {detail}.",
         "lpn_survey_note_id_duplicate": "Name already used earlier in this file, new name assigned.",
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
-        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned.",
-        "lpn_survey_note_gpx_trkpt": "The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.",
-        "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
-        "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
+        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
     "keys": {
         "lpn_tool_add_meter": "Customer",
         "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
-        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
         "lpn_pane_tab_customers": "Customers",
         "lpn_customer_heading": "Customer {id}",
         "lpn_field_meter_demand": "Demand per service",
-        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_demand_tip": "What each service at this customer requires. Find and replace can leverage the distinction between blank and 0.",
         "lpn_field_meter_count": "Number of services",
         "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
         "lpn_field_meter_total": "Total demand",
         "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
         "lpn_field_meter_pipe": "Connected asset",
         "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_field_meter_node": "Connected to",
+        "lpn_field_meter_node_tip": "The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.",
         "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
-        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.",
+        "lpn_field_meter_pattern_tip": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.",
         "lpn_meter_pattern_unknown": "No pattern in this project is named {id}, so the customer was left as it was.",
         "lpn_meter_placed": "Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.",
-        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, or drag the connection point to a different asset.",
         "lpn_field_meter_station": "Station along the pipe (%)",
         "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
         "lpn_field_meter_offset": "Offset from the pipe",
-        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_offset_tip": "Positive is to the right of the pipe looking from its first node toward its second. Typing a value here can move the customer to the other side of the main, and it always squares the service line to the main.",
         "lpn_field_meter_lumped": "Added to node",
-        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_field_meter_lumped_tip": "Nearest node; this customer's demands are added there.",
         "lpn_node_customers": "Customer demands",
-        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_tip": "List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.",
         "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
         "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
         "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.",
-        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_tool_zoom_window": "Zoom Window",
+        "lpn_zoom_in": "Zoom in",
+        "lpn_zoom_out": "Zoom out",
+        "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
+        "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
+        "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
+        "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
+        "lpn_pane_not_used": "Not used",
+        "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -786,9 +880,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -801,14 +897,21 @@
         "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+        "lpn_msglog_name": "Messages",
+        "lpn_msglog_heading": "Recent messages",
+        "lpn_msglog_empty": "No messages yet.",
+        "lpn_msglog_ago": "{x} ago",
+        "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
-        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.",
+        "lpn_engine_wait_bytes": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.",
         "lpn_field_desc": "Description",
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_tag": "Tag",
+        "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
@@ -822,39 +925,70 @@
         "lpn_map_attach_readjust_tip": "Return to Step 2 of the map attachment process.",
         "lpn_map_attach_scale_from": "Scale from the current size…",
         "lpn_map_attach_scale_from_prompt": "Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
-        "lpn_map_attach_scale_from_bad": "Type one number greater than zero.",
+        "lpn_map_attach_scale_from_bad": "Type a single number greater than zero.",
         "lpn_map_attach_scale_from_done": "The map is resized, and your drawing and every coordinate in it are exactly as they were.",
         "lpn_map_attach_none": "There is no world map attached to this project yet. Use Map, World map, Attach first.",
         "lpn_map_attach_remove": "Detach",
         "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
         "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
         "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
-        "lpn_mapgeo_replace": "This project already has the world map attached. Replace that georeferencing?",
         "lpn_mapgeo_intro": "Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_step1": "Step 1 of 2: find your place in the world",
         "lpn_mapgeo_step2": "Step 2 of 2: fit the map behind your drawing",
         "lpn_mapgeo_hint1": "Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.",
+        "lpn_mapgeo_readjust_intro": "Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.",
         "lpn_mapgeo_hint2": "Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.",
         "lpn_mapgeo_gestures": "Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.",
-        "lpn_mapgeo_dial_turn": "Turn the map",
+        "lpn_mapgeo_dial_turn": "Rotate the map",
         "lpn_mapgeo_dial_turn_read": "{d} degrees",
         "lpn_mapgeo_dial_size": "Map size",
         "lpn_mapgeo_dial_size_read": "{f} times",
-        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
+        "lpn_mapgeo_dial_help": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
         "lpn_mapgeo_place": "Place approximately",
         "lpn_mapgeo_finish": "Georeference here",
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom. Symbols stop growing at this same width, so when the map is wider they keep their size on the ground and get smaller on the screen. With the box blank, symbols stop growing where a junction would be as wide as the 10th-percentile pipe length. Reservoirs and tanks keep their screen size at every zoom.",
-        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_always": "Always show",
+        "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
+        "lpn_settings_symbol_cap_mid": "times the length of the",
+        "lpn_settings_symbol_cap_post": "percentile pipe",
+        "lpn_settings_symbol_cap_tip": "A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
+        "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
-        "lpn_labels_customer_note": "A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width": "Widest view that attempts to display customer labels",
-        "lpn_labels_customer_width_tip": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
+        "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_reports_status": "Status",
+        "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
+        "lpn_status_title": "Status report",
+        "lpn_status_needs_run": "The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.",
+        "lpn_status_empty": "Nothing changed status during this run.",
+        "lpn_status_col_time": "Time",
+        "lpn_status_col_event": "Event",
+        "lpn_status_opened": "{type} {id} opened",
+        "lpn_status_closed": "{type} {id} closed",
+        "lpn_status_filling": "{type} {id} is filling",
+        "lpn_status_emptying": "{type} {id} is emptying",
+        "lpn_status_full": "{type} {id} is full",
+        "lpn_status_dry": "{type} {id} is empty",
+        "lpn_status_no_converge": "The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.",
+        "lpn_status_note": "Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.",
+        "lpn_reports_full": "Full",
+        "lpn_reports_full_tip": "Every node and every link at every reporting time step of the last run, as one table you can download or print.",
+        "lpn_full_title": "Full report",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.",
+        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.",
+        "lpn_full_step_label": "Time step",
+        "lpn_full_download_csv": "Download CSV",
+        "lpn_full_print": "Print report",
+        "lpn_full_col_time": "Time",
+        "lpn_full_col_type": "Type",
+        "lpn_full_col_id": "ID",
+        "lpn_full_row_count": "{n} rows.",
         "lpn_library_import": "Import libraries…",
-        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
         "lpn_library_import_choose": "Choose what to copy from {file}",
         "lpn_library_import_count": "{name} ({count})",
         "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
@@ -872,46 +1006,26 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
-        "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
         "lpn_survey_read_error": "That file could not be read from your disk.",
         "lpn_survey_cancelled": "Nothing was created and nothing was changed.",
-        "lpn_survey_row": "row {n}",
         "lpn_survey_axis_north": "Northing",
         "lpn_survey_axis_east": "Easting",
-        "lpn_survey_column_n": "column {n}",
         "lpn_survey_err_empty": "That file has nothing in it.",
         "lpn_survey_err_unreadable": "That file could not be read as a surveyed point list.",
-        "lpn_survey_err_no_coords": "This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}",
         "lpn_survey_err_ambiguous_coord": "More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.",
-        "lpn_survey_err_ambiguous_lon": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
-        "lpn_survey_err_plane": "That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.",
-        "lpn_survey_err_gpx_no_wpt": "That GPX file holds no waypoints, so there is nothing to make junctions from.",
         "lpn_survey_err_no_points": "Not one row of that file could be read as a surveyed point. Rows read: {detail}",
         "lpn_survey_format_label": "File format:",
         "lpn_survey_format_internal": "specified internally",
         "lpn_survey_create": "Create nodes",
-        "lpn_survey_fmt_pnezd": "Point name, northing, easting, elevation, description (PNEZD)",
-        "lpn_survey_fmt_penzd": "Point name, easting, northing, elevation, description (PENZD)",
-        "lpn_survey_fmt_pnez": "Point name, northing, easting, elevation (PNEZ)",
-        "lpn_survey_fmt_penz": "Point name, easting, northing, elevation (PENZ)",
-        "lpn_survey_fmt_nezd": "Northing, easting, elevation, description (NEZD)",
-        "lpn_survey_fmt_enzd": "Easting, northing, elevation, description (ENZD)",
-        "lpn_survey_fmt_nez": "Northing, easting, elevation (NEZ)",
-        "lpn_survey_fmt_enz": "Easting, northing, elevation (ENZ, also written XYZ)",
-        "lpn_survey_from_header": "The first line of your file names its own columns, so those names were used and the column order below was not needed.",
-        "lpn_survey_note_header_unread": "The first line was passed over: it names no columns this page knows.",
+        "lpn_survey_note_header_unread": "The first line was skipped: it names no columns this page knows.",
         "lpn_survey_type_label": "Asset type:",
         "lpn_survey_confirm_junction": "{n} junction(s) found. Proceed?",
         "lpn_survey_confirm_reservoir": "{n} reservoir(s) found. Proceed?",
         "lpn_survey_confirm_tank": "{n} tank(s) found. Proceed?",
-        "lpn_survey_map_gpx": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
-        "lpn_survey_map_none": "not used",
-        "lpn_survey_unit_m": "meters",
-        "lpn_survey_unit_ft": "feet",
-        "lpn_survey_confirm_pipes": "No pipes are drawn. A surveyed list says where the points are, not which of them are joined.",
         "lpn_survey_report_junction": "{n} junction(s) imported, {m} with elevation.",
         "lpn_survey_report_reservoir": "{n} reservoir(s) imported, {m} with elevation.",
         "lpn_survey_report_tank": "{n} tank(s) imported, {m} with elevation.",
@@ -922,20 +1036,14 @@
         "lpn_survey_note_line": "Line {line}: {sev}: {code}: {text}",
         "lpn_survey_note_row_short": "Too few columns for the file format above.",
         "lpn_survey_note_coord_missing": "The {axis} cell is empty.",
-        "lpn_survey_note_lon_missing": "The longitude column is empty on this row, so no junction was made for it.",
         "lpn_survey_note_bad_coord": "The {axis} does not read as a number.",
-        "lpn_survey_note_bad_lon": "The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
         "lpn_survey_note_coord_range": "The {axis} is outside the range this project allows.",
-        "lpn_survey_note_lon_range": "This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.",
         "lpn_survey_note_bad_elev": "Non-numeric elevation. Imported without elevation.",
         "lpn_survey_note_ambiguous_elev": "More than one column could be the elevation, so none of them was read.",
-        "lpn_survey_note_blank_rows": "Blank lines passed over: {detail}.",
+        "lpn_survey_note_blank_rows": "Blank lines skipped: {detail}.",
         "lpn_survey_note_id_duplicate": "Name already used earlier in this file, new name assigned.",
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
-        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned.",
-        "lpn_survey_note_gpx_trkpt": "The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.",
-        "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
-        "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
+        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
     "key_context": {
         "lpn_tool_add_meter": {
@@ -1131,6 +1239,38 @@
             }
         },
         "lpn_field_meter_pipe_suggest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Verteks",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Klik satu sudut jendela.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Verteks",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Klik satu sudut jendela.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_node_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1450,19 +1590,627 @@
                 }
             }
         },
+        "lpn_tool_zoom_window": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Tampilkan Semua",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Teks",
+                    "english": "Text"
+                }
+            }
+        },
+        "lpn_zoom_in": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Tampilkan Semua",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Teks",
+                    "english": "Text"
+                }
+            }
+        },
+        "lpn_zoom_out": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Tampilkan Semua",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_new_text",
+                    "value": "Teks",
+                    "english": "Text"
+                }
+            }
+        },
+        "lpn_offscreen_intact": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Gunakan File, Proyek baru untuk membuka contoh. Atau mulai dengan menambahkan reservoir, simpul, dan pipa dari bilah alat.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_examples_welcome",
+                    "value": "Selamat datang di pemodelan jaringan air bersih, dengan penyelesai EPANET",
+                    "english": "Welcome to water supply network modelling"
+                }
+            }
+        },
+        "lpn_units_mapcoords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_mapcoords_deg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_usft": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "Panjang dan koordinat peta",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "Elevasi dan tinggi tekan",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_file_convert_as": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
         "lpn_copy_of": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Buka berkas xy di peta…",
-                    "english": "Convert coordinates as…"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_file_import_geo_tip",
-                    "value": "Membuka berkas proyek atau berkas EPANET pada tab proyek baru di halaman ini, di atas peta jalan. Anda menempatkan gambar pada dunia secara manual: geser dan perbesar ke lokasi, lalu ubah ukuran dan putar agar sesuai. Jika x dan y pada berkas sudah berupa garis bujur dan garis lintang, tekan tombol Ini sudah lat\/lon dan jaringan akan langsung berpindah ke tempatnya. Setiap angka yang Anda ketik tetap seperti semula.",
-                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_coordsys_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_none_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_oneway": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_no_transform": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_file_convert_as_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Tampilkan citra satelit",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_georef_answered": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "X dan y pada berkas ini dibaca sebagai garis bujur dan garis lintang, sehingga jaringan sudah berada di peta dan tidak ada yang dipindahkan. Periksa apakah letaknya sudah benar, lalu tekan tombol Simpan penempatan ini.",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Menempatkan model dilakukan dalam dua langkah. Langkah 1 adalah langkah cepat: model tetap diam dan Anda menggerakkan peta di belakangnya, sampai lokasi Anda berada di bawah model dengan ukuran yang kira-kira tepat. Belum ada rotasi pada tahap ini. Langkah 2 adalah langkah presisi: Anda menyeret, mengubah ukuran, dan memutar model itu sendiri. Proyek Anda pada mulanya berada di atas peta seluruh dunia, jadi temukan lokasi Anda terlebih dahulu, lalu tekan tombol Letakkan model di sini.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_tool_zoom_window_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Sesuaikan seluruh jaringan ke jendela.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Buka pengaturan untuk proyek ini.",
+                    "english": "Open the settings for this project."
+                }
+            }
+        },
+        "lpn_zoom_in_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Sesuaikan seluruh jaringan ke jendela.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Buka pengaturan untuk proyek ini.",
+                    "english": "Open the settings for this project."
+                }
+            }
+        },
+        "lpn_zoom_out_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Sesuaikan seluruh jaringan ke jendela.",
+                    "english": "Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_settings_tip",
+                    "value": "Buka pengaturan untuk proyek ini.",
+                    "english": "Open the settings for this project."
+                }
+            }
+        },
+        "lpn_pane_not_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_text_attached",
+                    "value": "Terlampir",
+                    "english": "Attached"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_filter_note",
+                    "value": "Difilter berdasarkan {q}. Menampilkan {n} dari {all}.",
+                    "english": "Filtered by {q}. Showing {n} of {all}."
+                }
+            }
+        },
+        "lpn_pane_goto_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Urutkan berdasarkan kolom ini. Klik lagi untuk membalik urutannya.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                }
+            }
+        },
+        "lpn_find_filter_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "mengandung",
+                    "english": "contains"
                 }
             }
         },
@@ -1722,6 +2470,22 @@
                 }
             }
         },
+        "lpn_crsbox_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_crs",
+                    "value": "Proyeksi peta",
+                    "english": "Coordinate system"
+                },
+                "next_translated": {
+                    "key": "lpn_crs_view",
+                    "value": "Saring berdasarkan tampilan peta",
+                    "english": "Filter by map view"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,
@@ -1767,6 +2531,22 @@
                     "key": "lpn_crs_none",
                     "value": "Tidak digeoreferensi",
                     "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_inp_report_no_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_label_anchor",
+                    "value": "Label teks ditempatkan sebagaimana EPANET menempatkannya, dari sudut kiri atasnya.",
+                    "english": "Text labels are placed as EPANET places them, from their top left corner."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Halaman ini tidak menggunakan semua yang digunakan EPANET, tetapi tidak ada apa pun dalam berkas Anda yang dibuang. Berikut adalah apa yang disimpan berkas Anda tanpa digunakan oleh halaman ini, dan apa yang diubah saat berkas dibaca:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
                 }
             }
         },
@@ -1962,6 +2742,22 @@
                 }
             }
         },
+        "lpn_lock_open_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Ambil alih kunci mereka",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} detik",
+                    "english": "{n} seconds"
+                }
+            }
+        },
         "lpn_lock_requested": {
             "reason": "missing",
             "current_value": null,
@@ -1975,6 +2771,86 @@
                     "key": "lpn_ago_seconds",
                     "value": "{n} detik",
                     "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_msglog_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "waktu yang tidak diketahui",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "waktu yang tidak diketahui",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "waktu yang tidak diketahui",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_ago": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "waktu yang tidak diketahui",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_msglog_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ago_unknown",
+                    "value": "waktu yang tidak diketahui",
+                    "english": "an unknown time"
+                },
+                "next_translated": {
+                    "key": "lpn_lock_readonly_banner",
+                    "value": "Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.",
+                    "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
                 }
             }
         },
@@ -2087,6 +2963,22 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Tag dapat memiliki arti apa pun sesuai kebutuhan Anda, misalnya zona tekanan atau surat perintah kerja. Tidak ada perhitungan di sini maupun di EPANET yang membacanya. Tag hanya satu kata: EPANET berhenti membaca pada spasi pertama, sehingga spasi ditolak saat Anda mengetiknya. Tag ini dibawa masuk dan keluar dari berkas EPANET.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_mode_zoom_window": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_vertices",
+                    "value": "Mode: Verteks. Verteks setiap pipa ditampilkan sebagai gagang kotak kecil. Klik pipa untuk menambah verteks, klik gagang untuk menghapusnya, atau seret gagang untuk memindahkannya. Tidak ada yang lain di peta yang berubah dalam mode ini.",
+                    "english": "Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode."
+                },
+                "next_translated": {
+                    "key": "lpn_select_first",
+                    "value": "Tidak ada yang dipilih. Klik sebuah elemen di peta terlebih dahulu, lalu tekan Hapus.",
+                    "english": "Nothing is selected. Click an asset on the map first, then press Delete."
                 }
             }
         },
@@ -2410,22 +3302,6 @@
                 }
             }
         },
-        "lpn_mapgeo_replace": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Hapus gambar latar ini?",
-                    "english": "Remove the background image?"
-                },
-                "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Klik dua titik pada gambar latar, misalnya kedua ujung skala batang. Kemudian ketik jarak sebenarnya di antara keduanya.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
-                }
-            }
-        },
         "lpn_mapgeo_intro": {
             "reason": "missing",
             "current_value": null,
@@ -2475,6 +3351,22 @@
             }
         },
         "lpn_mapgeo_hint1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "Hapus gambar latar ini?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "Klik dua titik pada gambar latar, misalnya kedua ujung skala batang. Kemudian ketik jarak sebenarnya di antara keduanya.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_mapgeo_readjust_intro": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2714,6 +3606,86 @@
                 }
             }
         },
+        "lpn_settings_symbol_cap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Saat Anda menyeret label menjauh dari elemen yang dinamainya, garis kembali ke elemen itu akan tertarik ke sudut tertentu terdekat jika Anda menyeret cukup dekat dengannya. Teruskan menyeret dan penguncian akan lepas, sehingga sudut mana pun tetap tersedia. Nonaktif berarti bebas diseret, seperti yang selalu dilakukan halaman ini.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opasitas simbol (0 hingga 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_mid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Saat Anda menyeret label menjauh dari elemen yang dinamainya, garis kembali ke elemen itu akan tertarik ke sudut tertentu terdekat jika Anda menyeret cukup dekat dengannya. Teruskan menyeret dan penguncian akan lepas, sehingga sudut mana pun tetap tersedia. Nonaktif berarti bebas diseret, seperti yang selalu dilakukan halaman ini.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opasitas simbol (0 hingga 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_post": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Saat Anda menyeret label menjauh dari elemen yang dinamainya, garis kembali ke elemen itu akan tertarik ke sudut tertentu terdekat jika Anda menyeret cukup dekat dengannya. Teruskan menyeret dan penguncian akan lepas, sehingga sudut mana pun tetap tersedia. Nonaktif berarti bebas diseret, seperti yang selalu dilakukan halaman ini.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opasitas simbol (0 hingga 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_symbol_cap_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_leader_snap_tip",
+                    "value": "Saat Anda menyeret label menjauh dari elemen yang dinamainya, garis kembali ke elemen itu akan tertarik ke sudut tertentu terdekat jika Anda menyeret cukup dekat dengannya. Teruskan menyeret dan penguncian akan lepas, sehingga sudut mana pun tetap tersedia. Nonaktif berarti bebas diseret, seperti yang selalu dilakukan halaman ini.",
+                    "english": "Snap angle used when you drag a label away from its asset."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opasitas simbol (0 hingga 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_time_clock_day": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_format_tip",
+                    "value": "Tulis waktu sebagai jam dan menit, seperti 2:30. Angka polos berarti jam, jadi 8 berarti delapan jam. Setengah jam adalah 0:30.",
+                    "english": "Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30)."
+                }
+            }
+        },
         "lpn_settings_sym_customer": {
             "reason": "missing",
             "current_value": null,
@@ -2731,22 +3703,6 @@
             }
         },
         "lpn_labels_customer_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Simbologi penghubung",
-                    "english": "Link"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_page",
-                    "value": "Halaman",
-                    "english": "Page"
-                }
-            }
-        },
-        "lpn_labels_customer_width": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2791,6 +3747,438 @@
                     "key": "lpn_settings_page",
                     "value": "Halaman",
                     "english": "Page"
+                }
+            }
+        },
+        "lpn_reports_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_status_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_col_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_col_event": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_filling": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_emptying": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_full": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_dry": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_no_converge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_status_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_full": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_full_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_step_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_download_csv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_print": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_col_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_full_row_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_total_cost",
+                    "value": "Biaya total",
+                    "english": "Total cost"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Tidak ada harga daya yang dinyatakan, sehingga setiap biaya di sini adalah nol. Atur harga di bawah Pengaturan, Energi.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
                 }
             }
         },
@@ -3098,6 +4486,22 @@
                 }
             }
         },
+        "lpn_ff_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_no_selection",
+                    "value": "Tidak ada simpul yang dipilih. Pilih satu di peta, atau uji setiap simpul.",
+                    "english": "No junction is selected. Choose one on the map, or test every junction."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_required",
+                    "value": "Debit kebakaran yang diperlukan",
+                    "english": "Required fire flow"
+                }
+            }
+        },
         "lpn_ff_clear": {
             "reason": "missing",
             "current_value": null,
@@ -3138,18 +4542,6 @@
                 "next_translated": null
             }
         },
-        "lpn_survey_not_geo": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_survey_read_error": {
             "reason": "missing",
             "current_value": null,
@@ -3163,18 +4555,6 @@
             }
         },
         "lpn_survey_cancelled": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_row": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3210,18 +4590,6 @@
                 "next_translated": null
             }
         },
-        "lpn_survey_column_n": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_survey_err_empty": {
             "reason": "missing",
             "current_value": null,
@@ -3246,55 +4614,7 @@
                 "next_translated": null
             }
         },
-        "lpn_survey_err_no_coords": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_survey_err_ambiguous_coord": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_err_ambiguous_lon": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_err_plane": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_err_gpx_no_wpt": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3343,114 +4663,6 @@
             }
         },
         "lpn_survey_create": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_pnezd": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_penzd": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_pnez": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_penz": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_nezd": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_enzd": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_nez": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_fmt_enz": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_from_header": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3511,66 +4723,6 @@
             }
         },
         "lpn_survey_confirm_tank": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_map_gpx": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_map_none": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_unit_m": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_unit_ft": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_confirm_pipes": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3702,18 +4854,6 @@
                 "next_translated": null
             }
         },
-        "lpn_survey_note_lon_missing": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_survey_note_bad_coord": {
             "reason": "missing",
             "current_value": null,
@@ -3726,31 +4866,7 @@
                 "next_translated": null
             }
         },
-        "lpn_survey_note_bad_lon": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_survey_note_coord_range": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_note_lon_range": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3823,42 +4939,6 @@
             }
         },
         "lpn_survey_note_id_invalid": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_note_gpx_trkpt": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_note_gpx_rtept": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Tidak ada jawaban. Kode yang dilaporkan adalah {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_survey_note_elev_converted": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

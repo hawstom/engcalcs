@@ -86,6 +86,23 @@
 	};
 
 	/**
+	 * **WHICH DAY OF THE RUN A CLOCK READING FALLS ON, COUNTING FROM 1.**
+	 *
+	 * A wall clock wraps at midnight, which is its whole job, and that is exactly what makes a bare
+	 * `01:00` ambiguous on a run of several days. Tom, 2026-09-23: *"if we are putting clock time in
+	 * the tip (which is of questionable value), we should put Day {i}, {j}:00."*
+	 *
+	 * **THE BOUNDARY IS MIDNIGHT ON THE CLOCK, NOT 24 HOURS OF ELAPSED TIME**, and the two differ
+	 * whenever the run does not start at midnight: a project whose `startClock` is 06:00 reaches
+	 * Day 2 after 18 elapsed hours, not 24. Counting elapsed days instead would print Day 1 for a
+	 * reading the clock says is tomorrow morning, which is the ambiguity this exists to remove.
+	 */
+	EC.lpnTimeClockDay = function (times, t) {
+		var start = (times && times.startClock) || 0;
+		return Math.floor((start + (t || 0)) / SEC_PER_DAY) + 1;
+	};
+
+	/**
 	 * Which frame shows time `t`: the last one at or before it, so a slider that lands between two
 	 * reporting times shows the state that was true then rather than one that has not happened.
 	 * -1 for an empty run.
@@ -303,8 +320,10 @@
 	var state = {
 		t: 0, run: null, token: 0, playing: false, timer: null, speed: 1,
 		// ---- the four fields that make a period run cheap enough to leave automatic (2026-08-19) ----
-		// `lastRunMs` is how long the LAST run of THIS network took, measured; it is what decides
-		// whether the page may run the period by itself (see EC.LPN_TIME_AUTO).
+		// `lastRunMs` is how long the LAST run of THIS network took, measured on the wall clock; it
+		// is what the slow-run advice quotes (see EC.LPN_TIME_SLOW_MS).
+		// `lastBusyMs` is what that run cost the THREAD, its slices summed without the waits between
+		// them; it decides whether an edit's live answer can be the run itself (see editRunsNow()).
 		// `wanted` is "a run has been asked for", set by the Run button, by a document arriving and
 		// by the transport, and consumed by the next solve.
 		// `busy` is a run in flight, so a second request queues instead of piling up.
@@ -315,7 +334,7 @@
 		// appears (Task 450). A run somebody pressed Run for owes them a sign that it started; an
 		// automatic run after a quiet moment owes them silence, or the page grows a box that pops
 		// up every time the mouse stops moving.
-		lastRunMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
+		lastRunMs: null, lastBusyMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
 	};
 
 	/**
@@ -603,9 +622,13 @@
 	 * particular solve is a run rather than an edit. Returns false otherwise, and
 	 * js/looped-network.js carries on to the ordinary steady solve.
 	 *
-	 * **A HYDRAULIC EDIT RECALCULATES THE FIRST REPORTING TIME AND NOTHING ELSE** (Tom, 2026-08-19:
-	 * "On any edit, only the first time step should be recalculated"). Two things follow, and the
-	 * second is the whole point of the change:
+	 * **A HYDRAULIC EDIT ON A SLOW NETWORK SHOWS THE FIRST REPORTING TIME FIRST.** This answers Tom's
+	 * "multiplied burden of recalculating every time step at every value change" (2026-08-19, quoted
+	 * above LPN_TIME_AUTO). It is NOT a ruling of his that an edit recalculates only the first step:
+	 * a sentence to that effect was cited here as his, cannot be found in any transcript, and he
+	 * struck it on 2026-09-23 -- the one place first-step-only makes sense is while the EPANET engine
+	 * is still loading for a new browser. On a fast network an edit runs the period at once (see
+	 * editRunsNow()). Where the preview does run, two things follow:
 	 *
 	 *   1. The page stays LIVE. Returning false here hands the solve back, and what gets drawn is
 	 *      the steady solve of the document as it now stands -- the same as-you-type behaviour
@@ -613,9 +636,8 @@
 	 *   2. **THE FRAMES GO.** They describe a network that no longer exists, and a result that no
 	 *      longer matches the document must never be on screen as if it did. Dropping them rather
 	 *      than labelling them stale is EPANET's own answer, it keeps EC.lpnTimeCurrentFrame()
-	 *      honest for free, and it is what gives "only the first time step" a literal meaning on
-	 *      screen: the transport goes back to the start, because the start is the one moment that
-	 *      has actually been worked out.
+	 *      honest for free, and it is why the transport goes back to the start: the start is the
+	 *      one moment that has actually been worked out.
 	 *
 	 * The period comes back either by itself, after a quiet moment, or on the Run button -- see
 	 * EC.LPN_TIME_AUTO for which, and why that is a measurement rather than a preference.
@@ -630,6 +652,7 @@
 			// would leave the transport showing a run that is no longer being computed.
 			cancelIdleRun();
 			state.lastRunMs = null;
+			state.lastBusyMs = null;
 			state.runSig = null;
 			state.wantedByUser = false;
 			if (state.run) { state.run = null; state.t = 0; renderPanel(); }
@@ -654,9 +677,47 @@
 		}
 		dropFrames();
 		state.runSig = null;
+		// **A RUN STILL IN FLIGHT IS ANSWERING THE NETWORK THIS EDIT JUST REPLACED.** Its frames
+		// may not land on top of whatever this edit draws, so it is superseded here, exactly as a
+		// newer run supersedes it. runFinished() still fires when it ends, so a queued run is not lost.
+		if (state.busy) { state.token++; }
+		// **ONE CHANGE, ONE RESULT, ONE LABEL PASS** (Task 653). When the run that is coming anyway
+		// is cheap, the steady preview is pure cost: it is solved, drawn and labelled, and a second
+		// later the run replaces it with the same instant -- t is back at the first reporting time
+		// either way. So the run goes now, in its place. A run already in flight owns the engine;
+		// the request queues behind it and runFinished() starts it.
+		if (editRunsNow()) {
+			cancelIdleRun();
+			if (state.busy) { state.wanted = true; return true; }
+			startRun(model);
+			return true;
+		}
 		if (autoRunAllowed()) { scheduleIdleRun(); }
 		return false;
 	};
+
+	/**
+	 * **MAY THIS EDIT'S LIVE ANSWER BE THE RUN ITSELF?** Only with the switch on (off means off,
+	 * and that path never reaches here anyway), and only for a network whose last run was measured
+	 * and cost its thread no more than EC.LPN_TIME_SLOW_MS.
+	 *
+	 * **WHY THAT LINE.** With the switch on the run happens anyway, a moment later, so running it
+	 * now instead of the preview is strictly LESS work: one run and one label pass, against a
+	 * steady solve, a label pass, the run and a second label pass. The label pass is the expensive
+	 * part (hundreds of ms on Net3, measured). The one thing the preview buys is an EARLIER first
+	 * answer, and that is worth something only where the run itself is slow -- which is exactly
+	 * where the page already tells the user so. Below that line the preview is pure cost; above it
+	 * the preview keeps data entry live, which is Tom's "multiplied burden" concern (2026-08-19).
+	 *
+	 * **THREAD TIME, NOT WALL CLOCK.** `lastBusyMs` is the run's slices summed; the wall clock also
+	 * counts whatever the page did while the run yielded, and on opening a project that is the
+	 * whole label pass -- measured at 3.6-6 s of wall clock for a run whose slices cost 0.4-0.7 s.
+	 * Unmeasured counts as slow, so the preview is what an unknown network gets.
+	 */
+	function editRunsNow() {
+		return autoRunAllowed() && state.lastBusyMs !== null &&
+			state.lastBusyMs <= EC.LPN_TIME_SLOW_MS;
+	}
 
 	/**
 	 * Everything the solver reads, as one string. Same string, same answers.
@@ -776,6 +837,7 @@
 			// exactly as much wall clock as a kept one, and it is the cost this network's next
 			// automatic run is judged by.
 			state.lastRunMs = nowMs() - t0;
+			if (run && typeof run.busyMs === 'number') { state.lastBusyMs = run.busyMs; }
 			runFinished();
 			if (token !== state.token) {
 				// The box belonged to this run and this run no longer belongs to the page. It goes
@@ -846,6 +908,12 @@
 	EC.lpnTimeRunNow = function () { requestRun(true); };
 
 	/**
+	 * Move the transport to `t` seconds, exactly as the slider does. The one door a harness has to a
+	 * time step without clicking the toolbar.
+	 */
+	EC.lpnTimeGoTo = function (t) { setTime(t); };
+
+	/**
 	 * **WHAT THE PUMPS COST OVER THE RUN IN HAND, OR NULL** (Task 566; dev/pump-energy.md).
 	 * js/lpn-epanet.js works it out while the clock is walking; this is the one door the page reads
 	 * it through, so it can never answer out of a run that has been superseded -- the frames and
@@ -893,6 +961,7 @@
 	EC.lpnTimeArrived = function () {
 		cancelIdleRun();
 		state.lastRunMs = null;
+		state.lastBusyMs = null;
 		state.run = null;
 		state.runSig = null;
 		state.t = 0;
@@ -925,6 +994,7 @@
 		state.wanted = false;
 		state.wantedByUser = false;
 		state.lastRunMs = null;
+		state.lastBusyMs = null;
 	};
 
 	/**
@@ -944,7 +1014,7 @@
 	EC.lpnTimeRunState = function () {
 		return {
 			frames: state.run ? state.run.frames.length : 0,
-			t: state.t, lastRunMs: state.lastRunMs,
+			t: state.t, lastRunMs: state.lastRunMs, lastBusyMs: state.lastBusyMs,
 			auto: autoRunAllowed(), wanted: state.wanted, busy: state.busy,
 			idle: !!state.idle
 		};
@@ -1523,28 +1593,30 @@
 	var ui = null;
 
 	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
-	// **THE LABEL IS THE STEP'S RUN-TIME RANGE, NEVER THE WALL CLOCK.** `next` is the following
-	// reporting time, so a step reads `24:00 - 25:00` and keeps climbing past a day -- it must
-	// never fall back to `EC.lpnTimeClockText()`, whose whole job is to WRAP at 24:00 for a
-	// CLOCKTIME control, and which read as `24:00 - 0:00` here before this was written. The last
-	// step has no following stop, so it shows one bare elapsed time.
-	function stepText(t, next) {
-		var start = EC.lpnTimeElapsedText(t);
-		return (next === undefined || next === null) ? start
-			: start + ' - ' + EC.lpnTimeElapsedText(next);
+	// **THE LABEL IS ONE INSTANT, NEVER A RANGE.** `EC.lpnReportTimes()` is a flat list of discrete
+	// reporting INSTANTS; it was never a list of intervals, so pairing one with the next one to
+	// manufacture a span was inventing a quantity this page does not compute. Every comparable
+	// tool (EPANET's own Browser Time, epanet-js's step model, WaterGEMS's Time Browser) names one
+	// instant per step, singular. **AND IT MUST STILL NOT WRAP** -- `EC.lpnTimeElapsedText()`
+	// keeps climbing past a day (`24:00`, `25:00`, ...) rather than falling back to a wall clock
+	// that resets at midnight. R-105 was reopened, 2026-09-22: "these are not ranges, they are
+	// times... change the selector to have only one time per option."
+	function stepText(t) {
+		return EC.lpnTimeElapsedText(t);
 	}
-	// **THE CLOCK READING DID NOT GO AWAY; IT MOVED INTO THE ROW'S TIP.** The label used to be
-	// `elapsed  ·  clock` -- two readings of ONE instant side by side -- and Tom read it as a
-	// range and was right to: two times separated by a mark is a range to everybody. His
-	// instruction, 2026-09-21: *"Fix it to say 24:00 - 25:00, and fix all subsequent steps."*
-	// So the LABEL is now a genuine run-time range and cannot wrap. The clock is still the thing
-	// a pattern is keyed on, so it is kept where it costs no width, and it is the reason the
-	// signature below still has to notice a project that states the SAME grid from a different
-	// hour -- every row would otherwise keep the clock of the project before it.
-	function stepClockText(t, next) {
-		var times = docTimes(), start = EC.lpnTimeClockText(times, t);
-		return (next === undefined || next === null) ? start
-			: start + ' - ' + EC.lpnTimeClockText(times, next);
+	// **THE CLOCK READING LIVES IN THE ROW'S TIP, AND IT TOO IS NOW ONE INSTANT.** It used to
+	// pair with the label as `elapsed  ·  clock`, which read as a range and was the first defect
+	// R-105 fixed; the label then became a genuine range, which is the second defect this one
+	// undoes. `EC.lpnTimeClockText()` is the one that WRAPS at 24:00 -- that is its whole job, for
+	// a CLOCKTIME control -- so a single elapsed instant is paired with a single, possibly wrapped,
+	// clock instant here. **AND THE DAY NUMBER RIDES WITH IT** (Tom, 2026-09-23: *"if we are putting
+	// clock time in the tip (which is of questionable value), we should put Day {i}, {j}:00"*),
+	// because a wrapped clock alone cannot say which morning `01:00` is.
+	function stepClockText(t) {
+		var pc = EngCalcs.pageConfig || {}, times = docTimes();
+		return (pc.lpn_time_clock_day || 'Day {day}, {clock}')
+			.replace(/\{day\}/g, String(EC.lpnTimeClockDay(times, t)))
+			.replace(/\{clock\}/g, EC.lpnTimeClockText(times, t));
 	}
 	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
 	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
@@ -1666,8 +1738,8 @@
 		var stops, labels, clocks, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
-		labels = stops.map(function (t, i) { return stepText(t, stops[i + 1]); });
-		clocks = stops.map(function (t, i) { return stepClockText(t, stops[i + 1]); });
+		labels = stops.map(function (t) { return stepText(t); });
+		clocks = stops.map(function (t) { return stepClockText(t); });
 		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
 		// the rows themselves changed -- an edit to the duration, to the report step, or to the
 		// clock time at the start; rebuilding on every solve would close the list under a user who

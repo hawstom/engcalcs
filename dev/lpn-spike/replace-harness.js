@@ -259,22 +259,25 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	// replaceExtraSpecs() rather than pushSpecList(), and they are the only properties a node and a
 	// link both carry. Description joined the tag on 2026-09-15 (Task 674). Their own coverage is
 	// dev/lpn-spike/find-tag-harness.js and dev/lpn-spike/identity-band-harness.js.
+	// **`length` AND `status` JOINED THIS LIST WITH TASK 708** (gaps #2 and #6 in
+	// dev/property-venue-matrix.md): a bulk write to a pipe's length no longer needs a second
+	// decision per link left unstated ("follow the drawing" is handled by clearing `lenAuto`
+	// inside the spec's own `set`, per the comment on that entry in pushSpecList()), and Active/
+	// Shut is now the same property Find offers, `status`. See replace-status-length-harness.js
+	// for both writes' own coverage.
 	ok('a pipe scope offers the pipe inputs',
-		JSON.stringify(L.specFields('pipe')) === JSON.stringify(['diameter', 'roughness', 'km', 'desc', 'tag']),
+		JSON.stringify(L.specFields('pipe')) === JSON.stringify(['diameter', 'roughness', 'km', 'length', 'status', 'desc', 'tag']),
 		JSON.stringify(L.specFields('pipe')));
 	ok('a junction scope offers the node inputs',
 		// `fireFlow` joined them with Task 530 -- a junction's own required fire flow is an INPUT
 		// this tool can set in bulk, which is the whole point of giving a district one number.
-		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow', 'desc', 'tag']),
+		// `emitter` joined them with Task 708 (gap #3).
+		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow', 'emitter', 'desc', 'tag']),
 		JSON.stringify(L.specFields('junction')));
 	// **RESULTS ARE SEARCHABLE AND NOT WRITABLE.** Pressure is printed on the map, so it is a
 	// perfectly good thing to search on; nothing writes it, so it must never appear here.
 	ok('a solved result is never offered as something to set',
 		L.specFields('junction').indexOf('pressure') < 0 && L.specFields('pipe').indexOf('velocity') < 0);
-	// Length is left out with the results, for its own reason: `lenAuto` is a second decision per
-	// link ("follow the drawing") that one value box cannot express.
-	ok('length is left out, because Auto is a second decision per link',
-		L.specFields('pipe').indexOf('length') < 0, JSON.stringify(L.specFields('pipe')));
 	// A mixed scope has no single property to set. Nothing is offered, and it is SAID.
 	ok('the all-elements scope offers nothing to set', L.specFields('all').length === 0);
 	ok('a Text scope offers nothing to set either', L.specFields('text').length === 0);

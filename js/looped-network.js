@@ -16,7 +16,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer, spotDebugLayer;
+	var svg, world, modelLayer, backdropLayer, gridLayer, customersLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer, spotDebugLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
@@ -84,8 +84,12 @@ var EngCalcs = EngCalcs || {};
 	// label keeps the exact offset it was dropped at (n.lx/n.ly are absolute world units).
 
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
-	function defaultLabelOffset() {
-		var k = symbolFactor();
+	// `full`: fitItems() alone passes true, for the same reason nodeRadiusFull() exists -- the fit
+	// multiplies a world size back out by the LIVE scale to recover a scale-independent pixel
+	// figure, and that only cancels when this offset's own division uses that SAME scale
+	// unconditionally, which the capped symbolFactor() stops doing once the cap is in force.
+	function defaultLabelOffset(full) {
+		var k = full ? symbolFactorFull() : symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
 	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
@@ -95,8 +99,8 @@ var EngCalcs = EngCalcs || {};
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
-	function nodeLabelBase(n) {
-		var d = defaultLabelOffset();
+	function nodeLabelBase(n, full) {
+		var d = defaultLabelOffset(full);
 		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
 			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
 	}
@@ -165,7 +169,13 @@ var EngCalcs = EngCalcs || {};
 	// layout pass, and outside one every call reads the DOM exactly as it always did -- so there is no
 	// invalidation to remember, no resize seam to wire, and nothing a later caller can get stale.
 	var mapBoxPx = null, mapBoxDepth = 0;
+	// **COUNTED, FOR THE REASON linkSegIndexBuilds IS COUNTED 280 LINES DOWN**: a stopwatch on a
+	// shared machine measures the machine, and this number does not move with the load. It is the
+	// number of times the browser was asked to lay the whole drawing out again -- once per edit is
+	// the floor, and anything above that is a hold somebody forgot to declare.
+	var mapBoxReads = 0;
 	function readMapBox() {
+		mapBoxReads++;
 		return { w: (svg && svg.clientWidth) || 0, h: (svg && svg.clientHeight) || 0 };
 	}
 	function mapBox() {
@@ -3002,6 +3012,13 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
+		// The one data label the pointer is carrying right now, if any. It is placed exactly where
+		// the pointer puts it (js/lpn-collide.js candidatesFor()), never pushed along its leader.
+		function labelHeldByDrag(key) {
+			if (!drag || drag.id === undefined) { return false; }
+			return (drag.type === 'nodelbl' && key === nodeLabelKey(drag.id)) ||
+				(drag.type === 'linklbl' && key === linkLabelKey(drag.id));
+		}
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -3012,7 +3029,7 @@ var EngCalcs = EngCalcs || {};
 			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
 			labels.push({
-				id: key, anchor: anchor, home: home, dragged: !!dragged,
+				id: key, anchor: anchor, home: home, dragged: !!dragged, held: labelHeldByDrag(key),
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
@@ -3558,7 +3575,10 @@ var EngCalcs = EngCalcs || {};
 	// a meter symbol attached to a pipe at a station along it (`link` + `t`), carrying the same
 	// description and tag every other element carries, a per-service demand and a count. **A CUSTOMER IS NOT A NODE**: its demand is summed
 	// into the junction its pipe reaches it through, which is arithmetic on a junction the network
-	// already had. See customerNodeId() for that rule and why the junction is derived, not stored.
+	// already had. See customerNodeId() for that rule. The junction is DERIVED while the pipe is
+	// there; `node` is the one exception, a fallback holding the junction id ONLY once the pipe a
+	// node-exact connection ran through has been deleted (customerNodeFallback(), Tom, 2026-09-25) --
+	// so a Customer connected to a node cannot be detached by deleting or re-routing the main.
 	var doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
@@ -3700,6 +3720,13 @@ var EngCalcs = EngCalcs || {};
 	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	// **WGS 84 ITSELF, THE OTHER GEOGRAPHIC ANSWER** (Tom, 2026-09-25: EPSG:4326 was missing from
+	// the chooser and must be an ordinary, unmodified-name option). Its own stored numbers are the
+	// same longitude and latitude degrees LPN_CRS_WEBMERC already means here, so picking either one
+	// makes the identical lat/lon project -- crsIsLatLonCode() is where that equivalence is stated,
+	// and crsBoxOk() is where a 4326 pick is folded onto LPN_CRS_WEBMERC before anything reads it.
+	var LPN_CRS_GEOWGS84 = 'EPSG:4326';
+	function crsIsLatLonCode(code) { return code === LPN_CRS_WEBMERC || code === LPN_CRS_GEOWGS84; }
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3870,8 +3897,14 @@ var EngCalcs = EngCalcs || {};
 		var out = [], i, f, z;
 		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
 		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// **AND EPSG:4326 RIGHT BESIDE IT** (Tom, 2026-09-25), the register's own name for the plain
+		// longitude/latitude CRS this page's own lat/lon project actually stores. Both entries lead
+		// to the identical project -- crsIsLatLonCode() -- so neither is a projected CRS the register
+		// list below could duplicate.
+		out.push({ code: LPN_CRS_GEOWGS84, name: 'WGS 84' });
 		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
-		// CRS like any other, so it is skipped rather than offered twice.
+		// CRS like any other, so it is skipped rather than offered twice. EPSG:4326 is geographic,
+		// not projected, so the register (projected CRS only) never carries it and needs no skip.
 		if (crsRegisterReady()) {
 			for (i = 0; i < LPN_CRS_REG_LIST.length; i++) {
 				if (LPN_CRS_REG_LIST[i].code !== LPN_CRS_WEBMERC) { out.push(LPN_CRS_REG_LIST[i]); }
@@ -3924,6 +3957,9 @@ var EngCalcs = EngCalcs || {};
 		if (c === LPN_CRS_WEBMERC) {
 			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
 		}
+		// WGS 84 geographic has no Mercator pole cut -- it is plain latitude and covers the whole
+		// globe, pole to pole.
+		if (c === LPN_CRS_GEOWGS84) { return { w: -180, e: 180, s: -90, n: 90 }; }
 		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
 		// THE REGISTER'S OWN BOX WINS over anything derived here, and for a reason worth stating:
 		// the family table rounds a band OUTWARD across all of a family's zones, because one row
@@ -3974,10 +4010,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
-		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
-		// write a document claiming its longitudes were metres.
-		if (String(code) === LPN_CRS_WEBMERC) { return false; }
+		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
+		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
+		// ever reached here it would write a document claiming its longitudes were metres.
+		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
 			(doc.labels && doc.labels.length))) { return false; }
@@ -3999,8 +4035,21 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
+		// **R-218: NEVER "WGS 84 / Pseudo-Mercator (EPSG:3857)" HERE.** That is the catalogue's own
+		// name for the code this page uses internally to mark a lat/lon project (comment at
+		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
+		// projected metres when they are longitude and latitude degrees (R-188). This is the one
+		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
+		//
+		// **THROUGH THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A SEPARATE STRING** (Tom, 2026-09-25,
+		// closing R-218's own key: "probably no longer needed since we are not changing any of the
+		// entries"). The register's name for 4326 is "WGS 84", which crsOptionText() turns into
+		// "WGS 84 (EPSG:4326)" -- the exact fact this line used to spell out by hand, now read off
+		// the one place a CRS's name is allowed to live. **THIS IS THE SEAM**: any other surface
+		// naming a lat/lon project's coordinate system (the map status strip included) should call
+		// this function rather than grow a second copy of it.
 		if (isLatLonProject()) {
-			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
+			return crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) });
 		}
 		code = projectCrsCode();
 		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
@@ -4254,6 +4303,26 @@ var EngCalcs = EngCalcs || {};
 		if (!w || !h) { return null; }
 		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat),
 			s: Math.max(minScale(), Math.min(w, h) / degLat) };
+	}
+	// **PROJECT1's OWN HOME VIEW, KEPT SEPARATE FROM `LPN_GEO_HOME`** (R-208,
+	// dev/tom-review-queue.md: *"we start the Project1 on WGS84 zoomed to our favorite place ...
+	// possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center,
+	// Novato, CA."*). Repointing `LPN_GEO_HOME` itself would move every wizard-made blank
+	// geographic project to Novato too, surprising someone who explicitly chose "start blank,
+	// geographic" -- this constant and function exist only for the ONE tab nobody chose to make.
+	//
+	// Centre and span are the real Nominatim `jsonv2` result for "Downtown Novato Center, Novato,
+	// CA" (2026-09-24: centre from the result's lat/lon, span from its own `boundingbox`, the
+	// larger of the two sides) -- the same search a visitor's own place-name lookup would return,
+	// not a hand-picked point.
+	var LPN_FIRST_VISIT_HOME = { lon: -122.579669, lat: 38.108195 };
+	var LPN_FIRST_VISIT_SPAN = 0.0024; // degrees -- the geocoder's own bounding box, padded a hair
+	function firstVisitHomeView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return null; }
+		return { cx: inwardX(LPN_FIRST_VISIT_HOME.lon), cy: inwardY(LPN_FIRST_VISIT_HOME.lat),
+			s: Math.max(minScale(), Math.min(w, h) / LPN_FIRST_VISIT_SPAN) };
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
@@ -5000,8 +5069,9 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
-	// THE REPORTS FLY-OUT (Tom, 2026-09-04). Three finished answers, each of which opens and is
-	// simply there -- no criteria to set, nothing to press.
+	// THE REPORTS FLY-OUT (Tom, 2026-09-04; the Status and Full rows added for ROADMAP Tasks 716
+	// and 715). Five finished answers, each of which opens and is simply there -- no criteria to
+	// set, nothing to press.
 	//
 	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
 	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
@@ -5038,6 +5108,25 @@ var EngCalcs = EngCalcs || {};
 				// one call. It stays here rather than being hidden when there is nothing to show,
 				// for the reason openRunReportBox() states.
 				fn: function () { closeMenu(); openRunReportBox(); }
+			},
+			// **STATUS AND FULL, EPANET'S OWN TWO NAMES, LAST** (ROADMAP Tasks 716, 715; Tom,
+			// 2026-09-25: *"Make the reports roadmap tasks before EPANET++."*). Both read the
+			// extended period run's own frames (js/lpn-time.js) rather than computing anything of
+			// their own, so they sit with the EPANET run report rather than above the divider with
+			// Run and Fire flow -- nothing here is a criterion to set or a sweep to start.
+			//
+			// **THE ROW SAYS "Status"/"Full", NOT "Status report"/"Full report"** -- the parent
+			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
+			// report") already follows two rows up. The BOX TITLES keep the full names.
+			{
+				icon: 'info', label: pc.lpn_reports_status || 'Status',
+				tip: pc.lpn_reports_status_tip,
+				fn: function () { closeMenu(); openStatusReportBox(); }
+			},
+			{
+				icon: 'info', label: pc.lpn_reports_full || 'Full',
+				tip: pc.lpn_reports_full_tip,
+				fn: function () { closeMenu(); openFullReportBox(); }
 			}
 		];
 	}
@@ -5182,7 +5271,103 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// ---- TASK 708: THE RANKED GAPS FROM dev/property-venue-matrix.md, CLOSED BELOW -------
+			//
+			// **THE EMITTER COEFFICIENT (gap #3).** Overridable, but its own `set` -- not a plain
+			// `prop` -- because it crosses the one two-unit boundary on this page (Task 638's own
+			// pair, flow per pressure^gamma): replaceWrite() calls setProp() directly for any spec
+			// carrying a `prop`, which would store the DISPLAYED number raw and skip
+			// emitterToStore() entirely. No `prop` here routes the write through this `set`
+			// instead, exactly the way paneColEmitter()'s own cell does.
+			{ key: 'emitter', group: 'node', field: 'emitter', label: pc.lpn_field_emitter || 'Emitter coefficient',
+				applies: function (n) { return n.type === 'junction'; },
+				get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+				set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } },
+			// **PIPE LENGTH (gap #6): FINDABLE SINCE FIND_EXTRA_LINK_FIELDS, NOW WRITABLE TOO.**
+			// Overridable, and again no `prop`: a Base-side write must also clear `lenAuto`
+			// (`paneColClosed()`'s neighbour `paneColLength`-shaped cell does this inline), or the
+			// next geometry pass silently throws the typed length away and re-derives it from the
+			// drawing (line 9862). Inside a scenario `lenAuto` is never consulted, so `setProp()`
+			// alone is correct there; only Base needs the extra line.
+			{ key: 'length', group: 'link', field: 'length', label: pc.lpn_field_length || 'Length',
+				applies: function (l) { return l.type === 'pipe'; },
+				get: function (l) { return effective(l, 'length'); },
+				set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+			// **A LINK'S OPEN/CLOSED STATUS (gap #2, ranked highest).** Overridable, and a `prop`
+			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
+			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
+			// logic to bypass -- unlike `emitter` and `length` above.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), THE TABLE COLUMN'S OWN KEY, NOT
+			// `lpn_result_status`** (pre-review, Task 708). `lpn_result_status` ("Status") already
+			// names a DIFFERENT concept elsewhere on this page -- the post-solve/EPS status the
+			// colour ramp and the Labels legend show (`linkFieldDefs()`, `COLOR_LINK_FIELDS`),
+			// which can differ from this stored input during a run a `[RULES]` control has closed.
+			// Reusing that word here would put "Status" on two different questions in one panel.
+			// `choices` is derived from findChoiceDefs() rather than spelled out again, so the
+			// codes here and the words a Find/Replace `<select>` shows can never drift apart.
+			{ key: 'status', group: 'link', field: 'status', prop: 'status',
+				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
+				label: pc.lpn_field_closed || 'Closed',
+				applies: function () { return true; },
+				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is base-owned (not in
+			// LPN_OVERRIDABLE), so no `prop`, and the write is the same clamp
+			// paneColPumpSpeed() applies: a blank, a zero or a negative all mean 1 rather than a
+			// pump switched off, which has its own property (`status`, above).
+			{ key: 'speed', group: 'link', field: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },
+			{ key: 'energyPrice', group: 'link', field: 'energyPrice', prop: 'energyPrice', label: pc.lpn_energy_price || 'Price of power',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPrice'); }, set: function (l, v) { l._energyPrice = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE ENERGY PRICE PATTERN, AN ID RATHER THAN A QUANTITY** -- the same shape as a
+			// customer's demand pattern in customerReplaceSpecs() below: `str` so a bulk write
+			// carries the exact bytes typed, and no `prop` so the write can refuse a name nothing
+			// in the library answers to rather than filling four hundred pumps with a dangling
+			// reference.
+			{ key: 'energyPattern', group: 'link', field: 'energyPattern', str: true, label: pc.lpn_energy_price_pattern || 'Price pattern',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPattern') || ''; },
+				set: function (l, v) {
+					var id = String(v === undefined || v === null ? '' : v).trim();
+					if (!id || !libPatternsRead().some(function (pp) { return pp.id === id; })) { return; }
+					setProp(l, 'energyPattern', id);
+				} },
+			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
+			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
+			// other three are base-owned geometry, written bare exactly as their table cells are.
+			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
+			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
+			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
+			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
+			// query keeps reading in every language -- but the WORDS a person picks from are the
+			// popup's own four (paneColMixingModel()'s `choices()`, read through findChoiceDefs()
+			// so there is exactly one list of them, not a second copy to drift out of translation).
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel',
+				choices: findChoiceDefs('mixingModel').map(function (o) { return o[0]; }),
+				label: pc.lpn_mixing_model || 'Mixing model',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
+			// **THE MIXING FRACTION, GATED EXACTLY AS THE TABLE CELL GATES IT** -- only a
+			// two-compartment tank has one, so `applies` refuses the rest rather than writing a
+			// number nothing reads.
+			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
+				applies: function (n) { return n.type === 'tank' && (n.mixingModel || 'MIXED') === '2COMP'; },
+				get: function (n) { return n.mixingFraction; }, set: function (n, v) { n.mixingFraction = v; } }
 		].concat(customPushSpecs());
 	}
 	/**
@@ -5313,7 +5498,11 @@ var EngCalcs = EngCalcs || {};
 			// them for a reason they did not ask for.
 			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
 				// OFF, like every other field a network does not have until it is asked for.
-				quality: false, initQuality: false },
+				quality: false, initQuality: false,
+				// **TANK WATER DEPTH, OFF BY DEFAULT** (Task 696, Tom, 2026-09-25: fix the missing
+				// coverage rather than disable it in Convert as). A junction and a reservoir have no
+				// 'level' to print, exactly as they have no diameter -- see the node loop below.
+				level: false },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -5377,7 +5566,9 @@ var EngCalcs = EngCalcs || {};
 				// water age and concentration exactly as before.
 				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
 				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1,
+				// level 2 -- a water depth reads in the same Elevation/Head unit and precision as
+				//   elev and head, which it sits between physically.
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, level: 2, quality: 1,
 					'quality:trace': 0, initQuality: 2 },
 				// The customer group's own two numbers, its own entries: this map is what decides
 				// which rows get a decimals spinner, so borrowing the node's would have tied a
@@ -5465,7 +5656,11 @@ var EngCalcs = EngCalcs || {};
 				// and "do not make this a criterion for which whole label wins a contested spot".
 				// initQuality ranks just under quality for the same argument: it is only ever on
 				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
-				node: { head: 2, elev: 4, demand: 6, initQuality: 8, id: 10, quality: 12,
+				// **LEVEL TAKES THE GAP HIS EVEN NUMBERS LEFT** (Task 696): level (tank water depth)
+				// slots between head and elev, on the same argument nodeFieldDefs()'s ordering comment
+				// gives for elev trailing head/pressure -- head is DERIVED from elev and level, so it is
+				// still the first of the three to give up its space when a label is crowded.
+				node: { head: 2, level: 3, elev: 4, demand: 6, initQuality: 8, id: 10, quality: 12,
 					demandActual: 16, pressure: 18 },
 				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
 				// neighbours it had, and the three new ones are slotted where they belong -- the
@@ -5530,7 +5725,10 @@ var EngCalcs = EngCalcs || {};
 			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'M' },
+			// M is the structural (internal) letter for Customer (LPN_ID_KEY.meter); its default
+			// DISPLAYED prefix is 'C' (R-229) -- a project stored with the old 'M' default keeps it,
+			// since only the user touches a file's data.
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -5645,16 +5843,33 @@ var EngCalcs = EngCalcs || {};
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-21 under Task 705). Generated
 			// labels are drawn only while the visible map is at most this many DISPLAY LENGTH UNITS
-			// wide, and the same number is what stops a map symbol growing on the ground
-			// (symbolCapScale()). null = always draw, which is the right default because no single
-			// number is meaningful across networks 400 ft and 40 miles wide -- the Settings row
-			// captures it from the current view rather than asking anyone to guess one.
+			// wide. null = always draw, which is the right default because no single number is
+			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
+			// from the current view rather than asking anyone to guess one.
+			//
+			// **0 = NEVER draw a generated label, at any zoom** (2026-09-23, replacing
+			// "Thematic map (colors only)" -- Tom: *"Should we do the same for all labels and use
+			// that to replace the 'Thematic map, no labels' setting?"*). Mirrors the customer row's
+			// own 0 ("Type 0 to leave customers unlabelled."). null and 0 are DIFFERENT stored
+			// values read differently in labelWidthLimitSI() -- null is "no threshold", 0 is a real
+			// threshold nothing is ever narrower than.
+			//
+			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
+			// asked for the day before: *"I'd prefer not to have two rules."*). See
+			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
 			//
 			// **A TYPED NUMBER IN THE DISPLAY UNIT, NEVER SI, and it is REINTERPRETED rather than
 			// converted when the unit changes** -- the suite's own absolute rule. Converted to
 			// metres only where it is compared, in labelWidthLimitSI().
 			labelMaxWidth: null,
-			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
+			// **THE ONE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his wording, 2026-09-22):** "Prevent
+			// nodes from scaling larger than `symbolCapMultiple` times the length of the
+			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
+			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
+			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
+			symbolCapMultiple: 0.5,
+			symbolCapPercentile: 20,
+			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
 			alignPipeLabels: true,
@@ -5732,10 +5947,6 @@ var EngCalcs = EngCalcs || {};
 			colorClassesLink: 7,
 			colorReverseNode: false,
 			colorReverseLink: false,
-			// Task 327's thematic map: colour is the whole message, so the GENERATED labels come
-			// off. It never touches labelSettings, and it is one of three suppressors read by
-			// applyLabelVisibility() -- see there. It does NOT hide the user's own Text (Task 428).
-			colorThematic: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
 			//
@@ -5847,6 +6058,9 @@ var EngCalcs = EngCalcs || {};
 		// through here again, so a measurement that recovers is picked up with nothing to reset.
 		if (!viewNumbersUsable()) { noteMapUnmeasurable(true); return; }
 		noteMapUnmeasurable(false);
+		// An empty geographic document re-origins under the camera first; the rebase ends in its
+		// own setTransform(), which has then done everything below.
+		if (followViewWhileEmpty()) { return; }
 		// **THE STROKE SIZES RIDE THE TRANSFORM, and that is the whole of the 2026-09-09 repair.**
 		// See publishScaleSizes(): a scale that reaches the world layer without them following it
 		// paints the map as one solid colour and makes every pipe's invisible grab band cover the
@@ -6832,51 +7046,59 @@ var EngCalcs = EngCalcs || {};
 	// At a whole-county view a 7 px junction dot is a mile across on the map, and a drawing that is
 	// nothing but overlapping dots says less than one that is mostly pipe.
 	//
-	// **THE RULE IS DERIVED, AND THERE IS NO CONTROL FOR IT.** He offered two shapes -- a second
-	// number under Map and page > Appearance, or "the maximum symbol size is whatever it is at the
-	// maximum label zoom, so that once labels are hidden, symbols start shrinking on screen and stay
-	// constant on the ground as you zoom out". The second ships, and the reason is not only that it
-	// is free. The two rules answer the SAME question -- how far out is too far out to keep drawing
-	// at reading size -- and a second box lets a user set them to disagree, which produces a view
-	// with no lettering and mile-wide dots and no way to tell which of two numbers caused it. One
-	// threshold, one answer, and the tip on that one row says both things it does.
+	// **ONE RULE, NOT TWO** (Tom, 2026-09-22, closing his own two competing ideas -- the
+	// 10th-percentile link length and "piggyback on the labeling threshold": *"10th %-ile and 'same
+	// as label limit' were competing ideas for this limit; I'd prefer not to have two rules. I like
+	// 10th %-ile a lot, probably better than piggybacking on the labels limit."*). **The labeling
+	// threshold (`settings.labelMaxWidth`) no longer feeds this at all** -- it used to be tried
+	// first, with the percentile rule as its fallback when no threshold was typed, and that
+	// arrangement is exactly what he asked removed.
 	//
-	// **WHAT IT IS WHEN NO THRESHOLD IS SET, which is the default:** his own (1), the 10th-percentile
-	// link length as the maximum junction size on the map. It is the honest fallback because it is
-	// the same KIND of statement -- the network's own shortest ordinary pipe is the distance at which
-	// two junctions stop being separable, so a dot wider than that is drawing over the thing it
-	// marks.
+	// **HIS NEW SETTING, HIS OWN WORDING:** *"Let's try a new setting for %-ile: 'Prevent nodes from
+	// scaling larger than __ times the length of the __ percentile pipe' where we set the defaults
+	// at 0.5 and 20% for now."* Two numbers, both project data: `settings.symbolCapMultiple`
+	// (default 0.5) and `settings.symbolCapPercentile` (default 20 -- his new figure, not the old
+	// 10th). The maximum junction diameter on the ground is `multiple * that percentile's link
+	// length`, always on, no blank-means-off state to explain.
 	//
 	// **EXPRESSED AS A FLOOR ON THE SCALE, not as a cap on a size**, because every symbol on this
 	// map is already one number divided by `state.s`. Below this scale the drawing stops growing on
 	// the ground and starts shrinking on the screen, which is exactly his sentence.
 	var symbolCapCache = null;       // the floor scale, or 0 for "no cap"; null = not yet computed
-	var p10LinkLengthCache = null;   // world units; 0 for "no usable link"
+	var pctLinkLengthCache = null;   // world units, AT THE PERCENTILE LAST ASKED FOR; 0 for "no usable link"
+	var pctLinkLengthPctCache = null;
 	// **KEYED ON THE DOCUMENT AND ITS LINK COUNT AS WELL AS INVALIDATED BY NAME.** A cache keyed on
 	// the count alone survived a project switch on feat/label-gang-search and laid 119 of 216 labels
 	// out from the previous document's number, so the key is the `doc.links` ARRAY ITSELF plus its
 	// length -- a switch, an undo and a rebuild all replace the array -- and buildDom() and a node
 	// drag clear it outright. What neither catches is a node nudged by a hand-typed coordinate, and
-	// a 10th percentile of up to 512 lengths does not move measurably for one pipe.
+	// a percentile of up to 512 lengths does not move measurably for one pipe.
 	var p10LinkKeyArr = null, p10LinkKeyLen = -1;
 	function invalidateSymbolCap() { symbolCapCache = null; }
 	// **AND THE LINK LENGTHS ARE INVALIDATED SEPARATELY**, because they are the expensive half and
-	// they change only when the drawing does, while the cap also moves with the window and the
-	// settings.
-	function invalidateLinkLengths() { p10LinkLengthCache = null; symbolCapCache = null; }
+	// they change only when the drawing does, while the cap also moves with the settings.
+	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
+	function symbolCapMultiple() {
+		var v = settings.symbolCapMultiple;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+	}
+	function symbolCapPercentile() {
+		var v = settings.symbolCapPercentile;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
 	// random sample would make the cap flicker between two values on a pinch. A zero-length link is
 	// left out rather than counted: a pump and a valve are zero-length by construction, and a
-	// network of two pumps would otherwise report a 10th percentile of nothing at all.
+	// network of two pumps would otherwise report a percentile of nothing at all.
 	var LPN_SYMBOL_CAP_SAMPLE = 512;
-	function p10LinkLengthWorld() {
+	function pLinkLengthWorld(pct) {
 		var list = doc.links || [], n = list.length, step, lens = [], i, l, a, b, d;
 		if (list !== p10LinkKeyArr || n !== p10LinkKeyLen) {
 			p10LinkKeyArr = list; p10LinkKeyLen = n;
-			p10LinkLengthCache = null; symbolCapCache = null;
+			pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null;
 		}
-		if (p10LinkLengthCache !== null) { return p10LinkLengthCache; }
+		if (pctLinkLengthCache !== null && pctLinkLengthPctCache === pct) { return pctLinkLengthCache; }
 		step = Math.max(1, Math.ceil(n / LPN_SYMBOL_CAP_SAMPLE));
 		for (i = 0; i < n; i += step) {
 			l = list[i];
@@ -6885,27 +7107,18 @@ var EngCalcs = EngCalcs || {};
 			d = Math.hypot(b.x - a.x, b.y - a.y);
 			if (d > 0) { lens.push(d); }
 		}
-		if (!lens.length) { p10LinkLengthCache = 0; return 0; }
+		pctLinkLengthPctCache = pct;
+		if (!lens.length) { pctLinkLengthCache = 0; return 0; }
 		lens.sort(function (x, y) { return x - y; });
-		p10LinkLengthCache = lens[Math.floor(0.1 * (lens.length - 1))];
-		return p10LinkLengthCache;
+		pctLinkLengthCache = lens[Math.floor((pct / 100) * (lens.length - 1))];
+		return pctLinkLengthCache;
 	}
 	function computeSymbolCapScale() {
-		var limSI = labelWidthLimitSI(), px = mapBox().w, v, mpu, wWorld, l10;
-		if (limSI > 0 && px > 0) {
-			// The scale the threshold itself describes: the view is exactly `limSI` metres wide.
-			v = currentView();
-			mpu = metresPerWorldUnit(v ? v.cx : 0, v ? v.cy : 0);
-			wWorld = (mpu > 0) ? limSI / mpu : 0;
-			if (wWorld > 0 && isFinite(wWorld)) { return px / wWorld; }
-		}
-		// The junction's DIAMETER is `settings.symbolSize` screen pixels, so the scale at which that
-		// diameter measures one 10th-percentile link on the ground is symbolSize / L10.
-		l10 = p10LinkLengthWorld();
-		return (l10 > 0 && settings.symbolSize > 0) ? settings.symbolSize / l10 : 0;
+		var lp = pLinkLengthWorld(symbolCapPercentile()), capLen = symbolCapMultiple() * lp;
+		return (capLen > 0 && settings.symbolSize > 0) ? settings.symbolSize / capLen : 0;
 	}
 	function symbolCapScale() {
-		p10LinkLengthWorld();   // cheap when nothing moved; clears the cap when the document did
+		pLinkLengthWorld(symbolCapPercentile());   // cheap when nothing moved; clears the cap when the document did
 		if (symbolCapCache === null) { symbolCapCache = computeSymbolCapScale(); }
 		return symbolCapCache;
 	}
@@ -6920,11 +7133,12 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
 	}
-	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both). They are
-	// the two things a reader is looking FOR on a wide view -- where does the water come from and
-	// where is it stored -- so they keep their size on the screen at every zoom while everything
-	// else settles onto the ground. Two call sites, nodeSymbolSize() and nodeRadius(), and both
-	// already branch on those two types.
+	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both, and
+	// confirmed 2026-09-22 while widening the rule to pipes: *"Yes. Everything shrinks except
+	// reservoirs and tanks."*). They are the two things a reader is looking FOR on a wide view --
+	// where does the water come from and where is it stored -- so they keep their size on the
+	// screen at every zoom while everything else settles onto the ground. Two call sites,
+	// nodeSymbolSize() and nodeRadius(), and both already branch on those two types.
 	//
 	// **AND THE EDITING FURNITURE, WHICH IS NOT A SYMBOL AT ALL:** a vertex grip, the selection
 	// ring, the pending-pipe ring, the rubber band and the marquee. They are the page talking to the
@@ -6937,8 +7151,12 @@ var EngCalcs = EngCalcs || {};
 	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
 	// --lpn-sym: a pipe network's PIPES are its primary content and their weight is a drawing
 	// decision of its own, not a consequence of how big the junction dots are.
+	//
+	// **DIVIDES BY THE CAPPED SCALE, NOT THE RAW ONE, since 2026-09-22** (Tom: *"Everything shrinks
+	// except reservoirs and tanks."*). A pipe is not one of the two declared exceptions, so past the
+	// cap its stroke stops growing on the ground exactly as a junction's does.
 	function linkStrokeWidth() {
-		return settings.linkWidth / (state.s || 1);
+		return settings.linkWidth / symbolScaleAt();
 	}
 	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
 	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
@@ -7073,6 +7291,22 @@ var EngCalcs = EngCalcs || {};
 		// The two declared exceptions to the maximum map size (Task 705) -- symbolFactorFull().
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
+	}
+	// **THE FIT-ONLY, UNCAPPED TWIN OF nodeRadius() -- always symbolFactorFull(), never the cap.**
+	// fitItems() multiplies a world size by the LIVE scale to recover a scale-INDEPENDENT pixel
+	// figure, and that cancellation only holds when the division inside the world size and the
+	// multiplication outside it use the SAME scale unconditionally -- which symbolFactorFull() does
+	// and the capped symbolFactor() does not, once the view is far enough out that the cap (rather
+	// than the live scale) decides the divisor. A fit started at 0.02x and one started at 1x then
+	// disagreed on where the SAME candidate scale would put a junction, because the capped radius
+	// baked in whichever scale happened to be live when the fit was ASKED for, not the candidate
+	// scale being tested (`zoom-fit-harness.js`, section 2, caught it the day the cap's own default
+	// moved enough to cross this network's fit window). The fit reserves room as though every
+	// symbol were still at its full, unshrunk screen size -- conservative rather than wrong, since
+	// the true capped size past the fitted scale can only be smaller than what was reserved.
+	function nodeRadiusFull(n) {
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
+		return JUNCTION_R * symbolFactorFull();
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
 	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
@@ -7885,7 +8119,8 @@ var EngCalcs = EngCalcs || {};
 	// inlined: a second view of a colour setting has appeared twice already, and when it appears
 	// again this is the one line it has to be added to.
 	function syncColorControls() {
-		buildColoringSection();
+		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
+		keepSetboxControl(buildColoringSection);
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -8190,8 +8425,16 @@ var EngCalcs = EngCalcs || {};
 		var nf = colorFieldOf('node'), lf = colorFieldOf('link');
 		var nb = nf ? effectiveBreaks('node', nf) : [], lb = lf ? effectiveBreaks('link', lf) : [];
 		doc.nodes.forEach(function (n) { paintNodeColor(n.id, nb); });
-		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); });
+		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
 		renderColorLegend();
+	}
+	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
+	// starts with. buildLinkEls() draws it once; this keeps it true on every solve and every step
+	// of the transport, which is what reaches here without rebuilding a single element.
+	function paintLinkStatus(l) {
+		var le = linkEls[l.id];
+		if (!le || !le.line || !le.line.classList) { return; }
+		le.line.classList.toggle('lpn-link-closed', linkStatusOf(l) === 'closed');
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
 	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no generated
@@ -8381,11 +8624,13 @@ var EngCalcs = EngCalcs || {};
 		}, linksLayer);
 		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
 		// open one on the map while carrying no water, which turns a one-click state into an
-		// invisible cause of a network that will not solve. Read through effective(), so a future
-		// scenario override changes the drawing too, not only the arithmetic.
+		// invisible cause of a network that will not solve. Read through linkStatusOf(), so a
+		// scenario override changes the drawing too, and so does a run: at a time step where a
+		// control has opened a pump the file starts shut, the pump is drawn open (Tom, 2026-09-25,
+		// on Net3's pump 10). paintLinkStatus() keeps it current as the transport moves.
 		var line = el('polyline', {
 			points: linkPoints(l), fill: 'none',
-			'class': 'lpn-link lpn-link-' + l.type + (effective(l, 'status') === 'closed' ? ' lpn-link-closed' : ''),
+			'class': 'lpn-link lpn-link-' + l.type + (linkStatusOf(l) === 'closed' ? ' lpn-link-closed' : ''),
 			'data-link': l.id
 		}, linksLayer);
 		var handles = [], i;
@@ -9043,10 +9288,13 @@ var EngCalcs = EngCalcs || {};
 	// stays inside the user's own project, and it must never reach a log row or a usage statistic --
 	// nothing here writes one, which is the structural half of that rule rather than a discipline.
 
-	// **A CUSTOMER IS A QUARTER OF A JUNCTION AND FOLLOWS THE SYMBOL SCALE SETTING** (Tom,
-	// 2026-09-19: *"Customer symbols should scale using the Symbol scale setting, but they should
-	// just be a lot smaller than a node, like 0.2 to 0.3 as big, maybe 0.25."*). 0.25, his own
-	// middle figure.
+	// **A CUSTOMER FOLLOWS THE SYMBOL SCALE SETTING, AT 0.30 OF A JUNCTION** (Tom, 2026-09-19:
+	// *"Customer symbols should scale using the Symbol scale setting, but they should just be a lot
+	// smaller than a node, like 0.2 to 0.3 as big, maybe 0.25."* -- shipped at 0.25, his own middle
+	// figure). **RAISED 2026-09-25** (Tom, looking at the shipped drawing: *"Customer symbols
+	// appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it
+	// another 0.05 from where it is."* -- read literally against the value actually in force, 0.25
+	// plus 0.05 is 0.30).
 	//
 	// **THIS REPLACES A HYBRID REAL-WORLD RULE, and that rule is gone rather than qualified.** The
 	// meter used to be drawn `max(1 m, 1.5 px)` in world units -- to scale on a site plan, held at a
@@ -9067,7 +9315,7 @@ var EngCalcs = EngCalcs || {};
 	// this map, so it never grows past a fraction of what the pipe itself draws at, at any zoom.
 	// **The other half of his sentence -- the line shrinking below 1px once the whole drawing
 	// stops growing -- is Task 705's maximum map size**, applied in serviceStrokeWorld().
-	var LPN_METER_NODE_FRAC = 0.25;      // of a junction's own radius -- his figure
+	var LPN_METER_NODE_FRAC = 0.30;      // of a junction's own radius -- see the ruling above
 	var LPN_SERVICE_STROKE_FRAC = 0.5;   // of settings.linkWidth, screen px
 	// **1 px IS HIS OWN FLOOR, VERBATIM** -- *"a lesser multiple of the link width or always just
 	// 1 px until we get to the zoom where everything stops growing ... at which point it shrinks
@@ -9148,12 +9396,29 @@ var EngCalcs = EngCalcs || {};
 		var t = c && c.t;
 		return (typeof t === 'number' && isFinite(t)) ? Math.max(0, Math.min(1, t)) : 0.5;
 	}
+	// **THE FALLBACK NODE, USED ONLY WHEN THERE IS NO LIVE PIPE TO DERIVE ONE FROM** (Tom,
+	// 2026-09-25: a Customer whose service is on a junction must not lose that junction when the
+	// pipe it snapped through is deleted). `c.node` is never the authoritative answer while `c.link`
+	// still resolves -- customerNodeId() and customerAttachPoint() both ask the live pipe first --
+	// so this is read only after that has already failed, and it answers null the moment the node
+	// itself is gone too (deleteNode() clears the field at that point; a stale id read here would
+	// otherwise resurrect a demand that has genuinely left the drawing).
+	function customerNodeFallback(c) {
+		return (c && c.node) ? nodeById(c.node) : null;
+	}
 	// **WHERE THE SERVICE MEETS THE PIPE**: the point that fraction of the arc length names, which on
 	// a bent pipe may be a vertex rather than the foot of a perpendicular to any one segment. Say
 	// "the nearest point on the pipe" rather than "the perpendicular foot" anywhere that can bite.
+	//
+	// **OR, WITH NO PIPE LEFT, THE NODE ITSELF** -- see customerNodeFallback(). A service caught
+	// exactly on a node when its pipe was deleted keeps its house standing where the pipe's end used
+	// to be, which is this same point: a pipe's endpoint IS the node's own position.
 	function customerAttachPoint(c) {
-		var l = customerLink(c), p;
-		if (!l) { return null; }
+		var l = customerLink(c), p, n;
+		if (!l) {
+			n = customerNodeFallback(c);
+			return n ? { x: n.x, y: n.y } : null;
+		}
 		p = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		return { x: p.x, y: p.y };
 	}
@@ -9197,6 +9462,51 @@ var EngCalcs = EngCalcs || {};
 		if (!l) { return 0; }
 		n = linkNormalAt(l, customerT(c));
 		return (c.x || 0) * n.x + (c.y || 0) * n.y;
+	}
+	/**
+	 * **A SERVICE OUTSIDE A BEND CONNECTS AT THE BEND** (Tom, 2026-09-25: *"We didn't account for
+	 * vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex.
+	 * And we need to allow dragging a customer to this region while intelligently tracking onto the
+	 * vertex while appropriate."*).
+	 *
+	 * Outside a convex bend there is a wedge where no perpendicular from the meter lands on either
+	 * leg. The nearest point on the pipe there IS the vertex -- nearestFractionOnPolyline() already
+	 * answers exactly that station -- but the offset used to be squared to the leg the station
+	 * happened to fall in, which dragged the meter out of the wedge onto that leg's perpendicular:
+	 * the region was, in effect, banned. **A station exactly on an interior vertex is now read the
+	 * way a station on a node is: the offset whole**, because a bend, like a junction, has no one
+	 * leg to be square to. Leave the wedge and the nearest point is a perpendicular foot again, so
+	 * the drag moves continuously on and off the vertex with no rule of its own.
+	 *
+	 * The fractions are summed in the same order nearestFractionOnPolyline() sums them, so its
+	 * answer at a vertex compares equal; the tolerance only absorbs a hand-edited file.
+	 */
+	var LPN_BEND_T_EPS = 1e-9;
+	function linkBendAt(l, t) {
+		var pts, segs = [], total = 0, run = 0, i, d;
+		if (!l || typeof t !== 'number' || !isFinite(t) || t <= 0 || t >= 1) { return null; }
+		pts = linkPointList(l);
+		if (pts.length < 3) { return null; }
+		for (i = 0; i + 1 < pts.length; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+		}
+		if (!(total > 0)) { return null; }
+		for (i = 0; i + 1 < segs.length; i++) {
+			run += segs[i];
+			if (Math.abs(run / total - t) <= LPN_BEND_T_EPS) { return { index: i + 1, f: run / total }; }
+		}
+		return null;
+	}
+	function customerAtBend(c) {
+		return !!linkBendAt(customerLink(c), c ? c.t : undefined);
+	}
+	// Which side of the pipe a meter at a bend stands on, for the SIGN of its offset: the sum of the
+	// two legs' normals, so the sign agrees with the one a meter on either leg beside it reads.
+	function linkBendNormal(l, idx) {
+		var pts = linkPointList(l), a = pts[idx - 1], v = pts[idx], b = pts[idx + 1],
+			l1 = Math.hypot(v.x - a.x, v.y - a.y) || 1, l2 = Math.hypot(b.x - v.x, b.y - v.y) || 1;
+		return { x: -(v.y - a.y) / l1 - (b.y - v.y) / l2, y: (v.x - a.x) / l1 + (b.x - v.x) / l2 };
 	}
 	/**
 	 * **A SERVICE THAT COMES OFF THE MAIN RIGHT AT A NODE SNAPS TO THE NODE** (Tom, 2026-09-17:
@@ -9288,11 +9598,14 @@ var EngCalcs = EngCalcs || {};
 		return { link: a.link, t: a.t, point: { x: p.x, y: p.y } };
 	}
 	// Whether this meter's service lands exactly on a node, which is what the drawing says out loud
-	// (see updateCustomerGeometry). A station of exactly 0 or 1 IS the pipe's end node, and only the
-	// snap above and a typed 0 or 100 can produce one.
+	// (see updateCustomerGeometry) and what the Properties box, the Tables pane and Find all read
+	// before deciding whether to show a pipe and a station or a "Connected to" node instead. A
+	// station of exactly 0 or 1 IS the pipe's end node, and only the snap above and a typed 0 or 100
+	// can produce one -- or, with the pipe gone, the fallback node customerNodeFallback() still
+	// answers (see the comment there).
 	function customerAtNodeEnd(c) {
 		var t;
-		if (!customerLink(c)) { return false; }
+		if (!customerLink(c)) { return !!customerNodeFallback(c); }
 		t = customerT(c);
 		return t === 0 || t === 1;
 	}
@@ -9310,6 +9623,12 @@ var EngCalcs = EngCalcs || {};
 	 * point, so a new attachment means a new offset for the SAME drawn point -- which is why the
 	 * meter's current position is read before anything is written and handed to the one offset
 	 * writer afterwards.
+	 *
+	 * **A LIVE PIPE IS ALWAYS THE FRESH ANSWER, SO THE FALLBACK NODE IS DROPPED HERE.** Whatever
+	 * `c.node` said -- from a pipe deleted out from under a node-exact connection -- this pipe is
+	 * what serves the meter now, and customerNodeId() reads it first regardless. Keeping the old
+	 * field around would be a second opinion nothing asks for until the day this pipe, too, is
+	 * deleted, at which point it would resurrect the WRONG node.
 	 */
 	function setCustomerConnection(c, l, t) {
 		var pt;
@@ -9319,6 +9638,7 @@ var EngCalcs = EngCalcs || {};
 			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
 		}
 		c.link = l.id;
+		delete c.node;
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
 		return setCustomerOffsetTo(c, l, t, pt.x, pt.y);
@@ -9351,11 +9671,13 @@ var EngCalcs = EngCalcs || {};
 	 * is where several mains meet and there is no one of them to be square to.
 	 */
 	function setCustomerOffsetTo(c, l, t, x, y) {
-		var an, n;
+		var an, n, bend;
 		if (!l) { return false; }
 		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		bend = linkBendAt(l, c.t);
+		if (bend) { c.t = bend.f; }
 		an = Geom.pointAlongPolyline(linkPointList(l), c.t);
-		if (c.t === 0 || c.t === 1) { c.x = x - an.x; c.y = y - an.y; return true; }
+		if (c.t === 0 || c.t === 1 || bend) { c.x = x - an.x; c.y = y - an.y; return true; }
 		n = linkNormalAt(l, c.t);
 		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
 	}
@@ -9383,18 +9705,22 @@ var EngCalcs = EngCalcs || {};
 		// offset there, so a service that arrived at a node by sliding along its pipe draws exactly
 		// where it always did; what this allows is the one Tom asked for, a meter left standing
 		// where the hand put it when the press named a node.
-		if (customerAtNodeEnd(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
+		// **AND ON A BEND, FOR THE SAME REASON** -- see linkBendAt().
+		if (customerAtNodeEnd(c) || customerAtBend(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
 		l = customerLink(c);
 		n = linkNormalAt(l, customerT(c));
 		d = customerPerpDistance(c, l);
 		return { x: an.x + n.x * d, y: an.y + n.y * d };
 	}
-	// **THE JUNCTION THIS CUSTOMER LUMPS AT, DERIVED AND NEVER STORED.** The rule is one function in
-	// js/lpn-inp.js, shared with the `.inp` writer; the precedent for deriving it is `lenAuto` on a
-	// pipe length, and the reason is that a consequence which is recomputed cannot go stale when the
-	// pipe is re-routed, bent, or has its ends renamed.
+	// **THE JUNCTION THIS CUSTOMER LUMPS AT.** The rule is one function in js/lpn-inp.js, shared with
+	// the `.inp` writer; the precedent for deriving it from the pipe is `lenAuto` on a pipe length,
+	// and the reason is that a consequence which is recomputed cannot go stale when the pipe is
+	// re-routed, bent, or has its ends renamed. **DERIVED WHILE THE PIPE IS THERE; `c.node` ANSWERS
+	// ONLY WHEN IT IS NOT** (Tom, 2026-09-25) -- see customerNodeFallback() and
+	// detachCustomersFromLink(). The predicate is `nodeById` itself, so a fallback naming a node that
+	// has since been deleted too answers null rather than a stale id.
 	function customerNodeId(c) {
-		return EngCalcs.lpnCustomerNode(c, customerLink(c));
+		return EngCalcs.lpnCustomerNode(c, customerLink(c), nodeById);
 	}
 	function customerFlow(c) { return EngCalcs.lpnCustomerFlow(c); }
 	// The customer demand rows for one junction, in the shape demandRowsOf() concatenates.
@@ -9416,8 +9742,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Every customer attached to nothing. Its demand is in no junction's total and therefore in no
 	// answer, which is a fact the user has to be told rather than left to notice.
+	//
+	// **NOT `!customerLink(c)`** (Tom, 2026-09-25): a customer connected exactly to a node has no
+	// pipe once that pipe is deleted, and is still connected -- customerNodeId() is the honest
+	// question, the same one the demand rows ask.
 	function detachedCustomers() {
-		return (doc.customers || []).filter(function (c) { return !customerLink(c); });
+		return (doc.customers || []).filter(function (c) {
+			var n = customerNodeId(c);
+			return n === null || n === undefined;
+		});
 	}
 
 	// ---- drawing a meter ------------------------------------------------------------------------
@@ -9558,20 +9891,31 @@ var EngCalcs = EngCalcs || {};
 	// degrees of longitude.
 	//
 	// **ONE CONCEPT, TWO LEVELS** (Task 705, reconciling this with Task 669's labeling threshold).
-	// `settings.labelMaxWidth` is the widest view that shows ANY generated label, and it also sets
-	// the symbol cap (symbolCapScale()); this one is a second, narrower gate for customers alone,
-	// read INSIDE the first -- customerLabelsAttempted() refuses whenever dataLabelsHidden, which the
-	// labeling threshold sets. Both are the same quantity in the same unit through the same three
-	// functions below, and both boxes are filled by the same captureViewWidth().
+	// `settings.labelMaxWidth` is the widest view that shows ANY generated label -- **no longer the
+	// symbol cap too, since Tom removed that piggyback 2026-09-22** (see symbolCapScale()); this one
+	// is a second, narrower gate for customers alone, read INSIDE the first --
+	// customerLabelsAttempted() refuses whenever dataLabelsHidden, which the labeling threshold
+	// sets. Both are the same quantity in the same unit through the same three functions below, and
+	// both boxes are filled by the same captureViewWidth().
 	function viewWidthLimitSI(v) {
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
 	}
-	function customerLabelWidthLimitSI() { return viewWidthLimitSI(labelSettings.customerMaxWidth); }
-	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
-	// project's own length unit, so a project in feet keeps the number its reader typed and changing
-	// the unit REINTERPRETS it, exactly as every other typed number on this page.
-	function labelWidthLimitSI() { return viewWidthLimitSI(settings.labelMaxWidth); }
+	// **`null` FOR "NO THRESHOLD" (ALWAYS DRAW), OR 0 FOR A REAL THRESHOLD NOTHING IS EVER NARROWER
+	// THAN (NEVER DRAW).** `viewWidthLimitSI()` collapses both "blank" and "0" to the same 0, which
+	// is wrong here, where blank and 0 are two different answers -- so this reads the stored value
+	// directly rather than going through that shared converter. The stored number is in the
+	// project's own length unit, so a project in feet keeps the number its reader typed and
+	// changing the unit REINTERPRETS it, exactly as every other typed number on this page.
+	// **THE CUSTOMER ROW NOW FOLLOWS THE SAME RULE** (Tom, 2026-09-23 pre-review: "make the customer
+	// row accept exactly what the all-labels row accepts") -- both readers share this one shape.
+	function labelMaxWidthLimitSI(v) {
+		if (v === 0) { return 0; }
+		var lim = viewWidthLimitSI(v);
+		return lim > 0 ? lim : null;
+	}
+	function labelWidthLimitSI() { return labelMaxWidthLimitSI(settings.labelMaxWidth); }
+	function customerLabelWidthLimitSI() { return labelMaxWidthLimitSI(labelSettings.customerMaxWidth); }
 	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
 	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
 	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
@@ -9611,7 +9955,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function customerLabelsAttempted() {
 		var lim = customerLabelWidthLimitSI(), wide;
-		if (dataLabelsHidden || !lim) { return false; }
+		if (dataLabelsHidden) { return false; }
+		// **BLANK IS "ALWAYS", 0 IS "NEVER"** (Tom, 2026-09-23 pre-review), the same reading
+		// `labelsPastThreshold()` gives `labelWidthLimitSI()` -- `lim === null` means the customer
+		// row itself imposes no limit (the all-labels gate above still applies); `lim === 0` is the
+		// real "never label a customer" answer this row has always had.
+		if (lim === 0) { return false; }
+		if (lim === null) { return true; }
 		wide = visibleMapMetres();
 		// A view we cannot measure is not a view we refuse to label: the threshold is a courtesy,
 		// and failing closed on an unmeasurable canvas would blank every label in a harness.
@@ -9755,8 +10105,11 @@ var EngCalcs = EngCalcs || {};
 		// The connector names its customer too, though it is not pickable: an element that says
 		// whose it is can be found and read -- by a probe driving a real browser, and by anybody
 		// reading the drawing in the inspector -- and "which service is this" has no other answer.
-		var stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, labelsLayer),
-			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
+		// customersLayer is below every pipe (see init()); the spike harnesses that hand-roll their
+		// layer stack have none, and fall back to labelsLayer, which buildDom() empties anyway.
+		var layer = customersLayer || labelsLayer,
+			stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, layer),
+			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, layer);
 		custEls[c.id] = { stub: stub, box: box };
 		buildCustomerLabelEls(c);
 		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
@@ -9801,14 +10154,16 @@ var EngCalcs = EngCalcs || {};
 		// support. The class is the same idiom .lpn-lbl-hidden already is.
 		ce.stub.classList[an ? 'remove' : 'add']('lpn-service-off');
 		ce.box.classList[an ? 'remove' : 'add']('lpn-meter-loose');
-		// **A SNAP THAT CAUGHT SAYS SO WHILE IT IS CAUGHT** (Task 247; Tom, 2026-09-17). A service
-		// landing exactly on a node is the one attachment a reader cannot verify by eye -- a
-		// connection one pixel short of the junction draws identically and lumps by the near-miss
-		// rule instead -- so the connector is marked while it is on the node and unmarked the moment
-		// a drag takes it off. Painted here, in the one pass every move goes through, rather than at
-		// each gesture: a mark applied by a drag and cleared by nobody is the defect this avoids.
-		ce.stub.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-service-snapped');
-		ce.box.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-meter-snapped');
+		// **A SNAP THAT CAUGHT NO LONGER SAYS SO IN RED** (Task 247; Tom, 2026-09-25: *"Red for
+		// node-connected Customers is a bad decision. Let's leave it black."*). It used to mark the
+		// connector and the dot while a service landed exactly on a node, on the argument that the
+		// snap is the one attachment a reader cannot verify by eye -- but the red read as a warning
+		// about the drawing rather than as information, and it is the same red every gesture in
+		// progress on this map uses (the rubber band, the pending meter dot), which made a SETTLED
+		// connection look like one still being made. **A settled node connection is drawn exactly
+		// like any other connected customer now; the Properties box, the Tables pane and Find are
+		// where a reader confirms it, with a "Connected to" row naming the junction instead of a
+		// pipe and a station of 0 or 100 (renderCustomerFields(), paneCustomerCols()).**
 	}
 	// Every meter on this pipe, redrawn where the pipe's new shape puts it. Replayed from
 	// updateLinkGeometry(), which is the one pass every reshaping goes through -- so there is no
@@ -9974,12 +10329,29 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * Silently dropping the demand would change the answers without saying so, which is why this
 	 * returns the count and its caller says it out loud.
+	 *
+	 * **EXCEPT A CUSTOMER CONNECTED EXACTLY TO A NODE, WHICH IS NOT DETACHED AT ALL** (Tom,
+	 * 2026-09-25: *"Do we have Customers not allowed to connect directly to nodes?... it will be
+	 * happier for users to see Customer connected to a node"* -- and that connection must survive
+	 * the pipe it happened to snap through being deleted). Its junction is captured into `c.node`
+	 * -- the fallback customerNodeId() and customerAttachPoint() read once the pipe is gone -- and
+	 * its `x`/`y` is left exactly as it is, because on a node the offset is already read whole from
+	 * that junction's own position (see customerPoint()) and the junction has not moved. Only a
+	 * customer that was genuinely along the pipe, not AT either end of it, loses its connection here.
 	 */
 	function detachCustomersFromLink(linkId) {
 		var moved = 0;
 		(doc.customers || []).forEach(function (c) {
-			var pt;
+			var pt, nid;
 			if (c.link !== linkId) { return; }
+			if (customerAtNodeEnd(c)) {
+				nid = customerNodeId(c);
+				c.link = null;
+				delete c.t;
+				if (nid !== null && nid !== undefined) { c.node = nid; } else { delete c.node; }
+				if (custEls[c.id]) { updateCustomerGeometry(c.id); }
+				return;
+			}
 			// The absolute position it is drawn at NOW becomes its own, because `x`/`y` stops being
 			// an offset the moment there is nothing to be an offset from.
 			pt = customerPoint(c);
@@ -10016,8 +10388,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!id) {
 			// Detached, and drawn where it was: `x`/`y` stops being an offset the moment there is
-			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule.
-			c.link = null; delete c.t;
+			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule. An
+			// explicit detach is a real decision to serve this customer from nothing, so the node
+			// fallback goes with the pipe reference rather than quietly outliving it.
+			c.link = null; delete c.t; delete c.node;
 			c.x = pt.x; c.y = pt.y;
 			return true;
 		}
@@ -10033,6 +10407,7 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		c.link = l.id;
+		delete c.node;   // a live pipe is always the fresh answer -- see setCustomerConnection()
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
 		setCustomerAt(c, l, pt.x, pt.y);
@@ -10108,7 +10483,9 @@ var EngCalcs = EngCalcs || {};
 	function setCustomerStation(c, t) {
 		var l = customerLink(c);
 		if (!l) { return false; }
-		return setCustomerPerp(c, t, customerPerpDistance(c, l));
+		// Off a bend the whole signed distance carries over, so sliding away keeps the house as far
+		// out as it stood rather than as far as one leg's normal happened to measure it.
+		return setCustomerPerp(c, t, customerAtBend(c) ? customerOffsetDrawn(c) : customerPerpDistance(c, l));
 	}
 
 	// ---- STATION AND OFFSET: the pair a position is read from ------------------------------------
@@ -10131,8 +10508,14 @@ var EngCalcs = EngCalcs || {};
 	// wrote it through setCustomerPerp() from the first day, which is why nothing below is a new
 	// way of storing anything.
 	function customerOffsetDrawn(c) {
-		var l = customerLink(c), n;
+		var l = customerLink(c), n, bend;
 		if (!l) { return 0; }
+		bend = linkBendAt(l, c.t);
+		if (bend) {
+			n = linkBendNormal(l, bend.index);
+			return ((c.x || 0) * n.x + (c.y || 0) * n.y) < 0 ?
+				-Math.hypot(c.x || 0, c.y || 0) : Math.hypot(c.x || 0, c.y || 0);
+		}
 		// **ON A NODE THE WHOLE DISTANCE IS THE ANSWER, NOT ITS SQUARE COMPONENT.** A service that
 		// lands on a junction keeps the offset it was given whole (customerPoint()), because a
 		// junction is where several mains meet and there is no one of them to be square to. Reading
@@ -10157,6 +10540,10 @@ var EngCalcs = EngCalcs || {};
 		if (!l || !isLatLonProject()) { return 1; }
 		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		n = linkNormalAt(l, customerT(c));
+		// On a bend the offset runs wherever the meter stands, not along one leg's normal.
+		if (customerAtBend(c) && Math.hypot(c.x || 0, c.y || 0) > 0) {
+			n = { x: (c.x || 0) / Math.hypot(c.x, c.y), y: (c.y || 0) / Math.hypot(c.x, c.y) };
+		}
 		return Geom.geodesicPolylineMeters([
 			{ x: outwardX(an.x), y: outwardY(an.y) },
 			{ x: outwardX(an.x + n.x * OFFSET_PROBE), y: outwardY(an.y + n.y * OFFSET_PROBE) }
@@ -10171,7 +10558,14 @@ var EngCalcs = EngCalcs || {};
 	// squares the service to its main, which is the only angle this page offers at all.
 	function setCustomerOffset(c, v) {
 		var per = customerOffsetUnitsPerDrawn(c);
+		var mag;
 		if (!customerLink(c) || typeof v !== 'number' || !isFinite(v) || !(per > 0)) { return false; }
+		// On a bend a typed offset keeps the service's direction and changes only its length;
+		// squaring it to one leg would throw the meter out of the wedge it was put in.
+		if (customerAtBend(c) && (mag = customerOffsetDrawn(c)) !== 0) {
+			c.x = (c.x || 0) * (v / per) / mag; c.y = (c.y || 0) * (v / per) / mag;
+			return true;
+		}
 		return setCustomerPerp(c, customerT(c), v / per);
 	}
 
@@ -10203,6 +10597,7 @@ var EngCalcs = EngCalcs || {};
 		// broken. Guarded because the spike harnesses that hand-roll their layer stack have no
 		// such layer; those fall back to nodesLayer, which IS emptied above.
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
+		if (customersLayer) { customersLayer.innerHTML = ''; }
 		// A wholesale rebuild is a new drawing as far as the symbol cap knows (Task 705).
 		invalidateLinkLengths();
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
@@ -10454,10 +10849,11 @@ var EngCalcs = EngCalcs || {};
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
-	function mapHitAt(cx, cy) {
+	function mapHitAt(cx, cy, skip) {
 		var list = document.elementsFromPoint(cx, cy) || [], i, t;
 		for (i = 0; i < list.length; i++) {
 			if (list[i] === svg) { break; }
+			if (skip && list[i] === skip) { continue; }   // see gripClickHandsThrough()
 			if (!svg.contains(list[i])) { break; }   // page furniture over the map -- not a map hit
 			t = resolveLabelHit(list[i]);
 			// SKIPPED, not returned as a miss: something visible may be under the invisible thing,
@@ -10468,6 +10864,43 @@ var EngCalcs = EngCalcs || {};
 		}
 		return svg;
 	}
+	/**
+	 * **THE GRIP IS FOR DRAGGING; A CLICK ON IT GOES TO WHAT IS UNDER IT** (Perry's pre-review of
+	 * Tom's 2026-09-25 finding *"Customer zindex is higher than Junction. Fix that."*). A customer
+	 * draws under pipes and junctions now, but its connection grip has to stay on top or it cannot
+	 * be grabbed -- and the grip sits exactly ON the junction of a node-connected customer, which is
+	 * selected the moment it is placed. So a plain click on that junction opened the customer.
+	 *
+	 * **HANDED THROUGH RATHER THAN DRAWN UNDER.** Drawing the grip under a node when it sits on one
+	 * would have fixed the click and taken the drag away: the press would grab the junction and move
+	 * it, and a node-connected customer could never be re-connected by its grip again. So the grip
+	 * keeps the press (a drag from it still moves the connection), and a press that did NOT move
+	 * asks what is beneath the grip. A junction or a pipe there wins, which is Tom's order of
+	 * precedence -- customer below link and junction -- applied to the one thing still drawn above
+	 * them. The customer's own dot beneath it, or bare map, leaves the click on the customer.
+	 */
+	function gripClickHandsThrough(t, cx, cy) {
+		var d = (t && t.dataset) || {}, under, ud;
+		if (d.custhandle === undefined || !custHandleEl) { return t; }
+		under = mapHitAt(cx, cy, custHandleEl);
+		ud = (under && under.dataset) || {};
+		if (under === svg || !hitIsElement(under) || ud.cust !== undefined ||
+				ud.custhandle !== undefined || ud.custlbl !== undefined) { return t; }
+		selectFromHit(under);
+		return under;
+	}
+	// **ONE NODE MOVING IS A LAYOUT PASS, AND IT NOW SAYS SO** (Task 690, Tom 2026-09-19: *"There is
+	// still an unbelievable delay when speed-entering a column."*). The loops below re-lay-out every
+	// label on every pipe that touches this node, and each of those asks for the canvas box and for
+	// the drawing's segment index -- the two questions buildDom() already holds for its own pass,
+	// declared 9,200 lines up this file with the measurement that earned them. This path never
+	// declared one, so a single edit read the canvas once per pipe, and each read is a LAYOUT read
+	// that makes the browser lay the whole drawing out again between two writes.
+	// **Measured before and after on a 92-junction Net3 with recalculation off: one committed cell
+	// 31 ms, then 6 ms.** The drawing is identical either way -- the document does not move inside
+	// this function, so a held answer cannot go stale; holding changes WHEN the browser is asked,
+	// not what it says.
+	//
 	// `contentChanged` is FALSE BY DEFAULT ON PURPOSE. A node drag alone calls this on every
 	// animation frame (see the tick()/applyDrag() architecture), where only POSITION moved and
 	// recomposing the label's text would force a getBBox() layout read every frame for nothing --
@@ -10476,15 +10909,31 @@ var EngCalcs = EngCalcs || {};
 	// which is the stale-snapshot ruling reaching node labels the way rebuildLink() already
 	// reaches link ones: refreshOneLabelInPlace() rewrites only THIS node's own label, never a
 	// network-wide pass.
+	// **A CUSTOMER WITH NO PIPE LEFT (c.node fallback) FOLLOWS THE NODE ITSELF** (Tom, 2026-09-25).
+	// updateCustomersOnLink() is what a moving pipe replays for the customers riding on IT; this is
+	// its twin for the customer whose pipe has already been deleted -- customersByLink cannot find
+	// it, because it has no link, so updateNode() below asks by node id instead. Not indexed: this
+	// state only exists after a pipe deletion, so the scan is over however many customers a
+	// document actually has, not a hot path multiplied by node count.
+	function updateCustomersFallenBackToNode(id) {
+		(doc.customers || []).forEach(function (c) {
+			if (c.node === id && !c.link && custEls[c.id]) { updateCustomerGeometry(c.id); }
+		});
+	}
 	function updateNode(id, contentChanged) {
 		var n = nodeById(id), ne = nodeEls[id], i;
-		ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
-		if (ne.hit) { syncNodeHit(n); }
-		positionNodeSymbol(id);
-		layoutNodeLabel(id);
-		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
-		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
-		if (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
+			if (ne.hit) { syncNodeHit(n); }
+			positionNodeSymbol(id);
+			layoutNodeLabel(id);
+			for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
+			updateCustomersFallenBackToNode(id);
+			for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+			if (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		scheduleSolve();
 	}
 	function updateVertex(linkId, vidx) {
@@ -10550,6 +10999,10 @@ var EngCalcs = EngCalcs || {};
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
+		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
+		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
+		// this edit triggers: with nothing owed this is a no-op.
+		flushLabelRefresh();
 		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			fsNow = effectiveFontSize() + 'px', lines;
 		if (group === 'node') {
@@ -10576,6 +11029,10 @@ var EngCalcs = EngCalcs || {};
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696), same treatment elev/quality/initQuality
+			// get above: guarded, and with no extrema mark (null) since this is one label, not a pass.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, null, nd.level))); }
 			var qualVal = nodeQualityValue(n);
 			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
 			var initQualVal = nodeInitQuality(n);
@@ -10772,6 +11229,9 @@ var EngCalcs = EngCalcs || {};
 	// (Tasks 669 and 705) and the per-pipe one that hides a label longer than its own pipe -- and
 	// both must be answered for the scale being TESTED, or the fit reserves room for labels that
 	// will not be there.
+	// What a Zoom to fit shows round a drawing that is a single point: 250 m in a geographic
+	// project, a few streets either way; 250 drawing units (feet or metres) in a grid one.
+	var LPN_POINT_FIT_M = 250;
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
@@ -10795,19 +11255,30 @@ var EngCalcs = EngCalcs || {};
 
 
 		doc.nodes.forEach(function (n) {
-			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
+			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
+			// whichever scale happened to be live when it was asked for.
+			var rad = nodeRadiusFull(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
 			fitItem(out, nat.x, nat.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
 			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
 			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
 			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
-			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
-				lx = (base.x >= nat.x) ? base.x : base.x - tw;
-			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
+			// nodeLabelBase(n, true): the UNCAPPED default offset, for the same reason as
+			// nodeRadiusFull() above -- otherwise this bakes in whichever scale was live when the
+			// fit was asked for, not the candidate scale being tested.
+			// **A DRAGGED OFFSET IS WORLD UNITS AND IS ANCHORED, NOT REACHED** (R-184). `n.lx`/`n.ly`
+			// are drawing units that do not shrink with the zoom, so counting them in the reach turned
+			// ten units of offset into 5,000 px at scale 500 and Zoom to fit framed empty paper. The
+			// item's anchor carries the world part and the reach only the pixel part.
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n, true),
+				lx = (base.x >= nat.x) ? base.x : base.x - tw,
+				ax = nat.x + (n.lx !== undefined ? n.lx : 0), ay = nat.y + (n.ly !== undefined ? n.ly : 0);
+			boxFor(ax, ay, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
+			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
+			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactorFull() * sc;
 			for (j = 0; j < l.verts.length; j++) {
 				v = l.verts[j];
 				fitItem(out, v.x, v.y, vr, vr, vr, vr);
@@ -10817,8 +11288,9 @@ var EngCalcs = EngCalcs || {};
 			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
 			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
 			// pipe by a world distance derived from the arrow's pixel size.
+			// defaultLabelOffset(true): uncapped, same reason as the node loop above.
 			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
-				d = defaultLabelOffset(),
+				d = defaultLabelOffset(true),
 				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
 				ex = mid.x + (l.lx !== undefined ? l.lx : d.x),
 				ey = mid.y + (l.ly !== undefined ? l.ly : d.y),
@@ -10827,7 +11299,9 @@ var EngCalcs = EngCalcs || {};
 			// the scale being tested: the label is a fixed width in pixels, so it covers more of a
 			// pipe the further out you are. Asked here at atScale rather than at the current one.
 			if (tw * sc / (atScale || 1) * SHORT_LINE_MULT > Geom.polylineLength(linkPointList(l))) { return; }
-			boxFor(mid.x, mid.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+			// World part of the offset in the anchor, as in the node loop above.
+			boxFor(mid.x + (l.lx !== undefined ? l.lx : 0), mid.y + (l.ly !== undefined ? l.ly : 0),
+				lx, ly - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id]; if (!le) { return; }
@@ -10840,7 +11314,23 @@ var EngCalcs = EngCalcs || {};
 		});
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
 		// returns maxScale() on a blank canvas.
-		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
+		if (!out.length) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); return out; }
+		// **A DRAWING WITH NO EXTENT IS ONE PLACE, AND IT IS FRAMED AT STREET SCALE THERE** (Tom,
+		// 2026-09-25, a single junction on Project1). The pair above used to be added whenever
+		// there were fewer than two items, so one bare junction was fitted together with the points
+		// (0, 0) and (10, 10) -- ten DEGREES in a geographic project, so the fit showed a continent
+		// with the junction somewhere in it -- and a junction plus its own label (two items at one
+		// anchor) fitted at maxScale(). Every anchor at one point means there is no extent to fit,
+		// so the frame is LPN_POINT_FIT_M centred on it.
+		var i0, same = true;
+		for (i0 = 1; i0 < out.length && same; i0++) {
+			same = out[i0].x === out[0].x && out[i0].y === out[0].y;
+		}
+		if (same) {
+			var half = LPN_POINT_FIT_M / 2 * (isLatLonProject() ? DEG_PER_M : 1);
+			fitItem(out, out[0].x - half, out[0].y - half, 0, 0, 0, 0);
+			fitItem(out, out[0].x + half, out[0].y + half, 0, 0, 0, 0);
+		}
 		return out;
 	}
 	// The translation window for one axis at one scale. `need > room` means this scale does not fit;
@@ -10878,9 +11368,15 @@ var EngCalcs = EngCalcs || {};
 	//     is copied verbatim and cannot drift.
 	// The COST is real: opening a big model on a phone shows a fragment at the desktop's
 	// magnification rather than the whole intended view, small.
+	// **IT ASKS `mapBox()` AND NOT THE ELEMENT, WHICH IS THE ONLY LINE THAT CHANGED HERE** (Task 690,
+	// 2026-09-19). `svg.clientWidth` is a LAYOUT READ: taken after any DOM write it makes the
+	// browser lay the entire drawing out again before it will answer. This function is called by
+	// makeUndoSnapshot(), so it ran once for every value typed into a table -- **measured at 6.7 ms
+	// of the 31 ms one committed cell cost on a 92-junction Net3.** `mapBox()` is the same read
+	// with a hold in front of it, so inside a pass that has declared one the whole edit asks the
+	// browser once. Same numbers, and outside a hold it is literally the same call.
 	function currentView() {
-		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
-			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+		var box = mapBox(), w = box.w || 0, h = box.h || 0,
 			sc = state.s || 1;
 		if (!w || !h) { return null; }
 		// cx/cy: the world point in the middle. s: pixels per world unit, the same number a resize
@@ -10997,13 +11493,53 @@ var EngCalcs = EngCalcs || {};
 		// the scale from the canvas, so there is no number here to judge.
 		if (!isFinite(v.s) || v.s <= 0) { return true; }
 		sc = Math.max(minScale(), Math.min(maxScale(), v.s));
-		if (Math.max(ext.w, ext.h) * sc < LPN_VIEW_MIN_MODEL_PX) { return false; }
+		// A lone node, or nodes all at one point, has no extent to be "too small to see"; only its
+		// position can put it off screen (Tom, 2026-09-25: one junction and no pipes, Zoom to fit,
+		// and "Your network is intact" would not go away). minScale() exempts zero span the same way.
+		if (Math.max(ext.w, ext.h) > 0 && Math.max(ext.w, ext.h) * sc < LPN_VIEW_MIN_MODEL_PX) { return false; }
 		w = svg && svg.clientWidth ? svg.clientWidth : 0;
 		h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		if (!w || !h) { return true; }
 		halfW = (w / 2) / sc; halfH = (h / 2) / sc;
 		return v.cx + halfW >= ext.minx && v.cx - halfW <= ext.maxx &&
 			v.cy + halfH >= ext.miny && v.cy - halfH <= ext.maxy;
+	}
+	// **TASK 647: "the network is intact, just off screen" is a different failure from "the
+	// project is gone", and a visitor cannot tell them apart on a blank canvas** (Tom, 2026-09-13:
+	// "a blank map is equally fatal as a lost project. User doesn't know the difference."). This
+	// reuses viewShowsModel()'s own arithmetic rather than a second geometry -- the same boolean
+	// that decides whether a SAVED view is worth restoring at load, asked again after the user has
+	// panned or zoomed by hand. `modelExtent()` returning null (no elements at all) is answered by
+	// leaving the overlay off: there is nothing off screen to be intact, and Task 314's shop
+	// window already owns that canvas.
+	//
+	// **CALLED ONLY AT REST** -- from the pan-release path (endPointer's wasPan branch) and from
+	// scheduleReshed()'s own debounced settle, never per drag frame or per wheel notch -- matching
+	// the "at rest" discipline viewShowsModel() already keeps for the load-time case (Task 628).
+	function updateOffscreenNotice() {
+		var el = document.getElementById('lpn_offscreen_notice');
+		var v = currentView();
+		var show = !!el && !!v && !!modelExtent() && !viewShowsModel(v);
+		if (el) { el.style.display = show ? 'flex' : 'none'; }
+	}
+	// One-time fill and wiring, called from the same boot pass as wireMessageLogButton() etc.
+	// The button reuses `lpn_tool_zoom_extent` -- the toolbar's own "Zoom to fit" string -- rather
+	// than a second key for the same action, and is wired to `zoomExtent` the same DIRECT way the
+	// toolbar button is (`addEventListener('click', zoomExtent)`, not a wrapping closure): a
+	// wrapped `function () { zoomExtent(); }` is a second BARE call view-memory-harness.js counts
+	// as an automatic fit nobody asked for (Task 439's asterisk trap) -- see that harness's "every
+	// automatic fit says so" assertion. `zoomExtent` reads its `auto` argument off the click event
+	// it is handed here, exactly as the toolbar's own button already does, so this is not a new
+	// quirk.
+	function wireOffscreenNotice() {
+		var pc = EngCalcs.pageConfig || {};
+		var text = document.getElementById('lpn_offscreen_notice_text');
+		var btn = document.getElementById('lpn_offscreen_zoom_btn');
+		if (text) { text.textContent = pc.lpn_offscreen_intact || 'Your network is intact.'; }
+		if (btn) {
+			btn.textContent = pc.lpn_tool_zoom_extent || 'Zoom to fit';
+			btn.addEventListener('click', zoomExtent);
+		}
 	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
@@ -11050,6 +11586,11 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
+	// **R-208's OWN DEFERRAL, SEPARATE FROM `pendingView`/`pendingViewFor`.** Set once, in init(),
+	// for the ONE project a first visit is born with; consumed and cleared by `noteMapSized()`,
+	// which is the first moment the canvas has a real height to compute Novato's home view against.
+	// See the note where it is set for why it cannot be an ordinary `pendingView`.
+	var firstVisitPendingId = null;
 	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
@@ -11125,6 +11666,69 @@ var EngCalcs = EngCalcs || {};
 	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights -- a touch
 	// generous, so the labels it lays out are comfortable at the tighter scale the second pass picks.
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
+	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
+	// example has needed; the cap exists so a layout that never settles cannot hang a click.
+	var LPN_FIT_SETTLE_PASSES = 8;
+	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
+	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
+	var lastFit = null;
+	// **A SOLVE FINISHING NEVER MOVES THE VIEW** (Tom, 2026-08-15, going through every automatic fit
+	// and rejecting nearly all of it: the post-solve re-fit *"illegal"*; see `view-memory-harness.js`).
+	// There used to be a `fitAwaitsSolve` here that let applySolveResult() re-run a Zoom to fit
+	// pressed just ahead of a due solve. Tom, 2026-09-25, catching that this had come back in a
+	// narrower form: *"Zoom to fit pressed before results arrive runs once more when they land: I
+	// think this is what I forbade."* Removed rather than guarded, so nobody reinstates it under a
+	// different name. See the note at the end of zoomExtent() for the fuller quote.
+	// Everything that sits OVER the map, as rectangles in canvas pixels (R-216): every occupant
+	// overlayOccupants() already lists for the legends to dodge -- the mode hint and notice strip,
+	// each cell of the bottom strip including the scale bar, the tile credit, the +/- chip -- plus
+	// the two legends themselves. Measured, never assumed, because most of them fill in or change
+	// size after the page has drawn.
+	function mapFurnitureRects(canvasRect) {
+		var wrap = svg && svg.parentNode, out = [], list, i, b, extra, cr = canvasRect;
+		if (!wrap || !wrap.getBoundingClientRect || !(cr.width > 0)) { return out; }
+		list = overlayOccupants(wrap.getBoundingClientRect()).map(function (o) { return o.rect; });
+		extra = [document.getElementById('lpn_labels_legend'), colorLegendBox];
+		for (i = 0; i < extra.length; i++) {
+			if (extra[i] && extra[i].style && extra[i].style.display !== 'none' && extra[i].getBoundingClientRect) {
+				list.push(extra[i].getBoundingClientRect());
+			}
+		}
+		for (i = 0; i < list.length; i++) {
+			b = list[i];
+			if (!b || !(b.width > 0) || !(b.height > 0)) { continue; }
+			if (b.right <= cr.left || b.left >= cr.right || b.bottom <= cr.top || b.top >= cr.bottom) { continue; }
+			out.push({ l: b.left - cr.left, r: b.right - cr.left, t: b.top - cr.top, b: b.bottom - cr.top });
+		}
+		return out;
+	}
+	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
+	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
+	// on the map, so it cannot be off it.
+	function drawnInkItems() {
+		var out = [], sc = state.s || 1, rr = svg.getBoundingClientRect(), els, i, e, b, cs, ax, ay, n, h, id;
+		if (!labelsLayer || !labelsLayer.querySelectorAll || !window.getComputedStyle) { return out; }
+		els = labelsLayer.querySelectorAll('text, line.lpn-leader');
+		for (i = 0; i < els.length; i++) {
+			e = els[i];
+			if (e.tagName.toLowerCase() === 'text' && !(e.textContent || '').trim()) { continue; }
+			cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) { continue; }
+			b = e.getBoundingClientRect ? e.getBoundingClientRect() : null;
+			if (!b || (!b.width && !b.height)) { continue; }
+			id = e.getAttribute('data-nodelbl');
+			n = id ? nodeById(id) : null;
+			if (n) {
+				h = nodeLabelBase(n); ax = h.x; ay = h.y;
+			} else {
+				ax = (b.left + b.width / 2 - rr.left - state.tx) / sc;
+				ay = (b.top + b.height / 2 - rr.top - state.ty) / sc;
+			}
+			var sx = state.tx + sc * ax + rr.left, sy = state.ty + sc * ay + rr.top;
+			fitItem(out, ax, ay, sx - b.left, b.right - sx, sy - b.top, b.bottom - sy);
+		}
+		return out;
+	}
 	function zoomExtent(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it: the mode hint sits
@@ -11134,34 +11738,70 @@ var EngCalcs = EngCalcs || {};
 		// It guarantees nothing is under an overlay IMMEDIATELY AFTER a fit, and nothing more -- the
 		// user can still pan or zoom content back under one, because the overlays are screen-fixed
 		// and the drawing is not. A guarantee needs the overlays out of the canvas (Task 253).
-		var r = svg.getBoundingClientRect(), pad = 16,
+		var r = svg.getBoundingClientRect(), pad = 16, padLeft = pad, padRight = pad,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
+			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
 				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
-		function apply(v) {
+		function place(v, set) {
+			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
+				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+		}
+		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
+		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
+		// threshold no data label is drawn, so a scale chosen to make room for dragged-out lettering
+		// fitted the network into a frame sized for labels that were not there. Measured on the
+		// geographic Net3 in a 1900 px window: two labels pulled 150 px out took the fit from 8,587
+		// to 5,856, with nothing but the network drawn. `sPast` hides the labels and `sShown` does
+		// not; the answer is the largest scale on the hidden side that still holds the network.
+		// Both steps that choose a scale for the labels' sake come through here.
+		// dev/lpn-spike/label-drag-fit-harness.js.
+		function hiddenSideFit(sPast, sShown) {
+			var lo = sPast, hi = sShown, mid, j;
+			for (j = 0; j < LPN_FIT_BISECTIONS; j++) {
+				mid = (lo + hi) / 2;
+				if (labelsPastThreshold(mid)) { lo = mid; } else { hi = mid; }
+			}
+			items = modelItems;
+			return Math.min(lo, solve());
+		}
+		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
+		// Zoom to fit exists for (R-184): whatever else it does, it never shows empty paper.
+		function modelInside(v, p) {
+			var i, it, x, y;
+			for (i = 0; i < modelItems.length; i++) {
+				it = modelItems[i]; x = p.tx + v * it.x; y = p.ty + v * it.y;
+				if (!(x >= 0 && x <= r.width && y >= 0 && y <= r.height)) { return false; }
+			}
+			return true;
+		}
+		function apply(v, p) {
 			state.s = v;
-			state.tx = fitWindow(items, v, 'x', 'l', 'r', r.width, pad, pad).t;
-			state.ty = fitWindow(items, v, 'y', 't', 'b', r.height, padTop, padBottom).t;
+			state.tx = p.tx;
+			state.ty = p.ty;
 			setTransform();
 			onZoomChanged();
 		}
-		// **TWO SOLVES, NOT A CONVERGENCE LOOP.**
+		// **AN ANALYTIC SEED, THEN A SETTLE ON WHAT IS REALLY DRAWN** (R-214).
 		//   1. fit the MODEL ALONE, with six text heights of extra room, so the answer cannot depend
 		//      on the view we arrived from and the labels get somewhere comfortable to land.
-		//   2. work out the labels ONCE, at that scale.
-		//   3. fit again to the model plus those label boxes, without recomputing them.
-		// NOT an iterate-until-stable loop: it seeds from state.s, so arriving from a 0.02x view --
-		// where a label is 550 world units of lettering -- gives a different answer from arriving at
-		// 1x. NOT a flat pad of ~6 text heights either: a fixed pad is most of a small map and
-		// nothing on a large one. Deliberately accepted: the labels are laid out for step 1's scale,
-		// so a label can end fractionally outside the padding.
-
+		//   2. work out the labels' HOME boxes once, at that scale, and fit model plus labels.
+		//   3. SETTLE: draw at that scale, lay the labels out for real (reshedNow()), measure every
+		//      piece of lettering and every leader as drawn, and if any of it is outside the frame,
+		//      solve again with those measured boxes. Repeat until nothing is outside.
+		// Step 3 exists because the home boxes are not where the labels end up: the placement pass
+		// pushes a label out along its own leader to clear its neighbours (a dragged one by ~80 px on
+		// the Basic SI example), and that push is decided at the scale being drawn, so only a layout
+		// AT the target scale can say where the lettering is -- a fixed point, solved by iterating.
+		// **IT STILL CANNOT DEPEND ON THE VIEW WE ARRIVED FROM**: the settle starts from step 2's
+		// answer, never from state.s, and the scale only ever steps DOWN, so it ends, and a second
+		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
+		var modelItems = items;
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -11169,6 +11809,12 @@ var EngCalcs = EngCalcs || {};
 		var modelFit = s;
 		items = fitItems(s);
 		s = solve();
+		if (labelsPastThreshold(s)) {
+			var labelled = items, bare;
+			items = modelItems;
+			bare = solve();
+			if (!labelsPastThreshold(bare)) { s = hiddenSideFit(s, bare); } else { items = labelled; }
+		}
 		// **A LABEL WIDER THAN THE WINDOW MUST NOT DECIDE THE ZOOM** (Tom, 2026-09-16, on his EWB
 		// demo file: *"Zoom to fit ... does not show the entire network. It's close, but it's not
 		// what we aim for."*). `fitScaleFor()` answers `minScale()` when nothing fits even at the
@@ -11181,9 +11827,106 @@ var EngCalcs = EngCalcs || {};
 		// So a step-2 answer that bottomed out is not an answer. Fall back to the model fit and let
 		// the lettering overhang, which is the trade the original branch intended: **the NETWORK is
 		// what Zoom to fit is for.**
-		if (!(s > minScale())) { s = modelFit; }
-		apply(s);
+		// **AND THE FALLBACK IS CENTRED ON THE MODEL, NOT ON THE LETTERING** that just failed to
+		// fit, and it is also taken whenever the label-aware answer would leave a node off the
+		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
+		// **A PRESS FROM THE VIEW THE LAST FIT LEFT IS NEARLY FREE** (pre-review 2026-09-24: about
+		// 1.2 s a press on the geographic Net3, every press). Steps 1 and 2 are arithmetic; step 3
+		// redraws. If steps 1 and 2 give the same seed they gave last time, on a canvas of the same
+		// size, and the view is still exactly the one that fit settled on, then the only question
+		// left is whether anything drawn has since moved under an overlay or off the frame -- one
+		// measurement, no relayout. Anything else (an edit, a resize, a pan, a zoom, new results)
+		// changes the seed or the view and takes the full path.
+		var seed = [modelFit, s, r.width, r.height].join(' ');
+		if (lastFit && lastFit.seed === seed && lastFit.s === state.s && lastFit.tx === state.tx &&
+			lastFit.ty === state.ty) {
+			padLeft = lastFit.pads[0]; padRight = lastFit.pads[1]; padTop = lastFit.pads[2]; padBottom = lastFit.pads[3];
+			if (!firstObstruction(modelItems.concat(drawnInkItems()))) {
+				if (auto) { rebaseSignatureIfClean(); }
+				return;
+			}
+		}
+		var at = place(s, items);
+		if (!(s > minScale()) || !modelInside(s, at)) {
+			apply(modelFit, place(modelFit, modelItems));
+		} else {
+			apply(s, at);
+			settleOnDrawnInk();
+		}
+		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
+		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
+		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
+		// the reasoning that a label about to gain a P= line deserved a frame drawn for it (pre-
+		// review 2026-09-24: Net2's node 1 ended 3 px under the coordinate readout). Tom, 2026-09-25,
+		// on exactly that behaviour: *"Zoom to fit pressed before results arrive runs once more when
+		// they land: I think this is what I forbade."* He has forbidden the view refitting itself
+		// after a solve, full stop -- **nothing about a solve finishing ever moves the view.** A
+		// press fits once, when pressed; a solve landing later leaves the view exactly where it was.
 		if (auto) { rebaseSignatureIfClean(); }
+		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
+		// PIXELS, which is the shape a label really has: a node label is anchored at its home
+		// endpoint (nodeLabelBase(), the user's drag included), anything else at its own centre.
+		// The nudge the placement pass added is then pixels of reach, which is what it is.
+		//
+		// **AND NOTHING MAY END UNDER THE MAP'S FURNITURE** (R-216, Tom 2026-09-24: *"Zooms almost
+		// to fit. Only the scale bar obscures a label."*). The two bands above reserve the top and
+		// bottom strips by their measured height, but a corner overlay -- the scale bar when the
+		// strip wraps, the tile credit, the +/- chip, a legend -- is a rectangle, not a band, and it
+		// changes size after the fit it sits over (the scale bar appears, a legend fills in). So the
+		// settle asks the real question: is any node or any piece of drawn lettering under any
+		// overlay, measured as drawn? For each one that is, the edge it hugs is reserved to the
+		// overlay's own measured depth -- whichever edge gives up the smaller share of the canvas --
+		// and the fit is solved again. Reserves only grow and the scale only steps down, so it ends.
+		function settleOnDrawnInk() {
+			var k, all, s2, p2, hit;
+			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
+				reshedNow();
+				all = modelItems.concat(drawnInkItems());
+				hit = firstObstruction(all);
+				if (!hit) { return; }
+				if (hit !== true) { reserveEdgeFor(hit); }
+				items = all;
+				s2 = Math.min(state.s, solve());
+				if (!(s2 > minScale())) { return; }
+				p2 = place(s2, all);
+				// A step down that would hide the labels is not made for their sake: hiddenSideFit().
+				if (!labelsPastThreshold(state.s) && labelsPastThreshold(s2)) {
+					s2 = hiddenSideFit(s2, state.s);
+					p2 = place(s2, modelItems);
+				}
+				if (!modelInside(s2, p2)) { return; }
+				apply(s2, p2);
+			}
+			reshedNow();
+		}
+		// `true` when something is outside the padded frame, the overlay's rectangle when something
+		// is under an overlay, null when all is clear.
+		function firstObstruction(all) {
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			for (i = 0; i < all.length; i++) {
+				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
+				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
+				for (j = 0; j < furn.length; j++) {
+					f = furn[j];
+					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				}
+				if (bl < padLeft - e || br > r.width - padRight + e ||
+					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
+			}
+			return outside || null;
+		}
+		function reserveEdgeFor(f) {
+			var gap = 4, cands = [
+				{ k: 'top', d: f.b, span: r.height }, { k: 'bottom', d: r.height - f.t, span: r.height },
+				{ k: 'left', d: f.r, span: r.width }, { k: 'right', d: r.width - f.l, span: r.width }
+			];
+			cands.sort(function (a, b) { return a.d / a.span - b.d / b.span; });
+			var c = cands[0], v = c.d + gap;
+			if (c.k === 'top') { padTop = Math.max(padTop, v); }
+			else if (c.k === 'bottom') { padBottom = Math.max(padBottom, v); }
+			else if (c.k === 'left') { padLeft = Math.max(padLeft, v); }
+			else { padRight = Math.max(padRight, v); }
+		}
 	}
 
 	// ---- OPENSTREETMAP BASEMAP, FOR A GEOGRAPHIC PROJECT (ROADMAP Task 145) ----------------------
@@ -11706,12 +12449,21 @@ var EngCalcs = EngCalcs || {};
 	// tile offering a basemap the menu no longer agreed about -- the drift refreshBasemapTeaser()'s
 	// own comment warns against.
 	function basemapChoosable() { return projectLocatable() || xyGeorefOk(); }
+	// **GO TO AND THE PLACE-NAME SEARCH ASK THE WIDE QUESTION TOO, SINCE 2026-09-22** (Tom, on
+	// feat/map-menu: *"The last two menu rows showing for EPSG projects, Goto and Search, were not
+	// requested, but are nice, and can show for unnamed CRS projects, but disabled when a world map
+	// is not attached (no georeference)."*). Both travel through goToPoint(), which gained a branch
+	// that turns a latitude and longitude into drawing units through the attached map's transform,
+	// so they no longer need anything a georeferenced grid project lacks. Moving the camera changes
+	// nothing in the document, which is why this widening is safe where the DEM's is not.
+	// On a grid project that means the map is SHOWING, not merely that a placement is kept: a
+	// Detached grid project greys both rows, as Tom's "disabled when a world map is not attached"
+	// says. A geographic or projected project is findable whether its map is showing or not.
+	function placeFindable() { return projectLocatable() || worldMapAttached(); }
 	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
-	// oversight.** It gates the place-name search and the DEM elevations as well as the tiles, and
-	// both of those want more than a transform: Go to points a camera whose units are DEGREES in a
-	// lat/lon project, and the DEM writes numbers into the document. Attaching a backdrop is meant
-	// to change nothing, so it unlocks the tiles and stops there; the other two rows are Tom's to
-	// ask for.
+	// oversight.** It still gates the DEM elevations, which write numbers into the document from a
+	// place on the Earth; attaching a backdrop is meant to change nothing, so an attached world map
+	// unlocks the tiles, Go to and the search (placeFindable() above), and stops there.
 	//
 	// **AND THIS IS TASK 692's QUESTION ASKED A FOURTH TIME.** That audit found four capabilities
 	// gated on "are these coordinates a latitude and a longitude" where what they meant was "can
@@ -11725,14 +12477,27 @@ var EngCalcs = EngCalcs || {};
 	// defect 692 closed, and widening these three would re-open it from the other side.
 	// dev/lpn-spike/xy-world-map-harness.js asserts both halves.
 	function basemapOn() { return basemapChoosable() && project.basemap !== 'off'; }
-	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
-	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
+	// One setter for both sources, and 'off'. **IT SETS; IT NO LONGER TOGGLES** (2026-09-22). It used
+	// to turn the basemap OFF when asked for the style already showing, which was right for the
+	// retired Hide/Show street map and satellite rows and nothing else: once World map, Attach went
+	// through it, Attach on a map that was already showing turned the map off while its notice said
+	// it had attached it (Perry's review, 2026-09-22). The corner teaser always asks for the OTHER
+	// style, so it never relied on the toggle.
+	//
+	// **THE STYLE IN USE IS REMEMBERED WHEN THE MAP GOES OFF**, so Detach then Attach brings back
+	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
+	// project for the same reason `basemap` is: it is a statement about this document's picture.
 	function setBasemapStyle(style) {
-		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
+		if (style === 'off' && project.basemap && project.basemap !== 'off') {
+			project.basemapLast = project.basemap;
+		}
+		project.basemap = style;
 		refreshBasemap();
 		saveToStorage();
 	}
-	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
+	function setBasemapOn(on) {
+		setBasemapStyle(on ? (project.basemapLast || 'osm') : 'off');
+	}
 	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
 	// a tile can, and the only thing that removes it is turning the basemap off. The two sources
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
@@ -11749,8 +12514,7 @@ var EngCalcs = EngCalcs || {};
 	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
 	// is a third thing to keep in step with openMapMenu(). It carries the SAME two strings as that
 	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
-	// come to mean different things -- including the seam's own rule that asking for the style
-	// already showing turns the basemap off.
+	// come to mean different things.
 	//
 	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
 	// bar to icons, so a phone reader has strictly FEWER routes to this than a desktop one; taking
@@ -11759,7 +12523,12 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!basemapChoosable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		// **HIDDEN WHILE DETACHED** (Perry's re-review, 2026-09-22). It asked basemapChoosable() --
+		// "a placement exists" -- so on a Detached project it re-attached the map silently, with no
+		// notice and no undo step. World map, Attach is the one way back, per Tom's "Detach and
+		// attach provide the same functionality"; this only swaps street for satellite on a map
+		// that is already showing.
+		if (!worldMapAttached() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -11771,14 +12540,18 @@ var EngCalcs = EngCalcs || {};
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');
 		b.title = name;
 	}
-	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF**, and that is the whole
-	// difference between it and the View rows. setBasemapStyle() toggles off when asked for the
-	// style already showing, which is right for a row that reads "Hide satellite images" and wrong
-	// for a corner tile: Tom pressed it twice and lost the basemap entirely -- "I get satellite, but
-	// now I lost map. No more map. Satellite has attribution, Map has nothing." Turning the tiles
-	// off stays in the View menu, where a row says so in words.
+	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF.** Tom pressed an earlier version
+	// twice and lost the basemap entirely -- "I get satellite, but now I lost map. No more map.
+	// Satellite has attribution, Map has nothing." Turning the tiles off is Map, World map, Detach,
+	// where a row says so in words.
+	// **A SWITCH IS ITS OWN UNDO STEP, ALWAYS** (2026-09-22). The style is on the project and every
+	// undo snapshot carries it, so a switch that took no snapshot of its own would be reverted by
+	// the NEXT unrelated Ctrl+Z -- a street map coming back because somebody undid a pipe. One
+	// snapshot per press makes Ctrl+Z after a switch put the other style back, and nothing else.
 	function toggleBasemapTeaser() {
-		setBasemapStyle(basemapOn() && basemapStyle() === 'satellite' ? 'osm' : 'satellite');
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
+		setBasemapStyle(basemapStyle() === 'satellite' ? 'osm' : 'satellite');
 	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
@@ -11876,7 +12649,10 @@ var EngCalcs = EngCalcs || {};
 		// kind and, for a projected project, the CRS code. Changing either used to be safe because
 		// nothing survived the repaint; now something does.
 		var proj = projectedBasemapOk();
-		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
+		// ...and the ORIGIN, since a tile is placed in local units: followViewWhileEmpty() can move
+		// it under a tile that is still cached.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '') + '|' + (xg
 			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
 				'|' + xg.metersPerUnit + '|' + xg.rotDeg
 			: '');
@@ -12746,6 +13522,19 @@ var EngCalcs = EngCalcs || {};
 	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
 	// pinch come through here, so the two cannot come to different ideas about which is happening.
 	function wheelZoom(sx, sy, factor) {
+		// **ANY ZOOM BY ANY OTHER MEANS MAKES THE NEXT Zoom to fit PRESS A FIRST PRESS** (R-216, Tom
+		// 2026-09-24: *"Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is
+		// startling."*). The wheel is not a pointerdown or a keydown, so wireZoomArmReset() never
+		// saw it; this door is the one the wheel, the pinch, the +/- chip and the keyboard all use.
+		//
+		// **AND IT RESETS THE FACE AS WELL AS THE FLAG.** Two presses in a row leave the button in
+		// Zoom Window, where `zoomToolArmed` is already false -- so clearing the flag alone left a
+		// + click or a wheel notch with the button still saying Zoom Window (pre-review,
+		// 2026-09-24). A Zoom Window with NO box started yet is dropped back to Select, which puts
+		// the face back to Zoom to fit; one with its first corner down is kept, because zooming to
+		// find the second corner is part of drawing that box, not a different action.
+		zoomToolArmed = false;
+		if (mode === 'zoom-window' && !zoomWinDrag && !zoomWinPressAt) { setMode('select'); }
 		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
 		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
 		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
@@ -12775,6 +13564,42 @@ var EngCalcs = EngCalcs || {};
 		state.tx = lx - wx * state.s; state.ty = ly - wy * state.s;
 		setTransform();
 		onZoomChanged();
+	}
+	// **THE ONE STEP EVERY NON-GESTURE ZOOM CONTROL TAKES** (ROADMAP Task 682). The wheel moves the
+	// point under the cursor by 1.1x/notch (`wirePointerEvents()`'s wheel listener); a keyboard or a
+	// button has no cursor position to hold still, so it zooms about the view's own centre instead,
+	// through the SAME `wheelZoom()` the wheel and the pinch already call -- one door, so the +/-
+	// keys, the on-map chip and the toolbar's own zoom cannot come to a different idea of what a
+	// "step" is, and so mapgeo's step-2 camera rule (see wheelZoom()'s own comment) covers them too.
+	function keyZoom(factor) {
+		if (!svg) { return; }
+		var r = svg.getBoundingClientRect();
+		wheelZoom(r.left + r.width / 2, r.top + r.height / 2, factor);
+	}
+	// **THE ON-MAP +/- CHIP** (ROADMAP Task 682) -- markup is the empty shell in Looped-Network.php;
+	// this fills it through the same icon+aria-label+tip door every toolbar icon button already
+	// uses. `EngCalcs.setIconLabel()` DIRECTLY, not the local `setIconLabel()` wrapper a few
+	// thousand lines down: that wrapper also feeds Help > "What the toolbar icons mean"
+	// (toolbarIconIndex), and this chip is not a toolbar button.
+	function wireZoomControl() {
+		var pc = EngCalcs.pageConfig || {},
+			inBtn = document.getElementById('lpn_zoom_in'),
+			outBtn = document.getElementById('lpn_zoom_out');
+		// **THE TIP IS THE WHOLE TIP, NOT "Name -- tip".** Tom, 2026-09-25: *"The + and - button tips
+		// both have their action repeated. Use this form: 'Zoom in. Shortcut: +'."* The tip already
+		// says the action, so setIconLabel()'s joined title would say it twice; the name stays as
+		// the accessible name alone.
+		function tipOnly(btn, tip) { if (tip) { EngCalcs.setTipText(btn, tip); } }
+		if (inBtn) {
+			EngCalcs.setIconLabel(inBtn, 'zoom-in', pc.lpn_zoom_in || 'Zoom in', pc.lpn_zoom_in_tip);
+			tipOnly(inBtn, pc.lpn_zoom_in_tip);
+			inBtn.addEventListener('click', function () { keyZoom(1.1); });
+		}
+		if (outBtn) {
+			EngCalcs.setIconLabel(outBtn, 'zoom-out', pc.lpn_zoom_out || 'Zoom out', pc.lpn_zoom_out_tip);
+			tipOnly(outBtn, pc.lpn_zoom_out_tip);
+			outBtn.addEventListener('click', function () { keyZoom(1 / 1.1); });
+		}
 	}
 
 	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A LAT/LON ONE (ROADMAP Task 145) -----------
@@ -13096,16 +13921,27 @@ var EngCalcs = EngCalcs || {};
 	// drawn, so a point lands on the same screen pixel it did then. One attribute, no arithmetic
 	// over the document, nothing rebuilt.
 	var georefSettleTimer = null;
+	// **THE BACKGROUND IMAGE IS HELD STILL WITH THE MODEL** (R-172, Tom 2026-09-22: *"In Step 1, a
+	// background image gets dragged around with the map (then snaps back on release of drag) instead
+	// of always staying with the project."*). The picture lives in backdropLayer, a sibling of
+	// modelLayer, so the compensation that held the model still never reached it: it rode the map
+	// during the gesture and jumped back when georefReproject() re-derived it at the settle. It is
+	// part of what is being placed (georefCaptureBackdrop), so it takes the same compensation.
 	function georefApplyCompensation() {
 		if (!modelLayer) { return; }
-		var f = georefDetached() ? georef.frozen : null;
+		var f = georefDetached() ? georef.frozen : null,
+			layers = [modelLayer].concat(backdropLayer && georef && georef.bd ? [backdropLayer] : []);
+		if (backdropLayer && !(georef && georef.bd)) { backdropLayer.removeAttribute('transform'); }
 		if (!f || (f.tx === state.tx && f.ty === state.ty && f.s === state.s)) {
-			modelLayer.removeAttribute('transform');
+			layers.forEach(function (g) { g.removeAttribute('transform'); });
+			if (backdropLayer) { backdropLayer.removeAttribute('transform'); }
 			return;
 		}
-		modelLayer.setAttribute('transform',
-			'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
-			') scale(' + (f.s / state.s) + ')');
+		layers.forEach(function (g) {
+			g.setAttribute('transform',
+				'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
+				') scale(' + (f.s / state.s) + ')');
+		});
 	}
 	// Called on every view change. While detached it holds the model still and books a settle;
 	// otherwise it makes sure the compensation is not left on.
@@ -13409,12 +14245,6 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
 		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = detached ? '' : 'none'; }
-		// Offered only while the model is still in hand, and only when the numbers COULD be
-		// coordinates -- see georefStart(). It is the one thing on this bar that says the drawing
-		// does not need placing at all.
-		if (georefBarEl('lpn_georef_asdeg')) {
-			georefBarEl('lpn_georef_asdeg').style.display = (detached && georef.mayBeDegrees) ? '' : 'none';
-		}
 		if (georefBarEl('lpn_georef_twopt')) { georefBarEl('lpn_georef_twopt').style.display = detached ? 'none' : ''; }
 		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
@@ -13452,13 +14282,6 @@ var EngCalcs = EngCalcs || {};
 		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
 		var go = georefBarEl('lpn_georef_goto');
 		if (go) { go.addEventListener('click', goToLatLon); }
-		var asdeg = georefBarEl('lpn_georef_asdeg');
-		if (asdeg) {
-			asdeg.addEventListener('click', function () {
-				if (!georef || !georef.mayBeDegrees) { return; }
-				georefArmAsDegrees();
-			});
-		}
 		// A TOGGLE, so the tool it arms can be put down again without leaving the wizard. There is no
 		// second label for the pressed state: the notice says what the next click will do, and it is
 		// the notice a user is reading while picking.
@@ -13539,7 +14362,7 @@ var EngCalcs = EngCalcs || {};
 		// was offered and the press did nothing at all. goToPoint() below travels through the
 		// transform, so there is nothing here a projected project cannot do. The wizard's own live
 		// transform is the one addition: while it is open, the drawing can say where it is.
-		if (!projectLocatable() && !mapgeoActive()) { return; }
+		if (!placeFindable() && !mapgeoActive()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -13607,10 +14430,39 @@ var EngCalcs = EngCalcs || {};
 			georefDetachTick();
 			return;
 		}
-		var box = extent ? inwardBox(extent) : null;
+		// **A GRID PROJECT WITH THE WORLD MAP ATTACHED TRAVELS THROUGH ITS OWN TRANSFORM** (Tom,
+		// 2026-09-22 -- see placeFindable()). The drawing frame is the user's x/y, so a latitude is
+		// turned into drawing units by the attached map's similarity and nothing else; the camera
+		// moves, no document number does. An extent is sized from its four corners, because the
+		// map may be turned and a turned box's corners are not its east and west. It shares the ONE
+		// crossing into the drawing frame below rather than writing its own, which is what
+		// dev/lpn-spike/local-origin-harness.js counts.
+		var xg = xyGeoref(), at = { x: ll.lon, y: ll.lat }, sFit = 0;
+		if (xg) {
+			at = EngCalcs.lpnGeorefFromLonLat(xg, ll.lon, ll.lat);
+			if (!isFinite(at.x) || !isFinite(at.y)) { return; }
+			if (inwardBox(extent)) {
+				var cs = [[extent.west, extent.north], [extent.east, extent.north],
+					[extent.west, extent.south], [extent.east, extent.south]].map(function (c) {
+						return EngCalcs.lpnGeorefFromLonLat(xg, c[0], c[1]); });
+				var xs = cs.map(function (c) { return c.x; }), ys = cs.map(function (c) { return c.y; });
+				var dx = Math.max.apply(null, xs) - Math.min.apply(null, xs),
+					dy = Math.max.apply(null, ys) - Math.min.apply(null, ys),
+					w = svg && svg.clientWidth ? svg.clientWidth : 0,
+					h = svg && svg.clientHeight ? svg.clientHeight : 0;
+				if (w && h && dx > 0 && dy > 0) {
+					sFit = Math.min(w / dx, h / dy) * SEARCH_FIT_PAD;
+					sFit = Math.min(sFit, w / (SEARCH_FIT_FLOOR_M / xg.metersPerUnit));
+				}
+			}
+		}
+		// On a geographic project the extent box is its own centre and size; on an attached grid
+		// only the size came from it (sFit), and the centre is the travelled-to point.
+		var box = (extent && !xg) ? inwardBox(extent) : null;
 		var fit = box ? fitScaleForBox(box) : 0;
-		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(ll.lon),
-			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(ll.lat), s: fit > 0 ? fit : state.s });
+		if (!(sFit > 0 && isFinite(sFit))) { sFit = 0; }
+		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(at.x),
+			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(at.y), s: fit > 0 ? fit : (sFit || state.s) });
 		georefDetachTick();
 	}
 	/**
@@ -13673,6 +14525,120 @@ var EngCalcs = EngCalcs || {};
 		s = Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity) * SEARCH_FIT_PAD;
 		if (!isFinite(s) || s <= 0) { return 0; }
 		return Math.min(s, w / (SEARCH_FIT_FLOOR_M * DEG_PER_M));
+	}
+
+	// ---- ZOOM WINDOW: Tom's own second half of Task 682, "drag a box and zoom to it" -------------
+	// This is NOT fitScaleForBox() above: that helper's floor is stated in DEGREES
+	// (`SEARCH_FIT_FLOOR_M * DEG_PER_M`), which is only ever a correct unit for a geographic
+	// project, and it is only ever called with a box built that way (goToLatLon()'s `xg` branch
+	// passes no box at all). A Zoom Window box is drawn in WHATEVER FRAME `screenToWorld()` already
+	// reads -- degrees, a projected plane, or a plain XY grid -- so its scale is the plain
+	// pixels-per-drawing-unit ratio, with min/maxScale()'s own per-frame clamp (applyView() applies
+	// it) doing the only bounding this needs.
+	function zoomWindowScale(box) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0, dx, dy;
+		if (!w || !h || !box) { return 0; }
+		dx = Math.abs(box.x2 - box.x1);
+		dy = Math.abs(box.y2 - box.y1);
+		if (!(dx > 0) && !(dy > 0)) { return 0; }
+		return Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity);
+	}
+	function zoomToBox(box) {
+		var s = zoomWindowScale(box);
+		if (!(s > 0) || !isFinite(s)) { return; }
+		applyView({ cx: (box.x1 + box.x2) / 2, cy: (box.y1 + box.y2) / 2, s: s });
+	}
+	// **ONE MARQUEE, DRAWN IN WORLD COORDINATES LIKE select-area's** (so a pan mid-drag moves the
+	// box with the map, though nothing here allows panning while it is open), built in init()
+	// beside selectAreaEl. Its own small state rather than sharing select-area's `areaRing` --
+	// select-area remembers its shape (window/lasso/polygon) ACROSS mode switches, and folding a
+	// second tool into that memory would mean a Zoom Window drag could silently change what
+	// select-area draws next, or vice versa.
+	var zoomWinEl = null;
+	var zoomWinDrag = null;   // { id: pointerId, start: {x,y}, live: {x,y} } in WORLD coords, or null
+	function zoomWinPoints() {
+		if (!zoomWinDrag) { return []; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live || a;
+		return EngCalcs.lpnGeom.rectRing(a.x, a.y, b.x, b.y);
+	}
+	function paintZoomWin() {
+		var pts = zoomWinPoints();
+		if (!zoomWinEl) { return; }
+		if (!pts.length) { zoomWinEl.style.display = 'none'; return; }
+		zoomWinEl.style.display = '';
+		zoomWinEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
+	}
+	function zoomWinBegin(w, pointerId) {
+		zoomWinDrag = { id: pointerId, start: { x: w.x, y: w.y }, live: { x: w.x, y: w.y } };
+		paintZoomWin();
+	}
+	function zoomWinMove(w) {
+		if (!zoomWinDrag) { return; }
+		zoomWinDrag.live = { x: w.x, y: w.y };
+		paintZoomWin();
+	}
+	// Leaving the mode mid-drag (Escape, another tool, undo's own snapshot) drops the box rather
+	// than zooming to a rectangle the user never finished asking for -- the same rule Task 266's
+	// half-drawn marquee follows.
+	function zoomWinCancel() { zoomWinDrag = null; zoomWinPressAt = null; paintZoomWin(); }
+	function zoomWinFinish() {
+		if (!zoomWinDrag) { return; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live;
+		zoomWinDrag = null;
+		paintZoomWin();
+		// A press that never travelled is a click, not a box, and has nothing to zoom to -- stay in
+		// the mode so the same press-drag-release can be retried, exactly as a mis-aimed
+		// select-area click leaves that tool armed.
+		if (Math.abs(b.x - a.x) < 1e-9 && Math.abs(b.y - a.y) < 1e-9) { return; }
+		zoomToBox({ x1: Math.min(a.x, b.x), y1: Math.min(a.y, b.y),
+			x2: Math.max(a.x, b.x), y2: Math.max(a.y, b.y) });
+		// **A COMPLETED DRAG IS A ONE-SHOT COMMAND, LIKE ZOOM TO FIT, NOT A LINGERING TOOL** -- the
+		// same reading of Tom's "second time you click it" that makes `zoomToolShape` reset to
+		// 'fit' rather than a remembered preference (see its own comment). setMode()'s own
+		// zoom-window exit hook does that reset and repaints the toolbar button.
+		setMode('select');
+	}
+	// **R-180 (Tom, 2026-09-23): "It seems inconsistent for us to use click for selection, but drag
+	// for zoom. I think we should have a consistent idiom."** Ida's answer: Zoom Window takes
+	// EXACTLY the gesture shape select-area's window already takes -- click-a-corner,
+	// click-the-opposite-corner, OR press-drag-release, both committing the same box (EPANET's own
+	// Zoom-In tool is click-click; the suite already defers to EPANET's conventions). This mirrors
+	// `areaPress()`/`areaPointerUp()` (`:15547`/`:15612` in Ida's own citation) but reads and writes
+	// `zoomWinDrag` alone, never `areaRing` -- the two tools' state stays deliberately unshared, per
+	// the comment on `zoomWinDrag`'s own declaration above.
+	//
+	// `zoomWinPressAt` is `areaPressAt`'s exact counterpart: recorded on every press, before the
+	// press itself runs, so `started` can still answer "did THIS press open the box" after the
+	// press has changed what `zoomWinDrag` holds.
+	var zoomWinPressAt = null;   // { id: pointerId, x, y, started } in SCREEN coords, or null
+	// One press in zoom-window mode. No box open yet: this press OPENS one, exactly like
+	// `areaPress()`'s first call. A box already open: this press is the "second click" of a
+	// click-click pair, and commits it immediately -- `zoomWinFinish()`'s own zero-movement guard
+	// then protects a genuine miss (two clicks on the same spot) by leaving the box open rather
+	// than zooming to nothing.
+	function zoomWinPress(w, pointerId) {
+		if (!zoomWinDrag) { zoomWinBegin(w, pointerId); return 'start'; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return 'commit';
+	}
+	// **THE RELEASE OF A PRESS-DRAG-RELEASE, ON A POINTER** -- `areaPointerUp()`'s counterpart. A
+	// release that never travelled past the tap threshold is the up-stroke of an ordinary click
+	// that just opened the box (or, before this existed, was silently discarded by
+	// `zoomWinFinish()`'s own zero-movement guard on every plain click -- the defect R-180 named).
+	// Leaving the box open there, instead of finishing, is what makes the SECOND click able to find
+	// it and close it. A release that DID travel is a genuine drag ending, and commits exactly as
+	// before.
+	function zoomWinPointerUp(e, w) {
+		var from = zoomWinPressAt;
+		if (!from || from.id !== e.pointerId) { return false; }
+		zoomWinPressAt = null;
+		if (!from.started || !zoomWinDrag) { return false; }
+		if (Math.hypot(e.clientX - from.x, e.clientY - from.y) < tapMovePx(e)) { return false; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return true;
 	}
 
 	// ---- Task 497: elevations read from the land surface ------------------------------------------
@@ -14056,10 +15022,12 @@ var EngCalcs = EngCalcs || {};
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
+		// **A lat/lon PROJECT IS NOT A REASON TO REFUSE** (Task 696; Tom, 2026-09-23: the wizard
+		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:3857 on
+		// this page, one coordinate system among hundreds, so being on it says nothing about whether
+		// somebody may convert to another. It says where the network already is, so the wizard opens
+		// with that answer in place rather than asking the question again from the whole world.
+		var fromGeo = isLatLonProject();
 		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
 		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
 		// project that states its own coordinate system. The xy grid it was built for states none.
@@ -14130,12 +15098,15 @@ var EngCalcs = EngCalcs || {};
 		// nearly every drawing made on a plain grid fits inside +/-180 and +/-90, so the test's
 		// false-positive rate on the case it is supposed to reject is close to 100%.
 		//
-		// So the wizard always opens at step 1, which is what the menu row the user chose promised,
-		// and the reinterpret case is a BUTTON on the bar instead of a guess. Nothing is lost by
-		// waiting: georefArmAsDegrees() rebuilds every point from `georef.restore`, the numbers the
-		// document arrived with, so arming it after a step of panning is exactly as exact as arming
-		// it on the first frame.
-		georef.mayBeDegrees = georefSrcReadsAsDegrees();
+		// So the wizard always opens at step 1, which is what the menu row the user chose promised.
+		// **THE MANUAL REINTERPRET BUTTON THAT USED TO SIT HERE IS GONE** (R-219; Tom, 2026-09-24,
+		// answering R-190). It offered, on this same range-test guess, to arm the model unmoved
+		// whenever every coordinate could pass for a longitude and a latitude; the identical result
+		// -- the file's own numbers used unchanged -- is reached by typing 1 into the Ground distance
+		// field on step 2, so it is dropped as a control that bought nothing a visitor could not
+		// already do. georefArmAsDegrees() itself is untouched and still runs automatically from
+		// georefOpenAnswered(), for the different case of a project that already STATES it is
+		// georeferenced -- a known fact about the file, not a guess from its coordinates.
 		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
 		// entire world, whatever location and zoom that is, so that they can zoom to their
 		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
@@ -14158,17 +15129,21 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
+		if (fromGeo) { georefOpenAnswered(); return; }
 		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.');
 	}
-	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
-	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
-	// That is why the answer only chooses where the wizard OPENS, and never what the project is.
-	function georefSrcReadsAsDegrees() {
-		var src = georef && georef.src;
-		if (!src || !src.length) { return false; }
-		return src.every(function (p) {
-			return isFinite(p.x) && isFinite(p.y) && Math.abs(p.x) <= 180 && Math.abs(p.y) <= 90;
-		});
+	// **STEPS 1 AND 2 OPEN ALREADY ANSWERED** (Tom, 2026-09-22: *"If a project already has an
+	// attached World map ... the next step (placement step 1) uses our current georeferencing. In
+	// fact, we could just convert ... without further question. But we step them through Steps 1 and
+	// 2 in case they want to make any changes."*). The coordinates the copy arrived with are
+	// longitudes and latitudes, so the reinterpret path places the model exactly where they say, and
+	// the wizard then steps back to step 1 so both steps are still walked. Pressing Put the model
+	// here and Keep this placement without touching anything commits the placement unchanged.
+	function georefOpenAnswered() {
+		var pc = EngCalcs.pageConfig || {};
+		georefArmAsDegrees();
+		georefDetach();
+		setNotice(pc.lpn_georef_answered || 'This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.');
 	}
 	// **REINTERPRET: the label was wrong, the geometry was not.** Nothing is repositioned here. The
 	// document keeps the exact numbers it arrived with, and pressing Keep this placement without
@@ -14297,7 +15272,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.')) { return; }
+		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		var unrotated = georefBackdropRotated(georef.t);
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
@@ -14331,9 +15306,11 @@ var EngCalcs = EngCalcs || {};
 		// an image to turn, and saying nothing would leave a site plan silently off its own network.
 		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
 		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any asset to move it closer to where it really is.')
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
+		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
+		convasPlaced();
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -14376,6 +15353,8 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
+		// File, Convert as: the copy never became what was asked for, so it is closed.
+		convasAbandon();
 	}
 
 	// ---- THE WORLD MAP BEHIND AN XY DRAWING (ROADMAP Task 646) ----------------------------------
@@ -14754,11 +15733,10 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		// **IT CONFIRMS BEFORE IT REPLACES ONE**, which is the first thing his own summary asks of
-		// this row: the georeferencing already on file is an answer somebody gave, and starting the
-		// wizard throws it away the moment the first frame is drawn.
-		if (xyGeorefOk() && !window.confirm(pc.lpn_mapgeo_replace ||
-				'This project already has the world map attached. Replace that georeferencing?')) { return; }
+		// **NO REPLACE-CONFIRMATION ANY MORE, because nothing reaches this with a placement on file**
+		// (2026-09-22). World map, Attach puts a kept placement straight back and calls this only
+		// when there is none; changing a placement is Re-adjust. The confirm and its string
+		// (lpn_mapgeo_replace) went when that made them unreachable.
 		ext = mapgeoExtent();
 		mapgeo = {
 			step: MAPGEO_STEP_WORLD,
@@ -14781,10 +15759,75 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
-	// **THE FIVE WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
-	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
-	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
-	// comes and goes teaches nobody what the feature can do.
+	/**
+	 * **IS THE WORLD MAP ROW USABLE AT ALL?** True for a plain grid (its own wizard places it), a
+	 * geographic project (its coordinates already are the place) and a projected one whose CRS this
+	 * page can transform. False only for the rare projected project whose method proj4 does not
+	 * implement -- there is nowhere to put a tile, so the row is disabled rather than offered dead.
+	 */
+	function worldMapUsable() { return xyMapAttachable() || projectLocatable(); }
+	// **RE-ADJUST AND SCALE ARE A GRID-ONLY QUESTION** (Tom, 2026-09-22: for an EPSG project "Scale
+	// and Re-adjust should be disabled unless there's user demand to expose them"). A geographic or
+	// projected project's coordinates already say exactly where and how big it is -- "we align the
+	// streets with the project, never the project with the streets" -- so there is no placement of
+	// OURS to nudge. Only a grid project's placement is ours to have gotten wrong.
+	function worldMapAdjustable() { return xyMapAttachable(); }
+	// **"ATTACHED" IS ONE RULE FOR EVERY PROJECT KIND: A PLACEMENT EXISTS AND THE MAP IS SHOWING.**
+	// A geographic or projected project always has a placement -- its own coordinates -- and a grid
+	// project has one once the wizard has written `project.georef`. So "attached" is basemapOn(),
+	// which already asks exactly that (basemapChoosable() is "a placement exists"). A grid project
+	// whose placement is KEPT while the map is hidden reads as detached, and that includes an older
+	// file saved with the map hidden (Perry's review, 2026-09-22, point 4).
+	function worldMapAttached() { return basemapOn(); }
+	// A grid project with a placement on file, whether or not the map is showing.
+	function worldMapPlacementKept() { return xyMapAttachable() && xyGeorefOk(); }
+	/**
+	 * **ATTACH, WIDENED PAST THE GRID CASE** (Tom, 2026-09-22, on a project he could not see this row
+	 * on at all: *"georeference xy -- I don't see this work merged... The map menu should have
+	 * parallel Background image and attach world map rows."* And: *"Even an EPSG project should have
+	 * the option to detach and reattach the world map... But when they attach, they don't have to do
+	 * the wizard."*).
+	 *
+	 * **THE WIZARD RUNS ONLY WHEN THERE IS NOTHING TO PUT BACK.** A geographic or projected project's
+	 * coordinates already locate it, and a grid project that was Detached kept its placement, so for
+	 * all of those Attach just shows the map again -- in the style it was last shown in. Changing a
+	 * kept placement is Re-adjust's job once it is showing; Attach does not offer to start over,
+	 * because a second question on the one row that used to be a plain switch is the complication
+	 * Tom's "Detach and attach provide the same functionality" was taking away.
+	 *
+	 * Already attached, it does nothing: the row is greyed then, the way Detach is greyed while
+	 * detached, and this guard is for anything that calls it anyway.
+	 */
+	function worldMapAttach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (worldMapAttached()) { return; }
+		if (xyMapAttachable() && !xyGeorefOk()) { mapgeoStart(); return; }
+		if (!basemapChoosable()) { return; }
+		saveUndoSnapshot();
+		setBasemapOn(true);
+		setNotice(pc.lpn_map_attach_done ||
+			'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+	}
+	/**
+	 * **DETACH HIDES THE MAP AND KEEPS THE PLACEMENT, ON EVERY PROJECT KIND** (Perry's review,
+	 * 2026-09-22, point 3). On a grid project it used to DELETE the georeference with no confirm and
+	 * no undo, so the job the retired Hide-street-map row did -- hide the tiles, keep the placement --
+	 * became impossible there, which made Tom's reason for retiring that row untrue on a grid. Now it
+	 * is one undo step (the undo snapshot already carries `project.basemap`) and Attach puts the same
+	 * placement straight back. No coordinate in the drawing moves either way.
+	 */
+	function worldMapDetach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!worldMapAttached()) { return; }
+		saveUndoSnapshot();
+		setBasemapOn(false);
+		refreshMapStatus();
+		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
+	}
+	// **THE FOUR WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
+	// Built fresh on every open so `disabled` is read from the state of the moment. Attach is dead
+	// while the map is attached and every other row is dead while it is not -- greyed and not
+	// hidden, because a row that comes and goes teaches nobody what the feature can do.
 	//
 	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
 	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
@@ -14793,10 +15836,11 @@ var EngCalcs = EngCalcs || {};
 	// "move it a bit" and a reader looking for "it is the wrong size" each find a row with their own
 	// word on it, and the hint that comes up names the handle they want.
 	function mapgeoRows() {
-		var pc = EngCalcs.pageConfig || {}, has = xyGeorefOk();
+		var pc = EngCalcs.pageConfig || {},
+			has = worldMapAdjustable() && worldMapAttached();
 		return [
 			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
-				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
+				tip: pc.lpn_map_attach_tip, fn: worldMapAttach, disabled: worldMapAttached() },
 			// **ONE ROW, BECAUSE THE TWO OPENED THE IDENTICAL THING** (Tom, 2026-09-19: *"Map
 			// submenus a lie: Yes. I see. Let's replace rows two and three (I like their
 			// behavior; good call) with 'Re-adjust'"*). Move and Scale by picking named two
@@ -14812,7 +15856,8 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'scale', label: pc.lpn_map_attach_scale_from || 'Scale from the current size…',
 				fn: mapgeoScaleFromCurrent, disabled: !has },
 			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Detach',
-				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !has }
+				tip: pc.lpn_map_attach_remove_tip, fn: worldMapDetach,
+				disabled: !worldMapAttached() }
 		];
 	}
 	/**
@@ -14837,7 +15882,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		mapgeo = {
-			step: MAPGEO_STEP_FINE,
+			step: MAPGEO_STEP_WORLD,
 			openId: library ? library.openId : null,
 			prev: {
 				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
@@ -14848,12 +15893,23 @@ var EngCalcs = EngCalcs || {};
 		setMode('select');
 		mapgeoSet(project.georef);
 		refreshMapStatus();
-		// **ONE SENTENCE, BECAUSE THERE IS ONE ROW.** Move and Scale by picking used to name two
-		// HANDLES of the blue rectangle; deleting the rectangle left both rows opening the
-		// identical step 2, and Tom closed the loose end on 2026-09-19 by replacing them with a
-		// single Re-adjust. The `kind` argument went with them -- it distinguished two things that
-		// had stopped being two things.
-		setNotice(pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+		// **RE-ADJUST OPENS AT STEP 1, NOT STEP 2** (Tom, 2026-09-23: *"I am okay changing Re-adjust
+		// to go to Step 1. I think that is kind, and that it solves your valid concern."*).
+		//
+		// **THE CONCERN IT SOLVES: NOTHING COULD REACH STEP 1 A SECOND TIME.** Step 1 is the "where
+		// in the world is this" question and step 2 is the fine placement, so a grid project placed
+		// in the WRONG TOWN had no way back: Detach keeps the placement, Attach puts the same one
+		// back, and Re-adjust could only nudge it from where it already was. The alternative on the
+		// table was a Discard row that threw the placement away and restarted the wizard from the
+		// Gulf of Guinea; he chose this instead, and it is the kinder of the two because nothing is
+		// thrown away -- the reader passes through step 1 and on to step 2, and a reader who only
+		// wanted to nudge simply carries on.
+		//
+		// **SO THE PLACEMENT IS KEPT, WHICH IS WHAT MAKES THIS DIFFERENT FROM mapgeoStart().** That
+		// one overwrites project.georef with the whole world at 0 N 0 E, because a drawing nobody
+		// has placed honestly sits nowhere. Here the existing placement stays and the map opens on
+		// it; Cancel still restores `prev` exactly as before.
+		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.
@@ -14878,7 +15934,7 @@ var EngCalcs = EngCalcs || {};
 		if (answer === null) { return; }
 		f = parseFloat(String(answer).replace(',', '.'));
 		if (!(f > 0) || !isFinite(f)) {
-			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type one number greater than zero.');
+			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
 			return;
 		}
 		ext = mapgeoExtent();
@@ -15000,6 +16056,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+		convasPlaced();
 	}
 	function mapgeoCancel() {
 		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
@@ -15014,6 +16071,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+		convasAbandon();
 	}
 	// ---- the bar ---------------------------------------------------------------------------------
 	function mapgeoBarEl(id) { return document.getElementById(id); }
@@ -15038,7 +16096,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -15057,15 +16115,6 @@ var EngCalcs = EngCalcs || {};
 		b = mapgeoBarEl('lpn_mapgeo_search');
 		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
 		mapgeoWireDial();
-	}
-	function removeMapAttach() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!xyGeorefOk()) { return; }
-		delete project.georef;
-		markEdited();
-		refreshBasemap();
-		saveToStorage();
-		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 
 	// ---- toolbar mode ----
@@ -15670,6 +16719,59 @@ var EngCalcs = EngCalcs || {};
 	// it builds its button; before that (and in a harness that builds no toolbar) there is simply
 	// nothing to repaint.
 	var repaintAreaTool = null;
+	// **THE ZOOM TO FIT / ZOOM WINDOW DOUBLE DUTY'S OWN SHOWN SHAPE** (ROADMAP Task 682; Tom,
+	// 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select area button.
+	// ... The second time you click it, it changes to Zoom Window."). Unlike `selectAreaShape`,
+	// which is a standing PREFERENCE remembered across mode switches, this is a one-shot disclosure:
+	// leaving the tool (`setMode()`'s cancel block) always drops it back to 'fit', because the
+	// default and by far the more common press is Zoom to fit, and Zoom Window is reached by
+	// pressing it a second time rather than by a memory of what was last used.
+	var zoomToolShape = 'fit';   // 'fit' | 'window'
+	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
+	// **R-181 (Tom, 2026-09-23): "the first time you click, it does not change modes... I think
+	// that it should act like Select area. Click twice in a row to get mode change."** This is a
+	// SEPARATE flag from `zoomToolShape` above on purpose (Ida's spec) -- `zoomToolShape` is what
+	// the button currently SHOWS, and R-181 asks that the first press not change what it shows at
+	// all, so the paint decision and the "was the last press this same button, with nothing else
+	// pressed in between" question cannot share one variable. Set true the instant Zoom to fit
+	// fires; cleared on ANY other user action -- a mode change (setMode()'s own reset, kept as a
+	// belt-and-braces second door), OR an ordinary pointerdown/keydown anywhere that is not this
+	// same button (see `wireZoomArmReset()`).
+	//
+	// **THE FIRST SHIP OF THIS ONLY CLEARED IT ON A MODE CHANGE, AND THAT WAS WRONG** (pre-review,
+	// 2026-09-23, confirmed live in Chromium): press Zoom to fit once, click an ordinary map
+	// element to select or deselect it -- which never calls setMode(), since Select mode never
+	// leaves 'select' to look at something in it -- then press the button again, and it jumped
+	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
+	// TWICE IN A ROW", and a click on the map in between is not that.
+	var zoomToolArmed = false;
+	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
+	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
+	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
+	// otherwise leave a closure over a detached element.
+	var zoomToolButton = null;
+	var zoomArmResetWired = false;
+	// **THE ONE DOOR THAT UN-ARMS THE SECOND PRESS ON "ANYTHING ELSE"**, wired ONCE regardless of
+	// how many times wireToolbar() rebuilds the strip -- a second copy would just re-clear a flag
+	// that is already false, which is harmless, but a growing pile of document listeners is not
+	// nothing over a long session. Capture phase, so this runs before the target's own handler
+	// gets a chance to do anything, matching how Escape's own document listener is wired.
+	//
+	// **EXCLUDES THE BUTTON ITSELF** (`zoomToolButton.contains(e.target)`, true for a click landing
+	// on its icon's <svg>/<path> rather than the <button> element), because the button's own
+	// pointerdown fires before its own 'click' -- resetting there would un-arm the very press this
+	// flag exists to remember, one event early.
+	function wireZoomArmReset() {
+		if (zoomArmResetWired) { return; }
+		zoomArmResetWired = true;
+		function onOtherAction(e) {
+			if (!zoomToolArmed) { return; }
+			if (zoomToolButton && (e.target === zoomToolButton || (zoomToolButton.contains && zoomToolButton.contains(e.target)))) { return; }
+			zoomToolArmed = false;
+		}
+		document.addEventListener('pointerdown', onOtherAction, true);
+		document.addEventListener('keydown', onOtherAction, true);
+	}
 	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
 	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
 	// simply nothing to fade.
@@ -15950,6 +17052,13 @@ var EngCalcs = EngCalcs || {};
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
+			// **"Show at all zoom levels", SEARCHABLE AND WRITABLE** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*). No boolean condition exists on this panel yet, so it rides the
+			// numeric ones already here for `sizeMult` -- 1 for ticked, 0 for not, through
+			// findValueOf() below -- rather than inventing a yes/no vocabulary this panel has never
+			// needed before. `equal to 1` finds every note kept on past the threshold.
+			out.push(['allZoom', pc.lpn_field_text_all_zoom || 'Show at all zoom levels', 'Show at all zoom levels']);
 			findOfferCustom(out, d);
 			return out;
 		}
@@ -16049,12 +17158,25 @@ var EngCalcs = EngCalcs || {};
 			['demand', 'lpn_field_base_demand', 'Base demand'],
 			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
+			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
+			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
+			// row and table column that Find had simply never been given a row for.
+			['emitter', 'lpn_field_emitter', 'Emitter coefficient'],
 			// **LAST IN BAND 2, BESIDE THE OTHER THINGS YOU TYPE** (Tom, 2026-09-14). It is an
 			// INPUT -- the concentration a node starts a run holding -- so it belongs here and
 			// not with the results, even though its only reader is a chemical run. The result it
 			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
 			// Tables pane both make.
-			['initQuality', 'lpn_quality_initial', 'Initial quality']
+			['initQuality', 'lpn_quality_initial', 'Initial quality'],
+			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
+			// #4). A tank is the one node type with several scalar inputs of its own; gated to
+			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
+			['level', 'lpn_field_tank_level', 'Water depth'],
+			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
+			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
+			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
+			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
@@ -16068,7 +17190,22 @@ var EngCalcs = EngCalcs || {};
 			['roughness', null, 'Roughness'],
 			['km', 'lpn_field_km_short', 'Minor loss, k'],
 			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
-			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient']
+			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient'],
+			// **ACTIVE/CLOSED, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
+			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
+			// gate is needed below -- the generic test already offers it to every link.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), NOT `lpn_result_status` ("Status")** --
+			// pre-review, Task 708: `lpn_result_status` already names the post-solve/EPS status
+			// the colour ramp and the Labels legend show (`COLOR_LINK_FIELDS`, `linkFieldDefs()`),
+			// a different, run-dependent reading of the same link. Reusing that word here would
+			// put "Status" on two different questions in this one panel.
+			['status', 'lpn_field_closed', 'Closed'],
+			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
+			// below exactly as the pipe reaction pair is gated to a pipe.
+			['speed', 'lpn_field_pump_speed', 'Relative speed'],
+			['energyPrice', 'lpn_energy_price', 'Price of power'],
+			['energyPattern', 'lpn_energy_price_pattern', 'Price pattern']
 		];
 		var RESULT_LINK = [
 			['flow', 'lpn_result_flow', 'Flow'],
@@ -16094,6 +17231,13 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
+				} else if (key === 'emitter') {
+					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
+				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
+					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
 				} else {
 					// Everything else is offered where the Labels list and the colour ramp agree it
 					// exists, which is the same test this function has always applied.
@@ -16295,9 +17439,56 @@ var EngCalcs = EngCalcs || {};
 		// the junction it lumps at. Both are ids, so they take the text conditions and sort in the
 		// reader's own alphabet exactly as an id does. Its description and its tag are already on
 		// this list, being the same two properties a node and a link carry.
+		// **A LINK'S OPEN/CLOSED STATUS AND A TANK'S MIXING MODEL ARE CHOICES, NOT NUMBERS** (Task
+		// 708, gaps #2 and #4). Neither has a colour ramp or a unit; each is one of a short, fixed
+		// set of internal tokens (`open`/`closed`, `MIXED`/`2COMP`/`FIFO`/`LIFO`), stated in
+		// EPANET's own vocabulary rather than translated, exactly as a curve's kind is -- so
+		// `contains` and `equals` are the right questions and there is no numeric reading of
+		// either. A pump's energy price PATTERN is the same shape of thing as a demand pattern
+		// reference: an id, not a quantity.
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
-			prop === 'link' || prop === 'atNode';
+			prop === 'link' || prop === 'atNode' ||
+			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
+	}
+	/**
+	 * **A CHOICE PROPERTY'S CODES AND THEIR TRANSLATED WORDS, IN EXACTLY ONE PLACE** (pre-review
+	 * fix, Task 708). The internal token (`'closed'`, `'MIXED'`) is what is stored, matched and
+	 * saved in a query -- so it stays English and untranslated, the same ruling a curve's kind
+	 * carries -- but nothing on screen should ever show it to a reader or ask a reader to type it.
+	 * Before this, `status` and `mixingModel` were `findPropIsText()` properties with a plain text
+	 * box: a Spanish reader typing "cerrado" found nothing (the stored word is English), and a
+	 * matched row printed the English word back regardless of the page's language.
+	 *
+	 * Returns `null` for every other property -- the caller's signal to fall back to the ordinary
+	 * text or number box -- or `[[code, translated label], ...]`, in the order Find's and Replace's
+	 * `<select>` should list them.
+	 *
+	 * **`mixingModel` READS paneColMixingModel()'S OWN `choices()`, RATHER THAN A SECOND COPY OF
+	 * ITS FOUR WORDS.** The popup, the table and now Find/Replace are one door for what those four
+	 * words are, so a translator (or a future fifth mixing model) changes one function and every
+	 * venue agrees. `status` has no `choices()` of its own to borrow -- its table cell is a
+	 * checkbox, not a picklist -- so its two words are the same ones linkStatusText() already
+	 * prints for a link's status everywhere else on this map (`lpn_result_status_open`/`_closed`).
+	 */
+	function findChoiceDefs(prop) {
+		var pc = EngCalcs.pageConfig || {};
+		if (prop === 'status') {
+			return [['open', pc.lpn_result_status_open || 'Open'],
+				['closed', pc.lpn_result_status_closed || 'Closed']];
+		}
+		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
+		return null;
+	}
+	function findPropIsChoice(prop) { return findChoiceDefs(prop) !== null; }
+	// The translated word for a stored code, or null where `prop` is not a choice property, or the
+	// code is not one of its choices (a document written by an older version, or hand-edited) --
+	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	function findChoiceLabelOf(prop, code) {
+		var defs = findChoiceDefs(prop), i;
+		if (!defs) { return null; }
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === code) { return defs[i][1]; } }
+		return null;
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -16586,6 +17777,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
+		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
@@ -16595,6 +17787,57 @@ var EngCalcs = EngCalcs || {};
 		// carry one rather than every junction in the drawing.
 		if (prop === 'fireFlow') {
 			return cand.group === 'node' ? fireFlowOwn(cand.el) : undefined;
+		}
+		// **THE EMITTER COEFFICIENT CROSSES A UNIT BOUNDARY EFFECTIVE() DOES NOT**, exactly as the
+		// popup and the table read it: it is the one field on this page whose unit is two units
+		// (flow per pressure^gamma), so emitterToDisplay() is the one door, here as everywhere
+		// else (Task 708, gap #3).
+		if (prop === 'emitter') {
+			return cand.group === 'node' ? emitterToDisplay(effective(cand.el, 'emitter')) : undefined;
+		}
+		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
+		// is read through effective() like every other overridable input; the other three are
+		// base-owned geometry, read straight off the node exactly as their table cells do.
+		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
+			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
+			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
+		// default, exactly as the table's own get() answers it.
+		if (prop === 'mixingModel') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? (cand.el.mixingModel || 'MIXED') : undefined;
+		}
+		// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, the same gate the popup and the table
+		// draw the row under (paneColMixingFraction()'s own `plainFor`).
+		if (prop === 'mixingFraction') {
+			return (cand.group === 'node' && cand.el.type === 'tank'
+				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
+				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
+				? cand.el.mixingFraction : undefined;
+		}
+		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
+		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
+		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
+		if (prop === 'status') {
+			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+		}
+		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5). Speed is base-owned (not in
+		// LPN_OVERRIDABLE) and read bare with the same "blank/zero/negative means 1" rule
+		// paneColPumpSpeed() states; the price and its pattern are overridable, read through
+		// effective() like every other input here.
+		if (prop === 'speed') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return (typeof cand.el.speed === 'number' && isFinite(cand.el.speed)) ? cand.el.speed : 1;
+		}
+		if (prop === 'energyPrice') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			var priceVal = effective(cand.el, 'energyPrice');
+			return (typeof priceVal === 'number' && isFinite(priceVal)) ? priceVal : undefined;
+		}
+		if (prop === 'energyPattern') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return effective(cand.el, 'energyPattern') || undefined;
 		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
@@ -16852,12 +18095,20 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number') { return String(v); }
 		return String(+v.toFixed(4));
 	}
-	function findSelect(parent, labelText, options, value, onChange) {
+	// `hideLabel`: the wrapping <label> still carries labelText, so a screen reader still says
+	// what the selector is, but nothing is drawn on screen for it -- for a selector whose question
+	// is answered by a button beside it instead (R-225: "The word 'Table' is not needed").
+	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
-		lab.style.display = 'block';
+		if (hideLabel) {
+			lab.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;' +
+				'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+		} else {
+			lab.style.display = 'block';
+		}
 		options.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -17349,10 +18600,6 @@ var EngCalcs = EngCalcs || {};
 		}), findState.scope, function (v) {
 			findState.scope = v;
 			findNormalize();
-			// The filter's table follows the scope again -- see findFilterTarget(). A scope change
-			// already re-points the property and the condition; leaving the table pinned to the old
-			// scope's tab would be the one control that did not follow.
-			findFilterTable = null;
 			rebuildFindForm(); renderFindResults(null);
 		});
 		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
@@ -17366,13 +18613,54 @@ var EngCalcs = EngCalcs || {};
 		pair.className = 'lpn-find-pair';
 		box.appendChild(pair);
 		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
+			// **THE VALUE CONTROL IS REBUILT FOR THE NEW PROPERTY'S TYPE** (Tom, 2026-09-23, of
+			// Find > Pipes > Shut > equal to > Closed: *"Switching away from this leaves 'closed'
+			// in the Value field."*). Switching TO a choice property already discards a mismatched
+			// value, below -- this is the other direction: a choice property's own stored word is
+			// an EPANET code nobody should have to un-type out of the free-entry box that replaces
+			// the select, so it is cleared rather than carried over.
+			if (wasChoice && !findPropIsChoice(findState.prop)) { findState.value = ''; }
+			// **CHANGING FIND'S PROPERTY PUSHES REPLACE'S "PROPERTY TO CHANGE" TO MATCH** (Tom,
+			// 2026-09-23: *"normally that is what users want, and power users can learn"*), when
+			// the new property is one Replace can write at all. replaceNormalize() only falls back
+			// when the CURRENT Replace property has stopped applying -- it would leave Replace
+			// pointed at a still-valid but now-stale property, which is exactly what this pushes
+			// past.
+			if (replaceSpec(v)) {
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) {
+					replaceState.value = '';
+				}
+				replaceState.prop = v;
+			}
 			rebuildFindForm(); renderFindResults(null);
 		});
 		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
+		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
+		// `status`'s and `mixingModel`'s stored words are English EPANET tokens a reader is never
+		// shown and should never have to type or guess at -- the failure this replaces was a
+		// Spanish reader typing "cerrado" and finding nothing, because the box compared their
+		// typed word against the untranslated code. Only for the two conditions that actually
+		// compare against the property's OWN value: "n highest"/"n lowest" want a COUNT in this
+		// box and "empty" wants nothing at all, so both keep the plain text/number box below.
+		if (findPropIsChoice(findState.prop) && !findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op)) {
+			var choiceDefs = findChoiceDefs(findState.prop);
+			// A value left over from a different property (or from a document saved before this
+			// choice existed) is not one of these codes -- default to the first rather than
+			// leaving the select unable to show ANY option as chosen, which would silently search
+			// on the first one anyway without saying so.
+			if (!choiceDefs.some(function (o) { return o[0] === findState.value; })) {
+				findState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_find_value || 'Value', choiceDefs, findState.value, function (v) {
+				findState.value = v; updateFindQuery(); renderFindResults(null);
+			});
+			return;
+		}
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
 		valLab = document.createElement('label');
@@ -17460,11 +18748,12 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_find_go';
 		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
-		box.appendChild(btn);
-		// **NEXT TO THE FIND BUTTON, which on a 22rem box is the line under it** (Tom, 2026-09-06,
-		// Task 597). One select and one button: the whole of what filtering the tables costs the
-		// panel.
-		buildFilterRow(box);
+		// **ONE ROW: FIND, FILTER IN TABLE, THEN WHICH TABLE** (Tom, 2026-09-23: *"[Find][Filter in
+		// Table][tables_selector]"*). It used to be the Find button on its own line and a second,
+		// separate "Table to filter" row below it -- which read as two things being offered rather
+		// than one ("is this Filter in selected table, or Filter in active table?"). Built as one
+		// row here instead of appended to `box` twice.
+		buildFilterRow(box, btn);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
@@ -17513,15 +18802,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- THE FILTER BUTTON, BESIDE THE FIND BUTTON (ROADMAP Task 597) ---------------------------
 	//
-	// **WHICH TABLE IS DERIVED FROM THE SCOPE UNTIL THE USER SAYS OTHERWISE, and that is where the
-	// clicks are saved.** Somebody searching Pipes almost always wants the Pipes table, so the
-	// selector is already on it and the whole gesture is one press. Picking another one sticks;
-	// changing the scope hands the choice back to the derivation, because a scope change has already
-	// re-pointed the property and the condition for the same reason.
+	// **ONE BUTTON, NO SELECTOR** (Tom, 2026-09-25, of R-197's report that the selector was gone:
+	// *"I think what is simplest and closest to what we have is a simple 'Filter in table' button
+	// ... I think it implies that we filter all tables insofar as we can if 'Everything' is
+	// selected."*). A scope that names one table -- Junction, Pipe, ... -- filters that table
+	// alone, which is where the earlier selector always ended up anyway once it followed the
+	// scope. "Everything", and a typed compound query, name no single table, so the button filters
+	// every table the query can be asked of.
 	//
-	// `null` from the derivation means the scope names no single table -- Everything, and Text,
-	// which has no tab at all because nothing about a text label solves.
-	var findFilterTable = null;
+	// **A TABLE THE QUERY DOES NOT NAME A PROPERTY OF IS LEFT AS IT WAS, NEVER EMPTIED.** "Pressure
+	// above 40" is a fact about nodes; asking it of the Pipes table is not "zero pipes match", it
+	// is a question Pipes cannot answer, and those are different facts. `propAppliesToTable()`
+	// answers through the same menu findPropDefs() already builds for a scope's pull-down -- one
+	// list of "properties that exist here", read both to fill the menu and to test this.
 	function paneTableForScope(scope) {
 		var d = findScopeDef(scope), list = paneTables(), i;
 		if (d.key === 'all' || d.group === 'label') { return null; }
@@ -17530,33 +18823,102 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function findFilterTarget() {
-		return findFilterTable || paneTableForScope(findState.scope) || paneTables()[0].id;
+	// The scope key whose group/type matches this table -- the reverse of paneTableForScope().
+	// Unlike it, this matches Text too (paneTableForScope() answers "does this scope name ONE
+	// table", which Text does not, since Everything also reaches it; this answers "which scope
+	// speaks for this table's properties", which for the Text table is still 'text').
+	function scopeKeyForTable(spec) {
+		var defs = findScopeDefs(), i, d;
+		for (i = 0; i < defs.length; i++) {
+			d = defs[i];
+			if (d.group !== spec.group) { continue; }
+			if (!d.type || d.type === spec.type) { return d.key; }
+		}
+		return null;
+	}
+	function propAppliesToTable(prop, spec) {
+		var key = scopeKeyForTable(spec), save, defs, i;
+		if (!key) { return false; }
+		save = findState.scope;
+		findState.scope = key;
+		defs = findPropDefs();
+		findState.scope = save;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === prop) { return true; } }
+		return false;
+	}
+	// Every property named by a leaf condition, compound or not -- the set `propAppliesToTable()`
+	// tests a table against.
+	function findAstLeafProps(ast, out) {
+		if (!ast) { return out; }
+		if (ast.t === 'cond') { out[ast.prop] = true; return out; }
+		findAstLeafProps(ast.a, out); findAstLeafProps(ast.b, out);
+		return out;
+	}
+	function findQueryProps() {
+		if (findQueryAst) { return findAstLeafProps(findQueryAst, {}); }
+		var out = {};
+		out[findState.prop] = true;
+		return out;
+	}
+	function findQueryAppliesToTable(props, spec) {
+		var p;
+		for (p in props) {
+			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+		}
+		return true;
+	}
+	// One row of the multi-table receipt: "Junctions: 5 of 12".
+	function findFilterRowText(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_find_filter_row || '{table}: {n} of {all}')
+			.split('{table}').join(pc[spec.label] || spec.id)
+			.split('{n}').join(String(paneTableRowsInOrder(spec).length))
+			.split('{all}').join(String(paneTableAllElements(spec).length));
 	}
 	// **THE LINE THAT RUNS IS THE ONE IN THE BOX**, exactly as it is for the Find button: the query
 	// input is the single expression of what this panel selects, whether the controls wrote it or
 	// the user typed it. That is also what makes the filter and the search provably the same
 	// question -- there is one string and one evaluator.
 	function applyTableFilter() {
-		var text = findQueryInput ? findQueryInput.value : findQueryString(),
-			id = findFilterTarget(), spec, run;
+		var pc = EngCalcs.pageConfig || {},
+			text = findQueryInput ? findQueryInput.value : findQueryString(),
+			single = findQueryAst ? null : paneTableForScope(findState.scope),
+			run, props, firstId = null, rows = [];
 		run = findSelectByQuery(text);
 		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
 		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
 		if (!run.ok) { renderFindResults(run.msg); return; }
-		paneSetFilter(id, String(text).trim());
-		openPane(id);
-		spec = paneTableById(id);
-		// The receipt is the table's own banner text, so the panel and the table cannot say two
-		// different things about one filter.
-		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
+		if (single) {
+			paneSetFilter(single, String(text).trim());
+			openPane(single);
+			// The receipt is the table's own banner text, so the panel and the table cannot say two
+			// different things about one filter.
+			renderFindResults(paneFilterNoteText(paneTableById(single), paneTableRowsInOrder(paneTableById(single))));
+			return;
+		}
+		props = findQueryProps();
+		paneTables().forEach(function (spec) {
+			if (!findQueryAppliesToTable(props, spec)) { return; }
+			paneSetFilter(spec.id, String(text).trim());
+			if (!firstId) { firstId = spec.id; }
+			rows.push(findFilterRowText(spec));
+		});
+		if (!firstId) {
+			renderFindResults(pc.lpn_find_filter_none || 'This query doesn\'t apply to any table.');
+			return;
+		}
+		openPane(firstId);
+		renderFindResults(String(pc.lpn_find_filter_summary || 'Filtered by {q}. {rows}.')
+			.split('{q}').join(String(text).trim())
+			.split('{rows}').join(rows.join(', ')));
 	}
-	function buildFilterRow(box) {
+	// **ONE ROW: [Find] [Filter in table]** (Tom, 2026-09-25: a plain button, no selector). `findBtn`
+	// is the Find button built in rebuildFindForm() -- passed in rather than built twice, so there
+	// is exactly one Find button and exactly one place that wires its click.
+	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
 		row.className = 'lpn-find-filter';
-		findSelect(row, pc.lpn_find_filter_table || 'Table to filter',
-			paneTables().map(function (s) { return [s.id, pc[s.label] || s.id]; }),
-			findFilterTarget(), function (v) { findFilterTable = v; });
+		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		btn.id = 'lpn_find_filter_go';
@@ -17565,8 +18927,8 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
+			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
 		box.appendChild(row);
@@ -17631,7 +18993,12 @@ var EngCalcs = EngCalcs || {};
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
 			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
-				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
+				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
+					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
+					// fix, Task 708), not the stored English code -- the second half of the same
+					// failure the value box had: a Spanish reader who somehow matched a closed
+					// pipe must not be shown "closed" back.
+					: (findChoiceLabelOf(findState.prop, val) || findFmt(val))));
 		// **NO LIST OF THE LINKS THAT MEET HERE** (Tom, 2026-08-27, reading his own result rows:
 		// *"The results say 'Connected: nnn, nnn, nnn', and I don't know what that means... I think
 		// that it arose from tunnel vision on the Connected links task. Even though it's useful, I
@@ -17921,9 +19288,14 @@ var EngCalcs = EngCalcs || {};
 			// quantity shown three ways in two units is how two doors come to disagree. Clamped to
 			// the pipe, like the typed one; refused on a customer attached to nothing, because
 			// there is no pipe to be along or off.
+			//
+			// **AND REFUSED ON A CUSTOMER CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25). A station
+			// of 0 or 100 there is not a position along a main a bulk write should be nudging; the
+			// popup and the table both stop offering the same two cells for the same reason
+			// (renderCustomerFields(), paneCustomerCols()).
 			{ key: 'custStation', group: 'customer', field: 'station',
 				label: pc.lpn_field_meter_station || 'Station along the pipe (%)',
-				applies: function (c) { return !!customerLink(c); },
+				applies: function (c) { return !!customerLink(c) && !customerAtNodeEnd(c); },
 				get: function (c) { return customerLink(c) ? customerT(c) * 100 : undefined; },
 				set: function (c, v) {
 					if (!isFinite(v) || !customerLink(c)) { return; }
@@ -17931,7 +19303,7 @@ var EngCalcs = EngCalcs || {};
 				} },
 			{ key: 'custOffset', group: 'customer', field: 'offset',
 				label: pc.lpn_field_meter_offset || 'Offset from the pipe',
-				applies: function (c) { return !!customerLink(c); },
+				applies: function (c) { return !!customerLink(c) && !customerAtNodeEnd(c); },
 				get: function (c) { return customerLink(c) ? customerOffset(c) : undefined; },
 				set: function (c, v) {
 					if (!isFinite(v) || !customerLink(c)) { return; }
@@ -17953,6 +19325,27 @@ var EngCalcs = EngCalcs || {};
 				get: function (c) { return customerCustomValue(c, def); },
 				set: function (c, v) { setCustomerCustomProp(c, def, v); } };   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 		});
+	}
+	// **A TEXT OBJECT'S ONE REPLACE-WRITABLE PROPERTY** (Tom, review-queue R-174, 2026-09-23: *"This
+	// property should appear in multi-properties, Tables, and Find/Replace."*). `id` and `text`
+	// stay out of Replace on purpose (see the comment above replaceExtraSpecs()) -- an id is
+	// unreachable and a note's words are a one-at-a-time popup edit -- but `allZoom` is neither: it
+	// is a plain yes/no, base-write like size and position, on the identical terms `bold` and
+	// `sizeMult` already have in paneTextCols(). No `str`/`text` flag, so replaceValueOf() parses
+	// the value box as a number and `1`/`0` is how the box says "ticked"/"unticked", the same
+	// vocabulary findValueOf() already reads it in above.
+	function labelReplaceSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'allZoom', group: 'label', field: 'allZoom',
+				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
+				applies: function () { return true; },
+				get: function (lb) { return lb.allZoom === true ? 1 : 0; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+				} }
+		];
 	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
 	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
@@ -17988,11 +19381,18 @@ var EngCalcs = EngCalcs || {};
 		if (findQueryAst) { cands = replaceFoundSet(); }
 		else {
 			var d = findScopeDef(findState.scope);
-			if (d.key === 'all' || d.group === 'label') { return []; }
+			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
+			// property here applies to every group at once. **A Text scope is no longer blanket
+			// refused** -- it used to be, because a Text carried nothing writable (its words are a
+			// one-at-a-time popup edit and its id is unreachable, see the comments on both above).
+			// `labelReplaceSpecs()` now gives it one real spec (`allZoom`, R-174), and the filter
+			// below still leaves `text` and `id` out because no spec answers to them.
+			if (d.key === 'all') { return []; }
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
-		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs()).filter(function (s) {
+		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
+			.concat(labelReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
@@ -18000,6 +19400,14 @@ var EngCalcs = EngCalcs || {};
 		var specs = replaceSpecs(), i;
 		for (i = 0; i < specs.length; i++) { if (specs[i].field === field) { return specs[i]; } }
 		return null;
+	}
+	// Whether Replace shows a picklist for this field, the same test buildReplaceForm() makes
+	// before it draws one -- named so a property change can tell whether it is crossing INTO or
+	// OUT OF a choice, without repeating `replaceSpec(field) && replaceSpec(field).choices` at
+	// every call site.
+	function replacePropIsChoice(field) {
+		var s = replaceSpec(field);
+		return !!(s && s.choices);
 	}
 	// **THE PROPERTY BEING SEARCHED IS OFFERED FIRST, when it is writable.** "Find every 6 inch main,
 	// make it 8" is the core case and it names one property twice, so the common job needs no second
@@ -18068,6 +19476,19 @@ var EngCalcs = EngCalcs || {};
 		// it is flagged where it is READ rather than refused here -- Tom's own ruling, and the
 		// reason an empty box still refuses, since erasing a property on 400 assets is a real
 		// action that must not be spelled the same way as leaving a box alone.
+		// **A CHOICE PROPERTY (Task 708): status's open/closed, a tank's mixing model.** The value
+		// box is still plain text -- there is no dropdown here, only the Table pane has one -- so
+		// the typed word is matched case-insensitively against the fixed list of internal EPANET
+		// tokens `spec.choices` names, and normalized to the exact stored spelling. Anything else
+		// is refused exactly as an empty box is: `undefined` here is "type a valid value," not "no
+		// change," so a typo cannot be read as leaving four hundred pipes alone on purpose.
+		if (spec && spec.choices) {
+			var lc = raw.toLowerCase(), ci;
+			for (ci = 0; ci < spec.choices.length; ci++) {
+				if (String(spec.choices[ci]).toLowerCase() === lc) { return spec.choices[ci]; }
+			}
+			return undefined;
+		}
 		if (spec && spec.str) { return raw === '' ? undefined : raw; }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
@@ -18119,7 +19540,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id)
-			: (ref.group === 'customer' ? customerById(ref.id) : linkById(ref.id));
+			: (ref.group === 'customer' ? customerById(ref.id)
+			: (ref.group === 'label' ? labelById(ref.id) : linkById(ref.id)));
 	}
 	// **NOTHING IS WRITTEN UNTIL THE COUNT HAS BEEN SEEN.** A bulk write is the one action on this
 	// page whose blast radius the user cannot see coming -- the matched pipes are spread over a map
@@ -18250,7 +19672,7 @@ var EngCalcs = EngCalcs || {};
 	// action, and a Replace dialog beside a Find dialog would ask for the same three pull-downs
 	// twice. `box` is already in the document, so renderReplace() can find its message div by id.
 	function buildReplaceForm(box) {
-		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg;
+		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg, curSpec, choiceDefs;
 		replaceBox = box;
 		box.textContent = '';
 		replaceNormalize();
@@ -18281,6 +19703,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
+				// Same rule as Find's own Property select: switching AWAY from a choice property
+				// (e.g. Shut) leaves its EPANET code sitting in the free-entry box that replaces
+				// the picklist, so it is cleared here instead of carried over.
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) { replaceState.value = ''; }
 				replaceState.prop = v; replacePending = null;
 				// Rebuilt, not just re-messaged: choosing Elevation is what makes the source select
 				// exist at all, and leaving it behind when the property moves off Elevation would
@@ -18311,6 +19737,29 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(btn);
 			box.appendChild(msg);
 			renderReplace(null);
+			return;
+		}
+		// **A CHOICE PROPERTY GETS THE SAME PICKLIST ON THE WRITE SIDE** (pre-review fix, Task
+		// 708): typing the internal code to REPLACE with is exactly the failure the Find box had,
+		// and a picklist is also how a bulk write refuses a typo outright rather than silently
+		// leaving four hundred pipes unchanged (replaceValueOf()'s `choices` gate still runs
+		// underneath this, so a value this select could never produce is still refused).
+		curSpec = replaceSpec(replaceState.prop);
+		if (curSpec && curSpec.choices) {
+			choiceDefs = findChoiceDefs(replaceState.prop) ||
+				curSpec.choices.map(function (c) { return [c, c]; });
+			if (!choiceDefs.some(function (o) { return o[0] === replaceState.value; })) {
+				replaceState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_replace_value || 'New value', choiceDefs, replaceState.value, function (v) {
+				replaceState.value = v; replacePending = null; renderReplace(null);
+			});
+			btn = document.createElement('button');
+			btn.type = 'button';
+			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
+			btn.addEventListener('click', runReplacePreview);
+			box.appendChild(btn);
+			box.appendChild(msg);
 			return;
 		}
 		valWrap = document.createElement('div');
@@ -18587,11 +20036,36 @@ var EngCalcs = EngCalcs || {};
 	// declaration, so there is no per-type tab code that could disagree with the per-type columns.
 	// A rebuild on entry, because the tab may have been away for a whole editing session; a refill
 	// afterwards, because renderPaneTable() decides that for itself.
+	// **BUILT ONCE, ON DEMAND, AND THE DECLARATION HAS TO SIT ABOVE paneTabs** -- the column getters
+	// name functions declared further down the file, so the list cannot be a plain initializer; but
+	// `var paneTablesCache = null;` written down THERE re-ran at load AFTER the paneTabs block below
+	// had already filled it, which is the ordinary `var` hoisting rule and looks like nothing at
+	// all. The page then held TWO sets of six specs: the tab strip rendered, sorted and selected on
+	// the first set, while everything reaching a table by id -- the filter, the multi-properties
+	// box, and activePaneTableSpec(), which is what the Print button reads -- got the second, whose
+	// `sort` was permanently the default and whose `cells` and `sel` were permanently null. So the
+	// paper came out in id order however the reader had sorted the screen, which is the one
+	// user-visible half of it. Found while making undo reach the tables (Task 689); the harness
+	// asserts the two doors return the same object, because nothing on screen can say they do not.
+	var paneTablesCache = null;
+	function paneTables() {
+		if (!paneTablesCache) { paneTablesCache = buildPaneTables(); }
+		return paneTablesCache;
+	}
 	var paneTabs = [];
 	paneTables().forEach(function (spec) {
 		paneTabs.push({
 			id: spec.id, panel: spec.panel, label: spec.label, tip: 'lpn_pane_tab_tip',
-			show: function () { paneTableReset(spec); renderPaneTable(spec); },
+			// **SHOWING A TABLE RE-SORTS IT AND REFILLS IT; IT DOES NOT REBUILD IT** (Tom,
+			// 2026-09-21, R-111: *"Switching to Junctions the first time and some subsequent times
+			// delayed about 3 seconds or more. This is the worst issue I found."*). show() used to
+			// clear the signature as well as the order, so EVERY tab click threw away a table of
+			// ~1,300 live cells and built it again from nothing -- and a hidden panel keeps its
+			// DOM, so there was nothing to rebuild. Forgetting the order alone keeps "a sort is
+			// re-applied when you come back" exactly as it was: if the fresh order differs, the
+			// signature differs and renderPaneTable() rebuilds by itself; if it does not, the
+			// cells are refilled in place. See paneTableSignature() for what else forces one.
+			show: function () { spec.orderIds = null; renderPaneTable(spec); },
 			refresh: function () { renderPaneTable(spec); }
 		});
 	});
@@ -18787,6 +20261,12 @@ var EngCalcs = EngCalcs || {};
 		paneState.tab = now.id;
 		applyPaneLayout();
 		if (paneState.open && now.show) { now.show(); }
+		// **AND THE KEYBOARD LANDS IN THE TABLE, NOT ON THE TAB** (Tom, 2026-09-21, R-113:
+		// *"Switching tables (tabs) leaves the tab selected instead of the currently highlighted
+		// cell."*). A click on a tab focuses the tab button, and the table's own key handler never
+		// hears an arrow pressed there. Only here, on the tab strip's own gesture: a table shown by a
+		// solve, a project arriving or a menu row must not steal the caret from whatever has it.
+		if (paneState.open && paneTableById(now.id)) { paneFocusActiveCell(paneTableById(now.id)); }
 		savePaneState();
 	}
 	// **OPEN, NOT TOGGLE**, exactly like the Find box: a menu row that names a tab shows that tab.
@@ -19618,27 +21098,14 @@ var EngCalcs = EngCalcs || {};
 
 		// ---- WHAT IS TRUE OF NODE LABELS AND LINK LABELS ALIKE ----------------------------------
 		//
-		// **THEMATIC MAP STANDS UNDER "Node and link"** (Tom, 2026-08-19: "Move Thematic map to the
-		// Node and link section"). It hides EVERY label so that only the colours are left, which is
-		// as true of a node's label as of a link's -- filed inside either colouring group it read as
-		// belonging to that one kind of element, which is the same misreading the high/low mark and
-		// the separator were moved out of.
-		//
-		// **STILL A MODE, NOT A DEFAULT** (Task 327): it suppresses the labels and does not touch
-		// labelSettings, so switching it off brings the user's own choices back untouched -- which is
-		// what the tip promises, and why the tip travels with the row rather than staying behind.
-		// Moving where a control is DRAWN changes nothing about what it does.
-		var them = document.createElement('input');
-		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
-		them.addEventListener('change', function () {
-			// renderLabelsLegend() too: the labels key is hidden in thematic mode (Tom, 2026-08-20),
-			// so the checkbox that turns the mode on is one of the two things that change whether it
-			// is on screen. Without this the key stays until the next solve repaints it.
-			settings.colorThematic = them.checked; refreshValueColors(); renderLabelsLegend();
-			saveToStorage(); syncColorControls();
-		});
-		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map (colors only)', them,
-			pc.lpn_settings_color_thematic_tip);
+		// **"Thematic map (colors only)" IS RETIRED** (Tom, 2026-09-23: *"I noticed that we have a
+		// tip saying that 0 is never for Customer labels. Should we do the same for all labels and
+		// use that to replace the 'Thematic map, no labels' setting?"*). Everything the checkbox did
+		// -- labels off, the user's own Text stays, label choices are kept, the legend hides --
+		// now follows from the labeling threshold (below, in Map display) being typed as 0. A row
+		// that only duplicated a state the threshold already reaches is one fewer thing to explain.
+		// See applyLabelVisibility() and renderLabelsLegend() for where the 0 case is read, and the
+		// migration in applySaved() for a project that still carries the old flag.
 
 		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
 		//
@@ -19724,8 +21191,36 @@ var EngCalcs = EngCalcs || {};
 	// re-order Junctions under the hand of somebody typing in them. Each keeps its own SCROLL
 	// position too, and that one costs no code: a scroll offset belongs to the element that
 	// scrolls, and there are six panel divs.
+	/**
+	 * **THE ID IS EDITABLE HERE BECAUSE IT IS EDITABLE IN PROPERTIES** (Tom, 2026-09-19: *"the ID is
+	 * not editable, though it's editable in properties. Can you fix that?"*). One property with two
+	 * editors that disagree about whether it can be changed is the shape this page has already been
+	 * bitten by; so this goes through `applyNodeRename()` / `applyLinkRename()`, which is the SAME
+	 * door the popup's own `idField()` uses and the same one the bulk prefix rename uses. A rename
+	 * chases six indexes, every scenario override, every Text anchor, every meter and the sentence
+	 * of every control -- writing a second one of those is how one of the six gets forgotten.
+	 *
+	 * **ONLY A NODE OR A LINK.** A Text's id and a meter's id have no user-facing meaning and their
+	 * popups deliberately offer no rename either, so `plainFor` keeps those rows reading as plain
+	 * identity cells -- the table matching Properties in both directions rather than only the one
+	 * he noticed.
+	 */
 	function paneColId() {
-		return { key: 'id', label: 'lpn_field_id', get: function (el) { return el.id; } };
+		return { key: 'id', label: 'lpn_field_id', str: true, reread: true, em: 5,
+			get: function (el) { return el.id; },
+			plainFor: function (el) { var g = elGroup(el); return g !== 'node' && g !== 'link'; },
+			set: function (el, v) {
+				var newId = String(v === undefined || v === null ? '' : v).trim(),
+					group = elGroup(el), ok;
+				if (newId === el.id) { return; }
+				// **REFUSED OUT LOUD, IN THE POPUP'S OWN WORDS.** validateNewId() is the popup's
+				// rule and its message; `reread` above then puts the old id back in the box, so a
+				// refused rename leaves the document and the cell saying the same thing.
+				ok = validateNewId(newId, el.id);
+				if (ok !== true) { alert(ok); return; }
+				if (group === 'node') { applyNodeRename(el.id, newId); }
+				else { applyLinkRename(el.id, newId); }
+			} };
 	}
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
@@ -19808,10 +21303,17 @@ var EngCalcs = EngCalcs || {};
 	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
 	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
 	// the pipe is how it changes.
+	// **`refTo` IS WHAT MAKES A SUPPORT COLUMN POINT SOMEWHERE ELSE** (Tom, 2026-09-21: *"when we
+	// right-click on a support column (like From and To) that contains an asset, we can Show on map
+	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
+	// the right-click menu's Select in map reads it; every other column has none and the menu falls
+	// back to the row's own element, which is what it has always done.
 	function paneColEnds() {
 		return [
-			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; } },
-			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; } }
+			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; },
+				refTo: function (l) { return { group: 'node', id: l.from }; } },
+			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
+				refTo: function (l) { return { group: 'node', id: l.to }; } }
 		];
 	}
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
@@ -19833,6 +21335,14 @@ var EngCalcs = EngCalcs || {};
 	function paneColLinkResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (l) { return colorLinkValue(l, key); } };
+	}
+	// **A LINK'S STATUS AT THE TIME STEP ON SCREEN, AS A RESULT** (Tom, 2026-09-25: Net3's pump 10
+	// opens at 1:00 by its control, and the Tables kept calling it closed). The Shut column is the
+	// INPUT -- the status the run starts from -- and stays the user's; this one is EPANET's Status
+	// column, the word and not a number, blank until something has been solved.
+	function paneColLinkStatus() {
+		return { key: 'status', label: 'lpn_result_status', result: true, str: true,
+			get: function (l) { return lastSolveResult ? linkStatusText(l) : undefined; } };
 	}
 	function paneColNodeResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit,
@@ -19945,6 +21455,216 @@ var EngCalcs = EngCalcs || {};
 			get: function (el) { return effective(el, 'active') !== false; },
 			set: function (el, v) { setProp(el, 'active', !!v); } };
 	}
+	function paneUnitGradient() { return 'lpn_u_gradient'; }
+	// **THE WORD A CELL SHOWS WHERE THE ROW CANNOT USE THE COLUMN** (Tom, 2026-09-08, about the Text
+	// table's alignments: *"center and middle uneditable look like a bug"*). A tank that mixes
+	// completely has no mixing fraction and a throttle valve has no minor-loss coefficient -- the
+	// property popup simply does not draw those rows, but a table has a cell for every column on
+	// every row, and a stored default sitting in a box nobody can change reads as a control that
+	// has stopped working. So the cell states the RULE, and carries the popup's own sentence as its
+	// tip, exactly as paneTextAttachedWord() does.
+	function paneNotUsedWord() {
+		var pc = EngCalcs.pageConfig || {};
+		return pc.lpn_pane_not_used || 'Not used';
+	}
+	// ---- THE COLUMNS THAT CLOSE THE POPUP/TABLE GAP (ROADMAP Task 690) -------------------------
+	//
+	// Tom, 2026-09-18: *"Fix all that was found."* `dev/scripts/table_column_parity_check.php`
+	// derived 28 properties a person could edit in the property popup and could not see in the
+	// table -- and therefore could not see in the multi-properties box either, because
+	// multiGroups() builds its sections from these same specs. Every one of them is below.
+	//
+	// **EACH IS THE POPUP ROW'S TWIN AND IS BUILT FROM THE SAME THREE PARTS ON PURPOSE**: the same
+	// gate, the same effective() read and the same setProp() write. Two editors of one property
+	// must not have two ideas of what editing it means; `scenario_seam_check.php` holds the write
+	// half of that, and a plain write here where the popup writes plainly is deliberate rather than
+	// an oversight (a mixing model and a pump's speed are not overridable, and setProp() would
+	// write a `_mixingModel` nothing reads).
+	function paneChoicesPatterns() {
+		var pc = EngCalcs.pageConfig || {},
+			out = [['', pc.lpn_library_pattern_none || 'No pattern']];
+		libPatternsRead().forEach(function (p) { out.push([p.id, p.id]); });
+		return out;
+	}
+	// A pattern REFERENCE as a column. The value is the pattern's id, which is what the document
+	// stores and what a pasted spreadsheet would carry; the list is the project's own.
+	function paneColPattern(key, labelKey, get, set, overridable) {
+		var c = { key: key, label: labelKey, em: 5, choices: paneChoicesPatterns,
+			get: get, set: set };
+		if (overridable) { c.prop = key; }
+		return c;
+	}
+	// **WHERE A CHEMICAL ENTERS THE NETWORK** (Task 566): on every kind of node, and only while one
+	// is being tracked, which is the popup's own gate asked rather than stored.
+	function paneColSourceType() {
+		return { key: 'sourceType', label: 'lpn_source_type', em: 5,
+			when: function () { return qualityMode() === 'chemical'; },
+			prop: 'sourceType',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return [['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+					['MASS', pc.lpn_source_type_mass || 'Mass booster'],
+					['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
+					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']];
+			},
+			get: function (n) { return effective(n, 'sourceType') || 'CONCEN'; },
+			set: function (n, v) { setProp(n, 'sourceType', v); } };
+	}
+	function paneColSourceQuality() {
+		return { key: 'sourceQuality', label: 'lpn_source_quality', unitText: concentrationUnitText,
+			em: 3.5, blank: true,
+			when: function () { return qualityMode() === 'chemical'; },
+			prop: 'sourceQuality',
+			get: function (n) { return effective(n, 'sourceQuality'); },
+			set: function (n, v) { setProp(n, 'sourceQuality', v); } };
+	}
+	function paneColSourcePattern() {
+		var c = paneColPattern('sourcePattern', 'lpn_source_pattern',
+			function (n) { return effective(n, 'sourcePattern'); },
+			function (n, v) { setProp(n, 'sourcePattern', v || null); }, true);
+		c.when = function () { return qualityMode() === 'chemical'; };
+		return c;
+	}
+	// **THE EMITTER COEFFICIENT, WHICH IS A JUNCTION'S AND NOT THE NETWORK'S.** It is the one field
+	// on this page whose unit is two units -- flow per pressure^gamma -- so it cannot follow the
+	// store-what-was-typed rule and goes through the same emitterToDisplay()/emitterToStore() pair
+	// the popup uses. The heading therefore builds its own unit text rather than naming a family.
+	function paneColEmitter() {
+		return { key: 'emitter', label: 'lpn_field_emitter', em: 4, blank: true, prop: 'emitter',
+			unitText: function () { return unitLabel('lpn_u_flow') + '/' + unitLabel('lpn_u_pressure'); },
+			get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+			set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } };
+	}
+	// A reservoir's head pattern: EPANET multiplies the stated head by it. A PLAIN write, as in the
+	// popup -- which pattern a source follows is a statement about the system, not a design
+	// variable a scenario asks "what if" about.
+	function paneColHeadPattern() {
+		return paneColPattern('headPattern', 'lpn_field_head_pattern',
+			function (n) { return n.headPattern; },
+			function (n, v) { n.headPattern = v || null; updateNode(n.id); }, false);
+	}
+	function paneColMixingModel() {
+		return { key: 'mixingModel', label: 'lpn_mixing_model', em: 6,
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return [['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
+					['2COMP', pc.lpn_mixing_2comp || 'Two-compartment mixing'],
+					['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
+					['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']];
+			},
+			get: function (n) { return n.mixingModel || 'MIXED'; },
+			set: function (n, v) { n.mixingModel = v; updateNode(n.id); } };
+	}
+	// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, which is why the popup draws this row only for
+	// that model. The cell exists on every row because a column does; on the others it states the
+	// rule instead of showing a number nothing reads.
+	function paneColMixingFraction() {
+		return { key: 'mixingFraction', label: 'lpn_mixing_fraction', em: 3.5, blank: true,
+			get: function (n) { return n.mixingFraction; },
+			plainFor: function (n) { return (n.mixingModel || 'MIXED') !== '2COMP'; },
+			plainWord: paneNotUsedWord,
+			plainTip: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return pc.lpn_mixing_fraction_tip;
+			},
+			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
+	}
+	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
+	// whether the scenario contains the link at all, Closed is whether water can pass through the one
+	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
+	function paneColClosed() {
+		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
+			get: function (l) { return effective(l, 'status') === 'closed'; },
+			set: function (l, v) { setProp(l, 'status', v ? 'closed' : 'open'); } };
+	}
+	// The library references. A pipe type states diameter, roughness and more; choosing one goes
+	// through setPipeType(), the same door the popup's chooser uses, because that is what knows how
+	// an element stops holding its own copy of a property the type states.
+	function paneColPipeType() {
+		return { key: 'typeId', label: 'lpn_field_pipetype', em: 6, prop: 'typeId',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_pipetype_none || 'No pipe type selected']];
+				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + t.note) : t.id]); });
+				return out;
+			},
+			get: function (l) { return effective(l, 'typeId') || ''; },
+			set: function (l, v) { setPipeType(l, v || null); } };
+	}
+	function paneColFittings() {
+		return { key: 'fittingsId', label: 'lpn_field_fittings', em: 6, prop: 'fittingsId',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_fittings_none || 'No fittings list selected']];
+				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + f.note) : f.id]); });
+				return out;
+			},
+			get: function (l) { return effective(l, 'fittingsId') || ''; },
+			plainFor: function (l) { return pipeTypeOwns(l, 'fittingsId'); },
+			set: function (l, v) { setProp(l, 'fittingsId', v || null); } };
+	}
+	// A CURVE REFERENCE, never its points (Task 586): a curve is a document object and an element
+	// states one by id. The list is filtered to the kind the element can use, exactly as the
+	// popup's chooser is, so a pump cannot be pointed at a volume curve.
+	function paneColCurveRef(key, kind, labelKey) {
+		return { key: key, label: labelKey, em: 6, prop: key,
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_curve_none || 'No curve selected']];
+				libCurvesRead().forEach(function (c) { if (c.kind === kind) { out.push([c.id, c.id]); } });
+				return out;
+			},
+			get: function (l) { return effective(l, key) || ''; },
+			set: function (l, v) { setProp(l, key, v || null); } };
+	}
+	// **A PUMP DOES HAVE EDITABLE SCALARS AFTER ALL** (Tom, 2026-09-18: *"Make the pump table match
+	// the pump properties; I see nothing special there, and I don't know why you asked."*). The
+	// pumps tab was written as a reading rather than an editor, on the argument that what a pump IS
+	// is its curve; his answer is that a relative speed and a price of power are ordinary numbers
+	// and belong in the table with everything else.
+	//
+	// A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1 here exactly as they do in the popup -- a pump at
+	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
+	// failure to avoid. Turning a pump off has its own column, Closed.
+	function paneColPumpSpeed() {
+		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
+			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+			set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } };
+	}
+	function paneColSpeedPattern() {
+		return paneColPattern('speedPattern', 'lpn_field_speed_pattern',
+			function (l) { return l.speedPattern; },
+			function (l, v) { l.speedPattern = v || null; }, false);
+	}
+	function paneColEnergyPrice() {
+		return { key: 'energyPrice', label: 'lpn_energy_price', em: 3.5, blank: true, prop: 'energyPrice',
+			unitText: function () {
+				var pc = EngCalcs.pageConfig || {}, money = currencyLabel();
+				return (money ? money + '/' : '') + (pc.lpn_energy_kwh || 'kWh');
+			},
+			get: function (l) { return effective(l, 'energyPrice'); },
+			set: function (l, v) { setProp(l, 'energyPrice', v); } };
+	}
+	function paneColEnergyPattern() {
+		return paneColPattern('energyPattern', 'lpn_energy_price_pattern',
+			function (l) { return effective(l, 'energyPattern'); },
+			function (l, v) { setProp(l, 'energyPattern', v || null); }, true);
+	}
+	// **A THROTTLE VALVE'S LOSS IS ITS SETTING ALONE**, which is EPANET's own simplification and
+	// ours: it ignores the [VALVES] minor-loss column for a TCV, so a number typed here would be one
+	// neither engine reads. The popup answers that by not drawing the row; a table answers it by
+	// stating the rule in the cell.
+	function paneColValveK() {
+		return { key: 'km', label: 'lpn_field_km_short', em: 3, prop: 'k',
+			get: function (l) { return effective(l, 'k') || 0; },
+			plainFor: function (l) { return (l.valveType || 'TCV').toUpperCase() === 'TCV'; },
+			plainWord: paneNotUsedWord,
+			plainTip: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return pc.lpn_field_valve_km_tip;
+			},
+			set: function (l, v) { setProp(l, 'k', v); } };
+	}
 	// What a Text object's own popup redraws after any of size, bold, angle or alignment moves:
 	// the element's anchors, its style, then its content, measured width, geometry and visibility
 	// through refreshLabelContent(). One function, so the table, the multi-properties box and the
@@ -20022,6 +21742,11 @@ var EngCalcs = EngCalcs || {};
 			// somebody states one. A guess would be the invisible kind of wrong at a corner where
 			// four mains meet: the customer appears, every number calculates, and the demand is on
 			// the wrong main. Re-read after every write, because the setter may refuse the id.
+			// **BLANK WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25), the same swap
+			// renderCustomerFields() makes: the `atNode` column below names the junction, so this
+			// column stops repeating a pipe id that is, at that point, almost incidental. Still
+			// writable -- typing a pipe id here is exactly the keyboard way of dragging the
+			// connection grip off the node, and setCustomerLink() clears the node fallback itself.
 			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
 				hint: function (c) { return customerLink(c) ? '' : (suggestCustomerLink(c) || ''); },
 				hintTip: function (c) {
@@ -20030,7 +21755,11 @@ var EngCalcs = EngCalcs || {};
 						'The nearest asset is {id}. Type it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
-				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
+				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
+				refTo: function (c) {
+					var l = customerLink(c);
+					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
+				},
 				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
@@ -20038,9 +21767,13 @@ var EngCalcs = EngCalcs || {};
 			// and carries the house with it, setCustomerOffset() moves the house ACROSS. A meter
 			// attached to nothing has no pipe to be along or off, so both cells read empty there and
 			// both setters refuse rather than inventing a position.
+			//
+			// **AND BLANK, LIKE THE LINK CELL BESIDE THEM, WHEN THE CONNECTION IS EXACTLY A NODE**
+			// (Tom, 2026-09-25) -- a station of 0 or 100 is not a reading a table cell should print
+			// as though it were an ordinary position along the main.
 			{ key: 'station', label: 'lpn_field_meter_station', em: 3.5,
 				get: function (c) {
-					return customerLink(c) ? +(customerT(c) * 100).toFixed(2) : '';
+					return (customerLink(c) && !customerAtNodeEnd(c)) ? +(customerT(c) * 100).toFixed(2) : '';
 				},
 				set: function (c, v) {
 					if (!customerLink(c) || !isFinite(v)) { return; }
@@ -20050,7 +21783,7 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'offset', label: 'lpn_field_meter_offset', em: 3.5,
 				unit: function () { return 'lpn_u_length'; },
 				get: function (c) {
-					return customerLink(c) ? +customerOffset(c).toFixed(3) : '';
+					return (customerLink(c) && !customerAtNodeEnd(c)) ? +customerOffset(c).toFixed(3) : '';
 				},
 				set: function (c, v) {
 					if (!isFinite(v)) { return; }
@@ -20121,6 +21854,10 @@ var EngCalcs = EngCalcs || {};
 			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
 			// that says its demand is in no answer. The popup says so in words.
 			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
+				refTo: function (c) {
+					var n = customerNodeId(c);
+					return (n === null || n === undefined) ? null : { group: 'node', id: n };
+				},
 				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
 	}
@@ -20172,6 +21909,20 @@ var EngCalcs = EngCalcs || {};
 					lb.bold = !!v;   // base-write: Base-owned, as in the popup
 					textLabelRelayout(lb.id);
 				} },
+			// **THE POPUP'S OWN "Show at all zoom levels" ROW, RE-KEYED** (Tom, review-queue R-174,
+			// 2026-09-23: *"This property should appear in multi-properties, Tables, and
+			// Find/Replace."*), on the `bold` row's exact pattern -- `bool: true` for the checkbox
+			// cell, and this Table's own list is what feeds the multi-properties box (see
+			// multiGroups()/multiSection() above), so one column earns both venues at once. Off by
+			// default, like the popup's own row; a scenario visibility change is a redraw, not a
+			// re-solve, so applyLabelVisibility() stands in for textLabelRelayout()'s afterPropertyEdit().
+			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2,
+				get: function (lb) { return lb.allZoom === true; },
+				set: function (lb, v) {
+					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					applyLabelVisibility();
+					saveToStorage();
+				} },
 			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
 				get: function (lb) { return textLabelRotation(lb); },
 				set: function (lb, v) {
@@ -20180,13 +21931,6 @@ var EngCalcs = EngCalcs || {};
 					textLabelRelayout(lb.id);
 				} }
 		];
-	}
-	// Built once, on demand, because paneTabs is assembled at load time and these column getters
-	// name functions declared further down the file.
-	var paneTablesCache = null;
-	function paneTables() {
-		if (!paneTablesCache) { paneTablesCache = buildPaneTables(); }
-		return paneTablesCache;
 	}
 	function buildPaneTables() {
 		return [
@@ -20223,9 +21967,11 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'fireFlow', label: 'lpn_ff_required', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 						prop: 'fireFlow', get: function (n) { return fireFlowOwn(n); },
 						set: function (n, v) { setProp(n, 'fireFlow', fireFlowStore(v)); } },
+					paneColEmitter(),
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
@@ -20249,11 +21995,13 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
 						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id, true); } },
+					paneColHeadPattern(),
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
@@ -20290,18 +22038,21 @@ var EngCalcs = EngCalcs || {};
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
 					paneColReaction('tankCoeff', 'lpn_reaction_tank_short', paneReactionPerDay),
+					paneColMixingModel(), paneColMixingFraction(),
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+					paneColPipeType(),
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
@@ -20333,32 +22084,45 @@ var EngCalcs = EngCalcs || {};
 						plainFor: function (l) { return pipeKIsDerived(l); },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					// With the inputs and after them, which is the order this list already follows.
+					paneColFittings(),
 					paneColReaction('bulkCoeff', 'lpn_reaction_bulk_short', paneReactionPerDay),
 					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus(),
 					paneColLinkReactionRate()
 				])
 			},
 			{
 				id: 'pumps', panel: 'lpn_pane_pumps', label: 'lpn_pane_tab_pumps',
 				group: 'link', type: 'pump',
-				// A PUMP HAS NO EDITABLE SCALAR: what it is, is its curve, and a curve is a table of
-				// its own that belongs in the popup. So this tab is a reading of the pumps -- where
-				// they are and what they are doing -- and every cell in it is honest about that.
+				// **THIS TAB USED TO SAY "a pump has no editable scalar" AND TOM STRUCK THAT**
+				// (2026-09-18): *"Make the pump table match the pump properties; I see nothing
+				// special there, and I don't know why you asked."* The old argument was that what a
+				// pump IS, is its curve, and a curve is a document object edited in the Library --
+				// which remains true and is why the two curve columns here are REFERENCES and not
+				// points. It did not follow that the rest was unfit for a table: a relative speed, a
+				// speed pattern, a price of power and its pattern are ordinary numbers and names,
+				// and a person entering forty pumps wants them in rows like everything else.
 				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
 				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
 				// cell and the label beside the symbol cannot disagree.
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
+					paneColPumpSpeed(), paneColSpeedPattern(),
+					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
+					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkStatus()
 				])
 			},
 			{
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
@@ -20371,9 +22135,16 @@ var EngCalcs = EngCalcs || {};
 						get: function (l) { return effective(l, 'setting'); },
 						set: function (l, v) { setProp(l, 'setting', v); } },
 					paneColDiameter(),
+					paneColValveK(),
+					// A GPV states its head loss as a curve; every other valve type states a number,
+					// so the reference is blank on those rows and the chooser offers the same
+					// headloss curves the popup's does.
+					paneColCurveRef('curveId', 'headloss', 'lpn_gpv_curve_source'),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus()
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -20411,6 +22182,9 @@ var EngCalcs = EngCalcs || {};
 			// On the SPEC, because switching tabs is switching data sets: a shared one would
 			// resolve against another table's rows.
 			spec.sel = null;
+			// Which cells currently carry the selection class, by (element id, column key). See
+			// paneSelPaint(): repainting the whole table was 13.3 ms of every arrow key.
+			spec.painted = null;
 			spec.sig = '';
 			spec.orderIds = null;
 			return spec;
@@ -20497,8 +22271,142 @@ var EngCalcs = EngCalcs || {};
 	// table built per mode. paneTableSignature() reads this list too, so the table rebuilds itself
 	// the moment the set changes, and a sort left pointing at a column that has gone falls back to
 	// the id ordering paneTableSorted() already uses for a value nothing carries.
+	// ---- COLUMN WIDTHS AND COLUMN ORDER, WHICH ARE THE READER'S AND NOT THE DOCUMENT'S ----------
+	//
+	// Tom's spreadsheet specification, 2026-09-18, points (d) and (e): *"Each column's width can be
+	// adjusted by clicking on the divider line between column headings"* and *"Columns can be
+	// dragged left and right using their headings."*
+	//
+	// **BOTH ARE WINDOW FURNITURE AND NEITHER GOES IN THE FILE** (CLAUDE.md's Task 584 rule). How
+	// wide a column is, is a fact about the screen somebody is sitting at; which order they like to
+	// read the columns in is a fact about the job they are doing this afternoon. A colleague opening
+	// the project on a laptop must inherit neither, exactly as they must not inherit a 32-inch pane
+	// height. So this is a `localStorage` sibling key that serializeProject() never learns about,
+	// and `lpn_furniture_check.php` holds that.
+	//
+	// **ONE KEY FOR ALL SEVEN TABLES**, shaped `{ <tableId>: { w: {<colKey>: em}, order: [colKey] } }`.
+	// Seven keys would be seven things to declare, seven to migrate and seven to forget.
+	//
+	// **A REMEMBERED ORDER DOES NOT FREEZE THE COLUMN LIST.** Columns appear and disappear with the
+	// document -- a quality column only while a chemical is tracked, one per custom property -- so a
+	// column nobody has dragged is placed AFTER the remembered ones rather than dropped or forced to
+	// the front. A new column therefore shows up, which is the failure that matters; where it shows
+	// up is then one drag away.
+	var LPN_PANECOLS_KEY = 'lpn_panecols';
+	var paneColPrefs = (function () {
+		var raw = null, v;
+		try { raw = localStorage.getItem(LPN_PANECOLS_KEY); } catch (e) { return {}; }
+		if (!raw) { return {}; }
+		try { v = JSON.parse(raw); } catch (e) { return {}; }
+		return (v && typeof v === 'object') ? v : {};
+	}());
+	function paneColPrefFor(specId) {
+		if (!paneColPrefs[specId]) { paneColPrefs[specId] = {}; }
+		return paneColPrefs[specId];
+	}
+	function savePaneColPrefs() {
+		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
+	}
+	// The width a column is drawn at: what the reader dragged it to, else what the spec declares,
+	// else the stylesheet's own 7em fallback. In `em`, like every declared width, so it still
+	// follows the reader's text size.
+	function paneColWidthEm(specId, c) {
+		var w = paneColUserWidth(specId, c);
+		return w || (c.em || 0);
+	}
+	// **HAS THE READER DRAGGED THIS COLUMN?** -- which is a different question from how wide it is,
+	// and the one that decides whether the heading is allowed to break mid-word (Task 690, Tom
+	// 2026-09-19). A column nobody has touched keeps the layout he has already approved: the
+	// heading holds the column open at its longest word, exactly as it always did. A column he has
+	// dragged is HIS width, and the heading wraps to the character to fit inside it, which is what
+	// *"Let selectors and inputs be truncated and headings be wrapped to the character level"*
+	// asks for -- relaxed for the gesture, not for everybody's first look at the table.
+	function paneColUserWidth(specId, c) {
+		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
+		return (typeof w === 'number' && isFinite(w) && w > 0) ? Math.max(w, paneColFloorEm(c)) : 0;
+	}
+	// **NO HEADING WORD IS BROKEN INTO MORE THAN THREE PIECES** (Tom, 2026-09-21: *"some of the
+	// initial column widths are unreasonable. We talked about limiting words to breaking into three
+	// pieces (just an idea), but I see words broken into five pieces of one or two characters
+	// each."*). This SUPERSEDES the one-character floor of 2026-09-19. A dragged column breaks its
+	// heading at the character, so a width stored narrow -- by a drag, or by the defects that used
+	// to store one without a drag -- came back on every visit as a stack of one-letter lines. The
+	// floor is a third of the heading's longest word plus the heading's own padding; it is applied
+	// where a stored width is READ, so a width stored before this rule existed obeys it too, and
+	// nothing needs migrating. Measured with the heading's own font where a canvas exists; a
+	// generous per-character estimate otherwise (a floor that is slightly wide is harmless).
+	var paneWordEmCache = {};
+	function paneLongestWordEm(text) {
+		var words = String(text || '').replace(/[\u25b2\u25bc]/g, '').split(/\s+/), best = 0, key, ctx, host, px, cs;
+		key = words.sort(function (a, b) { return b.length - a.length; }).slice(0, 3).join(' ');
+		if (Object.prototype.hasOwnProperty.call(paneWordEmCache, key)) { return paneWordEmCache[key]; }
+		try {
+			ctx = document.createElement('canvas').getContext('2d');
+			host = document.getElementById('lpn_pane_body') || document.body;
+			cs = window.getComputedStyle(host);
+			px = parseFloat(cs.fontSize) * 0.9;
+			if (ctx && px > 0) {
+				ctx.font = 'bold ' + px + 'px ' + cs.fontFamily;
+				words.slice(0, 3).forEach(function (w) { best = Math.max(best, ctx.measureText(w).width / px); });
+			}
+		} catch (e) { best = 0; }
+		if (!(best > 0)) { best = (words[0] || '').length * 0.62; }
+		paneWordEmCache[key] = best;
+		return best;
+	}
+	function paneColFloorEm(c) {
+		return Math.max(1, Math.ceil((paneLongestWordEm(paneHeadingText(c)) / 3 + 0.55) * 100) / 100);
+	}
+	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
+	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
+	// to nothing would be a column the reader cannot find again; a column dragged very wide is their
+	// business.
+	function paneSetColWidth(spec, key, em) {
+		var pref = paneColPrefFor(spec.id);
+		if (!pref.w) { pref.w = {}; }
+		pref.w[key] = Math.max(paneColFloorEm(paneColByKey(spec, key) || { key: key }), Math.round(em * 100) / 100);
+		savePaneColPrefs();
+		return pref.w[key];
+	}
+	// **AND THERE IS A WAY BACK, BECAUSE A NARROW COLUMN WAS OTHERWISE NARROW FOR EVER** (Tom,
+	// 2026-09-19: *"Some of the columns are now sized too narrow by default. I believe that
+	// Description was a single character long."*). A stored width outlives the session that made
+	// it and nothing in the interface could undo one, so a column squeezed to a character stayed a
+	// character on every later visit and read as the table's own default. FORGETTING the width is
+	// the whole of the reset -- with nothing stored the column is back under the default rule, at
+	// its declared em or its longest heading word, whichever is wider, and the heading stops
+	// breaking mid-word because `lpn-pane-tight` is derived from the same answer.
+	function paneResetColWidth(spec, key) {
+		var pref = paneColPrefs[spec.id];
+		if (!pref || !pref.w || !Object.prototype.hasOwnProperty.call(pref.w, key)) { return false; }
+		delete pref.w[key];
+		savePaneColPrefs();
+		return true;
+	}
+	function paneMoveCol(spec, key, toIndex) {
+		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
+			from = order.indexOf(key), pref;
+		if (from < 0 || toIndex < 0 || toIndex >= order.length || toIndex === from) { return false; }
+		order.splice(from, 1);
+		order.splice(toIndex, 0, key);
+		pref = paneColPrefFor(spec.id);
+		pref.order = order;
+		savePaneColPrefs();
+		paneTableReset(spec);   // the heading order is part of the signature, so this forces a rebuild
+		return true;
+	}
+	function paneApplyColOrder(spec, cols) {
+		var pref = paneColPrefs[spec.id] && paneColPrefs[spec.id].order, pos = {}, tail;
+		if (!pref || !pref.length) { return cols; }
+		pref.forEach(function (k, i) { pos[k] = i; });
+		tail = pref.length;
+		return cols.map(function (c, i) {
+			return { c: c, at: (pos[c.key] === undefined) ? (tail + i) : pos[c.key] };
+		}).sort(function (a, b) { return a.at - b.at; }).map(function (x) { return x.c; });
+	}
 	function paneCols(spec) {
-		return spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec));
+		return paneApplyColOrder(spec,
+			spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec)));
 	}
 	/**
 	 * **THE CUSTOM PROPERTY COLUMNS** (Task 636), appended rather than baked into buildPaneTables():
@@ -20607,7 +22515,7 @@ var EngCalcs = EngCalcs || {};
 		// what a typed cell can be parsed back from; a choice and a text read verbatim.
 		if (c.bool) { return v ? '1' : '0'; }
 		if (!panePresent(v)) { return ''; }
-		if (c.result) { return String(plainRound(v, 2)); }
+		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
 	}
@@ -20644,17 +22552,176 @@ var EngCalcs = EngCalcs || {};
 	//   lpn-pane-col-x  WHICH column it is, so a stylesheet can reach exactly one -- the Pipes table
 	//                   is wider than a phone and two of its columns are narrowed below the
 	//                   breakpoint.
+	// **A SETTABLE TEXT COLUMN IS STILL TEXT.** `c.set` used to mean "numeric" because every
+	// settable column was one -- the id column's own rename (Task 690, 2026-09-19) is what first
+	// made that stop being true, and `c.str` is the flag that already existed to say a column
+	// holds words rather than a quantity: it is what paneCellText()/paneParseCellText() read for
+	// the identical reason two lines away. Without the exclusion, an id like "J123" was right-
+	// aligned and given the numeric cell class it does not belong in, alongside every other typed
+	// text column (a Text object's own words, a tag, an account number).
 	function paneCellClass(c, i) {
 		return 'lpn-pane-col-' + c.key + (i === 0 ? ' lpn-pane-first' : '') +
-			((c.result || c.set) ? ' lpn-pane-num' : '');
+			((c.result || c.set) && !c.str ? ' lpn-pane-num' : '');
 	}
 	// **THE COLUMN OWNS ITS BOX WIDTH, AND SAYS SO IN em** (Tom, 2026-08-23, per column, as
 	// multiples of the 7em every box used to be). It travels as a CUSTOM PROPERTY rather than an
 	// inline `style.width` on purpose: an inline width beats every stylesheet, and the phone widths
 	// in css/engcalcs.css -- which Tom has approved and this must not move -- are a stylesheet.
 	// A column that declares no `em` says nothing at all, and CSS's own fallback is the old 7em.
-	function paneApplyColWidth(input, c) {
-		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
+	// ---- THE TWO HEADING GESTURES -------------------------------------------------------------
+	//
+	// **ONE PAIR OF DOCUMENT LISTENERS PER DRAG, HUNG AND UNHUNG.** A pointer that leaves the table
+	// mid-drag -- which is exactly what happens when somebody drags a column narrow and overshoots
+	// -- never reaches a listener on the table, so the move and the release have to be watched on
+	// the document. They are added when a drag begins and removed when it ends, so there is nothing
+	// standing between drags and nothing to unhook when the table is rebuilt underneath them.
+	//
+	// **THE EM IS COMPUTED FROM THE FONT, NOT ASSUMED TO BE 16 px.** The whole width system on this
+	// page is in `em` so it follows the reader's own text size; measuring a drag in pixels and
+	// dividing by a guess would quietly rescale every column for anybody who has changed it.
+	function paneEmPx(table) {
+		var px = 16, cs;
+		try {
+			cs = window.getComputedStyle && window.getComputedStyle(table || document.body);
+			if (cs && cs.fontSize) { px = parseFloat(cs.fontSize) || 16; }
+		} catch (e) { px = 16; }
+		return px > 0 ? px : 16;
+	}
+	function paneColIndex(spec, key) {
+		var cols = paneCols(spec), i;
+		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return i; } }
+		return -1;
+	}
+	// A live resize writes the <col> and every input in that column, so the drag is seen as it
+	// happens; the preference is stored once, on release, rather than on every mouse move.
+	function paneDrawColWidth(spec, key, em) {
+		var i = paneColIndex(spec, key), id, th;
+		if (i < 0) { return; }
+		if (spec.colGroup && spec.colGroup.children && spec.colGroup.children[i]) {
+			spec.colGroup.children[i].style.width = em + 'em';
+		}
+		// The heading starts breaking at the character the moment the drag begins, not on the next
+		// rebuild -- otherwise the first drag narrower than the longest word appears to do nothing.
+		th = spec.headCells && spec.headCells[key];
+		if (th && th.classList) { th.classList.add('lpn-pane-tight'); }
+		for (id in spec.cells || {}) {
+			if (!Object.prototype.hasOwnProperty.call(spec.cells, id)) { continue; }
+			if (spec.cells[id][key] && spec.cells[id][key].style) {
+				spec.cells[id][key].style.setProperty('--lpn-pane-col-w', em + 'em');
+				if (spec.cells[id][key].tagName === 'SELECT' && spec.cells[id][key].classList) {
+					spec.cells[id][key].classList.add('lpn-pane-dragged');
+				}
+			}
+		}
+	}
+	// **A PRESS THAT NEVER TRAVELS CHANGES NOTHING, AND THAT IS THE WHOLE OF TOM'S "TOO NARROW BY
+	// DEFAULT"** (2026-09-19). Until this threshold existed, `up()` stored a width unconditionally,
+	// so a press and release on the divider -- which is seven pixels of the heading's own trailing
+	// padding, exactly where a hand aiming at a heading to sort it lands -- COMMITTED the column.
+	// Two things then changed at once and neither was asked for: a column declaring no em was
+	// pinned at the 7em fallback whatever it had been laid out at, and every committed column
+	// starts breaking its heading mid-word, because `lpn-pane-tight` is derived from "has a stored
+	// width". One stray click and an untouched column opened narrow, wrapped to the character, for
+	// ever. THE SAME DISCIPLINE THE COLUMN MOVE ALREADY KEEPS: the reorder below commits only once
+	// the pointer has crossed into another heading, for the same reason -- one heading doing two
+	// jobs has to be able to tell them apart. Two pixels, because a hand is not quite still.
+	var PANE_COL_DRAG_SLOP = 2;
+	// **A DRAG STARTS FROM THE WIDTH ON SCREEN, NOT FROM A NUMBER THE COLUMN MAY NOT HAVE** (Tom,
+	// 2026-09-21, R-110: *"Sometimes the column widths are unreasonable. For example,
+	// Pumps.Date installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?);
+	// Pump.Price pattern, width = 3em (due to selector?)"*). The blind spot was exactly the columns
+	// he named: a pull-down and a custom property DECLARE NO WIDTH -- the browser sizes them from
+	// their widest option or their heading -- and the drag took the 7em fallback as where it was
+	// starting from. So the first pixel of any drag on one of them snapped it to 7em plus the
+	// travel, whatever it had been drawn at; and a column that declares an em its heading has
+	// outgrown (a 3.5em figure under a three-word heading) snapped NARROWER than it stood, by the
+	// difference, before the hand had moved. A few drags of that and a column is a character wide,
+	// stored per browser for good. The heading's own rendered width is the one number that is
+	// always what the reader sees; the declared width stays the answer where nothing is laid out.
+	function paneColDrawnEm(spec, c, unit) {
+		var th = spec.headCells && spec.headCells[c.key], w = 0;
+		try { w = (th && th.getBoundingClientRect) ? th.getBoundingClientRect().width : 0; } catch (e) { w = 0; }
+		if (w > 0 && unit > 0) { return Math.round((w / unit) * 100) / 100; }
+		return paneColWidthEm(spec.id, c) || 7;
+	}
+	function paneStartColResize(spec, key, ev) {
+		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
+			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startEm;
+		if (i < 0) { return; }
+		// A grip is not a sort and not a column move: it is only ever a resize.
+		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+		if (ev && ev.preventDefault) { ev.preventDefault(); }
+		table = spec.colGroup && spec.colGroup.parentNode;
+		unit = paneEmPx(table);
+		startEm = paneColDrawnEm(spec, cols[i], unit);
+		function dxOf(e2) {
+			return ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX;
+		}
+		function move(e2) {
+			var dx = dxOf(e2);
+			if (Math.abs(dx) < PANE_COL_DRAG_SLOP) { return; }
+			paneDrawColWidth(spec, key, Math.max(paneColFloorEm(cols[i]), startEm + dx / unit));
+		}
+		function up(e2) {
+			var dx = dxOf(e2);
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+			if (Math.abs(dx) < PANE_COL_DRAG_SLOP) { return; }
+			move(e2);
+			paneSetColWidth(spec, key, Math.max(1, startEm + dx / unit));
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+		return { move: move, up: up };
+	}
+	// **DOUBLE-CLICKING THE DIVIDER PUTS THE COLUMN BACK**, which is the gesture a spreadsheet user
+	// already has in their fingers for exactly this (Excel and Calc both autofit a column on a
+	// double-click of its right divider). It is the only way out of a width somebody regrets: the
+	// preference is stored per browser and survives every reload, so without this a column dragged
+	// to one character is one character for good. It forgets rather than measures -- see
+	// paneResetColWidth() -- so what comes back is the default the table was designed with.
+	function paneResetColOnDouble(spec, key, ev) {
+		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+		if (ev && ev.preventDefault) { ev.preventDefault(); }
+		if (paneResetColWidth(spec, key)) { paneTableReset(spec); renderPaneTable(spec); }
+	}
+	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
+	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
+	// button's own click handler does its job; a press, a travel and a release somewhere else is a
+	// column move and the click that follows is suppressed once.
+	function paneStartColDrag(spec, key, ev) {
+		var over = null;
+		if (ev && ev.button) { return; }
+		function move(e2) {
+			var th = paneThOfEvent(e2 && e2.target);
+			if (th && th._lpnColKey && th._lpnColKey !== key) { over = th._lpnColKey; }
+		}
+		function up() {
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+			if (over === null) { return; }
+			if (paneMoveCol(spec, key, paneColIndex(spec, over))) { renderPaneTable(spec); }
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+		return { move: move, up: up };
+	}
+	function paneThOfEvent(node) {
+		var n = node, guard = 0;
+		while (n && guard++ < 6) {
+			if (n._lpnColKey) { return n; }
+			n = n.parentNode;
+		}
+		return null;
+	}
+	function paneApplyColWidth(input, c, spec) {
+		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
+		if (em) { input.style.setProperty('--lpn-pane-col-w', em + 'em'); }
+		// A pull-down gives up its natural width only in a column the reader has dragged (R-110;
+		// the rule and its reason are in css/engcalcs.css beside `select.lpn-pane-dragged`).
+		if (spec && input.classList && input.tagName === 'SELECT' && paneColUserWidth(spec.id, c)) {
+			input.classList.add('lpn-pane-dragged');
+		}
 	}
 	// The placeholder and its explanation for a column that offers a suggestion, and nothing at all
 	// for one that does not. The tip goes on `title` rather than beside the cell: a table of forty
@@ -20686,10 +22753,33 @@ var EngCalcs = EngCalcs || {};
 	// "showing 12 of 40", and adding a junction that the filter turns away changes the 40 while
 	// leaving every row in place -- so a signature made of the rows alone would leave a stale count
 	// on screen for as long as nothing else moved.
+	//
+	// **AND WHAT KIND OF CELL EACH ONE IS** (R-111). A cell is built as a box, a pull-down or plain
+	// text, and refillPaneTable() can only write a value into the kind it finds -- so a row whose
+	// `plainFor` answer changed (a demand that became a list of categories, a pipe type that now
+	// owns its diameter), or a pull-down whose list of choices changed (a curve added in the
+	// Library), has to be rebuilt. That was always true of a live refill and was covered, on a tab
+	// switch, only by rebuilding everything; now that a switch refills, it is stated here.
 	function paneTableSignature(spec, rows) {
+		var cols = paneCols(spec);
+		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
+		// column where every row ties (Active and Closed before anything is edited, Tag before
+		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
+		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
+		// row-id string is unchanged from the last render, so this fell into the refill branch
+		// below, which repaints cells by id and never touches a header button -- the arrow never
+		// appeared and the click looked like nothing happened. A second click, after some OTHER
+		// column had scrambled the row order, always changed the row-id string and so always
+		// rebuilt; that is why the defect was invisible except as the very first click.
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
-			paneCols(spec).map(paneHeadingText).join('|') + '||' +
-			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length;
+			spec.sort.col + '/' + spec.sort.dir + '||' +
+			cols.map(paneHeadingText).join('|') + '||' +
+			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
+			cols.map(function (c) {
+				if (c.result || !c.set) { return ''; }
+				return (c.choices && !c.bool ? c.choices().map(function (o) { return o[0]; }).join(',') : '') +
+					(c.plainFor ? ':' + rows.map(function (el) { return c.plainFor(el) ? 1 : 0; }).join('') : '');
+			}).join('|');
 	}
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
 	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
@@ -20721,30 +22811,27 @@ var EngCalcs = EngCalcs || {};
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
 				rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
-			table, thead, tr, tbody, note, filterNote;
+			table, thead, tr, tbody, note, filterNote, cg;
 		if (!host) { return; }
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
 		spec.cells = {};
 		spec.tds = {};
+		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
 		// rows with no visible cause is the one way this feature can mislead somebody.
 		filterNote = paneFilterBanner(spec, rows, true);
 		if (filterNote) { host.appendChild(filterNote); }
-		// **SAID ONCE FOR THE TABLE, AS A NOTE ON THE PANEL RATHER THAN A TIP ON THE TAB** (Tom,
-		// 2026-09-08). The Curves library teaches the same workflow the same way (see its
-		// lpn_library_curve_values_tip note): a hover tip on the tab strip is the easiest thing on
-		// this page to miss, and this sentence is the one that tells somebody with a spreadsheet
-		// open what this table is for. It says "rows that already exist" because panePasteAt()
-		// cannot grow the table -- when row creation by paste ships, this is the string to reword.
-		// Shown when the table is empty too, where the limit is exactly what a reader needs to know.
-		note = document.createElement('p');
-		note.className = 'lpn-lib-note';
-		note.textContent = pc.lpn_pane_paste_note || 'This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
-		host.appendChild(note);
+		// **NO STANDING NOTE ABOVE THE TABLE** (Tom, 2026-09-21: *"There is a message about 'rows that
+		// already exist'. When I scroll past the last visible row, that message disappears, and the
+		// headings jump upward. This is startling. The message uses precious head room. Maybe we
+		// should remove it since we are soon working on Declan's request to allow creation by
+		// pasting."*). The paste note went, and its language key with it: a paragraph that
+		// scrolls away above a sticky heading moves that heading the moment it has gone.
 		if (!rows.length) {
 			note = document.createElement('p');
+			note.className = 'lpn-lib-note';
 			// One message for all six: "none of these yet" is true of every tab, and the tab the
 			// reader is standing on already says which these are. **UNDER A FILTER IT WOULD BE
 			// FALSE**, and dangerously so -- the network may be full of pipes and none of them match
@@ -20757,11 +22844,28 @@ var EngCalcs = EngCalcs || {};
 		}
 		table = document.createElement('table');
 		table.className = 'lpn-pane-table';
+		// **A <colgroup> IS HOW A TABLE COLUMN IS GIVEN A WIDTH**, rather than a width on each cell:
+		// one element per column, so a drag rewrites one style instead of four hundred, and the
+		// heading and its cells cannot end up at two different widths. The inputs keep their own
+		// `--lpn-pane-col-w` because that is what sizes the BOX inside the cell.
+		cg = document.createElement('colgroup');
+		paneCols(spec).forEach(function (c) {
+			var col = document.createElement('col'), em = paneColWidthEm(spec.id, c);
+			if (em) { col.style.width = em + 'em'; }
+			cg.appendChild(col);
+		});
+		table.appendChild(cg);
+		spec.colGroup = cg;
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
+		spec.headCells = {};
 		paneCols(spec).forEach(function (c, i) {
-			var th = document.createElement('th'), b = document.createElement('button');
-			th.className = paneCellClass(c, i);
+			var th = document.createElement('th'), b = document.createElement('button'),
+				grip = document.createElement('span');
+			th.className = paneCellClass(c, i) +
+				(paneColUserWidth(spec.id, c) ? ' lpn-pane-tight' : '');
+			th._lpnColKey = c.key;
+			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -20770,7 +22874,29 @@ var EngCalcs = EngCalcs || {};
 				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function () { sortPaneTable(spec, c.key); });
+			// **DRAGGING THE HEADING MOVES THE COLUMN** (Tom's point (e)). It is a mousedown on the
+			// heading rather than a drag handle of its own: the heading IS the handle, which is what
+			// he asked for and what every spreadsheet does. A click that never moves is still a
+			// sort, because the reorder only commits once the pointer has crossed into another
+			// heading -- so the two gestures cannot be confused by a hand that is not quite still.
+			b.addEventListener('mousedown', function (ev) { paneStartColDrag(spec, c.key, ev); });
 			th.appendChild(b);
+			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
+			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
+			// and carries no text, because resizing a column is a pointer gesture with a keyboard
+			// equivalent nobody has asked for and no word that would help a screen reader.
+			// **ITS OWN CLASS, AND THE COLLISION IT ESCAPES IS WORTH KEEPING.** `lpn-pane-grip`
+			// is the BOTTOM PANE's row-resize handle, declared 35 lines earlier in
+			// css/engcalcs.css, and this grip wore it for a week: it inherited that handle's gray
+			// background, its bottom rule and a 3rem-wide `::after` bar, in a box 7px wide. Tom
+			// found all three by eye on 2026-09-19 without being able to name them -- blips on
+			// every separator and a gray line running past the last column.
+			grip.className = 'lpn-pane-colgrip';
+			grip.setAttribute('aria-hidden', 'true');
+			grip.addEventListener('mousedown', function (ev) { paneStartColResize(spec, c.key, ev); });
+			// ...and a double-click on the same divider gives the column its default width back.
+			grip.addEventListener('dblclick', function (ev) { paneResetColOnDouble(spec, c.key, ev); });
+			th.appendChild(grip);
 			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
 			tr.appendChild(th);
 		});
@@ -20802,7 +22928,7 @@ var EngCalcs = EngCalcs || {};
 		renderPaneTable(spec);
 	}
 	function paneTableRow(spec, el) {
-		var tr = document.createElement('tr'), cells = {}, tds = {};
+		var tr = document.createElement('tr'), cells = {}, tds = {}, pc = EngCalcs.pageConfig || {};
 		paneCols(spec).forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
 			td.className = paneCellClass(c, i);
@@ -20813,17 +22939,7 @@ var EngCalcs = EngCalcs || {};
 			td._lpnPaneId = el.id;
 			td._lpnPaneKey = c.key;
 			tds[c.key] = td;
-			if (c.key === 'id') {
-				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
-				// it, the same gesture a Find result row is. Renaming stays in the property popup,
-				// where the clash rules and the undo snapshot already live.
-				btn = document.createElement('button');
-				btn.type = 'button';
-				btn.className = 'lpn-pane-goto';
-				btn.textContent = el.id;
-				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
-				td.appendChild(btn);
-			} else if (paneCellIsPlain(c, el)) {
+			if (paneCellIsPlain(c, el)) {
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
@@ -20858,7 +22974,7 @@ var EngCalcs = EngCalcs || {};
 					});
 					input.value = paneCellText(c, el);
 				}
-				paneApplyColWidth(input, c);
+				paneApplyColWidth(input, c, spec);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
@@ -20890,7 +23006,7 @@ var EngCalcs = EngCalcs || {};
 				// the text, whatever the key handler does or forgets to do. Modelling the mode in
 				// a flag alone would leave the browser still moving a caret underneath it.
 				input.readOnly = true;
-				paneApplyColWidth(input, c);
+				paneApplyColWidth(input, c, spec);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input._lpnCell = { spec: spec, c: c, el: el };
@@ -20913,6 +23029,43 @@ var EngCalcs = EngCalcs || {};
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
+			/**
+			 * **THE ID CELL IS TWO THINGS, AND IT USED TO BE ONE** (Tom, 2026-09-19: *"At column A
+			 * there is a strange highlighting around the ID. And the ID is not editable, though
+			 * it's editable in properties."*). Both halves are here. The VALUE is now an ordinary
+			 * cell built by the branches above -- one door, so the ID is typed, selected, copied
+			 * and pasted exactly as every other column is, and paneColId() carries the rename. The
+			 * way BACK TO THE MAP is this pin, appended AFTER the control on purpose:
+			 * paneCellFocusable() takes the first control in a cell, and the caret has to land in
+			 * the box a person can type in.
+			 *
+			 * **AND IT IS A PIN RATHER THAN THE UNDERLINED ID IT WAS.** The old control was a
+			 * button whose text was the id, underlined at rest and turning #0645ad under the
+			 * pointer -- the browser's own visited-link colour, in the one table that had just
+			 * given that exact blue a different meaning (the current cell). Ida's reading,
+			 * 2026-09-19: a hyperlink promises LEAVING and a table full of them where a table
+			 * normally has none is a false promise; and two meanings sharing one colour in one
+			 * table is a collision whichever of them a reader learns first.
+			 */
+			if (c.key === 'id') {
+				// **THE PIN SITS ON THE ID'S OWN LINE** (Tom, 2026-09-21: *"We have a gratuitous
+				// space waster at ID where the goto map icon (nice unsolicited touch!) is a line
+				// break below the ID number. Put on same line"*). The cell holds two inline boxes
+				// and the column is 5em wide, so the browser wrapped the second one -- doubling the
+				// height of EVERY row in every table to carry an icon. The class is what
+				// css/engcalcs.css hangs `white-space: nowrap` on; a wrapper element would have
+				// been the other fix and is the wrong one, because paneCellFocusable() reads the
+				// cell's own children to find the box the caret goes in.
+				td.className += ' lpn-pane-idcell';
+				btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'lpn-pane-goto ec-help';
+				btn.title = pc.lpn_pane_goto_tip || 'Zoom & select';
+				btn.setAttribute('aria-label', btn.title + ' ' + el.id);
+				if (EngCalcs.iconEl) { btn.appendChild(EngCalcs.iconEl('pin')); }
+				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
+				td.appendChild(btn);
+			}
 			tr.appendChild(td);
 		});
 		spec.cells[el.id] = cells;
@@ -20923,17 +23076,36 @@ var EngCalcs = EngCalcs || {};
 	// map is edited, but the table itself is the same table. **A CELL THE USER IS IN IS LEFT
 	// ALONE** -- overwriting it mid-edit is the classic live-table defect, where half a typed number
 	// is replaced by the old one on the next tick.
+	//
+	// **THIS IS ALSO THE ONE PLACE `_lpnCell.el` IS RE-POINTED, AND UNTIL NOW NOTHING DID THAT**
+	// (Tom, 2026-09-21: *"When I type into any cell after any Undo and press Enter, Tab, or Arrow,
+	// my entry is reverted."*). `paneTableRow()` closes over `el` once, at the moment a cell's
+	// `<input>` is built, and `paneTableSignature()` is ids-and-headings only -- so undo(), which
+	// clones a whole new `doc` with new node/link objects sharing the OLD ids, changes not one
+	// character of the signature and the table takes the cheap refill path instead of a rebuild.
+	// Every input on screen was then still holding the PRE-UNDO object in its closure: a value
+	// typed afterward wrote onto that orphaned object, `c.set()` succeeded, `completeEdit()` ran,
+	// and the cell that a moment later re-read `doc` (the real one, untouched by the edit) put the
+	// old number straight back -- indistinguishable from the entry being reverted. Re-stamping the
+	// current `el` onto every live cell here, on every refill and not only after an undo, is the
+	// one fix that cannot go stale again: it is the same rows/ids refillPaneTable already walks.
 	function refillPaneTable(spec, rows) {
 		rows.forEach(function (el) {
 			var cells = spec.cells[el.id];
 			if (!cells) { return; }
 			paneCols(spec).forEach(function (c) {
-				var target = cells[c.key];
+				var target = cells[c.key], text;
 				if (!target) { return; }
+				if (target._lpnCell) { target._lpnCell.el = el; }
+				// **A CELL IS WRITTEN ONLY WHEN WHAT IT SAYS HAS CHANGED** (R-111). Assigning
+				// `textContent` replaces the text node even when the words are identical, and that
+				// alone marks the cell for layout -- so a refill of a table in which nothing had
+				// moved re-laid-out all ~1,300 cells, on every solve and now on every tab switch.
 				if (paneCellIsPlain(c, el)) {
-					target.textContent = paneCellText(c, el);
+					text = paneCellText(c, el);
+					if (target.textContent !== text) { target.textContent = text; }
 				} else if (c.bool && target.type === 'checkbox') {
-					target.checked = !!c.get(el);
+					if (target.checked !== !!c.get(el)) { target.checked = !!c.get(el); }
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
 					// The suggestion follows the drawing: move the meter and the pipe it would be
 					// served from changes, so a placeholder written once at build time would be
@@ -20943,7 +23115,8 @@ var EngCalcs = EngCalcs || {};
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
 					// refused to refresh it would leave one stale number in a live table.
-					target.value = paneCellText(c, el);
+					text = paneCellText(c, el);
+					if (target.value !== text) { target.value = text; }
 					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
 			});
@@ -21017,28 +23190,99 @@ var EngCalcs = EngCalcs || {};
 			spec.sel.fKey = cols[c].key;
 		}
 	}
+	/**
+	 * **IT TOUCHES THE CELLS THAT CHANGED AND NOTHING ELSE, AND THAT IS WHY THE TABLE IS NOT SLOW.**
+	 *
+	 * Tom, 2026-09-18: *"Editing is very sluggish, even when I turn off auto recalculate."* He had
+	 * already ruled out the solve, which was the obvious answer and the wrong one. MEASURED with
+	 * `dev/lpn-spike/pane-typing-bench.js` on 400 junctions x 13 columns, before any change: an
+	 * ArrowDown cost **17.9 ms**, of which **13.3 ms was this function** -- it wrote a class onto
+	 * every one of the 5,200 `<td>`s to move a highlight of one cell, on every press, and it is
+	 * called from the keydown, the focusin, the mousedown, the mouseover during a drag and the end
+	 * of every render. In a real browser each of those 5,200 writes is a style invalidation, so his
+	 * machine pays more than that bench does, not less.
+	 *
+	 * **THE SET OF PAINTED CELLS IS REMEMBERED BY (element id, column key), never by index.** A
+	 * sort click, a filter edit or a new part re-orders or rebuilds the rows underneath, so an
+	 * index recorded on the last paint would address a different cell on this one -- the same
+	 * reasoning the selection model itself is built on. Clearing what is no longer in the box and
+	 * setting what has newly entered it is then two loops over the SELECTION rather than one loop
+	 * over the table.
+	 *
+	 * A rebuild makes fresh `<td>`s with no class on them, so renderPaneTable() drops the memory
+	 * with the old cells; a stale memory would leave the first paint after a rebuild believing
+	 * cells were already lit.
+	 */
 	function paneSelPaint(spec, rows, cols) {
-		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {};
-		rows.forEach(function (el, r) {
-			cols.forEach(function (c, i) {
-				var td = tds[el.id] && tds[el.id][c.key], on;
-				if (!td) { return; }
-				on = !!box && r >= box.r0 && r <= box.r1 && i >= box.c0 && i <= box.c1;
-				// One class, and the box is a rectangle, so a cell either is in it or is not.
-				if (on) { td.classList.add('lpn-pane-sel'); } else { td.classList.remove('lpn-pane-sel'); }
-			});
-		});
+		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {},
+			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey;
+		if (box) {
+			// **ONE CELL IS NEVER WASHED, AND A WASH ALWAYS MEANS A RANGE** (Tom, 2026-09-19:
+			// *"In Navigate mode, there should be no blue shading, since that's reserved for Select
+			// mode."*). So the picture reads off the SIZE of the box and nothing else: a box of one
+			// cell is somebody moving about, and it wears a border; a box of more than one is
+			// somebody who has selected something, and it wears a wash with the border on top.
+			one = box.r0 === box.r1 && box.c0 === box.c1;
+			// **AND THE BORDER SITS ON THE STARTING CELL, NOT THE ENDING ONE** (Tom, 2026-09-19:
+			// *"In select mode, the current cell should be the starting cell, not the ending cell.
+			// So if I select A1 and B1, then arrow down once, I should be at A2."*). The anchor is
+			// where the selection began; the focus is where it has been dragged to. Painting the
+			// anchor is the visible half of that ruling -- paneHandleKey() moves from it, which is
+			// the half he can act on.
+			curKey = (rows[box.ar] && cols[box.ac])
+				? rows[box.ar].id + '\u0000' + cols[box.ac].key : null;
+			for (r = box.r0; r <= box.r1; r++) {
+				el = rows[r];
+				if (!el) { continue; }
+				for (i = box.c0; i <= box.c1; i++) {
+					if (!cols[i]) { continue; }
+					key = el.id + '\u0000' + cols[i].key;
+					now[key] = (one || key === curKey) ? (one ? 'cur' : 'selcur') : 'sel';
+				}
+			}
+		}
+		// **THE MEMORY REMEMBERS WHICH PICTURE, NOT MERELY THAT THERE WAS ONE.** A cell that was
+		// the current one and is now merely inside the range has not left the box, so a membership
+		// test alone would leave its border behind -- which is the stale highlight this whole
+		// function exists to avoid, one class further in.
+		for (key in was) {
+			if (!Object.prototype.hasOwnProperty.call(was, key) || now[key] === was[key]) { continue; }
+			td = paneTdByPaintKey(tds, key);
+			if (!td) { continue; }
+			td.classList.remove('lpn-pane-sel');
+			td.classList.remove('lpn-pane-cur');
+		}
+		for (key in now) {
+			if (!Object.prototype.hasOwnProperty.call(now, key) || was[key] === now[key]) { continue; }
+			td = paneTdByPaintKey(tds, key);
+			if (!td) { continue; }
+			if (now[key] !== 'cur') { td.classList.add('lpn-pane-sel'); }
+			if (now[key] !== 'sel') { td.classList.add('lpn-pane-cur'); }
+		}
+		spec.painted = now;
+	}
+	function paneTdByPaintKey(tds, key) {
+		var cut = key.indexOf('\u0000'), id = key.slice(0, cut), col = key.slice(cut + 1);
+		return (tds[id] && tds[id][col]) || null;
 	}
 	// The control standing in a cell, or the cell itself where there is none. A result cell and an
 	// identity carry no control at all and are given tabIndex -1 so the caret can still land on
 	// them: End must be able to reach the last column even when it is read-only, exactly as a
 	// spreadsheet's End does not skip a protected cell.
+	// **A `<select>` IS THE CONTROL IN ITS CELL AND WAS NOT ON THIS LIST, WHICH IS TOM'S STUCK
+	// ARROW** (2026-09-21: *"Left and right arrows get stuck at selectors unless I first skip over
+	// them with Ctrl"*). A choice cell holds a `<select>`; this answered the `<td>` instead, and a
+	// `<td>` in that branch is given no tabIndex, so `focus()` on it does nothing at all. The caret
+	// was therefore left on `document.body` -- OUTSIDE the table -- and the next keystroke never
+	// reached the table's own keydown listener, which is the whole of "stuck". Ctrl+arrow escaped
+	// it because paneJumpEdge() runs THROUGH a pull-down (paneCellBlankAt: a choice is never blank)
+	// and lands on a real box, so the focus moved and the listener was live again.
 	function paneCellFocusable(td) {
 		var kids = (td && td.children) || [], i, tag;
 		if (!td) { return null; }
 		for (i = 0; i < kids.length; i++) {
 			tag = kids[i].tagName || (kids[i]._tag && String(kids[i]._tag).toUpperCase());
-			if (tag === 'INPUT' || tag === 'BUTTON') { return kids[i]; }
+			if (tag === 'INPUT' || tag === 'SELECT' || tag === 'BUTTON') { return kids[i]; }
 		}
 		return td;
 	}
@@ -21058,18 +23302,126 @@ var EngCalcs = EngCalcs || {};
 	 * The `_selMoving` flag is what stops our own focus() call reading back through the focusin
 	 * listener and collapsing a Shift-extended selection to one cell.
 	 */
+	// **THE BROWSER'S OWN focus()-SCROLL DOES NOT KNOW ABOUT A STICKY HEADING** (Tom, 2026-09-21:
+	// *"The cursor, with up arrow, ends up under the headings if the table has been scrolled
+	// down. Ctrl+up doesn't help. But Ctrl+down, Ctrl+up fixes the disappearance."*). `.focus()`
+	// asks the browser to scroll the target into the viewport, and it does -- but `thead tr` is
+	// `position: sticky` (Task 690's own fix for the R-058 missing separators), which OVERLAYS the
+	// scrolling body rather than taking space out of it, so the browser's notion of "in view"
+	// counts pixels the heading is actually painted over. A row scrolled to the panel's own top
+	// edge is genuinely visible by the browser's arithmetic and hidden by the heading's, which is
+	// exactly the "Ctrl+Down, Ctrl+Up" workaround: the first jump scrolls far enough that the
+	// second lands the row well clear of the heading rather than flush against it. Measured
+	// directly rather than left to the browser, using the one number the CSS never states as a
+	// constant: the heading row's own rendered height.
+	/**
+	 * **ONE PARADIGM, AND IT IS HIS: A WHOLE CELL AT THE TOP** (Tom, 2026-09-21: *"Spreadsheet
+	 * software chooses a paradigm for where -- near or left/top -- to maintain exactly a whole cell
+	 * when arrowing past the edge of the screen... my vote is whole cell at top."*).
+	 *
+	 * **WE HAD BOTH OPINIONS AT ONCE, WHICH IS WHY IT LOOKED RANDOM.** Going up, the old code
+	 * aligned the cell's TOP flush under the heading; going down, it aligned the cell's BOTTOM
+	 * flush with the panel's floor -- and a bottom-flush scroll leaves whatever fraction of a row
+	 * happens to be left over clipped under the heading. Two rules, so the picture after a Down and
+	 * the picture after an Up were different kinds of picture, which is his (a).
+	 *
+	 * The rule here is ONE invariant, stated once and true whichever way the caret moved: **the
+	 * scroll always comes to rest on a row boundary, so the first row under the heading is always a
+	 * whole row**, and the cell the caret is on is always completely visible. Going down that means
+	 * scrolling the SMALLEST amount that shows the cell and then rounding on DOWN to the next row
+	 * boundary -- never a page, never the top, which is his (b).
+	 *
+	 * **IT SETS scrollTop ABSOLUTELY RATHER THAN NUDGING IT, and that is what kills the jump.**
+	 * `.focus()` has already asked the browser to scroll, and the browser's notion of "in view"
+	 * counts the pixels the sticky heading is painted over (which is the Ctrl+Down/Ctrl+Up
+	 * workaround he found). A relative correction inherits whatever the browser did first; an
+	 * absolute one overrules it, so there is exactly one answer for a given cell and it does not
+	 * depend on which way the caret arrived.
+	 *
+	 * The arithmetic is paneScrollTopFor(), kept separate because it is the part with a right
+	 * answer: this function only measures.
+	 */
+	function paneScrollTopFor(cur, viewH, headH, cellTop, cellBottom, rowTops) {
+		var want, i, best = null;
+		// ABOVE the fold, or clipped by the heading: the cell becomes the first whole row under it.
+		if (cellTop < cur + headH) { return Math.max(0, cellTop - headH); }
+		// Fully visible: nothing moves. A scroll on a key that did not need one is the "disorienting"
+		// half of what he reported.
+		if (cellBottom <= cur + viewH) { return cur; }
+		// BELOW the fold: the least scroll that shows the whole cell, then on DOWN to a row
+		// boundary so the top of the view is a whole row rather than a sliver of one.
+		want = cellBottom - viewH;
+		for (i = 0; i < rowTops.length; i++) {
+			if (rowTops[i] - headH >= want && (best === null || rowTops[i] < best)) { best = rowTops[i]; }
+		}
+		if (best !== null) { want = best - headH; }
+		// A row taller than the band would otherwise be pushed off its own top edge.
+		want = Math.min(want, cellTop - headH);
+		return Math.max(0, want);
+	}
+	function paneScrollCellIntoView(host, cellTd) {
+		var theadEl, theadRow, headH, hostRect, cellRect, cur, viewH, top, bottom, rowTops = [],
+			tbody, i, kids, r;
+		if (!host || !cellTd || !host.getBoundingClientRect || !cellTd.getBoundingClientRect) { return; }
+		theadEl = host.querySelector && host.querySelector('thead');
+		theadRow = theadEl && theadEl.children && theadEl.children[0];
+		headH = (theadRow && theadRow.getBoundingClientRect) ? theadRow.getBoundingClientRect().height : 0;
+		hostRect = host.getBoundingClientRect();
+		cellRect = cellTd.getBoundingClientRect();
+		cur = host.scrollTop || 0;
+		viewH = (typeof host.clientHeight === 'number' && host.clientHeight) ? host.clientHeight : hostRect.height;
+		// Content coordinates: what the panel would measure with scrollTop at 0.
+		top = (cellRect.top - hostRect.top) + cur;
+		bottom = top + cellRect.height;
+		tbody = host.querySelector && host.querySelector('tbody');
+		kids = (tbody && tbody.children) || [];
+		for (i = 0; i < kids.length; i++) {
+			r = kids[i].getBoundingClientRect && kids[i].getBoundingClientRect();
+			if (r) { rowTops.push((r.top - hostRect.top) + cur); }
+		}
+		host.scrollTop = paneScrollTopFor(cur, viewH, headH, top, bottom, rowTops);
+	}
+	// The table's current cell, focused -- the anchor of its selection, which is the cell wearing the
+	// border (see paneSelPaint()), so a Shift-extended range survives the trip untouched. A table
+	// nobody has touched yet gets its first cell, as a spreadsheet opens on A1.
+	function paneFocusActiveCell(spec) {
+		var rows, cols, box;
+		if (!spec || !spec.tds) { return false; }
+		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+		if (!rows.length || !cols.length) { return false; }
+		box = paneSelBox(spec, rows, cols);
+		if (!box) {
+			paneSelSet(spec, rows, cols, 0, 0, false);
+			paneSelPaint(spec, rows, cols);
+			box = paneSelBox(spec, rows, cols);
+		}
+		return box ? paneFocusCell(spec, rows[box.ar].id, cols[box.ac].key) : false;
+	}
 	function paneFocusCell(spec, id, key) {
-		var active = activeElementSafe(), target;
+		var active = activeElementSafe(), target, cellTd;
 		spec._selMoving = true;
 		try {
-			if (active && active.blur && active.tagName === 'INPUT') { active.blur(); }
-			target = paneCellFocusable(spec.tds && spec.tds[id] && spec.tds[id][key]);
+			if (active && active.blur && (active.tagName === 'INPUT' || active.tagName === 'SELECT')) { active.blur(); }
+			cellTd = spec.tds && spec.tds[id] && spec.tds[id][key];
+			target = paneCellFocusable(cellTd);
 			if (!target) { return false; }
-			target.focus();
-			// A cell arrived at by keyboard has its contents SELECTED, which is also what makes
-			// Left and Right behave: the first press collapses the selection the way a text field
-			// should, and only the second one leaves the cell.
-			if (target.select && target.tagName === 'INPUT') { target.select(); }
+			// **THE BROWSER IS ASKED NOT TO SCROLL AT ALL, so there is only ever one scroll**
+			// (Perry's pre-review, 2026-09-21). `.focus()` scrolls the target into view by its own
+			// approximate reckoning -- which is the reckoning that cannot see a sticky heading --
+			// and paneScrollCellIntoView() then sets the right answer absolutely. Both writes land
+			// in one task, so a browser would paint once either way; `preventScroll` removes the
+			// question rather than relying on that. A browser that does not know the option
+			// ignores it and behaves exactly as before.
+			target.focus({ preventScroll: true });
+			paneScrollCellIntoView(document.getElementById(spec.panel), cellTd);
+			// **ARRIVING AT A CELL SELECTS NO CHARACTERS** (Tom, 2026-09-19: *"the appearance is as
+			// Edit mode in that the contents of each cell are selected as I pass through/over/on
+			// it. Instead, a blue border highlight (double-wide inward) should indicate the current
+			// cell."*). It used to call select() here, and the reason given -- that a first Left or
+			// Right should collapse the text selection before leaving the cell -- died with the
+			// rule it served: an arrow key in READY and ENTRY moves a cell and never a caret, so
+			// there is nothing for a collapse to do. What was left was a cell that looked like it
+			// was being edited every time the caret merely passed over it.
 			return true;
 		} finally { spec._selMoving = false; }
 	}
@@ -21079,7 +23431,16 @@ var EngCalcs = EngCalcs || {};
 	// a spreadsheet does on a sparse column -- a second notion of "meaningfully blank" is a
 	// distinction a spreadsheet-literate user has no way to discover.
 	function paneCellBlankAt(rows, cols, r, c) {
-		return paneCellText(cols[c], rows[r]) === '';
+		var col = cols[c];
+		// **A CONTROL THAT HOLDS A STATE IS NEVER BLANK** (Tom, 2026-09-19: *"Ctrl+arrows works,
+		// but stops at selectors. Make it stop only at blanks/ends. Is an empty checkbox a blank?
+		// Let's say no since it's a zero in concept."*). His answer about the checkbox is the rule
+		// for both: an unticked box is a NO, which is a value, and a pull-down showing nothing is
+		// showing the one option that means none -- neither is the empty run of cells Ctrl+Down is
+		// looking for. A yes/no already read as 1 or 0 and was safe; a pull-down read back as its
+		// own empty option and stopped the jump on every row of it, which is what he hit.
+		if (col.bool || col.choices) { return false; }
+		return paneCellText(col, rows[r]) === '';
 	}
 	/**
 	 * Excel's Ctrl+Arrow, which is one rule read from both sides of a gap: from a cell whose
@@ -21101,23 +23462,17 @@ var EngCalcs = EngCalcs || {};
 		if (n >= lim) { n = lim - 1; }
 		return horiz ? { r: r, c: n } : { r: n, c: c };
 	}
-	// **THE FIRST DATA COLUMN IS INDEX 1, NOT THE ID.** Home is a spreadsheet user's most common
-	// keystroke, and the ID cell is a button that pans the map -- putting Home on it would take the
-	// reader somewhere else entirely the first time they tried to type over it. There is no row
-	// header in these tables for it to mean instead.
-	function paneHomeCol(cols) { return Math.min(1, cols.length - 1); }
-	// **THE CARET HAS TO BE AT THE EDGE BEFORE LEFT OR RIGHT LEAVES THE CELL**, or nobody can put
-	// the caret inside `1000` to make it `1500`. A field that refuses to answer is treated as an
-	// edge, which at least still moves. Same rule and same reason as the Curves grid.
-	function paneCaretEdge(input, atEnd) {
-		var st, en, len;
-		if (!input || input.tagName !== 'INPUT') { return true; }
-		len = String(input.value === undefined ? '' : input.value).length;
-		try { st = input.selectionStart; en = input.selectionEnd; } catch (e) { return true; }
-		if (st === null || st === undefined) { return true; }
-		if (st !== en) { return false; }
-		return atEnd ? st >= len : st <= 0;
-	}
+	// **HOME IS COLUMN A, WHICH IS THE ID** (Tom, 2026-09-19: *"Home and Ctrl+Home take me to
+	// column B, not to the ID column A. Fix this."*). It used to answer 1, on the argument that the
+	// ID cell is a button that pans the map and nobody wants Home to take them somewhere else. That
+	// argument confused ARRIVING at a cell with PRESSING it: Home focuses the button, exactly as
+	// End focuses a read-only result, and a focused button does nothing until it is pressed. A
+	// spreadsheet's Home is column A and there is no second candidate for what it could mean.
+	function paneHomeCol(cols) { return 0; }
+	// (paneCaretEdge() lived here and is DELETED, not left unused. It answered "is the caret against
+	// an edge", which was the old rule for letting Left or Right leave a cell being edited; Tom
+	// struck that rule on 2026-09-18 -- an arrow cannot leave EDIT mode at all now -- so the
+	// question no longer has a caller. Reinstating it would be reinstating the behaviour.)
 	/**
 	 * **THE HEADERS COME WITH A WHOLE-TABLE COPY AND WITH NOTHING ELSE.** Selecting B5:D40 in a
 	 * spreadsheet does not silently prepend a heading nobody selected; selecting the whole table
@@ -21146,39 +23501,117 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out.join('\n');
 	}
-	// ---- EDIT MODE, AND THE PASTE (ROADMAP Task 186, Tom 2026-09-07) ---------------------------
+	// ---- FOUR MODES, AND THE PASTE (ROADMAP Task 690; Tom, 2026-09-21, on his own earlier
+	// three-mode spec of 2026-09-18: *"There is another mode, and it is Select. So there are four
+	// modes. Call them what you want: Ready/Navigate, Enter/Entry, Edit, Select."*)
 	//
-	// *"Now that they are a spreadsheet, we will have spreadsheet expectations... Reason says that
-	// we are over the tipping point and we should go all the way."* So the model is the
-	// spreadsheet's own, and the two states are real states rather than a manner of speaking:
+	// He wrote the three-mode specification out after testing, because *"if we want these tables
+	// to act like a spreadsheet, maybe I should make a prioritize spec list of how spreadsheets
+	// act"* -- and the answer was that this page had TWO states where a spreadsheet has THREE. The
+	// middle one was the whole of that difference, and it is what made his Ctrl+Z feel
+	// *"unpredictable"*. Three weeks later he named a fourth: SELECT is a real mode in his own
+	// vocabulary, and the cell-level state that had been carrying that word (readOnly, current,
+	// nothing being typed) is renamed READY here -- Excel's own word for it, and the one
+	// `dev/tables-spreadsheet-modes.md` already had on record as the closer fit. Nothing about
+	// behaviour moved; this is the vocabulary catching up to a distinction he had already drawn.
 	//
-	//   NAVIGATION  the cell is `readOnly`. It has no caret, so an arrow cannot be swallowed by the
-	//               text under any circumstances. Typing a character OVERWRITES; F2 or a
-	//               double-click EDITS; Delete empties.
-	//   EDIT        the cell is writable and behaves as a text box. Left and Right are the caret
-	//               until it reaches an edge; Up, Down, Enter and Tab commit and move; Escape
-	//               abandons what was typed and puts back what the document holds.
+	//   READY    the cell is `readOnly`. Arrows, the mouse, Tab and Enter all move from cell to
+	//            cell and NEVER open an editor. F2 or a double-click opens EDIT. Typing a
+	//            printable character opens ENTRY. Delete empties the cell. Also called NAVIGATE.
 	//
-	// **`readOnly` IS THE MECHANISM AND NOT A DECORATION.** Modelling the mode in a flag alone
-	// would leave the browser moving a caret underneath it, and every arrow key would be a race
-	// between our handler and the caret. A read-only input has no caret to move.
-	function paneInEdit(input) {
-		return !!(input && input.tagName === 'INPUT' && input._lpnCell && input.readOnly === false);
+	//   ENTRY    you are typing INTO the cell but you are not editing it. The first character
+	//            REPLACES what was there and the rest append. **ARROW KEYS MOVE TO THE NEIGHBOURING
+	//            CELL, not within the text you just typed** -- Tom singles out the right arrow, and
+	//            it is the one that matters, because a person typing 400 numbers uses Right to move
+	//            on and a caret that swallowed it would be the defect that ruins the whole table.
+	//            F2 promotes ENTRY to EDIT, which is the spreadsheet's own escape hatch when you
+	//            decide mid-entry that you want to fix a character.
+	//
+	//   EDIT     entered only by F2 or a double-click. Arrows move the CARET and **cannot leave the
+	//            mode at all**; the only ways out are Tab, Enter, Escape, or the mouse landing on
+	//            another cell. That is stricter than what shipped -- Left and Right used to leave
+	//            the cell once the caret reached an edge -- and he asked for the stricter rule by
+	//            name, because an edit that jumps out from under you is unrecoverable typing.
+	//
+	// **`readOnly` IS THE MECHANISM FOR READY AND NOT A DECORATION.** Modelling that mode in a
+	// flag alone would leave the browser moving a caret underneath it, and every arrow key would be
+	// a race between our handler and the caret. A read-only input has no caret to move. ENTRY and
+	// EDIT are both writable, so THOSE two are told apart by a flag -- there is nothing in the DOM
+	// that distinguishes them, because the difference is entirely in what our own handler does with
+	// an arrow key.
+	//
+	// **WHAT Ctrl+Z MEANS FOLLOWS FROM THE MODES RATHER THAN BEING A RULE BESIDE THEM** (Task 689):
+	// the project undo in READY, where there is no caret and nothing is being typed, and the
+	// browser's own text undo in ENTRY and EDIT, where there is a caret and the characters under it
+	// are the user's. One line, and a person can see which they are in.
+	//
+	// **THIS IS THE PER-CELL MODE, ONE OF THREE, AND SELECT IS NOT AMONG THEM** (Task 690, his
+	// 2026-09-21 four-mode ruling). Select is a fact about the RANGE, not about any one cell's own
+	// `readOnly`/caret state -- a range of one cell IS a cell in READY, and a range of more than
+	// one is READY plus a highlighted rectangle. paneFourthMode() below is where the two are put
+	// back together into the label he actually uses.
+	// **A PULL-DOWN IS A CELL TOO, AND SAYING SO IS WHAT UNSTICKS THE ARROW KEYS** (Tom,
+	// 2026-09-21: *"Left and right arrows get stuck at selectors unless I first skip over them
+	// with Ctrl; interesting."*). It used to answer `null` for anything that was not an `<input>`,
+	// which made a choice cell a thing the mode machinery had no word for. A `<select>` has no
+	// `readOnly` property at all, so `undefined !== false` answers READY by itself -- which is the
+	// truth about it: a pull-down is never being typed in, and paneEnterEdit() turns it away on
+	// its own `type !== 'text'` test.
+	function paneCellMode(input) {
+		if (!input || !input._lpnCell) { return null; }
+		if (input.tagName !== 'INPUT' && input.tagName !== 'SELECT') { return null; }
+		if (input.readOnly !== false) { return 'ready'; }
+		return input._lpnEntry ? 'entry' : 'edit';
 	}
+	// **THE FOURTH MODE, WHICH IS TOM'S OWN AND NOT THIS PAGE'S INVENTION** (Task 690, 2026-09-21:
+	// *"There is another mode, and it is Select."*). `dev/tables-spreadsheet-modes.md` had argued
+	// there was no behaviour underneath a split of READY into two, and there still is not -- this
+	// function changes nothing about what the arrow keys or Ctrl+Z do. It exists so a reader asking
+	// "which of his four modes is this" has ONE place that answers, in his own words, rather than
+	// four call sites each re-deriving it.
+	function paneFourthMode(spec, input) {
+		var m = paneCellMode(input), rows, cols, box;
+		if (m !== 'ready') { return m; }
+		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+		box = paneSelBox(spec, rows, cols);
+		if (box && (box.r1 > box.r0 || box.c1 > box.c0)) { return 'select'; }
+		return 'ready';
+	}
+	// Kept as the name the rest of the page already uses for "an editor is open", which is exactly
+	// the question every one of its callers is asking: a refill must not overwrite a cell being
+	// typed in, a paste must not intercept, and Ctrl+Z must leave the keystroke to the browser.
+	// ENTRY and EDIT answer it the same way and only the arrow keys tell them apart.
+	function paneInEdit(input) {
+		var m = paneCellMode(input);
+		return m === 'entry' || m === 'edit';
+	}
+	// `wipe` IS the mode: a wiped cell is ENTRY (a character replaced the contents), a kept one is
+	// EDIT (F2 or a double-click). One argument rather than two, because there has never been a
+	// fourth combination and a second parameter would invite one.
 	function paneEnterEdit(input, wipe) {
 		if (!input || !input._lpnCell || input.type !== 'text') { return false; }
 		input.readOnly = false;
+		input._lpnEntry = !!wipe;
 		// **WHAT THE CELL HELD WHEN EDITING BEGAN**, so Escape has something to put back. Read
 		// here rather than from the document, because the document is where a commit has ALREADY
 		// landed and Escape must undo the typing, not the last commit.
-		input._lpnWas = input.value;
+		if (input._lpnWas === undefined) { input._lpnWas = input.value; }
 		if (wipe) { input.value = ''; }
 		else if (input.select) { input.select(); }
+		return true;
+	}
+	// **F2 IN ENTRY MODE PROMOTES TO EDIT AND KEEPS WHAT HAS BEEN TYPED.** It is not a fresh
+	// paneEnterEdit(): that would re-read `_lpnWas` and select the text, and what the person wants
+	// is the caret where it is with the arrows suddenly meaning the caret.
+	function panePromoteToEdit(input) {
+		if (paneCellMode(input) !== 'entry') { return false; }
+		input._lpnEntry = false;
 		return true;
 	}
 	function paneLeaveEdit(input) {
 		if (!input || !input._lpnCell) { return; }
 		input.readOnly = true;
+		delete input._lpnEntry;
 		delete input._lpnWas;
 	}
 	// Escape. **IT PUTS BACK WHAT WAS THERE AND FIRES NOTHING** -- restoring the text before the
@@ -21203,7 +23636,7 @@ var EngCalcs = EngCalcs || {};
 	// what the document holds rather than writing NaN into a field of the user's, which nothing
 	// downstream could tell from a value they meant.
 	function paneCommitCell(input) {
-		var ctx = input && input._lpnCell, c, el, p;
+		var ctx = input && input._lpnCell, c, el, p, was;
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
@@ -21213,6 +23646,34 @@ var EngCalcs = EngCalcs || {};
 			paneLeaveEdit(input);
 			return false;
 		}
+		/**
+		 * **A TYPED CELL IS AN EDIT LIKE ANY OTHER, AND UNTIL NOW IT TOOK NO SNAPSHOT** (Tom,
+		 * 2026-09-19: *"Ctrl+Z works for mouse copy, but doesn't undo and the undo button doesn't
+		 * undo."*). He is describing one defect from both ends: a PASTE called saveUndoSnapshot()
+		 * and a typed value did not, so Ctrl+Z after a paste worked and Ctrl+Z after typing put
+		 * back whatever the stack happened to be holding from before -- which from the outside is
+		 * indistinguishable from an undo that does nothing, and is worse, because the Undo button
+		 * on the toolbar reads the same empty stack.
+		 *
+		 * **ONLY A REAL CHANGE SNAPSHOTS, and that is not tidiness -- it is what makes ONE press of
+		 * Ctrl+Z enough.** paneCommitCell() runs TWICE for one edit: the key handler commits before
+		 * it moves, and then the move blurs the box, which fires `change`. A second snapshot taken
+		 * after the value had already landed would record the NEW state, so the first Ctrl+Z would
+		 * restore what was already on screen and the user would have to press it again. Compared as
+		 * PARSED values rather than as text, so "42.0" typed over a stored 42 is the no-change it
+		 * looks like.
+		 */
+		was = paneParseCellText(c, paneCellText(c, el));
+		// **ONE CANVAS MEASUREMENT FOR THE WHOLE COMMIT, SNAPSHOT INCLUDED** (Task 690). The
+		// snapshot records the camera, which means it reads the canvas -- and it is taken between
+		// the previous keystroke's drawing writes and this one's, which is the worst possible
+		// moment to ask: **6.7 ms of the 31 ms one committed cell cost on a 92-junction Net3 was
+		// that single read.** Declared out here rather than inside makeUndoSnapshot() so the read
+		// it does and the reads the redraw below does are the SAME one. Depth-counted, so the holds
+		// inside afterPropertyEdit() and updateNode() nest into it for free.
+		beginMapBoxHold();
+		try {
+		if (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
 		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
@@ -21222,6 +23683,7 @@ var EngCalcs = EngCalcs || {};
 		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
 		refreshPopupIfOpen();
+		} finally { endMapBoxHold(); }
 		paneLeaveEdit(input);
 		return true;
 	}
@@ -21303,15 +23765,21 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols), key = e && e.key,
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
 			active = activeElementSafe(), r, c, at;
-		var editing = paneInEdit(active);
+		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
 		// it must work whatever else the key handler would have made of the moment.
 		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
-		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin. It keeps the
-		// value; typing over a cell wipes it, which is Tom's (a) against his (b).
-		if (key === 'F2' && !editing) { return paneEnterEdit(active, false); }
+		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin, from either of the
+		// other two: from READY it opens the editor keeping the value, and from ENTRY it promotes
+		// what is already being typed, which is how a person who started overwriting decides they
+		// only wanted to change a character.
+		if (key === 'F2') {
+			if (mode === 'entry') { return panePromoteToEdit(active); }
+			if (mode === 'ready') { return paneEnterEdit(active, false); }
+			return false;
+		}
 		// **A PRINTABLE CHARACTER OVERWRITES**, which is the spreadsheet's own most-used gesture:
 		// land on a cell, type, move on. The mode is switched here and the keystroke is then left
 		// to the browser, so the character the user pressed is inserted by the same machinery that
@@ -21323,7 +23791,12 @@ var EngCalcs = EngCalcs || {};
 		// **DELETE EMPTIES A CELL IN NAVIGATION MODE.** The map's own Delete listener cannot reach
 		// here -- keyboardIsTyping() turns away any key inside an <input> -- so this is the only
 		// meaning Delete has with the caret in a table, and a spreadsheet user expects exactly one.
-		if (!editing && (key === 'Delete' || key === 'Backspace') && active && active._lpnCell) {
+		// A TEXT box only: a checkbox carries its answer in `checked` and a pull-down can only
+		// hold one of the options it offers, so "empty it" is not a request either of them has a
+		// reading for -- the same argument paneCellBlankAt() already makes about what counts as a
+		// blank. Before pull-downs could hold the caret at all this was unreachable for them.
+		if (!editing && (key === 'Delete' || key === 'Backspace') &&
+				active && active._lpnCell && active.tagName === 'INPUT' && active.type === 'text') {
 			active.value = '';
 			paneCommitCell(active);
 			return true;
@@ -21336,7 +23809,32 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols);
 			if (!box) { return false; }
 		}
-		r = box.fr; c = box.fc;
+		// **THE MOVE STARTS FROM THE ANCHOR, WHICH IS WHERE THE SELECTION BEGAN** (Tom,
+		// 2026-09-19: *"In select mode, the current cell should be the starting cell, not the
+		// ending cell. So if I select A1 and B1, then arrow down once, I should be at A2."*). His
+		// whole copy-down sequence depends on it: select A1 to B1, copy, press Down, paste. Moving
+		// from the FOCUS landed him at B2 and pasted a column across.
+		// A SHIFT-EXTEND STILL MOVES THE FOCUS, because that end is the one being dragged; and for
+		// a single cell the two are the same cell, so nothing else changes.
+		r = ext ? box.fr : box.ar;
+		c = ext ? box.fc : box.ac;
+		// **Ctrl+C IS OURS, AND IT HAS TO BE** (Tom, 2026-09-19: *"Works (and persists) for mouse
+		// select. Doesn't work for keyboard select or Navigate (copy current cell)."*). The `copy`
+		// listener on the table can only answer a copy the BROWSER raises, and a browser raises one
+		// off its own text selection -- which a mouse drag inside one box leaves behind and a
+		// Shift+Arrow never makes at all. Since a cell arrived at by keyboard no longer selects its
+		// characters either (paneFocusCell), there is now no native selection anywhere in this
+		// table and the event would never fire. So the keystroke is read here and the clipboard is
+		// written through libCopyOut(), the same door the Curves library already writes points
+		// with.
+		// **AND ONE CELL IS A COPY.** The listener declines a single cell on the argument that the
+		// browser's own copy of the caret's selection is better; with no selection to copy that
+		// argument is empty, and "copy the cell I am on" is what he asked for by name.
+		// A cell being TYPED IN keeps its own Ctrl+C: the characters under the caret are the user's.
+		if (jump && !editing && (key === 'c' || key === 'C' || key === 'Insert')) {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box));
+			return true;
+		}
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
@@ -21344,17 +23842,26 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 			return true;
 		}
+		// **AN ARROW KEY IN EDIT MODE IS THE CARET AND NOTHING ELSE** (Tom, 2026-09-18: *"You cannot
+		// exit edit mode with the arrow keys. You can only exit with Tab, Enter, or the mouse"*).
+		// It used to leave the cell once the caret reached an edge, which is what the Curves grid
+		// does and what this page copied; he asked for the stricter rule, and he is right that an
+		// edit which jumps out from under you is typing nobody can get back. Home and End are the
+		// caret's too, for the same reason.
+		//
+		// **ENTRY MODE IS THE OPPOSITE AND THAT IS THE WHOLE POINT OF IT**: the arrows commit and
+		// move, so the person typing four hundred numbers types a value, presses Right, and is on
+		// the next cell -- never inside the characters they just typed.
+		if (mode === 'edit' && !jump &&
+			(key.indexOf('Arrow') === 0 || key === 'Up' || key === 'Down' ||
+				key === 'Left' || key === 'Right' || key === 'Home' || key === 'End')) {
+			return false;
+		}
 		if (key === 'ArrowUp' || key === 'Up') { at = jump ? paneJumpEdge(rows, cols, r, c, -1, 0) : { r: r - 1, c: c }; }
 		else if (key === 'ArrowDown' || key === 'Down') { at = jump ? paneJumpEdge(rows, cols, r, c, 1, 0) : { r: r + 1, c: c }; }
 		else if (key === 'ArrowLeft' || key === 'Left') {
-			// **THE CARET RULE APPLIES IN EDIT MODE AND ONLY THERE** (Tom's point 2). While editing,
-			// Left is ordinary text editing until the caret is against the edge, or nobody could
-			// put the caret inside `1000` to make it `1500`. In navigation mode there IS no caret
-			// -- the cell is read-only -- so the arrow simply moves, every time.
-			if (editing && !jump && !ext && !paneCaretEdge(active, false)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, -1) : { r: r, c: c - 1 };
 		} else if (key === 'ArrowRight' || key === 'Right') {
-			if (editing && !jump && !ext && !paneCaretEdge(active, true)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, 1) : { r: r, c: c + 1 };
 		} else if (key === 'Home') { at = jump ? { r: 0, c: paneHomeCol(cols) } : { r: r, c: paneHomeCol(cols) }; }
 		else if (key === 'End') { at = jump ? { r: rows.length - 1, c: cols.length - 1 } : { r: r, c: cols.length - 1 }; }
@@ -21390,6 +23897,11 @@ var EngCalcs = EngCalcs || {};
 		table.addEventListener('focusin', function (e) {
 			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
 			if (!td || spec._selMoving) { return; }
+			// **A RIGHT PRESS INSIDE THE SELECTION HAS ALREADY SAID "LEAVE IT ALONE"** -- see the
+			// mousedown below. A right-click focuses the box under the pointer exactly as a left
+			// one does, so without this the selection would be collapsed here, a tick before the
+			// menu the user opened it for appears over it.
+			if (spec._keepSel) { spec._keepSel = false; return; }
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
 			if (r < 0 || c < 0) { return; }
@@ -21397,16 +23909,94 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 		});
 		table.addEventListener('mousedown', function (e) {
-			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c, box;
 			if (!td) { return; }
+			/**
+			 * **A RIGHT-CLICK INSIDE THE SELECTION LEAVES IT ALONE** (Tom, 2026-09-19:
+			 * *"Right-clicking anywhere in a selection should not perturb the selection. But I see
+			 * it changing the selection to the right-clicked cell."*). It is the press before the
+			 * context menu that carries "copy" -- collapsing the rectangle first means the menu
+			 * offers to copy one cell of the forty he had.
+			 *
+			 * **INSIDE ONLY, and that is the spreadsheet's own rule rather than a shortcut.** A
+			 * right press OUTSIDE the selection moves it, exactly as a left one does; only a press
+			 * on something already selected means "act on this", and a rule that never moved would
+			 * strand somebody whose only pointing device says menu.
+			 *
+			 * Neither is it a drag: a non-left button never starts one, which is the second half of
+			 * what he saw -- the button-state test in mouseover only asks about button 1, so a
+			 * right press that set `dragging` would extend the selection on the next mouse move.
+			 */
+			if (typeof e.button === 'number' && e.button !== 0) {
+				rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+				box = paneSelBox(spec, rows, cols);
+				r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
+				spec._keepSel = !!(box && r >= box.r0 && r <= box.r1 && c >= box.c0 && c <= box.c1);
+				return;
+			}
+			spec._keepSel = false;
+			/**
+			 * **A CELL THAT IS BEING TYPED IN KEEPS ITS OWN MOUSE, AND THAT IS THE HALF R-038's
+			 * FIX FORGOT TO ASK ABOUT** (Perry's pre-review, 2026-09-21, reproduced through the
+			 * real events). The `preventDefault()` below exists to stop a browser arming its own
+			 * drag-selection of the CHARACTERS in a cell nobody is typing in. **Inside a cell that
+			 * IS being typed in, those characters are the user's and the mouse is how they reach
+			 * them**: click in the middle of `1250` to put the caret between the 2 and the 5, or
+			 * drag across `50` to type over it. Preventing the press killed both -- the caret
+			 * stayed wherever Edit mode had left it and only Home, End and the arrows could move
+			 * it, on a page where four hundred numbers get typed at a sitting.
+			 *
+			 * It is the press on THIS cell only. A press on any OTHER cell, while this one is
+			 * being edited, is an ordinary move: it commits what was typed and goes there, with
+			 * the block back on, which is what keeps a drag from cell to cell working.
+			 */
+			var pressed = paneCellFocusable(td);
+			if (pressed && pressed === activeElementSafe() && paneInEdit(pressed)) { return; }
 			dragging = true;
-			if (!e.shiftKey) { return; }   // a plain press is the focusin above; Shift extends
+			/**
+			 * **A PLAIN PRESS MUST STILL PREVENT THE BROWSER'S OWN TEXT SELECTION** (Tom,
+			 * 2026-09-21: *"A selection should highlight cells, not characters. But I see
+			 * characters highlighting as in Entry mode when selecting by mouse."*). The keyboard
+			 * half of R-038 was fixed by dropping a `select()` call in paneFocusCell() -- but a
+			 * MOUSE drag was never that call at all. `readOnly` and CSS `user-select: none` both
+			 * stop a click from PLACING a caret, but neither stops a browser's native
+			 * click-and-drag text selection inside a form control's own value, which every browser
+			 * runs from `mousedown` regardless of `readOnly` or `user-select`. Dragging the pointer
+			 * from a cell to another one crosses out of that <input> before it commits to
+			 * anything, so it read as nothing until Tom stood still enough for the browser to
+			 * highlight a character or two of the cell he pressed on.
+			 *
+			 * **`preventDefault()` HERE STOPS THE SELECTION, AND ALSO STOPS THE BROWSER'S OWN
+			 * FOCUS**, which is why the plain-press branch focuses the cell itself: without it,
+			 * this fix would trade "characters highlight" for "clicking a cell does nothing". A
+			 * Shift+press must NOT move focus this way -- R-036 keeps the border on the cell the
+			 * range STARTED from, and calling focus() on the cell just pressed would drag it there.
+			 */
+			if (!e.shiftKey) {
+				var focusable = pressed;
+				/**
+				 * **A PULL-DOWN AND A CHECKBOX KEEP THE BROWSER'S OWN PRESS.** The
+				 * `preventDefault()` below exists to stop a browser arming its native
+				 * click-and-drag selection of the CHARACTERS inside a text box -- a select has no
+				 * characters to drag over, and preventing its mousedown stops the list from
+				 * opening and stops a checkbox toggling, which would trade R-038 for a control
+				 * that does nothing. The browser's own focus then reaches the focusin listener
+				 * above, which is what makes the press a selection.
+				 */
+				if (focusable && (focusable.tagName === 'SELECT' ||
+						(focusable.tagName === 'INPUT' && focusable.type === 'checkbox'))) {
+					return;
+				}
+				e.preventDefault();
+				if (focusable && focusable.focus) { focusable.focus(); }
+				return;   // a plain press is the focusin above; Shift extends below instead
+			}
+			e.preventDefault();
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
 			if (r < 0 || c < 0) { return; }
 			paneSelSet(spec, rows, cols, r, c, true);
 			paneSelPaint(spec, rows, cols);
-			e.preventDefault();
 		});
 		// **THE BUTTON STATE IS THE ONLY HONEST END OF A DRAG.** A mouseup released outside the
 		// table never reaches a listener on it, and a document-level one would have to be unhooked
@@ -21424,21 +24014,44 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 			e.preventDefault();
 		});
-		table.addEventListener('mouseup', function () { dragging = false; });
-		// **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
-		// obeys every rule about the user's own numbers. Intercepted only when the clipboard holds
-		// a GRID: one cell is ordinary typing and the browser does it better than we would --
-		// libPasteIsGrid()'s own rule, reused rather than restated.
+		// The flag is a one-shot for the focusin that follows the press. Cleared here as well,
+		// because a right press on a browser that does NOT focus the box would otherwise leave it
+		// standing and swallow the NEXT click's selection.
+		table.addEventListener('mouseup', function () { dragging = false; spec._keepSel = false; });
+		/**
+		 * **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
+		 * obeys every rule about the user's own numbers.
+		 *
+		 * **ONE CELL IS PASTED TOO, AND THAT IS TOM'S *"copy across columns does not work"***
+		 * (2026-09-19, re-testing after being told it did). It did not, and the reason is that this
+		 * listener and the `copy` listener below were the same argument and only ONE of them was
+		 * re-decided. Both used to hand a single cell back to the browser, on the ground that the
+		 * browser does its own thing better than we would. The copy half was corrected the same day
+		 * -- a cell arrived at by keyboard selects no characters, so the browser had nothing to copy
+		 * -- and this half kept the argument after the fact underneath it had gone: **a cell that is
+		 * not being typed in is `readOnly`**, which is what makes the arrow keys work at all, and a
+		 * browser paste into a read-only box does NOTHING. No refusal, no banner, no character.
+		 *
+		 * **AND IT IS WHY A HARNESS SAID IT WORKED.** A driven test pastes a BLOCK, which is a grid,
+		 * which was intercepted and did work; the gesture a person actually makes -- copy one cell,
+		 * stand on a cell in another column, paste -- was the one case that fell through. The test
+		 * and the user were doing different things and only the user was right.
+		 *
+		 * panePasteAt() already knows what to do with one cell: it tiles, on Tom's own 2026-09-07
+		 * ruling that *"pasting a single cell or row to multiple cells or rows should fill them
+		 * all"*. So there is nothing here but letting it through.
+		 */
 		table.addEventListener('paste', function (e) {
 			var text, cells;
 			// While a cell is being EDITED, a paste is a text paste into that box and nothing else.
 			// Intercepting there would make it impossible to paste a number into half a value.
+			// This is the line that stays: it is about a caret, not about how many cells there are.
 			if (paneInEdit(activeElementSafe())) { return; }
 			try { text = e.clipboardData && e.clipboardData.getData('text/plain'); }
 			catch (err) { return; }
 			if (!text) { return; }
 			cells = libPasteCells(text);
-			if (!libPasteIsGrid(cells)) { return; }
+			if (!cells.length) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
 			panePasteAt(spec, cells);
 		});
@@ -21446,15 +24059,199 @@ var EngCalcs = EngCalcs || {};
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 				box = paneSelBox(spec, rows, cols), tsv;
 			if (!box) { return; }
-			// ONE CELL IS NOT A RANGE: it is ordinary typing, and the browser's own copy of what
-			// the caret has selected inside the box is better than anything we would write.
-			if (box.r0 === box.r1 && box.c0 === box.c1) { return; }
+			// **ONE CELL IS A RANGE OF ONE, AND IT IS COPIED.** This used to hand a single cell
+			// back to the browser, on the argument that its own copy of the characters the caret
+			// had selected was better than ours. Since a cell arrived at by keyboard selects no
+			// characters at all (paneFocusCell, Tom 2026-09-19), that copy is now empty -- so the
+			// polite deferral became "Ctrl+C on one cell does nothing", which is what he reported.
+			// A cell being TYPED IN is a different matter and is still the browser's: paneInEdit()
+			// below holds that line.
+			if (paneInEdit(activeElementSafe())) { return; }
 			tsv = paneCopyTsv(spec, rows, cols, box);
 			try {
 				e.clipboardData.setData('text/plain', tsv);
 				e.preventDefault();
 			} catch (err) { /* no clipboardData: the browser's own copy stands */ }
 		});
+		// **A RIGHT-CLICK OFFERS THE FOUR THINGS A SPREADSHEET'S OWN MENU DOES** (Tom, 2026-09-21:
+		// *"For a complete spreadsheet experience, right-click should offer Copy, Paste, Select in
+		// map, and Delete."*). The mousedown handler above has already decided, by the time this
+		// fires, whether the press kept the existing range or collapsed it to the cell under the
+		// pointer -- so the menu only has to read paneSelBox() as it stands.
+		table.addEventListener('contextmenu', function (e) {
+			var td = paneTdOfEvent(spec, e.target);
+			if (!td) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			paneOpenContextMenu(spec, e.clientX || 0, e.clientY || 0, td);
+		});
+	}
+	// The open menu, at most one at a time -- a second right-click anywhere replaces it rather
+	// than stacking a second one behind the first.
+	var paneCtxMenuEl = null;
+	function paneCtxMenuContains(node) {
+		while (node) { if (node === paneCtxMenuEl) { return true; } node = node.parentNode; }
+		return false;
+	}
+	function paneCloseContextMenu() {
+		if (paneCtxMenuEl && paneCtxMenuEl.parentNode) { paneCtxMenuEl.parentNode.removeChild(paneCtxMenuEl); }
+		paneCtxMenuEl = null;
+	}
+	// Closed by anything else that happens on the page -- a left click elsewhere, a key, or the
+	// table rebuilding out from under it (renderPaneTable never reaches into this, so a stale
+	// row/column would otherwise sit in a menu whose target no longer exists).
+	document.addEventListener('mousedown', function (e) {
+		if (paneCtxMenuEl && !paneCtxMenuContains(e.target)) { paneCloseContextMenu(); }
+	});
+	document.addEventListener('keydown', function (e) {
+		if (paneCtxMenuEl && e && e.key === 'Escape') { paneCloseContextMenu(); }
+	});
+	/**
+	 * **DELETE CLEARS VALUES; IT NEVER REMOVES A ROW.** A row here is an element the map drew, and
+	 * a spreadsheet's Delete key has never once meant "remove the record" in Excel, Sheets or
+	 * Calc -- the table's own KEYBOARD Delete already set that precedent (paneHandleKey, "DELETE
+	 * EMPTIES A CELL IN NAVIGATION MODE"), and this is the same rule applied to a whole range
+	 * instead of only the active cell. Removing the junction itself stays one click away on the
+	 * map, through the Delete TOOL this menu item borrows its word from and nothing else of.
+	 *
+	 * **UNDOABLE, LIKE EVERY OTHER EDIT.** One snapshot for the whole range, taken only if the
+	 * range actually holds something to clear -- an empty-selection Delete must not fill the undo
+	 * stack with a no-op, the same rule paneCommitCell() already keeps for a typed cell.
+	 *
+	 * **THE ID COLUMN IS EXEMPT, AND NOT BECAUSE IT IS SPECIAL -- BECAUSE BLANK ISN'T A VALUE
+	 * THERE** (Perry's pre-review, reproduced with real events: three rows selected across the ID
+	 * column raised three sequential blocking alert()s, one per row, before the page could be
+	 * used again). Every other column's blank means "cleared"; an id's blank means "no id at
+	 * all", which validateNewId() correctly refuses out loud through paneColId().set() -- an
+	 * ordinary single-cell rename hits the same refusal and it is right there too. A BULK Delete
+	 * asking the same question forty times in a row is the alert storm, not the refusal itself.
+	 * paneCellIsPlain()/`!col.set` already skip every column with no business being cleared; this
+	 * is the one settable column where "clear it" was never a sensible request in the first
+	 * place, so it is skipped by name rather than by a property nothing else needs.
+	 */
+	function paneDeleteSelection(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), r, c, el, col, any = false;
+		if (!box) { return; }
+		for (r = box.r0; r <= box.r1 && !any; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				el = rows[r]; col = cols[c];
+				if (col.key === 'id' || paneCellIsPlain(col, el) || !col.set) { continue; }
+				if (paneCellText(col, el) !== '') { any = true; break; }
+			}
+		}
+		if (!any) { return; }
+		saveUndoSnapshot();
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				el = rows[r]; col = cols[c];
+				if (col.key === 'id') { continue; }
+				paneWriteCellText(spec, col, el, '');
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+	}
+	/**
+	 * **EVERY WORD ON THE MENU IS BORROWED, NOT COINED.** Copy and Paste are
+	 * `points_data_copy`/`points_data_paste` -- the row-table point grid's own labels, already
+	 * shipping on four calculator pages, and CLAUDE.md's concept-level reuse rule gives the key
+	 * used by materially more pages the win. **Zoom & select is `lpn_pane_goto_tip`**, the pin's
+	 * own tip: the pin already IS this command (findGoTo() selects the element and ZOOMS to it --
+	 * Tom, 2026-09-21, R-115: *"If right-click 'Show on map' is 'Select on map' instead of just
+	 * 'Go to' or 'Zoom to' (which is what I expected), then we should label it 'Zoom & select'."*
+	 * It does both, so the words are his), so
+	 * a second string for the identical action would be the "Source trace"/"Source share"
+	 * collision this project has already paid for once. Delete is `lpn_tool_delete`'s bare word,
+	 * reused for the imperative alone and not its sentence, because the map tool and this command
+	 * genuinely differ (see paneDeleteSelection() above).
+	 */
+	// **A MENU THAT RUNS OFF THE SCREEN IS A MENU WITH NOTHING ON IT** (Tom, 2026-09-21: *"When I
+	// right-click on a cell near the bottom of the screen, the right-click menu goes off the bottom
+	// of the screen."*). It is `position: fixed` at the pointer's own client coordinates, so
+	// nothing was ever going to stop it -- the pointer is frequently within four rows of the
+	// bottom, because the bottom pane IS the bottom of the window.
+	//
+	// **FLIP FIRST, CLAMP SECOND**, which is what every desktop menu does: put the menu ABOVE the
+	// pointer rather than sliding it up under it, so the pointer is still outside the menu and the
+	// first item is not sitting under the finger that opened it. The clamp is only the second
+	// answer, for a menu taller than the window, where there is no side to flip to.
+	function paneClampXY(x, y, w, h, vw, vh) {
+		var pad = 4, nx = x, ny = y;
+		if (nx + w > vw - pad) { nx = x - w; }
+		if (nx + w > vw - pad) { nx = vw - pad - w; }
+		if (ny + h > vh - pad) { ny = y - h; }
+		if (ny + h > vh - pad) { ny = vh - pad - h; }
+		return { x: Math.max(pad, nx), y: Math.max(pad, ny) };
+	}
+	function paneClampMenu(menu, x, y) {
+		var r = menu.getBoundingClientRect && menu.getBoundingClientRect(),
+			vw = (typeof window === 'object' && window.innerWidth) || 0,
+			vh = (typeof window === 'object' && window.innerHeight) || 0, at;
+		if (!r || !vw || !vh) { return; }
+		at = paneClampXY(x, y, r.width, r.height, vw, vh);
+		menu.style.left = at.x + 'px';
+		menu.style.top = at.y + 'px';
+	}
+	// Which element this menu's Select in map is about: the row's own, unless the cell under the
+	// pointer is a support column that NAMES another one -- see `refTo` on paneColEnds().
+	function paneCtxTarget(spec, td, rows, box) {
+		var col, el, ref, i;
+		if (td && td._lpnPaneKey) {
+			col = paneColByKey(spec, td._lpnPaneKey);
+			i = paneIndexOfId(rows, td._lpnPaneId);
+			el = i >= 0 ? rows[i] : null;
+			if (col && col.refTo && el) {
+				ref = col.refTo(el);
+				if (ref && ref.id !== undefined && ref.id !== null && ref.id !== '') { return ref; }
+			}
+		}
+		return { group: spec.group, id: rows[box.ar].id };
+	}
+	function paneOpenContextMenu(spec, x, y, td) {
+		var pc = EngCalcs.pageConfig || {}, rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), menu, mk, aim;
+		paneCloseContextMenu();
+		if (!box) { return; }
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		mk = function (text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = text;
+			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
+			menu.appendChild(b);
+			return b;
+		};
+		mk(pc.points_data_copy || 'Copy', function () {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box));
+		});
+		mk(pc.points_data_paste || 'Paste', function () {
+			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
+			// the clipboard directly -- and the one place it can be denied permission to. Silence
+			// on denial is correct: the browser's own permission prompt already said why.
+			try {
+				if (navigator.clipboard && navigator.clipboard.readText) {
+					navigator.clipboard.readText().then(function (text) {
+						var cells = libPasteCells(text);
+						if (cells.length) { panePasteAt(spec, cells); }
+					}, function () {});
+				}
+			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
+		});
+		aim = paneCtxTarget(spec, td, rows, box);
+		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
+			findGoTo(aim.group, aim.id);
+		});
+		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
+		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
+		paneClampMenu(menu, x, y);
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
@@ -21505,6 +24302,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		table = document.createElement('table');
 		table.className = 'lpn-pane-table lpn-print-table';
+		panePrintWidths(spec, table);
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
 		paneCols(spec).forEach(function (c, i) {
@@ -21529,6 +24327,51 @@ var EngCalcs = EngCalcs || {};
 		table.appendChild(tbody);
 		wrap.appendChild(table);
 		return wrap;
+	}
+	/**
+	 * **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to
+	 * use the column widths adjusted by the user"*; 2026-09-22: *"Print is not respecting on-screen
+	 * column widths"*; 2026-09-24, R-215: *"Widths seem to be trying, but not succeeding (tighter fit
+	 * on print than on screen)"*). Every column is given the width it is DRAWN at on screen, as a
+	 * literal `em` of the screen table's own font, and the sheet takes that same font -- so at full
+	 * size the printed table is the screen's, pixel for pixel. When the paper is narrower than that,
+	 * the font is `min(<screen px>, 100cqw x <screen px / table px>)`: the size at which the table is
+	 * exactly as wide as the sheet the browser is laying out, whatever paper that is. Widths, padding
+	 * and text are all in `em`, so every one of them shrinks by that one factor, and a heading wraps
+	 * where it wraps on screen.
+	 *
+	 * The rounds before this one assumed a 60em-at-9pt letter page and set padding in `pt`. The
+	 * assumption was wrong on A4 and the `pt` padding did not scale, so a shrunk sheet gave a bigger
+	 * share of each column to padding than the screen does -- which is the "tighter fit" he saw, and
+	 * what broke "Elevation" and "Base demand" mid-word. Measured in real Chromium, as a PDF, by
+	 * dev/browser-pass/specs/print.js.
+	 * Returns the em widths it applied, or null when the table has no columns to measure.
+	 */
+	function panePrintWidths(spec, table) {
+		var cols = paneCols(spec), unit, ems, sum = 0, cg;
+		if (!cols.length) { return null; }
+		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
+		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
+		ems.forEach(function (e) { sum += e; });
+		if (!(sum > 0)) { return null; }
+		// **EACH COLUMN ALSO CARRIES ITS 1px RULE, OUTSIDE THE SCALE.** On screen the grid is inset
+		// box-shadow, which takes no width; on paper it is a real border (a shadow is background
+		// paint and is dropped with "Background graphics" off), and under border-collapse each column
+		// owns 1px of it. Left inside the `em`, that pixel came out of the text's room -- at a
+		// sheet scaled to 0.45 it was enough to wrap "Shut" onto two lines.
+		cg = document.createElement('colgroup');
+		ems.forEach(function (e) {
+			var col = document.createElement('col');
+			col.style.width = 'calc(' + (Math.round(e * 100) / 100) + 'em + 1px)';
+			cg.appendChild(col);
+		});
+		table.appendChild(cg);
+		table.className += ' lpn-print-fixed';
+		table.style.width = 'calc(' + (Math.round(sum * 100) / 100) + 'em + ' + (ems.length + 1) + 'px)';
+		// (100cqw - the rules) / sum-in-em is the font at which the table fills the sheet exactly.
+		table.style.fontSize = 'min(' + (Math.round(unit * 100) / 100) + 'px, calc((100cqw - ' + (ems.length + 1) +
+			'px) / ' + (Math.round(sum * 100) / 100) + '))';
+		return ems;
 	}
 	// Taken down on afterprint where the browser has one, so nothing is removed while the print
 	// engine is still reading the page -- and again at the head of the next print, so a browser
@@ -21740,6 +24583,18 @@ var EngCalcs = EngCalcs || {};
 	// The pane follows the document without a listener of its own: every solve ends in a call to
 	// this, and every edit schedules a solve. A tab that is not on screen is not refreshed, and
 	// picks up whatever changed when it is next shown.
+	// **THE TABLE ON SHOW IS DRAWN FROM THE DOCUMENT, NOT BY THE SOLVE** (Tom, 2026-09-21, R-109:
+	// *"The page loads with the current table blank. I have to switch away and back to see that
+	// table."*). The pane was only ever refreshed at the END of a solve, and a document can arrive
+	// with no solve behind it at all -- Recalculate off, or an answer already kept for that tab --
+	// so the table wirePane() built at boot, before any project had been read, stayed on screen
+	// saying "This network has none of these yet" over a network of 92 junctions. Called wherever a
+	// document ARRIVES (the boot path and refreshAllFromDocument()), never on an edit. Every table's
+	// remembered row order belongs to the outgoing document, so all seven forget it.
+	function paneDocumentArrived() {
+		paneTables().forEach(paneTableReset);
+		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
+	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
 		if (!paneIsOpen() || !t || !t.refresh) { return; }
@@ -23296,7 +26151,8 @@ var EngCalcs = EngCalcs || {};
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text',
-		'vertices': 'lpn_mode_vertices'
+		'vertices': 'lpn_mode_vertices',
+		'zoom-window': 'lpn_mode_zoom_window'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
@@ -23306,29 +26162,10 @@ var EngCalcs = EngCalcs || {};
 		// dodges the box that is there NOW -- see placeLegends().
 		placeLegends();
 	}
-	// ---- CLEAN MAP (ROADMAP Task 253) ----------------------------------------------------------
-	//
-	// **ONE TOGGLE, AND DELIBERATELY ONLY TWO THINGS.** Tom, 2026-08-09: *"The only thing I care for
-	// it to hide at the moment (for map screenshots) is the Mode status line."* So this hides
-	// #lpn_mode_hint and #lpn_coords and NOTHING else -- the units/scenario readouts stay, because a
-	// screenshot of bare numbers with no statement of what they are is worse than one with the
-	// coordinate tracker in it. Task 175 holds the real printable-version question; this is not it.
-	//
-	// **NOT STORED, and not part of the project.** It is a presentation mode you hold for as long as
-	// you are taking pictures, so persisting it would mean a user could lose the mode line
-	// permanently and have no idea what removed it. A reload restores everything.
-	//
-	// `display:none` rather than `visibility:hidden` on purpose: overlayReserve() measures
-	// offsetHeight, so hiding the mode line also gives zoomExtent() that strip of canvas back.
-	var cleanMap = false;
-	function cleanMapOn() { return cleanMap; }
-	function setCleanMap(on) {
-		cleanMap = !!on;
-		['lpn_mode_hint', 'lpn_coords'].forEach(function (id) {
-			var el = document.getElementById(id);
-			if (el) { el.style.display = cleanMap ? 'none' : ''; }
-		});
-	}
+	// ---- CLEAN MAP (ROADMAP Task 253) is RETIRED (2026-09-22) ------------------------------------
+	// Tom: *"Hide map readouts was a print prep command. But it isn't very useful any more. Let's
+	// remove it."* `cleanMap`/`cleanMapOn()`/`setCleanMap()` had no caller but the Map menu row that
+	// went with them. KEYS DELETED: lpn_clean_map, lpn_clean_map_off, lpn_clean_map_tip.
 
 	function setMode(newMode) {
 		// Read-only does NOT restrict the TOOLS: open a project read-only and you can do anything
@@ -23338,6 +26175,21 @@ var EngCalcs = EngCalcs || {};
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// **R-181's ARMED FLAG UN-ARMS ON ANY MODE CHANGE, NOT ONLY A ZOOM-WINDOW EXIT** -- picking
+		// any other tool between the first and second press means there was no "second, consecutive
+		// press" left to complete (Ida's spec, Task 682 follow-up). This runs before the
+		// zoom-window-only block below because arming has nothing to do with being IN zoom-window
+		// mode -- the armed state lives entirely inside 'select', between the first Zoom to fit and
+		// a second press that has not happened yet.
+		if (newMode !== mode) { zoomToolArmed = false; }
+		// **ZOOM WINDOW IS THE SAME SHAPE OF HALF-DRAWN MARQUEE** (ROADMAP Task 682) -- and it also
+		// drops the toolbar button back to showing Zoom to fit, because the disclosure is one-shot
+		// rather than a remembered preference (see `zoomToolShape`'s own comment).
+		if (mode === 'zoom-window' && newMode !== 'zoom-window') {
+			zoomWinCancel();
+			zoomToolShape = 'fit';
+			if (repaintZoomTool) { repaintZoomTool(); }
+		}
 		// A half-placed meter dies with the tool, exactly as a half-drawn link does one line down:
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
@@ -23359,7 +26211,7 @@ var EngCalcs = EngCalcs || {};
 		// from sticking the way `lpn-panning` once did.
 		if (svg) {
 			svg.classList.toggle('lpn-placemode',
-				newMode.indexOf('add-') === 0 || newMode === 'select-area');
+				newMode.indexOf('add-') === 0 || newMode === 'select-area' || newMode === 'zoom-window');
 		}
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
@@ -23627,9 +26479,30 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 	}
 	function deleteNode(id) {
-		var links = incidentLinks[id].slice(), i;
+		var links = incidentLinks[id].slice(), i, orphaned = 0;
 		if (isSelected('node', id)) { deselectOne('node', id); }   // see deleteLink()
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
+		// **A CUSTOMER THAT SURVIVED EACH PIPE'S OWN DELETION ABOVE, AS A NODE FALLBACK
+		// (detachCustomersFromLink()), TRULY LOSES ITS CONNECTION HERE, WHEN THE NODE ITSELF GOES.**
+		// Read and converted to an absolute position BEFORE the node's own data is removed below,
+		// because customerPoint() -> customerAttachPoint() still needs to ask where it was. Said out
+		// loud with the same notice a pipe deletion gives, on the same argument: a demand that just
+		// left every answer on the screen is not something a reader can be left to notice.
+		(doc.customers || []).forEach(function (c) {
+			var pt;
+			if (c.node !== id) { return; }
+			pt = customerPoint(c);
+			c.x = pt.x; c.y = pt.y;
+			delete c.node;
+			orphaned++;
+			if (custEls[c.id]) { updateCustomerGeometry(c.id); }
+		});
+		if (orphaned) {
+			refreshCustomerHandle();
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
+				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				.replace('{n}', String(orphaned)));
+		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
@@ -24037,7 +26910,13 @@ var EngCalcs = EngCalcs || {};
 		// A DETACHED meter's x/y is a position on the map; an attached one's is an offset from its
 		// attachment point, and an offset does not move when the frame's origin does. Same rule,
 		// same reason and same shape as the Text above it (Task 247).
-		(o.customers || []).forEach(function (c) { if (!c.link) { visit(c); } });
+		//
+		// **`c.node` IS STILL AN ATTACHMENT** (Tom, 2026-09-25): a Customer connected exactly to a
+		// node whose pipe has since been deleted reads its offset from that node's own position
+		// (customerPoint()) exactly as it did through the pipe, so its `x`/`y` must NOT be shifted
+		// here -- the node it is offset from is shifted by the `o.nodes` pass above, and shifting the
+		// offset too would move the meter twice.
+		(o.customers || []).forEach(function (c) { if (!c.link && !c.node) { visit(c); } });
 		if (o.backdrop && typeof o.backdrop.tx === 'number') {
 			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
 				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
@@ -24170,9 +27049,14 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
-	function rebaseLiveGeoDoc() {
+	//
+	// `at`, when given, is a WORLD point (longitude, Mercator y) to put the origin's cell under
+	// instead of the model's own extent -- the one caller is followViewWhileEmpty(), for a document
+	// that has no model to choose from.
+	function rebaseLiveGeoDoc(at) {
 		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
+		if (at && isFinite(at.x) && isFinite(at.y)) { minX = at.x; minY = at.y; }
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
 		// cartesianY()'s call sites for exactly this reason -- a fifth site added later without the
@@ -24184,13 +27068,15 @@ var EngCalcs = EngCalcs || {};
 		// a departure of 1e-13 could only change the answer at an exact cell boundary, and both
 		// answers there are equally valid origins. NO COORDINATE IS MOVED BY THIS ROUND TRIP; the
 		// shift below is a subtraction of the chosen origin and nothing else.
-		eachStoredPoint(doc, function (pt, get) {
-			if (get) { return; }
-			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
-			var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
-			if (X < minX) { minX = X; }
-			if (Y < minY) { minY = Y; }
-		});
+		if (!at) {
+			eachStoredPoint(doc, function (pt, get) {
+				if (get) { return; }
+				if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+				var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
+				if (X < minX) { minX = X; }
+				if (Y < minY) { minY = Y; }
+			});
+		}
 		if (!isFinite(minX) || !isFinite(minY)) { return null; }
 		org = {
 			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
@@ -24222,6 +27108,41 @@ var EngCalcs = EngCalcs || {};
 		tv = tabViews[library.openId];
 		if (tv && isFinite(tv.cx) && isFinite(tv.cy)) { tv.cx += dx; tv.cy += dy; }
 		return { dx: dx, dy: dy };
+	}
+	// **AN EMPTY GEOGRAPHIC DOCUMENT'S ORIGIN FOLLOWS THE CAMERA** (Tom, 2026-09-25, on Project1:
+	// *"There are nodes, but they are not visible, even when I zoom to fit."*). Task 439 derives a
+	// geographic origin from the MODEL, so a document with no model keeps {0, 0} -- and a camera
+	// over Novato at street zoom is then `translate(-5e7, ...)`: past Chrome's layout range, so
+	// every junction drawn there and every tile under it is laid out millions of pixels off the
+	// canvas. Nothing was wrong with the symbols or the zoom limit; the drawn numbers were too big.
+	// Project1 is born exactly there, and a wizard-made blank project or a place-name search on an
+	// empty one reaches the same state by hand.
+	//
+	// So while the document holds no model at all, a view whose centre sits more than
+	// LPN_GEO_FOLLOW_PX from the origin re-origins onto the 1/128-degree cell under that centre,
+	// with the camera compensated inside rebaseLiveGeoDoc() so nothing on screen moves. With no
+	// model there is no user number to shift, and the first junction placed is then born small.
+	// Once a model exists, Task 439's own rule (origin from the model) is left alone.
+	//
+	// The bound: after a follow the centre is within one cell (1/128 degree) of the origin, which is
+	// 434,000 px at maxScale() -- under this, so a follow can never trigger another. Chrome's layout
+	// range is about 3.3e7 px, so this keeps every drawn number more than ten times inside it.
+	// Never mid-gesture: a pan holds `tx0` from before the shift and would jump by the whole origin.
+	var LPN_GEO_FOLLOW_PX = 2e6, followingView = false;
+	function geoDocHasModel() {
+		if (doc.nodes.length) { return true; }
+		var any = false;
+		eachStoredPoint(doc, function (pt, get) { if (!get) { any = true; } });
+		return any;
+	}
+	function followViewWhileEmpty() {
+		if (followingView || drag || georef || !doc || !isLatLonProject() || geoDocHasModel()) { return false; }
+		var v = currentView();
+		if (!v || Math.max(Math.abs(v.cx), Math.abs(v.cy)) * v.s < LPN_GEO_FOLLOW_PX) { return false; }
+		followingView = true;
+		try {
+			return !!rebaseLiveGeoDoc({ x: outwardX(v.cx), y: Geom.mercY(outwardY(v.cy)) });
+		} finally { followingView = false; }
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
@@ -24308,7 +27229,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', AREA_HINT_KEY, MENU_CUE_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -24582,6 +27503,9 @@ var EngCalcs = EngCalcs || {};
 	 * the label choices too, since both are serialized.
 	 */
 	function captureLabelLayout() {
+		// The kept layout must be the settled one: a pass owed and not yet run would otherwise be
+		// kept as the answer and restored on the way back (Task 653).
+		flushLabelRefresh();
 		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
 		function grab(h) {
 			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
@@ -25451,9 +28375,15 @@ var EngCalcs = EngCalcs || {};
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		// A number, and ZERO IS A REAL ANSWER here ("never label a customer"), so this is a type
 		// test and never a truthiness one -- `savedLS.customerMaxWidth || default` would silently
-		// turn the one setting that says NEVER back into the default.
-		if (typeof savedLS.customerMaxWidth === 'number' && isFinite(savedLS.customerMaxWidth) &&
-			savedLS.customerMaxWidth >= 0) { labelSettings.customerMaxWidth = savedLS.customerMaxWidth; }
+		// turn the one setting that says NEVER back into the default. **NULL IS ALSO A REAL ANSWER**
+		// (Tom, 2026-09-23 pre-review: blank means "always show", the same state the all-labels row
+		// already persists) -- accepted here the same way `savedSettings.labelMaxWidth`'s own reader
+		// treats it a few lines down, so a blanked customer row survives a save/reload round trip
+		// instead of silently reverting to whatever number the field held before.
+		if (savedLS.customerMaxWidth === null || (typeof savedLS.customerMaxWidth === 'number' &&
+			isFinite(savedLS.customerMaxWidth) && savedLS.customerMaxWidth >= 0)) {
+			labelSettings.customerMaxWidth = savedLS.customerMaxWidth;
+		}
 		backdrop = saved.backdrop || null;
 		// Same one-level-deeper merge the labelSettings block documents: `defaults` and
 		// `sectionsOpen` are nested, so a top-level Object.assign swaps the saved one in whole and
@@ -25529,6 +28459,14 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		delete settings.colorFrozenBreaks;
+		// **A PROJECT SAVED WITH "Thematic map (colors only)" ON OPENS WITH LABELS OFF** (2026-09-23,
+		// retiring that checkbox in favour of the labeling threshold read as 0). **0
+		// WINS over a saved positive threshold**: the last thing that project's reader saw was no
+		// labels at all, not labels past some particular width, so the state that reproduces the
+		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
+		// read a stale one and disagree with the map.
+		if (savedSettings.colorThematic) { settings.labelMaxWidth = 0; }
+		delete settings.colorThematic;
 		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
 		// count and the reverse flag were one each for the whole map until they split per element
 		// class; a document written then carries the single key, and both groups take its value,
@@ -25732,6 +28670,9 @@ var EngCalcs = EngCalcs || {};
 		lastSolveResult = (kept && kept.solve) || null;
 		// The labels wait for the camera -- see buildDom() and the restore below.
 		labelPassDeferred = true;
+		// And a pass requested for the OUTGOING document is not owed to this one, which is laid out
+		// once below (Task 653). Left set, it would run a second full pass a frame after arrival.
+		labelRefreshPending = false;
 		closePopup();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
@@ -25786,8 +28727,8 @@ var EngCalcs = EngCalcs || {};
 			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
 		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
-		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
-		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
+		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
+		// not an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
 		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is
@@ -25798,6 +28739,7 @@ var EngCalcs = EngCalcs || {};
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
 			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
 		});
+		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
@@ -26338,7 +29280,9 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { renameToNumbered(upId, name); georefStart(); }
+		// The file route of File, Convert as (an empty tab has nothing to copy): the file lands, then
+		// the same box is offered for it (Task 696).
+		if (asGeo && upId) { renameToNumbered(upId, name); convertAsLanded(); }
 	}
 	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
 	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
@@ -27073,6 +30017,19 @@ var EngCalcs = EngCalcs || {};
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
 			body.appendChild(sum);
+			// **THIS FILE STATES NO COORDINATE SYSTEM** (R-219; Tom, 2026-09-24: files with an
+			// unreferenced EPSG coordinate system can be scaled 1:1 in Step 2 of the Convert as…
+			// wizard, and both Import and Convert as should say so). `mapUnits` is 'degrees' only
+			// when [BACKDROP] UNITS said so; every other file -- Feet, Meters, None or no [BACKDROP]
+			// at all -- lands as a plain XY drawing (docFromInp() above), which is what "unreferenced"
+			// means here. This report is the one place BOTH doors show it: it renders for a plain
+			// Import EPANET file… and for the copy File, Convert as… lands before its own box opens.
+			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
+				var crsNote = document.createElement('p');
+				crsNote.style.margin = '0 0 8px';
+				crsNote.textContent = pc.lpn_inp_report_no_crs || 'EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
+				body.appendChild(crsNote);
+			}
 			// The one place an anchor mode is worth mentioning, and only to someone whose file had
 			// labels in it (Task 332). Deliberately NOT a setting: nobody can hold an opinion about
 			// an anchor mode before seeing it, and this report already says what is different about
@@ -27222,7 +30179,7 @@ var EngCalcs = EngCalcs || {};
 		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
-		if (asGeo) { renameToNumbered(id); georefStart(); }
+		if (asGeo) { renameToNumbered(id); convertAsLanded(); }
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -27641,52 +30598,656 @@ var EngCalcs = EngCalcs || {};
 		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
 	}
-	/**
-	 * **File, Convert coordinates as: a Save as that converts.** Tom's design, 2026-09-18, in
-	 * his own three steps: *"(1) the row becomes File, Convert coordinates as...; (2) it offers a
-	 * file picker OR makes a duplicate tab named `Copy of {project_name}`; (3) the redesigned
-	 * conversion wizard runs."*).
-	 *
-	 * **WHAT SHIPPED BEFORE THIS WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ
-	 * CORRECTLY.** The row opened a FILE and placed it; he wants a row that converts THIS project.
-	 * Tom: *"let's not fool ourselves, conversion of all coordinates is happening"* -- and the rule
-	 * this repository actually holds is never to convert IN PLACE, which a Save as does not: the
-	 * project you were looking at is still open, still unconverted, and still on its own tab.
-	 *
-	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
-	 * georeference is Map, World map, Attach, which moves no coordinate at all;
-	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
-	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
-	 * in most situations. As always, we prefer the preserve-the-inputs path."*
-	 *
-	 * **THE "OR" IN HIS STEP 2 IS ANSWERED BY THE PROJECT ITSELF RATHER THAN BY A DIALOG.** An
-	 * empty tab has nothing to copy, so that is the case where the picker is the only thing the
-	 * command can mean; a tab with a network in it is the thing being converted. Asking which of
-	 * the two somebody meant, when the answer is already on the screen, is a modal for nothing.
-	 */
-	function convertCoordsAs() {
-		var pc = EngCalcs.pageConfig || {}, saved, name;
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+	// ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing Tasks 688 and 693) ----------------------
+	//
+	// **ONE ROW FOR UNITS AND COORDINATES, AND IT IS A SAVE AS.** Tom, 2026-09-22/23: *"(a) Project
+	// and units (maybe this one menu row as 'Convert as...' can handle both units and coordinates),
+	// (b) step 1 (if CRS changed), (c) step 2 (if CRS changed)."* And: *"The first thing it needs to
+	// do is ask what coordinate system we are going to."* So the box asks the coordinate system
+	// first, then the units and the rounding, and the placement steps follow only when the
+	// coordinate system actually changes.
+	//
+	// **NEVER IN PLACE.** Tom: *"let's not fool ourselves, conversion of all coordinates is
+	// happening"*, and the rule this repository holds is that conversion never happens in place. The
+	// project on screen is serialized, the COPY is converted, and the copy lands in a new tab named
+	// `Copy of {name}`. The original's bytes are never touched (dev/lpn-spike/convert-as-harness.js).
+	//
+	// **THE UNIT SELECTOR BAN IS UNTOUCHED.** Changing a unit on the strip still reinterprets the
+	// typed number. This rewrites the stored numbers AND the recorded unit selection together, once,
+	// into a new project, which is Tom's own reconciliation of the two (Task 688: *"File, Convert
+	// units as...: I agree."*). Converting back is a second conversion and never an undo, because
+	// exact factors still fail in doubles (150 * 0.3048 / 0.3048 is 149.99999999999997).
+	//
+	// **THE THREE COORDINATE CASES ARE HIS** (R-155): an EPSG coordinate system (lat/lon is
+	// EPSG:3857 here, one of them), an unnamed (local) georeference, and not georeferenced.
+	//
+	// **WHERE THE COORDINATES ARE CONVERTED: ON THE SAVED DOCUMENT, NOT THE LIVE ONE.** A saved
+	// document states its frame plainly -- Cartesian, absolute through `origin`, and longitude and
+	// latitude for a lat/lon project -- so one pure function (convertSavedGeometry) can move every
+	// position, offset, scenario position and the background image without knowing about the live
+	// frame's Mercator y, its origin shift or its y-down memory. The placement steps between are the
+	// existing wizard, unchanged, which is where every conversion to a new place already went.
+	var convas = null;          // a conversion in flight, from the box to the end of the placement
+	var convasUnits = [];       // [{ name, sel, item }], cloned from the strip as the New project box does
+	var convasPick = { crs: LPN_CRS_WEBMERC, place: null };
+	var convasWired = false;
+	// Which of the three cases this project is, plus the EPSG code when it states one.
+	function projectCoordKind() {
+		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_WEBMERC }; }
+		if (projectCrsCode()) { return { kind: 'epsg', crs: projectCrsCode() }; }
+		return { kind: xyGeorefOk() ? 'unnamed' : 'none', crs: '' };
+	}
+	function convasCrsChanged(from, to) {
+		if (from.kind !== to.kind) { return true; }
+		return from.kind === 'epsg' && String(from.crs) !== String(to.crs);
+	}
+	// The menu row. An empty tab has nothing to copy, so there the row means the file picker, and the
+	// file that lands is then offered the same box (see landProjectText()).
+	function convertAs() {
+		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		if (!doc.nodes.length) { pickGeoFile(); return; }
+		openConvertAsBox();
+	}
+	// A file opened through the row's file route: the same box, unless there is nothing to convert.
+	function convertAsLanded() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!doc.nodes.length) {
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
 		}
-		// Nothing here to convert: the row can only mean the file route.
-		if (!doc.nodes.length) { pickGeoFile(); return; }
-		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		openConvertAsBox();
+	}
+	function convasEl() { return document.getElementById('lpn_convas_panel'); }
+	function convasKind() {
+		var k = ['epsg', 'unnamed', 'none'], i, r;
+		for (i = 0; i < k.length; i++) {
+			r = document.getElementById('lpn_convas_kind_' + k[i]);
+			if (r && r.checked) { return k[i]; }
+		}
+		return 'none';
+	}
+	function convasSetKind(kind) {
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.checked = (k === kind); }
+		});
+	}
+	// The chooser button and the name beside it, as the New project box shows its own.
+	function syncConvasCrs() {
+		var b = document.getElementById('lpn_convas_crs_pick'),
+			n = document.getElementById('lpn_convas_crs_name'),
+			off = convasKind() !== 'epsg';
+		if (b) { b.disabled = off; }
+		if (n) {
+			// R-218: the same lat/lon name crsDisplayName() reads off the catalogue's own EPSG:4326
+			// entry, not the catalogue's Pseudo-Mercator name -- crsBoxOk() has already folded any
+			// 4326 pick onto LPN_CRS_WEBMERC by the time convasPick.crs is read here, so this is the
+			// one comparison that still needs to ask which code it is.
+			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
+				? crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) })
+				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
+		}
+	}
+	function closeConvasBox() { hidePanel(convasEl()); }
+	function wireConvasBox() {
+		if (convasWired) { return; }
+		convasWired = true;
+		var box = convasEl();
+		if (!box) { return; }
+		var ok = document.getElementById('lpn_convas_ok'),
+			cancel = document.getElementById('lpn_convas_cancel'),
+			close = document.getElementById('lpn_convas_close'),
+			si = document.getElementById('lpn_convas_si'),
+			us = document.getElementById('lpn_convas_us'),
+			pick = document.getElementById('lpn_convas_crs_pick');
+		if (ok) { ok.addEventListener('click', convasOk); }
+		if (cancel) { cancel.addEventListener('click', closeConvasBox); }
+		if (close) { close.addEventListener('click', closeConvasBox); }
+		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); }); }
+		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); }); }
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.addEventListener('change', syncConvasCrs); }
+		});
+		// Once each: the four suffix boxes are static markup, never re-cloned on open, so a typed
+		// edit is remembered for the life of the page rather than only until the next open.
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var el = document.getElementById('lpn_convas_suffix_' + k);
+			if (el) { el.addEventListener('input', function () { convasSuffixDirty[k] = true; }); }
+		});
+		if (pick) {
+			pick.addEventListener('click', function () {
+				openCrsBox(convasPick.crs, convasPick.place, function (code, ll) {
+					convasPick.crs = code;
+					convasPick.place = ll || convasPick.place;
+					convasSetKind('epsg');
+					syncConvasCrs();
+				});
+			});
+		}
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeConvasBox(); }
+		});
+	}
+	// **IT OPENS ON THE PROJECT AS IT IS**: its own coordinate case and system, its own units, and no
+	// rounding. Pressing Convert without changing anything therefore makes a plain copy.
+	function openConvertAsBox() {
+		var pc = EngCalcs.pageConfig || {}, box = convasEl(), from = projectCoordKind(), h, r, fromEl;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		wireConvasBox();
+		convasFor = library.openId;
+		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
+		convasSetKind(from.kind);
+		fromEl = document.getElementById('lpn_convas_from');
+		if (fromEl) {
+			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
+		}
+		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
+		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_roughness') { u.item.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
+		});
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k);
+			if (s) { s.value = ''; }
+		});
+		// The Label column (Task 696): fresh every open, pre-filled from this box's own units, and
+		// repainted as those units change -- until a row is typed into, see convasSuffixDirty.
+		convasSuffixDirty = {};
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_diameter' || u.name === 'lpn_u_elevhead' || u.name === 'lpn_u_flow') {
+				u.sel.addEventListener('change', refreshConvasSuffixPrefill);
+			}
+		});
+		refreshConvasSuffixPrefill();
+		syncConvasCrs();
+		box.style.display = 'block';
+		raisePanel(box);
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		initTipsIn(box);
+		var ok = document.getElementById('lpn_convas_ok');
+		if (ok && ok.focus) { ok.focus(); }
+	}
+	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
+	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
+	// **THE LABEL COLUMN (Task 696), ONE UNIT FAMILY PER ROUNDING ROW.** Read to pre-fill the box
+	// (' ' + the unit's own DISPLAY TEXT -- the option's textContent, what the dropdown itself
+	// shows, never its value/name -- matching a shipped quality suffix's own leading space --
+	// labelDefaultSuffix()) and to know which cloned select's change should refresh which row.
+	// **DEPTH PRE-FILLS FROM THE SAME UNIT HEAD DOES** (Task 696, Tom, 2026-09-25): a water depth
+	// is in the Elevation/Head family like Head is, and it now has a per-field label suffix to write
+	// into -- nodeFieldDefs()'s 'level' row, wired through convasApplyLabelSuffixes() below.
+	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', depth: 'lpn_u_elevhead', flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
+	// Sees an edit that started from the user, not from a pre-fill, so a row they typed into is
+	// never overwritten by a later unit change. Reset each time the box opens.
+	var convasSuffixDirty = {};
+	function convasSuffixUnitClone(famName) {
+		var i;
+		for (i = 0; i < convasUnits.length; i++) {
+			if (convasUnits[i].name === famName) { return convasUnits[i]; }
+		}
+		return null;
+	}
+	// **ONLY A ROW THE USER HAS NOT TOUCHED YET REPAINTS**, so a preset click or a per-field unit
+	// change keeps every box in step with what it would say fresh, without clobbering a suffix
+	// somebody already typed. A disabled row (depth) is skipped outright.
+	function refreshConvasSuffixPrefill() {
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			if (convasSuffixDirty[k]) { return; }
+			var el = document.getElementById('lpn_convas_suffix_' + k), u = convasSuffixUnitClone(LPN_CONVAS_SUFFIX_UNIT[k]);
+			if (!el || el.disabled || !u || !u.sel || !u.sel.options.length) { return; }
+			el.value = ' ' + u.sel.options[u.sel.selectedIndex].textContent;
+		});
+	}
+	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
+	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
+	function convasAnswers() {
+		var kind = convasKind(), units = {}, rounding = {}, suffix = {};
+		convasUnits.forEach(function (u) { units[u.name] = u.sel.value; });
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k), sf = document.getElementById('lpn_convas_suffix_' + k);
+			rounding[k] = s ? String(s.value || '') : '';
+			suffix[k] = sf ? String(sf.value || '') : '';
+		});
+		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
+			units: units, rounding: rounding, suffix: suffix };
+	}
+	// The box is not modal, so a tab switch can happen under it; its answers were read off the
+	// project it opened on, so a different project gets the box again rather than those answers.
+	var convasFor = null;
+	function convasOk() {
+		var a = convasAnswers();
+		closeConvasBox();
+		if (convasFor !== library.openId) { convertAs(); return; }
+		runConvertAs(a);
+	}
+	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
+	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
+	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
+	// the visitor is missing a transform for.
+	function convasForeignCrs(from, to) {
+		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
+		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
+		return '';
+	}
+	function convasNoTransformMessage(pc, code) {
+		return String(pc.lpn_convas_no_transform
+			|| '{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.')
+			.replace('{crs}', crsLabel(code) || String(code || ''));
+	}
+	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
+	// only when a project needs them. Both ends are checked before anything is copied, so a system
+	// this page cannot transform refuses up front rather than half way through.
+	function runConvertAs(a) {
+		var pc = EngCalcs.pageConfig || {}, from = projectCoordKind(),
+			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_WEBMERC) : '' },
+			changed = convasCrsChanged(from, to), need = [], bornAs = library.openId;
+		if (changed) {
+			if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { need.push(from.crs); }
+			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
+		}
+		if (!need.length) { convasProceed(a, from, to, changed); return; }
+		var refuse = function (code) {
+			setNotice(convasNoTransformMessage(pc, code));
+		};
+		if (!EngCalcs.lpnCrsLoad) { refuse(need[0]); return; }
+		EngCalcs.lpnCrsLoad(function () {
+			if (library.openId !== bornAs) { return; }
+			var missing = need.filter(function (c) { return !EngCalcs.lpnCrsHas(c); });
+			if (missing.length) { refuse(missing[0]); return; }
+			convasProceed(a, from, to, changed);
+		});
+	}
+	// Metres in one of a length unit, from the suite's one factor table ("that unit per SI unit").
+	function metersPerLengthUnit(key) {
+		var f = key && EngCalcs.unitFactors ? EngCalcs.unitFactors[key] : 0;
+		return (f > 0) ? 1 / f : 1;
+	}
+	// A SAVED document's position, as longitude and latitude in {x, y}, for each case that knows
+	// where it is. Null for the case that does not.
+	function savedLonLatReader(saved, from) {
+		var t = saved.project && saved.project.georef;
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC) { return function (p) { return { x: p.x, y: p.y }; }; }
+		if (from.kind === 'epsg') {
+			return function (p) {
+				var ll = EngCalcs.lpnCrsInverse(from.crs, p);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		if (from.kind === 'unnamed' && t) {
+			return function (p) {
+				var ll = EngCalcs.lpnGeorefToLonLat(t, p.x, p.y);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		return null;
+	}
+	// **A LOCAL GRID FOR A PROJECT THAT KNOWS WHERE IT IS**: the tangent plane at the middle of the
+	// network, north up, in the copy's own length unit. The same transform an attached world map
+	// states, so "unnamed (local) georeference" is this plane with the transform kept, and "not
+	// georeferenced" is the same plane with it dropped.
+	function savedLocalPlane(saved, toLL, lenKey) {
+		var org = savedOrigin(saved), lon = 0, lat = 0, n = 0;
+		(saved.nodes || []).forEach(function (nd) {
+			if (!isFinite(nd.x) || !isFinite(nd.y)) { return; }
+			var ll = toLL({ x: nd.x + org.x, y: nd.y + org.y });
+			if (!ll) { return; }
+			lon += ll.x; lat += ll.y; n++;
+		});
+		if (!n) { return null; }
+		return { anchor: { x: 0, y: 0 }, origin: { lon: lon / n, lat: lat / n },
+			metersPerUnit: metersPerLengthUnit(lenKey), rotDeg: 0 };
+	}
+	function savedOrigin(saved) {
+		var geo = saved.project && saved.project.coords === LPN_COORDS_GEO, o = saved.origin;
+		return (!geo && o && isFinite(o.x) && isFinite(o.y)) ? { x: o.x, y: o.y } : { x: 0, y: 0 };
+	}
+	/**
+	 * **EVERY COORDINATE IN A SAVED DOCUMENT, THROUGH ONE MAP.** `map` takes an absolute POSITION in
+	 * the document's own frame -- longitude and latitude for a lat/lon document, the plane's own
+	 * numbers otherwise -- and returns the position in the new frame, or null. `dstGeo` says whether
+	 * the new frame is lat/lon, because that is the one frame whose DRAWING y (Mercator) differs from
+	 * its position y (latitude).
+	 *
+	 * Positions (nodes, vertices, free Text, detached customers, scenario positions) go through the
+	 * map directly. Offsets (label offsets, anchored Text, attached customers) are vectors, so they go
+	 * through the map's local derivative at their anchor, which carries a change of scale, a turn and
+	 * the Mercator stretch without a second opinion about any of them. The background image is moved
+	 * by its centre and rescaled by the same derivative; it is not turned, for the reason
+	 * georefWriteBackdrop() gives. The saved view is dropped, so the copy opens fitted to its network.
+	 *
+	 * Returns false if any position has no answer, and the caller converts nothing.
+	 */
+	function convertSavedGeometry(saved, map, dstGeo) {
+		var srcGeo = !!(saved.project && saved.project.coords === LPN_COORDS_GEO),
+			org = savedOrigin(saved), failed = false, nodeByOvKey = {}, linksById = {}, drawAt = {},
+			minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, eps, jobs = [];
+		function mapPos(p) {
+			var q = map(p);
+			if (!q || !isFinite(q.x) || !isFinite(q.y)) { failed = true; return null; }
+			return q;
+		}
+		// The two Mercator sites of File, Convert as (dev/lpn-spike/mercator-harness.js counts them):
+		// a lat/lon document's drawing y is Mercator and its position y is latitude, in the saved file
+		// exactly as outwardY()/inwardY() have it in memory.
+		function toMerc(p) { return { x: p.x, y: Geom.mercY(p.y) }; }
+		function drawToPos(d) { return srcGeo ? { x: d.x, y: Geom.mercLat(d.y) } : d; }
+		function posToDraw(p) { return dstGeo ? toMerc(p) : p; }
+		function mapDraw(d) { var q = mapPos(drawToPos(d)); return q ? posToDraw(q) : null; }
+		function absPos(p) { return { x: p.x + org.x, y: p.y + org.y }; }
+		function drawOfPos(p) { var a = absPos(p); return srcGeo ? toMerc(a) : a; }
+		// The derivative, read off the map itself, applied to one vector anchored at drawing point d.
+		function mapVec(d, v) {
+			var a = mapDraw(d), bx = mapDraw({ x: d.x + eps, y: d.y }), by = mapDraw({ x: d.x, y: d.y + eps });
+			if (!a || !bx || !by) { return null; }
+			return { x: ((bx.x - a.x) * v.x + (by.x - a.x) * v.y) / eps,
+				y: ((bx.y - a.y) * v.x + (by.y - a.y) * v.y) / eps };
+		}
+		(saved.nodes || []).forEach(function (n) {
+			nodeByOvKey[ovKeyFor('node', n.id)] = n;
+			if (!isFinite(n.x) || !isFinite(n.y)) { return; }
+			var d = drawOfPos(n);
+			drawAt[n.id] = d;
+			minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x);
+			minY = Math.min(minY, d.y); maxY = Math.max(maxY, d.y);
+		});
+		(saved.links || []).forEach(function (l) { linksById[l.id] = l; });
+		eps = isFinite(maxX) ? Math.max(maxX - minX, maxY - minY) * 1e-6 : 0;
+		if (!(eps > 0)) { eps = 1e-6; }
+		function linkAnchor(id) { var l = linksById[id]; return l ? (drawAt[l.from] || drawAt[l.to]) : null; }
+		// OFFSETS FIRST, while every anchor is still where the offset was measured from.
+		function offset(el, kx, ky, at) {
+			var hx = typeof el[kx] === 'number', hy = typeof el[ky] === 'number', v;
+			if ((!hx && !hy) || !at) { return; }
+			v = mapVec(at, { x: hx ? el[kx] : 0, y: hy ? el[ky] : 0 });
+			if (!v) { return; }
+			jobs.push(function () { if (hx) { el[kx] = v.x; } if (hy) { el[ky] = v.y; } });
+		}
+		(saved.nodes || []).forEach(function (n) { offset(n, 'lx', 'ly', drawAt[n.id]); });
+		(saved.links || []).forEach(function (l) { offset(l, 'lx', 'ly', linkAnchor(l.id)); });
+		(saved.labels || []).forEach(function (lb) {
+			if (lb.anchorNode) { offset(lb, 'x', 'y', drawAt[lb.anchorNode]); }
+			else if (lb.anchorLink) { offset(lb, 'x', 'y', linkAnchor(lb.anchorLink)); }
+		});
+		(saved.customers || []).forEach(function (c) { if (c.link) { offset(c, 'x', 'y', linkAnchor(c.link)); } });
+		// A SCENARIO'S OWN POSITIONS are absolute and may hold one axis only; the missing half comes
+		// from the node, as georefCaptureCoordOverrides() completes it, and only held axes are written.
+		(saved.scenarios || []).forEach(function (sc) {
+			if (sc.isBase) { return; }
+			Object.keys(sc.overrides || {}).forEach(function (key) {
+				var ov = sc.overrides[key], n = nodeByOvKey[key] || null, a, q;
+				if (!ov || !n || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
+				a = absPos(n);
+				q = mapPos({ x: typeof ov.x === 'number' ? ov.x : a.x, y: typeof ov.y === 'number' ? ov.y : a.y });
+				if (!q) { return; }
+				jobs.push(function () {
+					if (typeof ov.x === 'number') { ov.x = q.x; }
+					if (typeof ov.y === 'number') { ov.y = q.y; }
+				});
+			});
+		});
+		// The background image: its centre moves, its scale follows the map's east-west derivative.
+		var bd = saved.backdrop;
+		if (bd && isFinite(bd.tx) && isFinite(bd.ty) && bd.s > 0) {
+			var bw = (bd.x || 0) + (bd.width || 0) / 2, bh = (bd.y || 0) + (bd.height || 0) / 2,
+				c = { x: bd.tx + (srcGeo ? 0 : org.x) + bd.s * bw, y: bd.ty + (srcGeo ? 0 : org.y) - bd.s * bh },
+				c2 = mapDraw(c), east = mapVec(c, { x: 1, y: 0 });
+			if (c2 && east) {
+				jobs.push(function () {
+					var s = bd.s * Math.hypot(east.x, east.y);
+					bd.s = s;
+					bd.tx = c2.x - s * bw;
+					bd.ty = c2.y + s * bh;
+				});
+			}
+		}
+		// POSITIONS, through eachStoredPoint()'s own list so nothing is missed -- minus the two
+		// {get, set} points, which are the view (dropped) and the backdrop (done above).
+		eachStoredPoint(saved, function (pt, get) {
+			if (get || !isFinite(pt.x) || !isFinite(pt.y)) { return; }
+			var q = mapPos(absPos(pt));
+			if (!q) { return; }
+			jobs.push(function () {
+				pt.x = q.x; pt.y = q.y;
+				// The file's own characters no longer state these numbers.
+				if (pt.tok) { delete pt.tok.x; delete pt.tok.y; }
+			});
+		});
+		if (failed) { return false; }
+		jobs.forEach(function (j) { j(); });
+		delete saved.view;
+		// A lat/lon document states origin {0, 0} and applySaved() derives its own; a plane document
+		// is given one here, which is what a State Plane or UTM number needs to be drawable.
+		delete saved.origin;
+		if (dstGeo) { saved.origin = { x: 0, y: 0 }; } else { rebaseDocument(saved); }
+		return true;
+	}
+	function savedSetKind(saved, kind, crs, georefT) {
+		var p = saved.project;
+		delete p.coords; delete p.crs; delete p.georef;
+		if (kind === 'geo') { p.coords = LPN_COORDS_GEO; p.basemap = p.basemap || 'osm'; }
+		else if (kind === 'epsg') { p.crs = String(crs); }
+		else if (kind === 'unnamed') { p.georef = georefT; }
+		else { delete p.basemap; }
+	}
+	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Destructive
+	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
+	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
+	// unit names that actually changed, which is what the rounding reads.
+	function convasApplyUnits(a) {
+		var changed = {};
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
+			if (!to || !from || to === from) { return; }
+			fOld = EngCalcs.unitFactors[from];
+			fNew = EngCalcs.unitFactors[to];
+			if (!fOld || !fNew) { return; }
+			applyOneUnit(name, to);
+			if (unitKey(name) !== to) { return; }   // not an option this select offers
+			convertUnitValues(name, fNew / fOld);
+			changed[name] = true;
+		});
+		convasRound(changed, a.rounding || {});
+		rememberUnitSelections();
+		afterUnitChange();
+		return changed;
+	}
+	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
+	// not 12.299999999999999.
+	function roundToStep(v, step) {
+		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+		return +(Math.round(v / step) * step).toFixed(d);
+	}
+	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
+	// typed, and rounding it would be a second edit nobody asked for.
+	function convasRound(changed, rounding) {
+		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
+		function rnd(obj, prop, s) { if (obj && typeof obj[prop] === 'number') { obj[prop] = roundToStep(obj[prop], s); } }
+		function ovs(prop, s) {
+			scenarios.forEach(function (sc) {
+				Object.keys(sc.overrides || {}).forEach(function (k) { rnd(sc.overrides[k], prop, s); });
+			});
+		}
+		var s = step('diameter');
+		if (s && changed.lpn_u_diameter) {
+			doc.links.forEach(function (l) { rnd(l, '_diameter', s); });
+			ovs('diameter', s);
+		}
+		s = step('depth');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_level', s); rnd(n, 'minLevel', s); rnd(n, 'maxLevel', s); });
+			ovs('level', s);
+		}
+		s = step('head');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_head', s); });
+			ovs('head', s);
+		}
+		s = step('flow');
+		if (s && changed.lpn_u_flow) {
+			doc.nodes.forEach(function (n) {
+				rnd(n, '_demand', s);
+				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
+			});
+			(doc.customers || []).forEach(function (c) { rnd(c, 'demand', s); });
+			doc.links.forEach(function (l) {
+				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { rnd(l, '_setting', s); }
+			});
+			ovs('demand', s);
+		}
+	}
+	// **THE LABEL COLUMN, INTO THE ONE SETTING THAT ALREADY DOES THIS JOB** (Task 333's
+	// labelSettings.suffix, read by labelSuffixFor() and written by setLabelAffix() -- the same seam
+	// a Labels row uses). Diameter, Depth and Head land straight on the field the rounding above just
+	// rewrote; Flow lands on both typed demand fields the rounding touches, junction and customer.
+	// **DEPTH (TANK LEVEL) NOW HAS ONE** (Task 696, Tom, 2026-09-25): nodeFieldDefs()'s 'level' row,
+	// the same field the Settings label columns for tanks offer. Runs on the COPY, after
+	// importProject() has switched context onto it, exactly as convasApplyUnits() already does.
+	function convasApplyLabelSuffixes(a) {
+		var s = a.suffix || {};
+		if (typeof s.diameter === 'string') { setLabelAffix('suffix', 'link', 'diameter', s.diameter); }
+		if (typeof s.depth === 'string') { setLabelAffix('suffix', 'node', 'level', s.depth); }
+		if (typeof s.head === 'string') { setLabelAffix('suffix', 'node', 'head', s.head); }
+		if (typeof s.flow === 'string') {
+			setLabelAffix('suffix', 'node', 'demand', s.flow);
+			setLabelAffix('suffix', 'customer', 'demand', s.flow);
+		}
+	}
+	/**
+	 * **THE COPY, CONVERTED IN THE ORDER THE TWO HALVES NEED.**
+	 *
+	 *   1. Serialize this project and give the copy its own name and no docId.
+	 *   2. Coordinates that need no placement are converted on the saved copy: a local grid rescaled
+	 *      with its length unit, a world map dropped, or a known location laid out as a local grid.
+	 *      A known location that is going to a new coordinate system is first expressed in lat/lon,
+	 *      so the placement steps open already answered.
+	 *   3. The copy lands in a new tab, and the units are converted in it.
+	 *   4. If the coordinate system changed, the placement steps run on the copy, and when they
+	 *      finish convasPlaced() lays the lat/lon result onto the chosen system.
+	 */
+	function convasProceed(a, from, to, changed) {
+		var pc = EngCalcs.pageConfig || {}, saved, name, id, origId = library.openId,
+			lenFrom = unitKey('lpn_u_length'), lenTo = (a.units && a.units.lpn_u_length) || lenFrom,
+			k = metersPerLengthUnit(lenFrom) / metersPerLengthUnit(lenTo), step = null, toLL, t2, ok = true;
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
 		if (!saved || !saved.project) {
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
-		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId
-		// is what the lock broker and every live file handle key on, so two tabs sharing one would
-		// be two documents claiming to be the same file. And the world map attached to the original
-		// is a statement about coordinates that are about to be replaced, so it goes too.
+		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
+		// what the lock broker and every live file handle key on.
 		delete saved.project.docId;
-		delete saved.project.georef;
 		saved.project.name = name;
-		landProjectText(JSON.stringify(saved), true, name);
+		if (!changed) {
+			// **A LOCAL GRID'S COORDINATES ARE IN ITS LENGTH UNIT** (Task 693), so a new length unit
+			// rescales them with the pipes, and an attached world map keeps its place on the ground.
+			if ((from.kind === 'none' || from.kind === 'unnamed') && k !== 1) {
+				ok = convertSavedGeometry(saved, function (p) { return { x: p.x * k, y: p.y * k }; }, false);
+				var g = saved.project.georef;
+				if (ok && g && g.anchor) {
+					g.anchor = { x: g.anchor.x * k, y: g.anchor.y * k };
+					g.metersPerUnit = g.metersPerUnit / k;
+				}
+			}
+		} else if (from.kind === 'unnamed' && to.kind === 'none') {
+			// Detaching changes no coordinate: the grid is the grid it always was.
+			savedSetKind(saved, 'none');
+		} else if (from.kind === 'none') {
+			// Nowhere yet: the steps start from the whole world, as they always have.
+			step = to.kind === 'unnamed' ? 'attach' : 'place';
+		} else {
+			toLL = savedLonLatReader(saved, from);
+			if (to.kind === 'none') {
+				t2 = toLL ? savedLocalPlane(saved, toLL, lenTo) : null;
+				ok = !!t2 && convertSavedGeometry(saved, function (p) {
+					var ll = toLL(p);
+					return ll ? EngCalcs.lpnGeorefFromLonLat(t2, ll.x, ll.y) : null;
+				}, false);
+				if (ok) { savedSetKind(saved, 'none'); }
+			} else {
+				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC)) {
+					ok = !!toLL && convertSavedGeometry(saved, toLL, true);
+					if (ok) { savedSetKind(saved, 'geo'); }
+				}
+				step = 'answered';
+			}
+		}
+		if (!ok) {
+			setNotice(convasNoTransformMessage(pc, convasForeignCrs(from, to)));
+			return;
+		}
+		id = importProject(saved);
+		if (!id) { return; }
+		convasApplyUnits(a);
+		convasApplyLabelSuffixes(a);
+		saveToStorage();
+		renderTabs();
+		// No zoomExtent() here or below: a converted copy carries no saved view, so opening it fits
+		// through restoreViewOrFit() like any document without one (view-memory-harness.js).
+		if (!step) {
+			setNotice(String(pc.lpn_convas_done || 'The converted copy is {name}. The original project is unchanged.')
+				.replace('{name}', name));
+			return;
+		}
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
+		georefStart();
+		if (!georefActive()) { convasAbandon(); }
+	}
+	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
+	// this lays it onto the system the box asked for, on the saved document, and installs it in the
+	// same tab. A conversion to lat/lon itself is already finished.
+	function convasPlaced() {
+		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_WEBMERC)) { return; }
+		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
+		if (!saved || !saved.project) { return; }
+		if (c.to.kind === 'epsg') {
+			ok = convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnCrsForward(c.to.crs, { lon: p.x, lat: p.y });
+			}, false);
+			if (ok) { savedSetKind(saved, 'epsg', c.to.crs); }
+		} else {
+			t2 = savedLocalPlane(saved, function (p) { return { x: p.x, y: p.y }; }, c.lenKey);
+			ok = !!t2 && convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnGeorefFromLonLat(t2, p.x, p.y);
+			}, false);
+			if (ok) { savedSetKind(saved, c.to.kind, '', t2); }
+		}
+		if (!ok) {
+			setNotice(convasNoTransformMessage(pc, c.to.kind === 'epsg' ? c.to.crs : ''));
+			return;
+		}
+		writeJSON(projectKey(library.openId), saved);
+		prepared = prepareDocument(JSON.parse(JSON.stringify(saved)));
+		if (!prepared) { return; }
+		applySaved(prepared);
+		// The undo stack holds the lat/lon drawing the steps left, which is not this document's frame.
+		clearUndo();
+		saveToStorage();
+		refreshAllFromDocument();
+		renderTabs();
+		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+	}
+	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
+	// a half-converted duplicate left open is a second document nobody asked to keep.
+	function convasAbandon() {
+		var pc = EngCalcs.pageConfig || {}, c = convas;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (indexEntry(c.origId)) { switchToTab(c.origId); }
+		discardProject(c.copyId);
+		renderTabs();
+		setNotice(pc.lpn_convas_cancelled || 'Nothing was converted. The copy is closed, and the original project is unchanged.');
 	}
 
 	// ---- Live file handles ----
@@ -28569,7 +32130,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
 		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
-		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
+		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
+		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
+		if (initials === null) {
+			setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.');
+			return;
+		}
 		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
 		setNotice((r && r.ok && r.requested)
 			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
@@ -28609,7 +32175,11 @@ var EngCalcs = EngCalcs || {};
 			// answer from the rest. It licenses exactly that much and no colour.
 			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
 			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
+			// **CANCEL LEAVES A RESIDUE** (ROADMAP Task 704). It used to leave nothing at all: the
+			// dialog closed, the file did not open, and there was no trace anywhere of what had
+			// just been offered or why the file did not appear. That is exactly "Help! What did I
+			// miss!", and it costs one sentence to fix.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { setNotice(pc.lpn_lock_open_cancelled || 'That file was not opened, and nothing here changed. Somebody else still has it open.'); } },
 			{
 				// **THE GLYPH IS THE VERDICT STRINGS' OWN, AND IT IS PREPENDED HERE RATHER THAN
 				// WRITTEN INTO THE LANGUAGE FILE.** `⚠` is decorative, international and RTL-safe,
@@ -28873,6 +32443,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		banner.innerHTML = '';
 		if (!state) { banner.style.display = 'none'; settle(); return; }
+		// **THE BANNER'S MESSAGES LAND IN THE MESSAGE LOG TOO** (ROADMAP Task 704, row 2 of Ida's
+		// ranking). This bar carries real decisions -- who has the file, what you may still do
+		// about it -- and once dismissed there is no way back to the words. logMessage() keeps one
+		// row per distinct message, so a repaint on every tab switch does not fill the log.
+		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
 		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
 		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
@@ -29613,6 +33188,27 @@ var EngCalcs = EngCalcs || {};
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
+	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
+	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
+	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
+	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
+	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
+	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
+	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
+	// jobs from the one call it always made; a button built by hand because it must carry no tip
+	// calls this alone.
+	function registerToolbarIcon(el, iconName, name, tip) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === el) {
+				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
+				return;
+			}
+		}
+		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+	}
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
 		// when I hover on the toolbar icon, one is our styled tip. The other is the browser tip.
@@ -29636,17 +33232,9 @@ var EngCalcs = EngCalcs || {};
 		if (prior) { prior.dispose(); }
 		EngCalcs.setIconLabel(el, iconName, name, tip);
 		if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
-		// **THE INDEX IS KEYED ON THE BUTTON, so a repaint replaces its row rather than adding
-		// one.** Help, What the toolbar icons mean is DERIVED from this list; before this, cycling
-		// the area tool three times listed the area button four times.
-		var i;
-		for (i = 0; i < toolbarIconIndex.length; i++) {
-			if (toolbarIconIndex[i].el === el) {
-				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
-				return;
-			}
-		}
-		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
+		// Help, What the toolbar icons mean is DERIVED from this list; before this, cycling the
+		// area tool three times listed the area button four times.
+		registerToolbarIcon(el, iconName, name, tip);
 	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
@@ -29722,7 +33310,16 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !list) { return; }
 		if (!level) {
 			if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
+			// **THE OPEN ITEM LOOKS PRESSED** (feat/menu-button preview, R-202/R-203): aria-expanded
+			// was already the accessible signal a menu button owes a screen reader; it is now also
+			// what .lpn-menubar-item[aria-expanded="true"] (css/engcalcs.css) paints darker, so no
+			// second piece of state was invented to track "which one is open" -- one attribute, read
+			// by both. Harmless on the few non-menubar anchors that also open a level-0 popup (the
+			// scenario menu, a tab's context menu): aria-expanded is valid on any button that
+			// controls a popup, and no CSS rule outside .lpn-menubar-item reads it.
+			if (openMenuAnchor) { openMenuAnchor.setAttribute('aria-expanded', 'false'); }
 			openMenuAnchor = anchor;
+			if (anchor) { anchor.setAttribute('aria-expanded', 'true'); }
 			closeSubMenu();   // a new pull-down never inherits the previous one's fly-out
 			closeViewPopovers();
 		}
@@ -29861,6 +33458,7 @@ var EngCalcs = EngCalcs || {};
 		hidePanel(document.getElementById('lpn_menu_popup'));
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		unparkAnchorTip(0);
+		if (openMenuAnchor) { openMenuAnchor.setAttribute('aria-expanded', 'false'); }
 		openMenuAnchor = null;
 	}
 	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
@@ -30135,11 +33733,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function buildNewBoxUnits() {
-		var host = document.getElementById('lpn_new_units_fields');
-		if (!host) { return; }
+	// Shared with the File, Convert as box (Task 696), which asks the same units question of a copy.
+	function cloneUnitStrip(hostId) {
+		var host = document.getElementById(hostId), out = [];
+		if (!host) { return out; }
 		host.innerHTML = '';
-		newBoxUnits = [];
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var live = unitEl(name), item = unitStripItem(live), copy, sel;
 			if (!item) { return; }
@@ -30148,10 +33746,15 @@ var EngCalcs = EngCalcs || {};
 			sel = copy.querySelector('select');
 			if (!sel) { return; }
 			sel.removeAttribute('name');
+			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
 			host.appendChild(copy);
-			newBoxUnits.push({ name: name, sel: sel, item: copy });
+			out.push({ name: name, sel: sel, item: copy });
 		});
+		return out;
+	}
+	function buildNewBoxUnits() {
+		newBoxUnits = cloneUnitStrip('lpn_new_units_fields');
 	}
 	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
 	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
@@ -30167,10 +33770,11 @@ var EngCalcs = EngCalcs || {};
 	// A preset is a family => unit-key map and every select declares its family, which is exactly
 	// what EngCalcs.setUnits() does to the real strip. Applied to the clones here, because the real
 	// strip belongs to the project that is currently open.
-	function applyNewBoxPreset(system) {
+	function applyNewBoxPreset(system) { applyPresetToClones(newBoxUnits, system); }
+	function applyPresetToClones(list, system) {
 		var preset = (EngCalcs.unitSets || {})[system];
 		if (!preset) { return; }
-		newBoxUnits.forEach(function (u) {
+		list.forEach(function (u) {
 			var fam = (u.sel.dataset && u.sel.dataset.family) ||
 				(u.sel.getAttribute && u.sel.getAttribute('data-family')) || '';
 			var want = preset[fam];
@@ -30366,7 +33970,7 @@ var EngCalcs = EngCalcs || {};
 					// broken rather than that another projection over the same ground would work,
 					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
 					// the choice as well; this is the same sentence, after it.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+					setNotice(String((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || '{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.').replace('{crs}', crsLabel(crs) || String(crs || '')));
 				});
 			}
 		}
@@ -30498,9 +34102,18 @@ var EngCalcs = EngCalcs || {};
 	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
 	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 *
+	 * **NEITHER LAT/LON CODE EVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
+	 * beside "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the very projection the map is drawn in).
+	 * js/lpn-crs.js's proj4 definitions cover PROJECTED systems; EPSG:3857 and EPSG:4326 both mean
+	 * this page's own native lat/lon project, placed with the hand-written Mercator math
+	 * (Geom.mercLat/mercY) this page has always drawn its basemap with, never through proj4 --
+	 * lpnCrsHas('3857') and lpnCrsHas('4326') both correctly answer false, and asking either was the
+	 * defect, not the answer.
 	 */
 	function crsCannotBePlaced(code) {
-		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+		if (!code || crsIsLatLonCode(code)) { return false; }
+		return !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
 			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
 	}
 	function crsOptionText(entry) {
@@ -30557,7 +34170,7 @@ var EngCalcs = EngCalcs || {};
 			// A filter that is on and filtering nothing looks broken, so it says which it is.
 			note.textContent = (crsBoxViewOn() && !crsBox.place)
 				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
-				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
+				: (pc.lpn_crs_count || '{n} of {total} coordinate systems listed.')
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
 			// **THE ACKNOWLEDGEMENT THE IOGP TERMS REQUIRE, AND IT IS NOT A LANGUAGE KEY** -- the
 			// same rule as the OpenStreetMap and Nominatim credits: it names an owner rather than
@@ -30565,14 +34178,12 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
-			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
-			// "(no map)" mark in the option is what a person scanning the list sees; this is what
-			// they read once their choice has settled on one. Two sizes of the same fact, because
-			// the mark has to be short enough not to push a 50-character register name out of the
-			// select and the sentence has to be long enough to say what is lost.
-			if (crsCannotBePlaced(crsBox.code)) {
-				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
-			}
+			// **THE NOTE ENDS HERE, AFTER THE IOGP CREDIT** (Tom, 2026-09-25: the sentence this used
+			// to append -- lpn_crs_unplaceable's full explanation -- read as nonsense here). The
+			// "(no map)" mark in the option is what a person scanning the list sees for the rare
+			// unplaceable row; the key itself is still rendered, at the actual moment of consequence
+			// -- newProject()'s own refusal sentence a few hundred lines below this file, once
+			// somebody has gone ahead and created on one of the 106 anyway.
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -30594,7 +34205,12 @@ var EngCalcs = EngCalcs || {};
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
 			pick = crsBox.onPick;
 		closeCrsBox();
-		if (pick) { pick(code, crsBox.place); }
+		// **BOTH LAT/LON ENTRIES ANSWER AS LPN_CRS_WEBMERC**, the one code every caller downstream
+		// (New project, Convert as) already knows means "make the lat/lon project". EPSG:3857 and
+		// EPSG:4326 are offered as two unmodified, honestly-named rows so nothing in the register is
+		// hidden (Tom, 2026-09-25); which one somebody clicked never needs to be told apart again
+		// after this point, because both name the identical project.
+		if (pick) { pick(crsIsLatLonCode(code) ? LPN_CRS_WEBMERC : code, crsBox.place); }
 	}
 	var crsBoxWired = false;
 	function wireCrsBox() {
@@ -30760,27 +34376,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
-			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
-			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
-			// along. That is what this row is for, and it takes both kinds of file for exactly that
-			// reason.
-			//
-			// **THIRD, BELOW BOTH ROWS IT RESCUES.** Tom, 2026-08-19: *"But make it third since it is
-			// truly our fallback option."* The first two are what a person reaches for; this is what
-			// they reach for after one of those gave them the wrong coordinate kind. A fallback
-			// listed above the thing it falls back from reads as an equal alternative.
-			//
-			// **A ROW RATHER THAN A PROMPT ON Open…**, by Tom's standing rule that a choice must not
-			// stand in front of the common action: opening a file is common, placing a grid drawing
-			// on the world is rare, so the rare act carries the extra door.
-			//
-			// **NEVER DISABLED.** It opens a file, and there is always a file it could open --
-			// nothing about the project on screen makes this impossible, because the result is a new
-			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
-			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Convert coordinates as…',
-			  tip: pc.lpn_file_import_geo_tip, fn: convertCoordsAs },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -30861,6 +34456,17 @@ var EngCalcs = EngCalcs || {};
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
+			// **DIRECTLY AFTER SAVE AS..., NOT AMONG THE ROWS THAT OPEN A FILE** (Task 696, R-213;
+			// Tom, 2026-09-24: *"there is nothing else about converting, and it's not about
+			// importing or exporting"*). It copies THIS project and converts the copy (convertAs()),
+			// so it belongs with Save, Save as, Save all and Revert -- the rows that act on the open
+			// project -- rather than with Open, Open example and the import/export rows, each of
+			// which replaces it with something else. On an empty tab it opens a file first.
+			//
+			// It replaced Task 447's "Import XY to lat/lon…", which converted the open project in
+			// place and had to be greyed whenever that project was already on the map.
+			{ icon: 'globe', label: pc.lpn_file_convert_as || 'Convert as…',
+			  tip: pc.lpn_file_convert_as_tip, fn: convertAs },
 			// **Present always, disabled when it would do nothing.** A row that appears and
 			// disappears teaches no one it is there, and its absence reads as a missing feature
 			// rather than as a state. Every sibling here -- Save, Revert -- greys out instead.
@@ -30982,12 +34588,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
+				+ (pc.lpn_tool_key_hint_two || 'Shortcut: {key} or {key2}')
 					.replace('{key}', key).replace('{key2}', alt);
 		}
 		if (key || alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', key || alt);
+				+ (pc.lpn_tool_key_hint || 'Shortcut: {key}').replace('{key}', key || alt);
 		}
 		return tip;
 	}
@@ -31227,8 +34833,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
 	function wireNotesPopup() {
-		var cx = document.getElementById('lpn_menu_cue_x');
-		if (cx) { cx.addEventListener('click', retireMenuCue); }
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
 		var x = document.getElementById('lpn_notes_close');
@@ -31264,7 +34868,12 @@ var EngCalcs = EngCalcs || {};
 			// and the reason is that a reader does not meet these rows one feature at a time**: a
 			// picture behind the drawing and a map behind the drawing are the same kind of thing,
 			// so a reader who has learnt one submenu has learnt the other.
-			{ icon: 'globe', hidden: !xyMapAttachable(),
+			// **ALWAYS OFFERED, NEVER HIDDEN, SINCE 2026-09-22** (Tom: *"Keep all rows visible
+			// always. But disable what's not applicable."* And, on an EPSG project he could not
+			// find this on at all: *"Even an EPSG project should have the option to detach and
+			// reattach the world map."*). `disabled` covers the one real gap -- a projected
+			// project whose method proj4 does not implement, which has nowhere to put a tile.
+			{ icon: 'globe', disabled: !worldMapUsable(),
 				label: pc.lpn_map_attach_menu || 'World map…',
 				tip: pc.lpn_map_attach_tip,
 				submenu: function () { return mapgeoRows(); } },
@@ -31275,51 +34884,36 @@ var EngCalcs = EngCalcs || {};
 			// moved to the Project menu, beside Tables, where the two things you READ beside the
 			// map now sit together -- see openProjectBarMenu(). What is left here is the drawing
 			// itself: how it is framed, how much furniture is over it, and where on Earth it is.
-			// The label states what the row will DO, because this menu has no checkmark column --
-			// the same convention the street-map row below follows.
-			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Hide map readouts'),
-				tip: pc.lpn_clean_map_tip,
-				fn: function () { setCleanMap(!cleanMapOn()); } },
-			// **HIDDEN WHERE THE PROJECT CANNOT SAY WHERE IT IS, not disabled.** A grid project's
-			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
-			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
-			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
-			// place name. Is this intentional?"* -- it was not; it was `isLatLonProject()` written
-			// before there was a transform, and the answer to a typed latitude is now one forward
-			// projection away). The label states what the row will DO, because this menu has no
-			// checkmark column.
+			//
+			// **HIDE MAP READOUTS, AND THE SEPARATE HIDE/SHOW STREET MAP AND SATELLITE ROWS, ARE
+			// RETIRED** (Tom, 2026-09-22: *"Hide map readouts was a print prep command. But it
+			// isn't very useful any more. Let's remove it."* And: *"I think we can retire the
+			// Hide/Show street map and satellite images rows. Detach and attach provide the same
+			// functionality."*). World map, Attach/Detach now turns the tiles on and off for
+			// every project kind, and the corner teaser (refreshBasemapTeaser()) still swaps
+			// street for satellite. `cleanMapOn()`/`setCleanMap()` went with the readouts row --
+			// nothing else called them. KEYS DELETED: lpn_clean_map, lpn_clean_map_off,
+			// lpn_clean_map_tip, lpn_basemap_hide, lpn_basemap_satellite_hide, lpn_basemap_tip,
+			// lpn_basemap_satellite_tip.
+			//
+			// **SHOWN ON EVERY PROJECT, DISABLED WHERE IT CANNOT SAY WHERE IT IS** (Tom, 2026-09-22:
+			// *"Goto and Search ... can show for unnamed CRS projects, but disabled when a world map
+			// is not attached (no georeference)."*). This used to HIDE them on a grid project; it is
+			// now the same rule as the rest of this menu, greyed rather than gone. placeFindable()
+			// is lat/lon, a projected project with a transform, or a grid with the world map
+			// attached. The search row stays hidden only when js/lpn-search.js did not load, since
+			// then there is no label to show at all.
+			{ separator: true },
 			{
-				hidden: !projectLocatable(), separator: true
-			},
-			{
-				hidden: !projectLocatable(), icon: 'globe',
+				disabled: !placeFindable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
-				hidden: !projectLocatable() || !EngCalcs.lpnSearchOpen, icon: 'find',
+				hidden: !EngCalcs.lpnSearchOpen, disabled: !placeFindable(), icon: 'find',
 				label: EngCalcs.lpnSearchMenuLabel && EngCalcs.lpnSearchMenuLabel(),
 				tip: EngCalcs.lpnSearchMenuTip && EngCalcs.lpnSearchMenuTip(),
 				fn: function () { EngCalcs.lpnSearchOpen(); }
-			},
-			{
-				hidden: !basemapChoosable(), icon: 'view',
-				label: (basemapOn() && basemapStyle() === 'osm')
-					? (pc.lpn_basemap_hide || 'Hide street map')
-					: (pc.lpn_basemap_show || 'Show street map'),
-				tip: pc.lpn_basemap_tip,
-				fn: function () { setBasemapStyle('osm'); }
-			},
-			// **HIDDEN WITHOUT A TOKEN, not shown-and-broken.** A row that fetches a 401 per tile
-			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
-			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
-			{
-				hidden: !basemapChoosable() || !satelliteAvailable(), icon: 'view',
-				label: (basemapOn() && basemapStyle() === 'satellite')
-					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
-					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
-				tip: pc.lpn_basemap_satellite_tip,
-				fn: function () { setBasemapStyle('satellite'); }
 			}
 			// **THE TERRAIN-ELEVATIONS ROW IS GONE, TASK 542.** Tom pressed it and wrote the defect
 			// himself: *"To be honest, I did not expect nor necessarily welcome what I got. I was
@@ -31565,6 +35159,11 @@ var EngCalcs = EngCalcs || {};
 			b.id = m.id;
 			if (m.id === 'lpn_menu_file') { fileMenuButton = b; }
 			b.className = 'lpn-menubar-item';
+			// Starts closed; openMenu()/closeMenu() flip this as the pull-down opens and shuts, and
+			// .lpn-menubar-item[aria-expanded="true"] (css/engcalcs.css) is what paints the open item
+			// pressed. Set here too (not just by openMenu()) so a screen reader gets the right state
+			// on first render, before anything has been clicked.
+			b.setAttribute('aria-expanded', 'false');
 			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
 			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
 			// appends the label as a bare TEXT NODE, and a stylesheet cannot reach one -- so the
@@ -31593,12 +35192,10 @@ var EngCalcs = EngCalcs || {};
 			if (m.tip) { b.title = m.tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function (e) {
 				e.stopPropagation();
-				retireMenuCue();   // they found the bar; the cue has done its job
 				m.open(e.currentTarget);
 			});
 			bar.appendChild(b);
 		});
-		showMenuCue();
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
 		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
 		initTipsIn(bar);
@@ -31986,6 +35583,12 @@ var EngCalcs = EngCalcs || {};
 		modelLayer = el('g', {}, world);
 		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
 		// the .lpn-symbols rule in css/engcalcs.css.
+		// **CUSTOMERS PAINT UNDER EVERY PIPE AND EVERY NODE** (Tom, 2026-09-25: *"Customer zindex is
+		// higher than Junction. Fix that. Make it just less than link?"*). A service and its dot are
+		// the least of the things on the map, so where one overlaps a main or a junction the main or
+		// the junction shows and takes the press -- a mouse's precedence is nothing but paint order.
+		// The selection grip stays in labelsLayer, on top, because it is the thing in the hand.
+		customersLayer = el('g', { 'class': 'lpn-customers' }, modelLayer);
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		// **A PUMP OR VALVE SYMBOL PAINTS OVER EVERY PIPE AND UNDER EVERY NODE, AND IT NEEDS ITS OWN
 		// LAYER TO DO BOTH** (Tom, 2026-09-10: *"Somebody has to win. There's no compelling reason to
@@ -32017,6 +35620,10 @@ var EngCalcs = EngCalcs || {};
 		// IN WORLD COORDINATES, like everything else in `world`: the ring is a shape on the
 		// drawing, so a pan mid-drag moves the map under it exactly as it moves the pipes.
 		selectAreaEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
+		// The Zoom Window box (ROADMAP Task 682) -- its own element rather than sharing
+		// selectAreaEl, because the two tools' state is deliberately not shared (see zoomWinDrag's
+		// own comment) and painting one over the other's element would race whichever tool last drew.
+		zoomWinEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
 		// The bends already picked (Task 567), in the same layer and the same red dash as the band:
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
@@ -32028,6 +35635,7 @@ var EngCalcs = EngCalcs || {};
 		spotDebugLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
+		wireZoomControl();
 		georefWireBar();
 		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
@@ -32061,6 +35669,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (opening) {
 			applySaved(opening);
 			buildDom();
+			paneDocumentArrived();   // R-109: wirePane() above drew the table before this document existed
 			// The boot path does not go through refreshAllFromDocument(), so it marks the arrival
 			// itself: a project reopened with a duration is presented over it, exactly as one
 			// opened from the tab strip is.
@@ -32077,6 +35686,30 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
+			// GRID.** The reported defect was specific: attaching the world map to the default tab
+			// errored, because a schematic project has no coordinate system to place tiles with.
+			// Making Project1 geographic from birth removes the error at its source instead of
+			// routing the visitor around it -- see `firstVisitHomeView()` above for where the
+			// numbers come from and why `LPN_GEO_HOME` itself is untouched.
+			project.coords = LPN_COORDS_GEO;
+			// **AND THE STREET MAP IS ON, BEHIND THE GALLERY, FROM THE FIRST FRAME** (Tom,
+			// 2026-09-25: *"we need to have this visible on first load behind the gallery. I think
+			// we can suppress any disclosure at this time because it is a standard app request
+			// instead of a user request"*). A geographic project defaults its basemap on
+			// (`basemapOn()` is `project.basemap !== 'off'`), and this one is no longer the
+			// exception: a map application drawing its street map is the service the visitor came
+			// for. It fetches OpenStreetMap tiles with no gesture behind it, which is why
+			// privacy.php says the street map is shown on this first, empty project and can be
+			// hidden (Map, World map, Detach), while the other three outside requests still ask.
+			// It stores nothing new: `project.basemap` stays unset, as on every geographic project.
+			// **NOT `pendingView`/`pendingViewFor` HERE** -- `firstVisitHomeView()`, like
+			// `geoHomeView()`, needs the canvas's real height to compute a scale, and at this point
+			// in boot the canvas is still behind the curtain (height 0 until `applyMapHeight()` runs
+			// on `window load` -- see the Task 418 note above "AND IT IS BORN CLEAN"). Computed now,
+			// it would come back null and the camera would never move. `firstVisitPendingId` asks
+			// `noteMapSized()` to compute and apply it once the canvas actually has a size.
+			firstVisitPendingId = firstId;
 			// **AND IT IS BORN CLEAN.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
@@ -32139,9 +35772,13 @@ var EngCalcs = EngCalcs || {};
 		wireEnergyBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
+		wireStatusReportBox();
+		wireFullReportBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
+		wireMessageLogButton();
+		wireOffscreenNotice();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -32484,11 +36121,60 @@ var EngCalcs = EngCalcs || {};
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
-		// **`zoomExtent` BY REFERENCE, so the click event arrives as its `auto` argument.** Left
-		// exactly as it was -- changing it is a behaviour change to the fit and belongs in its own
-		// task, not in a tooltip fix.
-		extentBtn.addEventListener('click', zoomExtent);
+		// **ZOOM TO FIT / ZOOM WINDOW: THE SAME DISCLOSURE IDIOM AS SELECT-AREA** (ROADMAP Task
+		// 682; Tom, 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select
+		// area button. Give it a little triangle indicator. The second time you click it, it
+		// changes to Zoom Window."). `.lpn-tool-more` is the same class that draws select-area's
+		// corner triangle purely in CSS (`::after`, css/engcalcs.css) -- nothing new in the DOM for
+		// a screen reader to mistake for a second control.
+		extentBtn.className = 'lpn-tool-more';
+		extentBtn.dataset.tool = 'zoom-window';   // so setModeUI()'s generic aria-pressed sweep finds it
+		function paintZoomToolButton() {
+			if (zoomToolShape === 'window') {
+				setIconLabel(extentBtn, 'zoom-window', pc.lpn_tool_zoom_window || 'Zoom Window', pc.lpn_tool_zoom_window_tip);
+			} else {
+				setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
+			}
+			// ASSIGNED, not appended -- setIconLabel() adds .ec-help to whatever is already there,
+			// so a `+=` on a button repainted on every shape change would grow the class list
+			// without bound (the exact bug paintAreaButton()'s own comment names).
+			if (extentBtn.className.indexOf('lpn-tool-more') < 0) { extentBtn.className += ' lpn-tool-more'; }
+			extentBtn.dataset.tool = 'zoom-window';
+			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
+		}
+		extentBtn.addEventListener('click', function () {
+			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
+			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
+			// come back to, because Zoom to fit is what the button shows by default.
+			if (mode === 'zoom-window') { setMode('select'); return; }
+			// **R-181 (Tom, 2026-09-23): the FIRST press never changes what the button shows -- it
+			// only does what it already showed, exactly as select-area's own button never re-labels
+			// itself on the press that enters the tool.** `zoomToolArmed` is the one-shot memory of
+			// "the last thing pressed was this button, doing Zoom to fit, with nothing else in
+			// between" -- setMode()'s reset hook clears it on any other mode change, so it is only
+			// ever true here on a genuine SECOND, CONSECUTIVE press.
+			if (zoomToolArmed) {
+				zoomToolArmed = false;
+				zoomToolShape = 'window';
+				setMode('zoom-window');
+				paintZoomToolButton();
+				return;
+			}
+			// **`zoomExtent(false)`, EXPLICITLY, never a bare call** -- view-memory-harness.js
+			// greps the whole file for an unmarked `zoomExtent()` on the argument that every real
+			// call site must SAY whether it is a fit nobody asked for (Tom, 2026-08-15: "there are
+			// no automatic zooms or pans... a fit that establishes a view the document never had is
+			// not a change to it"). This one is a press, which is an edit, so it says so.
+			zoomExtent(false);
+			zoomToolArmed = true;
+			// **NO paintZoomToolButton() HERE, ON PURPOSE.** The face stays "Zoom to fit" -- Tom:
+			// "Changing the first time you click is confusing." `zoomToolShape` is untouched too,
+			// so a second press elsewhere (a different tool, then back here) starts this over.
+		});
+		repaintZoomTool = paintZoomToolButton;
+		zoomToolButton = extentBtn;
+		wireZoomArmReset();
+		paintZoomToolButton();
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
@@ -32708,6 +36394,13 @@ var EngCalcs = EngCalcs || {};
 			if (mode !== 'select-area') { return; }
 			areaMove(screenToWorld(e.clientX, e.clientY));
 		});
+		// The Zoom Window box, tracking only the ONE pointer that opened it (ROADMAP Task 682) --
+		// unlike the ring above, this gesture is a press-drag-release, so a hover with no button
+		// down must not move a box nobody is drawing.
+		svg.addEventListener('pointermove', function (e) {
+			if (mode !== 'zoom-window' || !zoomWinDrag || zoomWinDrag.id !== e.pointerId) { return; }
+			zoomWinMove(screenToWorld(e.clientX, e.clientY));
+		});
 		// The profile path chooser's hover (Task 433) -- the same shape as the rubber band above and
 		// for the same reason: between clicks the user must see what the next click would commit.
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
@@ -32780,6 +36473,18 @@ var EngCalcs = EngCalcs || {};
 					drag = { type: 'pan', tx0: state.tx, ty0: state.ty };
 				}
 				Object.assign(drag, common);
+				return;
+			}
+			// **ZOOM WINDOW IS ALSO ITS OWN MODE, FOR THE SAME REASON** (ROADMAP Task 682): the
+			// whole gesture is a press-drag-release box OR a click-click box (R-180), on a mouse or
+			// a finger alike, so `drag` (the pan/node/vertex/label state machine below) never arms
+			// while it is open.
+			if (mode === 'zoom-window') {
+				// Recorded BEFORE the press, exactly as select-area's own `areaPressAt` is, because
+				// `started` asks "did THIS press open the box" and there is no way left to ask that
+				// once zoomWinPress() has run.
+				zoomWinPressAt = { id: e.pointerId, x: e.clientX, y: e.clientY, started: !zoomWinDrag };
+				zoomWinPress(screenToWorld(e.clientX, e.clientY), e.pointerId);
 				return;
 			}
 			// **SELECT AREA IS ITS OWN MODE AND NOTHING ELSE HAPPENS IN IT** (Task 266). No node
@@ -32916,6 +36621,16 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
+			// The Zoom Window release (ROADMAP Task 682; R-180) -- a cancelled pointer drops the box
+			// rather than zooming to wherever the browser happened to take the gesture away, the
+			// same rule select-area's own cancel follows two lines down. A release that is not
+			// cancelled goes through `zoomWinPointerUp()`, exactly as select-area's own release
+			// does through `areaPointerUp()`: a release that never travelled leaves the box open
+			// for a second click, and only a release that DID travel commits it here.
+			if (mode === 'zoom-window') {
+				if (cancelled) { zoomWinPressAt = null; if (zoomWinDrag) { zoomWinCancel(); } }
+				else { zoomWinPointerUp(e, screenToWorld(e.clientX, e.clientY)); }
+			}
 			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
 			// because nothing else on this page owns that finger: select-area arms no `drag`.
 			if (mode === 'select-area') {
@@ -32968,7 +36683,9 @@ var EngCalcs = EngCalcs || {};
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
-			if (wasPan && !drag) { relayoutLabels(); }
+			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
+			// and its release is the "at rest" moment -- never mid-drag.
+			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
 		}
 		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
 		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
@@ -33106,6 +36823,14 @@ var EngCalcs = EngCalcs || {};
 					var nearMeter = nearestCustomerNearScreen(e.clientX, e.clientY, TOUCH_REACH_PX);
 					if (nearMeter && custEls[nearMeter.id]) { t = custEls[nearMeter.id].box; }
 				}
+			}
+			// **A CLICK ON THE CONNECTION GRIP IS A CLICK ON WHAT THE GRIP SITS ON** -- see
+			// gripClickHandsThrough(). This line is past the drag test above, so a drag that starts
+			// on the grip still carries the connection; only a press that did not move is handed
+			// through. Not with Shift (that toggles, on the press), nor while the profile's path
+			// tools own every press.
+			if (mode === 'select' && !e.shiftKey && !profileDrawActive() && !profileEditActive()) {
+				t = gripClickHandsThrough(t, e.clientX, e.clientY);
 			}
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.
@@ -34049,6 +37774,10 @@ var EngCalcs = EngCalcs || {};
 			});
 		} else if (name === 'lpn_u_flow') {
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
+			// A junction's further demand categories (Task 468) and a customer's own demand (Task
+			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
+			doc.nodes.forEach(function (nd) { (nd.extraDemands || []).forEach(function (d) { conv(d, 'base'); }); });
+			(doc.customers || []).forEach(function (c) { conv(c, 'demand'); });
 			convOverrides('demand');
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
@@ -34195,13 +37924,50 @@ var EngCalcs = EngCalcs || {};
 		}
 		return key;
 	}
-	// One redraw for either answer: the document's numbers or their meaning changed, so everything
-	// derived from them is stale -- the labels, the solve, and what is on disk.
+	// **NOT refreshAllFromDocument() -- THAT IS THE PROJECT-ARRIVAL PATH** (ROADMAP Task 653, LEFT
+	// half). A unit change is not a different network arriving: nothing moves. CLAUDE.md's Unit
+	// Sets rule is "changing a unit reinterprets the typed number; it never converts it" -- so the
+	// STORED numbers are untouched (Non-destructive) or rewritten in place by convertUnitValues()
+	// (Destructive) before this runs either way, and no unit here ever decides a coordinate (see
+	// unitServes() and LPN_UNIT_SELECTS -- length, diameter, roughness, elevation/head, pressure,
+	// flow, velocity, gradient, age; x/y and lon/lat are never among them). So buildDom() has
+	// nothing to rebuild: every element keeps its shape and its place, and rebuilding the whole SVG
+	// tree, the Settings box and the Libraries box for that is the 0.4-0.8 s this task measured.
+	//
+	// What DOES go stale is what reads the numbers through the unit strip: every label's text,
+	// Properties (an open popup), the Tables pane, the legend, the status readout, and any colour
+	// break defined in this quantity. All of it is READ FROM `doc`/`lastSolveResult` at render
+	// time, so re-rendering it -- not rebuilding the DOM it renders into -- is the whole job.
 	function afterUnitChange() {
-		// On a geographic project the threshold's metres move with the unit while a world unit
-		// (a degree) does not, so the cap is re-derived (Task 705). On a grid it is unit-invariant.
+		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
+		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
+		// costs nothing and a future input to the cap might not be so lucky.
 		invalidateSymbolCap();
-		refreshAllFromDocument();
+		// **ONE COALESCED PASS, LIKE EVERY OTHER SETTINGS CONTROL SINCE THE FIRST HALF OF 653.**
+		// requestLabelRefresh() also repaints the labels legend and the scenario marks
+		// (refreshLabelPassTail()), and anything that reads the layout before the frame flushes it
+		// first -- so nothing here can show the old lettering.
+		requestLabelRefresh();
+		// Colour breaks are typed in the unit just changed, so a thematic map painted before this
+		// change is now reading its own numbers in the wrong quantity.
+		refreshValueColors();
+		// The two panels that show the document's numbers without waiting to be asked.
+		refreshPaneIfOpen();
+		refreshPopupIfOpen();
+		// The status strip names the flow and pressure units directly (Task 522).
+		refreshMapStatus();
+		// **ONE SOLVE, NOT TWO, AND NOT THE PROJECT-ARRIVAL ONE.** scheduleArrivalSolve() (what
+		// refreshAllFromDocument() used) unconditionally drops the fire-flow run, which is right for
+		// a different network arriving and wrong for an edit -- Task 530's ruling is that only a
+		// genuinely different network clears the rings. scheduleSolve() is the same door every other
+		// edit on this page goes through: recalculate ON gets one debounced solve, which itself
+		// redraws labels, colours, the pane and the popup again once the new numbers exist;
+		// recalculate OFF leaves the stale answers on screen, exactly as the snapshot rule requires,
+		// while still saving the edit.
+		scheduleSolve();
+		// The unit choice is part of the PROJECT (there are no browser units on this page), so it
+		// is saved at once rather than on the solve's debounce -- the user just made one deliberate
+		// choice, not a burst of keystrokes.
 		saveToStorage();
 	}
 	function wireUnitSelects() {
@@ -34382,9 +38148,29 @@ var EngCalcs = EngCalcs || {};
 			refreshMapStatus();
 		});
 	}
+	// **THE MAP COORDINATES LINE UNDER LENGTH** (Task 693, folded into 696). Derived, never chosen:
+	// degrees for lat/lon, the plane's own unit for an EPSG system, and the length unit for a local
+	// grid, attached or not, because that is what a local grid's numbers are in.
+	function mapCoordsUnitText() {
+		var pc = EngCalcs.pageConfig || {}, u;
+		if (isLatLonProject()) { return pc.lpn_units_mapcoords_deg || 'degrees'; }
+		if (!isProjectedProject()) { return unitLabel('lpn_u_length'); }
+		u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(projectCrsCode()) : null;
+		if (!u) { return projectCrsCode(); }
+		if (u.units === 'm') { return pc.u_m || 'm'; }
+		if (u.units === 'ft') { return pc.u_ft || 'ft'; }
+		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
+		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
+		return String(u.units);
+	}
+	function refreshMapCoordsUnit() {
+		var el = document.getElementById('lpn_u_mapcoords');
+		if (el) { el.textContent = mapCoordsUnitText(); }
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		ensureCrsForProject();
+		refreshMapCoordsUnit();
 		if (!el) { return; }
 		// A PIPE, not spaces. Three "Label: value" pairs run together are one undifferentiated string
 		// at 11px, and whitespace is the weakest divider there is.
@@ -34517,7 +38303,7 @@ var EngCalcs = EngCalcs || {};
 		// below it, which is the same rule .lpn-set-row carries in css/engcalcs.css.
 		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
-		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
+		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
 		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
 		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
@@ -34603,7 +38389,7 @@ var EngCalcs = EngCalcs || {};
 			spec.value = v;
 			spec.onChange(v);
 			saveToStorage();
-			refreshLabelText();
+			requestLabelRefresh();
 		});
 		return box;
 	}
@@ -34620,7 +38406,7 @@ var EngCalcs = EngCalcs || {};
 		box.setAttribute('aria-label', spec.title);
 		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
 		box.style.boxSizing = 'border-box';
-		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); refreshLabelText(); });
+		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); requestLabelRefresh(); });
 		return box;
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
@@ -34637,6 +38423,12 @@ var EngCalcs = EngCalcs || {};
 			['demand', pc.lpn_field_base_demand || 'Base demand'],
 			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			['elev', pc.lpn_field_elev || 'Elevation'],
+			// **TANK WATER DEPTH** (Task 696, Tom, 2026-09-25: give the coverage this was missing
+			// rather than disable it in Convert as). Trails Elevation on the same physical-order
+			// argument: a tank is the one node type that has it, and the node loop below prints it
+			// only where one is typed, exactly as Elevation prints nothing for an imported reservoir
+			// with none. The same key names it in the tank's own Properties popup (renderNodeFields).
+			['level', pc.lpn_field_tank_level || 'Water depth'],
 			// LAST, and off by default. It is the one field here that no network has until a run
 			// has been made with the analysis switched on, and its heading follows that switch.
 			['quality', qualityLabel()],
@@ -34710,12 +38502,60 @@ var EngCalcs = EngCalcs || {};
 	// row layout itself was already correct. rebuildLabelsFields() now calls columnHeadings() on this
 	// host before this function runs, with trailingCols trimmed to ['decimals'] because a customer
 	// label has no Drop column to head (see customerFieldDefs()'s own comment).
+	// **ONE CONTROL, BUILT ONCE, USED BY BOTH THE ALL-LABELS AND CUSTOMER ROWS** (Tom, 2026-09-23
+	// pre-review: "Best: build both rows through one shared function so they cannot drift."). The
+	// two rows differ only in WHERE the number lives and what else a change must also do --
+	// `spec.get`/`spec.set` are the whole of that difference. Everything else (the box, its width,
+	// the placeholder, the unit, the capture button, and the three-way blank/0/number read a typed
+	// entry gets) is written once.
+	//
+	// **BLANK IS null ("ALWAYS"), 0 IS A REAL NUMBER ("NEVER"), A REFUSED ENTRY PUTS BACK WHATEVER
+	// spec.get() ALREADY HELD** -- the same rule `setLabelMaxWidth()` used to enforce for the
+	// all-labels row alone; the customer row never had a door to null before this, so its own box
+	// could show "Always show" but never actually reach the state that placeholder promises.
+	function buildLabelWidthControl(spec) {
+		var pc = EngCalcs.pageConfig || {},
+			wrap = document.createElement('span'), input = document.createElement('input'),
+			unit = document.createElement('span'), btn = document.createElement('button');
+		wrap.className = 'lpn-set-ctlgroup';
+		input.type = 'number'; input.step = 'any'; input.min = '0';
+		// **THE SAME WIDTH ON BOTH ROWS** (Tom, 2026-09-23 pre-review: the customer box was 2.6rem,
+		// the all-labels box 7em -- visibly narrower for no reason tied to what either box holds).
+		input.style.width = '7em'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
+		if (spec.id) { input.id = spec.id; }
+		input.placeholder = pc.lpn_settings_label_always || 'Always show';
+		input.setAttribute('aria-label', spec.label || pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less');
+		function paint() {
+			var v = spec.get();
+			input.value = (typeof v === 'number' && isFinite(v) && v >= 0) ? String(v) : '';
+		}
+		paint();
+		function commit(v) { spec.set(v); paint(); }
+		input.addEventListener('change', function () {
+			var t = input.value.trim();
+			if (t === '') { commit(null); return; }
+			var v = +t;
+			if (isFinite(v) && v >= 0) { commit(v); } else { paint(); }
+		});
+		btn.type = 'button'; btn.className = 'lpn-btn';
+		btn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		btn.addEventListener('click', function (e) {
+			// Inside a <label>, so the press must not also be read as a click on the box.
+			if (e && e.preventDefault) { e.preventDefault(); }
+			var w = captureViewWidth();
+			if (w > 0) { commit(w); }
+		});
+		unit.className = 'lpn-set-note';
+		unit.textContent = unitLabel('lpn_u_length');
+		// **THE UNIT SITS BEFORE THE BUTTON** (Tom, 2026-09-22/23: "'ft' is in the wrong place. It
+		// should be before the button.") -- on both rows now.
+		wrap.appendChild(input); wrap.appendChild(unit); wrap.appendChild(btn);
+		return { wrap: wrap, input: input, paint: paint };
+	}
 	function buildCustomerLabelSection(host) {
-		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'),
-			name = document.createElement('span'), input = document.createElement('input'),
-			unit = document.createElement('span'), note = document.createElement('div'),
-			wrap = document.createElement('span'), useBtn = document.createElement('button'),
-			cur = labelSettings.customerMaxWidth;
+		var pc = EngCalcs.pageConfig || {}, line = document.createElement('label'),
+			text = document.createElement('span'), note = document.createElement('div');
 		customerFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
 				function (v) { labelSettings.customer[f[0]] = v; },
@@ -34739,54 +38579,33 @@ var EngCalcs = EngCalcs || {};
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
+			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
-		name.className = 'lpn-set-name ec-help';
-		name.style.flex = '1 1 auto';
-		name.textContent = pc.lpn_labels_customer_width ||
-			'Widest view that attempts to display customer labels';
-		name.title = pc.lpn_labels_customer_width_tip ||
-			'How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
-		input.type = 'number'; input.step = 'any'; input.min = '0';
-		input.style.width = LPN_LABEL_AFFIX_W; input.style.flex = '0 0 auto';
-		input.style.boxSizing = 'border-box';
-		input.setAttribute('aria-label', name.textContent);
-		input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
-		// **A REFUSED ENTRY PUTS THE OLD NUMBER BACK RATHER THAN STANDING**, which is the energy
-		// rows' own rule: a box showing a value the document does not hold is the one state a
-		// reader cannot tell from a setting that took.
-		input.addEventListener('change', function () {
-			var v = parseFloat(input.value);
-			if (isFinite(v) && v >= 0) { labelSettings.customerMaxWidth = v; }
-			else { input.value = String(labelSettings.customerMaxWidth); return; }
-			saveToStorage();
-			refreshLabelText();
+		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
+		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
+		// interfaces identical"; pre-review, same day: "build both rows through one shared function
+		// so they cannot drift"). This function cannot reach rebuildSettingsFieldsNow()'s own nested
+		// row() helper -- a different top-level function -- so the `.lpn-set-row`/setFieldLabel()
+		// wrapper is built here by hand, but `buildLabelWidthControl()` above supplies everything
+		// inside it. Same wording, too: the row NAME is shared with lpn_settings_label_max_width
+		// (the all-labels row's own key) rather than a second key carrying an identical string, per
+		// CLAUDE.md's "reuse whole labels" rule -- these two rows now say exactly the same thing
+		// about what they gate.
+		line.className = 'lpn-set-row';
+		setFieldLabel(text, pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
+		// the box's own "Always show" placeholder was previously unreachable -- the old change
+		// handler refused an empty entry and put the last number back). saveToStorage() and
+		// requestLabelRefresh() are this row's own two side effects, exactly as they were before.
+		var lw = buildLabelWidthControl({
+			get: function () { return labelSettings.customerMaxWidth; },
+			set: function (v) { labelSettings.customerMaxWidth = v; saveToStorage(); requestLabelRefresh(); },
+			label: pc.lpn_settings_label_max_width
 		});
-		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
-		// view' button like the other one we restored in a different branch."*). Same words and the
-		// same rounding UP; the QUANTITY is captured by captureViewWidth(), which reads what
-		// this box is actually compared against rather than what the other branch's box is -- see
-		// the comment there for the two ways a verbatim copy was wrong.
-		//
-		// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps the pair
-		// inside the row's control column instead of pushing the whole group left.
-		useBtn.type = 'button';
-		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		useBtn.addEventListener('click', function () {
-			var w = captureViewWidth();
-			if (!(w > 0)) { return; }
-			labelSettings.customerMaxWidth = w;
-			input.value = String(labelSettings.customerMaxWidth);
-			saveToStorage();
-			refreshLabelText();
-		});
-		wrap.className = 'lpn-set-ctlgroup';
-		wrap.appendChild(input); wrap.appendChild(useBtn);
-		unit.className = 'lpn-set-note';
-		unit.textContent = unitLabel('lpn_u_length');
-		row.appendChild(name); row.appendChild(wrap); row.appendChild(unit);
-		host.appendChild(row);
+		line.appendChild(text); line.appendChild(lw.wrap);
+		host.appendChild(line);
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
@@ -35051,15 +38870,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
 		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
-		// **THEMATIC MODE HIDES THIS LEGEND** (Tom, 2026-08-20). Thematic is the mode that
-		// strips the drawing back to colour alone -- it already switches the data labels off
-		// -- so a key naming the label fields is a key to lettering nobody can see. The colour
-		// legend is the one that belongs on a thematic map and it is a different element
-		// (colorLegendBox), so this hides without touching that one.
+		// **THE LABELING THRESHOLD HIDES THIS LEGEND WHEN IT HIDES EVERY LABEL** (Tom, 2026-08-20,
+		// on the retired "Thematic map" checkbox; folded into the threshold on 2026-09-23). A
+		// threshold of 0, or any view wider than it, already switches the data labels off, so a key
+		// naming the label fields is a key to lettering nobody can see. The colour legend is the one
+		// that belongs on a map with no labels and it is a different element (colorLegendBox), so
+		// this hides without touching that one.
 		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
-		// chrome the placement never touches.
-		box.style.display = (any && !galleryIsUp() && !settings.colorThematic && !legendIsOff(settings.legendPosition))
-			? '' : 'none';
+		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
+		// the read that keeps that exclusion true.
+		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
+			!legendIsOff(settings.legendPosition)) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -35266,6 +39087,15 @@ var EngCalcs = EngCalcs || {};
 			fitWhenSized = false;
 			if (!(validView(v) && applyView(v))) { zoomExtent(wasAuto); }
 		}
+		// **R-208: PROJECT1's HOME VIEW, NOW THAT THE CANVAS CAN ANSWER `clientWidth`/`clientHeight`
+		// HONESTLY.** Guarded on the SAME project still being open and still empty -- a visitor who
+		// switched tabs or started drawing before the canvas ever sized must not have their camera
+		// moved out from under them, which is the same discipline `pendingViewFor` observes for the
+		// ordinary case.
+		if (firstVisitPendingId && firstVisitPendingId === library.openId && !doc.nodes.length) {
+			applyView(firstVisitHomeView());
+		}
+		firstVisitPendingId = null;
 		// **NOTHING THAT HAPPENED BEFORE THE CANVAS HAD A SIZE WAS A USER EDIT** (Task 418), so this
 		// re-baselines once, here, and never again -- the mapSized guard above makes this function
 		// run exactly once per page load, and rebaseSignatureIfClean() still refuses a project that
@@ -35455,6 +39285,9 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < host.childNodes.length; i++) { add(host.childNodes[i]); }
 		});
 		add(document.getElementById('lpn_basemap_credit'));
+		// The on-map zoom chip (ROADMAP Task 682) -- fixed top-right, the labels legend's own
+		// default corner, so a legend parked there dodges under it rather than through it.
+		add(document.getElementById('lpn_zoom_control'));
 		return out;
 	}
 	// **ONE FUNCTION PLACES BOTH LEGENDS**, in a fixed order, and each one placed becomes an occupant
@@ -35590,12 +39423,27 @@ var EngCalcs = EngCalcs || {};
 	// `atScale` is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in
 	// force. The quantity is visibleMapMetres(), the one the customer-label gate and both capture
 	// buttons read, so a captured view cannot disagree with the gate it feeds (R-090).
+	// **A GENUINE POSITIVE THRESHOLD, EXCEEDED -- 0 IS DELIBERATELY NOT READ HERE.** This feeds the
+	// per-label "Show at all zoom levels" rule below, which is meant to go with a real width the
+	// reader typed and captured, exactly as before 2026-09-23. 0 is unconditional rather than a width
+	// to be "past", and Tom's ruling on it (*"Should we do the same for all labels and use that to
+	// replace the 'Thematic map, no labels' setting?"*) keeps the old thematic checkbox's own
+	// promise that a Text label survives -- see labelsFullyHidden() for the unconditional case.
 	function labelsPastThreshold(atScale) {
 		var lim = labelWidthLimitSI(), wide;
-		if (!(lim > 0)) { return false; }
+		if (!(lim > 0)) { return false; }   // null (no threshold) or 0 (unconditional, see below)
 		wide = visibleMapMetres(atScale);
 		// A view we cannot measure is not one we refuse to label -- customerLabelsAttempted()'s rule.
 		return wide > 0 && wide > lim;
+	}
+	// **UNCONDITIONAL: GENERATED ANNOTATION IS HIDDEN, at 0 or past a real threshold.** 2026-09-23
+	// folded "Thematic map (colors only)" into a labelMaxWidth of 0, which must reach
+	// `dataLabelsHidden` (so node and link labels come off) and the labels legend (so its key
+	// vanishes with them) -- but must NOT reach labelsPastThreshold() above, or a Text label with
+	// "Show at all zoom levels" off would disappear too, which is the one thing Tom's ruling did
+	// not ask for and the old checkbox never did either.
+	function labelsFullyHidden(atScale) {
+		return settings.labelMaxWidth === 0 || labelsPastThreshold(atScale);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -35632,10 +39480,11 @@ var EngCalcs = EngCalcs || {};
 	// a rule of its own. What the OR governs is `.lpn-annotation`, so no suppressor can ever reach
 	// authored content again by construction.
 	//
-	// Three suppressors:
+	// Two suppressors:
 	//   * generated annotation is off while the project is being placed on the map;
-	//   * thematic mode: colour is the message, so the lettering comes off;
-	//   * the view is wider than the labeling threshold.
+	//   * the view is wider than the labeling threshold -- and a threshold of 0 is past at every
+	//     zoom, which is how "Thematic map (colors only)" was retired (2026-09-23): colour the
+	//     message by typing 0 into the one threshold rather than a second switch.
 	// And two per-label rules:
 	//   * a Text label switched off in this scenario is not there at all (the MODEL, not the view);
 	//   * a Text label whose "Show at all zoom levels" is UNticked goes with the threshold.
@@ -35651,9 +39500,13 @@ var EngCalcs = EngCalcs || {};
 		// the rule for the georef case: "only elements including text". A Text object is a note
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
-		// **AND THE THIRD SUPPRESSOR IS THE LABELING THRESHOLD** (Tasks 669 and 705).
+		// **AND THE SECOND SUPPRESSOR IS THE LABELING THRESHOLD, 0 INCLUDED** (Tasks 669 and 705;
+		// 2026-09-23 folded thematic mode into it). `dataLabelsHidden` reads the UNCONDITIONAL
+		// labelsFullyHidden() (0 or a real threshold exceeded); the per-label loop below reads
+		// `past` -- labelsPastThreshold() alone, a real threshold only -- because a Text label's
+		// own "Show at all zoom levels" rule must not fire on 0 (see labelsFullyHidden()'s comment).
 		var past = labelsPastThreshold(state.s);
-		dataLabelsHidden = !!(georefActive() || settings.colorThematic || past);
+		dataLabelsHidden = !!(georefActive() || labelsFullyHidden(state.s));
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
 		// labels only, typically a handful, so the loop is cheap.
@@ -35662,11 +39515,15 @@ var EngCalcs = EngCalcs || {};
 			if (!le) { return; }
 			// MEMBERSHIP FIRST, and it beats everything else here: a label switched OFF in this
 			// scenario is not there at all (Task 407). Then the label's OWN answer to the zoom:
-			// **a Text object is authored content and ships exempt from the threshold** -- the rule
-			// this page has always had, and what makes the shipped Net3 note reading "Zoom in to
-			// see labels" still readable when the labels have gone. `!== false` rather than a
-			// truthiness test, so a note written before this switch existed keeps showing.
-			var gone = !isActive(lb) || (past && lb.allZoom === false);
+			// **DEFAULT OFF** (Tom, review-queue R-174, 2026-09-23: *"This property should be off
+			// for all but the largest text object in our examples and for all projects with no
+			// previous settings."*), reversing the launch ruling -- a Text object is no longer
+			// exempt from the threshold unless it says so. `=== true` rather than a truthiness
+			// test, so `allZoom: false` (every note stored under the old default) and an absent
+			// property both read as off. Each shipped example now states `allZoom: true` on
+			// whichever of its own Text objects is the largest, which is what keeps a note like
+			// Net3's "Zoom in to see labels" readable when the labels have gone.
+			var gone = !isActive(lb) || (past && lb.allZoom !== true);
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
@@ -35674,14 +39531,21 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). Both are inputs to the symbol cap
-	// as well as to the label gate, so the cap is recomputed, every symbol re-sized once, and the
-	// labels re-decided. Never on the zoom path: a zoom changes neither input.
+	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). **No longer an input to the symbol
+	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
+	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
+	// changes neither input.
+	//
+	// **AND THE LABELS LEGEND, SINCE 2026-09-23.** The retired "Thematic map" checkbox's own change
+	// handler called renderLabelsLegend() directly (the key had to vanish the moment the mode did);
+	// folding thematic mode into this threshold moved that same obligation here, and every path that
+	// can change dataLabelsHidden -- a typed 0, blank, a real number, "Use current view", or a
+	// resize crossing it -- goes through this one function, so one call covers all of them.
 	function labelThresholdChanged() {
-		invalidateSymbolCap();
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
+		renderLabelsLegend();
 		if (!dataLabelsHidden) { relayoutLabels(); }
 	}
 	// **THE TRANSITION BACK COSTS A RELAYOUT, and that is why a suppressor calls this rather than
@@ -35778,15 +39642,25 @@ var EngCalcs = EngCalcs || {};
 	var reshedTimer = null;
 	function scheduleReshed() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
-		reshedTimer = setTimeout(function () {
-			reshedTimer = null;
-			if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
-			beginLinkGeomHold();
-			try {
-				reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
-				relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
-			} finally { endLinkGeomHold(); }
-		}, 120);
+		reshedTimer = setTimeout(reshedNow, 120);
+	}
+	// The debounced pass above, run NOW -- for Zoom to fit, which has to see the labels exactly as
+	// they will be drawn at the scale it is testing (R-214). Cancels the pending timer, so the same
+	// work is not done twice.
+	function reshedNow() {
+		if (reshedTimer) { clearTimeout(reshedTimer); }
+		reshedTimer = null;
+		// Task 647: this is the zoom gesture's own "settled" signal -- one notch or a whole wheel
+		// spin, never a mid-gesture frame -- so the off-screen overlay is decided here too, ahead of
+		// the dataLabelsHidden early return below (that return is about re-composing text, not about
+		// whether the model is on screen).
+		updateOffscreenNotice();
+		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+		beginLinkGeomHold();
+		try {
+			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
+			relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
+		} finally { endLinkGeomHold(); }
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
@@ -35820,56 +39694,9 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **SHOWN IS THE DEFAULT AND A BLOCKED STORAGE IS SHOWN**, which is the safe direction for a
 	// help bubble exactly as it is for the page titles above.
-	// ---- The menu cue (Task 625; Ida's re-diagnosis, section F item 4) -------------------------
-	//
-	// **IT RETIRES ITSELF THE MOMENT IT WORKS.** Opening ANY menu is proof the reader has found the
-	// bar, so that is what dismisses it for good -- not a timer, and not only the close button.
-	// A cue that keeps appearing after it has done its job is the Hide-titles highlight again in
-	// another costume.
-	//
-	// FURNITURE, so localStorage and never the project: whether one reader has found the menus is
-	// a fact about that reader, and a colleague opening the file must not inherit it.
-	var MENU_CUE_KEY = 'lpn_menucue';
-	function menuCueDone() {
-		try { return localStorage.getItem(MENU_CUE_KEY) === '0'; } catch (e) { return true; }
-	}
-	function retireMenuCue() {
-		var el = document.getElementById('lpn_menu_cue');
-		if (el) { el.style.display = 'none'; }
-		try { localStorage.setItem(MENU_CUE_KEY, '0'); } catch (e) {}
-	}
-	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design.
-	//
-	// **THE ARROW LANDS ON File, NOT ON THE MARK AND NOT ON Water** (Tom, 2026-09-11, asking the
-	// right question). The mark is IDENTITY, not a command, and the sentence sends the reader to
-	// the menus -- pointing at the mark would aim it at the one item that holds none.
-	// Water is this page's own menu and the most interesting one, but singling it out contradicts
-	// "every", and a reader who follows the arrow to Water has been told the bar is one menu wide.
-	// File is the first COMMAND menu and the start of the reading order, so the arrow points at
-	// where the row begins and the eye continues along it.
-	function showMenuCue() {
-		var el = document.getElementById('lpn_menu_cue'), bar = document.getElementById('lpn_menubar'),
-			arrow = el && el.querySelector ? el.querySelector('.lpn-menu-cue-arrow') : null,
-			txt = document.getElementById('lpn_menu_cue_text'), pc = EngCalcs.pageConfig || {};
-		if (!el || !bar || menuCueDone()) { return; }
-		// Nothing to point at yet: the bar is built after this file loads.
-		if (!bar.children || !bar.children.length) { return; }
-		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Start with the menus above. Use the toolbar for quick access.'; }
-		el.style.display = '';
-		// Measured, not assumed: the mark's width depends on the icon and the bar's own gap, and a
-		// hardcoded offset would drift the first time either changes. Falls back to no indent if
-		// the bar has not been laid out yet, which is correct rather than wrong-by-a-guess.
-		// `fileMenuButton`, not getElementById: buildMenuBar() already holds the button, and the id
-		// is assigned computedly (`b.id = m.id`) so a lookup by name is invisible to
-		// dom_id_resolve_check.php -- which said so.
-		var file = fileMenuButton;
-		if (file && arrow && file.getBoundingClientRect && bar.getBoundingClientRect) {
-			var fr = file.getBoundingClientRect(), br = bar.getBoundingClientRect();
-			if (fr.width > 0) {
-				el.style.marginLeft = Math.max(0, fr.left - br.left + (fr.width / 2) - 10) + 'px';
-			}
-		}
-	}
+	// The menu cue (Task 625) is gone: Tom, 2026-09-25, "Delete the toolbar hint. It failed." Every
+	// tester was slow to find the MENUS, and a quiet strip of prose under them did not change that.
+	// Its localStorage key is still erased by literal in Erase everything, for browsers that hold it.
 	var AREA_HINT_KEY = 'lpn_areahint';
 	function areaHintShown() {
 		try { return localStorage.getItem(AREA_HINT_KEY) !== '0'; } catch (e) { return true; }
@@ -35921,6 +39748,9 @@ var EngCalcs = EngCalcs || {};
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
 	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
+		return keepSetboxControl(rebuildSettingsFieldsNow);
+	}
+	function rebuildSettingsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {};
 		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
 		// option values) and MOVED in and out of this panel, never rebuilt. Park it back in its holder
@@ -36016,7 +39846,8 @@ var EngCalcs = EngCalcs || {};
 			['T', pc.lpn_tool_add_tank || 'Tank'],
 			['L', pc.lpn_tool_add_pipe || 'Pipe'],
 			['P', pc.lpn_tool_add_pump || 'Pump'],
-			['V', pc.lpn_tool_add_valve || 'Valve']
+			['V', pc.lpn_tool_add_valve || 'Valve'],
+			['M', pc.lpn_tool_add_meter || 'Customer']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps it inside
@@ -36376,7 +40207,18 @@ var EngCalcs = EngCalcs || {};
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
-			var active = pushSpecs.filter(pushFieldShown);
+			// **A SECOND GATE, BESIDE pushFieldShown()** (Task 708). This button seeds each
+			// property from `settings.defaults[s.key]`, and pushFieldShown() alone answers "is
+			// this shown on the map", not "does a New-asset default exist for it" -- the two used
+			// to be the same question for every entry in pushSpecList(), because every property
+			// with a map-label toggle also had a defaultRow() above. `length` and `status` break
+			// that: both are shown on the map by default option and NEITHER has a New-asset
+			// default (deliberately, for `length` -- see the comment above defaultRow's absence --
+			// and never given one for `status`). Without this second test, turning the Length or
+			// Status label on and pressing this button would push `undefined` onto every pipe.
+			var active = pushSpecs.filter(function (s) {
+				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(settings.defaults, s.key);
+			});
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
@@ -36432,7 +40274,7 @@ var EngCalcs = EngCalcs || {};
 			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
 			// the very element that just changed under it.
 			refreshPopupIfOpen();
-			refreshLabelText();
+			requestLabelRefresh();
 			scheduleSolve();
 			saveToStorage();
 		});
@@ -36476,7 +40318,7 @@ var EngCalcs = EngCalcs || {};
 			if (+lwInput.value >= 1) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		row(mapBody, pc.lpn_settings_link_width || 'Link line thickness (pixels)', lwInput);
+		row(mapBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput);
 		// **FLOW-DIRECTION ARROWS** (Tom, 2026-09-01). Built exactly like maskLabels and
 		// alignPipeLabels two rows below -- a bare checkbox through row(), reading `settings`,
 		// writing `settings`, then one apply function and saveToStorage(). It sits with the link
@@ -36556,42 +40398,73 @@ var EngCalcs = EngCalcs || {};
 		// worth, presses the button, and the view's width becomes the number. Blank is "always",
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
+		// **0 IS "NEVER"** (2026-09-23), mirroring the customer row's own 0 -- the tip
+		// says so, in the customer tip's own wording. This is what replaced "Thematic map (colors
+		// only)": type 0 here for colour with no lettering, instead of a second switch that did the
+		// same thing a different way.
+		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
-		// captureViewWidth(), rounded UP -- and one number doing two jobs: it hides generated labels
-		// and it is where symbols stop growing on the ground (symbolCapScale()). The tip says both.
-		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
-			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
-		lmwWrap.className = 'lpn-set-ctlgroup';
-		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
-		lmwInput.id = 'lpn_set_label_max_width';
-		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
-		lmwInput.value = labelWidthLimitSI() > 0 ? String(settings.labelMaxWidth) : '';
-		// Blank, zero or anything unreadable is "no threshold", stored as null -- the value a
-		// project that has never been asked carries, so there is exactly one way to say it.
-		function setLabelMaxWidth(v) {
-			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v > 0) ? v : null;
-			lmwInput.value = settings.labelMaxWidth === null ? '' : String(settings.labelMaxWidth);
-			labelThresholdChanged();
-			saveToStorage();
-		}
-		lmwInput.addEventListener('change', function () {
-			var t = lmwInput.value.trim();
-			setLabelMaxWidth(t === '' ? null : +t);
+		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
+		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
+		// generated labels and nothing else; the symbol-size cap is the separate row below.
+		// Blank or anything unreadable is "no threshold", stored as null -- the value a project that
+		// has never been asked carries, so there is exactly one way to say it. **0 IS A REAL ANSWER
+		// here ("never show a label"), so this is a type test and never a truthiness one** --
+		// `v || null` would silently turn the one setting that says NEVER back into "always",
+		// exactly the trap `labelSettings.customerMaxWidth`'s own comment names. Built through
+		// `buildLabelWidthControl()` (above `buildCustomerLabelSection()`), the same door the
+		// customer row's own box now goes through -- `labelThresholdChanged()` is this row's own
+		// extra side effect (the customer row's is `requestLabelRefresh()`).
+		var lmw = buildLabelWidthControl({
+			id: 'lpn_set_label_max_width',
+			get: function () { return settings.labelMaxWidth; },
+			set: function (v) { settings.labelMaxWidth = v; labelThresholdChanged(); saveToStorage(); }
 		});
-		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
-		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		lmwBtn.addEventListener('click', function (e) {
-			// Inside a <label>, so the press must not also be read as a click on the box.
-			if (e && e.preventDefault) { e.preventDefault(); }
-			var w = captureViewWidth();
-			if (w > 0) { setLabelMaxWidth(w); }
-		});
-		lmwUnit.className = 'lpn-set-note';
-		lmwUnit.textContent = unitLabel('lpn_u_length');
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwBtn); lmwWrap.appendChild(lmwUnit);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
-			lmwWrap, pc.lpn_settings_label_max_width_tip);
+			lmw.wrap, pc.lpn_settings_label_max_width_tip);
+		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
+		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
+		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
+		// always on, no blank state to explain. Both numbers are plain dimensionless quantities (a
+		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
+		// unit change.
+		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
+			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
+			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+		capWrap.className = 'lpn-set-ctlgroup';
+		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
+		capMultInput.id = 'lpn_set_symbol_cap_mult';
+		capMultInput.style.width = '4em';
+		capMultInput.value = trimNum(symbolCapMultiple());
+		capMultInput.addEventListener('change', function () {
+			var v = +capMultInput.value;
+			if (isFinite(v) && v > 0) {
+				settings.symbolCapMultiple = v; invalidateSymbolCap(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capMultInput.value = trimNum(symbolCapMultiple());
+			}
+		});
+		capMid.className = 'lpn-set-note';
+		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
+		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
+		capPctInput.id = 'lpn_set_symbol_cap_pct';
+		capPctInput.style.width = '4em';
+		capPctInput.value = trimNum(symbolCapPercentile());
+		capPctInput.addEventListener('change', function () {
+			var v = +capPctInput.value;
+			if (isFinite(v) && v >= 0 && v <= 100) {
+				settings.symbolCapPercentile = v; invalidateLinkLengths(); refreshSymbolSizes(); saveToStorage();
+			} else {
+				capPctInput.value = trimNum(symbolCapPercentile());
+			}
+		});
+		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
+		capPost.className = 'lpn-set-note';
+		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
+		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
+		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
+		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
+			pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -37045,7 +40918,7 @@ var EngCalcs = EngCalcs || {};
 			// fields are printed and what prefix each carries, so the labels themselves have to be
 			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
 			// used to redraw only the legend, which left the map showing the old label set.
-			refreshLabelText();
+			requestLabelRefresh();
 			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
 			// positions too, and the colour controls were showing the old ones.
 			rebuildSettingsBox();
@@ -37202,11 +41075,128 @@ var EngCalcs = EngCalcs || {};
 		var b = setboxEl();
 		return !!b && b.style.display === 'flex';
 	}
+	// ---- THE CONTROL IN THE USER'S HAND SURVIVES A REBUILD OF THE BOX (Task 653) ----------------
+	//
+	// A rebuild replaces every control it builds, so "the same control" after it can only mean
+	// "the copy built in the same place". A KEY names that place: an id or a form name where the
+	// control has one, and otherwise the id'd host it sits in, the words on its row and its
+	// position among its kind in that host. **THE ROW'S WORDS ARE IN THE KEY ON PURPOSE:** two
+	// selects offering the same three options sit side by side in Water quality (bulk and wall
+	// reaction order), and a key by position alone would put one's handler under the other's name
+	// the day a row above them appeared.
+	function setboxControlKey(el, box) {
+		if (el.id) { return '#' + el.id; }
+		if (el.name) { return '@' + el.name; }
+		var host = el.parentNode, row = el.parentNode, words = '', list, i;
+		while (host && host !== box && !host.id) { host = host.parentNode; }
+		if (!host || host === box || !host.id) { return null; }
+		while (row && row !== host && !(row.classList && row.classList.contains('lpn-set-row'))) { row = row.parentNode; }
+		if (row && row !== host && row.firstChild) { words = row.firstChild.textContent || ''; }
+		list = setboxControlsOfTag(host, el.tagName);
+		for (i = 0; i < list.length; i++) { if (list[i] === el) { break; } }
+		return host.id + '|' + words + '|' + el.tagName + '|' + i;
+	}
+	// Document order, walked by hand over `children` rather than asked of querySelectorAll(), so
+	// the harness's DOM stub (which answers [] to every selector) walks the same tree.
+	function setboxControlsOfTag(root, tag) {
+		var out = [];
+		(function walk(e) {
+			var kids = e.children || [], i;
+			for (i = 0; i < kids.length; i++) {
+				if (kids[i].tagName === tag) { out.push(kids[i]); }
+				walk(kids[i]);
+			}
+		}(root));
+		return out;
+	}
+	function setboxControlByKey(box, key) {
+		var parts, host, list, i, el;
+		if (!key) { return null; }
+		if (key.charAt(0) === '#' || key.charAt(0) === '@') {
+			list = setboxControlsOfTag(box, 'SELECT').concat(setboxControlsOfTag(box, 'INPUT'), setboxControlsOfTag(box, 'TEXTAREA'));
+			for (i = 0; i < list.length; i++) {
+				if ((key.charAt(0) === '#' ? list[i].id : list[i].name) === key.slice(1)) { return list[i]; }
+			}
+			return null;
+		}
+		parts = key.split('|');
+		host = document.getElementById(parts[0]);
+		if (!host || !box.contains(host)) { return null; }
+		el = setboxControlsOfTag(host, parts[2])[+parts[3]] || null;
+		return el && setboxControlKey(el, box) === key ? el : null;
+	}
+	// The same list of choices, in the same words. A select whose options were rebuilt DIFFERENTLY
+	// (a unit in a field name, a method list that follows the field) is not kept: the copy is the
+	// truth and the old one would offer choices that no longer exist.
+	function sameSelectOptions(a, b) {
+		var oa = a.options || a.children || [], ob = b.options || b.children || [], i;
+		if (oa.length !== ob.length) { return false; }
+		for (i = 0; i < oa.length; i++) {
+			if (oa[i].value !== ob[i].value || oa[i].textContent !== ob[i].textContent) { return false; }
+		}
+		return true;
+	}
+	var setboxKeeping = false;
+	function keepSetboxControl(rebuild) {
+		// Only the outermost rebuild does this: rebuildSettingsBox() runs rebuildSettingsFields()
+		// and buildColoringSection(), and each can also be called alone.
+		if (setboxKeeping) { return rebuild(); }
+		var box = setboxEl(), ev = (typeof window !== 'undefined') ? window.event : null,
+			focused = (typeof document !== 'undefined') ? document.activeElement : null,
+			held = [], out;
+		// TWO CONTROLS CAN BE IN THE HAND AT ONCE: the one whose own change event is running, and
+		// the one focus has already moved to -- a text box commits on blur, so its change arrives
+		// while the control just clicked is focused. Safari does not focus a select on a click at
+		// all, which is why the event is asked as well as the focus.
+		[ev && (ev.type === 'change' || ev.type === 'input') ? ev.target : null, focused].forEach(function (el) {
+			if (!el || !box || !box.contains || !box.contains(el) || held.some(function (h) { return h.el === el; })) { return; }
+			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
+			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
+		});
+		if (!held.length) { return rebuild(); }
+		setboxKeeping = true;
+		try { out = rebuild(); } finally { setboxKeeping = false; }
+		held.forEach(function (h) {
+			var el = h.el, twin;
+			if (!box.contains(el)) {
+				twin = setboxControlByKey(box, h.key);
+				if (!twin) { return; }
+				if (el.tagName === 'SELECT' && twin.tagName === 'SELECT' && sameSelectOptions(el, twin)) {
+					// The copy holds the state `settings` now implies; the old element takes it on
+					// and the copy, never shown, is dropped.
+					if (typeof twin.value === 'string') { el.value = twin.value; }
+					el.disabled = twin.disabled;
+					el.title = twin.title;
+					twin.parentNode.replaceChild(el, twin);
+				} else {
+					el = twin;
+				}
+			}
+			// A move out of the page and back (the units block is parked during a rebuild) drops
+			// focus even though the element survived, so it is handed back either way.
+			if (h.focus && document.activeElement !== el && el.focus) {
+				try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+			}
+		});
+		return out;
+	}
 	// Rebuild EVERY section on every open. Built once at init and repainted only by the paths that
 	// remember, the box would show page-load values for every setting anything else wrote -- and a
 	// writer has to remember to repaint, and one will not. Rebuilding makes the box a VIEW of
 	// `settings` rather than a copy. Cheap: a few dozen form controls, only when it is opened.
+	//
+	// **BUT NEVER THE CONTROL IN THE USER'S HAND** (Task 653). Tom, 2026-09-13: *"the Settings
+	// Quality selector ... doesn't work (change) once it responds. All selectors are the same that
+	// way."* A select whose own change rebuilds the box was thrown away by that rebuild and a copy
+	// put in its place: the focus went with it, the next arrow key went nowhere, and a dropdown
+	// reopened on the old element opened on something no longer in the page. So the rebuild still
+	// happens -- the box stays a view of `settings` -- and afterwards the one control the user is
+	// working is put back where its fresh copy was built, carrying the copy's value and state. Any
+	// other control keeps its focus by moving it to the copy. See keepSetboxControl().
 	function rebuildSettingsBox() {
+		keepSetboxControl(rebuildSettingsBoxNow);
+	}
+	function rebuildSettingsBoxNow() {
 		rebuildSettingsFields();
 		rebuildLabelsFields();
 		buildColoringSection();
@@ -37334,17 +41324,26 @@ var EngCalcs = EngCalcs || {};
 		if (setboxTextCache) { setboxTextCache.set(el, text); }
 		return text;
 	}
+	// **AN AND OF WORDS, NOT ONE SUBSTRING** (Tom, 2026-09-23 (g): "can Settings filter work as an
+	// AND word search? I think it currently works as an entire string search."). `words` is already
+	// lower-cased and split on whitespace by the one caller that builds it (applySetboxFilter());
+	// every function below just threads the array through, so there is exactly one place that reads
+	// what the user typed.
+	function setboxWordsMatch(text, words) {
+		for (var i = 0; i < words.length; i++) { if (text.indexOf(words[i]) < 0) { return false; } }
+		return true;
+	}
 	// Hide/show the units of one container and report how many survived. A SUB-HEADING is decided
 	// by its body, except when the heading itself matches -- somebody searching "units" means the
 	// Units section, not the four rows inside it that happen to contain the word.
-	function filterSetboxContainer(container, q) {
+	function filterSetboxContainer(container, words) {
 		var shown = 0, pendingSub = null;
 		[].forEach.call(container.children, function (kid) {
 			var n, headMatch;
 			if (kid.classList.contains('lpn-set-sub')) { pendingSub = kid; return; }
 			if (kid.classList.contains('lpn-set-subbody')) {
-				headMatch = pendingSub && q && setboxUnitText(pendingSub).indexOf(q) >= 0;
-				n = filterSetboxContainer(kid, headMatch ? '' : q);
+				headMatch = pendingSub && words.length && setboxWordsMatch(setboxUnitText(pendingSub), words);
+				n = filterSetboxContainer(kid, headMatch ? [] : words);
 				if (headMatch) { n = Math.max(n, 1); }
 				kid.style.display = n ? '' : 'none';
 				if (pendingSub) { pendingSub.style.display = n ? '' : 'none'; }
@@ -37357,15 +41356,15 @@ var EngCalcs = EngCalcs || {};
 			// div. Recursing through it keeps the filter working ROW BY ROW; treating the host as
 			// one unit would make a search for "opacity" show everything either builder wrote.
 			if (kid.classList.contains('lpn-set-part')) {
-				n = filterSetboxContainer(kid, q);
+				n = filterSetboxContainer(kid, words);
 				kid.style.display = n ? '' : 'none';
 				shown += n;
 				return;
 			}
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
-			if (kid.classList.contains('lpn-set-group')) { kid.style.display = q ? 'none' : ''; return; }
-			var m = !q || setboxUnitText(kid).indexOf(q) >= 0;
+			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			kid.style.display = m ? '' : 'none';
 			if (m) { shown++; }
 		});
@@ -37374,14 +41373,18 @@ var EngCalcs = EngCalcs || {};
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
-			index = document.getElementById('lpn_setbox_index'), q, total = 0, live = {};
+			index = document.getElementById('lpn_setbox_index'), q, words, total = 0, live = {};
 		if (!box) { return; }
 		q = (input && input.value || '').trim().toLowerCase();
+		// Every whitespace-separated word must appear SOMEWHERE in a row's own text -- an AND, not
+		// the single substring this used to be -- so "zoom label" finds the row without either word
+		// sitting next to the other.
+		words = q ? q.split(/\s+/).filter(function (w) { return w !== ''; }) : [];
 		[].forEach.call(box.querySelectorAll('.lpn-set-sec'), function (sec) {
 			var body = sec.querySelector('.lpn-set-secbody'),
-				headMatch = q && sec.querySelector('.lpn-set-head') &&
-					setboxUnitText(sec.querySelector('.lpn-set-head')).indexOf(q) >= 0,
-				n = body ? filterSetboxContainer(body, headMatch ? '' : q) : 0;
+				headMatch = words.length && sec.querySelector('.lpn-set-head') &&
+					setboxWordsMatch(setboxUnitText(sec.querySelector('.lpn-set-head')), words),
+				n = body ? filterSetboxContainer(body, headMatch ? [] : words) : 0;
 			if (headMatch) { n = Math.max(n, 1); }
 			// **A SECTION MAY DECLARE ITSELF UNFILTERABLE, AND EXACTLY ONE DOES** (Task 591).
 			// Credits became a section of its own on 2026-09-06; as a bare footer it sat outside
@@ -39114,6 +43117,16 @@ var EngCalcs = EngCalcs || {};
 	// says it is carried rather than worked out. A file stating `Quality Chlorine mg/L` must be able
 	// to keep saying so through an open-and-save, which means the mode has to be reachable; but the
 	// page cannot produce that state itself, because it would be offering an analysis it does not run.
+	// **WHETHER A QUALITY SETTING CAN CHANGE A SINGLE LETTER ON THE MAP** (Task 653). The mode, the
+	// trace node and the chemical reach the labels only through a field that prints quality -- its
+	// value, its decimals, its heading in the legend. With none of them ticked, which is how every
+	// project ships, a quality change owes the labels nothing until the run it schedules lands, and
+	// that run lays them out itself. Measured before this: one full label pass of the three a
+	// Quality change cost, spent redrawing identical text.
+	function qualityFieldsLabelled() {
+		var n = labelSettings.node || {}, l = labelSettings.link || {};
+		return !!(n.quality || n.initQuality || l.quality || l.rate);
+	}
 	function settingsQualityRows(host, rowFn, noteFn) {
 		var pc = EngCalcs.pageConfig || {}, q = qualitySetting(),
 			sel = document.createElement('select'), opts = [
@@ -39121,7 +43134,7 @@ var EngCalcs = EngCalcs || {};
 				['age', pc.lpn_quality_age || 'Water age'],
 				['trace', pc.lpn_quality_trace || 'Source trace']
 			];
-		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that reacts']);
+		opts.push(['chemical', pc.lpn_quality_chemical || 'A reactive chemical']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -39160,7 +43173,7 @@ var EngCalcs = EngCalcs || {};
 			if (backTo) {
 				requestAnimationFrame(function () { scrollSetboxTo(backTo); });
 			}
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -39186,7 +43199,7 @@ var EngCalcs = EngCalcs || {};
 			src.addEventListener('change', function () {
 				settings.quality.traceNode = src.value;
 				saveToStorage();
-				refreshLabelText();
+				if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 				refreshPopupIfOpen();
 				scheduleSolve();
 			});
@@ -39225,7 +43238,7 @@ var EngCalcs = EngCalcs || {};
 			settings.quality.chemical = name.value;
 			saveToStorage();
 			rebuildSettingsBox();
-			refreshLabelText();
+			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -41336,6 +45349,10 @@ var EngCalcs = EngCalcs || {};
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
 	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
 	// third of it.
+	// **AND IT IS ONE CANVAS MEASUREMENT, for the reason updateNode() states at length** (Task 690).
+	// The hold is depth-counted, so declaring one here and another inside updateNode() costs
+	// nothing and means the LINK branch -- which relays out every label on a rebuilt pipe -- is
+	// covered by the same bargain the node branch already is.
 	//
 	// **AND, SINCE this edit's own map label, EVERYWHERE ELSE THAT SAME INPUT SHOWS** (Tom, on the
 	// stale-snapshot ruling: "Any input we edit must be reflected wherever it shows, Table,
@@ -41347,11 +45364,14 @@ var EngCalcs = EngCalcs || {};
 	// or demand typed into Properties or the table sat on the map until the next real solve.
 	function afterPropertyEdit(el) {
 		var group = elGroup(el);
-		if (group === 'link') { rebuildLink(el); }
-		// A Text label's redraw is its content, its measured width and its visibility -- the same
-		// three whether the words changed or the label was switched off (Task 407).
-		else if (group === 'label') { refreshLabelContent(el.id); }
-		else if (nodeEls[el.id]) { updateNode(el.id, true); }
+		beginMapBoxHold();
+		try {
+			if (group === 'link') { rebuildLink(el); }
+			// A Text label's redraw is its content, its measured width and its visibility -- the same
+			// three whether the words changed or the label was switched off (Task 407).
+			else if (group === 'label') { refreshLabelContent(el.id); }
+			else if (nodeEls[el.id]) { updateNode(el.id, true); }
+		} finally { endMapBoxHold(); }
 		// **THE ELEMENT JUST EDITED, NOT EVERY ELEMENT ON THE MAP** (ROADMAP Task 706). The amber
 		// override ring and the inactive greying are read PER ELEMENT -- isActive() and
 		// hasDisplayedOverride() ask about one asset and nothing else -- so editing this one cannot
@@ -41429,7 +45449,14 @@ var EngCalcs = EngCalcs || {};
 		// scheduleSolve() here, not just inside set callbacks, centralizes it for every current
 		// and future use of this helper (elev/demand/head's set already also calls updateNode(),
 		// which itself schedules a solve -- calling it twice is harmless, debounced).
-		input.addEventListener('change', function () { set(+input.value); completeEdit(ov); });
+		// **AND THE UNDO SNAPSHOT IS HERE TOO** (Tom, 2026-09-22: "Ctrl+Z or the Undo button don't
+		// put it back" after editing Base demand). Every OTHER commit path in this popup --
+		// closedField's checkbox, curveChooser's select, customPropFields, the override marker, a
+		// row's delete button -- calls saveUndoSnapshot() itself; this shared helper alone forgot
+		// to, so every elevation, tank level, reservoir head, diameter, roughness, k and fire-flow
+		// edit that goes through it was silently unrecorded. One snapshot per commit, taken BEFORE
+		// the write, exactly where every other field's own handler takes its.
+		input.addEventListener('change', function () { saveUndoSnapshot(); set(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -41450,6 +45477,7 @@ var EngCalcs = EngCalcs || {};
 		input.placeholder = (placeholder === undefined || placeholder === null || placeholder === '')
 			? '' : String(+(+placeholder).toFixed(6));
 		input.addEventListener('change', function () {
+			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
 			set(input.value === '' ? undefined : +input.value);
 			completeEdit(ov);
 		});
@@ -41466,7 +45494,7 @@ var EngCalcs = EngCalcs || {};
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'text';
 		input.value = get() || '';
-		input.addEventListener('change', function () { set(input.value.trim()); });
+		input.addEventListener('change', function () { saveUndoSnapshot(); set(input.value.trim()); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -41515,7 +45543,7 @@ var EngCalcs = EngCalcs || {};
 	function patternField(fields, labelText, get, set, tip) {
 		var label = document.createElement('label'), sel = document.createElement('select');
 		libFillPatternOptions(sel, get());
-		sel.addEventListener('change', function () { set(sel.value); });
+		sel.addEventListener('change', function () { saveUndoSnapshot(); set(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
@@ -42454,10 +46482,26 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 	}
+	/**
+	 * **THE OPEN POPUP FOLLOWS THE RENAME, IN THE FUNCTION EVERY CALLER SHARES.** Two doors call
+	 * this: Properties' own rename field, through renameNode() below, and the pane table's ID
+	 * cell (paneColId().set(), Task 690). Both used to be "the same door" in name only -- only
+	 * renameNode() updated `currentPopup`, so renaming a node from the TABLE while its Properties
+	 * popup happened to be open left `currentPopup.id` naming the id that no longer exists. The
+	 * very next `refreshPopupIfOpen()` (paneCommitCell() calls one after every commit) then asked
+	 * renderNodeFields() to look up an id nodeById() could not find, which reads a property off
+	 * null and crashes -- found and reproduced with real DOM events by Perry's pre-review, not
+	 * this function's own test. Doing it HERE, before either caller runs another line, is the
+	 * fix `dev/scenario-seam-repair.md` argues for: one write seam, not two callers each trusted
+	 * to remember the other half.
+	 */
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
 		invalidateIdMaps();   // an id changed IN PLACE -- the one mutation the array check cannot see
+		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === oldId) {
+			currentPopup = { kind: 'node', id: newId };
+		}
 		renameOverrides('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
@@ -42469,6 +46513,12 @@ var EngCalcs = EngCalcs || {};
 			if (l.to === oldId) { l.to = newId; }
 		});
 		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
+		// **AND EVERY CUSTOMER FALLING BACK TO IT** (Task 247, Tom, 2026-09-25). A customer whose
+		// pipe was deleted while it sat exactly on this node names the junction directly in `node`
+		// (customerNodeFallback()); left unrewritten here, a rename would leave it naming an id this
+		// document no longer has, which reads as detached and silently drops its demand -- the same
+		// defect applyLinkRename() already guards against for `c.link`.
+		(doc.customers || []).forEach(function (c) { if (c.node === oldId) { c.node = newId; } });
 		// A control's IF NODE condition (Task 533). See renameInControls().
 		renameInControls('node', oldId, newId);
 		// **AND EVERY SAVED PATH THAT STOPS HERE** (Task 510's `doc.profiles`). A path is a list of
@@ -42482,17 +46532,22 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function renameNode(oldId, newId) {
-		applyNodeRename(oldId, newId);
-		currentPopup = { kind: 'node', id: newId };
+		applyNodeRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderNodeFields(newId);
 		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
 		// pressure label would silently vanish for this node until the next unrelated edit.
 		scheduleSolve();
 	}
+	// See applyNodeRename()'s docblock: this is its twin, and it keeps `currentPopup` in step for
+	// the identical reason -- Properties' renameLink() and the pane table's link-id cell both call
+	// this one function, and only one of them used to finish the job.
 	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
 		invalidateIdMaps();   // as applyNodeRename() -- see byId()
+		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === oldId) {
+			currentPopup = { kind: 'link', id: newId };
+		}
 		renameOverrides('link', oldId, newId);
 		// **NOTHING FOLLOWS A LINK RENAME ANY MORE** (Task 586). It used to: `curveRef` named ANOTHER
 		// PUMP to copy points from, so renaming that pump silently emptied the borrower's curve. A
@@ -42524,8 +46579,7 @@ var EngCalcs = EngCalcs || {};
 		renameInControls('link', oldId, newId);
 	}
 	function renameLink(oldId, newId) {
-		applyLinkRename(oldId, newId);
-		currentPopup = { kind: 'link', id: newId };
+		applyLinkRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderLinkFields(newId);
 		scheduleSolve();
 	}
@@ -42604,7 +46658,7 @@ var EngCalcs = EngCalcs || {};
 		// The next element drawn must not land on a number now in use.
 		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
 		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
-		refreshLabelText();
+		requestLabelRefresh();
 		scheduleSolve();
 		saveToStorage();
 		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
@@ -43219,13 +47273,20 @@ var EngCalcs = EngCalcs || {};
 		// **THE TYPED NUMBER, STORED AS TYPED.** No factor here in either direction: a demand's
 		// base is in the flow unit the column heading names, exactly like the Base demand box on a
 		// junction that has only one, and the solver does its own converting at its own boundary.
+		// **THE MISSING SNAPSHOT** (Tom, 2026-09-22: editing Base demand and pressing Ctrl+Z or
+		// Undo "don't put it back to what it was"). Every other commit in this popup takes one --
+		// the override marker's checkbox, the curve chooser, a custom property, this very row's own
+		// delete button three lines below -- but this row's three EDITS never did, so a Base demand
+		// (or its pattern or its description) typed here left nothing on the undo stack to pop.
 		bInput.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
 		libFillPatternOptions(sel, acc.getPattern());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setPattern(sel.value);
 			afterPropertyEdit(n);
 		});
@@ -43233,6 +47294,7 @@ var EngCalcs = EngCalcs || {};
 		cInput.value = acc.getCategory() || '';
 		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
+			saveUndoSnapshot();
 			acc.setCategory(cInput.value.trim());
 			afterPropertyEdit(n);
 		});
@@ -43868,6 +47930,12 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
+			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
+			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
+			// the INPUT, the status the run starts from, and stays exactly what the user set; this
+			// row is what EPANET reports for the step on screen, the column its own link report
+			// ends on.
+			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -44264,20 +48332,22 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed). With the
-		// labeling threshold back, a note needs its own answer to it. **TICKED BY DEFAULT**: a Text
-		// object is authored content and has always stayed on the drawing, and the shipped Net3 note
-		// reading "Zoom in to see labels" only makes sense if it outlives the labels it speaks of.
-		// Stored only when UNticked (`allZoom: false`), so every note written before this switch
-		// existed keeps showing. BASE-WIDE like size and position, and for the same reason.
+		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed).
+		// **UNTICKED BY DEFAULT** (Tom, review-queue R-174, 2026-09-23: *"This property should be
+		// off for all but the largest text object in our examples and for all projects with no
+		// previous settings."*) -- reversing the launch ruling recorded above until this ruling. A
+		// note keeps its old on-screen behaviour only if it explicitly says so; a project saved
+		// before this property existed, or a fresh Text, is off and goes with the threshold like
+		// generated annotation. Stored only when TICKED (`allZoom: true`), so absence keeps meaning
+		// the default. BASE-WIDE like size and position, and for the same reason.
 		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
 		allZoomInput.type = 'checkbox';
-		allZoomInput.checked = lb.allZoom !== false;
+		allZoomInput.checked = lb.allZoom === true;
 		allZoomInput.addEventListener('change', function () {
-			if (allZoomInput.checked === (lb.allZoom !== false)) { return; }
+			if (allZoomInput.checked === (lb.allZoom === true)) { return; }
 			saveUndoSnapshot();
-			if (allZoomInput.checked) { delete lb.allZoom; }
-			else { lb.allZoom = false; }   // base-write: zoom visibility is Base-owned, exactly as size is
+			if (allZoomInput.checked) { lb.allZoom = true; }
+			else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 			applyLabelVisibility();
 			saveToStorage();
 		});
@@ -44454,7 +48524,7 @@ var EngCalcs = EngCalcs || {};
 		var c = customerById(custId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
-			nd = nid ? nodeById(nid) : null,
+			nd = nid ? nodeById(nid) : null, atNode = c ? customerAtNodeEnd(c) : false,
 			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
 			stLabel, stInput, offLabel, offInput, warn;
 		if (!c) { return; }
@@ -44554,7 +48624,27 @@ var EngCalcs = EngCalcs || {};
 		readonlyField(fields, (pc.lpn_field_meter_total || 'Total demand') +
 			' (' + unitLabel('lpn_u_flow') + ')', customerFlow(c), pc.lpn_field_meter_total_tip);
 
-		if (l) {
+		// **CONNECTED EXACTLY TO A NODE READS AS A NODE, NOT AS A PIPE AT STATION 0 OR 100** (Tom,
+		// 2026-09-25: *"I think it will be happier for users to see Customer connected to a node if
+		// that is the case instead of a link at station 0."*). The pipe, the station and the offset
+		// are all about a position ALONG a main; a service that lands exactly on the junction those
+		// mains meet at is not along any one of them, so this box says which junction it serves
+		// instead of naming a main almost incidentally and reporting a station a reader has to
+		// recognise as "the whole pipe" rather than read as a number.
+		if (atNode && nd) {
+			readonlyField(fields, pc.lpn_field_meter_node || 'Connected to', nd.id,
+				pc.lpn_field_meter_node_tip);
+			// **A DEMAND ON A FIXED HEAD CHANGES NOTHING, AND IT IS REPORTED RATHER THAN REROUTED.**
+			// A reservoir's and a tank's water surface is the level the document states, so the
+			// solve is identical with or without this meter's demand.
+			if (isFixedHeadNode(nd)) {
+				warn = document.createElement('p');
+				warn.className = 'lpn-set-note';
+				warn.textContent = pc.lpn_customer_fixed_head ||
+					'⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+				fields.appendChild(warn);
+			}
+		} else if (l) {
 			readonlyField(fields, pc.lpn_field_meter_pipe || 'Connected asset', l.id,
 				pc.lpn_field_meter_pipe_tip);
 			// **THE STATION, AS A PERCENTAGE OF THE WAY ALONG THE PIPE.** A percentage rather than a
@@ -44687,7 +48777,7 @@ var EngCalcs = EngCalcs || {};
 		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
 		// order for the same control shape on the same popup.
 		var text = document.createElement('span');
-		setFieldLabel(text, pc.lpn_field_closed || 'Shut', pc.lpn_field_closed_tip);
+		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -44710,7 +48800,7 @@ var EngCalcs = EngCalcs || {};
 			if (options[i][0] === current) { o.selected = true; }
 			sel.appendChild(o);
 		}
-		sel.addEventListener('change', function () { onChange(sel.value); });
+		sel.addEventListener('change', function () { saveUndoSnapshot(); onChange(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
@@ -44726,6 +48816,7 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'number'; input.step = 'any';
 		input.value = (value === undefined || value === null || value === '') ? '' : String(value);
 		input.addEventListener('change', function () {
+			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
 			onChange(input.value === '' ? undefined : +input.value);
 			completeEdit(ov);
 		});
@@ -44738,7 +48829,7 @@ var EngCalcs = EngCalcs || {};
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any'; input.value = value;
-		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
+		input.addEventListener('change', function () { saveUndoSnapshot(); onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -44868,7 +48959,8 @@ var EngCalcs = EngCalcs || {};
 			// restored on almost none of them: undoing a diameter must not move the map, but a
 			// document put back into a frame the camera is not in has its whole drawing off screen
 			// -- grid numbers under a street-level lat/lon view. undo() draws that line.
-			coords: project.coords, basemap: project.basemap, view: currentView()
+			coords: project.coords, basemap: project.basemap, basemapLast: project.basemapLast,
+			view: currentView()
 		};
 	}
 	function pushUndoSnapshot(snap) {
@@ -44900,8 +48992,15 @@ var EngCalcs = EngCalcs || {};
 		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
 		var coordsChanged = snap.coords !== project.coords;
+		// **AND THE MAP ITSELF WHEN ITS PICTURE CHANGED** (Perry's re-review, 2026-09-22). World
+		// map, Detach and Attach, and a switch on the corner toggle, change `project.basemap` and
+		// never `coords`, so repainting only on a kind change left Ctrl+Z restoring the menu's
+		// idea of the map while the canvas kept the tiles it had. The comparison is made before the
+		// assignment, like `coordsChanged`.
+		var basemapChanged = snap.basemap !== project.basemap;
 		project.coords = snap.coords;
 		project.basemap = snap.basemap;
+		project.basemapLast = snap.basemapLast;
 		// The backdrop rides in the same snapshot rather than in a stack of its own: a Move that
 		// nudged the image and a Move that nudged a node are the same kind of event to the person
 		// pressing Ctrl+Z, and two stacks would make the order of undos depend on which kind each one
@@ -44927,7 +49026,7 @@ var EngCalcs = EngCalcs || {};
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
 		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
-		if (coordsChanged) {
+		if (coordsChanged || basemapChanged) {
 			refreshBasemap();
 			refreshMapStatus();
 		}
@@ -44951,6 +49050,15 @@ var EngCalcs = EngCalcs || {};
 		// first line when the box is not in the page, so a project undone with the box closed costs
 		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
 		rebuildLibraryBox();
+		// **AND THE TABLE UNDER THE MAP, FOR THE SAME REASON** (ROADMAP Task 689). A table edit is
+		// now undoable from inside the table, so the pane is a place a person watches an undo
+		// happen rather than a place they happen to have open. renderPaneTable() refills in place
+		// when the row set has not moved, so an undone cell goes back to what the document holds;
+		// refreshPaneIfOpen() returns at its first line when no pane is open, exactly as
+		// rebuildLibraryBox() does. The solve that scheduleSolve() below ends in calls this too,
+		// but a debounced solve is not a guarantee about the next paint, and an undo the user
+		// cannot see is indistinguishable from an undo that did nothing.
+		refreshPaneIfOpen();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
@@ -44970,8 +49078,43 @@ var EngCalcs = EngCalcs || {};
 		var tag = (el.tagName || '').toLowerCase();
 		return tag === 'input' || tag === 'textarea' || tag === 'select';
 	}
+	// **A TABLE CELL IS THE ONE TEXT ENTRY THAT STILL GETS THE MAP'S UNDO** (ROADMAP Task 689; Tom,
+	// 2026-09-17: *"Checking this on the Junctions Table, I can copy and paste from two cells to two
+	// cells. But I can't Ctrl+Z within the table. I must move cursor to the map for Ctrl+Z to
+	// work."*). The guard above was right about its own case and wrong about this one: a pane cell
+	// is an `<input>`, so isTextEntry() turned it away, and an undo that exists and cannot be
+	// reached from where the edit was made is worse than no undo at all -- a person who has learned
+	// Ctrl+Z presses it after a bad paste and nothing happens.
+	//
+	// **THE RULE FOLLOWS FROM THE MODES RATHER THAN SITTING BESIDE THEM**, and that is the
+	// correction Tom's *"Ctrl+Z doesn't work or is unpredictable. I can't tell"* earned (2026-09-18).
+	// It was first written on a TWO-state model -- editor open against editor closed -- and a
+	// two-state rule cannot be predicted by somebody living in three (now four, Task 690) states:
+	// typing a character put him in ENTRY, which still looks like READY because he had not asked
+	// to edit anything, and Ctrl+Z there quietly meant something else.
+	//
+	//   READY   the project undo. There is no caret and nothing is being typed. (SELECT, his
+	//           fourth mode, is READY plus a highlighted range of more than one cell -- the
+	//           boundary below does not move, because a range is still nothing being typed.)
+	//   ENTRY   the browser's own text undo. There IS a caret and the characters under it are his.
+	//   EDIT    the browser's own text undo, for the same reason.
+	//
+	// The boundary is now visible without being announced, because it is the same boundary the
+	// arrow keys are on: where Right moves to the next cell, Ctrl+Z undoes the project; where Right
+	// moves the caret, Ctrl+Z undoes the typing. Escape returns a cell to READY, and so does every
+	// commit, so the project undo is one keystroke away at all times. That is also Tom's own
+	// 2026-08-20 point about the Library fields, kept: an ordinary input anywhere else on the page
+	// still has its native undo, because it has no cell context at all.
+	//
+	// A checkbox cell and a select cell have no editor to open, so they are permanently in READY.
+	//
+	// Nothing else moves: the tool-key handler below keeps the plain isTextEntry() guard, because a
+	// bare digit on a selected cell OVERWRITES it (Task 186) and must not also pick a tool.
+	function paneCellNavigating(el) {
+		return paneCellMode(el) === 'ready';
+	}
 	document.addEventListener('keydown', function (e) {
-		if (isTextEntry(e.target)) { return; }
+		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
 	});
 
@@ -45014,6 +49157,30 @@ var EngCalcs = EngCalcs || {};
 		if (!m) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		setMode(m);
+	});
+
+	/**
+	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
+	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
+	 * entry's own citations for why not Ctrl/Cmd+`+`/`-`: every browser already claims that chord
+	 * for its own page zoom, and taking it back would surprise a visitor who has learned it.
+	 *
+	 * `=` IS BOUND TOO, because it is the unshifted key under `+` on a US layout and a QGIS-style
+	 * tool binds both -- a visitor should not have to hold Shift to zoom in.
+	 *
+	 * **THE GUARD IS THE ONE Ctrl+Z AND THE DIGIT PICKER ALREADY USE**, for the reason stated
+	 * beside the digit picker above: a bare `-` reaching a field would zoom the map out every time
+	 * somebody typed a negative elevation.
+	 *
+	 * The factor is `wheelZoom()`'s own 1.1 per notch (`wirePointerEvents()`'s wheel listener), so
+	 * a keyboard press is exactly one wheel notch -- through `keyZoom()`, the same door the wheel,
+	 * the pinch and the on-map chip all use, so none of them can disagree about what a "step" is.
+	 */
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key === '+' || e.key === '=') { e.preventDefault(); keyZoom(1.1); return; }
+		if (e.key === '-') { e.preventDefault(); keyZoom(1 / 1.1); }
 	});
 
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
@@ -45710,13 +49877,282 @@ var EngCalcs = EngCalcs || {};
 	// same element is wiped just slowly enough for the user not to see it. Separate slots dissolve
 	// that -- both can be on screen at once and nothing has to arbitrate.
 
+	// ---- THE MESSAGE LOG (ROADMAP Task 704, rows 1 and 2 of Ida's ranking) ----
+	//
+	// **A BANNER THAT VANISHES IS A DEFECT** (Tom, 2026-09-18, testing the lock work: *"The banner
+	// message about 'We asked your colleague to close the file' disappeared too fast and
+	// unrecoverable. 'Help! What did I miss!' We need a better messaging system."*).
+	//
+	// setNotice() is already ONE DOOR with 83 call sites and an eight-second expiry, and a later
+	// message silently REPLACES an earlier one. **THE COUNT IS RE-DERIVED, NOT INHERITED**: the
+	// figure carried into this task was 66, which was an undercount nobody had re-checked. 83 is
+	// this file with comments stripped, on the day the log was built and before the two Cancel
+	// notices below made it 85. Re-derive it rather than quoting this line. That replacement is the whole of the complaint, and
+	// the answer is not a longer timer -- it is a place the message went. QGIS splits exactly here:
+	// QgsMessageBar is transient, QgsMessageLog is the store behind it, reached from one icon at
+	// the end of the status bar. This is that split and nothing more.
+	//
+	// **IN MEMORY ONLY, AND THAT IS A RULING RATHER THAN A SHORTCUT.** Anything written to a
+	// visitor's device makes a sentence in consent_body false, which is a banner rewrite, 26
+	// retranslations and an EC_CONSENT_VERSION bump that re-asks everybody. A log that lives as
+	// long as the page answers "what did I miss", and that is a question about the last few
+	// minutes, not about last Tuesday.
+	//
+	// **THIRTY, AND THE BOUND IS CHOSEN FOR THE READER RATHER THAN FOR THE MEMORY.** Thirty rows is
+	// about one long working session of opens, saves, lock answers and unit changes. It fits the
+	// dialog at a glance, which is the point at which a log is still a way BACK to something rather
+	// than a second document to search. The storage cost of any bound here is nil; the reading cost
+	// is not.
+	//
+	// **ONE ROW PER DISTINCT MESSAGE, AND A REPEAT MOVES TO THE TOP RATHER THAN ADDING A ROW.**
+	// renderBanner() repaints on every tab switch and every lock answer, so an append-only log
+	// would bury the one thing somebody missed under forty identical read-only banners. The time
+	// shown is therefore the LAST time that message was on screen, which is what the reader is
+	// asking about.
+	var NOTICE_LOG_MAX = 30;
+	var noticeLog = [];   // newest FIRST: { text, severity, at }
+	// **TWO LEVELS, AND THE SECOND IS THE ONE THE BANNER ALREADY DRAWS.** renderBanner() paints
+	// amber for "you may work through this" and red for "this has taken editing away"; everything
+	// setNotice() carries is a completed action. That is two honest kinds of event and this page
+	// does not have four, so QGIS's four severities are deliberately not imported -- a level
+	// nobody can assign consistently is a colour that means nothing by the third week.
+	// **THE LIMITATION, WRITTEN DOWN AT THE PLACE IT WOULD BITE.** Dedupe is an exact match on the
+	// pair (text, severity), which is right for the case that matters -- a message carrying a
+	// changing number ("Saved Net3.lwn", "Saved Net2.lwn") stays distinct, because the numbers and
+	// names are substituted before this sees the string. What it cannot tell apart is TWO DIFFERENT
+	// LANGUAGE KEYS THAT RENDER BYTE-IDENTICAL ENGLISH: they would collapse into one row, and the
+	// reader would be shown one event where two happened. No such collision exists in the current
+	// strings -- checked, not assumed. Comparing the KEY instead would fix it and cost more than it
+	// buys: every caller would have to pass one, and renderBanner() composes its sentence from a
+	// key plus a name, so there is no single key to pass. If a collision ever does ship, the cheap
+	// repair is to reword one of the two strings, which is a translation edit and not a design
+	// change.
+	function logMessage(text, severity) {
+		var t = String(text == null ? '' : text).trim(), kind, i;
+		if (!t) { return; }
+		kind = severity === 'warning' ? 'warning' : 'notice';
+		for (i = 0; i < noticeLog.length; i++) {
+			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
+		}
+		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
+		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
+	}
+	// "{x} ago" as its own key rather than an English concatenation: agoText() already solves the
+	// plural problem (n is never 1), and this wrapper lets a language put its word for "ago"
+	// wherever its own grammar wants it.
+	function messageAgeText(at) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_msglog_ago || '{x} ago').replace('{x}', agoText(Math.max(1, Date.now() - at)));
+	}
+	// **AN ON-MAP LIST, NOT A DIALOG** (ROADMAP Task 704; superseded Ida's 2026-09-21 dialog design
+	// the next day, Tom having actually used it: *"The alert paradigm is not a good UX for showing
+	// past messages. User expects them to descend below the glyph, below the Mode status in
+	// similar appearance that they originally had... fill the map below the Mode status line with
+	// old messages with oldest at the bottom."*). #lpn_msglog_panel is a child of the same
+	// top-left column the mode hint and the notice sit in, directly under that slot, so opening it
+	// reads as the next line down rather than as a separate control landing somewhere else on the
+	// page.
+	var msglogPanelOpen = false;
+	// **THE NOTICE'S HEIGHT IS INVISIBLE TO FLOW, AND USUALLY THAT DOES NOT MATTER.** #lpn_map_notice
+	// is `position:absolute` on purpose ("a transient must not change the fit, or every save would
+	// re-zoom the map") and #lpn_mode_hint beside it is an ordinary flow element, so on a normal
+	// window the panel's own flow position already falls below whichever of the two is showing,
+	// because mode_hint's real height is what flow sees either way.
+	//
+	// **AT 640px AND UNDER, #lpn_mode_hint IS display:none BY DESIGN** ("no mouse verbs on a
+	// phone" -- see the small-screen rule in css/engcalcs.css). With it gone, flow has NOTHING
+	// contributing height to that slot any more, so if the notice happens to be showing at that
+	// moment, the panel's ordinary flow position lands at the very top of the column, squarely on
+	// top of the notice it was supposed to appear below (measured: a browser pass caught the panel
+	// starting 15px above the notice's own bottom edge at 390px). This is a targeted compensation
+	// for exactly that combination, computed fresh each time the panel opens rather than assumed:
+	// zero everywhere the mode hint is doing its ordinary job.
+	function msglogPanelTopCompensation() {
+		var modeHint = document.getElementById('lpn_mode_hint'), notice = document.getElementById('lpn_map_notice');
+		var cs = modeHint && window.getComputedStyle ? window.getComputedStyle(modeHint) : null;
+		var modeHintInFlow = !!(cs && cs.display !== 'none');
+		var noticeShowing = !!(notice && notice.style.display !== 'none');
+		if (noticeShowing && !modeHintInFlow) { return notice.offsetHeight + 4; }
+		return 0;
+	}
+	function fitMsglogPanelHeight(panel) {
+		// **MEASURED AGAINST THE MAP, NEVER A BARE CSS PERCENTAGE.** A percentage `max-height` on
+		// an absolutely positioned ancestor whose own height is auto measures that ancestor's own
+		// content -- which is this panel -- and caps nothing. The map's own canvas is the thing
+		// with a real, laid-out height, so the panel's available room is read from it directly:
+		// however far down the canvas the panel starts, minus a little breathing room above the
+		// canvas's own bottom edge.
+		var canvas = document.getElementById('lpn_canvas'), canvasBox, panelBox, avail;
+		if (!canvas) { return; }
+		canvasBox = canvas.getBoundingClientRect();
+		panelBox = panel.getBoundingClientRect();
+		avail = canvasBox.bottom - panelBox.top - 8;
+		panel.style.maxHeight = Math.max(40, avail) + 'px';
+	}
+	function renderMsglogPanel() {
+		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
+		if (!panel) { return; }
+		panel.innerHTML = '';
+		if (!noticeLog.length) {
+			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
+			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
+			var none = document.createElement('div');
+			none.className = 'lpn-msglog-panel-empty';
+			none.textContent = pc.lpn_msglog_empty || 'No messages yet.';
+			panel.appendChild(none);
+			return;
+		}
+		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
+		// re-sorting at render time, so the panel can never disagree with the log it is reading.
+		noticeLog.forEach(function (row) {
+			var pill = document.createElement('div');
+			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
+			var when = document.createElement('span');
+			when.className = 'lpn-msglog-panel-when';
+			when.textContent = messageAgeText(row.at);
+			pill.appendChild(when);
+			var what = document.createElement('span');
+			what.className = 'lpn-msglog-panel-text';
+			what.textContent = row.text;
+			pill.appendChild(what);
+			panel.appendChild(pill);
+		});
+		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
+		// paragraph of Ida's dialog design; it says something none of the pills above it do --
+		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
+		// as the last row rather than dropped along with the dialog chrome around it.
+		var note = document.createElement('div');
+		note.className = 'lpn-msglog-panel-note';
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+			.replace('{n}', NOTICE_LOG_MAX);
+		panel.appendChild(note);
+	}
+	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
+	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
+	// without hunting for a close button the panel does not have (it is a readout, not a form).
+	// **CAPTURED ON pointerdown, NOT click, AND CONSUMED** (Perry's review, 2026-09-22: dismissing
+	// the panel by clicking the map also did whatever that click would otherwise have done -- the
+	// canvas wires its own selection/tool handling on `pointerdown`
+	// (`svg.addEventListener('pointerdown', ...)`), which fires and finishes BEFORE a `click`
+	// listener ever sees the gesture, so listening for `click` here could never have intercepted
+	// anything). Registered with `capture: true` on `document`, which runs before the canvas's own
+	// listener on the `svg` element sees the event at all, so `stopPropagation()` here genuinely
+	// stops it from reaching the map -- and `preventDefault()` alongside it, since a canvas built
+	// on pointer events reads default-prevention as "this gesture is somebody else's" the same way
+	// a native control does.
+	function msglogOutsidePointerDown(e) {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (panel && panel.contains(e.target)) { return; }
+		if (btn && btn.contains(e.target)) { return; }
+		e.stopPropagation();
+		if (e.preventDefault) { e.preventDefault(); }
+		closeMessageLogPanel();
+	}
+	function msglogKeyHandler(e) {
+		if (e.key === 'Escape' || e.key === 'Esc') { closeMessageLogPanel(); }
+	}
+	function openMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!panel) { return; }
+		renderMsglogPanel();
+		panel.style.display = 'flex';
+		panel.style.marginTop = msglogPanelTopCompensation() + 'px';
+		fitMsglogPanelHeight(panel);
+		msglogPanelOpen = true;
+		if (btn) { btn.setAttribute('aria-expanded', 'true'); }
+		// Deferred one tick so the pointerdown that opened the panel (the press on the glyph
+		// itself) is not the same pointerdown the outside-dismiss listener sees and immediately
+		// closes the panel again on.
+		setTimeout(function () {
+			document.addEventListener('pointerdown', msglogOutsidePointerDown, true);
+			document.addEventListener('keydown', msglogKeyHandler, true);
+		}, 0);
+	}
+	function closeMessageLogPanel() {
+		var panel = document.getElementById('lpn_msglog_panel'), btn = document.getElementById('lpn_msglog_btn');
+		if (!msglogPanelOpen) { return; }
+		msglogPanelOpen = false;
+		// **hidePanel(), NOT A HAND-WRITTEN display:'none'** (ROADMAP Task 562;
+		// dev/lpn-spike/panel-touch-harness.js). It also sweeps any `.ec-help` tip this panel
+		// raised -- this panel's rows carry none today, but a per-box checklist for that rule is
+		// exactly what that harness exists to make unnecessary.
+		hidePanel(panel);
+		if (btn) { btn.setAttribute('aria-expanded', 'false'); }
+		document.removeEventListener('pointerdown', msglogOutsidePointerDown, true);
+		document.removeEventListener('keydown', msglogKeyHandler, true);
+	}
+	function toggleMessageLogPanel() {
+		if (msglogPanelOpen) { closeMessageLogPanel(); } else { openMessageLogPanel(); }
+	}
+	// **STANDING RATHER THAN CONDITIONAL, for the reason the grievance button beside it is.** A
+	// control that appears only once there is something to read is one nobody learns, and it would
+	// reflow the strip under the hand every time a notice landed. It is one icon in a strip that
+	// already exists, already wraps, and is already reserved against by zoomExtent().
+	// **HISTORY, NOT INFO** (Ida, 2026-09-21, after Tom: *"The i info glyph doesn't seem quite right
+	// to me."*). 'info' names standing reference facts elsewhere on this page (Welcome, Privacy
+	// notice, About); this is a personal, growing, timestamped feed of what just happened, and one
+	// mark cannot hold both jobs. See lib/Icons.lib.php for the drawing itself and Tom's own
+	// ruling on it, 2026-09-22.
+	// **NO TIP** (Tom, 2026-09-22: *"I don't think we need a tip on the down arrow glyph. I think
+	// it's more trouble than help."*). setIconLabel() always writes a `title` and adds `.ec-help`,
+	// which is the one selector initTips() wires a hover popup onto -- so this button is built by
+	// hand rather than through that door: the icon, and an `aria-label` so a screen reader still
+	// gets a name, but nothing that triggers a tooltip on hover or long-press. `lpn_msglog_tip` is
+	// therefore unread; it (never translated into any of the other 26 languages) was deleted with
+	// this change.
+	// **AND DELIBERATELY NOT IN HELP > "TOOLBAR KEY", ON TOM'S OWN RULING** (2026-09-23). Perry
+	// found that building this button by hand had silently dropped it out of that list, it was put
+	// back, and Tom then struck the whole idea: *"If we are putting 'Messages' under Help, Toolbar,
+	// that makes 'Toolbar' a lie since the 'Messages' glyph is not really on the Toolbar. My
+	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
+	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
+	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
+	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// name stays; the drawing carries the rest.
+	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
+	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
+	// accident. It simply is not called here.
+	function wireMessageLogButton() {
+		var pc = EngCalcs.pageConfig || {}, btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		var name = pc.lpn_msglog_name || 'Messages';
+		btn.textContent = '';
+		var ic = iconEl('history');
+		if (ic) { btn.appendChild(ic); }
+		btn.setAttribute('aria-label', name);
+		btn.setAttribute('aria-expanded', 'false');
+		btn.setAttribute('aria-controls', 'lpn_msglog_panel');
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			toggleMessageLogPanel();
+		});
+	}
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
+	// **HIGHLIGHTED WHILE IT SHOWS, NEVER OTHERWISE** (ROADMAP Task 704; Tom: "it must appear and
+	// possibly highlight while a message displays"). This is the ONE place #lpn_map_notice's text is
+	// written, so it is the one place that can know whether a message is currently on screen --
+	// noteMapUnmeasurable() and setNotice() both funnel through here, and neither needs its own
+	// copy of this rule.
+	//
+	// **THE LOCK BANNER (renderBanner(), #lpn_lock_banner) DOES NOT LIGHT THE GLYPH** (Perry's
+	// review, 2026-09-22, asked to make it do so or say why). It is logged into the same message
+	// log through logMessage() directly, but it is not this column: #lpn_lock_banner is a standing
+	// bar of its own, in normal document flow above the map, not a child of #lpn_map_overlay_tl_col.
+	// Lighting a glyph in the top-left map overlay for a message showing in a completely different
+	// part of the page would point the reader at the wrong spot -- the highlight's whole job is
+	// "the thing beside me is what just changed", and here it would not be.
+	function markMsglogActive(on) {
+		var btn = document.getElementById('lpn_msglog_btn');
+		if (!btn) { return; }
+		btn.classList[on ? 'add' : 'remove']('lpn-msglog-active');
+	}
 	function showNotice(text) {
 		var el = document.getElementById('lpn_map_notice');
 		if (!el) { return; }
 		el.textContent = text || '';
 		el.style.display = text ? 'block' : 'none';
+		markMsglogActive(!!text);
 	}
 	// **WHEN THIS PAGE CANNOT MEASURE ITSELF, IT SAYS SO** (MJH, 2026-09-09). A map that is silently
 	// unusable cost one user a whole session: the drawing was intact, the menus worked, and nothing
@@ -45739,6 +50175,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		// Logged on the TRANSITION only, not on every re-show: this message is re-shown whenever an
+		// ordinary notice has covered it, and each of those is the same standing fact said again.
+		if (!mapUnmeasurable) { logMessage(words, 'warning'); }
 		mapUnmeasurable = true;
 		el = document.getElementById('lpn_map_notice');
 		if (el && el.textContent === words) { return; }
@@ -45746,6 +50185,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
+		// sites already go through, which is why the log needed no second seam: teaching the door
+		// teaches all of them at once.
+		logMessage(text, 'notice');
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
@@ -45772,6 +50215,14 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = text || '';
+		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
+		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
+		// progress box writes through (`host.status`) -- "Working out the extended period
+		// simulation." on the way in, the run summary on the way out -- so hooking it here logs
+		// both without lpn-time.js knowing the log exists. logMessage()'s own dedupe (identical
+		// text+severity moves to the top rather than duplicating) is what stops an unchanged
+		// diagnostic re-logging itself on every ordinary solve.
+		if (text) { logMessage(text, 'notice'); }
 		var next = text ? (code || 'status') : '';
 		// A NEW COMPLAINT IS A NEW THING TO REPORT. The button stays thanked while the same message
 		// stands -- a second press posts nothing -- but a different diagnostic is a different
@@ -45847,6 +50298,12 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
+		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
+		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
+		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
+		// logged the moment it is set, same as setStatus() beside it.
+		if (text) { logMessage(text, 'notice'); }
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
@@ -45986,7 +50443,11 @@ var EngCalcs = EngCalcs || {};
 		// and a user who wants a prefix can type their own.
 		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
 		// quality row's own input, and neither half of that pair has a symbol a reader would know.
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '', initQuality: '' },
+		// **TANK WATER DEPTH DEFAULTS TO 'Y='** (Tom, 2026-09-25: "For Water depth, initial default
+		// prefix can be 'Y='"). 'd' was ruled out as ambiguous with a pipe's own diameter on the
+		// same label set (Task 696); Y is the standard hydraulics symbol for depth.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=',
+			level: 'Y=', quality: '', initQuality: '' },
 		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
 		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
 		// are. A status prints a WORD and would read as an equation with one; an average quality
@@ -46186,6 +50647,45 @@ var EngCalcs = EngCalcs || {};
 	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
+	//
+	// **SYNCHRONOUS, AND THE PATHS THAT NEED IT SO STILL CALL IT** -- building the drawing, a
+	// project arriving, a solve landing, and every harness. A control that only CHANGES something
+	// the labels print calls requestLabelRefresh() below instead (Task 653).
+	//
+	// **ONE PASS PER BURST, AFTER THE PAINT** (Task 653). Tom, 2026-09-13: *"the Settings Quality
+	// selector is very sluggish and doesn't work (change) once it responds."* Measured then: 89%
+	// of a 2.5 s select was this pass, run inside the select's own change handler, so the select
+	// could not even show its new value until every label had been re-measured. A request marks
+	// the pass owed and schedules it for after the next frame has painted; any number of requests
+	// before then cost one pass, and a synchronous refreshLabelText() in between pays the debt.
+	//
+	// **ANYTHING THAT READS THE LAYOUT FLUSHES FIRST** -- relayoutLabels(), refreshOneLabelInPlace(),
+	// captureLabelLayout() (the tab-switch keep) and the browser's own print -- so no reader can see
+	// the layout from before a change it has already been told about. A new document arriving
+	// cancels the debt instead: refreshAllFromDocument() lays its labels out itself.
+	var labelRefreshPending = false, labelRefreshScheduled = false;
+	function requestLabelRefresh() {
+		labelRefreshPending = true;
+		if (labelRefreshScheduled) { return; }
+		labelRefreshScheduled = true;
+		// rAF then a task: the rAF callback runs BEFORE its frame paints, so doing the pass there
+		// would hold the paint exactly as the synchronous call did. The task after it runs once
+		// the frame is on screen. Without rAF (a background tab, the node stub) a plain task.
+		var run = function () { labelRefreshScheduled = false; flushLabelRefresh(); };
+		if (typeof requestAnimationFrame === 'function') {
+			requestAnimationFrame(function () { setTimeout(run, 0); });
+		} else {
+			setTimeout(run, 0);
+		}
+	}
+	function flushLabelRefresh() {
+		if (labelRefreshPending) { refreshLabelText(); }
+	}
+	// Printing is a reader too, and it reads between tasks: Ctrl+P inside the owed frame would put
+	// the old lettering on paper.
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('beforeprint', function () { flushLabelRefresh(); });
+	}
 	function refreshLabelText() {
 		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
 		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
@@ -46197,6 +50697,8 @@ var EngCalcs = EngCalcs || {};
 		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
 		// elements and the legend is chrome; both are visible under a thematic map, so they are the
 		// part of this pass a suppressor has no business cancelling.
+		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
+		labelRefreshPending = false;
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -46238,6 +50740,11 @@ var EngCalcs = EngCalcs || {};
 		// solver in SI and go through displayRound().
 		var nodeVal = {
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
+			// **TANK WATER DEPTH ONLY** (Task 696): a junction or reservoir has no 'level' to print,
+			// exactly as it has no diameter. plainRound(), not displayRound(): effective(n, 'level')
+			// is a typed number already in the Elevation/Head display unit, the same treatment elev
+			// gets above.
+			level: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(effective(n, 'level'), nd.level) : undefined; }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
@@ -46279,6 +50786,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
+			level: fieldExtrema(nodeVal.level.list),
 			demand: fieldExtrema(nodeVal.demand.list),
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
@@ -46365,6 +50873,13 @@ var EngCalcs = EngCalcs || {};
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
 			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
+			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
+			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
+			// nodeVal.level exists only to feed extrema.level above, the same division every other
+			// field on this list keeps.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, extrema.level, nd.level))); }
 			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.
@@ -46671,6 +51186,9 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		// Placing text that a requested content pass is about to rewrite would place the old text
+		// (Task 653). Inside the pass itself nothing is owed, so this is a no-op there.
+		flushLabelRefresh();
 		// **OFF MEANS OFF: THE COLLISION RELAXATION IS THE SINGLE MOST EXPENSIVE THING ON THIS PAGE**
 		// (Tom, 2026-09-17), and running it over annotation `.lpn-labels-hidden` is not drawing
 		// decides where to put lettering nobody will see. This is the one place it is entered, which
@@ -46867,7 +51385,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{percent}', String(Math.round(epanetBarFraction() * 100)));
 		}
 		if (epanetWarmLoaded > 0) {
-			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.')
+			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.')
 				.replace('{kb}', String(Math.round(epanetWarmLoaded / 1024)));
 		}
 		return '';
@@ -47012,10 +51530,52 @@ var EngCalcs = EngCalcs || {};
 	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
 	// choice and a page that reports a wait the reader is already in are different pages. The words
 	// are Tom's own, 2026-09-06.
+	//
+	// **NEVER A FLASH** (Perry's review, 2026-09-22, live on port 8099: opening an example showed
+	// this exact banner for ~300ms then cleared it -- "SOLVER" and "POWER" share four of six
+	// letters in the same positions, which is a good match for the word Tom saw and could not
+	// read, "similar to POWER", and asked to stop happening. Naming the string was not fixing it).
+	// Most solves finish inside a second, so most of the time nobody should see this banner at
+	// all; a banner on screen for less time than a human can read a sentence is worse than no
+	// banner. Two rules, both against WALL TIME rather than against the fetch's own progress
+	// events, because the flash was never about bytes:
+	//   1. NOT SHOWN until the wait has lasted ENGINE_BANNER_SHOW_DELAY_MS. If the wait ends before
+	//      then, nothing was ever shown and nothing is logged -- there is no message to keep.
+	//   2. ONCE SHOWN, held at least ENGINE_BANNER_MIN_SHOWN_MS even if the wait ends sooner, so a
+	//      genuinely fast finish still leaves something readable rather than a second flash.
+	var ENGINE_BANNER_SHOW_DELAY_MS = 1000;
+	var ENGINE_BANNER_MIN_SHOWN_MS = 1500;
+	var engineBannerShowTimer = null;     // pending "show" timeout id, or null
+	var engineBannerHideTimer = null;     // pending "hide" timeout id (deferred by rule 2), or null
+	var engineBannerPendingBase = '';     // base sentence waiting out the show delay
+	var engineBannerPendingFull = '';     // its full text (base + progress), refreshed every tick
+	var engineBannerShownBase = '';       // base sentence actually on screen, '' if none
+	var engineBannerShownAt = 0;          // Date.now() of the actual (not scheduled) show
+	function paintEngineBanner(el, full) {
+		el.textContent = full;
+		el.style.display = full ? 'block' : 'none';
+		refreshEpanetBar(!!full);
+	}
+	// **LOGGED HERE, AND ONLY HERE** (Task 704: "log it only if it was actually shown"). This is
+	// the one place text actually reaches the screen, so it is the one place that can honestly say
+	// a message was shown.
+	function showEngineBannerNow(el, base, full) {
+		if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+		engineBannerShownBase = base;
+		engineBannerShownAt = Date.now();
+		logMessage(base, 'notice');
+		paintEngineBanner(el, full);
+	}
+	function hideEngineBannerNow(el) {
+		if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+		engineBannerShownBase = '';
+		engineBannerShownAt = 0;
+		paintEngineBanner(el, '');
+	}
 	function refreshEpanetBanner() {
 		var el = document.getElementById('lpn_engine_banner'),
 			pc = EngCalcs.pageConfig || {},
-			text = '';
+			base = '', full, elapsed;
 		if (!el) { return; }
 		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
 		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
@@ -47031,25 +51591,76 @@ var EngCalcs = EngCalcs || {};
 		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
 		// anything modal.
 		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
-			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+			base = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
 		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
-				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
+				base = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
 			} else if (epanetWarmState === 'unavailable') {
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
+				base = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
-		if (text && epanetWarmState === 'warming') {
+		full = base;
+		if (base && epanetWarmState === 'warming') {
 			var prog = epanetProgressText();
-			if (prog) { text += ' ' + prog; }
+			if (prog) { full = base + ' ' + prog; }
 		}
-		el.textContent = text;
-		el.style.display = text ? 'block' : 'none';
-		refreshEpanetBar(!!text);
+		if (base) {
+			if (engineBannerShownBase === base) {
+				// Already on screen with this exact sentence -- just refresh the ticking progress
+				// text underneath it. No re-log (logMessage() would dedupe it anyway, but there is
+				// no new SHOW event here either) and no timer to touch.
+				paintEngineBanner(el, full);
+				return;
+			}
+			if (engineBannerHideTimer) { clearTimeout(engineBannerHideTimer); engineBannerHideTimer = null; }
+			if (engineBannerShownBase) {
+				// Something else is already visible and the reader is already looking at this
+				// slot -- replace it immediately. The flash guard is for the FIRST appearance
+				// only; a mid-read swap is not the defect Perry measured.
+				showEngineBannerNow(el, base, full);
+				return;
+			}
+			if (engineBannerPendingBase === base && engineBannerShowTimer) {
+				// Already waiting out the delay for this exact sentence -- keep the text current
+				// for whenever the timer fires, but do not restart the wall-clock wait.
+				engineBannerPendingFull = full;
+				return;
+			}
+			if (engineBannerShowTimer) { clearTimeout(engineBannerShowTimer); engineBannerShowTimer = null; }
+			// ENGINE_BANNER_SHOW_DELAY_MS <= 0 means "no guard" -- the harness knob
+			// (dev/lpn-spike/engine-progress-harness.js) uses exactly this to test the byte/percent
+			// arithmetic synchronously; the shipped page never sets it below 1000.
+			if (ENGINE_BANNER_SHOW_DELAY_MS <= 0) { showEngineBannerNow(el, base, full); return; }
+			engineBannerPendingBase = base;
+			engineBannerPendingFull = full;
+			engineBannerShowTimer = setTimeout(function () {
+				engineBannerShowTimer = null;
+				showEngineBannerNow(el, engineBannerPendingBase, engineBannerPendingFull);
+			}, ENGINE_BANNER_SHOW_DELAY_MS);
+			return;
+		}
+		// base is empty: nothing left to report right now.
+		if (engineBannerShowTimer) {
+			// Never shown -- the wait ended inside the delay, which is the whole point of rule 1.
+			clearTimeout(engineBannerShowTimer);
+			engineBannerShowTimer = null;
+		}
+		engineBannerPendingBase = '';
+		if (!engineBannerShownBase) { return; }
+		elapsed = Date.now() - engineBannerShownAt;
+		if (elapsed >= ENGINE_BANNER_MIN_SHOWN_MS) {
+			hideEngineBannerNow(el);
+			return;
+		}
+		if (engineBannerHideTimer) { return; }
+		engineBannerHideTimer = setTimeout(function () {
+			engineBannerHideTimer = null;
+			hideEngineBannerNow(el);
+		}, ENGINE_BANNER_MIN_SHOWN_MS - elapsed);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:
@@ -47217,6 +51828,52 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 
+	// **THE TIME STEP ON SCREEN IS THE CONDITION TESTED, AND ALL OF IT, NOT ONLY ITS DEMANDS**
+	// (Tom, 2026-09-25, on Net3: *"the static pressure for Junction 10 never matches the map
+	// pressure, and it's always significantly lower"*). assembleModel() already scales demands,
+	// reservoir heads and pump speeds to the transport's time, because those are patterns anyone can
+	// evaluate at an instant. Two parts of the state cannot be evaluated at an instant, because a run
+	// produced them: where each TANK stands, which is everything that flowed in or out since the run
+	// began, and which links a CONTROL or RULE has switched. Without them the sweep tested Net3 with
+	// every tank at its starting level and pump 10 still shut as the file starts it, although its
+	// control opens it at 1:00 -- a network nobody was looking at.
+	//
+	// So where a run is on screen, its frame at this moment is laid over the copy: each tank's water
+	// surface, and each link's status. Only on the COPY; the document's own starting levels and
+	// statuses are the user's input and are never touched.
+	//
+	// **WHICH STATUSES ARE LAID OVER, AND WHICH ARE LEFT TO THE SOLVE.** An open link is laid over
+	// always: whatever shut it in the file, the run says it was open at this moment. A closed one is
+	// laid over for a pipe or a pump, where only the file, a control or a rule shuts it, with one
+	// exception -- a link touching a tank that is sitting at its lowest or highest level, which the
+	// engine shuts on its own for that step and would open again the moment a fire drew on the tank.
+	// A valve that went shut is left to decide for itself, because a PRV, PSV or FCV closes on its
+	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
+	// feed.
+	function fireFlowAtFrame(model) {
+		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
+			atLimit = {}, TOL = 1e-3;
+		if (!f || !f.heads) { return false; }
+		model.nodes.forEach(function (n) {
+			var h = f.heads[n.id];
+			if (n.type !== 'tank' || typeof h !== 'number' || !isFinite(h)) { return; }
+			n.head = h;
+			n.level = h - (n.elev || 0);
+			if (n.level <= (n.minLevel || 0) + TOL ||
+				(n.maxLevel > 0 && n.level >= n.maxLevel - TOL)) { atLimit[n.id] = true; }
+		});
+		if (f.statuses) {
+			model.links.forEach(function (l) {
+				var st = f.statuses[l.id];
+				if (st === 'open') { l.status = 'open'; return; }
+				if (st !== 'closed' || l.type === 'valve') { return; }
+				if (atLimit[l.from] || atLimit[l.to]) { return; }
+				l.status = 'closed';
+			});
+		}
+		return true;
+	}
+
 	// ---- the marks on the map -------------------------------------------------------------------
 	//
 	// **A CLASS ON THE JUNCTION'S OWN CIRCLE, NOT A SECOND ELEMENT AND NOT THE COLOUR RAMP.** The
@@ -47324,7 +51981,7 @@ var EngCalcs = EngCalcs || {};
 
 		boxes.scope = ffSelect([
 			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junction only']
+			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -47840,6 +52497,7 @@ var EngCalcs = EngCalcs || {};
 			minPressure = ffValue(ask.minPressure, 'lpn_u_pressure'),
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
+			skipped = 0,
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -47847,14 +52505,29 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
 		}
+		// **EVERY SELECTED JUNCTION, ONE AT A TIME** (Tom, 2026-09-25: *"area selection and
+		// multi-selection succeeded fire flow analysis and fire flow analysis does not know how to
+		// handle multiple selected hydrants"*). This read `selection`, the singular, which is the LAST
+		// thing selected -- so a window drag over six hydrants tested one of them and said nothing
+		// about the other five. The list is the subject now, in the order it was picked, and each
+		// junction in it gets its own row exactly as a whole-system sweep gives it one. Whatever else
+		// the drag caught -- a pipe, a tank, a label -- is not a hydrant, and the count of those is
+		// said rather than swallowed.
 		if (ask.scope === 'selected') {
-			if (!selection || selection.kind !== 'node' ||
-				!junctions.some(function (n) { return n.id === selection.id; })) {
+			skipped = 0;
+			ids = [];
+			selections.forEach(function (s) {
+				if (s.kind === 'node' && junctions.some(function (n) { return n.id === s.id; })) {
+					ids.push(s.id);
+				} else {
+					skipped++;
+				}
+			});
+			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
 					'No junction is selected. Choose one on the map, or test every junction.');
 				return;
 			}
-			ids = [selection.id];
 		} else {
 			ids = junctions.map(function (n) { return n.id; });
 		}
@@ -47863,6 +52536,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		model = assembleModel();
+		fireFlowAtFrame(model);
 		engine = engineFor(model);
 		if (ask.design !== 'off') {
 			design = {
@@ -47888,6 +52562,10 @@ var EngCalcs = EngCalcs || {};
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
 		openFireFlowRunBox(ids.length);
+		if (skipped) {
+			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
+				.replace('{n}', String(skipped)));
+		}
 
 		return EngCalcs.lpnFireFlowSweep(model, {
 			solve: engine.solve,
@@ -48539,8 +53217,466 @@ var EngCalcs = EngCalcs || {};
 		if (energyBoxIsOpen()) { rebuildEnergyReport(); }
 	}
 
+	// ---- THE STATUS REPORT AND THE FULL REPORT (ROADMAP Tasks 716, 715) -------------------------
+	//
+	// EPANET's own Report menu, Status and Full. Both read the extended period run's own frames
+	// (js/lpn-time.js's EC.lpnTimeRunFrames()) rather than computing anything new: the Status report
+	// is the same open/closed and level history the map, the labels and the Tables pane already
+	// carry, collected into one time-ordered list; the Full report is the same colorNodeValue() /
+	// colorLinkValue() accessors the map's colour ramp and the Tables pane already read, asked of
+	// every element at every reporting step instead of just the one the transport is parked on.
+	//
+	// **NEITHER IS A SECOND COMPUTATION**, which is the whole reason both are cheap: the run has
+	// already happened by the time either box is opened.
+
+	/** EPANET's own noun for this element, so the report reads the way its own status text does. */
+	function reportTypeNoun(kind, type) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'node') {
+			if (type === 'tank') { return pc.lpn_tool_add_tank || 'Tank'; }
+			if (type === 'reservoir') { return pc.lpn_tool_add_reservoir || 'Reservoir'; }
+			return pc.lpn_tool_add_junction || 'Junction';
+		}
+		if (type === 'pump') { return pc.lpn_tool_add_pump || 'Pump'; }
+		if (type === 'valve') { return pc.lpn_tool_add_valve || 'Valve'; }
+		return pc.lpn_tool_add_pipe || 'Pipe';
+	}
+	/**
+	 * **THE FRAMES BEHIND BOTH REPORTS.** An extended period run's own stops, in order -- the same
+	 * array the time-series chart plots and the scrubber steps through. Empty with no run, which is
+	 * the honest answer the built-in solver's single instant also gives: neither report claims to
+	 * show "what changed" or "every step" of a network nobody has asked to run over time.
+	 */
+	function reportFrames() { return (EngCalcs.lpnTimeRunFrames && EngCalcs.lpnTimeRunFrames()) || []; }
+	/**
+	 * **A TANK'S OWN FULL/EMPTY BAND, IN SI.** `minLevel`/`maxLevel` are typed numbers in the
+	 * project's elevation-head unit, exactly like `level` itself (CLAUDE.md: a stored unit is a
+	 * NAME, and only toSI()/toDisplay() cross it) -- so they are converted here rather than compared
+	 * against the frame's SI level as they stand, which is the Task 255 shape of defect.
+	 */
+	function tankLevelBandSI(n) {
+		var minSI = typeof n.minLevel === 'number' ? toSI(n.minLevel, 'lpn_u_elevhead') : undefined,
+			maxSI = typeof n.maxLevel === 'number' ? toSI(n.maxLevel, 'lpn_u_elevhead') : undefined;
+		return { min: minSI, max: maxSI };
+	}
+	/**
+	 * **THE EVENT STREAM, IN TIME ORDER** -- EPANET's own Status report content: a pump or a valve
+	 * opening or closing, a tank filling, emptying, filling up or running dry, and a step the solver
+	 * could not fully converge on. The FIRST frame seeds the state silently (the initial condition is
+	 * not a change), and every frame after it is compared only with its own predecessor, so an event
+	 * fires once, at the step it actually happened on, and never repeats while nothing moves.
+	 *
+	 * **A SMALL TOLERANCE, NOT AN EXACT EQUALITY**, on both the fill/drain direction and the
+	 * full/empty band: a tank riding EPANET's own numerical noise at its ceiling would otherwise
+	 * report itself full and not-full every other reporting step.
+	 */
+	function statusReportEvents() {
+		var pc = EngCalcs.pageConfig || {}, frames = reportFrames(), events = [],
+			tanks = doc.nodes.filter(function (n) { return n.type === 'tank'; }),
+			linkState = {}, tankState = {};
+		if (frames.length < 1) { return events; }
+		doc.links.forEach(function (l) { linkState[l.id] = frames[0].statuses ? frames[0].statuses[l.id] : undefined; });
+		tanks.forEach(function (t) {
+			var band = tankLevelBandSI(t), lvl = frames[0].levels ? frames[0].levels[t.id] : undefined,
+				eps = (typeof band.min === 'number' && typeof band.max === 'number')
+					? Math.max(1e-6, (band.max - band.min) * 1e-4) : 1e-6;
+			tankState[t.id] = {
+				dir: 0, eps: eps,
+				full: typeof lvl === 'number' && typeof band.max === 'number' && lvl >= band.max - eps,
+				dry: typeof lvl === 'number' && typeof band.min === 'number' && lvl <= band.min + eps
+			};
+		});
+		frames.forEach(function (f, i) {
+			if (i === 0) { return; }
+			doc.links.forEach(function (l) {
+				var st = f.statuses ? f.statuses[l.id] : undefined;
+				if (st === undefined || st === linkState[l.id]) { return; }
+				linkState[l.id] = st;
+				events.push({
+					t: f.t,
+					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} opened')
+						: (pc.lpn_status_closed || '{type} {id} closed'))
+						.replace('{type}', reportTypeNoun('link', l.type))
+						.replace('{id}', labelPrefixFor('link', 'id') + l.id)
+				});
+			});
+			tanks.forEach(function (t) {
+				var band = tankLevelBandSI(t), st = tankState[t.id],
+					lvl = f.levels ? f.levels[t.id] : undefined,
+					prevLvl = frames[i - 1].levels ? frames[i - 1].levels[t.id] : undefined,
+					name = labelPrefixFor('node', 'id') + t.id, dir;
+				if (typeof lvl !== 'number') { return; }
+				if (typeof prevLvl === 'number') {
+					dir = (lvl - prevLvl) > st.eps ? 1 : ((lvl - prevLvl) < -st.eps ? -1 : 0);
+					if (dir !== 0 && dir !== st.dir) {
+						st.dir = dir;
+						events.push({
+							t: f.t,
+							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} is filling')
+								: (pc.lpn_status_emptying || '{type} {id} is emptying'))
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					}
+				}
+				if (typeof band.max === 'number') {
+					if (lvl >= band.max - st.eps && !st.full) {
+						st.full = true;
+						events.push({
+							t: f.t,
+							text: (pc.lpn_status_full || '{type} {id} is full')
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					} else if (lvl < band.max - st.eps) { st.full = false; }
+				}
+				if (typeof band.min === 'number') {
+					if (lvl <= band.min + st.eps && !st.dry) {
+						st.dry = true;
+						events.push({
+							t: f.t,
+							text: (pc.lpn_status_dry || '{type} {id} is empty')
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					} else if (lvl > band.min + st.eps) { st.dry = false; }
+				}
+			});
+			if (f.converged === false) { events.push({ t: f.t, text: pc.lpn_status_no_converge || 'The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.' }); }
+		});
+		return events;
+	}
+	function statusBoxEl() { return document.getElementById('lpn_status_box'); }
+	function statusBoxIsOpen() {
+		var box = statusBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function rebuildStatusReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_status_report'),
+			frames = reportFrames(), events, body;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!frames.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			return;
+		}
+		events = statusReportEvents();
+		if (!events.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
+			return;
+		}
+		body = ffTable(host, [pc.lpn_status_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		events.forEach(function (e) {
+			var tr = ffEl('tr', null, null, body);
+			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));
+			ffCell(tr, e.text);
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_status_note || 'Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.', host);
+	}
+	function openStatusReportBox() {
+		var box = statusBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildStatusReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, statusboxLayout); });
+		initTipsIn(box);
+		rememberBoxOpen(statusboxLayout, saveStatusboxLayout, true);
+	}
+	function closeStatusReportBox() {
+		hidePanel(statusBoxEl());
+		rememberBoxOpen(statusboxLayout, saveStatusboxLayout, false);
+	}
+	var LPN_STATUSBOX_KEY = 'lpn_statusbox';
+	var statusboxLayout = newBoxLayout();
+	function saveStatusboxLayout() {
+		try { localStorage.setItem(LPN_STATUSBOX_KEY, JSON.stringify(statusboxLayout)); } catch (e) {}
+	}
+	function wireStatusReportBox() {
+		var box = statusBoxEl(), x = document.getElementById('lpn_status_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeStatusReportBox); }
+		wireBoxMemory(box, LPN_STATUSBOX_KEY, statusboxLayout, saveStatusboxLayout, statusBoxIsOpen);
+	}
+	function refreshStatusReportBoxIfOpen() {
+		if (statusBoxIsOpen()) { rebuildStatusReport(); }
+	}
+
+	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------
+	//
+	// **ONE FLAT TABLE, NOT EPANET'S PAIR PER TIME PERIOD.** EPANET writes a node table and a link
+	// table for each period; this page's own Tables pane already keeps nodes and links in separate
+	// tabs, so a Time column beside a Type column says the same thing in a shape a CSV reader and a
+	// spreadsheet both take without a second pass, and one row per element per step is what the
+	// harness and the reader both want to sort and filter on.
+	var FULL_REPORT_COLS = [
+		{ key: 'demand', group: 'node', field: 'demandActual' },
+		{ key: 'head', group: 'node', field: 'head' },
+		{ key: 'pressure', group: 'node', field: 'pressure' },
+		{ key: 'quality', group: 'node', field: 'quality' },
+		{ key: 'flow', group: 'link', field: 'flow' },
+		{ key: 'velocity', group: 'link', field: 'velocity' },
+		{ key: 'headloss', group: 'link', field: 'headloss' },
+		{ key: 'status', group: 'link', field: 'status' }
+	];
+	function fullReportColHeading(col) {
+		var pc = EngCalcs.pageConfig || {};
+		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
+		var unit = colorFieldUnitText(col.group, col.field);
+		return colorFieldLabel(col.group, col.field) + (unit ? ' (' + unit + ')' : '');
+	}
+	/**
+	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
+	 * is the seam the time-series chart already trusts for this (see its own note above): it swaps
+	 * `lastSolveResult` and the pattern clock for the span of one call and restores both in a
+	 * `finally`, so a row of this report can never disagree with what the Tables pane would show at
+	 * that same step, and the swap can never leave the map parked at the wrong moment.
+	 */
+	function fullReportRows() {
+		var frames = reportFrames(), rows = [];
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		frames.forEach(function (f) {
+			tsAsOfFrame(f, function () {
+				var t = typeof f.t === 'number' ? f.t : 0;
+				doc.nodes.forEach(function (n) {
+					rows.push({
+						t: t, group: 'node', type: reportTypeNoun('node', n.type), id: n.id,
+						demand: colorNodeValue(n, 'demandActual'), head: colorNodeValue(n, 'head'),
+						pressure: colorNodeValue(n, 'pressure'), quality: colorNodeValue(n, 'quality')
+					});
+				});
+				doc.links.forEach(function (l) {
+					rows.push({
+						t: t, group: 'link', type: reportTypeNoun('link', l.type), id: l.id,
+						flow: colorLinkValue(l, 'flow'),
+						velocity: colorLinkValue(l, 'velocity'),
+						headloss: colorLinkValue(l, 'headloss'),
+						status: linkStatusText(l)
+					});
+				});
+			});
+		});
+		return rows;
+	}
+	// **THE SAME ROUNDING THE TABLES PANE USES FOR A RESULT CELL** (paneCellText(): `plainRound(v,
+	// 2)`), so a Full report row can never print a number the Tables pane would print differently at
+	// the same step.
+	function fullReportCellText(row, key) {
+		var v = row[key];
+		if (typeof v === 'number') { return isFinite(v) ? String(plainRound(v, 2)) : ''; }
+		return v === undefined || v === null ? '' : String(v);
+	}
+	function csvField(text) {
+		var s = text === undefined || text === null ? '' : String(text);
+		return (/[",\r\n]/).test(s) ? ('"' + s.replace(/"/g, '""') + '"') : s;
+	}
+	function fullReportCsvText(rows) {
+		var pc = EngCalcs.pageConfig || {},
+			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+				.concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			lines = [headers.map(csvField).join(',')];
+		rows.forEach(function (r) {
+			lines.push([
+				EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id
+			].concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
+				.map(csvField).join(','));
+		});
+		return lines.join('\r\n') + '\r\n';
+	}
+	// **A NAME SAFE ON EVERY FILESYSTEM THIS SUITE'S USERS ACTUALLY WRITE TO** -- Windows refuses
+	// `\ / : * ? " < > |` in a filename outright, so those become a hyphen rather than being handed
+	// to the browser to reject silently.
+	function sanitizeFilename(name) {
+		return String(name || '').replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+	}
+	function downloadTextFile(filename, text, mime) {
+		var blob = new Blob([text], { type: mime || 'text/plain' }), url = URL.createObjectURL(blob),
+			a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+	}
+	function fullReportFilename(ext) {
+		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project');
+		return name + '-Full report.' + ext;
+	}
+	function downloadFullReportCsv() {
+		downloadTextFile(fullReportFilename('csv'), fullReportCsvText(fullReportRows()), 'text/csv');
+	}
+	/** THE SAME STATIC-COPY, ONE-PRINTER APPROACH paneBuildPrintable() uses for the Tables pane
+	 * (`#lpn_print_area`, see css/engcalcs.css): a plain table built from the rows, never the live
+	 * box, so nothing modal or scrolling ends up on the page. */
+	function fullReportPrintable(rows) {
+		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'), h, table, thead, tbody;
+		wrap.id = 'lpn_print_area';
+		h = document.createElement('h1');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = pc.lpn_full_title || 'Full report';
+		wrap.appendChild(h);
+		if (!rows.length) {
+			h = document.createElement('p');
+			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+			wrap.appendChild(h);
+			return wrap;
+		}
+		table = document.createElement('table');
+		table.className = 'lpn-pane-table lpn-print-table';
+		thead = document.createElement('thead');
+		(function () {
+			var tr = document.createElement('tr');
+			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
+				.forEach(function (text) {
+					var th = document.createElement('th');
+					th.textContent = text;
+					tr.appendChild(th);
+				});
+			thead.appendChild(tr);
+		}());
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		rows.forEach(function (r) {
+			var tr = document.createElement('tr'), td;
+			[EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
+				.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
+				.forEach(function (text) {
+					td = document.createElement('td');
+					td.textContent = text;
+					tr.appendChild(td);
+				});
+			tbody.appendChild(tr);
+		});
+		table.appendChild(tbody);
+		wrap.appendChild(table);
+		return wrap;
+	}
+	var fullPrintArea = null;
+	function endFullPrint() {
+		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
+		if (fullPrintArea && fullPrintArea.parentNode) { fullPrintArea.parentNode.removeChild(fullPrintArea); }
+		fullPrintArea = null;
+	}
+	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
+	// does for the Tables pane; neither function touches the tab at all.
+	function printFullReport() {
+		if (!document.body) { return; }
+		endFullPrint();
+		fullPrintArea = fullReportPrintable(fullReportRows());
+		document.body.appendChild(fullPrintArea);
+		document.body.classList.add('lpn-printing-table');
+		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
+			window.addEventListener('afterprint', endFullPrint);
+			window.print();
+		} else {
+			try { window.print(); } finally { endFullPrint(); }
+		}
+	}
+	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
+	function fullBoxIsOpen() {
+		var box = fullBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	/**
+	 * **WHICH TIME STEP THE BOX SHOWS A TABLE OF.** Remembered across a rebuild (an edit, a new run)
+	 * so the reader is not thrown back to the first step every time the box repaints; not persisted
+	 * anywhere else, because which step somebody was reading is not a fact worth carrying past this
+	 * page load.
+	 */
+	var fullReportStepIndex = 0;
+	/**
+	 * **ONE STEP ON SCREEN AT A TIME, EVERY STEP IN THE DOWNLOAD.** Net3's 5,400 rows build and CSV
+	 * in well under 20 ms (dev/lpn-spike/report-harness.js), but a browser laying out 5,400 real
+	 * table rows -- 60,000-odd cells, with borders and padding -- is a different cost from building
+	 * the array, and a bigger network or a shorter reporting step multiplies both the row count and
+	 * that layout cost together. EPANET's own Full report is a text FILE meant to be scrolled or
+	 * searched in an editor, not a live web table repainted on every edit; the closest live-page
+	 * equivalent that stays responsive at any network size is one reporting step's rows on screen,
+	 * with a control to change which step -- so Download and Print (which build the whole document
+	 * once, off screen) carry every step, and the table in the box carries one.
+	 */
+	function rebuildFullReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_full_report'),
+			rows, frames, stepRows, sel, body;
+		if (!host) { return; }
+		host.innerHTML = '';
+		rows = fullReportRows();
+		if (!rows.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
+			return;
+		}
+		frames = reportFrames();
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || '{n} rows.').replace('{n}', String(rows.length)), host);
+		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
+		if (frames.length > 1) {
+			sel = document.createElement('select');
+			sel.id = 'lpn_full_step';
+			frames.forEach(function (f, i) {
+				var opt = document.createElement('option');
+				opt.value = String(i);
+				opt.textContent = EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(f.t) : String(f.t);
+				sel.appendChild(opt);
+			});
+			sel.value = String(fullReportStepIndex);
+			sel.addEventListener('change', function () {
+				fullReportStepIndex = +sel.value;
+				rebuildFullReport();
+			});
+			ffRow(host, pc.lpn_full_step_label || 'Time step', null, sel, '');
+		}
+		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
+		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+		stepRows.forEach(function (r) {
+			var tr = ffEl('tr', null, null, body);
+			ffCell(tr, r.type);
+			ffCell(tr, r.id);
+			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
+		});
+	}
+	function openFullReportBox() {
+		var box = fullBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildFullReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, fullboxLayout); });
+		initTipsIn(box);
+		rememberBoxOpen(fullboxLayout, saveFullboxLayout, true);
+	}
+	function closeFullReportBox() {
+		hidePanel(fullBoxEl());
+		rememberBoxOpen(fullboxLayout, saveFullboxLayout, false);
+	}
+	var LPN_FULLBOX_KEY = 'lpn_fullbox';
+	var fullboxLayout = newBoxLayout();
+	function saveFullboxLayout() {
+		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
+	}
+	function wireFullReportBox() {
+		var box = fullBoxEl(), x = document.getElementById('lpn_full_close'),
+			csv = document.getElementById('lpn_full_csv'), pr = document.getElementById('lpn_full_print');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeFullReportBox); }
+		if (csv) { csv.addEventListener('click', downloadFullReportCsv); }
+		if (pr) { pr.addEventListener('click', printFullReport); }
+		wireBoxMemory(box, LPN_FULLBOX_KEY, fullboxLayout, saveFullboxLayout, fullBoxIsOpen);
+	}
+	function refreshFullReportBoxIfOpen() {
+		if (fullBoxIsOpen()) { rebuildFullReport(); }
+	}
+
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
+		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
 			lastSolveResult = null;
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
@@ -48553,6 +53689,9 @@ var EngCalcs = EngCalcs || {};
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
+				// Task 708: an open Properties popup reads lastSolveResult too, at render time, and
+				// nothing here had ever asked it to redraw -- see the note at the success path below.
+				refreshPopupIfOpen();
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up with
@@ -48563,6 +53702,7 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 			refreshValueColors();
 			refreshPaneIfOpen();
+			refreshPopupIfOpen();   // Task 708
 			return;
 		}
 		// **A SOLVE THAT DID NOT CONVERGE IS DRAWN AND MARKED, NOT DISCARDED** (ROADMAP Task 565).
@@ -48697,6 +53837,15 @@ var EngCalcs = EngCalcs || {};
 		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
 		// schedules a solve, so the open tab follows the document with no listener of its own.
 		refreshPaneIfOpen();
+		// **AND WHERE THE OPEN PROPERTIES POPUP HUNG UNTIL NOW** (Task 708, Tom: "When I change
+		// Base demand in Properties, Demand, Pressure etc. change on the node label, but not in
+		// Properties"). afterPropertyEdit() already redraws an open popup the instant the edit
+		// lands, but that solve is DEBOUNCED 300 ms out -- and when it lands here, this function
+		// refreshed the map labels and the Tables pane and never asked the popup to redraw. A
+		// junction's Pressure/Head rows are read straight off lastSolveResult at render time, so
+		// the popup simply kept showing the number it had drawn a third of a second earlier,
+		// disagreeing with its own map label and table row until the popup was closed and reopened.
+		refreshPopupIfOpen();
 		// And the energy report, on the same seam and for the same reason: a run that has just
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.
@@ -48704,6 +53853,10 @@ var EngCalcs = EngCalcs || {};
 		// And the EPANET run report, on the same seam: a new run writes a new .rpt, and a box left
 		// showing the previous one would be last time's answer under this time's title.
 		refreshRunReportBoxIfOpen();
+		// And the status and full reports, on the same seam: both read the run's own frames, and a
+		// box left open must show this run's answer and not the one it replaced.
+		refreshStatusReportBoxIfOpen();
+		refreshFullReportBoxIfOpen();
 		// And the scenario comparison, on the same seam and for exactly the same reason: the table
 		// answered a network that has just changed under it, so it is dropped rather than left
 		// standing as though it were still true.
@@ -48808,7 +53961,7 @@ var EngCalcs = EngCalcs || {};
 		// **THE WIZARD IS LOCATABLE WHILE IT RUNS**, which is what makes Tom's step 1 offer Search
 		// by name on a project that states no coordinate system at all: the place is what the
 		// wizard is asking for, so refusing to look one up would refuse the question.
-		EngCalcs.lpnSearchInit({ locatable: function () { return projectLocatable() || mapgeoActive(); },
+		EngCalcs.lpnSearchInit({ locatable: function () { return placeFindable() || mapgeoActive(); },
 			goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
@@ -48937,6 +54090,15 @@ var EngCalcs = EngCalcs || {};
 		// edit, so a burst that crosses the Recalculate switch still costs exactly one write.
 		scheduleSave();
 		if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
+		// **AND THE TABLE ON SHOW FOLLOWS THE DOCUMENT, WHETHER OR NOT ANYTHING IS SOLVED** (Perry's
+		// pre-review of Tom's fifth pass, 2026-09-22). With the switch ON the pane is refreshed when
+		// the solve lands; with it OFF this is the only door, and it used to refresh nothing -- so a
+		// scenario switch left the Junctions table showing the scenario just left (a 999999 override
+		// still on screen over a Base value of 0). This is "an edit still has to show up everywhere
+		// the input is shown", reaching the table. It is a REFILL of the one table on show, writing
+		// only the cells that changed, never a map-wide pass; and the result columns read the kept
+		// lastSolveResult, so the snapshot rule stands -- stale answers stay, nothing is cleared.
+		refreshPaneIfOpen();
 	}
 
 	// calcAndSave() calls this unconditionally, from the units strip's own selects and from
@@ -48968,7 +54130,7 @@ var EngCalcs = EngCalcs || {};
 		// The pane's tabs carry their units in their headings and axis titles, so a switch has to
 		// redraw the open one for exactly the reason the popup is rebuilt.
 		refreshPaneIfOpen();
-		refreshLabelText();
+		requestLabelRefresh();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup
 		// does -- otherwise a US number sits under an SI label. THE WHOLE BOX: Coloring's field

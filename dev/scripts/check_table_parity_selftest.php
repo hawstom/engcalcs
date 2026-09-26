@@ -114,9 +114,9 @@ pin('a + selftest on a name it cannot derive from is reported, not guessed',
 // one silent failure. The live files must keep yielding both.
 $root = dirname(__DIR__, 2);
 $liveRuns = ecRunChecks((string) file_get_contents($root . '/dev/scripts/check_all.sh'));
-$liveClaims = ecCheckTableClaims((string) file_get_contents($root . '/CLAUDE.md'));
+$liveClaims = ecCheckTableClaims((string) file_get_contents($root . '/dev/automated-checks.md'));
 pin('the live check_all.sh still yields run_check lines (>20)', count($liveRuns) > 20, true);
-pin('the live CLAUDE.md still yields table rows (>20)', count($liveClaims['cells']) > 20, true);
+pin('the live dev/automated-checks.md still yields table rows (>20)', count($liveClaims['cells']) > 20, true);
 
 if ($fails) {
     echo "\n$fails fixture(s) failed. check_table_parity_check.php's reading of one of the two\n";

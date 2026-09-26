@@ -1124,7 +1124,14 @@
 				// Measured before the fix: a curve steepened at every point still reported the old 6 m.
 				'\u0001' + (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV'
 					? (l.curvePoints || []).map(function (q) { return q[0] + ',' + q[1]; }).join(';')
-					: ''));
+					: '') +
+				// **A PUMP'S STATUS IS IN THE SIGNATURE, AND IT HAS TO BE** (2026-09-25). A session
+				// opened with a pump shut and then handed EN_INITSTATUS = open by pushValues() still
+				// solves with that pump delivering nothing: measured on Net3's pump 10, shut at 0:00
+				// and opened by its control at 1:00, 30 psi low at Junction 10 against the run it was
+				// asked to reproduce, while the same model opened cold was right to 0.0001 psi. So a
+				// pump opening or shutting reopens the Project from its text, which is always right.
+				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -1850,6 +1857,12 @@
 					// what a user comparing two runs actually wants.
 					var stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0,
 						convAccuracy = null, convUnknown = false;
+					// **WHAT THE RUN COST THE THREAD, WITHOUT THE WAITING BETWEEN SLICES** (Task
+					// 653). The wall clock js/lpn-time.js takes around a run also counts whatever
+					// else the page did while the run was yielding -- on opening a project that is
+					// the whole label pass, and it made a 100 ms run read as three seconds. This is
+					// the sum of the slices alone, which is the cost the next edit would pay again.
+					var busyMs = 0;
 					function noteStep(tNow, c) {
 						stepsRun++;
 						if (c.converged === null) { convUnknown = true; return; }
@@ -1932,8 +1945,9 @@
 						if (!rateOn) { finish(shutdown()); return; }
 						tell(runSpan);
 						setTimeout(function () {
-							var report = shutdown();
+							var read0 = nowMs(), report = shutdown();
 							fillReactionRates();
+							busyMs += nowMs() - read0;
 							finish(report);
 						}, 0);
 					}
@@ -1953,6 +1967,7 @@
 							firstUnconvergedTime: firstBadT,
 							relativeError: worstRelErr,
 							accuracy: convAccuracy,
+							busyMs: busyMs,
 							frames: frames,
 							duration: duration, reportStart: reportStart, reportStep: reportStep,
 							quality: qualOn ? (model.quality || null) : null,
@@ -2015,6 +2030,7 @@
 								if (nowMs() - slice0 >= sliceMs) { break; }
 							}
 						} catch (e) { failed(e); return; }
+						busyMs += nowMs() - slice0;
 						if (!finished) { tell(fractionNow()); setTimeout(qslice, 0); return; }
 						done();
 					}
@@ -2118,6 +2134,7 @@
 							failed(e);
 							return;
 						}
+						busyMs += nowMs() - slice0;
 						if (!finished) {
 							tell(fractionNow());
 							// setTimeout rather than a microtask ON PURPOSE: a microtask does not

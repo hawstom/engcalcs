@@ -37,11 +37,14 @@
         "name that comes back meaning something else must not walk through an open door."
     ],
     "protected": [
+        "feat/property-venue",
+        "feat/convert-as",
         "customer",
         "graph",
         "projection",
         "custom-property",
         "674-coordinate-entry",
+        "tables-interface",
         "feat/customer-demands",
         "feat/time-series-graph",
         "feat/label-gang-search",
@@ -55,7 +58,20 @@
         "feat/notice-log",
         "feat/zoom-symbol-size",
         "feat/map-menu",
-        "tables-interface"
+        "tables-interface",
+        "feat/zoom-scale-rules",
+        "feat/zoom-control",
+        "feat/convert-as",
+        "feat/table-editing",
+        "feat/property-venue",
+        "feat/label-limit",
+        "feat/offscreen-notice",
+        "feat/usage-report",
+        "feat/select-on-focus",
+        "feat/first-project",
+        "feat/customer-node",
+        "feat/menu-button",
+        "feat/report"
     ],
     "feature_freeze": {
         "active": false,

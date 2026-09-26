@@ -113,6 +113,7 @@ run_check "form keyboard stops"          blocking php dev/scripts/focus_order_ch
 # unfiltered lines pasted into five writers -- so this checks the helper's behaviour AND that nobody
 # has pasted the raw read back in.
 run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_tag_check.php
+run_check "no Accept-Language header answers 500" blocking php dev/scripts/accept_language_check.php
 # Task 318, third of the same kind and the worst of the three while it was missing: the service
 # worker precached bare paths while every page requested '?v=<filemtime>', so 22 of 25 precache
 # entries were unreachable and the offline promise on About.php was simply false. Nothing rendered
@@ -290,6 +291,25 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
 run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
+# Task 690, the spreadsheet-parity half. Every property in an element's property popup is also a
+# column in that element's table -- and, because multiGroups() derives its sections from
+# paneTables(), in the multi-properties box with it. Adding a popup field is a complete, working,
+# shippable change that nothing on this side of the wire can see the other half of; Tom found the
+# last one by opening the table looking for it (*"Initial quality is in no Table and no
+# multi-properties. Embarrassing"*). BOTH SIDES ARE DERIVED: the row builders are the functions
+# taking `fields` first and a `labelText` parameter, and the columns are buildPaneTables() with its
+# paneCol* helpers resolved. A RATCHET AT ZERO since 2026-09-19: it shipped advisory at 28 gaps, Tom
+# said "Fix all that was found", all 28 were closed and the flag turned over. The selftest is
+# blocking too, because every way this check can quietly stop working makes its count SMALLER, which
+# reads as progress on the very task it serves.
+run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
+run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
+# ROADMAP Task 708: the audit's mechanically-derivable slice, a THIRD editor of the same
+# document -- an editable Tables-pane column with no matching Find property for its element's
+# GROUP. Advisory while the matrix in dev/property-venue-matrix.md is still being ranked; its
+# selftest is blocking for the reason table_column_parity_selftest.php's own is.
+run_check "table/Find parity"            advisory php dev/scripts/property_venue_check.php
+run_check "table/Find parity selftest"   blocking php dev/scripts/property_venue_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
@@ -332,6 +352,13 @@ run_check "unit default set selftest"    blocking php dev/scripts/unit_default_s
 # solver as 6 metres. The page renders, the select is right, and the answer is wrong by 25.4.
 run_check "form field units"             blocking php dev/scripts/form_field_units_check.php
 run_check "form field units selftest"    blocking php dev/scripts/form_field_units_selftest.php
+# Task 685, Tom 2026-09-17: "name each one after its own field". 226 of 430 rendered form controls
+# had no accessible name, essentially every unit select in the suite -- a screen reader announced
+# "combo box, feet" with nothing saying which field it belonged to. Renders the 16 calculator pages
+# and fails on any <select> (not only a unit one) with no aria-label, no resolving aria-labelledby,
+# and no <label>.
+run_check "unit select accessible names" blocking php dev/scripts/unit_select_name_check.php
+run_check "unit select name selftest"    blocking php dev/scripts/unit_select_name_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
@@ -411,7 +438,7 @@ run_check "review queue selftest"        blocking php dev/scripts/review_queue_s
 # to that file, because dev/*.md's 31 dead citations are nearly all legitimate history.
 run_check "check table parity"           blocking php dev/scripts/check_table_parity_check.php
 run_check "check table selftest"         blocking php dev/scripts/check_table_parity_selftest.php
-run_check "CLAUDE.md paths resolve"      blocking php dev/scripts/doc_path_check.php
+run_check "start-of-session doc paths"  blocking php dev/scripts/doc_path_check.php
 run_check "doc path selftest"            blocking php dev/scripts/doc_path_selftest.php
 # The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
 # one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
@@ -525,7 +552,7 @@ if [ -n "$FAILED" ]; then
 fi
 if [ -n "$ADVISORY" ]; then
 	echo "Advisory findings above:$ADVISORY"
-	echo "Not blocking. Worth a look when convenient; see CLAUDE.md for what each one means."
+	echo "Not blocking. Worth a look when convenient; see dev/automated-checks.md for what each one means."
 fi
 echo "All blocking checks pass."
 

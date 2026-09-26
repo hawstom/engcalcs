@@ -264,8 +264,14 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	const doors = (code.match(/restoreViewOrFit\(\)/g) || []).length;
 	ok('both open paths restore the view rather than fitting outright', doors >= 3,
 		doors + ' call site(s): the function, refreshAllFromDocument, and boot');
+	// **THE TOOLBAR BUTTON STOPPED CALLING zoomExtent BY REFERENCE WHEN IT GAINED A SECOND MODE**
+	// (ROADMAP Task 682: the same press now also has to decide Zoom to fit vs Zoom Window). What
+	// this assertion still owes Tom's sentence is that the fit-shaped press explicitly says
+	// `false` rather than leaving the flag to be inferred -- see the `bare === 0` assertion above,
+	// which is the other half of the same rule. The Map menu row is untouched and still passes
+	// zoomExtent BY REFERENCE, exactly as before.
 	ok('...and the button the user presses is NOT marked automatic, since that one is an edit',
-		/fn: zoomExtent\b/.test(code) && /addEventListener\('click', zoomExtent\)/.test(code));
+		/fn: zoomExtent\b/.test(code) && /extentBtn\.addEventListener\('click', function \(\) \{[\s\S]*?zoomExtent\(false\);/.test(code));
 	ok('...with a re-baseline that only ever fires on an already-clean project',
 		/function rebaseSignatureIfClean/.test(code) && /if \(e && !e\.dirty\)/.test(code));
 }
@@ -284,7 +290,10 @@ console.log('\n--- a project is born clean, however it was born ---');
 	const src = require('fs').readFileSync(
 		require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
 	const at = src.indexOf('var firstId = newProjectId()');
-	const branch = src.slice(at, at + 1400);
+	// Widened past 1400 (R-208): the boot branch grew its own explanatory comment for why Project1
+	// opens geographic, at Novato, with its basemap off -- see js/looped-network.js's note beside
+	// `firstVisitPendingId`. The window only has to reach `bornClean = true;`, whatever comes before it.
+	const branch = src.slice(at, at + 3600);
 	// **AND THE STAMP IS TAKEN AFTER THE SEEDING** (Task 418). Stamped in the branch it was still
 	// too early: seedDefaultInputs() runs afterwards and fills settings.defaults, which
 	// docSignature() covers, so the first autosave found a document nobody had touched already

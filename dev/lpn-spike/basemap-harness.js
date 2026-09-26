@@ -332,13 +332,17 @@ ok('turning it back on says so on the project', L.getProject().basemap === 'osm'
 		!L.satAvailable() && L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()));
 	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
 
-	// Asking for the style already showing turns the basemap OFF. That is what makes each menu
-	// row a toggle of its own instead of half of a cycle nobody can predict.
+	// **ASKING FOR THE STYLE ALREADY SHOWING LEAVES IT SHOWING** (reversed 2026-09-22). It used to
+	// turn the basemap OFF, a rule for the retired Hide/Show rows; once World map, Attach went
+	// through this setter it turned a showing map off while saying it had attached one. Turning
+	// the map off is now asked for by name ('off', which World map, Detach sends).
 	const cur = L.style();
 	L.setStyle(cur);
-	ok('asking for the style already showing turns the basemap off', !L.basemapOn(), p.basemap);
+	ok('asking for the style already showing leaves the basemap on', L.basemapOn() && L.style() === cur, p.basemap);
+	L.setStyle('off');
+	ok('...and off is asked for by name', !L.basemapOn());
 	L.setStyle('osm');
-	ok('...and asking again brings it back', L.basemapOn() && L.style() === 'osm');
+	ok('...and asking for a style brings it back', L.basemapOn() && L.style() === 'osm');
 
 	// An unknown style must not blank the map: a project file written by a future version, or by
 	// hand, is the realistic source of one.
@@ -408,10 +412,9 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	ok('...and it says it is a toggle that is currently off',
 		btn.getAttribute('aria-pressed') === 'false');
 
-	// **ONE SEAM, TWO BEHAVIOURS, AND THE DIFFERENCE IS THE POINT.** The click goes through
-	// setBasemapStyle() like the menu row, but it never ASKS for the style already showing, so the
-	// seam's off-toggle cannot fire. A corner tile swaps the two basemaps; only a row that says
-	// "Hide" in words takes the tiles away. Tom, 2026-08-23, on the version that inherited the
+	// **THE CORNER TILE SWAPS THE TWO BASEMAPS AND NEVER TAKES THEM AWAY**; only World map,
+	// Detach does that, in words. (The setter's old off-toggle, which this tile had to avoid, went
+	// on 2026-09-22.) Tom, 2026-08-23, on the version that inherited the
 	// off-toggle: *"I get satellite, but now I lost map. No more map. Satellite has attribution,
 	// Map has nothing, no map and no attribution."*
 	const click = function () { btn._listeners.click.forEach(function (f) { f(); }); };

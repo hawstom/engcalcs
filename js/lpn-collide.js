@@ -309,13 +309,23 @@ EngCalcs.lpnCollide = (function () {
 	// can be stretched longer at the same angle."* The stored endpoint is first, and the distance
 	// term keeps it there unless something is genuinely in the way -- so a dragged label that is
 	// clear of everything does not move at all.
+	//
+	// **THE STRETCH IS MEASURED ON AT MOST `reach` OF THE LEADER, NEVER ON ALL OF IT** (Tom,
+	// 2026-09-25: *"labels being dragged jump double distance (twice as far at the cursor
+	// location) at unpredictable locations"*). Multiplying the whole leader made the push grow with
+	// the drag: a label pulled 300 px out went 660 px out the moment its endpoint touched anything,
+	// and Zoom to fit then made room for a push that was gone at the scale it chose. A leader
+	// shorter than `reach` stretches exactly as before; a longer one moves by the same few label
+	// heights. dev/lpn-spike/label-drag-fit-harness.js.
 	var RAY_STRETCH = [1, 1.3, 1.7, 2.2];
-	function rayCandidates(anchor, home) {
-		var dx = home.x - anchor.x, dy = home.y - anchor.y, out = [], i;
+	function rayCandidates(anchor, home, reach) {
+		var dx = home.x - anchor.x, dy = home.y - anchor.y, out = [], i, len, k;
 		if (!dx && !dy) { return [{ x: home.x, y: home.y, neighbours: [] }]; }
+		len = Math.hypot(dx, dy);
+		k = (reach > 0 && reach < len) ? reach / len : 1;
 		for (i = 0; i < RAY_STRETCH.length; i++) {
 			out.push({
-				x: anchor.x + dx * RAY_STRETCH[i], y: anchor.y + dy * RAY_STRETCH[i],
+				x: anchor.x + dx * (1 + (RAY_STRETCH[i] - 1) * k), y: anchor.y + dy * (1 + (RAY_STRETCH[i] - 1) * k),
 				neighbours: i === 0 ? [1] : (i === RAY_STRETCH.length - 1 ? [i - 1] : [i - 1, i + 1])
 			});
 		}
@@ -326,7 +336,10 @@ EngCalcs.lpnCollide = (function () {
 	// special-case, and it carries the ring's two nearest directions as its neighbours.
 	function candidatesFor(lbl, inner, outer, steps) {
 		var cands, i, best = [0, 1], bestD = [Infinity, Infinity], d;
-		if (lbl.dragged) { return rayCandidates(lbl.anchor, lbl.home); }
+		// **THE LABEL UNDER THE HAND STAYS UNDER THE HAND.** While it is being dragged its only
+		// candidate is the endpoint the pointer gives it; everything else moves round it.
+		if (lbl.dragged && lbl.held) { return [{ x: lbl.home.x, y: lbl.home.y, neighbours: [] }]; }
+		if (lbl.dragged) { return rayCandidates(lbl.anchor, lbl.home, inner); }
 		cands = ringCandidates(lbl.anchor, inner, outer, steps);
 		for (i = 0; i < cands.length; i++) {
 			d = Math.hypot(cands[i].x - lbl.home.x, cands[i].y - lbl.home.y);

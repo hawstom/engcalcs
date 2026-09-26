@@ -106,23 +106,28 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // pair is as wide as the longer of its two halves instead of their sum, so the whole strip
 	      // wraps into a couple of tidy rows inside a sensible box.
 	      //
-	      // A <span> per pair, not a <label>: echoUnitSelect() emits a `name=` and no `id=`, so a
-	      // <label for> has nothing to point at and a wrapping <label> would make the name text a
-	      // second click target for the select -- which on a narrow box means a stray tap opens a
-	      // dropdown the user was only reading. ?>
+	      // A <span> per pair, not a <label>: a wrapping <label> would make the name text a second
+	      // click target for the select -- which on a narrow box means a stray tap opens a dropdown
+	      // the user was only reading. Each select still gets its accessible name (ROADMAP Task 685)
+	      // from the same string this span shows, passed straight to echoUnitSelect() as aria-label
+	      // rather than tied through the span's id -- one fewer id to keep in sync with the name. ?>
 	<div class="d-print-none" id="lpn_units_strip">
 		<div id="lpn_units_all" class="lpn-units-group">
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', '', $ec_lang['lpn_units_length']); ?></span>
+		<?php // DERIVED AND READ-ONLY (Task 693, in 696): what the coordinates are in, which is a fact
+		      // the coordinate system states rather than a choice. No select, so nothing clones it
+		      // and nothing converts through it. Filled by refreshMapCoordsUnit(). ?>
+		<span class="lpn-units-item" id="lpn_u_mapcoords_row"><span class="lpn-units-name"><?=$ec_lang['lpn_units_mapcoords']?></span><span id="lpn_u_mapcoords" class="lpn-units-derived"></span></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', '', $ec_lang['lpn_field_diameter']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', '', $ec_lang['lpn_units_elevhead']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', '', $ec_lang['lpn_units_pressure']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', '', $ec_lang['lpn_units_flow']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', '', $ec_lang['lpn_units_velocity']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', '', $ec_lang['lpn_result_gradient']); ?></span>
 		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
 		      // typed in hours. A source share is a percentage and has no selector at all. ?>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', ''); ?></span>
-		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', '', $ec_lang['lpn_result_water_age']); ?></span>
+		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', '', $ec_lang['lpn_field_roughness']); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
@@ -157,10 +162,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // Placed in markup rather than built in JS so the id resolves and the string is translated
       // like every other; shown, positioned and retired by js/looped-network.js. ?>
-	<div class="d-print-none lpn-menu-cue" id="lpn_menu_cue" style="display:none" role="note">
-		<span class="lpn-menu-cue-arrow" aria-hidden="true">▲</span><span id="lpn_menu_cue_text"></span>
-		<button type="button" id="lpn_menu_cue_x" class="lpn-menu-cue-x" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<div class="d-print-none" id="lpn_tabs"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
@@ -234,7 +235,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
 	      // fixed center-screen placement. ?>
 	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
-		<?=$ec_lang['lpn_backdrop_target_label']?>
+		<label for="lpn_backdrop_target_mode"><?=$ec_lang['lpn_backdrop_target_label']?></label>
 		<select id="lpn_backdrop_target_mode">
 			<option value="node"><?=$ec_lang['lpn_backdrop_target_node']?></option>
 			<option value="free"><?=$ec_lang['lpn_backdrop_target_free']?></option>
@@ -285,9 +286,119 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // Only the mode hint is reserved against by zoomExtent() (overlayReserve). The
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
-		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js).
+		      //
+		      // **z-index:6, MATCHING #lpn_georef_bar** (Perry's review, 2026-09-22, reported
+		      // twice: at 390px on a fresh project, #lpn_examples_pane intercepted every press
+		      // meant for the glyph). `.lpn-examples` is `margin:0 auto;max-width:68rem` -- at
+		      // 1280px that centres it narrower than the viewport, clear of this row's left edge,
+		      // but at 390px the max-width does nothing and the block spans the canvas, painting
+		      // OVER this row because #lpn_empty_hint comes later in the DOM and neither had a
+		      // z-index. `pointer-events:auto` on `.lpn-examples` covers its whole padding box, not
+		      // just its buttons, so the glyph was hit-tested underneath rather than on top. A
+		      // stacking context on this row, not a change to the examples pane, because every
+		      // other reader of #lpn_map_overlay_tl already assumes plain DOM-order painting for
+		      // its own children. ?>
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:6;display:flex;flex-direction:row;align-items:flex-start;gap:4px;pointer-events:none">
+			<?php // **THE MESSAGE LOG BUTTON LIVES WHERE THE MESSAGES DO** (ROADMAP Task 704; Tom,
+			      // 2026-09-21, having used it: *"the button/glyph must be where the messages appear,
+			      // and it must appear and possibly highlight while a message displays."*). It shipped
+			      // in the bottom strip beside the scenario button and the coordinate readout, which
+			      // is the opposite corner of the map from the thing it recalls. Ida, agreeing: *"That
+			      // is a real defect, not a matter of taste, and I should have caught it before you
+			      // did."*
+			      //
+			      // **THE FIXED START EDGE OF THE WHOLE COLUMN, OUTSIDE THE PART THE NOTICE COVERS.**
+			      // #lpn_map_notice covers #lpn_mode_hint exactly while it shows, so a control placed
+			      // inside that stack would be underneath a message half the time it was wanted. This
+			      // overlay is therefore a ROW: the button, then everything that comes and goes. It
+			      // reads [glyph] [whatever the map is currently saying] in reading order, in both
+			      // states -- mode line showing and notice showing alike -- and in RTL too, because
+			      // the row is plain `flex-direction:row` with no direction override, so the browser
+			      // itself reverses the visual order under `dir="rtl"` and the glyph still leads.
+			      // **#lpn_map_notice moved INTO #lpn_map_overlay_tl_col in this same change** (Perry's
+			      // review, 2026-09-22): it used to be a sibling of this whole row, absolutely
+			      // positioned at the MAP's own top-left corner with a physical `left:4px` -- which is
+			      // where the glyph now sits, so the notice sat exactly on top of the glyph and its
+			      // highlight for the whole time a message showed, in every language, and doubly so in
+			      // RTL where the glyph is at the physical right and the notice was still nailed to the
+			      // physical left. It is now a child of the column below, positioned with
+			      // `inset-inline-start:0` rather than `left`, so it starts at the column's own start
+			      // edge -- immediately after the glyph -- in either direction.
+			      //
+			      // **AND THE MESSAGE TEXT IS NEVER PUT ON THIS LINE.** Folding the sentence into the
+			      // mode line is the obvious next step and is wrong: the mode hint already wraps to
+			      // two lines in several languages, and a row that must fit a glyph and a sentence
+			      // side by side at 320px in a language 40% longer than English fits neither. The two
+			      // stay stacked, one covering the other, exactly as they were.
+			      //
+			      // Same size, font-size and translucent pill as the mode text beside it, so the row
+			      // reads as one readout rather than as a control parked next to one.
+			      //
+			      // **HIGHLIGHTED WHILE A MESSAGE SHOWS** (Ida's ruling, and Tom's own words above:
+			      // "possibly highlight while a message displays"). showNotice() in
+			      // js/looped-network.js is the one door every notice and the standing
+			      // map-unmeasurable warning already go through, so it is the one place that adds
+			      // and removes .lpn-msglog-active -- on while #lpn_map_notice is showing text, off
+			      // the moment it is cleared, whether by the eight-second timer or by a later
+			      // message replacing it. pointer-events:auto on the button alone, because the row
+			      // it sits in is otherwise inert like every overlay here, and it is one keyboard
+			      // stop like every other icon button on this page. ?>
+			<button type="button" id="lpn_msglog_btn" class="lpn-msglog-btn"></button>
+			<?php // Everything that comes and goes, in the stack it has always been in. `position:
+			      // relative` is load-bearing: #lpn_map_notice is absolutely positioned at THIS box's
+			      // top-left, which is how it goes on covering the mode hint now that the column no
+			      // longer starts at the map's own corner. One number to get right, not two that have
+			      // to be kept in step. ?>
+			<div id="lpn_map_overlay_tl_col" style="position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
+			      // saving a project put a line of text above the canvas and "moves the map down past the
+			      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
+			      // the mode status temporarily"). Same move the mode hint itself made, for the same
+			      // reason: a readout that comes and goes must not be in the page's FLOW, because
+			      // everything below it moves when it arrives.
+			      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
+			      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
+			      // uncovers it. It is not measured by overlayReserve(), which is the point -- a
+			      // transient must not change the fit, or every save would re-zoom the map.
+			      //
+			      // **A CHILD OF THIS COLUMN, NOT A SIBLING OF THE WHOLE ROW** (Perry's review,
+			      // 2026-09-22, catching a defect the glyph move introduced). It used to sit outside
+			      // #lpn_map_overlay_tl entirely, positioned with a physical `left:4px` against the
+			      // MAP's own corner -- which is exactly where the glyph now lives, so the notice sat
+			      // on top of the glyph and its highlight for the whole time a message showed, making
+			      // both invisible and the highlight pointless. `inset-inline-start:0` rather than
+			      // `left:0`, and `top:0` rather than `top:4px`, because this box's own position:relative
+			      // origin -- inherited from the column, whose own top-left corner is already past the
+			      // glyph and the 4px inset -- is the coordinate system now, not the map's. The logical
+			      // property is what keeps this correct in RTL: the column's own start edge is its
+			      // right edge under `dir="rtl"`, and `inset-inline-start` follows that automatically
+			      // where a physical `left` would not. ?>
+			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
+			<?php // **THE MESSAGE LOG IS AN ON-MAP LIST NOW, NOT A DIALOG** (ROADMAP Task 704, Tom
+			      // 2026-09-22, live on port 8099: *"The alert paradigm is not a good UX for showing
+			      // past messages. User expects them to descend below the glyph, below the Mode status
+			      // in similar appearance that they originally had... fill the map below the Mode
+			      // status line with old messages with oldest at the bottom."*). This supersedes
+			      // Ida's 2026-09-21 dialog design, which his own use of the page overruled the next
+			      // day -- a live browser pass outranks a design note nobody has used yet.
+			      //
+			      // A CHILD OF THIS COLUMN, directly under the mode-hint/notice slot, so it reads as
+			      // the next line down rather than as a separate control. Newest row FIRST, matching
+			      // `noticeLog`'s own order (newest first), so no re-sorting happens at render time.
+			      // Hidden by default; toggleMessageLogPanel() in js/looped-network.js shows and fills
+			      // it, sets `aria-expanded` on the button, and closes it again on a second press, on
+			      // Escape, or on a click outside either the panel or the button. `max-height` is set
+			      // in JS against the map's own measured height (never a bare CSS percentage, which
+			      // would measure the OVERLAY's own auto height and cap nothing) so a long history
+			      // scrolls inside the map instead of running off the bottom of it.
+			      //
+			      // pointer-events:auto because unlike the readouts above it this one is scrollable
+			      // content, not a passive overlay; role="region" plus an aria-label from the same
+			      // heading key the old dialog used, because a list with no name is unannounced to a
+			      // screen reader even though it is visually obvious to a sighted user. ?>
+			<div id="lpn_msglog_panel" class="lpn-msglog-panel d-print-none" role="region" aria-label="<?=htmlspecialchars($ec_lang['lpn_msglog_heading'])?>" style="display:none;position:relative;pointer-events:auto;overflow-y:auto;width:100%"></div>
 			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
 			      // instructions popup bubble for how to continue and end the current mode."*). A
 			      // box of its own rather than more text in the mode line, because it says
@@ -345,19 +456,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // states no size the bar runs INDETERMINATE -- it still exists and still moves, because
 			      // his ruling is that the unknown belongs in the bar rather than out of it. ?>
 			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
+			</div>
 		</div>
-		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
-		      // saving a project put a line of text above the canvas and "moves the map down past the
-		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
-		      // the mode status temporarily"). Same move the mode hint itself made, for the same
-		      // reason: a readout that comes and goes must not be in the page's FLOW, because
-		      // everything below it moves when it arrives.
-		      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
-		      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
-		      // uncovers it. Same top-left origin, higher z-index, opaque background. It is not
-		      // measured by overlayReserve(), which is the point -- a transient must not change the
-		      // fit, or every save would re-zoom the map. ?>
-		<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:4px;left:4px;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
 		<?php // THE PLACEMENT BAR (ROADMAP Task 145). Top-CENTRE of the map, not the top-left stack:
 		      // it is a modal-for-the-duration control rather than a readout, and it must not cover
 		      // the mode hint or the solver's diagnostic. pointer-events on -- unlike every other
@@ -386,10 +486,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // than by dragging -- and because picking a point off the drawing needs the model to be
 			      // on the ground, which is what step 2 means. ?>
 			<button type="button" id="lpn_georef_twopt" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_twopt'], $ec_lang['lpn_georef_twopt_tip'])?></button>
-			<?php // Shown in step 1 only, and only when every coordinate could also be a lon/lat pair
-			      // (georefRefreshBar). It is the reinterpret case, which used to be a range test
-			      // deciding for the user -- and deciding wrong for any drawing on a small grid. ?>
-			<button type="button" id="lpn_georef_asdeg" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_asdeg_btn'], $ec_lang['lpn_georef_asdeg_tip'])?></button>
+			<?php // **THE "THESE ARE ALREADY lat/lon" BUTTON IS GONE** (R-219; Tom, 2026-09-24,
+			      // answering R-190: "We have 'Ground distance per drawing unit' on Step 2 ... That
+			      // can be set to 1 to use project coordinates. So I say drop it"). It offered, on a
+			      // range-test guess, to reinterpret a small XY drawing's own numbers as degrees rather
+			      // than place it; the same effect -- the file's numbers used unchanged as ground
+			      // distance -- is reached by typing 1 into the Ground distance field the step-2
+			      // controls above already carry, so the guess-and-button pair bought nothing a
+			      // visitor could not already do. georefArmAsDegrees() itself stays: a project that
+			      // ALREADY states it is georeferenced still lands through it automatically
+			      // (georefOpenAnswered()), which is a known fact about that file, never a guess. ?>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
@@ -491,6 +597,27 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
 		      // 2026-07-30; default 'top-right' reproduces this div's original hardcoded position). ?>
 		<div id="lpn_labels_legend" style="display:none;position:absolute;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
+		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
+		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
+		      // (the one mapping vendor already on this page) puts its zoom stack in by default.
+		      //
+		      // TOP-RIGHT IS THE ONLY CALM CORNER (Ida, 2026-09-17): top-left already carries a
+		      // growing status column, bottom-left holds seven things, bottom-right is the
+		      // non-dismissible tile attribution. Styled like every other chip in that population --
+		      // rgba(255,255,255,.85), a thin border, nothing new drawn on the page.
+		      //
+		      // HIDDEN BELOW THE 640PX BREAKPOINT (css/engcalcs.css) -- a finger pinches instead.
+		      //
+		      // EMPTY IN THE MARKUP: filled by wireZoomControl() in js/looped-network.js, through the
+		      // same icon+aria-label+tip door every toolbar icon button already uses
+		      // (EngCalcs.setIconLabel()), so this gets an accessible name and a touch-reachable tip
+		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
+		      // labels legend dodges under it instead of through it. ?>
+		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:rgba(255,255,255,.85);border:1px solid #999">
+			<button type="button" id="lpn_zoom_in" style="width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
+		</div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>
@@ -512,6 +639,30 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // step with the generated one. ?>
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;inset:0;pointer-events:none;overflow:auto">
 			<div id="lpn_examples_pane" class="lpn-examples"></div>
+		</div>
+		<?php // ROADMAP Task 647, Tom 2026-09-13: "a blank map is equally fatal as a lost project.
+		      // User doesn't know the difference" -- so when the model has elements but none of
+		      // them intersect the current view, this says so instead of leaving a blank canvas
+		      // that reads exactly like a lost project.
+		      //
+		      // **A PERSISTENT OVERLAY, NOT THE TRANSIENT NOTICE STRIP AND NOT THE MESSENGER LOG**
+		      // (Ida, Task 647 journal entry): #lpn_map_notice is architecturally transient (its own
+		      // doc comment: "a transient must not change the fit") and Task 616 measured that row
+		      // going unread; the Messenger is a log of what already happened, opened by a glyph the
+		      // reader must remember exists, and this is a fact about the CURRENT view, always true
+		      // until the reader acts. So it sits centred where the emptiness is, styled after
+		      // #lpn_empty_hint immediately above it: `inset:0`, wrapper `pointer-events:none` so
+		      // panning still works in the gaps, and only the box itself takes clicks. No inherent
+		      // side, so RTL needs nothing special. updateOffscreenNotice() in js/looped-network.js
+		      // is the one place this is shown or hidden -- called only when a pan or a zoom gesture
+		      // has settled, never mid-drag and never per wheel notch, reusing viewShowsModel()'s
+		      // own arithmetic rather than a second geometry. Hidden instantly, no fade: the display
+		      // toggle is the only style write. ?>
+		<div id="lpn_offscreen_notice" class="d-print-none" role="status" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;pointer-events:none;text-align:center">
+			<div class="lpn-offscreen-card">
+				<div id="lpn_offscreen_notice_text" style="margin-bottom:6px"></div>
+				<button type="button" id="lpn_offscreen_zoom_btn" class="btn btn-sm btn-outline-secondary"></button>
+			</div>
 		</div>
 		<?php // THE BOTTOM STATUS STRIP. Both readouts in ONE flex row so their order is real rather
 		      // than two absolute boxes that happen not to collide: settings first, then the
@@ -589,6 +740,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      //
 			      // LAST IN THE STRIP so it never pushes a live readout, and quiet by design -- it must
 			      // not compete with the drawing. ?>
+			<?php // THE MESSAGE LOG BUTTON MOVED (ROADMAP Task 704, Tom 2026-09-21) to
+			      // #lpn_map_overlay_tl, beside the mode hint and the notice it recalls -- see the
+			      // comment there. It is not a cell of this strip any more. ?>
 			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
@@ -930,12 +1084,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // defaultSettings() in js/looped-network.js. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_node_fields"></div>
+							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_link_fields"></div>
+							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
 						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
@@ -952,7 +1106,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_customer_fields"></div>
+							<div id="lpn_labels_customer_fields" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
@@ -1190,6 +1344,33 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
+<?php // THE STATUS REPORT (ROADMAP Task 716). EPANET's Report > Status: what changed, in time
+      // order, over the last extended period simulation -- pumps and valves opening or closing,
+      // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
+      // borrows the same box shell as the reports above it; the list is built in JS
+      // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_statusbox_title">
+	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
+	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_status_report" class="lpn-ff-report"></div>
+	</div>
+</div>
+<?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
+      // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
+      // frames the Status report and the Tables pane read, so the three cannot disagree. Download
+      // and Print sit beside the close button, the same placement the run report's Copy button
+      // uses, because this table can run to thousands of rows and a button that scrolls away with
+      // it is a button nobody finds. ?>
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_fullbox_title">
+	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
+	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
+	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
+	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_full_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -1283,7 +1464,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<fieldset class="lpn-new-block">
 			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
 			<div>
-				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_coordsys_geo_tip'])?></label>
+				<?php // Reuses Convert as's own lpn_convas_epsg / lpn_convas_epsg_tip (2026-09-25):
+				      // once "projection" left both strings, this radio's own wording was identical
+				      // to Convert as's, and a second copy of the same sentence is the one that
+				      // could drift from it. ?>
+				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
 				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
 				      // *"The button is not a good place for the full projection name. How about an
 				      // ellipsis button followed by the name?"*). It used to be one control doing both
@@ -1336,6 +1521,95 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	</div>
 </div>
 
+<?php // ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing 688 and 693) ------------------------
+      //
+      // Tom's shape, 2026-09-22/23: *"(a) Project and units (maybe this one menu row as 'Convert
+      // as...' can handle both units and coordinates), (b) step 1 (if CRS changed), (c) step 2 (if
+      // CRS changed)."* And: *"The first thing it needs to do is ask what coordinate system we are
+      // going to."* So this box is page (a), and the coordinate system is its first question. The
+      // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
+      // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
+      // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
+<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
+	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></legend>
+			<div id="lpn_convas_from"></div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+				<button type="button" id="lpn_convas_crs_pick" aria-describedby="lpn_convas_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_epsg']))?>">&hellip;</button>
+				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span>
+			</div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed"> <?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label>
+			</div>
+			<div>
+				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none"> <?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label>
+			</div>
+		</fieldset>
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></legend>
+			<div class="lpn-new-presets">
+				<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
+				<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
+			</div>
+			<div id="lpn_convas_units_fields" class="lpn-units-group"></div>
+		</fieldset>
+		<?php // Tom's rounding request (Task 688): "Diameter, Depth, Demand and Flow, Head", each a
+		      // selector of nearest 100, 10, 1, 0.1, 0.01, 0.001. The steps are numbers, not words, so
+		      // they are not language keys. "No rounding" is the default: rounding changes a number
+		      // beyond what the conversion itself does, so it is something a person asks for.
+		      //
+		      // Two columns (Tom, 2026-09-23): Round converted values, unchanged, and Label -- a
+		      // suffix appended after that quantity on the copy's own map labels, through the same
+		      // per-field labelSettings.suffix a Labels row already writes (js/looped-network.js
+		      // setLabelAffix()), pre-filled from the unit chosen above.
+		      //
+		      // **DEPTH (TANK LEVEL) HAS NO SUCH FIELD, AND ITS BOX IS DISABLED RATHER THAN
+		      // INVENTING ONE.** `level` is not one of nodeFieldDefs()'s rows. Making it one was
+		      // measured, not guessed: it touches defaultLabelSettings() in four places (the node
+		      // on/off map, its decimals map, and a RENUMBER of the seven-entry node priority rank
+		      // -- Task 445's drop order, which dev/lpn-spike/label-priority-harness.js and
+		      // node-shed-harness.js assert invariants over and would need new fixtures for), a new
+		      // LPN_NODE_DROP_RULE classification (a judgement call among 'like'/'low'/'extreme',
+		      // not mechanical), nodeFieldDefs() itself, and the value computed and pushed in BOTH
+		      // node label render paths (refreshLabelTextPass() and the single-element
+		      // refreshOneLabelInPlace() the stale-snapshot ruling requires) -- eight-plus touch
+		      // points across the map's core render and collision path, for a feature (a new kind of
+		      // map label) Tom has not asked for. That is Tom's call, not this wizard's. ?>
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></legend>
+			<div class="lpn-convas-round-head">
+				<span></span>
+				<span class="lpn-convas-round-col"><?=$ec_lang['lpn_convas_round']?></span>
+				<span class="lpn-convas-round-col"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></span>
+			</div>
+			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
+				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
+			<div class="lpn-convas-round-row">
+				<label for="lpn_convas_round_<?=$rk?>"><?=$ec_lang[$rkey]?></label>
+				<select id="lpn_convas_round_<?=$rk?>">
+					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
+					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
+				</select>
+				<?php // R-217 (Tom, 2026-09-24) dropped this row's own tip glyph for alignment; that
+				      // stands. Depth's suffix box is no longer disabled -- tank water depth is now a
+				      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three
+				      // (Tom, 2026-09-25). ?>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
+			</div>
+			<?php } ?>
+		</fieldset>
+		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
+		<div class="lpn-new-actions">
+			<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
+			<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
+		</div>
+	</div>
+</div>
+
 <?php // ---- THE GEOGRAPHIC PROJECTION BOX (ROADMAP Task 641 phase 2) ----------------------------
       //
       // Tom's summary, 2026-09-13: it *"uses the map view as a UX element to filter the universe of
@@ -1356,10 +1630,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
 <div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
-	<?php // The title carries the tip that says what choosing one COMMITS you to -- that nothing of
-	      // yours is converted, and that the choice is final. It is the phase-1 wording, moved from
-	      // the control that is gone to the box that replaced it. ?>
-	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_crs_tip'])?></div>
+	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
+	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
+	      // permanence-warning tip this title used to carry had no other reader and is retired
+	      // with it. ?>
+	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crsbox_title']?></div>
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
@@ -1497,6 +1772,8 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_pipe: <?=json_encode($ec_lang['lpn_field_meter_pipe'])?>,
 	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
 	lpn_field_meter_pipe_suggest: <?=json_encode($ec_lang['lpn_field_meter_pipe_suggest'])?>,
+	lpn_field_meter_node: <?=json_encode($ec_lang['lpn_field_meter_node'])?>,
+	lpn_field_meter_node_tip: <?=json_encode($ec_lang['lpn_field_meter_node_tip'])?>,
 	lpn_meter_pipe_unknown: <?=json_encode($ec_lang['lpn_meter_pipe_unknown'])?>,
 	lpn_field_meter_pattern_tip: <?=json_encode($ec_lang['lpn_field_meter_pattern_tip'])?>,
 	lpn_meter_pattern_unknown: <?=json_encode($ec_lang['lpn_meter_pattern_unknown'])?>,
@@ -1540,9 +1817,13 @@ EngCalcs.pageConfig = {
 	lpn_tool_vertices_tip: <?=json_encode($ec_lang['lpn_tool_vertices_tip'])?>,
 	lpn_tool_delete: <?=json_encode($ec_lang['lpn_tool_delete'])?>,
 	lpn_tool_zoom_extent: <?=json_encode($ec_lang['lpn_tool_zoom_extent'])?>,
+	lpn_tool_zoom_window: <?=json_encode($ec_lang['lpn_tool_zoom_window'])?>,
+	lpn_zoom_in: <?=json_encode($ec_lang['lpn_zoom_in'])?>,
+	lpn_zoom_out: <?=json_encode($ec_lang['lpn_zoom_out'])?>,
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
+	lpn_offscreen_intact: <?=json_encode($ec_lang['lpn_offscreen_intact'])?>,
 	lpn_examples_welcome: <?=json_encode($ec_lang['lpn_examples_welcome'])?>,
 	lpn_examples_heading: <?=json_encode($ec_lang['lpn_examples_heading'])?>,
 	lpn_examples_sub: <?=json_encode($ec_lang['lpn_examples_sub'])?>,
@@ -1609,8 +1890,10 @@ EngCalcs.pageConfig = {
 	lpn_find_value: <?=json_encode($ec_lang['lpn_find_value'])?>,
 	lpn_find_btn: <?=json_encode($ec_lang['lpn_find_btn'])?>,
 	lpn_find_filter_btn: <?=json_encode($ec_lang['lpn_find_filter_btn'])?>,
-	lpn_find_filter_table: <?=json_encode($ec_lang['lpn_find_filter_table'])?>,
 	lpn_find_filter_tip: <?=json_encode($ec_lang['lpn_find_filter_tip'])?>,
+	lpn_find_filter_row: <?=json_encode($ec_lang['lpn_find_filter_row'])?>,
+	lpn_find_filter_summary: <?=json_encode($ec_lang['lpn_find_filter_summary'])?>,
+	lpn_find_filter_none: <?=json_encode($ec_lang['lpn_find_filter_none'])?>,
 	lpn_find_op_contains: <?=json_encode($ec_lang['lpn_find_op_contains'])?>,
 	lpn_find_op_equals: <?=json_encode($ec_lang['lpn_find_op_equals'])?>,
 	lpn_find_op_gt: <?=json_encode($ec_lang['lpn_find_op_gt'])?>,
@@ -1724,11 +2007,16 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
 	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
 	lpn_pane_text_attached: <?=json_encode($ec_lang['lpn_pane_text_attached'])?>,
-	lpn_pane_paste_note: <?=json_encode($ec_lang['lpn_pane_paste_note'])?>,
+	lpn_pane_not_used: <?=json_encode($ec_lang['lpn_pane_not_used'])?>,
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
+	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
+	// Borrowed, not owned here: the row-table point grid's own Copy/Paste labels, reused verbatim
+	// by the pane table's right-click menu (Task 690) rather than re-keyed under lpn_.
+	points_data_copy: <?=json_encode($ec_lang['points_data_copy'])?>,
+	points_data_paste: <?=json_encode($ec_lang['points_data_paste'])?>,
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
 	lpn_pane_print_tip: <?=json_encode($ec_lang['lpn_pane_print_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
@@ -1739,6 +2027,7 @@ EngCalcs.pageConfig = {
 	lpn_time_report_step: <?=json_encode($ec_lang['lpn_time_report_step'])?>,
 	lpn_time_report_start: <?=json_encode($ec_lang['lpn_time_report_start'])?>,
 	lpn_time_clock_start: <?=json_encode($ec_lang['lpn_time_clock_start'])?>,
+	lpn_time_clock_day: <?=json_encode($ec_lang['lpn_time_clock_day'])?>,
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
 	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
@@ -1844,6 +2133,10 @@ EngCalcs.pageConfig = {
       // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
       // already supplied further up this object; the elevation one was not supplied by anything. ?>
 	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
+	lpn_units_mapcoords_deg: <?=json_encode($ec_lang['lpn_units_mapcoords_deg'])?>,
+	lpn_units_usft: <?=json_encode($ec_lang['lpn_units_usft'])?>,
+	u_m: <?=json_encode($ec_lang['u_m'])?>,
+	u_ft: <?=json_encode($ec_lang['u_ft'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
@@ -2005,7 +2298,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
-	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
 	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
@@ -2064,6 +2356,7 @@ EngCalcs.pageConfig = {
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
 	lpn_mode_vertices: <?=json_encode($ec_lang['lpn_mode_vertices'])?>,
+	lpn_mode_zoom_window: <?=json_encode($ec_lang['lpn_mode_zoom_window'])?>,
 	lpn_select_first: <?=json_encode($ec_lang['lpn_select_first'])?>,
 	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
 	lpn_mode_add_reservoir: <?=json_encode($ec_lang['lpn_mode_add_reservoir'])?>,
@@ -2212,6 +2505,33 @@ EngCalcs.pageConfig = {
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_menu_tip: <?=json_encode($ec_lang['lpn_reports_menu_tip'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,
+	lpn_reports_status: <?=json_encode($ec_lang['lpn_reports_status'])?>,
+	lpn_reports_status_tip: <?=json_encode($ec_lang['lpn_reports_status_tip'])?>,
+	lpn_status_title: <?=json_encode($ec_lang['lpn_status_title'])?>,
+	lpn_status_needs_run: <?=json_encode($ec_lang['lpn_status_needs_run'])?>,
+	lpn_status_empty: <?=json_encode($ec_lang['lpn_status_empty'])?>,
+	lpn_status_col_time: <?=json_encode($ec_lang['lpn_status_col_time'])?>,
+	lpn_status_col_event: <?=json_encode($ec_lang['lpn_status_col_event'])?>,
+	lpn_status_opened: <?=json_encode($ec_lang['lpn_status_opened'])?>,
+	lpn_status_closed: <?=json_encode($ec_lang['lpn_status_closed'])?>,
+	lpn_status_filling: <?=json_encode($ec_lang['lpn_status_filling'])?>,
+	lpn_status_emptying: <?=json_encode($ec_lang['lpn_status_emptying'])?>,
+	lpn_status_full: <?=json_encode($ec_lang['lpn_status_full'])?>,
+	lpn_status_dry: <?=json_encode($ec_lang['lpn_status_dry'])?>,
+	lpn_status_no_converge: <?=json_encode($ec_lang['lpn_status_no_converge'])?>,
+	lpn_status_note: <?=json_encode($ec_lang['lpn_status_note'])?>,
+	lpn_reports_full: <?=json_encode($ec_lang['lpn_reports_full'])?>,
+	lpn_reports_full_tip: <?=json_encode($ec_lang['lpn_reports_full_tip'])?>,
+	lpn_full_title: <?=json_encode($ec_lang['lpn_full_title'])?>,
+	lpn_full_needs_run: <?=json_encode($ec_lang['lpn_full_needs_run'])?>,
+	lpn_full_note: <?=json_encode($ec_lang['lpn_full_note'])?>,
+	lpn_full_download_csv: <?=json_encode($ec_lang['lpn_full_download_csv'])?>,
+	lpn_full_print: <?=json_encode($ec_lang['lpn_full_print'])?>,
+	lpn_full_col_time: <?=json_encode($ec_lang['lpn_full_col_time'])?>,
+	lpn_full_col_type: <?=json_encode($ec_lang['lpn_full_col_type'])?>,
+	lpn_full_col_id: <?=json_encode($ec_lang['lpn_full_col_id'])?>,
+	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
+	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
 	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
 	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
 	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,
@@ -2260,17 +2580,14 @@ EngCalcs.pageConfig = {
 	lpn_menu_insert: <?=json_encode($ec_lang['lpn_menu_insert'])?>,
 	lpn_menu_map: <?=json_encode($ec_lang['lpn_menu_map'])?>,
 	lpn_basemap_show: <?=json_encode($ec_lang['lpn_basemap_show'])?>,
-	lpn_basemap_hide: <?=json_encode($ec_lang['lpn_basemap_hide'])?>,
-	lpn_basemap_tip: <?=json_encode($ec_lang['lpn_basemap_tip'])?>,
-	lpn_basemap_satellite_tip: <?=json_encode($ec_lang['lpn_basemap_satellite_tip'])?>,
-	lpn_basemap_satellite_hide: <?=json_encode($ec_lang['lpn_basemap_satellite_hide'])?>,
 	lpn_basemap_satellite_show: <?=json_encode($ec_lang['lpn_basemap_satellite_show'])?>,
-	lpn_clean_map: <?=json_encode($ec_lang['lpn_clean_map'])?>,
-	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
-	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
-	lpn_file_import_geo: <?=json_encode($ec_lang['lpn_file_import_geo'])?>,
+	lpn_file_convert_as: <?=json_encode($ec_lang['lpn_file_convert_as'])?>,
 	lpn_copy_of: <?=json_encode($ec_lang['lpn_copy_of'])?>,
-	lpn_file_import_geo_tip: <?=json_encode($ec_lang['lpn_file_import_geo_tip'])?>,
+	lpn_convas_from: <?=json_encode($ec_lang['lpn_convas_from'])?>,
+	lpn_convas_no_transform: <?=json_encode($ec_lang['lpn_convas_no_transform'])?>,
+	lpn_convas_done: <?=json_encode($ec_lang['lpn_convas_done'])?>,
+	lpn_convas_cancelled: <?=json_encode($ec_lang['lpn_convas_cancelled'])?>,
+	lpn_file_convert_as_tip: <?=json_encode($ec_lang['lpn_file_convert_as_tip'])?>,
 	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
 	lpn_georef_step1: <?=json_encode($ec_lang['lpn_georef_step1'])?>,
 	lpn_georef_step2: <?=json_encode($ec_lang['lpn_georef_step2'])?>,
@@ -2294,6 +2611,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_delete_tip: <?=json_encode($ec_lang['lpn_tool_delete_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
+	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
+	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
 	lpn_tool_settings_tip: <?=json_encode($ec_lang['lpn_tool_settings_tip'])?>,
 	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
 	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,
@@ -2328,6 +2648,7 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
 	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
+	lpn_georef_answered: <?=json_encode($ec_lang['lpn_georef_answered'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
@@ -2383,6 +2704,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_scope_selected: <?=json_encode($ec_lang['lpn_ff_scope_selected'])?>,
 	lpn_ff_no_junctions: <?=json_encode($ec_lang['lpn_ff_no_junctions'])?>,
 	lpn_ff_no_selection: <?=json_encode($ec_lang['lpn_ff_no_selection'])?>,
+	lpn_ff_skipped: <?=json_encode($ec_lang['lpn_ff_skipped'])?>,
 	lpn_ff_required: <?=json_encode($ec_lang['lpn_ff_required'])?>,
 	lpn_ff_required_tip: <?=json_encode($ec_lang['lpn_ff_required_tip'])?>,
 	lpn_ff_required_own: <?=json_encode($ec_lang['lpn_ff_required_own'])?>,
@@ -2451,7 +2773,6 @@ EngCalcs.pageConfig = {
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
 	lpn_help_welcome: <?=json_encode($ec_lang['lpn_help_welcome'])?>,
-	lpn_menu_cue: <?=json_encode($ec_lang['lpn_menu_cue'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
@@ -2484,6 +2805,11 @@ EngCalcs.pageConfig = {
 	lpn_tab_unsaved: <?=json_encode($ec_lang['lpn_tab_unsaved'])?>,
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
 	lpn_dialog_ok: <?=json_encode($ec_lang['lpn_dialog_ok'])?>,
+	lpn_msglog_name: <?=json_encode($ec_lang['lpn_msglog_name'])?>,
+	lpn_msglog_heading: <?=json_encode($ec_lang['lpn_msglog_heading'])?>,
+	lpn_msglog_empty: <?=json_encode($ec_lang['lpn_msglog_empty'])?>,
+	lpn_msglog_ago: <?=json_encode($ec_lang['lpn_msglog_ago'])?>,
+	lpn_msglog_note: <?=json_encode($ec_lang['lpn_msglog_note'])?>,
 	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
 	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
 	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
@@ -2492,6 +2818,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_report_counts: <?=json_encode($ec_lang['lpn_inp_report_counts'])?>,
 	lpn_inp_report_clean: <?=json_encode($ec_lang['lpn_inp_report_clean'])?>,
 	lpn_inp_report_label_anchor: <?=json_encode($ec_lang['lpn_inp_report_label_anchor'])?>,
+	lpn_inp_report_no_crs: <?=json_encode($ec_lang['lpn_inp_report_no_crs'])?>,
 	lpn_inp_report_lead: <?=json_encode($ec_lang['lpn_inp_report_lead'])?>,
 	lpn_inp_drop_headloss: <?=json_encode($ec_lang['lpn_inp_drop_headloss'])?>,
 	lpn_inp_drop_tank_curve: <?=json_encode($ec_lang['lpn_inp_drop_tank_curve'])?>,
@@ -2560,6 +2887,7 @@ EngCalcs.pageConfig = {
 	lpn_lock_ask_prompt: <?=json_encode($ec_lang['lpn_lock_ask_prompt'])?>,
 	lpn_lock_ask_sent: <?=json_encode($ec_lang['lpn_lock_ask_sent'])?>,
 	lpn_lock_ask_failed: <?=json_encode($ec_lang['lpn_lock_ask_failed'])?>,
+	lpn_lock_open_cancelled: <?=json_encode($ec_lang['lpn_lock_open_cancelled'])?>,
 	lpn_lock_requested: <?=json_encode($ec_lang['lpn_lock_requested'])?>,
 	lpn_ago_seconds: <?=json_encode($ec_lang['lpn_ago_seconds'])?>,
 	lpn_ago_minutes: <?=json_encode($ec_lang['lpn_ago_minutes'])?>,
@@ -2618,11 +2946,11 @@ EngCalcs.pageConfig = {
 	lpn_map_attach_remove_tip: <?=json_encode($ec_lang['lpn_map_attach_remove_tip'])?>,
 	lpn_map_attach_done: <?=json_encode($ec_lang['lpn_map_attach_done'])?>,
 	lpn_map_attach_removed: <?=json_encode($ec_lang['lpn_map_attach_removed'])?>,
-	lpn_mapgeo_replace: <?=json_encode($ec_lang['lpn_mapgeo_replace'])?>,
 	lpn_mapgeo_intro: <?=json_encode($ec_lang['lpn_mapgeo_intro'])?>,
 	lpn_mapgeo_step1: <?=json_encode($ec_lang['lpn_mapgeo_step1'])?>,
 	lpn_mapgeo_step2: <?=json_encode($ec_lang['lpn_mapgeo_step2'])?>,
 	lpn_mapgeo_hint1: <?=json_encode($ec_lang['lpn_mapgeo_hint1'])?>,
+	lpn_mapgeo_readjust_intro: <?=json_encode($ec_lang['lpn_mapgeo_readjust_intro'])?>,
 	lpn_mapgeo_hint2: <?=json_encode($ec_lang['lpn_mapgeo_hint2'])?>,
 	lpn_mapgeo_gestures: <?=json_encode($ec_lang['lpn_mapgeo_gestures'])?>,
 	lpn_mapgeo_dial_turn: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn'])?>,
@@ -2835,6 +3163,10 @@ EngCalcs.pageConfig = {
 	lpn_settings_label_max_width: <?=json_encode($ec_lang['lpn_settings_label_max_width'])?>,
 	lpn_settings_label_max_width_tip: <?=json_encode($ec_lang['lpn_settings_label_max_width_tip'])?>,
 	lpn_settings_label_always: <?=json_encode($ec_lang['lpn_settings_label_always'])?>,
+	lpn_settings_symbol_cap: <?=json_encode($ec_lang['lpn_settings_symbol_cap'])?>,
+	lpn_settings_symbol_cap_mid: <?=json_encode($ec_lang['lpn_settings_symbol_cap_mid'])?>,
+	lpn_settings_symbol_cap_post: <?=json_encode($ec_lang['lpn_settings_symbol_cap_post'])?>,
+	lpn_settings_symbol_cap_tip: <?=json_encode($ec_lang['lpn_settings_symbol_cap_tip'])?>,
 	lpn_settings_leader_snap: <?=json_encode($ec_lang['lpn_settings_leader_snap'])?>,
 	lpn_settings_leader_snap_tip: <?=json_encode($ec_lang['lpn_settings_leader_snap_tip'])?>,
 	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,
@@ -2860,8 +3192,6 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_gray: <?=json_encode($ec_lang['lpn_color_ramp_gray'])?>,
 	lpn_settings_color_reverse: <?=json_encode($ec_lang['lpn_settings_color_reverse'])?>,
 	lpn_color_none: <?=json_encode($ec_lang['lpn_color_none'])?>,
-	lpn_settings_color_thematic: <?=json_encode($ec_lang['lpn_settings_color_thematic'])?>,
-	lpn_settings_color_thematic_tip: <?=json_encode($ec_lang['lpn_settings_color_thematic_tip'])?>,
 	lpn_settings_color_key_position: <?=json_encode($ec_lang['lpn_settings_color_key_position'])?>,
 	lpn_settings_color_breaks: <?=json_encode($ec_lang['lpn_settings_color_breaks'])?>,
 	lpn_settings_color_equal_intervals: <?=json_encode($ec_lang['lpn_settings_color_equal_intervals'])?>,

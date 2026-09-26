@@ -107,12 +107,21 @@ off that pipe, here*; which end it lumps at is a consequence, and a consequence 
 a consequence that cannot go stale. The precedent already in the code is `lenAuto` on a pipe length:
 derived until the user types one.
 
-**NOT BUILT: the optional explicit `atNode` pin.** It was proposed here as the `lenAuto` shape's
-second half, and Tom's own 2026-08-24 ruling supersedes the need for it: the attachment point is
-user-draggable along its pipe (§7), so a reader who disagrees with the derived junction moves the
-service to where it really connects, which states the same thing about the network and states it
-where a reader can see it. A pin would be a second way to say it and the only one invisible on the
-drawing. Build it only if a real case turns up that dragging cannot express.
+**BUILT, 2026-09-25, AS A FALLBACK ONLY: the explicit `node` field.** This section originally
+argued against it on the `lenAuto` precedent, and that argument still holds for every customer
+whose pipe is still there — `customerNodeId()` derives from `link` + `t` first, always, and a
+`node` field is never read while that derivation succeeds. What changed is Tom naming the case the
+2026-08-24 ruling did not cover: *"Do we have Customers not allowed to connect directly to nodes? I
+think it will be happier for users to see Customer connected to a node if that is the case instead
+of a link at station 0."* A customer snapped exactly onto a node (`t` of 0 or 1) IS "connected to a
+node" in every sense a reader has, and the derivation's own honesty was the defect it exposed:
+deleting the pipe took the node with it, because nothing but that pipe said the node was there.
+`node` is written only at that moment (`detachCustomersFromLink()`; `deleteNode()` clears it when
+the node itself later goes too, and `applyNodeRename()` carries it through a rename), so a customer
+that has never lost its pipe never carries the field at all, and an old file with `t` of 0 or 1
+opens, reads and round-trips exactly as this section always described. The Properties box, the
+Tables pane and Find all read `customerAtNodeEnd()` to show "Connected to {node}" in place of a pipe
+and a station of 0 or 100 — the visible statement and the stored one say the same thing, not two.
 
 Because the assignment is derived, the popup and the status bar must **show which junction this
 customer currently lumps at**. Dragging a meter past the midpoint of a pipe silently moves flow from
@@ -124,11 +133,15 @@ Edge cases, each of which is a decision:
   solve (`EngCalcs.lpnIsFixedHead`). The rule still applies — do not quietly reroute to the second
   nearest junction — but the customer gets a `⚠` verdict saying the demand has no effect there.
   Report, do not be clever.
-- **The pipe is deleted.** The customer is **detached, not deleted.** A Text label is deleted with its
-  pipe because it is an annotation of that pipe; a customer is a service that exists whether or not
-  anyone has drawn a main to it yet. It keeps its account number, demand and drawn position, is drawn
-  unattached, and a status readout counts them: *N customers are not connected; their demand is not
-  in the solve.* Silently dropping demand changes the answer without saying so.
+- **The pipe is deleted.** The customer is **detached, not deleted** — UNLESS it was connected
+  exactly to a node (`t` of 0 or 1), in which case it stays connected to that node (see the `node`
+  field above): a service whose demand a reader already reads as belonging to the JUNCTION does not
+  lose that junction because the one pipe it happened to snap through is gone. A Text label is
+  deleted with its pipe because it is an annotation of that pipe; a customer that was genuinely
+  ALONG the main, not at either end of it, is a service that exists whether or not anyone has drawn
+  a main to it yet, so that one keeps its tag, demand and drawn position, is drawn unattached, and a
+  status readout counts them: *N customers are not connected; their demand is not in the solve.*
+  Silently dropping demand changes the answer without saying so, either way.
 - **The pipe is re-routed, a vertex is added or dragged, or an end node moves.** Re-derive. `t` is a
   fraction of arc length, so it survives a reshape approximately and the assignment may legitimately
   flip; that is visible via the readout above.

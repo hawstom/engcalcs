@@ -211,7 +211,8 @@
 			"x": 5027.103735895362,
 			"y": 5193.6831916434885,
 			"anchorNode": null,
-			"sizeMult": 4
+			"sizeMult": 4,
+			"allZoom": true
 		},
 		{
 			"id": "X2",
@@ -335,9 +336,9 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 9,
-		"symbolSize": 7,
-		"linkWidth": 2,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,

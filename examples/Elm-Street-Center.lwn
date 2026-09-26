@@ -546,7 +546,8 @@
 			"x": 579335.9317970247,
 			"y": 1304261.8907457609,
 			"anchorNode": null,
-			"sizeMult": 2
+			"sizeMult": 2,
+			"allZoom": true
 		},
 		{
 			"id": "X13",
@@ -701,11 +702,11 @@
 			"thisCalculator": false,
 			"units": false
 		},
-		"textSize": 11,
-		"symbolSize": 10,
-		"linkWidth": 3,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
 		"symbolOpacity": 1,
-		"backdropOpacity": 1,
+		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,

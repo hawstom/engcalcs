@@ -672,7 +672,7 @@
                 "lpn_georef_finish",
                 "lpn_georef_goto",
                 "lpn_georef_intro",
-                "lpn_file_import_geo",
+                "lpn_file_convert_as",
                 "lpn_georef_on_map",
                 "lpn_georef_rotation",
                 "lpn_georef_rotation_tip",
@@ -682,7 +682,7 @@
                 "lpn_georef_step1",
                 "lpn_georef_step1_hint",
                 "lpn_georef_step2",
-                "lpn_file_import_geo_tip",
+                "lpn_file_convert_as_tip",
                 "lpn_georef_unavailable",
                 "lpn_goto_bad",
                 "lpn_goto_menu",
@@ -1326,8 +1326,8 @@
                 "lpn_ex_net3_world_desc",
                 "lpn_field_active_tip",
                 "lpn_field_demand_pattern_tip",
-                "lpn_file_import_geo",
-                "lpn_file_import_geo_tip",
+                "lpn_file_convert_as",
+                "lpn_file_convert_as_tip",
                 "lpn_file_import_inp_tip",
                 "lpn_find_menu",
                 "lpn_find_menu_tip",
@@ -2494,8 +2494,8 @@
         "lpn_file_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_file_export_inp": "f428aa355e86893429222bafcf7efe0be54a2384",
         "lpn_file_export_inp_tip": "55566b08607bac0890966d7c0804683704185f96",
-        "lpn_file_import_geo": "4332a91e7bcf28d852fc717f9e728b8dd184185b",
-        "lpn_file_import_geo_tip": "630e00f87066dd0999d9e196c15daac84d842112",
+        "lpn_file_convert_as": "4332a91e7bcf28d852fc717f9e728b8dd184185b",
+        "lpn_file_convert_as_tip": "630e00f87066dd0999d9e196c15daac84d842112",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "2baa6bb757db0d079fae4defea56157bcb9d3ec1",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
@@ -2596,8 +2596,6 @@
         "lpn_fittings_none": "b615dcfdcf8645f7f5c7054fb0e9e6f21d8d9e21",
         "lpn_geomap": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
         "lpn_georef_adjust": "e5af13bcbd04eebd8e96cb6deded72be4bd6c1ad",
-        "lpn_georef_asdeg_btn": "489eb920bda19f826833d49ff77ec3ec77ad50e1",
-        "lpn_georef_asdeg_tip": "bd564aa596821aab2d3e372512e1cb6cbb7d093a",
         "lpn_georef_asdegrees": "c13ac3f8f725066e5adf32eb4ea0155b08a845e9",
         "lpn_georef_backdrop_unrotated": "044e4077a7af86a4d7da986c8225d3fe47f02980",
         "lpn_georef_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
@@ -2785,7 +2783,6 @@
         "lpn_main_menu": "19e15729a6d4e367d574cdb2c598b11c8d6a5e05",
         "lpn_main_title": "240a7028b367c659717c984b8588c008043744fc",
         "lpn_map_unmeasurable": "7eac1bfe88d67f6689d2b6e4ad6fa6db6239749f",
-        "lpn_menu_cue": "413e023e5de5ee7896a7a08d637f8929bea7b4c6",
         "lpn_menu_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
         "lpn_menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
@@ -2820,14 +2817,11 @@
         "lpn_net_emergency": "a469bd39646afbb29e721d7974f24f83d7722838",
         "lpn_new_coords": "8ebebca0195929f0e6604560db2d6f829dc20c86",
         "lpn_new_coordsys": "8330b94c9770af7c9d2bcc391d6d8c51c2abb9e2",
-        "lpn_new_coordsys_geo": "e37ed474592583b18914ab4c29e2304d1e45ef69",
-        "lpn_new_coordsys_geo_tip": "2d1eaa1d56d47efab44dd09030de3937d2d671bf",
         "lpn_new_coordsys_local": "4ab6870721d047192251652ad7c0b7011fa76bdc",
         "lpn_new_coordsys_local_tip": "24f3fb601de22adda4c25fd55f295b7750e14034",
         "lpn_new_coordsys_tip": "26b42c81605e839b4f6435b371aaadd135964c06",
         "lpn_new_create": "6e157c5da4410b7e9de85f5c93026b9176e69064",
         "lpn_new_crs": "6282076ab8db0197621911cfbf5022873718c578",
-        "lpn_new_crs_tip": "21878d2890490fc68c1b32bb21ed31db1c70e558",
         "lpn_new_place_hint": "41856c8b6bada67d66440e6e0d8c6077f490e058",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_new_title": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
@@ -2852,7 +2846,6 @@
         "lpn_pane_filter_none": "778c378ebb7ab3fcde0dc3a817012bf89ba9d678",
         "lpn_pane_filter_note": "05e2eb74abd40d38d2d0d292c8d3c5d57c84f813",
         "lpn_pane_none": "8a127c3c35dc5bcfd46a44eb69bc59549ad9e105",
-        "lpn_pane_paste_note": "d2362d3a8c1acea6b54502c4f8b6bdece464727b",
         "lpn_pane_pasted": "7afb7b32d87e8799315d1b6ac90f1240623781f2",
         "lpn_pane_print": "46e18fe132733ab1ff768a8aa616d225bae99f3d",
         "lpn_pane_print_tip": "90a936ee08e84cd564a615de8e6bc16ab1347b74",
@@ -6345,11 +6338,11 @@
             "words": 32,
             "ends_sentence": true
         },
-        "lpn_file_import_geo": {
+        "lpn_file_convert_as": {
             "words": 7,
             "ends_sentence": false
         },
-        "lpn_file_import_geo_tip": {
+        "lpn_file_convert_as_tip": {
             "words": 81,
             "ends_sentence": true
         },
@@ -6751,14 +6744,6 @@
         },
         "lpn_georef_adjust": {
             "words": 45,
-            "ends_sentence": true
-        },
-        "lpn_georef_asdeg_btn": {
-            "words": 4,
-            "ends_sentence": false
-        },
-        "lpn_georef_asdeg_tip": {
-            "words": 42,
             "ends_sentence": true
         },
         "lpn_georef_asdegrees": {
@@ -7509,10 +7494,6 @@
             "words": 47,
             "ends_sentence": true
         },
-        "lpn_menu_cue": {
-            "words": 11,
-            "ends_sentence": true
-        },
         "lpn_menu_edit": {
             "words": 1,
             "ends_sentence": false
@@ -7649,14 +7630,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_new_coordsys_geo": {
-            "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_new_coordsys_geo_tip": {
-            "words": 12,
-            "ends_sentence": true
-        },
         "lpn_new_coordsys_local": {
             "words": 4,
             "ends_sentence": false
@@ -7676,10 +7649,6 @@
         "lpn_new_crs": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_new_crs_tip": {
-            "words": 74,
-            "ends_sentence": true
         },
         "lpn_new_place_hint": {
             "words": 2,
@@ -7775,10 +7744,6 @@
         },
         "lpn_pane_none": {
             "words": 7,
-            "ends_sentence": true
-        },
-        "lpn_pane_paste_note": {
-            "words": 31,
             "ends_sentence": true
         },
         "lpn_pane_pasted": {

@@ -90,7 +90,7 @@ class Session {
 	// in this tree have already done exactly that (dev/session-handoff.md §4). `lang.ec.en.php` is
 	// the one source of a shipped English string; the page hands it to JS through pageConfig, so a
 	// spec naming a menu row, a button or a notice asks for it by KEY.
-	//   const ROW = await a.lang('lpn_file_import_geo');
+	//   const ROW = await a.lang('lpn_file_convert_as');
 	// It throws on a key the page does not supply, because a silent `undefined` would turn every
 	// assertion under it into a check of nothing.
 	async lang(key) {
@@ -448,7 +448,7 @@ class Session {
 	//
 	// US units unless a spec says otherwise — a project's units are the project's since Task 263,
 	// and a spec should not inherit whatever the strip happened to hold.
-	async newProject(system = 'us') { await this._newFromBox('xy', system); }
+	async newProject(system = 'us') { await this._newFromBox('local', system); }
 	// A lat/lon project: longitudes and latitudes, and a street map behind it.
 	async newGeoProject(system = 'us') { await this._newFromBox('geo', system); }
 	async _newFromBox(coords, system) {

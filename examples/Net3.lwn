@@ -2490,7 +2490,8 @@
 			"x": 35.440246952096,
 			"y": 15.397639717135469,
 			"anchorNode": null,
-			"sizeMult": 4
+			"sizeMult": 4,
+			"allZoom": true
 		}
 	],
 	"nextId": {
@@ -2615,11 +2616,12 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 8,
-		"symbolSize": 8,
-		"linkWidth": 2,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
+		"labelMaxWidth": 30,
 		"symbolOpacity": 1,
-		"backdropOpacity": 0.8,
+		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,
@@ -2628,7 +2630,6 @@
 		"colorLinkField": "",
 		"colorRamp": "epanet",
 		"colorReverse": false,
-		"colorThematic": false,
 		"colorLegendPosition": "bottom-right",
 		"colorBreaks": {},
 		"labelReadabilityBias": 110,
