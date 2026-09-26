@@ -963,7 +963,7 @@ the block.
       drawing from the splash screen, which can carry detail. Do not let one drawing be scaled to
       serve both -- that is what makes the big one look empty.
     - See also Task 648 and Task 679.
-- 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
+- 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
   as a thumbnail with the current window box placed on it for 'Where am I?'"*
@@ -1849,6 +1849,31 @@ the block.
   (`dev/lpn-spike/save-entry-at-hand-harness.js` says exactly what its stub cannot see -- the
   browser's own write, and the real cost of a style invalidation). This is what replaces the floor
   with a number.
+
+- 75|718| **File menu: Recents just above Exit, and an Import submenu.**
+  Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
+  items. It's probably time for an Import sub-menu."*
+- 50|717| **EPANET-MSX, multi-species water quality.**
+  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
+  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
+- 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
+  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
+  Junction, Pipe, etc until escape."*
+- 50|720| **Background layers from a GIS server.**
+  Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
+  A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
+- 50|721| **Scenarios as layered alternatives, with ready-made scenarios.**
+  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm. I am comfortable with it from
+  HEC-RAS, but it could be threatening to new users. What seems very welcoming is the set of
+  pre-configured scenarios and the ironclad rule that you are always editing only the specific data
+  layers (Alternatives) mapped to that Active Scenario."* Read against our scenario model first.
+- 50|722| **Change and revision tracking.**
+  Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
+- 25|723| **WaterCAD's element list, against ours.**
+  Tom, 2026-09-25, listing WaterCAD's elements: Pipe, Junction, Hydrant, Tank, Reservoir, Customer,
+  SCADA, Pump, Pump Station, Variable Speed Pump Battery, PRV, PSV, PBV, FCV, TCV, GPV, Isolation
+  valve, Spot Elevation, Turbine, Periodic Head-flow, Air Valve, Hydropneumatic Tank. Which of these
+  a migrating user misses first is Mary's and Sue's question (`watercad-migration.md`).
 
 # Reference
 
