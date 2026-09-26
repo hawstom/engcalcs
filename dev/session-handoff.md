@@ -8,9 +8,8 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Six branches may not merge without Tom's all-clear** (all in `protected` in
-  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
-  `feat/table-editing`, `feat/customer-node`, `feat/menu-button`, `feat/report`.
+- **Two branches may not merge without Tom's all-clear** (in `protected` in
+  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/table-editing`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -89,48 +88,36 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-25, evening
+## STATE — 2026-09-26
 
-### Master is 017ee4de, pushed with a green suite (Tom has not pulled it)
+### Production is 83bf02d5 (Tom pulled 2026-09-26; checked over ssh)
 
-Merged on his all-clear today: first-project, convert-as, property-venue (his property-venue
-bullet was headed feat/table-editing; the Find content made it this branch, recorded in the
-all-clear). Sibling sites pushed with the same change: librewaternet.org eef380e, not-epanet.org
-a058b5d. **They say the street map shows on the first, empty project, and CLAUDE.md now says so.
-Tom should pull all three together**, or the landing pages describe a first visit his server
-does not have yet.
+Master is ahead of it: 410ca3ce adds his two coordinate-system sentences (lpn_crs_unplaceable and
+lpn_convas_no_transform, both naming {crs}), Task 730, and queue answers. He deploys at his pleasure.
+librewaternet.org eef380e and not-epanet.org a058b5d are deployed and clean.
 
-### Awaiting his browser pass (each green on its own suite except the expected payload check)
+Merged 2026-09-26 on his all-clears: zoom-control, customer-node, menu-button, report; also the
+lone-junction offscreen fix and the example texts (lat/lon Net3 got "Zoom in to see labels", Net2
+lost its note; the text-all-zoom harness now allows an example to keep none).
 
-- **8103 `feat/zoom-control`** 43902998: R-263 (one cause fixed: a fit that hid labels kept room
-  for them; his exact screenshot NOT reproduced), R-264 (dragged label leapt to 2.2x its leader;
-  fixed), R-265 tips in his exact words.
-- **8105 `feat/table-editing`**: R-254..R-259, the spreadsheet heading (click selects, ⋮ menu,
-  arrow under ⋮, Manage columns applies on OK, move-to-beginning/end, print names the PDF
-  `{project}-{table}`). 850e3746, green: Perry's two defects (a 22 px click strip in a 72 px
-  cell; the ⋮ clipping two wrapped headings) fixed and harnessed, not re-reviewed by Perry.
-- **8113 `feat/customer-node`** 105d9f68: R-267..R-270. Perry's grip-over-junction defect fixed.
-- **8114 `feat/menu-button`** eceab3ab: outlined only, R-271. Needs his all-clear; merge master first.
-- **8115 `feat/report`** 87e15a16 (new port, needs the Apache reload): Tasks 715/716, Water >
-  Reports > Status / Full. Perry's two defects fixed. **SEAM with table-editing:** the Full
-  report's print suggests a generic PDF name because the page may not write `document.title`;
-  table-editing adds the one reviewed exception (set and restored around print). After
-  table-editing merges, route the Full report's print through the same path.
-  Adds two localStorage furniture keys, `lpn_statusbox` and `lpn_fullbox`.
+### Awaiting his browser pass
+
+- **8105 `feat/table-editing`** 410ddadc, green but for payloads: his fourth round. Heading text
+  inert, ring on the whole cell, ⋮ and arrow zero-space and hover-only, arrow is the only sort,
+  menu is Hide / Show all / Manage, drag has a ghost, a marker and a page-wide grabbing cursor,
+  Ctrl+Space removed (Task 730), tab tip ends "See Help, Notes for keyboard shortcuts." Tom:
+  "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click
+  selects, drag moves. Not re-reviewed by Perry since round three.
 - **8090 `feat/label-gang-search`**: unchanged.
 
 ### Open with him
 
-1. R-252: he believes SI writes no space before a unit symbol. The SI Brochure and NIST SP 811
-   both put a space ("10 mm"); the suffix prefill is always one space, which is right for both.
-2. R-253/R-262 answered in the 09-25 evening report; lpn_convas_no_transform reworded to name the
-   system, awaiting his ruling. R-260 (Find ID empty) could not be reproduced; asked him to retest.
-3. R-235, WaterCAD sample .inp from IOD, as before.
+- R-235, the WaterCAD sample .inp from IOD, as before. Everything else from 09-25 is answered.
 
 ### Translation sprint
 
-Not launched. Master has 2 unread strings and five branches carry new English awaiting his pass;
-launch after that pass merges, so one sprint covers them.
+Not launched. Master carries 250 untranslated keys, all ruled. Launch after table-editing merges,
+so one sprint covers it.
 
 ## Commands to hand Tom with any panel change
 
