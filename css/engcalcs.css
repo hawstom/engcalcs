@@ -2404,9 +2404,11 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    multiple heading cells to hide multiple columns at once?"*). The same wash the body cells use
    for their own selection (`.lpn-pane-table tbody td.lpn-pane-sel`), so a reader who already knows
    what a selected cell looks like recognises a selected heading without being told twice. */
-/* One shade deeper than the cells beneath it, as a spreadsheet's selected column heading is, so
-   the column reads as selected from the top down (R-221). */
-.lpn-pane-table thead th.lpn-pane-head-sel { background: #d3e3fd; }
+/* **A SELECTED HEADING IS SOLID BLUE** (Tom, 2026-09-26, fifth pass: *"Turn an entire heading
+   solid blue on select."*), as Google Sheets draws a selected column's letter: the cells beneath
+   keep the light wash, the heading above them is the one solid block, and its text turns white.
+   #0b57d0 against white text is 6.6:1. */
+.lpn-pane-table thead th.lpn-pane-head-sel { background: #0b57d0; color: #fff; }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
    <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
@@ -2562,7 +2564,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    arrow) actually holds keyboard focus -- inset so it never adds a pixel to the cell's box, and
    still exactly what Tab reveals. Browsers without `:has()` simply show no ring here, the same
    graceful drop this file already uses it for elsewhere. */
-.lpn-pane-table thead th:has(:focus-visible) { outline: 2px solid #0645ad; outline-offset: -2px; }
+/* **NO RING AT ALL, SINCE THE FIFTH PASS** (Tom, 2026-09-26: *"The blue outline for a selected
+   (tabbed) heading isn't great, and it conflicts with the column dragging wide blue line."*). A
+   heading that holds keyboard focus wears the light selection wash instead -- still exactly what
+   Tab reveals, and nothing drawn round the text -- and a SELECTED heading stays solid blue whether
+   it has focus or not. */
+.lpn-pane-table thead th:has(:focus-visible) { outline: 0; background: #e8f0fe; }
+.lpn-pane-table thead th.lpn-pane-head-sel:has(:focus-visible) { background: #0b57d0; }
 /* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
    because its `left`/`top` are the pointer's own client coordinates, which are already relative to
    the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
@@ -2658,24 +2666,28 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    off again on `mouseup`. The universal child selector needs to OUTRANK every other cursor rule in
    this file for the duration, which is what earns the one `!important` in this stylesheet. */
 .lpn-pane-col-dragging, .lpn-pane-col-dragging * { cursor: grabbing !important; }
-/* **THE GHOST**, a small label that follows the pointer for the life of the drag -- Tom, 2026-09-26,
-   fourth pass, point (2): *"drag is blind. I don't know where the column will end up."* Positioned
-   from cached rects computed ONCE at drag start (see `paneStartColDrag()`'s own comment on why:
-   reading `getBoundingClientRect()` on every `mousemove` would force a synchronous layout on every
-   pixel, which is the "layout thrashing" this file's own typing-bench work already measured a cost
-   for elsewhere). `pointer-events: none` so the ghost is never what a `mousemove` lands on. */
+/* **THE GHOST IS THE WHOLE COLUMN, SHADED** (Tom, 2026-09-26, fifth pass: *"Drag a column (not
+   heading) shaded outline (see Google Sheets)."*). A translucent grey block from the heading to the
+   foot of the visible table, carried sideways under the pointer; `paneStartColDrag()` sizes and
+   places it from rects read once when the drag begins. `pointer-events: none` so it is never what
+   a `mousemove` lands on. */
 .lpn-pane-col-ghost {
-	position: fixed; z-index: 2000; pointer-events: none; background: #fff; border: 1px solid #999;
-	border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 3px 8px; font: inherit;
-	font-size: .9em; white-space: nowrap; color: #222;
+	position: fixed; z-index: 2000; pointer-events: none; box-sizing: border-box;
+	background: rgba(60, 64, 67, .14); border: 1px solid rgba(60, 64, 67, .5);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
 }
-/* **THE INSERTION MARKER**, a thin line at the edge of whichever heading the pointer is nearest,
-   the side depending on which half of that heading the pointer is over -- the answer to "where the
-   column will end up" that the ghost alone does not give. */
+/* **THE DESTINATION IS A WIDE DARK LINE DOWN THE WHOLE DIVIDER** (fifth pass: *"Make a wide black
+   or dark gray destination line on entire column (not heading) divider when middle of drag
+   rectangle (not cursor) is between middle of two columns."*). Drawn only once the ghost's middle
+   has passed a neighbour's middle; at the column's own two edges there is none, because dropping
+   there does nothing. Dark grey rather than the page's blue, so it cannot be read as a selection. */
 .lpn-pane-col-marker {
-	position: fixed; z-index: 2000; pointer-events: none; width: 3px; background: #0645ad;
-	border-radius: 2px;
+	position: fixed; z-index: 2001; pointer-events: none; width: 4px; background: #3c4043;
 }
+/* **AND NOTHING ELSE ON THE HEADINGS SHOWS WHILE A COLUMN IS IN THE HAND** (fifth pass: *"Suppress
+   the menu and sort arrow during dragging."*) -- the sorted column's standing arrow included. */
+.lpn-pane-col-dragging .lpn-pane-colmenu,
+.lpn-pane-col-dragging .lpn-pane-sortarrow { visibility: hidden; }
 /* **THE "..." COLUMN MENU, HIDDEN UNTIL HOVER, FOCUS OR TOUCH** (Tom, 2026-09-26, third pass,
    reversing the second pass's "always visible": *"Possibly the arrow and the menu can take up
    zero space and appear with 100% opacity over any heading text on hover. Try that."*). Opens the
@@ -2694,47 +2706,60 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    rather than blends with whatever text is under it, and short enough (1.1em) to never reach past
    the first line no matter how many lines the heading wraps to. */
 .lpn-pane-colmenu {
-	position: absolute; inset-inline-end: 1px; top: 1px; height: 1.1em; width: 13px;
+	position: absolute; inset-inline-end: 1px; top: 2px; height: 1.1em; width: 15px;
 	display: flex; align-items: center; justify-content: center;
 	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
-	font-weight: normal; color: #99a; cursor: pointer; opacity: 0;
+	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
 }
 /* The glyph itself, same reasoning as the sort arrow below: `content:` rather than a text node, so
    print.js's per-text-node line count never sees it. */
 .lpn-pane-colmenu::after { content: '⋮'; }
-/* Hovering OR focusing anywhere in the heading reveals it -- not only hovering the dot itself,
-   which nobody can aim at while it is invisible. `:focus-within` is the keyboard equivalent of
-   hover (Tab into the heading), and a touch screen never fires `:hover` at all, so `(hover: none)`
-   shows it unconditionally there -- the one place a mouse and a finger are told apart in this file. */
-.lpn-pane-table thead th:hover .lpn-pane-colmenu,
-.lpn-pane-table thead th:focus-within .lpn-pane-colmenu,
-.lpn-pane-colmenu:focus-visible { opacity: 1; }
-.lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible { color: #0645ad; outline: 0; }
-@media (hover: none) { .lpn-pane-colmenu { opacity: 1; } }
-/* **THE ARROW, ON EVERY HEADING, DIRECTLY BELOW THE "..." GLYPH** (Tom, 2026-09-26, third pass:
-   *"Sorting still feels schizophrenic. Either the dots or the arrow, not both... clicking the
-   arrow sorts (ascending first, then toggles)."* -- sorting is the arrow's job alone now, so every
-   heading gets one, not only the sorted column). Same corner-badge shape, the same
-   `content:`-not-text-node reasoning, and the same hover/focus/touch reveal as the menu glyph just
-   above -- **EXCEPT the column that IS sorted**, whose own arrow is a judgement call kept visible
-   at all times (`.lpn-pane-sortarrow-active`, below): an arrow that only ever appeared on hover
-   would leave no way to see which column is sorted, or which direction, without touching every
-   heading in turn. Clicking ANY heading's arrow calls `sortPaneTable()`, which is already exactly
-   "ascending first, then toggles" for whichever column it is handed. */
+/* **THE ARROW, ON EVERY HEADING, BELOW THE "..." GLYPH, WITH AIR BETWEEN THEM** (Tom, 2026-09-26,
+   third pass: *"clicking the arrow sorts (ascending first, then toggles)"*; fifth pass: *"Put a
+   little vertical space between the ellipsis menu and the sort arrow."*). Same corner-badge shape
+   and `content:`-not-text-node reasoning as the menu glyph -- **EXCEPT the column that IS sorted**,
+   whose arrow stays visible (`.lpn-pane-sortarrow-active`) so the table says which column is
+   sorted, and which way, without being touched.
+   **THE AIR IS PADDING, NOT A GAP**: the button starts where the ⋮ ends and its top 5px are
+   transparent (`background-clip: content-box`), so the eye sees two separate marks while the
+   pointer crosses from one to the other without ever leaving the pair -- a real gap would flash
+   both out of sight halfway across it. `top` and the glyph's size are in the HEADING's em (the
+   glyph's `.8em` is on `::after`, not the button), so the space holds at every text size. */
 .lpn-pane-sortarrow {
-	position: absolute; inset-inline-end: 1px; top: 1.25em; height: 1em; width: 13px;
+	position: absolute; inset-inline-end: 1px; top: calc(2px + 1.1em); height: calc(5px + 1.05em);
+	width: 15px; box-sizing: border-box; padding: 5px 0 0; margin: 0;
 	display: flex; align-items: center; justify-content: center;
-	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
-	font-size: .8em; font-weight: normal; color: #667; cursor: pointer; opacity: 0;
+	background: #fff; background-clip: content-box; border: 0; border-radius: 2px; font: inherit;
+	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
 }
-.lpn-pane-sortarrow::after { content: '▲'; }
+.lpn-pane-sortarrow::after { content: '▲'; font-size: .8em; }
 .lpn-pane-sortarrow-desc::after { content: '▼'; }
-.lpn-pane-table thead th:hover .lpn-pane-sortarrow,
-.lpn-pane-table thead th:focus-within .lpn-pane-sortarrow,
-.lpn-pane-sortarrow:focus-visible,
+/* **SHOWN ONLY WHEN THE POINTER IS OVER THEIR OWN CORNER** (fifth pass: *"I think that the menu and
+   arrow are too eager to show. Can we make them show only when the cursor is directly over their
+   area of the cell?"*). Hovering the heading at large no longer reveals them; hovering either mark's
+   own box reveals the pair (`:has()`; a browser without it reveals just the one under the pointer).
+   The keyboard equivalent is `:focus-visible` inside the heading -- not `:focus-within`, which a
+   plain click on the heading also satisfies, and which is how a click used to leave both showing.
+   A touch screen never fires `:hover`, so `(hover: none)` shows them there unconditionally -- the
+   one place a mouse and a finger are told apart in this file. */
+.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover,
+.lpn-pane-table thead th:has(.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover) .lpn-pane-colmenu,
+.lpn-pane-table thead th:has(.lpn-pane-colmenu:hover, .lpn-pane-sortarrow:hover) .lpn-pane-sortarrow,
+.lpn-pane-table thead th:has(:focus-visible) .lpn-pane-colmenu,
+.lpn-pane-table thead th:has(:focus-visible) .lpn-pane-sortarrow,
 .lpn-pane-sortarrow-active { opacity: 1; }
-.lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: #0645ad; outline: 0; }
-@media (hover: none) { .lpn-pane-sortarrow { opacity: 1; } }
+.lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible,
+.lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: #0b57d0; outline: 0; }
+/* On a solid-blue selected heading the badges turn blue with it, and their marks white. */
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu,
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow { background-color: #0b57d0; color: #fff; }
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu:hover,
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow:hover { color: #d3e3fd; }
+/* A focused heading wears the light wash (above), and so do its badges, rather than two white
+   patches on it. */
+.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-colmenu,
+.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-sortarrow { background-color: #e8f0fe; }
+@media (hover: none) { .lpn-pane-colmenu, .lpn-pane-sortarrow { opacity: 1; } }
 /* The Manage columns dialog (openDialog(), #lpn_dialog): one row per column, a Show checkbox and
    two reorder buttons. Plain and compact -- this dialog is open for a few seconds, not a page of
    its own. **REWORKED TO A SELECTABLE LIST WITH BUTTONS OUTSIDE IT** (Tom, 2026-09-25, second

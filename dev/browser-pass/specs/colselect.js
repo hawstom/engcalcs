@@ -92,8 +92,11 @@ async function headCentre(a, key) {
 
 // A small-steps drag, matching a real hand rather than a single teleport -- the pre-reviewer's own
 // probe used this shape to reproduce what a single large `mousemove` can paper over.
+// It ends a few pixels PAST the destination's middle: since the fifth pass the drop is decided by
+// the ghost's middle crossing a neighbour's middle, and a hand landing exactly on it is a tie.
 async function dragHeading(a, from, to, steps) {
 	const p0 = await headCentre(a, from), p1 = await headCentre(a, to);
+	p1.x += (p1.x > p0.x ? 6 : -6);
 	await a.page.mouse.move(p0.x, p0.y);
 	await a.page.mouse.down();
 	for (let i = 1; i <= (steps || 15); i++) {
@@ -422,10 +425,15 @@ exports.run = async function ({ browser, report }) {
 		const result = await a.page.evaluate((key) => {
 			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
 			const b = th.querySelector('.lpn-pane-sort');
-			return { thOutline: getComputedStyle(th).outlineStyle, sortOutline: getComputedStyle(b).outlineStyle };
+			return { thOutline: getComputedStyle(th).outlineStyle, thBg: getComputedStyle(th).backgroundColor, sel: th.classList.contains('lpn-pane-head-sel'), sortOutline: getComputedStyle(b).outlineStyle };
 		}, key);
-		report.ok(result.thOutline === 'solid', 'Tab-focusing the heading button draws the ring on the <th>', JSON.stringify(result));
-		report.ok(result.sortOutline === 'none', '...and never on the text button itself', JSON.stringify(result));
+		// FIFTH PASS: no ring at all (Tom: "The blue outline for a selected (tabbed) heading isn't
+		// great"); a keyboard-focused heading wears the light wash instead.
+		// The click that put the caret there also SELECTED the column, so it is solid blue; an
+		// unselected focused heading would wear the light wash. Either way, never a ring.
+		report.ok(result.thOutline === 'none' && result.thBg === (result.sel ? 'rgb(11, 87, 208)' : 'rgb(232, 240, 254)'),
+			'Tab-focusing the heading draws no ring, only its fill (solid if selected, the wash if not)', JSON.stringify(result));
+		report.ok(result.sortOutline === 'none', '...and nothing is drawn round the text button itself', JSON.stringify(result));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
@@ -519,7 +527,7 @@ exports.run = async function ({ browser, report }) {
 		}, T);
 		report.ok(mid.bodyDragging && mid.bodyCursor === 'grabbing',
 			'far from the heading, mid-drag, the WHOLE PAGE still shows "grabbing"', JSON.stringify(mid));
-		report.ok(mid.ghostShown && !!mid.ghostText, 'a ghost label follows the pointer', JSON.stringify(mid));
+		report.ok(mid.ghostShown, 'a ghost follows the pointer', JSON.stringify(mid));
 		report.ok(mid.markerShown, '...and an insertion marker shows where the column will land', JSON.stringify(mid));
 		report.ok(mid.rowUnrebuilt, '...and the table body is NOT rebuilt mid-drag (the probe attribute survives)', JSON.stringify(mid));
 		await a.page.mouse.up();
@@ -530,6 +538,119 @@ exports.run = async function ({ browser, report }) {
 			markerGone: !document.querySelector('.lpn-pane-col-marker')
 		}));
 		report.ok(!cleanup.bodyDragging && cleanup.ghostGone && cleanup.markerGone, 'the ghost, marker and body class are all cleaned up on drop', JSON.stringify(cleanup));
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+	// ---- (14) THE FIFTH PASS, IN REAL CHROMIUM (Tom, 2026-09-26): "(1) Suppress the menu and sort
+	// arrow during dragging. (2) Sometimes mere clicking (tiny drag?) drags a column... wait for a
+	// 'long click' for a drag or a move of at least 1/2 column width"; "you can't drag a column to
+	// its own left or right edge; that is a do-nothing case"; "a wide black or dark gray destination
+	// line on entire column (not heading) divider when middle of drag rectangle (not cursor) is
+	// between middle of two columns"; "Turn an entire heading solid blue on select"; "When I tab from
+	// cell to cell, the only indicator I should see is cell outline." ------------------------------
+	{
+		const a = await openJunctions(browser, 'L');
+		const geo = (k) => a.page.evaluate(({ T, k }) => {
+			const th = document.querySelector(T + ' thead th.lpn-pane-col-' + k);
+			const r = th.getBoundingClientRect();
+			return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, mid: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, { T, k });
+		const dragUi = () => a.page.evaluate(() => {
+			const g = document.querySelector('.lpn-pane-col-ghost'), m = document.querySelector('.lpn-pane-col-marker');
+			const gr = g && g.getBoundingClientRect(), mr = m && m.getBoundingClientRect();
+			return {
+				ghost: !!g, marker: !!m && getComputedStyle(m).display !== 'none',
+				gTop: gr && gr.top, gH: gr && gr.height, gW: gr && gr.width, gBg: g && getComputedStyle(g).backgroundColor,
+				mLeft: mr && mr.left, mW: mr && mr.width, mTop: mr && mr.top, mH: mr && mr.height, mBg: m && getComputedStyle(m).backgroundColor,
+				glyphs: [...document.querySelectorAll('.lpn-pane-colmenu, .lpn-pane-sortarrow')].filter((e) => getComputedStyle(e).visibility !== 'hidden').length
+			};
+		});
+		// Sort one column first, so its standing arrow is visible and has to be suppressed too.
+		await a.page.evaluate((T) => document.querySelector(T + ' thead th.lpn-pane-col-elev .lpn-pane-sortarrow').click(), T);
+		await a.settle(200);
+		let s0 = await state(a);
+		const i = 3, k = s0.keys[i], right = s0.keys[i + 1];
+		const g = await geo(k), gr = await geo(right);
+		// (a) a press that travels less than half the column is a click: it selects, it never moves.
+		await a.page.mouse.move(g.mid, g.y);
+		await a.page.mouse.down();
+		await a.page.mouse.move(g.mid + g.width * 0.4, g.y, { steps: 5 });
+		let ui = await dragUi();
+		report.ok(!ui.ghost, 'a press that travels 40% of the column draws no ghost', JSON.stringify(ui));
+		await a.page.mouse.move(g.mid, g.y, { steps: 3 });
+		await a.page.mouse.up();
+		await a.settle(150);
+		let s1 = await state(a);
+		report.ok(s1.keys.join() === s0.keys.join(), '...and moves nothing', s1.keys.indexOf(k) + '');
+		report.ok(JSON.stringify(s1.headSel) === JSON.stringify([k]), '...it was a click, and selected the column', JSON.stringify(s1.headSel));
+		// (g) that selected heading is SOLID blue, its text white.
+		const col = await a.page.evaluate(({ T, k }) => {
+			const th = document.querySelector(T + ' thead th.lpn-pane-col-' + k);
+			return { bg: getComputedStyle(th).backgroundColor, fg: getComputedStyle(th.querySelector('.lpn-pane-sort')).color };
+		}, { T, k });
+		report.ok(col.bg === 'rgb(11, 87, 208)' && col.fg === 'rgb(255, 255, 255)', 'the selected heading is solid blue with white text', JSON.stringify(col));
+		// (b)+(c) half the width makes it a drag; the ghost is over its own slot, so no marker.
+		// Picked up near the RIGHT edge (clear of the resize grip and the ⋮/arrow badges there), so the ghost's middle
+		// trails the pointer by nearly half a column.
+		const grabX = g.right - 22, trail = grabX - g.mid;
+		await a.page.mouse.move(grabX, g.y);
+		await a.page.mouse.down();
+		await a.page.mouse.move(grabX + g.width / 2 + 2, g.y, { steps: 6 });
+		ui = await dragUi();
+		report.ok(ui.ghost, 'half the column\'s width makes it a drag: the ghost is drawn', JSON.stringify(ui));
+		report.ok(ui.glyphs === 0, '...and every ⋮ and sort arrow is hidden while dragging, the sorted column\'s too', ui.glyphs + ' visible');
+		report.ok(!ui.marker, '...and over its own slot (its own right edge) there is no marker', JSON.stringify(ui));
+		report.ok(Math.abs(ui.gW - g.width) < 1 && ui.gH > g.bottom - g.top + 40 && Math.abs(ui.gTop - g.top) < 1,
+			'the ghost is the whole column: its width, from the heading down the table', JSON.stringify(ui));
+		// (d) the POINTER past the neighbour's middle is not enough; the GHOST's middle has to be.
+		const ptrPast = gr.mid + 4;
+		await a.page.mouse.move(ptrPast, g.y, { steps: 4 });
+		ui = await dragUi();
+		report.ok(ptrPast - trail < gr.mid && !ui.marker, 'with the pointer past the neighbour\'s middle but the ghost\'s middle short of it, still no marker',
+			JSON.stringify({ ghostMid: ptrPast - trail, neighbourMid: gr.mid, marker: ui.marker }));
+		await a.page.mouse.move(gr.mid + trail + 3, g.y, { steps: 4 });
+		ui = await dragUi();
+		report.ok(ui.marker, 'once the ghost\'s middle passes the neighbour\'s middle, the destination marker appears', JSON.stringify(ui));
+		report.ok(ui.marker && Math.abs(ui.mLeft + ui.mW / 2 - gr.right) < 1.5, '...on the divider after that neighbour', ui.mLeft + ' vs ' + gr.right);
+		report.ok(ui.marker && Math.abs(ui.mTop - g.top) < 1 && Math.abs(ui.mH - ui.gH) < 1 && ui.mW >= 3,
+			'...a wide line down the WHOLE column divider, not only the heading', JSON.stringify({ top: ui.mTop, h: ui.mH, w: ui.mW }));
+		report.ok(ui.mBg === 'rgb(60, 64, 67)', '...in dark grey, not the selection blue', ui.mBg);
+		await a.page.mouse.up();
+		await a.settle(200);
+		const s2 = await state(a);
+		report.ok(s2.keys.indexOf(k) === i + 1 && s2.keys[i] === right, '...and the drop lands it after that neighbour', s0.keys.indexOf(k) + ' -> ' + s2.keys.indexOf(k));
+		ui = await dragUi();
+		report.ok(!ui.ghost && !ui.marker && ui.glyphs > 0, 'the ghost and marker are gone and the glyphs are back after the drop', JSON.stringify(ui));
+		// (e) a long press, with no travel at all, is a drag too.
+		const g2 = await geo(s2.keys[5]);
+		await a.page.mouse.move(g2.mid, g2.y);
+		await a.page.mouse.down();
+		await a.page.waitForTimeout(250);
+		const early = await dragUi();
+		await a.page.waitForTimeout(350);
+		const late = await dragUi();
+		await a.page.mouse.up();
+		await a.settle(150);
+		report.ok(!early.ghost && late.ghost, 'a hold (450 ms) with no travel becomes a drag; 250 ms does not', JSON.stringify({ early: early.ghost, late: late.ghost }));
+		report.ok((await state(a)).keys.join() === s2.keys.join(), '...and released in place, it moved nothing');
+		// (f) Navigation (Ready) mode: Tab into a cell shows the outline and no highlighted text.
+		const cell = await a.page.evaluate((T) => {
+			const r = document.querySelector(T + ' tbody tr:nth-child(2) td.lpn-pane-col-id').getBoundingClientRect();
+			return { x: r.left + 4, y: r.top + r.height / 2 };
+		}, T);
+		await a.page.mouse.click(cell.x, cell.y);
+		const tabbed = [];
+		for (let n = 0; n < 3; n++) {
+			await a.page.keyboard.press('Tab');
+			await a.settle(60);
+			tabbed.push(await a.page.evaluate(() => {
+				const e = document.activeElement;
+				return { tag: e.tagName, val: e.value, ro: e.readOnly, s: e.selectionStart, e: e.selectionEnd, cur: e.parentNode.classList.contains('lpn-pane-cur') };
+			}));
+		}
+		const texty = tabbed.filter((t) => t.tag === 'INPUT' && t.val);
+		report.ok(texty.length > 0 && texty.every((t) => t.ro && t.s === t.e && t.cur),
+			'Tab through Ready cells: each has the outline and none has its text selected', JSON.stringify(tabbed));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}

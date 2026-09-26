@@ -103,6 +103,13 @@ async function hoverHeading(a, key) {
 	}, key);
 	await a.page.mouse.move(box.x, box.y);
 }
+async function hoverOwn(a, key, cls) {
+	const box = await a.page.evaluate(({ key, cls }) => {
+		const r = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' ' + cls).getBoundingClientRect();
+		return { x: r.left + r.width / 2, y: r.bottom - 3 };
+	}, { key, cls });
+	await a.page.mouse.move(box.x, box.y);
+}
 async function opacityOf(a, key, cls) {
 	return a.page.evaluate(({ key, cls }) => {
 		const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
@@ -125,10 +132,27 @@ exports.run = async function ({ browser, report }) {
 		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '0', '...and so is the sort arrow');
 		let arrow = await arrowState(a, before[1]);
 		report.ok(arrow.present && !arrow.active, 'the arrow element exists on an unsorted column too, just not "active"', JSON.stringify(arrow));
+		// **FIFTH PASS: ONLY THEIR OWN CORNER REVEALS THEM** (Tom, 2026-09-26: *"I think that the
+		// menu and arrow are too eager to show. Can we make them show only when the cursor is
+		// directly over their area of the cell?"*).
 		await hoverHeading(a, before[1]);
 		await a.settle(100);
-		report.ok((await opacityOf(a, before[1], '.lpn-pane-colmenu')) === '1', 'hovering the heading reveals the "..." glyph');
-		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '1', '...and the sort arrow, at the same time');
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-colmenu')) === '0', 'hovering the middle of the heading no longer reveals the "..." glyph');
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '0', '...nor the sort arrow');
+		for (const cls of ['.lpn-pane-colmenu', '.lpn-pane-sortarrow']) {
+			await hoverOwn(a, before[1], cls);
+			await a.settle(100);
+			report.ok((await opacityOf(a, before[1], '.lpn-pane-colmenu')) === '1' && (await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '1',
+				'hovering the ' + (cls === '.lpn-pane-colmenu' ? '"..."' : 'arrow') + '\'s own box reveals the pair');
+		}
+		// Tom, fifth pass: "Put a little vertical space between the ellipsis menu and the sort arrow."
+		const gap = await a.page.evaluate((key) => {
+			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
+			const m = th.querySelector('.lpn-pane-colmenu').getBoundingClientRect();
+			const ar = th.querySelector('.lpn-pane-sortarrow');
+			return ar.getBoundingClientRect().top + parseFloat(getComputedStyle(ar).paddingTop) - m.bottom;
+		}, before[1]);
+		report.ok(gap >= 4, 'there is visible air between the "..." badge and the arrow badge', gap + ' px');
 		// Clicking an UNSORTED column's arrow sorts it ascending -- the menu no longer sorts at all.
 		await a.page.evaluate((key) => {
 			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sortarrow').click();

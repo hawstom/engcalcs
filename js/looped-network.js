@@ -21936,14 +21936,22 @@ var EngCalcs = EngCalcs || {};
 		savePaneColPrefs();
 		return true;
 	}
-	function paneMoveCol(spec, key, toIndex) {
-		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
-			from = order.indexOf(key), pref;
-		if (from < 0 || toIndex < 0 || toIndex >= order.length || toIndex === from) { return false; }
-		order.splice(from, 1);
-		order.splice(toIndex, 0, key);
+	// **A NEW ORDER FOR THE COLUMNS ON SCREEN, WITH EVERY HIDDEN COLUMN KEPT BESIDE ITS NEIGHBOUR**,
+	// so a column shown again comes back after the column it followed rather than at the end: each
+	// hidden key rides behind the nearest visible column before it (or leads, if there is none).
+	function paneSetVisibleColOrder(spec, visible) {
+		var all = paneColsAll(spec).map(function (c) { return c.key; }), after = {}, lead = [], prev = null,
+			next = [], pref;
+		all.forEach(function (k) {
+			if (paneColHidden(spec.id, k)) {
+				if (prev === null) { lead.push(k); } else { (after[prev] = after[prev] || []).push(k); }
+			} else { prev = k; }
+		});
+		next = lead.slice();
+		visible.forEach(function (k) { next.push(k); next = next.concat(after[k] || []); });
+		if (next.length !== all.length || next.join('\u0001') === all.join('\u0001')) { return false; }
 		pref = paneColPrefFor(spec.id);
-		pref.order = order;
+		pref.order = next;
 		savePaneColPrefs();
 		paneTableReset(spec);   // the heading order is part of the signature, so this forces a rebuild
 		return true;
@@ -22307,9 +22315,9 @@ var EngCalcs = EngCalcs || {};
 	// pinned at the 7em fallback whatever it had been laid out at, and every committed column
 	// starts breaking its heading mid-word, because `lpn-pane-tight` is derived from "has a stored
 	// width". One stray click and an untouched column opened narrow, wrapped to the character, for
-	// ever. THE SAME DISCIPLINE THE COLUMN MOVE ALREADY KEEPS: the reorder below commits only once
-	// the pointer has crossed into another heading, for the same reason -- one heading doing two
-	// jobs has to be able to tell them apart. Two pixels, because a hand is not quite still.
+	// ever. THE SAME DISCIPLINE THE COLUMN MOVE KEEPS, more strictly (half a column, or a hold --
+	// see paneStartColDrag()): one heading doing two jobs has to be able to tell them apart. Two
+	// pixels here, because a hand is not quite still.
 	var PANE_COL_DRAG_SLOP = 2;
 	// **A DRAG STARTS FROM THE WIDTH ON SCREEN, NOT FROM A NUMBER THE COLUMN MAY NOT HAVE** (Tom,
 	// 2026-09-21, R-110: *"Sometimes the column widths are unreasonable. For example,
@@ -22370,128 +22378,133 @@ var EngCalcs = EngCalcs || {};
 		if (ev && ev.preventDefault) { ev.preventDefault(); }
 		if (paneResetColWidth(spec, key)) { paneTableReset(spec); renderPaneTable(spec); }
 	}
-	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
-	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
-	// button's own click handler does its job; a press, a travel and a release somewhere else is a
-	// column move and the click that follows is suppressed once. **IF THE PRESSED HEADING IS PART
-	// OF A STANDING MULTI-COLUMN SELECTION, THE WHOLE SELECTION MOVES TOGETHER** -- one press, one
-	// motion, same as moving a single column; a heading that is not part of any selection (or is
-	// the whole of a one-column selection) moves alone. No `spec.headDragged` bookkeeping is needed
-	// here: a mousedown and mouseup on two DIFFERENT headings never produces a `click` on either
-	// one (the browser's click target is their common ancestor, which neither button's own listener
-	// is attached to), so there is no follow-on click to suppress. That flag remains meaningful only
-	// for a press-and-release that never leaves its own heading, which the sort button's `click`
-	// listener already answers on its own.
-	// **A DRAG THAT SHOWS SOMETHING, MEASURED TO STAY CHEAP** (Tom, 2026-09-26, fourth pass: "(1)
-	// unusably sluggish; (2) I lose the grab cursor... drag is blind, I don't know where the column
-	// will end up; (3) the grab cursor is a pointer on the heading text"). **MEASURED, NOT
-	// ASSUMED, BEFORE CHANGING ANYTHING**: the OLD `move()` handler here did no rebuild at all -- it
-	// walked up to six DOM ancestors of the event's target reading a plain property, and nothing
-	// else -- and 200 synthetic `mousemove` dispatches over Net3's Junctions timed at 0.008 ms
-	// average, 0.2 ms worst case: already free. Point (1)'s "unusably sluggish" is the FEEL of
-	// point (2)'s "blind" --
-	// a drag with no visual feedback at all reads as frozen, whatever it costs in milliseconds. The
-	// fix is therefore a ghost label and an insertion marker, not a performance rewrite -- and both
-	// are built to cost as little as the old handler did: **every heading's `getBoundingClientRect()`
-	// is read ONCE, before the first `mousemove`, never again during the drag** (reading it on every
-	// pixel would force a synchronous layout on every pixel -- the classic layout-thrashing trap --
-	// and nothing moves or rerenders until drop, so a cached rect never goes stale mid-drag). Point
-	// (3)'s cursor fix is CSS-only, beside `.lpn-pane-head-sel`'s own rule in css/engcalcs.css.
+	// **A COLUMN MOVE, MODELLED ON GOOGLE SHEETS** (Tom, 2026-09-26, fifth pass: *"Sometimes mere
+	// clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a 'long
+	// click' for a drag or a move of at least 1/2 column width."*; *"you can't drag a column to its
+	// own left or right edge; that is a do-nothing case"*; *"Drag a column (not heading) shaded
+	// outline (see Google Sheets)"*; *"Make a wide black or dark gray destination line on entire
+	// column (not heading) divider when middle of drag rectangle (not cursor) is between middle of
+	// two columns."*). Four rules, each his:
+	//   - **A PRESS IS A CLICK UNTIL IT HAS EARNED BEING A DRAG**: travel of half the pressed
+	//     column's own width, or a hold of PANE_COL_DRAG_HOLD_MS. Until then nothing is drawn, the
+	//     page listens and nothing else, and a release is the click it always was (select).
+	//   - **THE GHOST IS THE WHOLE COLUMN**, a shaded outline from the heading to the foot of the
+	//     visible table, carried sideways under the pointer at the offset it was picked up by.
+	//   - **THE DESTINATION IS DECIDED BY THE GHOST'S MIDDLE, NOT THE POINTER**: the column lands
+	//     in the gap whose neighbours' middles the ghost's middle lies between.
+	//   - **A GAP THAT WOULD LEAVE THE ORDER AS IT IS DRAWS NOTHING AND DROPS NOTHING** -- which is
+	//     the column's own two edges, until the ghost's middle has passed a neighbour's middle.
+	// **EVERY RECT IS READ ONCE, WHEN THE DRAG BEGINS** (measured 2026-09-26, fourth pass: a fresh
+	// `getBoundingClientRect()` per `mousemove` forces a layout per pixel, and nothing moves under
+	// the drag until drop, so the cached rects never go stale).
+	var PANE_COL_DRAG_HOLD_MS = 450;
+	// The nearest ancestor that clips the table, so the ghost and the marker stop at the bottom of
+	// what the reader can see rather than running down the page past the pane.
+	function paneColClipRect(table) {
+		var n = table && table.parentNode, cs, r;
+		while (n && n !== document.body && n.nodeType === 1) {
+			try { cs = window.getComputedStyle ? window.getComputedStyle(n) : null; } catch (e) { cs = null; }
+			if (cs && /(auto|scroll|hidden)/.test(String(cs.overflowY || '') + String(cs.overflow || ''))) {
+				r = n.getBoundingClientRect && n.getBoundingClientRect();
+				if (r && r.height > 0) { return r; }
+			}
+			n = n.parentNode;
+		}
+		return null;
+	}
+	// Where a group lands if the ghost's middle is at `mid`: the visible order with the group taken
+	// out and put back before the first remaining column whose middle is still to its right. `null`
+	// when that is the order already on screen -- the do-nothing case, which draws no marker.
+	function paneColDropPlan(order, group, rects, mid) {
+		var moving = order.filter(function (k) { return group.indexOf(k) !== -1; }),
+			rest = order.filter(function (k) { return group.indexOf(k) === -1; }), j = 0, next, x;
+		while (j < rest.length && rects[rest[j]] && (rects[rest[j]].left + rects[rest[j]].width / 2) < mid) { j++; }
+		next = rest.slice(0, j).concat(moving, rest.slice(j));
+		if (next.join('\u0001') === order.join('\u0001')) { return null; }
+		x = (j === 0) ? rects[rest[0]].left : rects[rest[j - 1]].right;
+		return { order: next, x: x };
+	}
 	function paneStartColDrag(spec, key, ev) {
 		var sel = paneHeadSel(spec), group = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key],
-			over = null, lastOverKey = null, rects = {}, ghost, marker;
+			order = paneCols(spec).map(function (c) { return c.key; }), rects = {}, plan = null,
+			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, lastX = startX,
+			active = false, timer = null, ghost = null, marker = null, ghostW = 0, grab = 0, top = 0, height = 0;
 		if (ev && ev.button) { return; }
+		group = order.filter(function (k) { return group.indexOf(k) !== -1; });
 		Object.keys(spec.headCells || {}).forEach(function (k) {
 			if (spec.headCells[k]) { rects[k] = spec.headCells[k].getBoundingClientRect(); }
 		});
-		// **THE CURSOR FOR THE WHOLE DRAG, ON `<body>`, NOT LEFT TO `:active`** (point (2)): `:active`
-		// is a CSS state Chromium drops the moment the pointer leaves the pressed element, mouse
-		// button or not -- which is exactly "I lose the grab cursor... when I leave the column".
-		// JS owns this state instead, on and off, because CSS cannot hold it once the pointer has
-		// moved on.
-		if (document.body) { document.body.classList.add('lpn-pane-col-dragging'); }
-		ghost = document.createElement('div');
-		ghost.className = 'lpn-pane-col-ghost';
-		ghost.textContent = group.map(function (k) {
-			var c = paneColByKey(spec, k);
-			return c ? paneHeadingText(c) : k;
-		}).join(', ');
-		document.body.appendChild(ghost);
-		marker = document.createElement('div');
-		marker.className = 'lpn-pane-col-marker';
-		marker.style.display = 'none';
-		document.body.appendChild(marker);
-		// The heading whose CENTRE is nearest the pointer's x, excluding the whole dragged group --
-		// a lookup over a dozen or so cached rects, not a DOM walk and not a fresh measurement.
-		function nearestKey(x) {
-			var bestKey = null, bestDist = Infinity;
-			Object.keys(rects).forEach(function (k) {
-				var r, dist;
-				if (group.indexOf(k) !== -1) { return; }
-				r = rects[k];
-				dist = Math.abs(x - (r.left + r.width / 2));
-				if (dist < bestDist) { bestDist = dist; bestKey = k; }
-			});
-			return bestKey;
+		if (!rects[key]) { return; }
+		function begin() {
+			var table = spec.colGroup && spec.colGroup.parentNode, tr = null, clip, bottom, left;
+			if (active) { return; }
+			active = true;
+			if (timer !== null) { clearTimeout(timer); timer = null; }
+			try { tr = table && table.getBoundingClientRect ? table.getBoundingClientRect() : null; } catch (e) { tr = null; }
+			clip = paneColClipRect(table);
+			top = rects[key].top;
+			bottom = tr ? tr.bottom : rects[key].bottom;
+			if (clip && clip.bottom < bottom) { bottom = clip.bottom; }
+			height = Math.max(rects[key].height, bottom - top);
+			left = rects[group[0]] ? rects[group[0]].left : rects[key].left;
+			group.forEach(function (k) { ghostW += rects[k] ? rects[k].width : 0; });
+			grab = Math.min(Math.max(startX - left, 0), ghostW);
+			// **THE CURSOR FOR THE WHOLE DRAG IS ON `<body>`**, because `:active` is dropped the
+			// moment the pointer leaves the pressed heading (fourth pass, point (2)); the same class
+			// hides every heading's ⋮ and arrow for the life of the drag (fifth pass, (1)).
+			if (document.body) { document.body.classList.add('lpn-pane-col-dragging'); }
+			ghost = document.createElement('div');
+			ghost.className = 'lpn-pane-col-ghost';
+			ghost.style.top = top + 'px';
+			ghost.style.height = height + 'px';
+			ghost.style.width = ghostW + 'px';
+			document.body.appendChild(ghost);
+			marker = document.createElement('div');
+			marker.className = 'lpn-pane-col-marker';
+			marker.style.display = 'none';
+			marker.style.top = top + 'px';
+			marker.style.height = height + 'px';
+			document.body.appendChild(marker);
+			track(lastX);
+		}
+		function track(x) {
+			var gl = x - grab;
+			ghost.style.left = gl + 'px';
+			plan = paneColDropPlan(order, group, rects, gl + ghostW / 2);
+			if (!plan) { marker.style.display = 'none'; return; }
+			marker.style.display = 'block';
+			marker.style.left = (plan.x - 2) + 'px';
 		}
 		function move(e2) {
-			var x = e2 && typeof e2.clientX === 'number' ? e2.clientX : 0,
-				y = e2 && typeof e2.clientY === 'number' ? e2.clientY : 0, k, r;
-			ghost.style.left = (x + 14) + 'px';
-			ghost.style.top = (y + 14) + 'px';
-			k = nearestKey(x);
-			over = k;
-			if (k === lastOverKey) { return; }
-			lastOverKey = k;
-			if (!k) { marker.style.display = 'none'; return; }
-			r = rects[k];
-			marker.style.display = 'block';
-			marker.style.top = r.top + 'px';
-			marker.style.height = r.height + 'px';
-			// Which SIDE of the target heading the marker sits on -- whichever edge the pointer is
-			// nearer, so the marker always reads as "the column lands here", not "on this heading".
-			marker.style.left = (x < r.left + r.width / 2 ? r.left - 1 : r.right - 1) + 'px';
+			var x = (e2 && typeof e2.clientX === 'number') ? e2.clientX : lastX;
+			lastX = x;
+			if (!active) {
+				if (Math.abs(x - startX) < rects[key].width / 2) { return; }
+				begin();
+				return;
+			}
+			track(x);
 		}
 		function up() {
 			document.removeEventListener('mousemove', move);
 			document.removeEventListener('mouseup', up);
+			if (timer !== null) { clearTimeout(timer); timer = null; }
+			if (!active) { return; }   // never became a drag: the click that follows selects
 			if (document.body) { document.body.classList.remove('lpn-pane-col-dragging'); }
-			if (ghost.parentNode) { ghost.parentNode.removeChild(ghost); }
-			if (marker.parentNode) { marker.parentNode.removeChild(marker); }
-			if (over === null) { return; }
-			if ((group.length > 1) ? paneMoveCols(spec, group, over) : paneMoveCol(spec, key, paneColIndex(spec, over))) {
-				renderPaneTable(spec);
-			}
+			if (ghost && ghost.parentNode) { ghost.parentNode.removeChild(ghost); }
+			if (marker && marker.parentNode) { marker.parentNode.removeChild(marker); }
+			// The release that ends a drag is not a click on the heading it ended over. The browser
+			// dispatches that click in the same task as this mouseup, before any timer, so the flag
+			// is consumed by it if there is one and cleared here if there is not -- never left
+			// standing to swallow the next real click.
+			spec.headDragged = true;
+			setTimeout(function () { spec.headDragged = false; }, 0);
+			if (plan && paneSetVisibleColOrder(spec, plan.order)) { renderPaneTable(spec); }
 		}
+		timer = setTimeout(function () { timer = null; begin(); }, PANE_COL_DRAG_HOLD_MS);
 		document.addEventListener('mousemove', move);
 		document.addEventListener('mouseup', up);
-		return { move: move, up: up };
-	}
-	// **THE GROUP VERSION OF `paneMoveCol()`**, for dragging a whole multi-column selection at once.
-	// Generalises it exactly: pull every moving key out of the order (keeping their relative order
-	// among themselves), then splice the whole block back in at the DESTINATION's index in the
-	// ORIGINAL (pre-removal) order -- which is what `paneMoveCol()` itself does for a single key, so
-	// a one-key call here lands identically. Landing beside the destination on whichever side the
-	// pointer approached from falls out of the same arithmetic `paneMoveCol()` already relies on:
-	// removing a key BEFORE the destination shifts every later index down by one, so re-inserting at
-	// the destination's ORIGINAL index lands the moved block AFTER it; removing one AFTER the
-	// destination leaves earlier indices alone, so it lands BEFORE.
-	function paneMoveCols(spec, keys, destKey) {
-		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
-			moveSet = {}, moving = [], kept, toIndex, pref;
-		keys.forEach(function (k) { moveSet[k] = true; });
-		if (moveSet[destKey]) { return false; }
-		toIndex = order.indexOf(destKey);
-		if (toIndex < 0) { return false; }
-		order.forEach(function (k) { if (moveSet[k]) { moving.push(k); } });
-		if (!moving.length) { return false; }
-		kept = order.filter(function (k) { return !moveSet[k]; });
-		kept.splice.apply(kept, [toIndex, 0].concat(moving));
-		pref = paneColPrefFor(spec.id);
-		pref.order = kept;
-		savePaneColPrefs();
-		paneTableReset(spec);
-		return true;
+		return { move: move, up: up, begin: begin, plan: function () { return plan; } };
 	}
 	function paneApplyColWidth(input, c, spec) {
 		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
@@ -22692,8 +22705,9 @@ var EngCalcs = EngCalcs || {};
 				if (ev.stopPropagation) { ev.stopPropagation(); }
 				paneHeadMenuTrigger(spec, c.key, ev.clientX || 0, ev.clientY || 0);
 			});
-			// **A "..." AT THE TRAILING EDGE OF EVERY HEADING, HIDDEN UNTIL HOVER (OR FOCUS, OR
-			// TOUCH)** (Tom, 2026-09-26, third pass, reversing the second pass's "always visible":
+			// **A "..." AT THE TRAILING EDGE OF EVERY HEADING, HIDDEN UNTIL THE POINTER IS OVER ITS
+			// OWN CORNER (OR KEYBOARD FOCUS, OR TOUCH)** -- the corner, not the whole heading, since
+			// the fifth pass ("too eager to show"). (Tom, 2026-09-26, third pass, reversing the second pass's "always visible":
 			// *"Possibly the arrow and the menu can take up zero space and appear with 100% opacity
 			// over any heading text on hover. Try that."*). `position: absolute` already gave it zero
 			// width; the change here is CSS-only (`opacity: 0` at rest, `1` under `:hover`/
