@@ -46,6 +46,11 @@ const L = loadLoopedNetwork(
 	"\t\taddNode: addNode, addLink: addLink, addText: addText,\n" +
 	"\t\tsetProp: setProp, effective: effective, buildDom: buildDom,\n" +
 	"\t\tdeleteElement: deleteElement, baseValue: baseValue, hasOverride: hasOverride,\n" +
+	// **A NODE'S POSITION AND THE PIPES IT DRAGS WITH IT** (Task 708, gap #7), and a Text's own
+	// words (gap #8): read straight off the real functions Properties and the Tables column use,
+	// not a second copy of the arithmetic.
+	"\t\taxisNames: axisNames, nodeCoordAxis: nodeCoordAxis, nodeById: nodeById, linkById: linkById,\n" +
+	"\t\tgeomLength: function (id) { return linkGeomLength(linkById(id)); },\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tundo: undo, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tclearUndo: clearUndo,\n" +
@@ -271,8 +276,9 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	ok('a junction scope offers the node inputs',
 		// `fireFlow` joined them with Task 530 -- a junction's own required fire flow is an INPUT
 		// this tool can set in bulk, which is the whole point of giving a district one number.
-		// `emitter` joined them with Task 708 (gap #3).
-		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow', 'emitter', 'desc', 'tag']),
+		// `emitter` joined them with Task 708 (gap #3); `axis1`/`axis2` joined them with gap #7,
+		// last because nodeCoordReplaceSpecs() is concatenated after everything else.
+		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow', 'emitter', 'desc', 'tag', 'axis1', 'axis2']),
 		JSON.stringify(L.specFields('junction')));
 	// **RESULTS ARE SEARCHABLE AND NOT WRITABLE.** Pressure is printed on the map, so it is a
 	// perfectly good thing to search on; nothing writes it, so it must never appear here.
@@ -365,6 +371,67 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 		ok('under ' + set + ' the typed 8 is stored as 8',
 			dia(n.links[0]) === 8 && dia(n.links[3]) === 12, String(dia(n.links[0])));
 	});
+}
+
+// ---- 8. A NODE'S POSITION (Task 708, ranked gap #7) ---------------------------------------------
+//
+// Tom, 2026-09-19, of the parallel Customer gap: *"Should coordinates be in Find? I say yes. This
+// is a freedom we need to give power users."* The key is `axis1`/`axis2` -- the SLOT, not the
+// document axis -- exactly as paneColCoord() already gives the Tables column, and the write goes
+// through setNodeCoordAxis(), the popup's own seam, not a second reimplementation of it. What that
+// buys, and what is asserted here, is that a Replace moves a node exactly the way Properties does:
+// the incident pipes' geometry follows, and one undo puts it all back.
+{
+	console.log('\n--- Find and Replace a node\'s position ---');
+	const n = build();   // r(0,0) - a(100,0) - b(200,0) - c(300,0) - d(400,0), and a-c direct
+	ok('a range on the first axis finds the far junctions',
+		JSON.stringify(L.query('junction', 'axis1', 'gt', '150').sort()) ===
+			JSON.stringify(['node:' + n.nodes[1], 'node:' + n.nodes[2], 'node:' + n.nodes[3]].sort()),
+		JSON.stringify(L.query('junction', 'axis1', 'gt', '150')));
+	ok('...and none of them on the second axis, which nobody has moved off zero',
+		L.query('junction', 'axis2', 'equals', '0').length === 4);
+
+	const lenAB0 = L.geomLength(n.links[1]);   // a-b
+	const lenBC0 = L.geomLength(n.links[2]);   // b-c
+	const lenCD0 = L.geomLength(n.links[3]);   // c-d, does not touch b
+	ok('the pipe either side of b starts at its drawn length', lenAB0 === 100 && lenBC0 === 100);
+
+	L.query('junction', 'axis1', 'equals', '200');   // b
+	L.setReplace('axis1', '250');
+	L.preview();
+	ok('one junction is pending', L.pending() && L.pending().length === 1, JSON.stringify(L.pending()));
+	const applied = L.apply();
+	ok('the write reports one node changed', applied === 1, String(applied));
+	ok('the node is where it was told to go', L.nodeCoordAxis(L.nodeById(n.nodes[1]), 1) === 250,
+		String(L.nodeCoordAxis(L.nodeById(n.nodes[1]), 1)));
+	// **THE PIPES ON EITHER SIDE MOVE WITH IT** -- a pipe holds no vertex of its own at an endpoint,
+	// so this is the assertion that setNodeCoordAxis()'s own updateNode() call was really reached,
+	// not a write that moved the dot and left the network's geometry behind.
+	ok('...and both incident pipes change length with it',
+		L.geomLength(n.links[1]) === 150 && L.geomLength(n.links[2]) === 50,
+		L.geomLength(n.links[1]) + ' / ' + L.geomLength(n.links[2]));
+	ok('...while the pipe that does not touch it is unchanged', L.geomLength(n.links[3]) === lenCD0);
+
+	L.undo();
+	ok('one undo puts the node back', L.nodeCoordAxis(L.nodeById(n.nodes[1]), 1) === 200,
+		String(L.nodeCoordAxis(L.nodeById(n.nodes[1]), 1)));
+	ok('...and both pipes with it', L.geomLength(n.links[1]) === lenAB0 && L.geomLength(n.links[2]) === lenBC0);
+
+	// **THE SCENARIO SEAM, ASKED OF A POSITION** -- the same pair replace-harness section 4 asks of
+	// a diameter, because setNodeCoordAxis() is a second door onto the same write and a defect in
+	// either door reads exactly like a working feature on screen.
+	console.log('\n--- ...and inside a scenario, it is an override ---');
+	const n2 = build();
+	const scn = L.createScenario('Relocated');
+	L.switchScenario(scn.id !== undefined ? scn.id : scn);
+	L.query('junction', 'axis1', 'equals', '200');
+	L.setReplace('axis1', '260');
+	L.preview();
+	L.apply();
+	const b2 = L.nodeById(n2.nodes[1]);
+	ok('the scenario sees the new position', L.effective(b2, 'x') === 260, String(L.effective(b2, 'x')));
+	ok('...BASE DOES NOT MOVE', L.baseValue(b2, 'x') === 200, String(L.baseValue(b2, 'x')));
+	ok('...and it is recorded as an override', L.hasOverride(b2, 'x') === true);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

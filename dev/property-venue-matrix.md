@@ -33,7 +33,7 @@ by design.
 | Property | Popup / Table / Multi | Find | Replace | Symbology | Labels | `.inp` |
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a *(identity, not a value to overwrite)* | n/a *(not a quantity)* | ✓ | `[JUNCTIONS]`/`[TAGS]` |
-| Coordinates (x, y) | ✓ | — | — | n/a | n/a *(the coordinate IS the position)* | `[COORDINATES]` |
+| Coordinates (x, y) | ✓ | ✓ *(Task 708, gap #7, closed; `axis1`/`axis2`, findPropDefs()'s own slot identity)* | ✓ *(Task 708, gap #7, closed; writes through setNodeCoordAxis(), the popup's and the Tables column's own seam)* | n/a | n/a *(the coordinate IS the position)* | `[COORDINATES]` |
 | Active / included | ✓ | — | — | n/a *(boolean, not a colour ramp)* | n/a | n/a *(a scenario concept; Base is always active)* |
 | Elevation | ✓ | ✓ | ✓ | ✓ | ✓ | `[JUNCTIONS]` |
 | Base demand | ✓ | ✓ | ✓ | ✓ | ✓ | `[JUNCTIONS]`/`[DEMANDS]` |
@@ -52,7 +52,7 @@ by design.
 | Property | Popup / Table / Multi | Find | Replace | Symbology | Labels | `.inp` |
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[RESERVOIRS]`/`[TAGS]` |
-| Coordinates | ✓ | — | — | n/a | n/a | `[COORDINATES]` |
+| Coordinates | ✓ | ✓ *(Task 708, gap #7, closed; shares the junction band, gated to the node group not the type)* | ✓ *(Task 708, gap #7, closed)* | n/a | n/a | `[COORDINATES]` |
 | Active / included | ✓ | — | — | n/a | n/a | n/a |
 | Elevation | ✓ | ✓ *(shared node band)* | ✓ | ✓ | ✓ | `[RESERVOIRS]` (ground reference only; head is the stored number) |
 | Head | ✓ | n/a *(no reservoir-specific Find row)* | — | ✓ *(via `head`)* | ✓ | `[RESERVOIRS]` |
@@ -67,7 +67,7 @@ by design.
 | Property | Popup / Table / Multi | Find | Replace | Symbology | Labels | `.inp` |
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[TANKS]`/`[TAGS]` |
-| Coordinates | ✓ | — | — | n/a | n/a | `[COORDINATES]` |
+| Coordinates | ✓ | ✓ *(Task 708, gap #7, closed; shares the junction band, gated to the node group not the type)* | ✓ *(Task 708, gap #7, closed)* | n/a | n/a | `[COORDINATES]` |
 | Active / included | ✓ | — | — | n/a | n/a | n/a |
 | Elevation | ✓ | ✓ *(shared node band)* | ✓ | ✓ | ✓ | `[TANKS]` |
 | Level (current) | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, overridable, `prop: 'level'`)* | — | ✓ *(Task 696, 2026-09-25)* | `[TANKS]` (`InitLvl`) |
@@ -223,11 +223,19 @@ pressing the button would have pushed `undefined` onto every pipe. Fixed at the 
 `pushFieldShown()` itself, which the scenario push still uses unguarded and correctly (it discards
 overrides rather than reading `settings.defaults`).
 
-**7. Coordinates (x, y) are not offered in Find, while a Customer's Station and Offset -- also
-positions -- were added to Find on Tom's own request (2026-09-19: *"Bad decision. Put them in."*).**
-The asymmetry may be a real distinction (an absolute map coordinate is a different kind of question
-than a relative position along a pipe) or may be the same gap under a different name. Ranked lower
-because nobody has reported hitting it.
+**7. CLOSED.** A junction's, reservoir's or tank's coordinates are now findable and replaceable
+(Tom, 2026-09-19: *"Should coordinates be in Find? I say yes. This is a freedom we need to give
+power users."*). The internal key is `axis1`/`axis2` -- findPropDefs()'s own slot identity, the
+same one paneColCoord() gives the Tables column -- so the property keeps naming itself after a
+document is reprojected, rather than `x`/`y`, which names the document's frame. The label is
+axisNames()'s own pair, so the pull-down calls an axis whatever the popup's coordinate rows and the
+Tables column already call it: Latitude/Longitude, Northing/Easting or X/Y, never a bare
+"coordinates". The write goes through `setNodeCoordAxis()`, the exact function the popup's typed
+boxes and the Tables column already call -- not a second implementation of it -- so a Replace
+refuses an off-world value the same way a typed edit does, and moves every incident pipe's endpoint
+with the node through the same `updateNode()` call, because a pipe holds no vertex of its own at an
+endpoint. A Customer's own position stays answered by Station and Offset (closed above, gap
+unnumbered): it has no separate x/y of its own to add here.
 
 **8. A Text's words have no Replace row**, though every other identity-like property (description,
 tag) does. Ranked low: a Text's words are closer to a description than to a design variable, and

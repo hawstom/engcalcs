@@ -94,6 +94,36 @@ const EC_VENUE_REQUIRED = [
 const EC_VENUE_REQUIRED_FIND_KEY = ['link' => 'status'];
 
 /**
+ * **GAP #7, CLOSED 2026-09-26, HELD BY A DIRECT REGEX RATCHET RATHER THAN THE $find[] MACHINERY
+ * ABOVE.** A node's coordinates are outside what this script's structured walk can see: they are
+ * offered by findPropDefs() as `axis1`/`axis2`, pushed by a bare `out.push([...])` gated on
+ * `d.group === 'node'` -- not inside BAND_NODE/RESULT_NODE, the only two arrays
+ * ecFindKeysByGroup() reads for the node group. Their Tables-pane column is `'axis' + slot`
+ * (paneColCoord()), a computed key ecKeyIdentity() cannot resolve to a literal either, so the
+ * table/Find walk above never counts it as editable in the first place and could not hold this
+ * even if the Find side were readable.
+ *
+ * So it is asserted directly against the functions that state it, by the same literal-presence
+ * method the BAND_NODE/BAND_LINK ternary assertions above already use: not a claim that these
+ * functions have any particular SHAPE, only that the one line naming the key is still there.
+ */
+function ecVenueRegexRequired(array $fns): array
+{
+    $problems = [];
+    $checks = [
+        ['findPropDefs', "/out\\.push\\(\\['axis1'/", 'axis1 (a node\'s first coordinate) is no longer offered by findPropDefs()'],
+        ['findPropDefs', "/out\\.push\\(\\['axis2'/", 'axis2 (a node\'s second coordinate) is no longer offered by findPropDefs()'],
+        ['nodeCoordReplaceSpecs', "/key:\\s*'axis1'/", "axis1 is no longer writable in nodeCoordReplaceSpecs()"],
+        ['nodeCoordReplaceSpecs', "/key:\\s*'axis2'/", "axis2 is no longer writable in nodeCoordReplaceSpecs()"],
+    ];
+    foreach ($checks as [$fn, $re, $why]) {
+        if (!isset($fns[$fn])) { $problems[] = "$fn() is gone -- $why"; continue; }
+        if (!preg_match($re, $fns[$fn]['body'])) { $problems[] = $why; }
+    }
+    return $problems;
+}
+
+/**
  * Table/Find pairs that are NOT findings, keyed `<type>/<label identity>`, with the reason each.
  * A declaration matching nothing FAILS -- see the docblock.
  */
@@ -366,6 +396,7 @@ foreach (EC_VENUE_REQUIRED_FIND_KEY as $group => $key) {
             . "is exempted on the strength of";
     }
 }
+foreach (ecVenueRegexRequired($fns) as $p) { $regressed[] = $p; }
 if ($regressed) {
     echo "table/Find parity (ROADMAP Task 708): a closed gap has reopened -- NOT advisory\n\n";
     foreach ($regressed as $r) { echo "  $r\n"; }
