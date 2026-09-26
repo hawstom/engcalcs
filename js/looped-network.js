@@ -10920,6 +10920,24 @@ var EngCalcs = EngCalcs || {};
 			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
 				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
 		}
+		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
+		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
+		// threshold no data label is drawn, so a scale chosen to make room for dragged-out lettering
+		// fitted the network into a frame sized for labels that were not there. Measured on the
+		// geographic Net3 in a 1900 px window: two labels pulled 150 px out took the fit from 8,587
+		// to 5,856, with nothing but the network drawn. `sPast` hides the labels and `sShown` does
+		// not; the answer is the largest scale on the hidden side that still holds the network.
+		// Both steps that choose a scale for the labels' sake come through here.
+		// dev/lpn-spike/label-drag-fit-harness.js.
+		function hiddenSideFit(sPast, sShown) {
+			var lo = sPast, hi = sShown, mid, j;
+			for (j = 0; j < LPN_FIT_BISECTIONS; j++) {
+				mid = (lo + hi) / 2;
+				if (labelsPastThreshold(mid)) { lo = mid; } else { hi = mid; }
+			}
+			items = modelItems;
+			return Math.min(lo, solve());
+		}
 		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
 		// Zoom to fit exists for (R-184): whatever else it does, it never shows empty paper.
 		function modelInside(v, p) {
@@ -10960,6 +10978,12 @@ var EngCalcs = EngCalcs || {};
 		var modelFit = s;
 		items = fitItems(s);
 		s = solve();
+		if (labelsPastThreshold(s)) {
+			var labelled = items, bare;
+			items = modelItems;
+			bare = solve();
+			if (!labelsPastThreshold(bare)) { s = hiddenSideFit(s, bare); } else { items = labelled; }
+		}
 		// **A LABEL WIDER THAN THE WINDOW MUST NOT DECIDE THE ZOOM** (Tom, 2026-09-16, on his EWB
 		// demo file: *"Zoom to fit ... does not show the entire network. It's close, but it's not
 		// what we aim for."*). `fitScaleFor()` answers `minScale()` when nothing fits even at the
@@ -11034,6 +11058,11 @@ var EngCalcs = EngCalcs || {};
 				s2 = Math.min(state.s, solve());
 				if (!(s2 > minScale())) { return; }
 				p2 = place(s2, all);
+				// A step down that would hide the labels is not made for their sake: hiddenSideFit().
+				if (!labelsPastThreshold(state.s) && labelsPastThreshold(s2)) {
+					s2 = hiddenSideFit(s2, state.s);
+					p2 = place(s2, modelItems);
+				}
 				if (!modelInside(s2, p2)) { return; }
 				apply(s2, p2);
 			}
@@ -12722,12 +12751,19 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {},
 			inBtn = document.getElementById('lpn_zoom_in'),
 			outBtn = document.getElementById('lpn_zoom_out');
+		// **THE TIP IS THE WHOLE TIP, NOT "Name -- tip".** Tom, 2026-09-25: *"The + and - button tips
+		// both have their action repeated. Use this form: 'Zoom in. Shortcut: +'."* The tip already
+		// says the action, so setIconLabel()'s joined title would say it twice; the name stays as
+		// the accessible name alone.
+		function tipOnly(btn, tip) { if (tip) { EngCalcs.setTipText(btn, tip); } }
 		if (inBtn) {
 			EngCalcs.setIconLabel(inBtn, 'zoom-in', pc.lpn_zoom_in || 'Zoom in', pc.lpn_zoom_in_tip);
+			tipOnly(inBtn, pc.lpn_zoom_in_tip);
 			inBtn.addEventListener('click', function () { keyZoom(1.1); });
 		}
 		if (outBtn) {
 			EngCalcs.setIconLabel(outBtn, 'zoom-out', pc.lpn_zoom_out || 'Zoom out', pc.lpn_zoom_out_tip);
+			tipOnly(outBtn, pc.lpn_zoom_out_tip);
 			outBtn.addEventListener('click', function () { keyZoom(1 / 1.1); });
 		}
 	}

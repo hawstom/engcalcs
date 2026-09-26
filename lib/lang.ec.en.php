@@ -1240,9 +1240,9 @@ $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map.';
 $ec_lang['lpn_tool_zoom_window_tip']='Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
-$ec_lang['lpn_zoom_in_tip']='Zoom in one step. Shortcut: +';
+$ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
 // Tom's wording, 2026-09-25.
-$ec_lang['lpn_zoom_out_tip']='Zoom out one step. Shortcut: -';
+$ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
