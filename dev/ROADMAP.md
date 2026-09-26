@@ -1776,8 +1776,10 @@ the block.
   - **AUDIT SHIPPED 2026-09-23:** `dev/property-venue-matrix.md` (8 element types x 8 venues) and
     `property_venue_check.php` (advisory, 42 table columns with no Find row). Top gaps a user would
     hit: Active/Closed not findable on any link; emitter coefficient; a tank's levels, diameter and
-    mixing; pump speed and energy price; pipe length findable but not replaceable. Filling them is
-    the next step, a branch of its own; Text's allZoom is in flight on `feat/zoom-scale-rules`.
+    mixing; pump speed and energy price; pipe length findable but not replaceable.
+  - **ALL SIX FILLED AND MERGED**, Text's allZoom included; `property_venue_check.php` now FAILS if
+    any reopens. **Left for Tom:** matrix gaps 7 (coordinates are not in Find, while a Customer's
+    Station and Offset are) and 8 (no Replace row for a Text's words). Close on his word.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
