@@ -1740,6 +1740,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
@@ -1808,6 +1810,22 @@ EngCalcs.pageConfig = {
 	lpn_multi_applied: <?=json_encode($ec_lang['lpn_multi_applied'])?>,
 	lpn_multi_no_fields: <?=json_encode($ec_lang['lpn_multi_no_fields'])?>,
 	lpn_pane_pasted: <?=json_encode($ec_lang['lpn_pane_pasted'])?>,
+	lpn_pane_filled: <?=json_encode($ec_lang['lpn_pane_filled'])?>,
+	lpn_pane_filldown: <?=json_encode($ec_lang['lpn_pane_filldown'])?>,
+	lpn_pane_fill_none: <?=json_encode($ec_lang['lpn_pane_fill_none'])?>,
+	lpn_pane_hide_col: <?=json_encode($ec_lang['lpn_pane_hide_col'])?>,
+	lpn_pane_hide_cols: <?=json_encode($ec_lang['lpn_pane_hide_cols'])?>,
+	lpn_pane_show_all_cols: <?=json_encode($ec_lang['lpn_pane_show_all_cols'])?>,
+	lpn_pane_sort_asc: <?=json_encode($ec_lang['lpn_pane_sort_asc'])?>,
+	lpn_pane_manage_cols: <?=json_encode($ec_lang['lpn_pane_manage_cols'])?>,
+	lpn_pane_manage_cols_title: <?=json_encode($ec_lang['lpn_pane_manage_cols_title'])?>,
+	lpn_pane_manage_cols_show: <?=json_encode($ec_lang['lpn_pane_manage_cols_show'])?>,
+	lpn_pane_manage_cols_up: <?=json_encode($ec_lang['lpn_pane_manage_cols_up'])?>,
+	lpn_pane_manage_cols_down: <?=json_encode($ec_lang['lpn_pane_manage_cols_down'])?>,
+	lpn_pane_manage_cols_top: <?=json_encode($ec_lang['lpn_pane_manage_cols_top'])?>,
+	lpn_pane_manage_cols_bottom: <?=json_encode($ec_lang['lpn_pane_manage_cols_bottom'])?>,
+	lpn_pane_colmenu_tip: <?=json_encode($ec_lang['lpn_pane_colmenu_tip'])?>,
+	lpn_pane_sortarrow_tip: <?=json_encode($ec_lang['lpn_pane_sortarrow_tip'])?>,
 	lpn_tool_area_window: <?=json_encode($ec_lang['lpn_tool_area_window'])?>,
 	lpn_tool_area_lasso: <?=json_encode($ec_lang['lpn_tool_area_lasso'])?>,
 	lpn_tool_area_polygon: <?=json_encode($ec_lang['lpn_tool_area_polygon'])?>,
@@ -1857,7 +1875,6 @@ EngCalcs.pageConfig = {
 	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
-	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,
 	lpn_crs_unplaceable_mark: <?=json_encode($ec_lang['lpn_crs_unplaceable_mark'])?>,
 	lpn_crs_unplaceable: <?=json_encode($ec_lang['lpn_crs_unplaceable'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
@@ -2011,7 +2028,6 @@ EngCalcs.pageConfig = {
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
-	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
 	// Borrowed, not owned here: the row-table point grid's own Copy/Paste labels, reused verbatim
 	// by the pane table's right-click menu (Task 690) rather than re-keyed under lpn_.
@@ -2644,13 +2660,10 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_ylgnbu: <?=json_encode($ec_lang['lpn_color_ramp_ylgnbu'])?>,
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
-	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
 	lpn_georef_answered: <?=json_encode($ec_lang['lpn_georef_answered'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
-	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
-	lpn_georef_projected: <?=json_encode($ec_lang['lpn_georef_projected'])?>,
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
 	lpn_georef_tab_locked: <?=json_encode($ec_lang['lpn_georef_tab_locked'])?>,

@@ -11360,6 +11360,18 @@ var EngCalcs = EngCalcs || {};
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
 		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
 		var modelFit = s;
+		// **WHILE A MODEL IS BEING PLACED, THE FIT IS THE MODEL'S ALONE.** The labels are off for the
+		// duration (georefSuspend(); Tom, 2026-08-18: *"hide labels temporarily during conversion"*),
+		// so the lettering steps 2 and 3 would measure is left over from an earlier frame -- on the
+		// answered steps of File, Convert as, from the whole-world opening -- and the settle stepped
+		// the zoom down to meet it until Elm Street Center was a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5).
+		if (georefActive()) {
+			apply(modelFit, place(modelFit, modelItems));
+			lastFit = null;
+			if (auto) { rebaseSignatureIfClean(); }
+			return;
+		}
 		items = fitItems(s);
 		s = solve();
 		if (labelsPastThreshold(s)) {
@@ -13745,10 +13757,30 @@ var EngCalcs = EngCalcs || {};
 	// The one write seam for "the placement changed". buildDom() rather than
 	// refreshAllFromDocument(): the elements have moved, and nothing about the project, the units,
 	// the view or the solve has. A full refresh here would re-fit the view on every frame of a drag.
+	// **KEEP THE DRAWN NUMBERS INSIDE CHROME'S LAYOUT RANGE WHILE PLACING** (Task 696, found by
+	// dev/lpn-spike/convert-as-browser-harness.js). georefStart() zeroes the origin, because degrees
+	// start from zero, and georefFinish() re-origins only at the end -- so a model placed at street
+	// zoom anywhere far from 0 N 0 E was drawn at `translate(6.5e7, ...)`, past Chrome's ~3.3e7 px
+	// layout range, and every pipe collapsed into one clamped point (Elm Street Center at Novato:
+	// a 13 px dot). followViewWhileEmpty() already guards the empty document against exactly this;
+	// this is the same rule for a model in mid-placement, through the same rebaseLiveGeoDoc(), which
+	// compensates the view itself. The step 1 freeze is a view too, so it moves by the same amount
+	// and the held model does not jump. Never mid-gesture: a pan holds a translation from before.
+	function georefKeepDrawable() {
+		if (!georef || drag || !isLatLonProject()) { return; }
+		var f = georef.frozen, big = Math.max(Math.abs(state.tx), Math.abs(state.ty),
+			f ? Math.abs(f.tx) : 0, f ? Math.abs(f.ty) : 0);
+		if (big < LPN_GEO_FOLLOW_PX) { return; }
+		var shift = rebaseLiveGeoDoc();
+		if (!shift) { return; }
+		if (f) { f.tx -= f.s * shift.dx; f.ty -= f.s * shift.dy; }
+		georefApplyCompensation();
+	}
 	function georefSetTransform(t) {
 		georef.t = t;
 		georef.rotDeg = t.rotDeg;
 		perfDebugTime('write', function () { georefWrite(t); });
+		georefKeepDrawable();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		// Anything sized in screen pixels was left at the scale of the LAST redraw while the model
 		// was being held still (onZoomChanged does no work at all while detached), so the settle
@@ -13805,8 +13837,11 @@ var EngCalcs = EngCalcs || {};
 			// The scale is shown as WHAT ONE DRAWING UNIT IS ON THE GROUND, in the project's own
 			// length unit -- the sentence a person can check against the drawing they made, unlike
 			// "metres per unit" which is our internal term.
+			// `unitK` is 1 except on the answered steps, where the drawing was re-expressed in
+			// degree-sized units and this says what one of the FILE's own units is on the ground
+			// (georefArmAsDegrees()), so R-219's "type 1" still means the file's numbers unchanged.
 			georefBarEl('lpn_georef_scale_in').value =
-				toDisplay(georef.t.metersPerUnit, 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
+				toDisplay(georef.t.metersPerUnit * (georef.unitK || 1), 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
 			georefBarEl('lpn_georef_rot_in').value = (Math.round(georef.t.rotDeg * 100) / 100);
 		}
 		georefBarEl('lpn_georef_unit').textContent = unitLabel('lpn_u_length');
@@ -13819,7 +13854,7 @@ var EngCalcs = EngCalcs || {};
 		// model where the user has already put it.
 		scale.addEventListener('change', function () {
 			if (!georef || !georef.t) { return; }
-			var m = toSI(+scale.value, 'lpn_u_length');
+			var m = toSI(+scale.value, 'lpn_u_length') / (georef.unitK || 1);
 			if (!(m > 0)) { georefRefreshBar(); return; }
 			var c = georefSrcCentre(), ll = EngCalcs.lpnGeorefToLonLat(georef.t, c.x, c.y);
 			georefSetTransform(EngCalcs.lpnGeorefWithScale(georef.t, m / georef.t.metersPerUnit, ll));
@@ -13973,7 +14008,9 @@ var EngCalcs = EngCalcs || {};
 			var p = projectLocatable()
 				? EngCalcs.lpnCrsForward(projectCrsCode(), { lon: ll.lon, lat: ll.lat }) : null;
 			if (!p) {
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// One of the few systems this page lists without a transform: Tom's own sentence,
+				// naming it (the retired "which this page does not have yet" sentence said otherwise).
+				setNotice(String((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || '{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.').replace('{crs}', crsLabel(projectCrsCode()) || String(projectCrsCode() || '')));
 				return;
 			}
 			applyView({
@@ -14581,14 +14618,14 @@ var EngCalcs = EngCalcs || {};
 		// somebody may convert to another. It says where the network already is, so the wizard opens
 		// with that answer in place rather than asking the question again from the whole world.
 		var fromGeo = isLatLonProject();
-		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
-		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
-		// project that states its own coordinate system. The xy grid it was built for states none.
-		if (isProjectedProject()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// **A DECLARED COORDINATE SYSTEM IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites
+		// every coordinate in the document, which is exactly what ruling P2 says no door may do to a
+		// project that states its own coordinate system in place. Its one door, File, Convert as,
+		// lays an EPSG copy out in lat/lon BEFORE calling this (convasProceed()), so the guard is a
+		// net and says nothing: its old "already states a map projection" sentence was deleted (Task 696; Tom:
+		// *"Obsolete. A project that is already georeferenced is easier (more precise) to convert,
+		// not harder."*).
+		if (isProjectedProject()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -14734,6 +14771,24 @@ var EngCalcs = EngCalcs || {};
 		// or the user's first drag would move them by exactly the ratio this corrects (Task 674).
 		(georef.ovs || []).forEach(function (o) {
 			o.src = EngCalcs.lpnGeorefFromLonLat(t, o.src.x, o.src.y);
+			// ...and they go back to the numbers they arrived with, which georefStart() had already
+			// rewritten through its whole-world opening transform.
+			if (o.hasX) { o.ov.x = o.was.x; }
+			if (o.hasY) { o.ov.y = o.was.y; }
+		});
+		// **THE OFFSETS COME BACK TOO** (label offsets, anchored Text, attached customers). The same
+		// opening transform had scaled them to the size of a continent, which left every label that
+		// far from its node until the first settle -- and, with the labels drawn, made the fit below
+		// back off to the minimum zoom: Elm Street Center opened as a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5). doc.origin is zero now, so the
+		// arrival offset is the plain difference of the captured tip and base; then both are
+		// re-expressed in this transform's frame, like `src`, for every settle after this one.
+		(georef.offs || []).forEach(function (o) {
+			var bx = inwardX(o.base.x), by = inwardY(o.base.y), px = inwardX(o.tip.x), py = inwardY(o.tip.y);
+			if (o.keys.x) { o.el[o.keys.x] = px - bx; }
+			if (o.keys.y) { o.el[o.keys.y] = py - by; }
+			o.base = EngCalcs.lpnGeorefFromLonLat(t, o.base.x, o.base.y);
+			o.tip = EngCalcs.lpnGeorefFromLonLat(t, o.tip.x, o.tip.y);
 		});
 		// The backdrop is re-expressed in the same frame for the same reason, and its SCALE with it:
 		// reinterpret's promise is that nothing moves, so the picture has to come out the size it
@@ -14746,12 +14801,24 @@ var EngCalcs = EngCalcs || {};
 			// `mpd` is already at t.origin.lat, which is the latitude georefWriteBackdrop() reads.
 			georef.bd.s = georef.bd.s * mpd.lon / t.metersPerUnit;
 		}
+		// **AND THE PICTURE IS DRAWN THROUGH IT NOW, not at the first settle** (R-172 (1), found by
+		// dev/lpn-spike/convert-as-browser-harness.js section 5). georefStart() had already written it
+		// through its whole-world opening transform, so without this the site plan sat there --
+		// enormous and off the network -- until the first drag's settle wrote it here, which is the
+		// jump on release Tom saw. The round trip through `bd.s` above returns the scale it arrived at.
+		georefWriteBackdrop(t);
 		// ATTACHED from the first frame: the model is already on the ground, which is what step 2
 		// means. Step 1 exists to aim a drawing that is nowhere in particular.
 		georef.step = GEOREF_STEP_ATTACHED;
 		georef.frozen = null;
 		georef.t = t;
 		georef.rotDeg = 0;
+		// **THE GROUND DISTANCE IS SHOWN PER UNIT OF THE FILE THE COPY CAME FROM.** One unit of `t`
+		// is a degree of latitude's worth of metres, so step 2 read "364168 ft per drawing unit" on
+		// Elm Street Center; File, Convert as knows what one of the original's own units was (a
+		// foot, a UTM metre), and the bar shows and takes the ground distance in those.
+		georef.unitK = (convas && convas.copyId === library.openId && convas.srcUnitM > 0)
+			? convas.srcUnitM / t.metersPerUnit : 1;
 		georefSuspend(true);
 		// **AND THE VIEW GOES TO THE MODEL.** Refusing to fit -- on the argument that the view is
 		// still the one fitted to these very coordinates when the project opened -- holds only while
@@ -14759,16 +14826,28 @@ var EngCalcs = EngCalcs || {};
 		// bar, by which time step 1 has carried them out to the whole Earth. Fitting re-baselines
 		// nothing: not one coordinate moves here, the camera merely points at where the numbers say
 		// the network already is.
+		// The origin goes under the model first, since the fit below goes to street zoom on it --
+		// see georefKeepDrawable(). A shift of the frame, not of any coordinate; the view follows.
+		rebaseLiveGeoDoc();
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
+		// **THE COMPENSATION GOES FIRST, AND THE FIT SECOND.** georefStart() drew the model through
+		// its whole-world step 1 compensation, and the fit's last step measures the labels AS DRAWN:
+		// under that stale transform every label reads as sitting far from its node, and the fit
+		// backed off to the minimum zoom, leaving Elm Street Center a 13 px dot on a 500,000 ft
+		// scale (dev/lpn-spike/convert-as-browser-harness.js section 5). Attached, it is identity.
+		georefApplyCompensation();
 		// AUTOMATIC, because the user asked to reinterpret the coordinates and not to change the
 		// view: a bare fit here would set the asterisk for a camera move nobody made.
 		zoomExtent(true);
 		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_asdegrees || 'The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.');
+		// No notice of its own: the one caller, georefOpenAnswered(), says what is true of the
+		// project it is reading, and the "x and y in this file were read as a longitude and a
+		// latitude" sentence this used to say, only for that caller to overwrite it at once, was
+		// deleted with its key.
 	}
 	// Whole-world framing puts a little more land on the screen than the equator does, and the
 	// clamp in applyView() takes care of the rest.
@@ -14827,7 +14906,11 @@ var EngCalcs = EngCalcs || {};
 		// and that is Tom's.
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		var unrotated = georefBackdropRotated(georef.t);
+		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
+		// before the steps began, so the steps see 0 degrees while the picture was left unturned
+		// all the same; convas.bdTurn carries that turn here so the sentence is still said.
+		var unrotated = georefBackdropRotated(georef.t) ||
+			!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
@@ -14863,7 +14946,7 @@ var EngCalcs = EngCalcs || {};
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
-		convasPlaced();
+		convasPlaced(unrotated);
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -15267,17 +15350,14 @@ var EngCalcs = EngCalcs || {};
 	function mapgeoStart() {
 		var pc = EngCalcs.pageConfig || {}, ext;
 		if (mapgeo || georefActive()) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
-		// A project that STATES a coordinate system already says where it is, and a second answer
-		// to that question is the drift ruling P2 exists to stop.
-		if (!xyMapAttachable()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// A project that STATES a coordinate system (lat/lon, EPSG:4326, is one) already says where
+		// it is, and a second answer to that question is the drift ruling P2 exists to stop. **NO
+		// SENTENCE, BECAUSE NO DOOR REACHES THIS** (Task 696): World map, Attach calls this only for
+		// a grid (xyMapAttachable()), and File, Convert as only from "not georeferenced". The two
+		// refusals that stood here ("This project is already on lat/lon." and "...already states a
+		// map projection...") were deleted with their keys; the first is the sentence Tom ruled wrong
+		// on 2026-09-23.
+		if (!xyMapAttachable()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -22013,14 +22093,22 @@ var EngCalcs = EngCalcs || {};
 		savePaneColPrefs();
 		return true;
 	}
-	function paneMoveCol(spec, key, toIndex) {
-		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
-			from = order.indexOf(key), pref;
-		if (from < 0 || toIndex < 0 || toIndex >= order.length || toIndex === from) { return false; }
-		order.splice(from, 1);
-		order.splice(toIndex, 0, key);
+	// **A NEW ORDER FOR THE COLUMNS ON SCREEN, WITH EVERY HIDDEN COLUMN KEPT BESIDE ITS NEIGHBOUR**,
+	// so a column shown again comes back after the column it followed rather than at the end: each
+	// hidden key rides behind the nearest visible column before it (or leads, if there is none).
+	function paneSetVisibleColOrder(spec, visible) {
+		var all = paneColsAll(spec).map(function (c) { return c.key; }), after = {}, lead = [], prev = null,
+			next = [], pref;
+		all.forEach(function (k) {
+			if (paneColHidden(spec.id, k)) {
+				if (prev === null) { lead.push(k); } else { (after[prev] = after[prev] || []).push(k); }
+			} else { prev = k; }
+		});
+		next = lead.slice();
+		visible.forEach(function (k) { next.push(k); next = next.concat(after[k] || []); });
+		if (next.length !== all.length || next.join('\u0001') === all.join('\u0001')) { return false; }
 		pref = paneColPrefFor(spec.id);
-		pref.order = order;
+		pref.order = next;
 		savePaneColPrefs();
 		paneTableReset(spec);   // the heading order is part of the signature, so this forces a rebuild
 		return true;
@@ -22034,9 +22122,141 @@ var EngCalcs = EngCalcs || {};
 			return { c: c, at: (pos[c.key] === undefined) ? (tail + i) : pos[c.key] };
 		}).sort(function (a, b) { return a.at - b.at; }).map(function (x) { return x.c; });
 	}
-	function paneCols(spec) {
+	// **HIDE, THE OTHER HALF OF DECLAN'S DESIGN** (dev/agents/data-entry-clerk/journal.md, "Column
+	// hide and reorder"). Reorder already shipped as the column drag above; this is the remaining
+	// piece. Same key, same object per table id, a sibling of `w` and `order`: `{ hidden: [colKey] }`.
+	// **ID IS NEVER HIDEABLE** -- it is the only door findGoTo() gives a click-to-pan action
+	// through, and hiding it would strand a row with no way to identify which element it is.
+	function paneColHidden(specId, key) {
+		var h = paneColPrefs[specId] && paneColPrefs[specId].hidden;
+		return !!(h && h.indexOf(key) !== -1);
+	}
+	// **ONE OR MANY, THE SAME WRITE** (Tom: *"can we select multiple heading cells to hide
+	// multiple columns at once?"*). A single-column Hide is `paneSetColsHidden(spec, [key], true)`
+	// -- one save and one rebuild whichever way it is called, rather than one rebuild per column,
+	// which would show every intermediate width for a heartbeat each.
+	function paneSetColsHidden(spec, keys, hidden) {
+		var pref = paneColPrefFor(spec.id), h, changed = false;
+		if (!pref.hidden) { pref.hidden = []; }
+		h = pref.hidden;
+		(keys || []).forEach(function (key) {
+			var i;
+			if (key === 'id') { return; }
+			i = h.indexOf(key);
+			if (hidden && i === -1) { h.push(key); changed = true; }
+			else if (!hidden && i !== -1) { h.splice(i, 1); changed = true; }
+		});
+		if (!changed) { return; }
+		savePaneColPrefs();
+		paneTableReset(spec);
+		renderPaneTable(spec);
+	}
+	function paneSetColHidden(spec, key, hidden) { paneSetColsHidden(spec, [key], hidden); }
+	// **HEADING SELECTION, FOR "HIDE THESE COLUMNS" -- WINDOW FURNITURE, LIKE THE COLUMN WIDTHS
+	// AND ORDER BESIDE IT.** Kept on the spec (one table's headings at a time) rather than
+	// `paneColPrefs`, because which headings are highlighted right now is not a fact worth a
+	// visitor's next visit -- it dies with the tab switch that already throws the DOM nodes away.
+	function paneHeadSel(spec) { return spec.headSel || (spec.headSel = []); }
+	function paneHeadSelPaint(spec) {
+		var sel = paneHeadSel(spec), cells = spec.headCells || {}, k;
+		for (k in cells) {
+			if (!Object.prototype.hasOwnProperty.call(cells, k) || !cells[k] || !cells[k].classList) { continue; }
+			if (sel.indexOf(k) !== -1) { cells[k].classList.add('lpn-pane-head-sel'); }
+			else { cells[k].classList.remove('lpn-pane-head-sel'); }
+		}
+	}
+	function paneHeadSelClear(spec) {
+		spec.headSel = [];
+		spec.headSelAnchor = null;
+		paneHeadSelApply(spec);
+	}
+	/**
+	 * **SELECTED COLUMNS ARE A SELECTION OF CELLS, NOT A SECOND KIND OF SELECTION** (Tom,
+	 * 2026-09-24, R-221: *"I only like this solution if it's spreadsheet-like. This would mean that
+	 * entire heading cells or columns highlight and that I can use the mouse to drag through
+	 * multiple columns in usual Select manner."*). A spreadsheet has one selection: selecting a
+	 * column selects every cell in it, and pressing on a cell afterwards replaces it. So this writes
+	 * the columns into `spec.sel` as a full-height rectangle whenever they are side by side -- which
+	 * is what Copy, Delete and fill-down already read -- and paneSelPaint() washes every cell of
+	 * every selected column, contiguous or not, and lights the headings with them.
+	 *
+	 * `spec.headSelSig` is the rectangle as this wrote it. Anything else that moves the selection
+	 * afterwards (a click on a cell, an arrow, Ctrl+A) changes `spec.sel`, paneSelPaint() sees that
+	 * it no longer matches, and the column selection is over -- one rule for every writer instead
+	 * of a clear call in each of them.
+	 */
+	function paneHeadSelApply(spec) {
+		var sel = paneHeadSel(spec), cols = paneCols(spec), rows, idx, lo, hi, a, contiguous;
+		rows = paneTableRowsInOrder(spec);
+		if (sel.length && rows.length) {
+			idx = sel.map(function (k) { return paneIndexOfKey(cols, k); }).filter(function (i) { return i >= 0; });
+			idx.sort(function (x, y) { return x - y; });
+			lo = idx[0]; hi = idx[idx.length - 1];
+			contiguous = idx.length > 0 && hi - lo + 1 === idx.length;
+			if (contiguous) {
+				a = paneIndexOfKey(cols, spec.headSelAnchor);
+				if (a < lo || a > hi) { a = lo; }
+				spec.sel = { aId: rows[0].id, aKey: cols[a].key, fId: rows[rows.length - 1].id,
+					fKey: cols[a === hi ? lo : hi].key };
+			} else {
+				spec.sel = null;
+			}
+			spec.headSelSig = JSON.stringify(spec.sel);
+		} else {
+			spec.headSelSig = null;
+		}
+		paneSelPaint(spec, rows, cols);
+	}
+	// **CTRL/CMD+CLICK TOGGLES ONE HEADING; SHIFT+CLICK EXTENDS A RANGE FROM THE LAST ONE
+	// TOUCHED** -- the same two idioms the body cells already answer to (paneSelSet's `ext`), so a
+	// reader who has selected a row range with Shift+click already knows the heading gesture too.
+	// **THE ANCHOR OUTLIVES A PLAIN CLICK**, which is the reason only one column hid (R-221). A
+	// plain click sorts and selects nothing, and it used to leave no anchor either -- so the
+	// ordinary spreadsheet gesture, click one heading and Shift+click another, selected only the
+	// second one, and a right-click then offered "Hide this column" for it alone. The click now
+	// leaves its column as the anchor, and Shift+click extends from there.
+	function paneHeadSelRange(spec, key) {
+		var keys = paneCols(spec).map(function (c) { return c.key; }),
+			i0 = spec.headSelAnchor ? keys.indexOf(spec.headSelAnchor) : -1, i1 = keys.indexOf(key), lo, hi;
+		if (i0 < 0) { i0 = i1; spec.headSelAnchor = key; }
+		if (i1 < 0) { return; }
+		lo = Math.min(i0, i1); hi = Math.max(i0, i1);
+		spec.headSel = keys.slice(lo, hi + 1);
+		paneHeadSelApply(spec);
+	}
+	function paneHeadSelToggle(spec, key) {
+		var sel = paneHeadSel(spec), i;
+		// Ctrl+click on a heading while CELLS are selected starts a column selection afresh: the
+		// two are one selection, and adding a column to a cell range is not a thing a table has.
+		if (!spec.headSelSig || spec.headSelSig !== JSON.stringify(spec.sel)) { spec.headSel = sel = []; }
+		i = sel.indexOf(key);
+		if (i === -1) { sel.push(key); } else { sel.splice(i, 1); }
+		spec.headSelAnchor = key;
+		paneHeadSelApply(spec);
+	}
+	// **DRAG-ACROSS-HEADINGS-TO-SELECT IS GONE** (pre-review, 2026-09-25: it is what made a plain
+	// drag of an unselected heading select instead of move, which is the gesture Tom actually
+	// reached for and master already gave him). Whole-column selection is Ctrl+click, Shift+click
+	// and Ctrl+Space (`paneHandleKey()`) only now -- the same three idioms a spreadsheet answers to
+	// for its own column headers, none of which compete with drag. **A PLAIN CLICK IS ONE OF THEM
+	// TOO, SINCE 2026-09-25 (SECOND PASS)** -- it used to sort; now it replaces the selection with
+	// this column alone (the heading `click` listener in `renderPaneTable()` calls
+	// `paneHeadSelToggle()`/`paneHeadSelRange()` directly for the modified cases and sets
+	// `spec.headSel` itself for the plain case, so there is no longer a single shared entry point
+	// worth a wrapper function here).
+	// **THE FULL, ORDERED LIST, HIDDEN COLUMNS INCLUDED.** Everything that reads the table --
+	// tabbing, arrow-jump, Home/End, paste, fill-down, copy, print -- goes through `paneCols()`
+	// below instead, which is the ordered list with a hidden column simply ABSENT rather than
+	// merely CSS-hidden (dev/agents/data-entry-clerk/journal.md): a paste that would have written
+	// into a hidden column falls into the same "dropped and COUNTED" bucket paneCols() already
+	// gives a paste that runs off the table's right edge, with no second rule needed. Only the
+	// hide/unhide menu itself needs the unfiltered list, to offer a hidden column back.
+	function paneColsAll(spec) {
 		return paneApplyColOrder(spec,
 			spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec)));
+	}
+	function paneCols(spec) {
+		return paneColsAll(spec).filter(function (c) { return !paneColHidden(spec.id, c.key); });
 	}
 	/**
 	 * **THE CUSTOM PROPERTY COLUMNS** (Task 636), appended rather than baked into buildPaneTables():
@@ -22252,9 +22472,9 @@ var EngCalcs = EngCalcs || {};
 	// pinned at the 7em fallback whatever it had been laid out at, and every committed column
 	// starts breaking its heading mid-word, because `lpn-pane-tight` is derived from "has a stored
 	// width". One stray click and an untouched column opened narrow, wrapped to the character, for
-	// ever. THE SAME DISCIPLINE THE COLUMN MOVE ALREADY KEEPS: the reorder below commits only once
-	// the pointer has crossed into another heading, for the same reason -- one heading doing two
-	// jobs has to be able to tell them apart. Two pixels, because a hand is not quite still.
+	// ever. THE SAME DISCIPLINE THE COLUMN MOVE KEEPS, more strictly (half a column, or a hold --
+	// see paneStartColDrag()): one heading doing two jobs has to be able to tell them apart. Two
+	// pixels here, because a hand is not quite still.
 	var PANE_COL_DRAG_SLOP = 2;
 	// **A DRAG STARTS FROM THE WIDTH ON SCREEN, NOT FROM A NUMBER THE COLUMN MAY NOT HAVE** (Tom,
 	// 2026-09-21, R-110: *"Sometimes the column widths are unreasonable. For example,
@@ -22315,34 +22535,133 @@ var EngCalcs = EngCalcs || {};
 		if (ev && ev.preventDefault) { ev.preventDefault(); }
 		if (paneResetColWidth(spec, key)) { paneTableReset(spec); renderPaneTable(spec); }
 	}
-	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
-	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
-	// button's own click handler does its job; a press, a travel and a release somewhere else is a
-	// column move and the click that follows is suppressed once.
+	// **A COLUMN MOVE, MODELLED ON GOOGLE SHEETS** (Tom, 2026-09-26, fifth pass: *"Sometimes mere
+	// clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a 'long
+	// click' for a drag or a move of at least 1/2 column width."*; *"you can't drag a column to its
+	// own left or right edge; that is a do-nothing case"*; *"Drag a column (not heading) shaded
+	// outline (see Google Sheets)"*; *"Make a wide black or dark gray destination line on entire
+	// column (not heading) divider when middle of drag rectangle (not cursor) is between middle of
+	// two columns."*). Four rules, each his:
+	//   - **A PRESS IS A CLICK UNTIL IT HAS EARNED BEING A DRAG**: travel of half the pressed
+	//     column's own width, or a hold of PANE_COL_DRAG_HOLD_MS. Until then nothing is drawn, the
+	//     page listens and nothing else, and a release is the click it always was (select).
+	//   - **THE GHOST IS THE WHOLE COLUMN**, a shaded outline from the heading to the foot of the
+	//     visible table, carried sideways under the pointer at the offset it was picked up by.
+	//   - **THE DESTINATION IS DECIDED BY THE GHOST'S MIDDLE, NOT THE POINTER**: the column lands
+	//     in the gap whose neighbours' middles the ghost's middle lies between.
+	//   - **A GAP THAT WOULD LEAVE THE ORDER AS IT IS DRAWS NOTHING AND DROPS NOTHING** -- which is
+	//     the column's own two edges, until the ghost's middle has passed a neighbour's middle.
+	// **EVERY RECT IS READ ONCE, WHEN THE DRAG BEGINS** (measured 2026-09-26, fourth pass: a fresh
+	// `getBoundingClientRect()` per `mousemove` forces a layout per pixel, and nothing moves under
+	// the drag until drop, so the cached rects never go stale).
+	var PANE_COL_DRAG_HOLD_MS = 450;
+	// The nearest ancestor that clips the table, so the ghost and the marker stop at the bottom of
+	// what the reader can see rather than running down the page past the pane.
+	function paneColClipRect(table) {
+		var n = table && table.parentNode, cs, r;
+		while (n && n !== document.body && n.nodeType === 1) {
+			try { cs = window.getComputedStyle ? window.getComputedStyle(n) : null; } catch (e) { cs = null; }
+			if (cs && /(auto|scroll|hidden)/.test(String(cs.overflowY || '') + String(cs.overflow || ''))) {
+				r = n.getBoundingClientRect && n.getBoundingClientRect();
+				if (r && r.height > 0) { return r; }
+			}
+			n = n.parentNode;
+		}
+		return null;
+	}
+	// Where a group lands if the ghost's middle is at `mid`: the visible order with the group taken
+	// out and put back before the first remaining column whose middle is still to its right. `null`
+	// when that is the order already on screen -- the do-nothing case, which draws no marker.
+	function paneColDropPlan(order, group, rects, mid) {
+		var moving = order.filter(function (k) { return group.indexOf(k) !== -1; }),
+			rest = order.filter(function (k) { return group.indexOf(k) === -1; }), j = 0, next, x;
+		while (j < rest.length && rects[rest[j]] && (rects[rest[j]].left + rects[rest[j]].width / 2) < mid) { j++; }
+		next = rest.slice(0, j).concat(moving, rest.slice(j));
+		if (next.join('\u0001') === order.join('\u0001')) { return null; }
+		x = (j === 0) ? rects[rest[0]].left : rects[rest[j - 1]].right;
+		return { order: next, x: x };
+	}
 	function paneStartColDrag(spec, key, ev) {
-		var over = null;
+		var sel = paneHeadSel(spec), group = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key],
+			order = paneCols(spec).map(function (c) { return c.key; }), rects = {}, plan = null,
+			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, lastX = startX,
+			active = false, timer = null, ghost = null, marker = null, ghostW = 0, grab = 0, top = 0, height = 0;
 		if (ev && ev.button) { return; }
+		group = order.filter(function (k) { return group.indexOf(k) !== -1; });
+		Object.keys(spec.headCells || {}).forEach(function (k) {
+			if (spec.headCells[k]) { rects[k] = spec.headCells[k].getBoundingClientRect(); }
+		});
+		if (!rects[key]) { return; }
+		function begin() {
+			var table = spec.colGroup && spec.colGroup.parentNode, tr = null, clip, bottom, left;
+			if (active) { return; }
+			active = true;
+			if (timer !== null) { clearTimeout(timer); timer = null; }
+			try { tr = table && table.getBoundingClientRect ? table.getBoundingClientRect() : null; } catch (e) { tr = null; }
+			clip = paneColClipRect(table);
+			top = rects[key].top;
+			bottom = tr ? tr.bottom : rects[key].bottom;
+			if (clip && clip.bottom < bottom) { bottom = clip.bottom; }
+			height = Math.max(rects[key].height, bottom - top);
+			left = rects[group[0]] ? rects[group[0]].left : rects[key].left;
+			group.forEach(function (k) { ghostW += rects[k] ? rects[k].width : 0; });
+			grab = Math.min(Math.max(startX - left, 0), ghostW);
+			// **THE CURSOR FOR THE WHOLE DRAG IS ON `<body>`**, because `:active` is dropped the
+			// moment the pointer leaves the pressed heading (fourth pass, point (2)); the same class
+			// hides every heading's ⋮ and arrow for the life of the drag (fifth pass, (1)).
+			if (document.body) { document.body.classList.add('lpn-pane-col-dragging'); }
+			ghost = document.createElement('div');
+			ghost.className = 'lpn-pane-col-ghost';
+			ghost.style.top = top + 'px';
+			ghost.style.height = height + 'px';
+			ghost.style.width = ghostW + 'px';
+			document.body.appendChild(ghost);
+			marker = document.createElement('div');
+			marker.className = 'lpn-pane-col-marker';
+			marker.style.display = 'none';
+			marker.style.top = top + 'px';
+			marker.style.height = height + 'px';
+			document.body.appendChild(marker);
+			track(lastX);
+		}
+		function track(x) {
+			var gl = x - grab;
+			ghost.style.left = gl + 'px';
+			plan = paneColDropPlan(order, group, rects, gl + ghostW / 2);
+			if (!plan) { marker.style.display = 'none'; return; }
+			marker.style.display = 'block';
+			marker.style.left = (plan.x - 2) + 'px';
+		}
 		function move(e2) {
-			var th = paneThOfEvent(e2 && e2.target);
-			if (th && th._lpnColKey && th._lpnColKey !== key) { over = th._lpnColKey; }
+			var x = (e2 && typeof e2.clientX === 'number') ? e2.clientX : lastX;
+			lastX = x;
+			if (!active) {
+				if (Math.abs(x - startX) < rects[key].width / 2) { return; }
+				begin();
+				return;
+			}
+			track(x);
 		}
 		function up() {
 			document.removeEventListener('mousemove', move);
 			document.removeEventListener('mouseup', up);
-			if (over === null) { return; }
-			if (paneMoveCol(spec, key, paneColIndex(spec, over))) { renderPaneTable(spec); }
+			if (timer !== null) { clearTimeout(timer); timer = null; }
+			if (!active) { return; }   // never became a drag: the click that follows selects
+			if (document.body) { document.body.classList.remove('lpn-pane-col-dragging'); }
+			if (ghost && ghost.parentNode) { ghost.parentNode.removeChild(ghost); }
+			if (marker && marker.parentNode) { marker.parentNode.removeChild(marker); }
+			// The release that ends a drag is not a click on the heading it ended over. The browser
+			// dispatches that click in the same task as this mouseup, before any timer, so the flag
+			// is consumed by it if there is one and cleared here if there is not -- never left
+			// standing to swallow the next real click.
+			spec.headDragged = true;
+			setTimeout(function () { spec.headDragged = false; }, 0);
+			if (plan && paneSetVisibleColOrder(spec, plan.order)) { renderPaneTable(spec); }
 		}
+		timer = setTimeout(function () { timer = null; begin(); }, PANE_COL_DRAG_HOLD_MS);
 		document.addEventListener('mousemove', move);
 		document.addEventListener('mouseup', up);
-		return { move: move, up: up };
-	}
-	function paneThOfEvent(node) {
-		var n = node, guard = 0;
-		while (n && guard++ < 6) {
-			if (n._lpnColKey) { return n; }
-			n = n.parentNode;
-		}
-		return null;
+		return { move: move, up: up, begin: begin, plan: function () { return plan; } };
 	}
 	function paneApplyColWidth(input, c, spec) {
 		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
@@ -22491,25 +22810,30 @@ var EngCalcs = EngCalcs || {};
 		spec.headCells = {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button'),
-				grip = document.createElement('span');
+				grip = document.createElement('span'), menuBtn = document.createElement('button'), arrow = null;
 			th.className = paneCellClass(c, i) +
 				(paneColUserWidth(spec.id, c) ? ' lpn-pane-tight' : '');
 			th._lpnColKey = c.key;
 			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
-			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
-			// that is a button already says it can be clicked.
-			b.textContent = paneHeadingText(c) +
-				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
-			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
-			b.addEventListener('click', function () { sortPaneTable(spec, c.key); });
-			// **DRAGGING THE HEADING MOVES THE COLUMN** (Tom's point (e)). It is a mousedown on the
-			// heading rather than a drag handle of its own: the heading IS the handle, which is what
-			// he asked for and what every spreadsheet does. A click that never moves is still a
-			// sort, because the reorder only commits once the pointer has crossed into another
-			// heading -- so the two gestures cannot be confused by a hand that is not quite still.
-			b.addEventListener('mousedown', function (ev) { paneStartColDrag(spec, c.key, ev); });
+			// **THE TEXT IS INERT** (Tom, 2026-09-26, third pass: *"The headings text is still
+			// acting like text, and this seems like sloppy programming. It should be a non-entity as
+			// far as the cursor and the display changes go. No hover shading, no cursor change."*).
+			// No title/tip on the text itself any more (a tip is a hover affordance, which is
+			// exactly what this button must not have), no class of its own beyond what lays it out,
+			// and CSS gives it no `:hover` rule and `cursor: inherit` so it never overrides the
+			// `<th>`'s own uniform pointer. Every glyph that used to compete with this text for
+			// room -- the "..." menu and the sort arrow -- now overlays it, at zero layout cost; see
+			// their own comments below for why no space is reserved for either any more.
+			b.appendChild(document.createTextNode(paneHeadingText(c)));
+			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
+			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
+			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
+			// per CSS2.1 10.5 -- confirmed in real Chromium, pre-review 2026-09-25: `b`'s own
+			// `height: 100%` measured 28.6px in a 91.3px cell -- so stretching the button itself
+			// cannot make the WHOLE cell clickable. Delegating to the `<th>`, which the browser DOES
+			// give the row's real height, does.)
 			th.appendChild(b);
 			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
 			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
@@ -22528,6 +22852,110 @@ var EngCalcs = EngCalcs || {};
 			grip.addEventListener('dblclick', function (ev) { paneResetColOnDouble(spec, c.key, ev); });
 			th.appendChild(grip);
 			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
+			// **RIGHT-CLICK (OR LONG-PRESS) A HEADING TO HIDE IT** -- the fast, spreadsheet-native
+			// gesture Declan's design names alongside the popover, mirroring the one Sheets/Excel
+			// users already have. There is no popover in this build (reorder already shipped as the
+			// drag above, so only hide is new); this menu is the whole of the affordance, and it is
+			// also the obvious way BACK -- a hidden column's own entry offers to show it again.
+			th.addEventListener('contextmenu', function (ev) {
+				if (ev.preventDefault) { ev.preventDefault(); }
+				if (ev.stopPropagation) { ev.stopPropagation(); }
+				paneHeadMenuTrigger(spec, c.key, ev.clientX || 0, ev.clientY || 0);
+			});
+			// **A "..." AT THE TRAILING EDGE OF EVERY HEADING, HIDDEN UNTIL THE POINTER IS OVER ITS
+			// OWN CORNER (OR KEYBOARD FOCUS, OR TOUCH)** -- the corner, not the whole heading, since
+			// the fifth pass ("too eager to show"). (Tom, 2026-09-26, third pass, reversing the second pass's "always visible":
+			// *"Possibly the arrow and the menu can take up zero space and appear with 100% opacity
+			// over any heading text on hover. Try that."*). `position: absolute` already gave it zero
+			// width; the change here is CSS-only (`opacity: 0` at rest, `1` under `:hover`/
+			// `:focus-within`, and unconditionally on a device with no hover at all) -- opens the
+			// exact same menu the right-click/long-press does, positioned under itself rather than
+			// the pointer. **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- a real "⋮"
+			// character in the button would be one more text node under the heading for
+			// `print.js`'s screen/print line-count walk to trip over on every column. The accessible
+			// name comes from `title` instead (picked up by `ec-help` for the styled tip).
+			menuBtn.type = 'button';
+			menuBtn.className = 'lpn-pane-colmenu ec-help';
+			menuBtn.setAttribute('aria-haspopup', 'menu');
+			menuBtn.setAttribute('aria-label', pc.lpn_pane_colmenu_tip || 'Hide or manage columns');
+			menuBtn.title = pc.lpn_pane_colmenu_tip || 'Hide or manage columns';
+			menuBtn.addEventListener('click', function (ev) {
+				var r = menuBtn.getBoundingClientRect();
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				paneHeadMenuTrigger(spec, c.key, r.left, r.bottom);
+			});
+			th.appendChild(menuBtn);
+			// **THE SORT ARROW, ON EVERY HEADING NOW -- SORTING IS THE ARROW'S JOB AND ONLY THE
+			// ARROW'S** (Tom, 2026-09-26, third pass: *"Sorting still feels schizophrenic. Either the
+			// dots or the arrow, not both... clicking the arrow sorts (ascending first, then
+			// toggles)."*). `sortPaneTable()` already IS exactly that rule (same column: flip
+			// direction; a different column: ascending) -- see its own definition -- so every
+			// heading's arrow calls it with no branching here. Same hidden-until-hover treatment as
+			// the "..." glyph just above, in the gutter directly below it, **WITH ONE EXCEPTION**:
+			// the CURRENTLY SORTED column's own arrow stays visible without hovering
+			// (`lpn-pane-sortarrow-active`, below) -- a judgement call, not Tom's literal words, made
+			// because an arrow that only ever shows on hover would leave no way to SEE which column
+			// is sorted or which direction from a glance at the table, only from touching each
+			// heading in turn. Direction shows as the glyph itself (`▲`/`▼`); an unsorted column's
+			// arrow always reads `▲`, since a first click there always sorts ascending.
+			arrow = document.createElement('button');
+			arrow.type = 'button';
+			arrow.className = 'lpn-pane-sortarrow ec-help' +
+				(spec.sort.col === c.key ? ' lpn-pane-sortarrow-active' : '') +
+				(spec.sort.col === c.key && spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+			arrow.title = (spec.sort.col === c.key) ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort')
+				: (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.setAttribute('aria-label', arrow.title);
+			arrow.addEventListener('click', function (ev) {
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				sortPaneTable(spec, c.key);
+			});
+			th.appendChild(arrow);
+			// **THE CLICK, MOUSEDOWN AND DRAG-START LISTENERS, ON THE `<th>` ITSELF** (see that
+			// rule's own CSS comment on why the button could not simply be stretched to the cell's
+			// full height). Every pixel of the cell reaches one of these two handlers EXCEPT the
+			// three controls named here by IDENTITY -- `grip`, `menuBtn` and `arrow` -- which paint
+			// on top of the button and are excepted so their own listeners (resize, the menu, the
+			// sort reversal) keep first claim on a press or click that lands on them. `menuBtn` and
+			// `arrow` already stop their own `click` from bubbling this far; `grip` does not (its
+			// own listeners are `mousedown`/`dblclick`, and a full click-cycle on it would otherwise
+			// reach here and select the column mid-resize), so the identity check below is the one
+			// place that matters for it.
+			th.addEventListener('click', function (ev) {
+				if (ev && (ev.target === grip || ev.target === menuBtn || ev.target === arrow)) { return; }
+				// The release that ends a drag is not a click on the heading it ended over.
+				if (spec.headDragged) { spec.headDragged = false; return; }
+				if (ev && (ev.ctrlKey || ev.metaKey)) { paneHeadSelToggle(spec, c.key); return; }
+				if (ev && ev.shiftKey) { paneHeadSelRange(spec, c.key); return; }
+				spec.headSel = [c.key];
+				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
+				paneHeadSelApply(spec);
+				paneHeadSelPaint(spec);
+			});
+			// **ONE GESTURE, ONE JOB** (pre-review, 2026-09-25, after Tom tried the one-motion drag
+			// master already had and could not move a column: R-221's "drag an unselected heading to
+			// select it, drag a selected one to move it" split the single press-and-drag master
+			// shipped and approved 2026-09-18 into two gestures that look identical until the pointer
+			// has already moved, so the one he reached for -- press any heading and drag it -- landed
+			// on the wrong one whenever the heading was not already selected, which is every heading
+			// on a fresh table). A click that never leaves its heading is still a select. A press
+			// that travels is ALWAYS a move, selected or not: if the pressed heading is part of a
+			// standing multi-column selection the whole selection moves together; otherwise only the
+			// pressed column does. A modified press is the click handler's business (Ctrl/Cmd
+			// toggles, Shift extends), and the press must not also start a drag or select characters.
+			th.addEventListener('mousedown', function (ev) {
+				if (ev && (ev.target === grip || ev.target === menuBtn || ev.target === arrow)) { return; }
+				if (ev && ev.button) { return; }
+				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
+				// **THE MISSING LINE** (Ida, 2026-09-25): paneStartColDrag()'s siblings (the resize
+				// grip, and this button's own old select-drag path) both called preventDefault()
+				// before attaching their listeners; this call did not, so the browser's own mousedown
+				// handling raced the custom drag -- a press on a heading started native text
+				// selection or a focus ring instead of picking the column up.
+				if (ev && ev.preventDefault) { ev.preventDefault(); }
+				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
+				paneStartColDrag(spec, c.key, ev);
+			});
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -22549,6 +22977,14 @@ var EngCalcs = EngCalcs || {};
 		// here, which is also why there is nothing to unhook: they die with the table they are on.
 		paneWireTable(spec, table);
 		paneSelPaint(spec, rows, paneCols(spec));
+		// A column that left with a hide, or simply is not on THIS table, cannot still be selected.
+		if (spec.headSel && spec.headSel.length) {
+			(function () {
+				var keys = paneCols(spec).map(function (c) { return c.key; });
+				spec.headSel = spec.headSel.filter(function (k) { return keys.indexOf(k) !== -1; });
+			}());
+		}
+		paneHeadSelPaint(spec);
 		initTipsIn(host);
 	}
 	function sortPaneTable(spec, col) {
@@ -22844,8 +23280,27 @@ var EngCalcs = EngCalcs || {};
 	 * cells were already lit.
 	 */
 	function paneSelPaint(spec, rows, cols) {
-		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {},
-			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey;
+		var box, tds = spec.tds || {},
+			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey, hs, ak;
+		// A column selection that something else has since replaced is over (paneHeadSelApply()).
+		if (spec.headSel && spec.headSel.length && spec.headSelSig !== JSON.stringify(spec.sel)) {
+			spec.headSel = [];
+			spec.headSelSig = null;
+		}
+		hs = (spec.headSel && spec.headSel.length) ? spec.headSel : null;
+		box = paneSelBox(spec, rows, cols);
+		if (hs && !box) {
+			// Columns that are not side by side: no rectangle to hold them, so they are painted
+			// from the list. The top cell of the anchor column carries the border, as a range's
+			// starting cell does.
+			ak = spec.headSelAnchor;
+			rows.forEach(function (el2, r2) {
+				hs.forEach(function (k) {
+					if (paneIndexOfKey(cols, k) < 0) { return; }
+					now[el2.id + '\u0000' + k] = (r2 === 0 && k === ak) ? 'selcur' : 'sel';
+				});
+			});
+		}
 		if (box) {
 			// **ONE CELL IS NEVER WASHED, AND A WASH ALWAYS MEANS A RANGE** (Tom, 2026-09-19:
 			// *"In Navigate mode, there should be no blue shading, since that's reserved for Select
@@ -22890,6 +23345,7 @@ var EngCalcs = EngCalcs || {};
 			if (now[key] !== 'sel') { td.classList.add('lpn-pane-cur'); }
 		}
 		spec.painted = now;
+		paneHeadSelPaint(spec);
 	}
 	function paneTdByPaintKey(tds, key) {
 		var cut = key.indexOf('\u0000'), id = key.slice(0, cut), col = key.slice(cut + 1);
@@ -23387,6 +23843,51 @@ var EngCalcs = EngCalcs || {};
 			.replace('{skipped}', String(refused + dropped)));
 		return { wrote: wrote, refused: refused, dropped: dropped };
 	}
+	/**
+	 * **CTRL+D FILLS DOWN THE TOP ROW OF A MULTI-ROW SELECTION**, the spreadsheet convention Excel
+	 * and Sheets both bind to it. It goes through the same validated write as a paste --
+	 * paneWriteCellText(), which is c.set(), which is setProp() -- so a scenario override, a
+	 * result/read-only refusal and the count of what was skipped are all handled exactly as they
+	 * are for paste, and a fill-down inside a scenario records an override without touching base.
+	 *
+	 * **THE ID COLUMN IS SKIPPED BY NAME**, the same precedent paneDeleteSelection() already set:
+	 * filling a range of ids with the top row's own id would ask validateNewId() to refuse the same
+	 * collision once per row below it, and its refusal is an alert() -- the identical alert-storm
+	 * paneDeleteSelection()'s own comment names.
+	 *
+	 * **ONE UNDO SNAPSHOT FOR THE WHOLE FILL**, taken before anything is written and only when there
+	 * is a settable column in range -- an empty-selection or all-read-only Ctrl+D must not fill the
+	 * undo stack with a no-op, the same rule paneCommitCell() and paneDeleteSelection() both keep.
+	 */
+	function paneFillDown(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
+			r, c, el, col, text, wrote = 0, refused = 0, any = false;
+		if (!box || box.r1 <= box.r0) { return false; }
+		for (c = box.c0; c <= box.c1; c++) {
+			col = cols[c];
+			if (col.key === 'id' || paneCellIsPlain(col, rows[box.r0]) || !col.set) { continue; }
+			any = true;
+		}
+		if (!any) { return false; }
+		saveUndoSnapshot();
+		for (c = box.c0; c <= box.c1; c++) {
+			col = cols[c];
+			if (col.key === 'id') { continue; }
+			text = paneCellText(col, rows[box.r0]);
+			for (r = box.r0 + 1; r <= box.r1; r++) {
+				el = rows[r];
+				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		setNotice(String(pc.lpn_pane_filled || 'Filled down {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused)));
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -23394,7 +23895,7 @@ var EngCalcs = EngCalcs || {};
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), key = e && e.key,
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
-			active = activeElementSafe(), r, c, at;
+			pc = EngCalcs.pageConfig || {}, active = activeElementSafe(), r, c, at;
 		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
@@ -23431,6 +23932,21 @@ var EngCalcs = EngCalcs || {};
 			paneCommitCell(active);
 			return true;
 		}
+		// **CTRL+D NEVER REACHES THE BROWSER FROM INSIDE THIS TABLE** (Tom: *"Ctrl+D on
+		// Pipes.From or To opens the browser Bookmark editing."* and *"I did not know about
+		// Ctrl+D."*). Asked BEFORE the `!box` early return below -- that return answers false for
+		// every non-navigation key when nothing is selected yet, which used to hand Ctrl+D straight
+		// back to the browser the moment focus was in the table but no cell had been picked. Asked
+		// here, with `!editing` guarding it exactly like Ctrl+C, a typed "d" mid-entry is still an
+		// ordinary character. A selection that CANNOT be filled -- From, To, ID, a single row -- is
+		// not a reason to let the browser see the key: paneFillDown() already declines quietly, so
+		// this says so instead, on the same notice line every other "nothing to do" moment here uses.
+		if (jump && !editing && (key === 'd' || key === 'D')) {
+			if (!paneFillDown(spec)) {
+				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
+			}
+			return true;
+		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
 			// where a spreadsheet with no selection puts you.
@@ -23465,6 +23981,13 @@ var EngCalcs = EngCalcs || {};
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 			return true;
 		}
+		// **CTRL+SPACE WAS REMOVED, NOT REPLACED** (Tom, 2026-09-26, fourth pass: *"The Ctrl+Space
+		// note is wrong... Let's remove it and park it in our roadmap. More trouble to debug than
+		// the feature is worth."*). It toggled the current column into the selection; a heading
+		// click (or Ctrl+click, for several) already does that with the mouse, and nothing else in
+		// this handler reached for the ' ' key, so removing it costs no other shortcut its
+		// character. Tom is adding the parked roadmap row himself, on master.
+		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
@@ -23525,7 +24048,16 @@ var EngCalcs = EngCalcs || {};
 		// Tab, a click, or anything else that lands the caret in a cell IS a selection -- so the
 		// keyboard picks up where the hand left off, with no separate act of selecting.
 		table.addEventListener('focusin', function (e) {
-			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c, t = e.target;
+			// **TAB SELECTS THE WHOLE VALUE, AND READY MODE MUST NOT SHOW IT** (Tom, 2026-09-26,
+			// fifth pass: *"spreadsheets don't highlight cell contents in Navigation (Ready) mode.
+			// When I tab from cell to cell, the only indicator I should see is cell outline."*).
+			// paneFocusCell() already selects no characters; native Tab does -- Chromium selects all
+			// of a text input it tabs into, read-only or not (measured: 0..5 of "38.68"). Collapsed
+			// here, for every way in, so a cell that is not being typed in never looks like one.
+			if (t && t.tagName === 'INPUT' && t.type === 'text' && t.readOnly && t.setSelectionRange) {
+				try { t.setSelectionRange(0, 0); } catch (e2) { /* a detached input has no range */ }
+			}
 			if (!td || spec._selMoving) { return; }
 			// **A RIGHT PRESS INSIDE THE SELECTION HAS ALREADY SAID "LEAVE IT ALONE"** -- see the
 			// mousedown below. A right-click focuses the box under the pointer exactly as a left
@@ -23848,18 +24380,29 @@ var EngCalcs = EngCalcs || {};
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
-		mk = function (text, fn) {
-			var b = document.createElement('button');
+		// **THE ACCELERATOR IS WRITTEN NEXT TO ITS ROW, THE WAY A DESKTOP MENU DOES** (Tom: *"It
+		// would be nice to have this documented somewhere somehow. I confess that I did not know
+		// about Ctrl+D."*). Only the two rows that are also a keyboard shortcut carry one -- Delete
+		// and Zoom & select have no keyboard equivalent of their own in the grid, and a label that
+		// claimed one would be the thing somebody trusted and typed.
+		mk = function (text, fn, accel) {
+			var b = document.createElement('button'), acc;
 			b.type = 'button';
 			b.setAttribute('role', 'menuitem');
-			b.textContent = text;
+			b.appendChild(document.createTextNode(text));
+			if (accel) {
+				acc = document.createElement('span');
+				acc.className = 'lpn-pane-ctxmenu-accel';
+				acc.textContent = accel;
+				b.appendChild(acc);
+			}
 			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
 			menu.appendChild(b);
 			return b;
 		};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
-		});
+		}, 'Ctrl+C');
 		mk(pc.points_data_paste || 'Paste', function () {
 			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
 			// the clipboard directly -- and the one place it can be denied permission to. Silence
@@ -23877,11 +24420,243 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
 			findGoTo(aim.group, aim.id);
 		});
+		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
+		// spans more than one row -- a single row has nothing below it to fill, and an item that
+		// does nothing when clicked is worse than an absent one.
+		if (box.r1 > box.r0) {
+			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); }, 'Ctrl+D');
+		}
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
 		paneClampMenu(menu, x, y);
+	}
+	// **SELECT-THEN-OPEN, SHARED BY EVERY WAY IN** (right-click, long-press -- which arrives as the
+	// same `contextmenu` event on a touch browser -- and the hover-revealed "..." button). A
+	// trigger ON the current multi-selection acts on all of it; anywhere else it is the
+	// single-column case, unchanged, exactly as it was written inline three times before this.
+	function paneHeadMenuTrigger(spec, key, x, y) {
+		var sel = paneHeadSel(spec);
+		if (sel.length <= 1 || sel.indexOf(key) === -1) {
+			spec.headSel = [key];
+			spec.headSelAnchor = key;
+			paneHeadSelApply(spec);
+		}
+		paneOpenColMenu(spec, x, y, key);
+	}
+	// **THE HEADING'S OWN MENU: HIDE (OR HIDE SEVERAL), SHOW ALL, MANAGE.** A right-click (or
+	// long-press) on any heading offers it. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can
+	// we select multiple heading cells to hide multiple columns at once?"*) -- when the triggering
+	// heading is part of a standing multi-selection, Hide acts on the whole selection in one write;
+	// otherwise it is exactly the single-column case this always was. ID is dropped from the
+	// targets rather than blocking the whole menu, so hiding a selection that happens to include ID
+	// still hides the rest -- ID itself is never hideable (paneSetColsHidden already refuses it).
+	//
+	// **SORT AND THE PER-COLUMN "Show {col}" ROWS ARE BOTH GONE** (Tom, 2026-09-26, third pass:
+	// *"Sorting still feels schizophrenic. Either the dots or the arrow, not both."* and *"Remove
+	// the itemized Show {column} rows from the column menu."*). Sorting is the arrow's job now,
+	// every heading's own (paneSortArrow(), built in renderPaneTable() beside this menu's glyph);
+	// putting it here too was the second voice Tom named. Showing one hidden column back by name is
+	// now Manage columns' job, which already lists every column with a checkbox -- the per-column
+	// rows here were a second, narrower door onto the same list. Show all columns stays, as the
+	// fast path for "I hid a few and want them all back" without opening a dialog for it.
+	function paneOpenColMenu(spec, x, y, key) {
+		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden, sel, targets;
+		paneCloseContextMenu();
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		mk = function (text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = text;
+			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
+			menu.appendChild(b);
+			return b;
+		};
+		sel = paneHeadSel(spec);
+		targets = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key];
+		targets = targets.filter(function (k) { return k !== 'id'; });
+		if (targets.length) {
+			mk(targets.length > 1 ? (pc.lpn_pane_hide_cols || 'Hide these columns') : (pc.lpn_pane_hide_col || 'Hide this column'),
+				function () { paneSetColsHidden(spec, targets, true); paneHeadSelClear(spec); });
+		}
+		hidden = cols.filter(function (c) { return paneColHidden(spec.id, c.key); });
+		// **NOT THE FILTER'S "Show all"** (`lpn_pane_filter_clear`, which clears the ROW filter and
+		// lives in the same pane) -- a different command reusing that string would say one thing in
+		// two places, which CLAUDE.md's label-normalization rule forbids for anything past a whole
+		// sentence. Shown only once something is hidden.
+		if (hidden.length) {
+			mk(pc.lpn_pane_show_all_cols || 'Show all columns', function () {
+				paneSetColsHidden(spec, hidden.map(function (c) { return c.key; }), false);
+			});
+		}
+		mk(pc.lpn_pane_manage_cols || 'Manage columns…', function () { paneOpenManageColsDialog(spec); });
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
+		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
+		paneClampMenu(menu, x, y);
+	}
+	// **THE TOUCH AND KEYBOARD PATH FOR REORDER AND MULTI-HIDE** -- the mouse-drag gesture above
+	// does not cover either, so this is not a second way to do what the drag already does; it is
+	// the only way for anyone without a mouse (Ida, 2026-09-25, after QGIS's "Organize columns").
+	// **REUSES `openDialog()`**, this page's one generic modal (js/looped-network.js, the tab-close
+	// prompt and others) rather than a new draggable/resizable "box": every other box on this page
+	// (Settings, Library, Compare, Energy, the run report) remembers its own position and size in a
+	// SEPARATE `localStorage` key, and a seventh one would be new storage for a dialog that is open
+	// for a few seconds and has nothing worth remembering between visits. Column order and hidden
+	// state are already `lpn_panecols` (paneColPrefs); this dialog reads and writes exactly that and
+	// adds no key of its own.
+	// **NOTHING APPLIES UNTIL OK; CANCEL DISCARDS EVERYTHING** (Tom, 2026-09-25, second pass: *"It's
+	// sluggish, possibly because it waits for the table to respond in real time, where it could
+	// (should?) do nothing until OK."*). The table behind the dialog is untouched while it is open --
+	// this works on a LOCAL COPY (`work`, an array of `{key, label, show, fixed}` in the order the
+	// dialog shows them) and writes `pref.order`/`pref.hidden` in one shot on OK. Cancel's `fn` is a
+	// no-op: the local copy is simply thrown away with the dialog.
+	// **A LIST WITH A SPREADSHEET-STYLE SELECTION, NOT PER-ROW ARROWS** (Tom, 2026-09-25, second
+	// pass: *"Highlight a group of columns honoring Ctrl and Shift, then use move up, move down,
+	// move to beginning, and move to end buttons outside the list to move the entire selection.
+	// This is solid and efficient."*). Click/Ctrl+click/Shift+click select rows in `work`; the four
+	// buttons move the WHOLE selection as a block, keeping the selected rows' own relative order.
+	function paneOpenManageColsDialog(spec) {
+		var pc = EngCalcs.pageConfig || {},
+			work = paneColsAll(spec).map(function (c) {
+				return { key: c.key, label: paneHeadingText(c), show: !paneColHidden(spec.id, c.key), fixed: c.key === 'id' };
+			}),
+			sel = [], anchor = 0, focusIdx = 0;
+		// **THE BLOCK MOVE, ONE STEP AT A TIME** -- moving the selection past its nearest unselected
+		// neighbour, ascending for a move down and descending for a move up, so a non-contiguous
+		// selection (Ctrl+click can make one) still moves as a coherent block instead of each row
+		// leapfrogging its selected neighbours. `top`/`bottom` extract the selection in its own
+		// relative order and reinsert it whole, which a one-step-at-a-time loop cannot do cheaply
+		// for a selection scattered across a long list.
+		function moveSel(where) {
+			var idxs = sel.slice().sort(function (a, b) { return a - b; }), i, moved, rest;
+			if (!idxs.length) { return; }
+			if (where === 'top' || where === 'bottom') {
+				moved = idxs.map(function (i2) { return work[i2]; });
+				rest = work.filter(function (c, i2) { return idxs.indexOf(i2) === -1; });
+				work = (where === 'top') ? moved.concat(rest) : rest.concat(moved);
+				sel = (where === 'top') ? moved.map(function (c, i2) { return i2; })
+					: moved.map(function (c, i2) { return rest.length + i2; });
+			} else if (where < 0) {
+				for (i = 0; i < idxs.length; i++) {
+					if (idxs[i] > 0 && sel.indexOf(idxs[i] - 1) === -1) {
+						moved = work[idxs[i] - 1]; work[idxs[i] - 1] = work[idxs[i]]; work[idxs[i]] = moved;
+						sel[sel.indexOf(idxs[i])] = idxs[i] - 1;
+					}
+				}
+			} else {
+				for (i = idxs.length - 1; i >= 0; i--) {
+					if (idxs[i] < work.length - 1 && sel.indexOf(idxs[i] + 1) === -1) {
+						moved = work[idxs[i] + 1]; work[idxs[i] + 1] = work[idxs[i]]; work[idxs[i]] = moved;
+						sel[sel.indexOf(idxs[i])] = idxs[i] + 1;
+					}
+				}
+			}
+			focusIdx = sel.length ? sel[sel.length - 1] : focusIdx;
+		}
+		openDialog(function (body) {
+			var h = document.createElement('p'), wrap, list, btnCol, redraw,
+				mkBtn, btnUp, btnDown, btnTop, btnBottom, rowClick;
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = pc.lpn_pane_manage_cols_title || 'Manage columns';
+			body.appendChild(h);
+			wrap = document.createElement('div');
+			wrap.className = 'lpn-managecols-wrap';
+			list = document.createElement('div');
+			list.className = 'lpn-managecols-list';
+			list.setAttribute('role', 'listbox');
+			list.setAttribute('aria-multiselectable', 'true');
+			list.tabIndex = 0;
+			btnCol = document.createElement('div');
+			btnCol.className = 'lpn-managecols-btns';
+			mkBtn = function (text, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.textContent = text;
+				b.addEventListener('click', function () { fn(); redraw(); list.focus(); });
+				btnCol.appendChild(b);
+				return b;
+			};
+			btnUp = mkBtn(pc.lpn_pane_manage_cols_up || 'Move up', function () { moveSel(-1); });
+			btnDown = mkBtn(pc.lpn_pane_manage_cols_down || 'Move down', function () { moveSel(1); });
+			btnTop = mkBtn(pc.lpn_pane_manage_cols_top || 'Move to beginning', function () { moveSel('top'); });
+			btnBottom = mkBtn(pc.lpn_pane_manage_cols_bottom || 'Move to end', function () { moveSel('bottom'); });
+			wrap.appendChild(list);
+			wrap.appendChild(btnCol);
+			body.appendChild(wrap);
+			rowClick = function (i, ev) {
+				if (ev && ev.shiftKey) {
+					sel = []; (function () { var lo = Math.min(anchor, i), hi = Math.max(anchor, i), k;
+						for (k = lo; k <= hi; k++) { sel.push(k); } }());
+				} else if (ev && (ev.ctrlKey || ev.metaKey)) {
+					var p = sel.indexOf(i);
+					if (p === -1) { sel.push(i); } else { sel.splice(p, 1); }
+					anchor = i;
+				} else {
+					sel = [i]; anchor = i;
+				}
+				focusIdx = i;
+				redraw();
+				list.focus();
+			};
+			// **EVERY CHANGE STAYS LOCAL UNTIL OK** -- no call here writes `paneColPrefs` or touches
+			// the live table; `redraw()` only repaints this dialog's own list from `work`/`sel`.
+			redraw = function () {
+				list.innerHTML = '';
+				btnUp.disabled = btnDown.disabled = btnTop.disabled = btnBottom.disabled = !sel.length;
+				work.forEach(function (c, i) {
+					var row = document.createElement('div'), cb = document.createElement('input'),
+						lab = document.createElement('span');
+					row.className = 'lpn-managecols-row' +
+						(sel.indexOf(i) !== -1 ? ' lpn-managecols-row-sel' : '') +
+						(i === focusIdx ? ' lpn-managecols-row-focus' : '');
+					row.setAttribute('role', 'option');
+					row.setAttribute('aria-selected', sel.indexOf(i) !== -1 ? 'true' : 'false');
+					cb.type = 'checkbox';
+					cb.checked = c.show;
+					cb.setAttribute('aria-label', (pc.lpn_pane_manage_cols_show || 'Show') + ' ' + c.label);
+					// ID can never be hidden (paneSetColsHidden already refuses it) -- shown checked
+					// and disabled rather than left off the list, so the list is every column this
+					// table has, not a subset the reader has to guess is missing one.
+					if (c.fixed) { cb.disabled = true; }
+					cb.addEventListener('click', function (ev) { if (ev && ev.stopPropagation) { ev.stopPropagation(); } c.show = cb.checked; });
+					lab.textContent = c.label;
+					row.appendChild(cb);
+					row.appendChild(lab);
+					row.addEventListener('click', function (ev) { rowClick(i, ev); });
+					list.appendChild(row);
+				});
+			};
+			// Arrow keys move focus (extending the selection with it, the ordinary listbox idiom);
+			// Space toggles Show on the focused row without disturbing the selection.
+			list.addEventListener('keydown', function (ev) {
+				if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+					focusIdx = Math.max(0, Math.min(work.length - 1, focusIdx + (ev.key === 'ArrowDown' ? 1 : -1)));
+					if (ev.shiftKey) { rowClick(focusIdx, { shiftKey: true }); } else { rowClick(focusIdx, {}); }
+					if (ev.preventDefault) { ev.preventDefault(); }
+				} else if (ev.key === ' ' || ev.key === 'Spacebar') {
+					if (!work[focusIdx].fixed) { work[focusIdx].show = !work[focusIdx].show; redraw(); }
+					if (ev.preventDefault) { ev.preventDefault(); }
+				}
+			});
+			redraw();
+		}, [
+			{ label: pc.lpn_dialog_ok || 'OK', fn: function () {
+				var pref = paneColPrefFor(spec.id);
+				pref.order = work.map(function (c) { return c.key; });
+				pref.hidden = work.filter(function (c) { return !c.show; }).map(function (c) { return c.key; });
+				savePaneColPrefs();
+				paneTableReset(spec);
+				renderPaneTable(spec);
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { }, gapBefore: true }
+		]);
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
@@ -24007,19 +24782,39 @@ var EngCalcs = EngCalcs || {};
 	// engine is still reading the page -- and again at the head of the next print, so a browser
 	// that never fires it cannot leave this sheet standing in for the map on the next Ctrl+P.
 	var panePrintArea = null;
+	// **THE SUGGESTED PDF NAME, RESTORED THE MOMENT PRINTING IS DONE.** `document.title` is the one
+	// thing a browser's own "Save as PDF" picker reads for its default file name -- nothing a page
+	// hands to `window.print()` can set it directly -- so this holds the tab's real title only long
+	// enough to print, exactly the way `document.title` is already borrowed elsewhere on this page
+	// for a moment and put back.
+	var panePrintPrevTitle = null;
+	// **CHARACTERS A FILE NAME CANNOT CARRY, ON WINDOWS OR ANY OTHER PLATFORM'S BROWSER** (Tom,
+	// 2026-08-21, 2026-09-25: *"make the Print table PDF name more useful, like
+	// {project}-{table}.pdf"*). A project or table name is free text and may hold any of these; the
+	// browser would silently mangle them itself, so this does it once, predictably, before either
+	// name reaches `document.title`.
+	function paneSanitizeFileName(s) {
+		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
 		if (panePrintArea && panePrintArea.parentNode) {
 			panePrintArea.parentNode.removeChild(panePrintArea);
 		}
 		panePrintArea = null;
+		if (panePrintPrevTitle !== null) { document.title = panePrintPrevTitle; panePrintPrevTitle = null; }
 	}
 	function printPaneTable(spec) {
+		var pc = EngCalcs.pageConfig || {}, projectName, tableName;
 		if (!spec || !document.body) { return; }
 		paneEndPrint();
 		panePrintArea = paneBuildPrintable(spec);
 		document.body.appendChild(panePrintArea);
 		document.body.classList.add('lpn-printing-table');
+		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
+		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
+		panePrintPrevTitle = document.title;
+		document.title = (projectName ? projectName + '-' : '') + tableName;
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
 			window.addEventListener('afterprint', paneEndPrint);
 			window.print();
@@ -30458,9 +31253,9 @@ var EngCalcs = EngCalcs || {};
 		runConvertAs(a);
 	}
 	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
-	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
-	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
-	// the visitor is missing a transform for.
+	// system'?"). Both sides can be EPSG planes (UTM zone 10N to State Plane, say), and then the
+	// FROM side is named: its caller, convasProceed(), fails only while reading the project's own
+	// coordinates. runConvertAs() names the missing side itself, before anything is copied.
 	function convasForeignCrs(from, to) {
 		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
 		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
@@ -30770,6 +31565,12 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
+		// Metres in one of THIS project's own coordinate units, for the answered steps' Ground
+		// distance box (georefArmAsDegrees()): the attached map's own scale, or the plane's unit.
+		// Null for lat/lon, whose unit is a degree and has no one ground length.
+		var bdTurn = saved.project.georef && isFinite(saved.project.georef.rotDeg) ? saved.project.georef.rotDeg : 0;
+		var srcUnitM = from.kind === 'unnamed' && saved.project.georef ? saved.project.georef.metersPerUnit
+			: (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC ? planeUnitMetres(from.crs) : null);
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
@@ -30826,7 +31627,8 @@ var EngCalcs = EngCalcs || {};
 				.replace('{name}', name));
 			return;
 		}
-		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
+			bdTurn: (from.kind === 'unnamed' && saved.backdrop && bdTurn) ? bdTurn : 0 };
 		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
 		georefStart();
 		if (!georefActive()) { convasAbandon(); }
@@ -30834,7 +31636,7 @@ var EngCalcs = EngCalcs || {};
 	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
 	// this lays it onto the system the box asked for, on the saved document, and installs it in the
 	// same tab. A conversion to lat/lon itself is already finished.
-	function convasPlaced() {
+	function convasPlaced(unrotated) {
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
 		if (!c || c.copyId !== library.openId) { return; }
@@ -30866,7 +31668,10 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		refreshAllFromDocument();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+		// The same two sentences georefFinish() said a moment ago, which this would otherwise erase.
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
+			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 	}
 	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
 	// a half-converted duplicate left open is a second document nobody asked to keep.
@@ -32752,7 +33557,7 @@ var EngCalcs = EngCalcs || {};
 			return true;
 		}
 		if (!georefActive()) { return false; }
-		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the conversion with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
 	}
 	function switchToTab(id) {
@@ -33582,7 +34387,10 @@ var EngCalcs = EngCalcs || {};
 				// js/lpn-crs.js: the first draft skipped the whole branch and the user got
 				// neither the arrival nor the explanation -- a project silently on its own plane
 				// with nothing said about it, which is the state this notice exists to prevent.
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// A module that did not load is a page that did not load, so it says what every such
+				// failure here says (Task 696 retired the "does not have yet" sentence, which Tom asked "Isn't
+				// this obsolete?" of: the page does have the transforms, when it has loaded).
+				setNotice((EngCalcs.pageConfig || {}).lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			} else {
 				EngCalcs.lpnCrsLoad(function () {
 					if (library.openId !== bornAs) { return; }
@@ -33593,7 +34401,7 @@ var EngCalcs = EngCalcs || {};
 						return;
 					}
 					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
-					// to reach for lpn_crs_place_projected, which says the transform is something
+					// to reach for the retired "does not have yet" sentence, which said the transform is something
 					// "this page does not have yet" -- true of the module being absent and false
 					// here, where the page has 5,240 transforms and not this one. A reader who
 					// has just watched a blank plane arrive at 0,0 concludes the feature is
@@ -37789,6 +38597,15 @@ var EngCalcs = EngCalcs || {};
 		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
 		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
 		return String(u.units);
+	}
+	// Metres in one of a plane's DECLARED units (a UTM metre, a US survey foot), from its own
+	// definition rather than measured on the ground, so it carries no zone scale factor. Null when
+	// the definition is not loaded or states a unit this does not know.
+	function planeUnitMetres(code) {
+		var u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null;
+		if (!u) { return null; }
+		if (isFinite(u.toMeter) && u.toMeter > 0) { return u.toMeter; }
+		return { m: 1, ft: 0.3048, 'us-ft': 1200 / 3937 }[u.units] || null;
 	}
 	function refreshMapCoordsUnit() {
 		var el = document.getElementById('lpn_u_mapcoords');

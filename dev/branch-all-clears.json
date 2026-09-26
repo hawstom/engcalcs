@@ -147,11 +147,11 @@
             "pin_note": "HE CLEARED IT AT f775f0a6 ON THE CONDITION OF ONE WORDING CHANGE, AND THE PIN IS THREE COMMITS LATER: a merge of master (d0eef965), his own \"Or start here\" (8aa04872), and CLAUDE.md's third-party line rewritten to match his street-map ruling (f6760e1e). Nothing else changed."
         },
         "feat/convert-as": {
-            "head": "1f5ae0a0",
-            "date": "2026-09-25",
-            "words": "feat/convert-as: (1) For Water depth, initial default prefix can be 'Y='. (2) With that, we can close, merge, and delete the branch. Nice work!",
-            "context": "Said after his browser pass on port 8104, in the same message as his string rulings on the Convert as keys.",
-            "pin_note": "HE CLEARED IT AT 47649c32 ON ONE CONDITION, AND THE PIN IS LATER: two merges of master (the second resolves the EPSG:4326 constant it shared with feat/first-project, keeping this branch's catalogue lookup), the Y= prefix he asked for, his own rewrite of lpn_convas_units_tip, and lpn_convas_no_transform reworded to name the coordinate system, which answers his question about it and is flagged for his ruling."
+            "head": "1641f58b",
+            "date": "2026-09-26",
+            "words": "Step 1 zoom is good. Image stays with the model on pan. ... Step 2 is good. Satellite is good. Done! Merge and delete.",
+            "context": "Said 2026-09-26 evening after his browser pass on port 8116, the branch's second round (it merged once on 2026-09-25 and was reopened). The same message asked for five follow-ups (backdrop opacity cap, a draggable wizard, EPSG list filtered to the area, the UTM zone from the location, Step 1 opening where the world map already is), which go to feat/placement-wizard rather than holding this merge. Recorded on his explicit approval, the permission guard having refused the edit.",
+            "pin_note": "HE CLEARED IT AT 483da66b AND THE PIN IS LATER: a merge of master (feat/table-editing had just landed; new-english-keys.md regenerated to resolve the conflict) and the regenerated translation payloads, nothing of the branch's own."
         },
         "feat/property-venue": {
             "head": "f76a98e1",
@@ -187,6 +187,13 @@
             "words": "8115 reports: Merge. Very nice. And the file name was good.",
             "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
             "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+        },
+        "feat/table-editing": {
+            "head": "23535175",
+            "date": "2026-09-26",
+            "words": "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete.",
+            "context": "Said 2026-09-26 evening after his browser pass on port 8105, in the same message as R-285 (\"Yes. It's perfect. We are gold now.\"). Recorded on his explicit approval, the permission guard having refused the edit.",
+            "pin_note": "HE CLEARED IT AT c28c6f3c AND THE PIN IS LATER: a merge of master and the regenerated translation payloads, nothing of the branch's own."
         }
     }
 }

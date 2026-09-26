@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2089,
-        "delta_key_count": 253,
-        "exempt_key_count": 35,
+        "expected_key_count": 2103,
+        "delta_key_count": 275,
+        "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -25,8 +25,6 @@
             "lpn_ex_net3_title",
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
-            "lpn_geomap",
-            "lpn_xymap",
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id",
@@ -560,6 +558,22 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
+        "lpn_pane_filldown": "Fill down",
+        "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_hide_col": "Hide this column",
+        "lpn_pane_hide_cols": "Hide these columns",
+        "lpn_pane_show_all_cols": "Show all columns",
+        "lpn_pane_sort_asc": "Sort ascending",
+        "lpn_pane_manage_cols": "Manage columns…",
+        "lpn_pane_manage_cols_title": "Manage columns",
+        "lpn_pane_manage_cols_show": "Show",
+        "lpn_pane_manage_cols_up": "Move up",
+        "lpn_pane_manage_cols_down": "Move down",
+        "lpn_pane_manage_cols_top": "Move to beginning",
+        "lpn_pane_manage_cols_bottom": "Move to end",
+        "lpn_pane_colmenu_tip": "Hide or manage columns",
+        "lpn_pane_sortarrow_tip": "Reverse the sort",
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
@@ -567,6 +581,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -589,7 +605,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -639,6 +655,10 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
+        "lpn_notes_6_term": "Table columns help",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_term": "Table keyboard shortcuts",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -815,6 +835,22 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
+        "lpn_pane_filldown": "Fill down",
+        "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_hide_col": "Hide this column",
+        "lpn_pane_hide_cols": "Hide these columns",
+        "lpn_pane_show_all_cols": "Show all columns",
+        "lpn_pane_sort_asc": "Sort ascending",
+        "lpn_pane_manage_cols": "Manage columns…",
+        "lpn_pane_manage_cols_title": "Manage columns",
+        "lpn_pane_manage_cols_show": "Show",
+        "lpn_pane_manage_cols_up": "Move up",
+        "lpn_pane_manage_cols_down": "Move down",
+        "lpn_pane_manage_cols_top": "Move to beginning",
+        "lpn_pane_manage_cols_bottom": "Move to end",
+        "lpn_pane_colmenu_tip": "Hide or manage columns",
+        "lpn_pane_sortarrow_tip": "Reverse the sort",
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
@@ -822,6 +858,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -844,7 +882,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -894,6 +932,10 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
+        "lpn_notes_6_term": "Table columns help",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_term": "Table keyboard shortcuts",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -1580,6 +1622,262 @@
                 }
             }
         },
+        "lpn_pane_filled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_filldown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_fill_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_hide_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_hide_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_show_all_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_sort_asc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_up": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_down": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_top": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_manage_cols_bottom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_colmenu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_sortarrow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n}টি ঘর পেস্ট করা হয়েছে। {skipped}টি পরিবর্তিত হয়নি।",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "একটি উইন্ডো নির্বাচন করুন",
+                    "english": "Select a window"
+                }
+            }
+        },
         "lpn_tool_zoom_window": {
             "reason": "missing",
             "current_value": null,
@@ -1692,6 +1990,38 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
@@ -1702,9 +2032,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1718,9 +2048,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1734,9 +2064,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1750,9 +2080,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1766,9 +2096,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1782,9 +2112,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1798,9 +2128,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1814,9 +2144,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1830,9 +2160,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1846,9 +2176,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1862,9 +2192,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1878,9 +2208,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1894,9 +2224,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1910,9 +2240,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1926,9 +2256,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1942,9 +2272,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1958,9 +2288,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1974,9 +2304,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1990,9 +2320,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2006,9 +2336,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2022,9 +2352,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2038,9 +2368,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2054,9 +2384,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2065,9 +2395,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2145,9 +2475,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pane_sort_tip",
-                    "value": "এই কলাম অনুযায়ী সাজান। উল্টাতে আবার ক্লিক করুন।",
-                    "english": "Sort by this column. Click again to reverse it."
+                    "key": "lpn_pane_filter_none",
+                    "value": "এই সারণিতে ফিল্টারের সাথে কিছুই মেলে না।",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
                     "key": "lpn_pane_print",
@@ -2481,9 +2811,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total}টির মধ্যে {n}টি প্রক্ষেপণ তালিকাভুক্ত।",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2497,9 +2827,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total}টির মধ্যে {n}টি প্রক্ষেপণ তালিকাভুক্ত।",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2513,9 +2843,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total}টির মধ্যে {n}টি প্রক্ষেপণ তালিকাভুক্ত।",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2841,6 +3171,70 @@
                     "key": "lpn_lock_readonly_banner",
                     "value": "শুধু-পঠন: {name} এই ফাইলটি খোলা রেখেছে। আপনি এখানে যা ইচ্ছা পরিবর্তন করতে পারেন, কিন্তু সংরক্ষণ করতে পারবেন না। ভিন্ন ফাইলে সংরক্ষণ করতে ফাইল, নতুন নামে সংরক্ষণ করুন ব্যবহার করুন।",
                     "english": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file."
+                }
+            }
+        },
+        "lpn_notes_6_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "একটি প্রকল্প প্রকৃত মাটিতে, পেছনে একটি রাস্তার মানচিত্র নিয়ে বসতে পারে। EPANET .inp ফাইল পড়া ও লেখা যায়। নিচের প্যানেল একটি পথ ধরে একটি প্রোফাইল আঁকে এবং সংযোগস্থলগুলো তালিকাভুক্ত করে। উপাদানগুলো তাদের ফলাফল অনুযায়ী রঙ করা যায়, এবং খুঁজুন ও প্রতিস্থাপন করুন আপনার নির্ধারিত একটি শর্ত পূরণ করে এমন প্রতিটি উপাদান বেছে নেয়।",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "রঙের ব্যান্ড সীমা একই থাকে",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_6_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "একটি প্রকল্প প্রকৃত মাটিতে, পেছনে একটি রাস্তার মানচিত্র নিয়ে বসতে পারে। EPANET .inp ফাইল পড়া ও লেখা যায়। নিচের প্যানেল একটি পথ ধরে একটি প্রোফাইল আঁকে এবং সংযোগস্থলগুলো তালিকাভুক্ত করে। উপাদানগুলো তাদের ফলাফল অনুযায়ী রঙ করা যায়, এবং খুঁজুন ও প্রতিস্থাপন করুন আপনার নির্ধারিত একটি শর্ত পূরণ করে এমন প্রতিটি উপাদান বেছে নেয়।",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "রঙের ব্যান্ড সীমা একই থাকে",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_7_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "একটি প্রকল্প প্রকৃত মাটিতে, পেছনে একটি রাস্তার মানচিত্র নিয়ে বসতে পারে। EPANET .inp ফাইল পড়া ও লেখা যায়। নিচের প্যানেল একটি পথ ধরে একটি প্রোফাইল আঁকে এবং সংযোগস্থলগুলো তালিকাভুক্ত করে। উপাদানগুলো তাদের ফলাফল অনুযায়ী রঙ করা যায়, এবং খুঁজুন ও প্রতিস্থাপন করুন আপনার নির্ধারিত একটি শর্ত পূরণ করে এমন প্রতিটি উপাদান বেছে নেয়।",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "রঙের ব্যান্ড সীমা একই থাকে",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_7_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "একটি প্রকল্প প্রকৃত মাটিতে, পেছনে একটি রাস্তার মানচিত্র নিয়ে বসতে পারে। EPANET .inp ফাইল পড়া ও লেখা যায়। নিচের প্যানেল একটি পথ ধরে একটি প্রোফাইল আঁকে এবং সংযোগস্থলগুলো তালিকাভুক্ত করে। উপাদানগুলো তাদের ফলাফল অনুযায়ী রঙ করা যায়, এবং খুঁজুন ও প্রতিস্থাপন করুন আপনার নির্ধারিত একটি শর্ত পূরণ করে এমন প্রতিটি উপাদান বেছে নেয়।",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "রঙের ব্যান্ড সীমা একই থাকে",
+                    "english": "Color band boundaries stay the same"
                 }
             }
         },
@@ -4942,6 +5336,8 @@
         }
     },
     "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

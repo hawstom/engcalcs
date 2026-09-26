@@ -45,6 +45,8 @@ const L = loadLoopedNetwork(
 	"\t\tcolGroup: function (id) { return paneTableById(id).colGroup; },\n" +
 	"\t\tcells: function (id) { return paneTableById(id).cells; },\n" +
 	"\t\tserialize: serializeProject, prefsKey: LPN_PANECOLS_KEY,\n" +
+	"\t\thide: function (id, key, on) { paneSetColHidden(paneTableById(id), key, on); },\n" +
+	"\t\tholdMs: PANE_COL_DRAG_HOLD_MS,\n" +
 	"\t\tsetCell: function (id, elId, key, v) { var s = paneTableById(id),\n" +
 	"\t\t\tel = doc.nodes.filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\tpaneColByKey(s, key).set(el, v); },\n" +
@@ -92,6 +94,27 @@ function gripOf(key) {
 	return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0];
 }
 function sortBtnOf(key) { return thFor(key).children.filter((c) => String(c.className || '').indexOf('lpn-pane-sort') === 0)[0]; }
+// **REAL LEFT-TO-RIGHT POSITIONS, FOR THE MOVE-DRAG TESTS BELOW** (2026-09-26, fourth pass:
+// paneStartColDrag() now finds "the heading under the pointer" by comparing `clientX` against each
+// heading's OWN cached `getBoundingClientRect()`, not by walking up from `event.target` -- ghost
+// and insertion-marker positioning need real coordinates, and reading a fresh rect on every
+// `mousemove` would force a layout the real page never does during a drag (see that function's own
+// comment). `modelHeadingWidths()` above gives every heading the SAME `left: 0`, which is enough
+// for the resize tests (they only ever ask about one heading's own width) but not for "which
+// heading is nearest this x" -- so this lays every heading out left-to-right by its modelled width
+// instead, cumulative, the way a real table row does.
+function modelHeadingPositions() {
+	var x = 0;
+	L.colKeys('junctions').forEach(function (k) {
+		var th = thFor(k), em = drawn[k] || L.widthEm('junctions', k) || 7, width = em * 16, left = x;
+		th.getBoundingClientRect = function () { return { left: left, top: 0, right: left + width, bottom: 20, width: width, height: 20 }; };
+		x += width;
+	});
+}
+function centerXOf(key) {
+	var r = thFor(key).getBoundingClientRect();
+	return r.left + r.width / 2;
+}
 
 console.log('\n--- the heading carries both handles ---');
 {
@@ -243,32 +266,145 @@ console.log('\n--- R-110: a drag starts from the width on screen ---');
 	}
 }
 
-console.log('\n--- (e) dragging a heading moves the column ---');
+// **THE FIFTH PASS'S DRAG, RULE BY RULE** (Tom, 2026-09-26): *"Sometimes mere clicking (tiny
+// drag?) drags a column... we need to wait for a 'long click' for a drag or a move of at least 1/2
+// column width"*; *"you can't drag a column to its own left or right edge; that is a do-nothing
+// case"*; *"a wide black or dark gray destination line on entire column (not heading) divider when
+// middle of drag rectangle (not cursor) is between middle of two columns"*. Driven through the real
+// <th> mousedown and the real document listeners, over headings laid out left to right.
+// dev/browser-pass/specs/colselect.js holds the same rules in real Chromium, with real pixels.
+function bodyEl(cls) { return (global.document.body.children || []).filter((c) => c.className === cls)[0] || null; }
+function ghostEl() { return bodyEl('lpn-pane-col-ghost'); }
+function markerEl() { return bodyEl('lpn-pane-col-marker'); }
+function markerShown() { const m = markerEl(); return !!m && m.style.display !== 'none'; }
+function rectOf(key) { return thFor(key).getBoundingClientRect(); }
+function spec() { return L.paneTableById('junctions'); }
+// A browser dispatches the click that follows a drag's mouseup in the same task; the stub runs
+// synchronously, so the drag's own zero-delay reset of that flag has not run yet. Clear it the way
+// the click would have consumed it, so the next section's clicks are real clicks.
+function afterDrop() { spec().headDragged = false; }
+function press(key, x) { fire(thFor(key), 'mousedown', { button: 0, clientX: x, clientY: 10 }); }
+function moveTo(x) { docFire('mousemove', { clientX: x, clientY: 10 }); }
+function release() { docFire('mouseup', {}); afterDrop(); }
+
+console.log('\n--- a press is a click until it travels half its own column ---');
 {
-	const before = L.colKeys('junctions');
-	const from = 'elev', to = before[before.length - 1];
-	report(before.indexOf(from) < before.indexOf(to), 'the two columns start in this order',
-		before.indexOf(from) + ' < ' + before.indexOf(to));
-	fire(sortBtnOf(from), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: sortBtnOf(to) });
-	docFire('mouseup', {});
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const before = L.colKeys('junctions'), from = before[3], r = rectOf(from), cx = r.left + r.width / 2;
+	press(from, cx);
+	moveTo(cx + r.width / 2 - 1);
+	report(!ghostEl() && !markerEl(), 'a travel just short of half the column draws nothing -- still a click',
+		'moved ' + (r.width / 2 - 1) + ' of ' + r.width + ' px');
+	report(!global.document.body.classList.contains('lpn-pane-col-dragging'), '...and the page is not in a drag');
+	moveTo(cx + 40);
+	release();
+	report(L.colKeys('junctions').join() === before.join(),
+		'...and releasing it (even having crossed into the next heading by pixels) moves nothing',
+		'moved 40 px of a ' + r.width + ' px column');
+	press(from, cx);
+	moveTo(cx - r.width / 2);
+	report(!!ghostEl() && global.document.body.classList.contains('lpn-pane-col-dragging'),
+		'half the column\'s width is the moment it becomes a drag: the ghost is drawn');
+	release();
+	report(L.colKeys('junctions').join() === before.join(), '...and dropped there, at its own edge, nothing moved');
+	report(!ghostEl() && !markerEl(), '...and the ghost and marker are gone on release');
+}
+
+console.log('\n--- no marker at a column\'s own edges; the ghost\'s MIDDLE decides ---');
+{
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const before = L.colKeys('junctions'), i = 3, from = before[i], right = before[i + 1], left = before[i - 1];
+	const r = rectOf(from), rr = rectOf(right), rl = rectOf(left);
+	// Picked up near its RIGHT edge, so the ghost's middle trails the pointer by nearly half a column.
+	const grabX = r.right - 2, trail = (r.width / 2) - 2;
+	press(from, grabX);
+	moveTo(grabX + r.width / 2 + 1);    // a drag now, ghost still over its own slot
+	report(!!ghostEl(), 'the drag has begun');
+	report(!markerShown(), 'with the ghost over its own slot there is no marker (its own right edge is a do-nothing)');
+	const ptrPast = rr.left + rr.width / 2 + 4;   // the POINTER is past the neighbour's middle...
+	moveTo(ptrPast);
+	report(ptrPast - trail < rr.left + rr.width / 2, '(the ghost\'s middle, ' + (ptrPast - trail) + ', is still short of the neighbour\'s, ' + (rr.left + rr.width / 2) + ')');
+	report(!markerShown(), '...so there is still no marker: the pointer passing the middle is not enough');
+	moveTo(rr.left + rr.width / 2 + trail + 1);   // ...and now the GHOST's middle is past it
+	report(markerShown(), 'once the ghost\'s middle passes the right neighbour\'s middle, the marker appears');
+	const m = markerEl(), g = ghostEl();
+	report(Math.abs(parseFloat(m.style.left) + 2 - rr.right) < 0.01,
+		'...on the divider after that neighbour -- where the column will land', m.style.left + ' vs ' + rr.right);
+	report(m.style.top === g.style.top && m.style.height === g.style.height && parseFloat(m.style.height) >= r.height,
+		'...and it spans the column\'s full height, the same as the ghost, not only the heading',
+		m.style.top + ' ' + m.style.height + ' / ghost ' + g.style.top + ' ' + g.style.height);
+	report(parseFloat(g.style.width) === r.width, 'the ghost is the whole column\'s width', g.style.width);
+	moveTo(ptrPast);
+	report(!markerShown(), 'drawn back before that middle, the marker goes again');
+	release();
+	report(L.colKeys('junctions').join() === before.join(), '...and dropped there, nothing moved');
+	// Leftward, the same rule, and then a real drop.
+	press(from, r.left + 2);
+	moveTo(rl.left + rl.width / 2 - (r.width / 2 - 2) - 1);   // ghost middle just past the left neighbour's middle
+	report(markerShown(), 'leftward, the marker appears once the ghost\'s middle passes the left neighbour\'s');
+	report(Math.abs(parseFloat(markerEl().style.left) + 2 - rl.left) < 0.01, '...on that neighbour\'s left divider',
+		markerEl().style.left + ' vs ' + rl.left);
+	release();
 	const after = L.colKeys('junctions');
-	report(after.indexOf(from) === before.indexOf(to), 'the dragged column lands where it was dropped',
+	report(after.indexOf(from) === i - 1 && after[i] === left, 'and the drop puts the column there, one place left',
 		before.indexOf(from) + ' -> ' + after.indexOf(from));
-	report(after.length === before.length, '...and no column is lost or duplicated',
-		after.length + ' / ' + before.length);
-	report(after.slice().sort().join() === before.slice().sort().join(),
-		'...it is the same set of columns, reordered');
-	// **A PRESS THAT NEVER TRAVELS IS A SORT, NOT A MOVE**, which is what keeps one heading doing
-	// two jobs honest.
-	const held = L.colKeys('junctions');
-	fire(sortBtnOf('elev'), 'mousedown', { button: 0 });
-	docFire('mouseup', {});
-	report(L.colKeys('junctions').join() === held.join(),
-		'a press and release on one heading moves nothing', L.colKeys('junctions').join() === held.join());
-	// A column that appears later is placed AFTER the remembered ones rather than dropped.
+	report(after.slice().sort().join() === before.slice().sort().join(), '...the same set of columns, reordered');
 	L.renderTable('junctions');
 	report(L.colKeys('junctions').join() === after.join(), 'the order survives a rebuild');
+}
+
+console.log('\n--- (e) dragging ANY heading, selected or not, moves it; a group moves together ---');
+{
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const before = L.colKeys('junctions');
+	const from = 'elev', to = before[before.length - 1], r = rectOf(from), rt = rectOf(to);
+	press(from, r.left + r.width / 2);
+	moveTo(rt.left + rt.width / 2 + 1);   // grabbed at its middle, so the ghost's middle is the pointer
+	release();
+	const after = L.colKeys('junctions');
+	report(after.indexOf(from) === before.length - 1,
+		'dragging an UNSELECTED heading past the last column\'s middle moves it to the end, in one motion',
+		before.indexOf(from) + ' -> ' + after.indexOf(from));
+	report(after.length === before.length && after.slice().sort().join() === before.slice().sort().join(),
+		'...and no column is lost or duplicated');
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const b2 = L.colKeys('junctions'), a1 = b2[1], a2 = b2[2], dest = b2[b2.length - 1];
+	fire(thFor(a1), 'click', { ctrlKey: true });
+	fire(thFor(a2), 'click', { ctrlKey: true });
+	const r1 = rectOf(a1), rd = rectOf(dest), w = rectOf(a1).width + rectOf(a2).width;
+	press(a1, r1.left);                         // picked up at the group's left edge
+	moveTo(rd.left + rd.width / 2 - w / 2 + 1);  // the group's ghost middle just past dest's middle
+	report(!!ghostEl() && Math.abs(parseFloat(ghostEl().style.width) - w) < 0.01,
+		'a selected group\'s ghost is the width of the whole group', ghostEl() && ghostEl().style.width);
+	release();
+	const a = L.colKeys('junctions');
+	report(a.indexOf(a2) === a.indexOf(a1) + 1, '...the group lands side by side, in its own order', a.indexOf(a1) + ',' + a.indexOf(a2));
+	report(a.indexOf(a2) === a.length - 1, '...as a block, after the destination', a.indexOf(a2) + ' of ' + (a.length - 1));
+}
+
+console.log('\n--- a hidden column keeps its place through a drag ---');
+{
+	spec().headSel = [];   // the group above is still selected; this is a single-column drag
+	L.renderTable('junctions');
+	const full = L.colKeys('junctions'), hid = full[2];
+	L.hide('junctions', hid, true);
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const vis = L.colKeys('junctions'), from = vis[vis.length - 1], r = rectOf(from), r0 = rectOf(vis[0]);
+	press(from, r.left + r.width / 2);
+	moveTo(r0.left + r0.width / 2 - 1);
+	release();
+	L.hide('junctions', hid, false);
+	L.renderTable('junctions');
+	const after = L.colKeys('junctions');
+	report(after[0] === from, 'the dragged column went to the front', after[0]);
+	report(after.indexOf(hid) === full.indexOf(hid) + 1 && after[after.indexOf(hid) - 1] === full[full.indexOf(hid) - 1],
+		'...and the column that was hidden meanwhile comes back beside the neighbour it had, not at the end',
+		full.indexOf(hid) + ' -> ' + after.indexOf(hid));
 }
 
 console.log('\n--- NEITHER OF THEM IS PROJECT DATA (Task 584) ---');
@@ -281,5 +417,22 @@ console.log('\n--- NEITHER OF THEM IS PROJECT DATA (Task 584) ---');
 	report(text.indexOf('lpn_panecols') < 0, '...so a colleague on a laptop inherits neither');
 }
 
-console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);
-process.exit(failures ? 1 : 0);
+// **A LONG PRESS IS A DRAG TOO**, without any travel -- the other door Tom named. Real time, so it
+// runs last, after everything synchronous above.
+(async function () {
+	console.log('\n--- a hold of ' + L.holdMs + ' ms, with no travel, becomes a drag ---');
+	L.renderTable('junctions');
+	modelHeadingPositions();
+	const k = L.colKeys('junctions')[3], r = rectOf(k);
+	report(L.holdMs >= 400 && L.holdMs <= 500, 'the hold is between 400 and 500 ms', L.holdMs);
+	press(k, r.left + r.width / 2);
+	await new Promise((res) => setTimeout(res, L.holdMs - 150));
+	report(!ghostEl(), 'short of the hold, still nothing is drawn');
+	await new Promise((res) => setTimeout(res, 250));
+	report(!!ghostEl() && global.document.body.classList.contains('lpn-pane-col-dragging'),
+		'past the hold, the ghost is drawn with the pointer not having moved');
+	release();
+	report(!ghostEl(), '...and released in place it is gone again, having moved nothing');
+	console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);
+	process.exit(failures ? 1 : 0);
+}());
