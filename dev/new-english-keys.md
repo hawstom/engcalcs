@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 223 untranslated keys, of 2062 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 250 untranslated keys, of 2089 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (223, 2 to read @@ NEEDS RULING)
+## lpn_  (250, 29 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -225,6 +225,36 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_find_filter_summary`**
   > Filtered by {q}. {rows}.
   _Ruled OK 2026-09-26._
+- **`lpn_full_col_id`**
+  > ID
+  @@ NEEDS RULING
+- **`lpn_full_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_full_col_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_full_download_csv`**
+  > Download CSV
+  @@ NEEDS RULING
+- **`lpn_full_needs_run`**
+  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
+  @@ NEEDS RULING
+- **`lpn_full_note`**
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
+  @@ NEEDS RULING
+- **`lpn_full_print`**
+  > Print report
+  @@ NEEDS RULING
+- **`lpn_full_row_count`**
+  > {n} rows.
+  @@ NEEDS RULING
+- **`lpn_full_step_label`**
+  > Time step
+  @@ NEEDS RULING
+- **`lpn_full_title`**
+  > Full report
+  @@ NEEDS RULING
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
@@ -474,6 +504,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_reports_full`**
+  > Full
+  @@ NEEDS RULING
+- **`lpn_reports_full_tip`**
+  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
+  @@ NEEDS RULING
+- **`lpn_reports_status`**
+  > Status
+  @@ NEEDS RULING
+- **`lpn_reports_status_tip`**
+  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
+  @@ NEEDS RULING
 - **`lpn_settings_label_always`**
   > Always show
   _Ruled OK 2026-09-26._
@@ -501,6 +543,45 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   _Ruled OK 2026-09-23._
+- **`lpn_status_closed`**
+  > {type} {id} closed
+  @@ NEEDS RULING
+- **`lpn_status_col_event`**
+  > Event
+  @@ NEEDS RULING
+- **`lpn_status_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_status_dry`**
+  > {type} {id} is empty
+  @@ NEEDS RULING
+- **`lpn_status_empty`**
+  > Nothing changed status during this run.
+  @@ NEEDS RULING
+- **`lpn_status_emptying`**
+  > {type} {id} is emptying
+  @@ NEEDS RULING
+- **`lpn_status_filling`**
+  > {type} {id} is filling
+  @@ NEEDS RULING
+- **`lpn_status_full`**
+  > {type} {id} is full
+  @@ NEEDS RULING
+- **`lpn_status_needs_run`**
+  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
+  @@ NEEDS RULING
+- **`lpn_status_no_converge`**
+  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
+  @@ NEEDS RULING
+- **`lpn_status_note`**
+  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
+  @@ NEEDS RULING
+- **`lpn_status_opened`**
+  > {type} {id} opened
+  @@ NEEDS RULING
+- **`lpn_status_title`**
+  > Status report
+  @@ NEEDS RULING
 - **`lpn_survey_axis_east`**
   > Easting
   _Ruled OK 2026-09-23._
@@ -701,7 +782,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**31 still to read**, of 50 new keys across 5 unmerged branch(es).
+**4 still to read**, of 23 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -711,8 +792,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### feat/customer-node (`105d9f68`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -726,91 +805,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/menu-button (`eceab3ab`) — adds no English strings
-
-### feat/report (`87e15a16`) — 27 new, 27 to read @@ NEEDS RULING
-
-- **`lpn_full_col_id`**
-  > ID
-  @@ NEEDS RULING
-- **`lpn_full_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_full_col_type`**
-  > Type
-  @@ NEEDS RULING
-- **`lpn_full_download_csv`**
-  > Download CSV
-  @@ NEEDS RULING
-- **`lpn_full_needs_run`**
-  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
-  @@ NEEDS RULING
-- **`lpn_full_note`**
-  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
-  @@ NEEDS RULING
-- **`lpn_full_print`**
-  > Print report
-  @@ NEEDS RULING
-- **`lpn_full_row_count`**
-  > {n} rows.
-  @@ NEEDS RULING
-- **`lpn_full_step_label`**
-  > Time step
-  @@ NEEDS RULING
-- **`lpn_full_title`**
-  > Full report
-  @@ NEEDS RULING
-- **`lpn_reports_full`**
-  > Full
-  @@ NEEDS RULING
-- **`lpn_reports_full_tip`**
-  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
-  @@ NEEDS RULING
-- **`lpn_reports_status`**
-  > Status
-  @@ NEEDS RULING
-- **`lpn_reports_status_tip`**
-  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
-  @@ NEEDS RULING
-- **`lpn_status_closed`**
-  > {type} {id} closed
-  @@ NEEDS RULING
-- **`lpn_status_col_event`**
-  > Event
-  @@ NEEDS RULING
-- **`lpn_status_col_time`**
-  > Time
-  @@ NEEDS RULING
-- **`lpn_status_dry`**
-  > {type} {id} is empty
-  @@ NEEDS RULING
-- **`lpn_status_empty`**
-  > Nothing changed status during this run.
-  @@ NEEDS RULING
-- **`lpn_status_emptying`**
-  > {type} {id} is emptying
-  @@ NEEDS RULING
-- **`lpn_status_filling`**
-  > {type} {id} is filling
-  @@ NEEDS RULING
-- **`lpn_status_full`**
-  > {type} {id} is full
-  @@ NEEDS RULING
-- **`lpn_status_needs_run`**
-  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
-  @@ NEEDS RULING
-- **`lpn_status_no_converge`**
-  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
-  @@ NEEDS RULING
-- **`lpn_status_note`**
-  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
-  @@ NEEDS RULING
-- **`lpn_status_opened`**
-  > {type} {id} opened
-  @@ NEEDS RULING
-- **`lpn_status_title`**
-  > Status report
-  @@ NEEDS RULING
+### feat/report (`87e15a16`) — adds no English strings
 
 ### feat/table-editing (`850e3746`) — 20 new, 4 to read @@ NEEDS RULING
 

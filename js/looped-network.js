@@ -4657,8 +4657,9 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
-	// THE REPORTS FLY-OUT (Tom, 2026-09-04). Three finished answers, each of which opens and is
-	// simply there -- no criteria to set, nothing to press.
+	// THE REPORTS FLY-OUT (Tom, 2026-09-04; the Status and Full rows added for ROADMAP Tasks 716
+	// and 715). Five finished answers, each of which opens and is simply there -- no criteria to
+	// set, nothing to press.
 	//
 	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
 	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
@@ -4695,6 +4696,25 @@ var EngCalcs = EngCalcs || {};
 				// one call. It stays here rather than being hidden when there is nothing to show,
 				// for the reason openRunReportBox() states.
 				fn: function () { closeMenu(); openRunReportBox(); }
+			},
+			// **STATUS AND FULL, EPANET'S OWN TWO NAMES, LAST** (ROADMAP Tasks 716, 715; Tom,
+			// 2026-09-25: *"Make the reports roadmap tasks before EPANET++."*). Both read the
+			// extended period run's own frames (js/lpn-time.js) rather than computing anything of
+			// their own, so they sit with the EPANET run report rather than above the divider with
+			// Run and Fire flow -- nothing here is a criterion to set or a sweep to start.
+			//
+			// **THE ROW SAYS "Status"/"Full", NOT "Status report"/"Full report"** -- the parent
+			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
+			// report") already follows two rows up. The BOX TITLES keep the full names.
+			{
+				icon: 'info', label: pc.lpn_reports_status || 'Status',
+				tip: pc.lpn_reports_status_tip,
+				fn: function () { closeMenu(); openStatusReportBox(); }
+			},
+			{
+				icon: 'info', label: pc.lpn_reports_full || 'Full',
+				tip: pc.lpn_reports_full_tip,
+				fn: function () { closeMenu(); openFullReportBox(); }
 			}
 		];
 	}
@@ -35302,6 +35322,8 @@ var EngCalcs = EngCalcs || {};
 		wireEnergyBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
+		wireStatusReportBox();
+		wireFullReportBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -52712,6 +52734,462 @@ var EngCalcs = EngCalcs || {};
 		if (energyBoxIsOpen()) { rebuildEnergyReport(); }
 	}
 
+	// ---- THE STATUS REPORT AND THE FULL REPORT (ROADMAP Tasks 716, 715) -------------------------
+	//
+	// EPANET's own Report menu, Status and Full. Both read the extended period run's own frames
+	// (js/lpn-time.js's EC.lpnTimeRunFrames()) rather than computing anything new: the Status report
+	// is the same open/closed and level history the map, the labels and the Tables pane already
+	// carry, collected into one time-ordered list; the Full report is the same colorNodeValue() /
+	// colorLinkValue() accessors the map's colour ramp and the Tables pane already read, asked of
+	// every element at every reporting step instead of just the one the transport is parked on.
+	//
+	// **NEITHER IS A SECOND COMPUTATION**, which is the whole reason both are cheap: the run has
+	// already happened by the time either box is opened.
+
+	/** EPANET's own noun for this element, so the report reads the way its own status text does. */
+	function reportTypeNoun(kind, type) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'node') {
+			if (type === 'tank') { return pc.lpn_tool_add_tank || 'Tank'; }
+			if (type === 'reservoir') { return pc.lpn_tool_add_reservoir || 'Reservoir'; }
+			return pc.lpn_tool_add_junction || 'Junction';
+		}
+		if (type === 'pump') { return pc.lpn_tool_add_pump || 'Pump'; }
+		if (type === 'valve') { return pc.lpn_tool_add_valve || 'Valve'; }
+		return pc.lpn_tool_add_pipe || 'Pipe';
+	}
+	/**
+	 * **THE FRAMES BEHIND BOTH REPORTS.** An extended period run's own stops, in order -- the same
+	 * array the time-series chart plots and the scrubber steps through. Empty with no run, which is
+	 * the honest answer the built-in solver's single instant also gives: neither report claims to
+	 * show "what changed" or "every step" of a network nobody has asked to run over time.
+	 */
+	function reportFrames() { return (EngCalcs.lpnTimeRunFrames && EngCalcs.lpnTimeRunFrames()) || []; }
+	/**
+	 * **A TANK'S OWN FULL/EMPTY BAND, IN SI.** `minLevel`/`maxLevel` are typed numbers in the
+	 * project's elevation-head unit, exactly like `level` itself (CLAUDE.md: a stored unit is a
+	 * NAME, and only toSI()/toDisplay() cross it) -- so they are converted here rather than compared
+	 * against the frame's SI level as they stand, which is the Task 255 shape of defect.
+	 */
+	function tankLevelBandSI(n) {
+		var minSI = typeof n.minLevel === 'number' ? toSI(n.minLevel, 'lpn_u_elevhead') : undefined,
+			maxSI = typeof n.maxLevel === 'number' ? toSI(n.maxLevel, 'lpn_u_elevhead') : undefined;
+		return { min: minSI, max: maxSI };
+	}
+	/**
+	 * **THE EVENT STREAM, IN TIME ORDER** -- EPANET's own Status report content: a pump or a valve
+	 * opening or closing, a tank filling, emptying, filling up or running dry, and a step the solver
+	 * could not fully converge on. The FIRST frame seeds the state silently (the initial condition is
+	 * not a change), and every frame after it is compared only with its own predecessor, so an event
+	 * fires once, at the step it actually happened on, and never repeats while nothing moves.
+	 *
+	 * **A SMALL TOLERANCE, NOT AN EXACT EQUALITY**, on both the fill/drain direction and the
+	 * full/empty band: a tank riding EPANET's own numerical noise at its ceiling would otherwise
+	 * report itself full and not-full every other reporting step.
+	 */
+	function statusReportEvents() {
+		var pc = EngCalcs.pageConfig || {}, frames = reportFrames(), events = [],
+			tanks = doc.nodes.filter(function (n) { return n.type === 'tank'; }),
+			linkState = {}, tankState = {};
+		if (frames.length < 1) { return events; }
+		doc.links.forEach(function (l) { linkState[l.id] = frames[0].statuses ? frames[0].statuses[l.id] : undefined; });
+		tanks.forEach(function (t) {
+			var band = tankLevelBandSI(t), lvl = frames[0].levels ? frames[0].levels[t.id] : undefined,
+				eps = (typeof band.min === 'number' && typeof band.max === 'number')
+					? Math.max(1e-6, (band.max - band.min) * 1e-4) : 1e-6;
+			tankState[t.id] = {
+				dir: 0, eps: eps,
+				full: typeof lvl === 'number' && typeof band.max === 'number' && lvl >= band.max - eps,
+				dry: typeof lvl === 'number' && typeof band.min === 'number' && lvl <= band.min + eps
+			};
+		});
+		frames.forEach(function (f, i) {
+			if (i === 0) { return; }
+			doc.links.forEach(function (l) {
+				var st = f.statuses ? f.statuses[l.id] : undefined;
+				if (st === undefined || st === linkState[l.id]) { return; }
+				linkState[l.id] = st;
+				events.push({
+					t: f.t,
+					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} opened')
+						: (pc.lpn_status_closed || '{type} {id} closed'))
+						.replace('{type}', reportTypeNoun('link', l.type))
+						.replace('{id}', labelPrefixFor('link', 'id') + l.id)
+				});
+			});
+			tanks.forEach(function (t) {
+				var band = tankLevelBandSI(t), st = tankState[t.id],
+					lvl = f.levels ? f.levels[t.id] : undefined,
+					prevLvl = frames[i - 1].levels ? frames[i - 1].levels[t.id] : undefined,
+					name = labelPrefixFor('node', 'id') + t.id, dir;
+				if (typeof lvl !== 'number') { return; }
+				if (typeof prevLvl === 'number') {
+					dir = (lvl - prevLvl) > st.eps ? 1 : ((lvl - prevLvl) < -st.eps ? -1 : 0);
+					if (dir !== 0 && dir !== st.dir) {
+						st.dir = dir;
+						events.push({
+							t: f.t,
+							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} is filling')
+								: (pc.lpn_status_emptying || '{type} {id} is emptying'))
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					}
+				}
+				if (typeof band.max === 'number') {
+					if (lvl >= band.max - st.eps && !st.full) {
+						st.full = true;
+						events.push({
+							t: f.t,
+							text: (pc.lpn_status_full || '{type} {id} is full')
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					} else if (lvl < band.max - st.eps) { st.full = false; }
+				}
+				if (typeof band.min === 'number') {
+					if (lvl <= band.min + st.eps && !st.dry) {
+						st.dry = true;
+						events.push({
+							t: f.t,
+							text: (pc.lpn_status_dry || '{type} {id} is empty')
+								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
+						});
+					} else if (lvl > band.min + st.eps) { st.dry = false; }
+				}
+			});
+			if (f.converged === false) { events.push({ t: f.t, text: pc.lpn_status_no_converge || 'The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.' }); }
+		});
+		return events;
+	}
+	function statusBoxEl() { return document.getElementById('lpn_status_box'); }
+	function statusBoxIsOpen() {
+		var box = statusBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function rebuildStatusReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_status_report'),
+			frames = reportFrames(), events, body;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!frames.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			return;
+		}
+		events = statusReportEvents();
+		if (!events.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
+			return;
+		}
+		body = ffTable(host, [pc.lpn_status_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		events.forEach(function (e) {
+			var tr = ffEl('tr', null, null, body);
+			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));
+			ffCell(tr, e.text);
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_status_note || 'Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.', host);
+	}
+	function openStatusReportBox() {
+		var box = statusBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildStatusReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, statusboxLayout); });
+		initTipsIn(box);
+		rememberBoxOpen(statusboxLayout, saveStatusboxLayout, true);
+	}
+	function closeStatusReportBox() {
+		hidePanel(statusBoxEl());
+		rememberBoxOpen(statusboxLayout, saveStatusboxLayout, false);
+	}
+	var LPN_STATUSBOX_KEY = 'lpn_statusbox';
+	var statusboxLayout = newBoxLayout();
+	function saveStatusboxLayout() {
+		try { localStorage.setItem(LPN_STATUSBOX_KEY, JSON.stringify(statusboxLayout)); } catch (e) {}
+	}
+	function wireStatusReportBox() {
+		var box = statusBoxEl(), x = document.getElementById('lpn_status_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeStatusReportBox); }
+		wireBoxMemory(box, LPN_STATUSBOX_KEY, statusboxLayout, saveStatusboxLayout, statusBoxIsOpen);
+	}
+	function refreshStatusReportBoxIfOpen() {
+		if (statusBoxIsOpen()) { rebuildStatusReport(); }
+	}
+
+	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------
+	//
+	// **ONE FLAT TABLE, NOT EPANET'S PAIR PER TIME PERIOD.** EPANET writes a node table and a link
+	// table for each period; this page's own Tables pane already keeps nodes and links in separate
+	// tabs, so a Time column beside a Type column says the same thing in a shape a CSV reader and a
+	// spreadsheet both take without a second pass, and one row per element per step is what the
+	// harness and the reader both want to sort and filter on.
+	var FULL_REPORT_COLS = [
+		{ key: 'demand', group: 'node', field: 'demandActual' },
+		{ key: 'head', group: 'node', field: 'head' },
+		{ key: 'pressure', group: 'node', field: 'pressure' },
+		{ key: 'quality', group: 'node', field: 'quality' },
+		{ key: 'flow', group: 'link', field: 'flow' },
+		{ key: 'velocity', group: 'link', field: 'velocity' },
+		{ key: 'headloss', group: 'link', field: 'headloss' },
+		{ key: 'status', group: 'link', field: 'status' }
+	];
+	function fullReportColHeading(col) {
+		var pc = EngCalcs.pageConfig || {};
+		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
+		var unit = colorFieldUnitText(col.group, col.field);
+		return colorFieldLabel(col.group, col.field) + (unit ? ' (' + unit + ')' : '');
+	}
+	/**
+	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
+	 * is the seam the time-series chart already trusts for this (see its own note above): it swaps
+	 * `lastSolveResult` and the pattern clock for the span of one call and restores both in a
+	 * `finally`, so a row of this report can never disagree with what the Tables pane would show at
+	 * that same step, and the swap can never leave the map parked at the wrong moment.
+	 */
+	function fullReportRows() {
+		var frames = reportFrames(), rows = [];
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		frames.forEach(function (f) {
+			tsAsOfFrame(f, function () {
+				var t = typeof f.t === 'number' ? f.t : 0;
+				doc.nodes.forEach(function (n) {
+					rows.push({
+						t: t, group: 'node', type: reportTypeNoun('node', n.type), id: n.id,
+						demand: colorNodeValue(n, 'demandActual'), head: colorNodeValue(n, 'head'),
+						pressure: colorNodeValue(n, 'pressure'), quality: colorNodeValue(n, 'quality')
+					});
+				});
+				doc.links.forEach(function (l) {
+					rows.push({
+						t: t, group: 'link', type: reportTypeNoun('link', l.type), id: l.id,
+						flow: colorLinkValue(l, 'flow'),
+						velocity: colorLinkValue(l, 'velocity'),
+						headloss: colorLinkValue(l, 'headloss'),
+						status: linkStatusText(l)
+					});
+				});
+			});
+		});
+		return rows;
+	}
+	// **THE SAME ROUNDING THE TABLES PANE USES FOR A RESULT CELL** (paneCellText(): `plainRound(v,
+	// 2)`), so a Full report row can never print a number the Tables pane would print differently at
+	// the same step.
+	function fullReportCellText(row, key) {
+		var v = row[key];
+		if (typeof v === 'number') { return isFinite(v) ? String(plainRound(v, 2)) : ''; }
+		return v === undefined || v === null ? '' : String(v);
+	}
+	function csvField(text) {
+		var s = text === undefined || text === null ? '' : String(text);
+		return (/[",\r\n]/).test(s) ? ('"' + s.replace(/"/g, '""') + '"') : s;
+	}
+	function fullReportCsvText(rows) {
+		var pc = EngCalcs.pageConfig || {},
+			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+				.concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			lines = [headers.map(csvField).join(',')];
+		rows.forEach(function (r) {
+			lines.push([
+				EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id
+			].concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
+				.map(csvField).join(','));
+		});
+		return lines.join('\r\n') + '\r\n';
+	}
+	// **A NAME SAFE ON EVERY FILESYSTEM THIS SUITE'S USERS ACTUALLY WRITE TO** -- Windows refuses
+	// `\ / : * ? " < > |` in a filename outright, so those become a hyphen rather than being handed
+	// to the browser to reject silently.
+	function sanitizeFilename(name) {
+		return String(name || '').replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+	}
+	function downloadTextFile(filename, text, mime) {
+		var blob = new Blob([text], { type: mime || 'text/plain' }), url = URL.createObjectURL(blob),
+			a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+	}
+	function fullReportFilename(ext) {
+		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project');
+		return name + '-Full report.' + ext;
+	}
+	function downloadFullReportCsv() {
+		downloadTextFile(fullReportFilename('csv'), fullReportCsvText(fullReportRows()), 'text/csv');
+	}
+	/** THE SAME STATIC-COPY, ONE-PRINTER APPROACH paneBuildPrintable() uses for the Tables pane
+	 * (`#lpn_print_area`, see css/engcalcs.css): a plain table built from the rows, never the live
+	 * box, so nothing modal or scrolling ends up on the page. */
+	function fullReportPrintable(rows) {
+		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'), h, table, thead, tbody;
+		wrap.id = 'lpn_print_area';
+		h = document.createElement('h1');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = pc.lpn_full_title || 'Full report';
+		wrap.appendChild(h);
+		if (!rows.length) {
+			h = document.createElement('p');
+			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+			wrap.appendChild(h);
+			return wrap;
+		}
+		table = document.createElement('table');
+		table.className = 'lpn-pane-table lpn-print-table';
+		thead = document.createElement('thead');
+		(function () {
+			var tr = document.createElement('tr');
+			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
+				.forEach(function (text) {
+					var th = document.createElement('th');
+					th.textContent = text;
+					tr.appendChild(th);
+				});
+			thead.appendChild(tr);
+		}());
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		rows.forEach(function (r) {
+			var tr = document.createElement('tr'), td;
+			[EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
+				.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
+				.forEach(function (text) {
+					td = document.createElement('td');
+					td.textContent = text;
+					tr.appendChild(td);
+				});
+			tbody.appendChild(tr);
+		});
+		table.appendChild(tbody);
+		wrap.appendChild(table);
+		return wrap;
+	}
+	var fullPrintArea = null;
+	function endFullPrint() {
+		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
+		if (fullPrintArea && fullPrintArea.parentNode) { fullPrintArea.parentNode.removeChild(fullPrintArea); }
+		fullPrintArea = null;
+	}
+	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
+	// does for the Tables pane; neither function touches the tab at all.
+	function printFullReport() {
+		if (!document.body) { return; }
+		endFullPrint();
+		fullPrintArea = fullReportPrintable(fullReportRows());
+		document.body.appendChild(fullPrintArea);
+		document.body.classList.add('lpn-printing-table');
+		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
+			window.addEventListener('afterprint', endFullPrint);
+			window.print();
+		} else {
+			try { window.print(); } finally { endFullPrint(); }
+		}
+	}
+	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
+	function fullBoxIsOpen() {
+		var box = fullBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	/**
+	 * **WHICH TIME STEP THE BOX SHOWS A TABLE OF.** Remembered across a rebuild (an edit, a new run)
+	 * so the reader is not thrown back to the first step every time the box repaints; not persisted
+	 * anywhere else, because which step somebody was reading is not a fact worth carrying past this
+	 * page load.
+	 */
+	var fullReportStepIndex = 0;
+	/**
+	 * **ONE STEP ON SCREEN AT A TIME, EVERY STEP IN THE DOWNLOAD.** Net3's 5,400 rows build and CSV
+	 * in well under 20 ms (dev/lpn-spike/report-harness.js), but a browser laying out 5,400 real
+	 * table rows -- 60,000-odd cells, with borders and padding -- is a different cost from building
+	 * the array, and a bigger network or a shorter reporting step multiplies both the row count and
+	 * that layout cost together. EPANET's own Full report is a text FILE meant to be scrolled or
+	 * searched in an editor, not a live web table repainted on every edit; the closest live-page
+	 * equivalent that stays responsive at any network size is one reporting step's rows on screen,
+	 * with a control to change which step -- so Download and Print (which build the whole document
+	 * once, off screen) carry every step, and the table in the box carries one.
+	 */
+	function rebuildFullReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_full_report'),
+			rows, frames, stepRows, sel, body;
+		if (!host) { return; }
+		host.innerHTML = '';
+		rows = fullReportRows();
+		if (!rows.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
+			return;
+		}
+		frames = reportFrames();
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || '{n} rows.').replace('{n}', String(rows.length)), host);
+		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
+		if (frames.length > 1) {
+			sel = document.createElement('select');
+			sel.id = 'lpn_full_step';
+			frames.forEach(function (f, i) {
+				var opt = document.createElement('option');
+				opt.value = String(i);
+				opt.textContent = EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(f.t) : String(f.t);
+				sel.appendChild(opt);
+			});
+			sel.value = String(fullReportStepIndex);
+			sel.addEventListener('change', function () {
+				fullReportStepIndex = +sel.value;
+				rebuildFullReport();
+			});
+			ffRow(host, pc.lpn_full_step_label || 'Time step', null, sel, '');
+		}
+		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
+		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+		stepRows.forEach(function (r) {
+			var tr = ffEl('tr', null, null, body);
+			ffCell(tr, r.type);
+			ffCell(tr, r.id);
+			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
+		});
+	}
+	function openFullReportBox() {
+		var box = fullBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildFullReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, fullboxLayout); });
+		initTipsIn(box);
+		rememberBoxOpen(fullboxLayout, saveFullboxLayout, true);
+	}
+	function closeFullReportBox() {
+		hidePanel(fullBoxEl());
+		rememberBoxOpen(fullboxLayout, saveFullboxLayout, false);
+	}
+	var LPN_FULLBOX_KEY = 'lpn_fullbox';
+	var fullboxLayout = newBoxLayout();
+	function saveFullboxLayout() {
+		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
+	}
+	function wireFullReportBox() {
+		var box = fullBoxEl(), x = document.getElementById('lpn_full_close'),
+			csv = document.getElementById('lpn_full_csv'), pr = document.getElementById('lpn_full_print');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeFullReportBox); }
+		if (csv) { csv.addEventListener('click', downloadFullReportCsv); }
+		if (pr) { pr.addEventListener('click', printFullReport); }
+		wireBoxMemory(box, LPN_FULLBOX_KEY, fullboxLayout, saveFullboxLayout, fullBoxIsOpen);
+	}
+	function refreshFullReportBoxIfOpen() {
+		if (fullBoxIsOpen()) { rebuildFullReport(); }
+	}
+
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
@@ -52892,6 +53370,10 @@ var EngCalcs = EngCalcs || {};
 		// And the EPANET run report, on the same seam: a new run writes a new .rpt, and a box left
 		// showing the previous one would be last time's answer under this time's title.
 		refreshRunReportBoxIfOpen();
+		// And the status and full reports, on the same seam: both read the run's own frames, and a
+		// box left open must show this run's answer and not the one it replaced.
+		refreshStatusReportBoxIfOpen();
+		refreshFullReportBoxIfOpen();
 		// And the scenario comparison, on the same seam and for exactly the same reason: the table
 		// answered a network that has just changed under it, so it is dropped rather than left
 		// standing as though it were still true.

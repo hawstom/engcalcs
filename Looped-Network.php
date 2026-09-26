@@ -1344,6 +1344,33 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
+<?php // THE STATUS REPORT (ROADMAP Task 716). EPANET's Report > Status: what changed, in time
+      // order, over the last extended period simulation -- pumps and valves opening or closing,
+      // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
+      // borrows the same box shell as the reports above it; the list is built in JS
+      // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_statusbox_title">
+	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
+	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_status_report" class="lpn-ff-report"></div>
+	</div>
+</div>
+<?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
+      // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
+      // frames the Status report and the Tables pane read, so the three cannot disagree. Download
+      // and Print sit beside the close button, the same placement the run report's Copy button
+      // uses, because this table can run to thousands of rows and a button that scrolls away with
+      // it is a button nobody finds. ?>
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_fullbox_title">
+	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
+	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
+	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
+	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_full_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -2475,6 +2502,33 @@ EngCalcs.pageConfig = {
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_menu_tip: <?=json_encode($ec_lang['lpn_reports_menu_tip'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,
+	lpn_reports_status: <?=json_encode($ec_lang['lpn_reports_status'])?>,
+	lpn_reports_status_tip: <?=json_encode($ec_lang['lpn_reports_status_tip'])?>,
+	lpn_status_title: <?=json_encode($ec_lang['lpn_status_title'])?>,
+	lpn_status_needs_run: <?=json_encode($ec_lang['lpn_status_needs_run'])?>,
+	lpn_status_empty: <?=json_encode($ec_lang['lpn_status_empty'])?>,
+	lpn_status_col_time: <?=json_encode($ec_lang['lpn_status_col_time'])?>,
+	lpn_status_col_event: <?=json_encode($ec_lang['lpn_status_col_event'])?>,
+	lpn_status_opened: <?=json_encode($ec_lang['lpn_status_opened'])?>,
+	lpn_status_closed: <?=json_encode($ec_lang['lpn_status_closed'])?>,
+	lpn_status_filling: <?=json_encode($ec_lang['lpn_status_filling'])?>,
+	lpn_status_emptying: <?=json_encode($ec_lang['lpn_status_emptying'])?>,
+	lpn_status_full: <?=json_encode($ec_lang['lpn_status_full'])?>,
+	lpn_status_dry: <?=json_encode($ec_lang['lpn_status_dry'])?>,
+	lpn_status_no_converge: <?=json_encode($ec_lang['lpn_status_no_converge'])?>,
+	lpn_status_note: <?=json_encode($ec_lang['lpn_status_note'])?>,
+	lpn_reports_full: <?=json_encode($ec_lang['lpn_reports_full'])?>,
+	lpn_reports_full_tip: <?=json_encode($ec_lang['lpn_reports_full_tip'])?>,
+	lpn_full_title: <?=json_encode($ec_lang['lpn_full_title'])?>,
+	lpn_full_needs_run: <?=json_encode($ec_lang['lpn_full_needs_run'])?>,
+	lpn_full_note: <?=json_encode($ec_lang['lpn_full_note'])?>,
+	lpn_full_download_csv: <?=json_encode($ec_lang['lpn_full_download_csv'])?>,
+	lpn_full_print: <?=json_encode($ec_lang['lpn_full_print'])?>,
+	lpn_full_col_time: <?=json_encode($ec_lang['lpn_full_col_time'])?>,
+	lpn_full_col_type: <?=json_encode($ec_lang['lpn_full_col_type'])?>,
+	lpn_full_col_id: <?=json_encode($ec_lang['lpn_full_col_id'])?>,
+	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
+	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
 	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
 	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
 	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,

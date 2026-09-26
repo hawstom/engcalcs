@@ -96,6 +96,8 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_energybox` | same | The same record for the Pump energy report box (same ruling) |
 | `lpn_cmpbox` | same | The same record for the Scenario comparison box (same ruling) |
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
+| `lpn_statusbox` | same | The same record for the Status report box (Task 716, same ruling) |
+| `lpn_fullbox` | same | The same record for the Full report box (Task 715, same ruling) |
 | `lpn_runbox` | same | Whether the run progress box is shown at all (Tom, 2026-09-12: *"The run report box is, to me, obnoxious. I want to be able to hide it forever and just see the time steps and run time in the banner briefly."*). Written only when it is OFF, so a browser that has never touched it holds nothing. The same category as the two rows below: a reading preference the visitor set deliberately, on this screen |
 | `lpn_menucue` | same | **LEGACY, no longer written** (2026-09-25: the menu cue was deleted on Tom's word, "It failed."). Still listed because browsers that saw the cue still hold it, and Erase everything still deletes it by literal |
 | `lpn_show_titles` | same | **LEGACY, no longer written** (Task 625, 2026-09-10). The app page emits no titles, so the toggle went with them. Still listed because browsers that used it still hold it, and Erase everything still deletes it by literal |

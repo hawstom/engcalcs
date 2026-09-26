@@ -143,7 +143,12 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The EPANET run report (Task 570): the strongest case of the three, because the text is
 		// the engine's own column-aligned monospace and must not wrap. On a phone a box narrower
 		// than the window means scrolling sideways inside something that is itself scrolling.
-		['openRunReportBox', 'the EPANET run report']];
+		['openRunReportBox', 'the EPANET run report'],
+		// The Status and Full boxes (ROADMAP Tasks 716, 715): the same family as the three report
+		// boxes above them, and Full is the widest table of the six -- EPANET's own eight result
+		// columns plus Type and ID -- so a phone wants the whole window for either.
+		['openStatusReportBox', 'the pump/valve/tank status box'],
+		['openFullReportBox', 'the per-step node/link table box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
