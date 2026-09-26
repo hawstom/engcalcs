@@ -23999,7 +23999,7 @@ var EngCalcs = EngCalcs || {};
 					shown = plan.errors.slice(0, 5);
 					errs = shown.join(' ');
 					if (plan.errors.length > shown.length) {
-						errs += ' ' + String(pc.lpn_pane_paste_more || '{n} more rows have problems too.')
+						errs += ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.')
 							.replace('{n}', String(plan.errors.length - shown.length));
 					}
 					setNotice(String(pc.lpn_pane_paste_refused || 'Nothing was pasted. {reasons}').replace('{reasons}', errs));

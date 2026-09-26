@@ -877,7 +877,7 @@ $ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';
-$ec_lang['lpn_pane_paste_more']='{n} more rows have problems too.';
+$ec_lang['lpn_pane_paste_more']='Rows with problems not shown here: {n}.';
 $ec_lang['lpn_pane_paste_no_id']='Row {row}: a new row needs an ID.';
 $ec_lang['lpn_pane_paste_bad_id']='Row {row}: the ID {id} has a space or a quotation mark in it.';
 $ec_lang['lpn_pane_paste_id_taken']='Row {row}: the ID {id} is already in use.';
