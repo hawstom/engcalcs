@@ -1850,6 +1850,13 @@ the block.
   PARKED. Tom, 2026-09-26: *"More trouble to debug than the feature is worth."* Removed from
   feat/table-editing; clicking a heading selects a column.
 
+- 25|731| **At whole-world zoom the map drags past the 180th meridian and a continent-sized model tears
+  across it.** Found 2026-09-26 building Convert as (`feat/convert-as`); an edge case, since the
+  mission scope is a 300 km span, but the wizard's world-wide first screen reaches it.
+- 50|732| **Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.** Ten checks fail
+  identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
+  catches it; bring them current or retire the checks.
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

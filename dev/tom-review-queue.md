@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-282.
+**An ID is permanent and never reused.** Next free: R-291. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -76,7 +76,7 @@ judgement and does not belong to a script.
 
 ### Task 696, the coordinate conversion wizard
 
-- [ ] R-172 -- | (1) In Step 1, a background image gets dragged around with the map (then snaps back on release of drag) instead of always staying with the project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center example, the world map worked, but the satellite view didn't. (3) I completely missed this until now, but this wizard is out of date with our current CRS paradigm. The first thing it needs to do is ask what coordinate system we are going to. -- folded into Task 696, which stays OPEN at 100 rather than closing, because his point (3) reopens the paradigm
+- [ ] R-172 -- | (1) In Step 1, a background image gets dragged around with the map (then snaps back on release of drag) instead of always staying with the project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center example, the world map worked, but the satellite view didn't. (3) I completely missed this until now, but this wizard is out of date with our current CRS paradigm. The first thing it needs to do is ask what coordinate system we are going to. -- folded into Task 696, which stays OPEN at 100 rather than closing, because his point (3) reopens the paradigm -- feat/convert-as 483da66b: (1) fixed on the answered path, Perry measured 0.00 px mid-drag; (2) not reproduced, real satellite tiles draw on localhost (127.0.0.1 is refused by the token), awaiting your pass on 8116
 
 ## Round of 2026-09-23b -- two all-clears and the zoom-control pass
 
@@ -223,6 +223,14 @@ judgement and does not belong to a script.
 - [ ] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc
 - [ ] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback
 - [x] R-281 feat/table-editing | "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click selects, drag moves. -- recorded in the handoff
+- [ ] R-283 feat/table-editing | "Put a little vertical space between the ellipsis menu and the sort arrow. You or Ida should know how to make it more pleasing." -- c28c6f3c: about 5 px of clear space, softer grey marks that turn blue on hover
+- [ ] R-284 feat/table-editing | "Dragging: I like it! (1) Suppress the menu and sort arrow during dragging. (2) Sometimes mere clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a "long click" for a drag or a move of at least 1/2 column width." -- c28c6f3c: every mark hidden mid-drag; a drag starts after half the column's width or a 450 ms hold
+- [?] R-285 feat/table-editing | (same comment, the threshold) -- Perry measured half-width at 288 px of silent travel on a widened Description column, 87-109 px on Net3's wider pipe columns. Keep half-width, or cap it (for example at 40 px)?
+- [ ] R-286 feat/table-editing | "I think that the menu and arrow are too eager to show. Can we make them show only when the cursor is directly over their area of the cell?" -- c28c6f3c: they show only over their own top-right corner; Perry notes nothing now hints that the corner does anything
+- [ ] R-287 feat/table-editing | "(1) The heavy blue line is not meaningful at the left and right edge of the selection ... you can't drag a column to its own left or right edge; that is a do-nothing case. (2) If and only if you drag beyond the middle of the adjacent column, a blue line appears at the new insertion place." -- c28c6f3c, with R-289's dark line as the marker
+- [ ] R-288 feat/table-editing | "Spreadsheets don't highlight cell contents in Navigation (Ready) mode. When I tab from cell to cell, the only indicator I should see is cell outline." -- c28c6f3c, checked on read-only and editable cells
+- [ ] R-289 feat/table-editing | "(1) Turn an entire heading solid blue on select. (2) Drag a column (not heading) shaded outline (see Google Sheets). (3) Make a wide black or dark gray destination line on entire column (not heading) divider when middle of drag rectangle (not cursor) is between middle of two columns." -- c28c6f3c: solid #0b57d0 heading, grey whole-column ghost, 4 px dark-grey full-height line decided by the ghost's middle
+- [?] R-290 feat/label-gang-search | (no new words; the master merge) -- c0104534: master's symbol-size rule and zoom-to-fit make this branch's own numbers worse (x2 Novato 72 labels give up a value, was 22; switching the crowding rule off gets 30 but a pass takes 8.3 s, not 0.8 s). Relax the crowding rule, accept slower passes, or rework?
 
 ### Rulings recorded, nothing to build
 
