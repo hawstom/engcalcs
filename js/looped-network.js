@@ -21831,19 +21831,83 @@ var EngCalcs = EngCalcs || {};
 	// is attached to), so there is no follow-on click to suppress. That flag remains meaningful only
 	// for a press-and-release that never leaves its own heading, which the sort button's `click`
 	// listener already answers on its own.
+	// **A DRAG THAT SHOWS SOMETHING, MEASURED TO STAY CHEAP** (Tom, 2026-09-26, fourth pass: "(1)
+	// unusably sluggish; (2) I lose the grab cursor... drag is blind, I don't know where the column
+	// will end up; (3) the grab cursor is a pointer on the heading text"). **MEASURED, NOT
+	// ASSUMED, BEFORE CHANGING ANYTHING**: the OLD `move()` handler here did no rebuild at all -- it
+	// walked up to six DOM ancestors of the event's target reading a plain property, and nothing
+	// else -- and 200 synthetic `mousemove` dispatches over Net3's Junctions timed at 0.008 ms
+	// average, 0.2 ms worst case: already free. Point (1)'s "unusably sluggish" is the FEEL of
+	// point (2)'s "blind" --
+	// a drag with no visual feedback at all reads as frozen, whatever it costs in milliseconds. The
+	// fix is therefore a ghost label and an insertion marker, not a performance rewrite -- and both
+	// are built to cost as little as the old handler did: **every heading's `getBoundingClientRect()`
+	// is read ONCE, before the first `mousemove`, never again during the drag** (reading it on every
+	// pixel would force a synchronous layout on every pixel -- the classic layout-thrashing trap --
+	// and nothing moves or rerenders until drop, so a cached rect never goes stale mid-drag). Point
+	// (3)'s cursor fix is CSS-only, beside `.lpn-pane-head-sel`'s own rule in css/engcalcs.css.
 	function paneStartColDrag(spec, key, ev) {
-		var over = null;
+		var sel = paneHeadSel(spec), group = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key],
+			over = null, lastOverKey = null, rects = {}, ghost, marker;
 		if (ev && ev.button) { return; }
+		Object.keys(spec.headCells || {}).forEach(function (k) {
+			if (spec.headCells[k]) { rects[k] = spec.headCells[k].getBoundingClientRect(); }
+		});
+		// **THE CURSOR FOR THE WHOLE DRAG, ON `<body>`, NOT LEFT TO `:active`** (point (2)): `:active`
+		// is a CSS state Chromium drops the moment the pointer leaves the pressed element, mouse
+		// button or not -- which is exactly "I lose the grab cursor... when I leave the column".
+		// JS owns this state instead, on and off, because CSS cannot hold it once the pointer has
+		// moved on.
+		if (document.body) { document.body.classList.add('lpn-pane-col-dragging'); }
+		ghost = document.createElement('div');
+		ghost.className = 'lpn-pane-col-ghost';
+		ghost.textContent = group.map(function (k) {
+			var c = paneColByKey(spec, k);
+			return c ? paneHeadingText(c) : k;
+		}).join(', ');
+		document.body.appendChild(ghost);
+		marker = document.createElement('div');
+		marker.className = 'lpn-pane-col-marker';
+		marker.style.display = 'none';
+		document.body.appendChild(marker);
+		// The heading whose CENTRE is nearest the pointer's x, excluding the whole dragged group --
+		// a lookup over a dozen or so cached rects, not a DOM walk and not a fresh measurement.
+		function nearestKey(x) {
+			var bestKey = null, bestDist = Infinity;
+			Object.keys(rects).forEach(function (k) {
+				var r, dist;
+				if (group.indexOf(k) !== -1) { return; }
+				r = rects[k];
+				dist = Math.abs(x - (r.left + r.width / 2));
+				if (dist < bestDist) { bestDist = dist; bestKey = k; }
+			});
+			return bestKey;
+		}
 		function move(e2) {
-			var th = paneThOfEvent(e2 && e2.target);
-			if (th && th._lpnColKey && th._lpnColKey !== key) { over = th._lpnColKey; }
+			var x = e2 && typeof e2.clientX === 'number' ? e2.clientX : 0,
+				y = e2 && typeof e2.clientY === 'number' ? e2.clientY : 0, k, r;
+			ghost.style.left = (x + 14) + 'px';
+			ghost.style.top = (y + 14) + 'px';
+			k = nearestKey(x);
+			over = k;
+			if (k === lastOverKey) { return; }
+			lastOverKey = k;
+			if (!k) { marker.style.display = 'none'; return; }
+			r = rects[k];
+			marker.style.display = 'block';
+			marker.style.top = r.top + 'px';
+			marker.style.height = r.height + 'px';
+			// Which SIDE of the target heading the marker sits on -- whichever edge the pointer is
+			// nearer, so the marker always reads as "the column lands here", not "on this heading".
+			marker.style.left = (x < r.left + r.width / 2 ? r.left - 1 : r.right - 1) + 'px';
 		}
 		function up() {
-			var sel = paneHeadSel(spec), group;
 			document.removeEventListener('mousemove', move);
 			document.removeEventListener('mouseup', up);
+			if (document.body) { document.body.classList.remove('lpn-pane-col-dragging'); }
+			if (ghost.parentNode) { ghost.parentNode.removeChild(ghost); }
+			if (marker.parentNode) { marker.parentNode.removeChild(marker); }
 			if (over === null) { return; }
-			group = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel : [key];
 			if ((group.length > 1) ? paneMoveCols(spec, group, over) : paneMoveCol(spec, key, paneColIndex(spec, over))) {
 				renderPaneTable(spec);
 			}
@@ -21877,14 +21941,6 @@ var EngCalcs = EngCalcs || {};
 		savePaneColPrefs();
 		paneTableReset(spec);
 		return true;
-	}
-	function paneThOfEvent(node) {
-		var n = node, guard = 0;
-		while (n && guard++ < 6) {
-			if (n._lpnColKey) { return n; }
-			n = n.parentNode;
-		}
-		return null;
 	}
 	function paneApplyColWidth(input, c, spec) {
 		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
@@ -23203,16 +23259,12 @@ var EngCalcs = EngCalcs || {};
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 			return true;
 		}
-		// **CTRL+SPACE TOGGLES THE CURRENT COLUMN INTO THE SELECTION** -- Google Sheets' own
-		// shortcut for exactly this (Ida, 2026-09-25, survey of established grids), reused rather
-		// than invented: a reader who already knows it in a spreadsheet knows it here. Read the
-		// column from the ANCHOR cell, matching every other "current column" idea in this handler
-		// (the copy-down arrow-key comment above). A cell being typed in keeps its own space
-		// character.
-		if (jump && !editing && key === ' ') {
-			paneHeadSelToggle(spec, cols[box.ac].key);
-			return true;
-		}
+		// **CTRL+SPACE WAS REMOVED, NOT REPLACED** (Tom, 2026-09-26, fourth pass: *"The Ctrl+Space
+		// note is wrong... Let's remove it and park it in our roadmap. More trouble to debug than
+		// the feature is worth."*). It toggled the current column into the selection; a heading
+		// click (or Ctrl+click, for several) already does that with the mouse, and nothing else in
+		// this handler reached for the ' ' key, so removing it costs no other shortcut its
+		// character. Tom is adding the parked roadmap row himself, on master.
 		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.

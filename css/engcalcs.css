@@ -2488,6 +2488,10 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    live here (percentage heights on a table cell's child do not resolve to the cell's real
    height). */
 .lpn-pane-sort { font-weight: bold; display: block; width: 100%; cursor: inherit; }
+/* The browser's OWN default focus ring on a focused `<button>` is not "unstyled", it is a second
+   ring drawn tight around the text -- exactly the thing point (1) objects to, just undoing the fix
+   a different way. The `<th>`'s own `:has(:focus-visible)` rule is the only ring this table draws. */
+.lpn-pane-sort:focus-visible { outline: none; }
 /* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
    text alignment with it -- it sits after the box, in its own ink. */
 .lpn-pane-goto {
@@ -2505,7 +2509,17 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: #0645ad; }
 /* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
    press does not leave a ring behind on a control whose whole job is to move the map. */
-.lpn-pane-sort:focus-visible, .lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+.lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+/* **THE RING BELONGS TO THE WHOLE HEADING, NEVER TO THE TEXT INSIDE IT** (Tom, 2026-09-26,
+   fourth pass: *"I still see special highlighting on the text"* -- a screenshot of a dark
+   rectangle drawn tight around the word "Longitude", which was `.lpn-pane-sort:focus-visible`'s
+   own outline on the inner button. The text is a non-entity (see `.lpn-pane-sort`'s own comment);
+   it draws nothing of its own, focus ring included. `:has(:focus-visible)` puts the ring on the
+   `<th>` itself instead, whichever of its own controls (the heading button, the "..." glyph, the
+   arrow) actually holds keyboard focus -- inset so it never adds a pixel to the cell's box, and
+   still exactly what Tab reveals. Browsers without `:has()` simply show no ring here, the same
+   graceful drop this file already uses it for elsewhere. */
+.lpn-pane-table thead th:has(:focus-visible) { outline: 2px solid #0645ad; outline-offset: -2px; }
 /* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
    because its `left`/`top` are the pointer's own client coordinates, which are already relative to
    the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
@@ -2580,6 +2594,45 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-table thead th { cursor: pointer; position: relative; }
 .lpn-pane-table thead th.lpn-pane-head-sel { cursor: grab; }
 .lpn-pane-table thead th.lpn-pane-head-sel:active { cursor: grabbing; }
+/* **`cursor: inherit` ON THE BUTTON DOES NOT ACTUALLY INHERIT, MEASURED** (Tom, 2026-09-26, fourth
+   pass, point (3): *"The grab cursor is a pointer on the heading text."*). `.lpn-pane-sort`
+   declares `cursor: inherit` and the cascade order says it should win over its own earlier
+   `cursor: pointer` -- and in a real Chromium it does not: a selected heading's `<th>` measured
+   `grab` while its own text button measured `pointer`, the exact split Tom saw. Real, buttons are
+   documented (and other browsers agree) to special-case an inherited `cursor` differently from a
+   plain `<div>`; rather than chase the exact spec paragraph, these three rules just say the same
+   thing `.lpn-pane-head-sel` above says, explicitly, for the one child that would not listen to
+   `inherit`. `:active` needs the same explicit repeat for the same reason. */
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
+.lpn-pane-table thead th.lpn-pane-head-sel:active .lpn-pane-sort { cursor: grabbing; }
+/* **AND WHILE AN ACTUAL DRAG IS RUNNING, THE WHOLE PAGE STAYS "grabbing"** (Tom, 2026-09-26,
+   fourth pass, point (2): *"I lose the grab cursor instead of pulling the column... I don't know
+   where the column will end up."*). `:active` is a CSS state that Chromium (like other engines)
+   drops the instant the pointer leaves the element that was pressed, even with the mouse button
+   still down -- which is exactly "I lose the grab cursor... when I leave the column". CSS alone
+   cannot hold a state across elements the pointer is no longer over; `paneStartColDrag()` sets this
+   class on `<body>` for the life of the drag instead, and JS -- not `:active` -- is what takes it
+   off again on `mouseup`. The universal child selector needs to OUTRANK every other cursor rule in
+   this file for the duration, which is what earns the one `!important` in this stylesheet. */
+.lpn-pane-col-dragging, .lpn-pane-col-dragging * { cursor: grabbing !important; }
+/* **THE GHOST**, a small label that follows the pointer for the life of the drag -- Tom, 2026-09-26,
+   fourth pass, point (2): *"drag is blind. I don't know where the column will end up."* Positioned
+   from cached rects computed ONCE at drag start (see `paneStartColDrag()`'s own comment on why:
+   reading `getBoundingClientRect()` on every `mousemove` would force a synchronous layout on every
+   pixel, which is the "layout thrashing" this file's own typing-bench work already measured a cost
+   for elsewhere). `pointer-events: none` so the ghost is never what a `mousemove` lands on. */
+.lpn-pane-col-ghost {
+	position: fixed; z-index: 2000; pointer-events: none; background: #fff; border: 1px solid #999;
+	border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 3px 8px; font: inherit;
+	font-size: .9em; white-space: nowrap; color: #222;
+}
+/* **THE INSERTION MARKER**, a thin line at the edge of whichever heading the pointer is nearest,
+   the side depending on which half of that heading the pointer is over -- the answer to "where the
+   column will end up" that the ghost alone does not give. */
+.lpn-pane-col-marker {
+	position: fixed; z-index: 2000; pointer-events: none; width: 3px; background: #0645ad;
+	border-radius: 2px;
+}
 /* **THE "..." COLUMN MENU, HIDDEN UNTIL HOVER, FOCUS OR TOUCH** (Tom, 2026-09-26, third pass,
    reversing the second pass's "always visible": *"Possibly the arrow and the menu can take up
    zero space and appear with 100% opacity over any heading text on hover. Try that."*). Opens the

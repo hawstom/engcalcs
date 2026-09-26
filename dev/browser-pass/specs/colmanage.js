@@ -9,18 +9,24 @@
 // Manage columns dialog should apply only on OK, and reorder by moving a SELECTION with buttons
 // outside the list rather than one row's own up/down arrows.
 //
+// Tom, 2026-09-26, THIRD pass, reversing the second pass's "always visible": the "..." and the
+// arrow take zero space and stay hidden until hover/focus/touch; sorting is the arrow's job alone
+// (an arrow now lives on every heading, ascending first then toggling); the menu no longer sorts
+// and no longer lists a hidden column by name (Manage columns already does).
+//
+// Tom, 2026-09-26, FOURTH pass: Ctrl+Space ("more trouble to debug than the feature is worth") is
+// removed, not merely untested -- see the section that proves it gone, below.
+//
 // colselect.js already covers, with real page.mouse events: dragging across headings to select,
 // Ctrl/Shift+click, Hide (this)/(these) column(s), and a SELECTED heading dragged onto another
-// moving the column (the missing preventDefault() fix). This spec covers: the "..." glyph (always
-// visible, not hover-only) opening the same menu, Sort ascending/descending on it, the arrow that
-// then appears under the glyph ONLY on the sorted column (and reverses it on click), "Show all
-// columns", the "Manage columns..." dialog (Show checkboxes and a selection moved by buttons,
-// applying only on OK and surviving a table rebuild), and Ctrl+Space toggling the current column
-// into the selection.
+// moving the column (the missing preventDefault() fix). This spec covers: the "..." glyph and the
+// sort arrow (hover/focus/touch-revealed, zero layout space), "Show all columns", the "Manage
+// columns..." dialog (Show checkboxes and a selection moved by buttons, applying only on OK and
+// surviving a table rebuild), and confirms Ctrl+Space no longer does anything.
 
 const { Session } = require('../lib/session');
 
-exports.title = 'Tables: the "..." column menu, the sort arrow, Manage columns, Ctrl+Space';
+exports.title = 'Tables: the "..." column menu, the sort arrow, Manage columns';
 
 async function openJunctions(browser, name) {
 	const a = await Session.open(browser, name);
@@ -301,11 +307,13 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// ---- Ctrl+Space toggles the current column into the selection --------------------------------
+	// ---- Ctrl+Space is GONE, not merely untested (Tom, 2026-09-26, fourth pass: "The Ctrl+Space
+	// note is wrong... Let's remove it and park it in our roadmap. More trouble to debug than the
+	// feature is worth.") -- a real regression net, since a silently-reintroduced shortcut with no
+	// visible affordance is exactly the kind of thing nothing else here would catch. -------------
 	{
 		const a = await openJunctions(browser, 'D');
 		const before = await keys(a);
-		// Land the caret in a cell of the third column, exactly as Tab or a click would.
 		await a.page.evaluate(({ T, key }) => {
 			const td = document.querySelector(T + ' tbody tr:first-child td.lpn-pane-col-' + key);
 			const focusable = td && (td.querySelector('input,select,button') || td);
@@ -316,19 +324,10 @@ exports.run = async function ({ browser, report }) {
 		await a.page.keyboard.press('Space');
 		await a.page.keyboard.up('Control');
 		await a.settle(200);
-		let sel = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead th')]
+		const sel = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead th')]
 			.filter((th) => th.classList.contains('lpn-pane-head-sel'))
 			.map((th) => (th.className.match(/lpn-pane-col-(\S+)/) || [])[1]), T);
-		report.ok(JSON.stringify(sel) === JSON.stringify([before[2]]), 'Ctrl+Space with a cell focused selects that whole column', JSON.stringify(sel));
-		// Pressed again, it comes back OUT of the selection (a toggle, not a one-way add).
-		await a.page.keyboard.down('Control');
-		await a.page.keyboard.press('Space');
-		await a.page.keyboard.up('Control');
-		await a.settle(200);
-		sel = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead th')]
-			.filter((th) => th.classList.contains('lpn-pane-head-sel'))
-			.map((th) => (th.className.match(/lpn-pane-col-(\S+)/) || [])[1]), T);
-		report.ok(sel.length === 0, '...pressed again, it toggles back out', JSON.stringify(sel));
+		report.ok(sel.length === 0, 'Ctrl+Space with a cell focused selects nothing any more', JSON.stringify(sel));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}

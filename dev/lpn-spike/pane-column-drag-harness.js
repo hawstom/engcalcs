@@ -92,6 +92,27 @@ function gripOf(key) {
 	return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0];
 }
 function sortBtnOf(key) { return thFor(key).children.filter((c) => String(c.className || '').indexOf('lpn-pane-sort') === 0)[0]; }
+// **REAL LEFT-TO-RIGHT POSITIONS, FOR THE MOVE-DRAG TESTS BELOW** (2026-09-26, fourth pass:
+// paneStartColDrag() now finds "the heading under the pointer" by comparing `clientX` against each
+// heading's OWN cached `getBoundingClientRect()`, not by walking up from `event.target` -- ghost
+// and insertion-marker positioning need real coordinates, and reading a fresh rect on every
+// `mousemove` would force a layout the real page never does during a drag (see that function's own
+// comment). `modelHeadingWidths()` above gives every heading the SAME `left: 0`, which is enough
+// for the resize tests (they only ever ask about one heading's own width) but not for "which
+// heading is nearest this x" -- so this lays every heading out left-to-right by its modelled width
+// instead, cumulative, the way a real table row does.
+function modelHeadingPositions() {
+	var x = 0;
+	L.colKeys('junctions').forEach(function (k) {
+		var th = thFor(k), em = drawn[k] || L.widthEm('junctions', k) || 7, width = em * 16, left = x;
+		th.getBoundingClientRect = function () { return { left: left, top: 0, right: left + width, bottom: 20, width: width, height: 20 }; };
+		x += width;
+	});
+}
+function centerXOf(key) {
+	var r = thFor(key).getBoundingClientRect();
+	return r.left + r.width / 2;
+}
 
 console.log('\n--- the heading carries both handles ---');
 {
@@ -260,8 +281,9 @@ console.log('\n--- (e) dragging ANY heading, selected or not, moves it in one mo
 	// could not make the whole cell one target, so the listeners moved up a level). This stub does
 	// not simulate DOM event bubbling from a child to its ancestor, so firing on `sortBtnOf()`
 	// would find no listener there any more.
+	modelHeadingPositions();
 	fire(thFor(from), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: thFor(to) });
+	docFire('mousemove', { clientX: centerXOf(to), clientY: 10 });
 	docFire('mouseup', {});
 	const after = L.colKeys('junctions');
 	report(after.indexOf(from) === before.indexOf(to),
@@ -295,8 +317,9 @@ console.log('\n--- dragging a heading that is part of a multi-column selection m
 	report(before.indexOf(a2) === before.indexOf(a1) + 1, 'two adjacent columns to select', a1 + ',' + a2);
 	fire(thFor(a1), 'click', { ctrlKey: true });
 	fire(thFor(a2), 'click', { ctrlKey: true });
+	modelHeadingPositions();
 	fire(thFor(a1), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: thFor(dest) });
+	docFire('mousemove', { clientX: centerXOf(dest), clientY: 10 });
 	docFire('mouseup', {});
 	const after = L.colKeys('junctions');
 	report(after.indexOf(a2) === after.indexOf(a1) + 1, '...they land beside each other still, in the same relative order',

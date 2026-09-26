@@ -454,7 +454,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -728,7 +728,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 2 unmerged branch(es).
+**27 still to read**, of 39 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -738,6 +738,117 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/queue-0926 (`06b7976e`) — 36 new, 27 to read @@ NEEDS RULING
+
+- **`lpn_field_meter_node`**
+  > Connected to
+  _Ruled OK 2026-09-26._
+- **`lpn_field_meter_node_tip`**
+  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
+  _Ruled OK 2026-09-26._
+- **`lpn_full_col_id`**
+  > ID
+  @@ NEEDS RULING
+- **`lpn_full_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_full_col_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_full_download_csv`**
+  > Download CSV
+  @@ NEEDS RULING
+- **`lpn_full_needs_run`**
+  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
+  @@ NEEDS RULING
+- **`lpn_full_note`**
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
+  @@ NEEDS RULING
+- **`lpn_full_print`**
+  > Print report
+  @@ NEEDS RULING
+- **`lpn_full_row_count`**
+  > {n} rows.
+  @@ NEEDS RULING
+- **`lpn_full_step_label`**
+  > Time step
+  @@ NEEDS RULING
+- **`lpn_full_title`**
+  > Full report
+  @@ NEEDS RULING
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  _Ruled OK 2026-09-25._
+- **`lpn_reports_full`**
+  > Full
+  @@ NEEDS RULING
+- **`lpn_reports_full_tip`**
+  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
+  @@ NEEDS RULING
+- **`lpn_reports_status`**
+  > Status
+  @@ NEEDS RULING
+- **`lpn_reports_status_tip`**
+  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
+  @@ NEEDS RULING
+- **`lpn_status_closed`**
+  > {type} {id} closed
+  @@ NEEDS RULING
+- **`lpn_status_col_event`**
+  > Event
+  @@ NEEDS RULING
+- **`lpn_status_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_status_dry`**
+  > {type} {id} is empty
+  @@ NEEDS RULING
+- **`lpn_status_empty`**
+  > Nothing changed status during this run.
+  @@ NEEDS RULING
+- **`lpn_status_emptying`**
+  > {type} {id} is emptying
+  @@ NEEDS RULING
+- **`lpn_status_filling`**
+  > {type} {id} is filling
+  @@ NEEDS RULING
+- **`lpn_status_full`**
+  > {type} {id} is full
+  @@ NEEDS RULING
+- **`lpn_status_needs_run`**
+  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
+  @@ NEEDS RULING
+- **`lpn_status_no_converge`**
+  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
+  @@ NEEDS RULING
+- **`lpn_status_note`**
+  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
+  @@ NEEDS RULING
+- **`lpn_status_opened`**
+  > {type} {id} opened
+  @@ NEEDS RULING
+- **`lpn_status_title`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  _Ruled OK 2026-09-25._
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_in`**
+  > Zoom in
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_in_tip`**
+  > Zoom in. Shortcut: +
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
+- **`lpn_zoom_out`**
+  > Zoom out
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_out_tip`**
+  > Zoom out. Shortcut: -
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -751,4 +862,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/table-editing (`5a77dd8d`) — adds no English strings
+### feat/table-editing (`acdbe7f8`) — adds no English strings

@@ -14,7 +14,8 @@
 // Tom tried is exactly what master already gave him (approved 2026-09-18) before R-221 split it in
 // two. So: press-and-drag ANY heading, selected or not, now MOVES it (the whole selection together,
 // if the pressed heading is part of one) -- one gesture, one job. Whole-column SELECTION is
-// Ctrl+click, Shift+click and Ctrl+Space only; there is no drag-to-select any more.
+// Ctrl+click and Shift+click only; there is no drag-to-select any more, and no Ctrl+Space
+// either (removed 2026-09-26, fourth pass: "more trouble to debug than the feature is worth").
 //
 // Tom, 2026-09-25, second pass: sorting by clicking a heading is gone entirely -- "(1)(a) No
 // selectable text; there is only one selection possible and one cursor for a heading... A click
@@ -386,6 +387,149 @@ exports.run = async function ({ browser, report }) {
 		report.ok(Math.abs(result.tableWidth - widthBefore) < 0.5,
 			'the Junctions table total width is unchanged -- no space is reserved for either glyph',
 			result.tableWidth + ' vs ' + widthBefore);
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (10) THE KEYBOARD FOCUS RING BELONGS TO THE WHOLE HEADING, NEVER TO THE TEXT (Tom,
+	// 2026-09-26, fourth pass: "I still see special highlighting on the text" -- a screenshot of a
+	// dark rectangle drawn tight around the word "Longitude", the button's own `:focus-visible`
+	// outline). Tab to the heading button and the ring must appear on the `<th>`, never on the
+	// button itself. ------------------------------------------------------------------------------
+	{
+		const a = await openJunctions(browser, 'H');
+		const key = await a.page.evaluate(() => (document.querySelector('#lpn_pane_junctions table thead th:nth-child(2)').className.match(/lpn-pane-col-(\S+)/) || [])[1]);
+		// A REAL keyboard-caused focus move, not `element.focus()`: Chromium's own `:focus-visible`
+		// heuristic does not treat a script-driven `.focus()` call as "visible" focus, only focus
+		// that followed keyboard interaction -- an earlier cut of this check called `.focus()`
+		// directly and both outlines read 'none', which proved nothing about the CSS rule either
+		// way. A mouse click lands the caret on the button (not "visible" focus either) with a
+		// KNOWN tab position; Shift+Tab then Tab is a two-step keyboard round trip that lands back
+		// on the SAME button by a keyboard action, which IS what earns `:focus-visible` -- and it
+		// does not depend on knowing how many other controls the page has before this one.
+		const box = await a.page.evaluate((key) => {
+			const r = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sort').getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, key);
+		await a.page.mouse.click(box.x, box.y);
+		await a.page.keyboard.press('Shift+Tab');
+		await a.page.keyboard.press('Tab');
+		const reached = await a.page.evaluate((key) => {
+			const b = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sort');
+			return document.activeElement === b;
+		}, key);
+		report.ok(reached, 'a keyboard round trip (Shift+Tab, Tab) lands back on the heading button');
+		const result = await a.page.evaluate((key) => {
+			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
+			const b = th.querySelector('.lpn-pane-sort');
+			return { thOutline: getComputedStyle(th).outlineStyle, sortOutline: getComputedStyle(b).outlineStyle };
+		}, key);
+		report.ok(result.thOutline === 'solid', 'Tab-focusing the heading button draws the ring on the <th>', JSON.stringify(result));
+		report.ok(result.sortOutline === 'none', '...and never on the text button itself', JSON.stringify(result));
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (11) THE TAB TIP NAMES HELP > NOTES (Tom, 2026-09-26, fourth pass: "it would be nice to
+	// have it referenced in a tip... at the end of the tables tabs. 'See Help, Notes for keyboard
+	// shortcuts.'") -- one shared key, read on every table tab, not a copy per tab. ----------------
+	{
+		const a = await openJunctions(browser, 'I');
+		// **`title` READS EMPTY ONCE BOOTSTRAP HAS TAKEN IT OVER** (js/looped-network.js's own
+		// comment: initTips() hands every `.ec-help[title]` to Bootstrap, which MOVES `title` into
+		// `data-bs-original-title` and blanks the real attribute) -- read that instead, the same way
+		// this page's own tip-reading code already does.
+		const tip = await a.page.evaluate(() => {
+			const b = document.getElementById('lpn_pane_tab_junctions');
+			return b ? (b.getAttribute('data-bs-original-title') || b.title) : '(no #lpn_pane_tab_junctions found)';
+		});
+		const wanted = await a.lang('lpn_pane_tab_tip');
+		report.ok(!!tip && tip === wanted && / See Help, Notes for keyboard shortcuts\.$/.test(tip),
+			'the Junctions tab tip ends with the Help, Notes sentence', JSON.stringify({ tip, wanted }));
+		const tip2 = await a.page.evaluate(() => {
+			const b = document.getElementById('lpn_pane_tab_pipes');
+			return b && (b.getAttribute('data-bs-original-title') || b.title);
+		});
+		report.ok(tip2 === tip, '...and Pipes\' tab shares the exact same tip -- one key, not a copy per tab', tip2);
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (12) CTRL+SPACE DOES NOTHING NOW (Tom, 2026-09-26, fourth pass: "The Ctrl+Space note is
+	// wrong... Let's remove it. More trouble to debug than the feature is worth.") ----------------
+	{
+		const a = await openJunctions(browser, 'J');
+		await a.page.evaluate(() => {
+			const td = document.querySelector('#lpn_pane_junctions table tbody tr:first-child td.lpn-pane-col-id');
+			const focusable = td && (td.querySelector('input,select,button') || td);
+			if (focusable && focusable.focus) { focusable.focus(); }
+		});
+		await a.settle(100);
+		await a.page.keyboard.down('Control');
+		await a.page.keyboard.press('Space');
+		await a.page.keyboard.up('Control');
+		await a.settle(150);
+		const sel = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead th')]
+			.filter((th) => th.classList.contains('lpn-pane-head-sel')).length, T);
+		report.ok(sel === 0, 'Ctrl+Space selects no column any more', sel);
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (13) THE DRAG SHOWS A GHOST AND AN INSERTION MARKER, AND THE CURSOR STAYS "grabbing"
+	// ACROSS THE WHOLE PAGE FOR THE WHOLE DRAG (Tom, 2026-09-26, fourth pass: "(2) I lose the grab
+	// cursor instead of pulling the column or the heading with me when I leave the column, so drag
+	// is blind. I don't know where the column will end up. (3) The grab cursor is a pointer on the
+	// heading text.") -- and nothing about the TABLE re-renders until drop (the row count and DOM
+	// node identity are unchanged mid-drag). ------------------------------------------------------
+	{
+		const a = await openJunctions(browser, 'K');
+		const key = 'axis1';
+		// (3) the selected heading's own TEXT shows the same "grab" cursor as the cell.
+		const box = await a.page.evaluate((k) => {
+			const r = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + k).getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, key);
+		await a.page.mouse.click(box.x, box.y);
+		await a.settle(100);
+		const cursors = await a.page.evaluate((k) => {
+			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + k);
+			return { th: getComputedStyle(th).cursor, text: getComputedStyle(th.querySelector('.lpn-pane-sort')).cursor };
+		}, key);
+		report.ok(cursors.th === 'grab' && cursors.text === 'grab', 'the selected heading and its own text both show "grab"', JSON.stringify(cursors));
+		// (2) mid-drag, the ghost and marker appear, and the cursor is "grabbing" even far from the
+		// heading. A marker attribute on the first row proves the table BODY is not rebuilt mid-drag
+		// (a rebuild throws every <tr> away and makes fresh ones with no attribute of their own).
+		await a.page.evaluate((T) => document.querySelector(T + ' tbody tr').setAttribute('data-lpn-probe', '1'), T);
+		await a.page.mouse.move(box.x, box.y);
+		await a.page.mouse.down();
+		await a.page.mouse.move(box.x + 300, box.y + 250, { steps: 8 });
+		await a.settle(80);
+		const mid = await a.page.evaluate((T) => {
+			const ghost = document.querySelector('.lpn-pane-col-ghost');
+			const marker = document.querySelector('.lpn-pane-col-marker');
+			const row = document.querySelector(T + ' tbody tr');
+			return {
+				bodyDragging: document.body.classList.contains('lpn-pane-col-dragging'),
+				bodyCursor: getComputedStyle(document.body).cursor,
+				ghostShown: !!ghost, ghostText: ghost && ghost.textContent,
+				markerShown: !!marker && getComputedStyle(marker).display !== 'none',
+				rowUnrebuilt: row && row.getAttribute('data-lpn-probe') === '1'
+			};
+		}, T);
+		report.ok(mid.bodyDragging && mid.bodyCursor === 'grabbing',
+			'far from the heading, mid-drag, the WHOLE PAGE still shows "grabbing"', JSON.stringify(mid));
+		report.ok(mid.ghostShown && !!mid.ghostText, 'a ghost label follows the pointer', JSON.stringify(mid));
+		report.ok(mid.markerShown, '...and an insertion marker shows where the column will land', JSON.stringify(mid));
+		report.ok(mid.rowUnrebuilt, '...and the table body is NOT rebuilt mid-drag (the probe attribute survives)', JSON.stringify(mid));
+		await a.page.mouse.up();
+		await a.settle(150);
+		const cleanup = await a.page.evaluate(() => ({
+			bodyDragging: document.body.classList.contains('lpn-pane-col-dragging'),
+			ghostGone: !document.querySelector('.lpn-pane-col-ghost'),
+			markerGone: !document.querySelector('.lpn-pane-col-marker')
+		}));
+		report.ok(!cleanup.bodyDragging && cleanup.ghostGone && cleanup.markerGone, 'the ghost, marker and body class are all cleaned up on drop', JSON.stringify(cleanup));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
