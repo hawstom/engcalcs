@@ -713,7 +713,6 @@ $ec_lang['lpn_pane_tab_junctions']='Nudos';
 $ec_lang['lpn_pane_tab_tip']='Esta pestaña muestra los elementos de este tipo como una tabla que puede ordenar y editar. Las columnas de resultados no se pueden editar.';
 $ec_lang['lpn_pane_none']='Esta red todavía no tiene ninguno de estos.';
 $ec_lang['lpn_pane_text_attached']='Adjunto';
-$ec_lang['lpn_pane_sort_tip']='Ordenar por esta columna. Vuelva a hacer clic para invertir el orden.';
 $ec_lang['lpn_basemap_show']='Mostrar mapa de calles';
 $ec_lang['lpn_georef_intro']='Colocar el modelo lleva dos pasos. El paso 1 es el rápido: el modelo se queda quieto y usted mueve el mapa detrás de él, hasta que su sitio quede bajo el modelo con aproximadamente el tamaño correcto. Todavía no hay giro. El paso 2 es el preciso: usted arrastra, cambia el tamaño y gira el modelo mismo. Su proyecto empieza sobre un mapa del mundo entero, así que primero encuentre su ubicación, y luego presione el botón Colocar el modelo aquí.';
 $ec_lang['lpn_georef_adjust']='El modelo ya está sobre el terreno, así que se mueve junto con el mapa. Arrastre el modelo para moverlo, arrastre una esquina para cambiar su tamaño, arrastre el tirador redondo encima del modelo para girarlo. O escriba la distancia real y el ángulo de giro abajo.';

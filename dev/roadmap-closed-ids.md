@@ -633,3 +633,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|704| CLOSED 2026-09-23 on Tom's word (*"Done. Close, merge, and delete branch."*). The message log: every notice is kept, a plain down-triangle glyph at the top left of the map lights while one shows and drops the history down the map, newest first; no alert box. `feat/notice-log`, `notice-log-harness.js`. The 57-dialog audit continues as Task 710.
 - 0|691| CLOSED 2026-09-23 with 704, which built what it asked: a QGIS-style log the user controls rather than a banner that leaves on a timer.
 - 0|647| CLOSED 2026-09-25 on Tom's word (*"Good. Close, merge, and delete branch."*). A whole project panned entirely off screen says so, in the neutral panel style, with a way back. `feat/offscreen-notice`.
+- 0|682| CLOSED 2026-09-26 with the feat/zoom-control merge on Tom's all-clear: + and - buttons top-right, plain + and - keys, and Zoom to fit doubling as Zoom Window.
+- 0|715| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Full, every element at every time step.
+- 0|716| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Status, what switched and when.

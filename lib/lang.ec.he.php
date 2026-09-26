@@ -1046,7 +1046,6 @@ $ec_lang['lpn_pane_resize']='גררו כדי להפוך את הלוח לגבוה
 $ec_lang['lpn_pane_tab_junctions']='צמתים';
 $ec_lang['lpn_pane_tab_tip']='לשונית זו מציגה את האלמנטים מסוג זה כטבלה שניתן למיין ולערוך. לא ניתן לערוך עמודות תוצאה.';
 $ec_lang['lpn_pane_none']='לרשת זו אין עדיין אף אחד מאלה.';
-$ec_lang['lpn_pane_sort_tip']='מיון לפי עמודה זו. לחצו שוב כדי להפוך את הסדר.';
 $ec_lang['lpn_find_menu']='חיפוש והחלפה';
 $ec_lang['lpn_find_title']='חיפוש והחלפה';
 $ec_lang['lpn_find_scope']='מה לחפש';
