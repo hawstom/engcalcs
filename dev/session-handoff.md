@@ -8,16 +8,18 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Eight branches may not merge without Tom's all-clear** (all in `protected` in
+- **Six branches may not merge without Tom's all-clear** (all in `protected` in
   `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/zoom-control`,
-  `feat/convert-as`, `feat/table-editing`, `feat/property-venue`, `feat/first-project`,
-  `feat/customer-node`, `feat/menu-button`.
+  `feat/table-editing`, `feat/customer-node`, `feat/menu-button`, `feat/report`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
   2026-09-23 twice showed a clean merge breaking a harness (the lag harness and Net3's threshold).
+- **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
+  takes that lock itself, so the wrapper deadlocks every one (2026-09-25, 280 s NOT RUN apiece).
+  Brief agents to write journals to the scratchpad while a suite runs in the main checkout.
 - Run `check_all.sh` and headless browser runs under their `flock` locks, and run no more than
   four agent tracks at once. WSL has 12 GB and 4 processors since 2026-09-23.
 
@@ -87,65 +89,48 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-25
+## STATE — 2026-09-25, evening
 
-### Master is f9ebf891, pushed and verified (not yet pulled by him)
+### Master is 017ee4de, pushed with a green suite (Tom has not pulled it)
 
-Merged on his all-clear: label-limit, offscreen-notice, usage-report, select-on-focus (Task 647
-closed). Also: the menu cue deleted (R-203; key `lpn_menu_cue` gone from 27 files, localStorage
-`lpn_menucue` now legacy and still erased by Erase everything); Tasks 715/716 (Full and Status
-Report) at 100 ahead of 697; R-230..R-247 queued; `dev/real-world-reviews.md`; Mary's
-`watercad-migration.md` and Sue's journal on WaterCAD; the keys list no longer lists keys a branch
-merely inherited. The merge commit was first pushed with `--no-verify` on the argument that its tree
-was identical to a verified tree; the classifier then blocked worktree removal as a CI bypass, and
-the suite was run on 61fa16f4 itself afterwards (green, stamped). Do not repeat the `--no-verify`.
+Merged on his all-clear today: first-project, convert-as, property-venue (his property-venue
+bullet was headed feat/table-editing; the Find content made it this branch, recorded in the
+all-clear). Sibling sites pushed with the same change: librewaternet.org eef380e, not-epanet.org
+a058b5d. **They say the street map shows on the first, empty project, and CLAUDE.md now says so.
+Tom should pull all three together**, or the landing pages describe a first visit his server
+does not have yet.
 
-### In flight
+### Awaiting his browser pass (each green on its own suite except the expected payload check)
 
-- **`fix/fireflow-eps`** MERGED at f9ebf891 (defect track): R-231..R-233. Time-step link
-  status in map, Properties, Tables; fire flow solves from the step's tank levels and statuses;
-  EPANET reopens when a pump's open/shut changes; every selected junction tested. Perry: ready.
-  New key `lpn_ff_skipped`, changed `lpn_ff_scope_selected`. Worktree fix-fireflow-eps awaits removal.
-
-### Awaiting his pass (each green on its own check_all; Perry's verdicts in his journal)
-
-- **8103 `feat/zoom-control`** dc1fa5a9: refit-after-results removed (R-236). Perry: ready.
-- **8104 `feat/convert-as`** 47649c32: R-237/R-238. 4326 listed, no "(no map)" on 3857, "projection"
-  gone from the Convert as, New project and Coordinate system boxes (two left elsewhere:
-  `lpn_georef_projected`, `lpn_terrain_no_place`), tank Water depth label. SEAM with first-project:
-  both edit `crsDisplayName()`; convert-as reads the catalogue's 4326 entry, first-project added
-  `LPN_CRS_WGS84` constants. Keep one.
-- **8105 `feat/table-editing`** 34b757b8: R-239..R-241. Click sorts; a one-motion drag of ANY
-  heading moves it (a selection moves as a block); Ctrl/Shift+click and Ctrl+Space select;
-  drag-to-select removed; hover sort arrow; ⋯ corner badge with Sort, Hide, Show all columns,
-  Manage columns. Perry found 5ddf79d0 (09-24) had turned his one-motion drag into a selection,
-  which was his "can't drag"; fixed in 53283193. Watch: a body-cell click may not always clear a
-  column selection (seen only in a harness).
-- **8106 `feat/property-venue`** b8733c5d: R-242, one "Filter in table" button with his tip. Perry: ready.
-- **8112 `feat/first-project`** f775f0a6: R-243/R-244. Empty lat/lon project follows the view
-  (nodes and tiles were drawn millions of px off canvas); street map ON behind the gallery;
-  status bar WGS 84 (EPSG:4326); privacy.php's two sentences rewritten. **Makes the landing page's
-  "each one asks first" false** (librewaternet.org index.html:234, screenshots.html:219) and
-  CLAUDE.md's "all opt-in" line; both wait on his ruling. Perry: ready.
-- **8113 `feat/customer-node`** cd7640b1: R-245..R-247. Black, "Connected to" row, node fallback on
-  pipe delete, size 0.25 to 0.30 of a junction (it was already 0.25, not 0.2).
-- **8114 `feat/menu-button`** a82d32f5: R-202 preview, solid blue menu items only;
-  `?menustyle=outline` for the outlined variant.
-- **8090 `feat/label-gang-search`**: unchanged, 256 commits behind master.
-
-Ports 8113 and 8114 are new and need the Apache reload (commands below).
+- **8103 `feat/zoom-control`** 43902998: R-263 (one cause fixed: a fit that hid labels kept room
+  for them; his exact screenshot NOT reproduced), R-264 (dragged label leapt to 2.2x its leader;
+  fixed), R-265 tips in his exact words.
+- **8105 `feat/table-editing`**: R-254..R-259, the spreadsheet heading (click selects, ⋮ menu,
+  arrow under ⋮, Manage columns applies on OK, move-to-beginning/end, print names the PDF
+  `{project}-{table}`). 7f3661a6: duplicate Cancel key removed; the divider harness now hides
+  the ⋮ glyph while it measures, since it was reading the glyph as a divider. No Perry pass yet.
+- **8113 `feat/customer-node`** 105d9f68: R-267..R-270. Perry's grip-over-junction defect fixed.
+- **8114 `feat/menu-button`** eceab3ab: outlined only, R-271. Needs his all-clear; merge master first.
+- **8115 `feat/report`** 87e15a16 (new port, needs the Apache reload): Tasks 715/716, Water >
+  Reports > Status / Full. Perry's two defects fixed. **SEAM with table-editing:** the Full
+  report's print suggests a generic PDF name because the page may not write `document.title`;
+  table-editing adds the one reviewed exception (set and restored around print). After
+  table-editing merges, route the Full report's print through the same path.
+  Adds two localStorage furniture keys, `lpn_statusbox` and `lpn_fullbox`.
+- **8090 `feat/label-gang-search`**: unchanged.
 
 ### Open with him
 
-1. The landing-page and CLAUDE.md "opt-in" claims (first-project).
-2. R-235: the half-drawn Zoom Window box, explained in the 09-25 report.
-3. WaterCAD: a sample WaterCAD-exported .inp from IOD would settle more than any research.
-4. The three unread label-limit strings on master (`lpn_labels_customer_width_tip`,
-   `lpn_settings_label_always`, `lpn_settings_label_max_width_tip`).
+1. R-252: he believes SI writes no space before a unit symbol. The SI Brochure and NIST SP 811
+   both put a space ("10 mm"); the suffix prefill is always one space, which is right for both.
+2. R-253/R-262 answered in the 09-25 evening report; lpn_convas_no_transform reworded to name the
+   system, awaiting his ruling. R-260 (Find ID empty) could not be reproduced; asked him to retest.
+3. R-235, WaterCAD sample .inp from IOD, as before.
 
 ### Translation sprint
 
-Not launched: seven feature branches carry new English awaiting his rulings.
+Not launched. Master has 2 unread strings and five branches carry new English awaiting his pass;
+launch after that pass merges, so one sprint covers them.
 
 ## Commands to hand Tom with any panel change
 

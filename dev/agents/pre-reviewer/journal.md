@@ -1760,3 +1760,156 @@ it exited, which looked identical to a genuine hang from the outside. Worth reme
 before concluding something is stuck: check who actually holds the lock
 (`for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && cat
 $p/cmdline; done`) before killing anything.
+
+## 2026-09-25 — feat/report (Tasks 715, 716), and the harness that couldn't have caught it
+
+OBSERVED, real Chromium (playwright-core against the worktree's own checkout, docroot symlinked
+so `/engcalcs/...` paths resolve as production does), Net3 loaded from the gallery and its own
+already-set EPS run, then a Basic (non-EPS) network for the steady-state path.
+
+- **CONFIRMED, live, Net3's Pump 10/L10 switches**: the Status report reads "1:00 Pump L10
+  opened" and "15:00 Pump L10 closed", matching R-231's fixture and `report-harness.js`'s own
+  assertion (3600s->open, 54000s->closed) exactly.
+- **MISSED: the Full report box renders nothing.** `rebuildFullReport()`
+  (`js/looped-network.js:51221`) writes only two `<p>` lines — a note and "5400 rows." — into
+  `#lpn_full_report`. The actual table exists only inside `fullReportPrintable()` (Print) and
+  `fullReportCsvText()` (CSV download), both built separately and never inserted into the visible
+  box. Confirmed by screenshot on both Net3 (EPS, 5400 rows) and a Basic non-EPS network (15
+  rows): opening Water > Reports > Full report shows a big empty white box under a row count,
+  nothing to read. The CSV and the printed table are both genuinely correct (checked the CSV
+  content, the printed table's headers and row count, and the PDF-suggested filename), so the
+  data plumbing is right — only the on-screen view was never wired up. `dev/lpn-spike/
+  report-harness.js` cannot catch this: it asserts `fullReportRows()`, `fullReportCsvText()`,
+  `rebuildStatusReport()`'s DOM is never touched for the Full side, and `rebuildFullReport` is
+  `require`d but never asked what it put in the DOM.
+- **MISSED: the two new Reports-menu rows break the branch's own stated naming rule.** The same
+  comment block (`js/looped-network.js:4630`) states "THE PARENT CARRIES THE WORD SO NO ROW HAS
+  TO" — Tom's own complaint about "Pump energy report"/"EPANET run report" stammering under a
+  parent called Reports, fixed once already. Live menu order, read from the DOM:
+  `["Pump energy", "Scenario comparison", "EPANET run", "Status report", "Full report"]` — the two
+  new rows are the only two that still carry the word "report", reintroducing exactly the
+  non-parallelism the comment says was fixed. (Box titles keeping "report" is fine and is what the
+  comment says should stay unchanged; it is the row label that regressed.)
+- **CONFIRMED, live: Recalculate-off snapshot rule holds.** Turned "Recalculate automatically"
+  off, opened the Status report (558 characters of text), made an edit (`Session.makeEdit()`),
+  reopened it: byte-identical, frame count unchanged (25). No auto-refresh leaked in.
+- **CONFIRMED, live, steady-state (non-EPS) network behaves sensibly**: Full report's CSV has one
+  row per node/link at t=0:00 with the right units and blanks exactly where EPANET has no such
+  quantity (Pressure/Demand blank for a Reservoir); Status report correctly explains it needs an
+  extended-period run rather than showing nothing or erroring.
+- **UNVERIFIABLE FROM HERE**: the claimed valve "active" state gap (engine bridge only exposes
+  open/closed) — Net3 has no valves, so I could not drive a PRV/PSV through a state change to see
+  what the Status report calls it. A browser pass on a network with an active valve should check
+  what word appears.
+- Process note: the worktree's own `dev/browser-pass` REPO resolution follows `git
+  rev-parse --show-toplevel` from wherever the required file lives, which pointed back at the main
+  checkout rather than the worktree; had to build my own docroot (`engcalcs` symlink to the
+  worktree) and PHP server rather than reuse `startServer()` unmodified. Worth remembering for the
+  next worktree review.
+
+**Verdict: NOT READY FOR TOM**, on the Full report defect alone — Task 715 explicitly asks for
+something a person reads, and today's box shows a person nothing. The menu-wording regression is
+the second, smaller thing to fix in the same pass.
+
+## 2026-09-25 -- feat/customer-node, review at da75608c: NOT READY, one confirmed regression on the exact complaint being fixed
+
+OBSERVED, checked 2026-09-25, worktree /home/haws/webdev/worktrees/feat-customer-node/engcalcs,
+real headless Chromium via dev/browser-pass infra (own PHP server, flock'd), a hand-drawn bent
+pipe and customer, plus mutation-testing js/looped-network.js's bend logic in a throwaway copy
+(restored before finishing; git diff clean afterward).
+
+**CONFIRMED, (1) partially: the customer DOT no longer outranks a Junction, but the SELECTION
+GRIP still does, exactly reproducing the complaint in a narrower case.** customersLayer now
+paints before linksLayer/linkSymbolLayer/nodesLayer (js/looped-network.js ~33540-33548), and with
+nothing selected, elementFromPoint() at a point where a node-connected customer's dot sits
+exactly on its junction resolves to the junction (`lpn-node lpn-node-junction`, dataNode=J1) and
+clicking there selects the junction, popup shows junction fields (fire flow, emitter
+coefficient) -- CONFIRMED live. But the connection GRIP (`.lpn-custhandle`, deliberately left in
+labelsLayer "on top... because it is the thing in the hand", css/engcalcs.css comment,
+js/looped-network.js ~9591) is drawn at customerAttachPoint(c), which for a node-connected
+customer is the node's own position -- and a customer is automatically selected the instant it is
+placed (`setSelection('customer', madeC.id)`). Measured: place a customer, connect it to a
+junction (the exact new capability R-246 asked for), and while it is still selected (i.e.
+immediately after placing it, or any time after re-selecting it), elementFromPoint() at that same
+point now resolves to `.lpn-custhandle`, and a click there opens the CUSTOMER's popup, not the
+junction's -- `selMeter:1, selNode:0`. Pressing Escape to deselect first restores the correct
+junction pick. Not one of Tom's literal words but squarely inside "Customer zindex is higher than
+Junction" -- the fix reordered the wrong element for this one case.
+
+**CONFIRMED (2), mutation-tested, not just read.** Copied js/looped-network.js, replaced `bend =
+linkBendAt(l, c.t); if (bend) { c.t = bend.f; }` with `bend = null;` and reran
+dev/lpn-spike/customer-bend-harness.js: 9 of the shipped 40 checks fail (2a.4/.7/.8/.9,
+2b.3/.5/.6/.10, 2c.4) -- the harness is real, not decorative. Restored the file; `git diff`
+clean. Live drag through the wedge (24-step slow arc around a hand-drawn bend, real
+mouse.move/down/up): the customer's drawn position moves smoothly, max delta between consecutive
+samples 2.9 world units on a ~45-unit radius sweep -- no jump. Demand routing: gave the bend
+customer (t=0.444 by the harness's own arithmetic; my hand-drawn geometry put it just past 0.5,
+toward the far end) a demand of 1234 and confirmed live that exactly one end junction's "Customer
+demands" section and Demand total picked it up, the other end stayed at 0 -- and the customer's
+own popup states "Added to node: J2" which matched the junction that actually got the demand. The
+mechanism is internally consistent and transparent (the popup tells you which node it lumped to),
+so I did not chase down whether J2 was in fact the nearer-by-arc-length end for my specific
+hand-drawn geometry -- the harness's own 2b.9 already re-derives that arithmetic independently.
+
+**CONFIRMED (3a): all 7 example files (published examples/ and their dev/water-network-examples/
+source) now open at textSize 12, symbolSize 12, linkWidth 4, and NOTHING else changed.** Diffed
+every file, master vs branch head, via `python -m json.tool`: the only lines that differ anywhere
+in any of the 7 files are those three settings keys (Net3-Novato-CA-World's symbolSize was
+already 12, so only 2 lines differ there). `php dev/scripts/generate_examples.php --check`
+reports FRESH -- the published copies match the authoring folder including the `docId` field
+generate_examples.php itself adds (documented in its own header, not a leak). The
+settings-select-lag-harness's own accommodation (pinning textSize/symbolSize/linkWidth to the OLD
+8/8/2 values on its private copy of Net3.lwn, so its label-row-count assertions still test what
+they tested before) is a legitimate, narrow fix -- reran it, 30/30 pass.
+
+**CONFIRMED (3b): "Link line thickness" -> "Link line width" touches exactly the one key.**
+`lib/lang.ec.en.php:2886` now reads 'Link line width (pixels)'; grepped every .php/.js file for
+the old string "Link line thickness" and the only hit left is a comment in
+customer-bend-harness.js quoting Tom's words, not a live fallback literal -- the exact defect
+shape (glyph/string fixed in the language file, an old literal left in a JS `||` fallback)
+flagged repeatedly in this journal's own past entries did not recur here.
+
+**Not independently re-verified beyond reading the code and diff (both plausible, neither
+contradicted):** the "black not red," "Connected to" row, and node-fallback-when-pipe-deleted
+work from the earlier commit on this branch (61bd2109) -- these were already reviewed once before
+under R-245/246/247 wording and I did not re-derive them from scratch this round, beyond
+observing the "Connected to: J2" popup text live, which is consistent with what is claimed.
+
+**Verdict: NOT READY.** The z-index fix is real and correctly reorders the customer's own drawn
+dot, but the connection grip it deliberately exempted now sits on top of the junction it connects
+to and reintroduces the exact complaint for any selected, node-connected customer -- which is the
+first thing anyone will hit, since placing a customer selects it automatically. The bend/vertex
+work and the three-setting example change are both solid and mutation/diff-confirmed.
+
+# 2026-09-25 second pre-review of feat/report (HEAD 87e15a16)
+
+OBSERVED (real headless Chromium, dev/browser-pass env+session, Net3 gallery card, auto-recalculate
+already on so no explicit Calculate press needed):
+- Full report box now shows a real table for one time step (216 rows), Type/ID + 8 result columns,
+  units in headings (Demand (gpm), Head (ft H2O), Pressure (psi), Source share (%), Flow (gpm),
+  Velocity (ft/sec), Head loss (ft H2O), Status). Time step selector has 25 options; switching from
+  step 0 to step 5 changed Junction 10's Head from 145.52 to 242.16 and Pressure from -0.64 to 41.25.
+  Note under it correctly says "5400 rows" (216 x 25). CONFIRMED against build agent's claim.
+- Reports fly-out rows read "Status" and "Full" (menuClickSub against pc.lpn_reports_status/full
+  resolved and worked). CONFIRMED against the "parent carries the word" rule.
+- Status report box: "Pump L10 opened" at 1:00, "Pump L10 closed" at 15:00 -- matches Tom's expected
+  1:00/15:00 pump event, "L10" prefix is the pre-existing labelPrefixFor() map-label convention
+  (id-prefix-harness.js), not something this branch introduced; not a defect.
+- document.title before AND during print stayed the fixed site title ("Free Online Water
+  Distribution Network Modeling with the EPANET Solver") -- confirmed by reading document.title
+  right before calling window.print() equivalent state. git diff of the "Fix pre-review" commit
+  (d3be5817) shows the build agent DELETED a working `document.title = fullReportFilename('pdf')...`
+  / restore-on-afterprint block that the previous commit (4d1e442) had added specifically so "the
+  suggested filename a browser's own Save as PDF offers ... is the same name the CSV download
+  carries." It was removed to satisfy dev/lpn-spike/example-network-harness.js's literal source
+  check `js.indexOf('document.title') < 0`, and the replacing comment claims "the printed sheet's
+  own h1/h2 ... is the only place this page states what a saved PDF is" -- this is false as a claim
+  about what a browser actually offers as a suggested filename (Chrome/Firefox source it from
+  document.title, never from on-page text), and it is the same commit's own prior comment saying
+  exactly that. MISSED: Full report's Print no longer offers a useful suggested PDF filename; it
+  regressed to the generic, project-independent site title. Tom's analogous want is on record as
+  R-259 (dev/tom-review-queue.md) for the Tables print, not yet closed there either -- this is a
+  new instance of the same want, not a duplicate report of an already-known gap.
+- printPaneTable() (Tables pane print) also does not touch document.title anywhere in this tree, so
+  its PDF suggestion is equally generic -- confirms R-259 is still open suite-wide, unaffected by
+  this branch either way.

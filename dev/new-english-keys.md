@@ -674,7 +674,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**27 still to read**, of 55 new keys across 7 unmerged branch(es).
+**32 still to read**, of 60 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -685,7 +685,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-node (`da75608c`) — 2 new, all ruled
+### feat/customer-node (`105d9f68`) — 2 new, all ruled
 
 - **`lpn_field_meter_node`**
   > Connected to
@@ -708,9 +708,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/property-venue (`f76a98e1`) — adds no English strings
-
-### feat/report (`4fad6782`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/report (`87e15a16`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_full_col_id`**
   > ID
@@ -728,7 +726,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
   @@ NEEDS RULING
 - **`lpn_full_note`**
-  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.
   @@ NEEDS RULING
 - **`lpn_full_print`**
   > Print report
@@ -736,17 +734,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_full_row_count`**
   > {n} rows.
   @@ NEEDS RULING
+- **`lpn_full_step_label`**
+  > Time step
+  @@ NEEDS RULING
 - **`lpn_full_title`**
   > Full report
   @@ NEEDS RULING
 - **`lpn_reports_full`**
-  > Full report
+  > Full
   @@ NEEDS RULING
 - **`lpn_reports_full_tip`**
   > Every node and every link at every reporting time step of the last run, as one table you can download or print.
   @@ NEEDS RULING
 - **`lpn_reports_status`**
-  > Status report
+  > Status
   @@ NEEDS RULING
 - **`lpn_reports_status_tip`**
   > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
@@ -791,10 +792,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`b7398d0b`) — 17 new, 1 to read @@ NEEDS RULING
+### feat/table-editing (`0e0739c1`) — 21 new, 5 to read @@ NEEDS RULING
 
+- **`lpn_dialog_cancel`**
+  > Cancel
+  @@ NEEDS RULING
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -820,6 +824,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_manage_cols`**
   > Manage columns…
   _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_bottom`**
+  > Move to end
+  @@ NEEDS RULING
 - **`lpn_pane_manage_cols_down`**
   > Move down
   _Ruled OK 2026-09-26._
@@ -829,6 +836,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_manage_cols_title`**
   > Manage columns
   _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_top`**
+  > Move to beginning
+  @@ NEEDS RULING
 - **`lpn_pane_manage_cols_up`**
   > Move up
   _Ruled OK 2026-09-26._
@@ -844,8 +854,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_sort_desc`**
   > Sort descending
   _Ruled OK 2026-09-26._
+- **`lpn_pane_sortarrow_tip`**
+  > Reverse the sort
+  @@ NEEDS RULING
 
-### feat/zoom-control (`d95c0b27`) — 7 new, all ruled
+### feat/zoom-control (`43902998`) — 7 new, all ruled
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -860,11 +873,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step. Shortcut: +
-  _Ruled OK 2026-09-25._
+  > Zoom in. Shortcut: +
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
 - **`lpn_zoom_out`**
   > Zoom out
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step. Shortcut: -
-  _Ruled 2026-09-25: His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's._
+  > Zoom out. Shortcut: -
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_

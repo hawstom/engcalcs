@@ -103,11 +103,11 @@ judgement and does not belong to a script.
 
 - [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one
   - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
-- [ ] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached
+- [x] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached -- merged, master 017ee4de
 
 ### feat/convert-as (8104)
 
-- [ ] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. Ensure that both 'Import' and 'Convert as ...' state clearly that files with an EPSG coordinate system that simply needs to be referenced/located can be scaled 1:1 in Step 2 of the Convert as... wizard." -- feat/convert-as 0693cb6d: button and its two keys deleted; Import report and the Step 2 Ground distance tip carry the 1:1 note. New strings need your ruling
+- [x] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. Ensure that both 'Import' and 'Convert as ...' state clearly that files with an EPSG coordinate system that simply needs to be referenced/located can be scaled 1:1 in Step 2 of the Convert as... wizard." -- feat/convert-as 0693cb6d: button and its two keys deleted; Import report and the Step 2 Ground distance tip carry the 1:1 note. New strings need your ruling -- merged, master 017ee4de
   -  [TGH 2026-09-24: In the import report, change the coordinate system paragraph as follows: "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"]
 
 ## Round of 2026-09-25 -- IOD's test, Net3 fire flow, and his pass over the ten branches
@@ -127,8 +127,8 @@ judgement and does not belong to a script.
 
 ### feat/convert-as (8104)
 
-- [ ] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP." -- feat/convert-as 47649c32, awaiting your pass
-- [ ] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here." -- feat/convert-as: tank Water depth is a label now; awaiting your pass
+- [x] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP." -- feat/convert-as 47649c32, awaiting your pass -- merged, master 017ee4de
+- [x] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here." -- feat/convert-as: tank Water depth is a label now; awaiting your pass -- merged, master 017ee4de
 
 ### feat/table-editing (8105)
 
@@ -138,12 +138,12 @@ judgement and does not belong to a script.
 
 ### feat/property-venue (8106)
 
-- [ ] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected." -- feat/property-venue b8733c5d, built as you proposed; awaiting your pass
+- [x] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected." -- feat/property-venue b8733c5d, built as you proposed; awaiting your pass -- merged, master 017ee4de
 
 ### feat/first-project (8112)
 
-- [ ] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?" -- feat/first-project f775f0a6: street map on at first load; privacy.php changed; landing page claim needs your ruling
-- [ ] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?" -- feat/first-project: WGS 84 (EPSG:4326)
+- [x] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?" -- feat/first-project f775f0a6: street map on at first load; privacy.php changed; landing page claim needs your ruling -- merged, master 017ee4de
+- [x] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?" -- feat/first-project: WGS 84 (EPSG:4326) -- merged, master 017ee4de
 
 ### Customer
 
@@ -159,47 +159,47 @@ judgement and does not belong to a script.
 
 ### feat/first-project (8112)
 
-- [ ] R-249 feat/first-project | "On the gallery welcome, end it 'Or start here'. With that, we can close, merge, and delete the branch. Nice work." -- feat/first-project 8aa04872
-- [ ] R-250 -- | Decision: "Street map on at first load: Yes." -- landing pages and CLAUDE.md reworded to match
+- [x] R-249 feat/first-project | "On the gallery welcome, end it 'Or start here'. With that, we can close, merge, and delete the branch. Nice work." -- feat/first-project 8aa04872 -- merged, master 017ee4de
+- [x] R-250 -- | Decision: "Street map on at first load: Yes." -- landing pages and CLAUDE.md reworded to match -- street map on; librewaternet.org eef380e, not-epanet.org a058b5d, privacy.php and CLAUDE.md say so
 
 ### feat/convert-as (8104)
 
-- [ ] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!"
-- [ ] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space."
-- [ ] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?"
+- [x] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!" -- merged, master 017ee4de
+- [?] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space." -- the prefill is always one space. The SI Brochure and NIST SP 811 both put a space between number and unit symbol ("10 mm"), so one space is right for SI and US alike. Keep it?
+- [?] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?" -- it fires when a chosen EPSG system has no transform in this page's catalogue; reworded to name it: "This page has no coordinate transform for {crs}, ..." -- merged, awaiting your ruling
 
 ### feat/table-editing (8105)
 
-- [ ] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice."
-- [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go."
-- [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu."
-- [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)."
-- [ ] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful."
-- [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf"
+- [ ] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice." -- feat/table-editing: whole cell is one target, click selects the column, ⋮ glyph opens the menu; awaiting your pass
+- [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed
+- [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it
+- [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list
+- [?] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
+- [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf
 
 ### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
 
-- [ ] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap."
-- [ ] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work."
-- [ ] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?"
+- [?] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap." -- not reproduced on the merged code: Everything, ID, is empty finds only Text items on Net3-Novato. Which project was open? A retest after you pull would settle it
+- [x] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work." -- merged, master 017ee4de
+- [?] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?" -- yes, rarely: a typed query naming a node-only and a link-only property together fits no single table
 
 ### feat/zoom-control (8103)
 
-- [ ] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side]
-- [ ] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant."
-- [ ] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'."
+- [ ] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side] -- feat/zoom-control 43902998: one cause fixed (a fit that hid labels kept room for them); your exact screenshot not reproduced, see the report
+- [ ] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant." -- feat/zoom-control 43902998: the dragged label leapt to 2.2x its leader; fixed
+- [ ] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'." -- feat/zoom-control 43902998: exactly your words
 - [x] R-266 feat/zoom-control | "The zoom window can be very nice for some users. ... 'Don't zoom again after results' seems to work fine." -- nothing to build
 
 ### feat/customer-node (8113)
 
-- [ ] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?"
-- [ ] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)"
-- [ ] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers."
-- [ ] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'."
+- [ ] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?" -- feat/customer-node 105d9f68: customers draw under links and junctions; a click on the junction under a selected customer's grip opens the junction
+- [ ] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)" -- feat/customer-node 105d9f68: outside a bend the customer connects at the bend, and a drag tracks onto it and off again
+- [ ] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers." -- feat/customer-node 105d9f68: all 7 examples
+- [ ] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'." -- feat/customer-node 105d9f68
 
 ### feat/menu-button (8114)
 
-- [ ] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'."
+- [ ] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'." -- feat/menu-button eceab3ab: outlined only; the cue was already deleted on master and is gone from the branch after merging master
 
 ### Fire flow
 
@@ -207,8 +207,8 @@ judgement and does not belong to a script.
 
 ### WaterCAD and EPANET, his notes
 
-- [ ] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool."
-- [ ] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!"
+- [x] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool." -- Tasks 718-723
+- [x] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!" -- 146.09 retitled "An inset overview map"; Task 717 at 50
 
 ### Rulings recorded, nothing to build
 
