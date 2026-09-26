@@ -1894,6 +1894,10 @@ the block.
   Declan's wishlist §6, ranked low by him: plan sets in the US are in State Plane. Read with the
   Convert as catalogue (Task 696) before building anything.
 
+- 5|730| **Ctrl+Space selects the current column in the Tables pane.**
+  PARKED. Tom, 2026-09-26: *"More trouble to debug than the feature is worth."* Removed from
+  feat/table-editing; clicking a heading selects a column.
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
