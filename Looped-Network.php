@@ -158,10 +158,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // Placed in markup rather than built in JS so the id resolves and the string is translated
       // like every other; shown, positioned and retired by js/looped-network.js. ?>
-	<div class="d-print-none lpn-menu-cue" id="lpn_menu_cue" style="display:none" role="note">
-		<span class="lpn-menu-cue-arrow" aria-hidden="true">▲</span><span id="lpn_menu_cue_text"></span>
-		<button type="button" id="lpn_menu_cue_x" class="lpn-menu-cue-x" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<div class="d-print-none" id="lpn_tabs"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
@@ -613,6 +609,30 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;inset:0;pointer-events:none;overflow:auto">
 			<div id="lpn_examples_pane" class="lpn-examples"></div>
 		</div>
+		<?php // ROADMAP Task 647, Tom 2026-09-13: "a blank map is equally fatal as a lost project.
+		      // User doesn't know the difference" -- so when the model has elements but none of
+		      // them intersect the current view, this says so instead of leaving a blank canvas
+		      // that reads exactly like a lost project.
+		      //
+		      // **A PERSISTENT OVERLAY, NOT THE TRANSIENT NOTICE STRIP AND NOT THE MESSENGER LOG**
+		      // (Ida, Task 647 journal entry): #lpn_map_notice is architecturally transient (its own
+		      // doc comment: "a transient must not change the fit") and Task 616 measured that row
+		      // going unread; the Messenger is a log of what already happened, opened by a glyph the
+		      // reader must remember exists, and this is a fact about the CURRENT view, always true
+		      // until the reader acts. So it sits centred where the emptiness is, styled after
+		      // #lpn_empty_hint immediately above it: `inset:0`, wrapper `pointer-events:none` so
+		      // panning still works in the gaps, and only the box itself takes clicks. No inherent
+		      // side, so RTL needs nothing special. updateOffscreenNotice() in js/looped-network.js
+		      // is the one place this is shown or hidden -- called only when a pan or a zoom gesture
+		      // has settled, never mid-drag and never per wheel notch, reusing viewShowsModel()'s
+		      // own arithmetic rather than a second geometry. Hidden instantly, no fade: the display
+		      // toggle is the only style write. ?>
+		<div id="lpn_offscreen_notice" class="d-print-none" role="status" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;pointer-events:none;text-align:center">
+			<div class="lpn-offscreen-card">
+				<div id="lpn_offscreen_notice_text" style="margin-bottom:6px"></div>
+				<button type="button" id="lpn_offscreen_zoom_btn" class="btn btn-sm btn-outline-secondary"></button>
+			</div>
+		</div>
 		<?php // THE BOTTOM STATUS STRIP. Both readouts in ONE flex row so their order is real rather
 		      // than two absolute boxes that happen not to collide: settings first, then the
 		      // coordinate tracker (Tom, 2026-08-10 -- "move to left before the coordinates to match
@@ -1033,12 +1053,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // defaultSettings() in js/looped-network.js. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_node_fields"></div>
+							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_link_fields"></div>
+							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
 						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
@@ -1055,7 +1075,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_labels_customer_fields"></div>
+							<div id="lpn_labels_customer_fields" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
@@ -1646,6 +1666,7 @@ EngCalcs.pageConfig = {
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
+	lpn_offscreen_intact: <?=json_encode($ec_lang['lpn_offscreen_intact'])?>,
 	lpn_examples_welcome: <?=json_encode($ec_lang['lpn_examples_welcome'])?>,
 	lpn_examples_heading: <?=json_encode($ec_lang['lpn_examples_heading'])?>,
 	lpn_examples_sub: <?=json_encode($ec_lang['lpn_examples_sub'])?>,
@@ -2114,7 +2135,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
-	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
 	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
@@ -2482,6 +2502,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_scope_selected: <?=json_encode($ec_lang['lpn_ff_scope_selected'])?>,
 	lpn_ff_no_junctions: <?=json_encode($ec_lang['lpn_ff_no_junctions'])?>,
 	lpn_ff_no_selection: <?=json_encode($ec_lang['lpn_ff_no_selection'])?>,
+	lpn_ff_skipped: <?=json_encode($ec_lang['lpn_ff_skipped'])?>,
 	lpn_ff_required: <?=json_encode($ec_lang['lpn_ff_required'])?>,
 	lpn_ff_required_tip: <?=json_encode($ec_lang['lpn_ff_required_tip'])?>,
 	lpn_ff_required_own: <?=json_encode($ec_lang['lpn_ff_required_own'])?>,
@@ -2550,7 +2571,6 @@ EngCalcs.pageConfig = {
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
 	lpn_help_welcome: <?=json_encode($ec_lang['lpn_help_welcome'])?>,
-	lpn_menu_cue: <?=json_encode($ec_lang['lpn_menu_cue'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
@@ -2969,8 +2989,6 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_gray: <?=json_encode($ec_lang['lpn_color_ramp_gray'])?>,
 	lpn_settings_color_reverse: <?=json_encode($ec_lang['lpn_settings_color_reverse'])?>,
 	lpn_color_none: <?=json_encode($ec_lang['lpn_color_none'])?>,
-	lpn_settings_color_thematic: <?=json_encode($ec_lang['lpn_settings_color_thematic'])?>,
-	lpn_settings_color_thematic_tip: <?=json_encode($ec_lang['lpn_settings_color_thematic_tip'])?>,
 	lpn_settings_color_key_position: <?=json_encode($ec_lang['lpn_settings_color_key_position'])?>,
 	lpn_settings_color_breaks: <?=json_encode($ec_lang['lpn_settings_color_breaks'])?>,
 	lpn_settings_color_equal_intervals: <?=json_encode($ec_lang['lpn_settings_color_equal_intervals'])?>,

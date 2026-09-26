@@ -2688,7 +2688,6 @@
 		"colorClassesLink": 7,
 		"colorReverseNode": false,
 		"colorReverseLink": false,
-		"colorThematic": false,
 		"colorLegendPosition": "middle-right",
 		"colorBreaks": {
 			"node.demand": [

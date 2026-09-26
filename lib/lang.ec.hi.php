@@ -901,8 +901,6 @@ $ec_lang['lpn_color_ramp_viridis']='बैंगनी से पीला (ए�
 $ec_lang['lpn_color_ramp_gray']='हल्के से गहरे स्लेटी';
 $ec_lang['lpn_settings_color_reverse']='रंगों का क्रम उलटें';
 $ec_lang['lpn_color_none']='कोई रंग नहीं';
-$ec_lang['lpn_settings_color_thematic']='विषयगत मानचित्र: केवल रंग, कोई लेबल नहीं';
-$ec_lang['lpn_settings_color_thematic_tip']='नोड और लिंक लेबल छुपा देता है ताकि मानचित्र पर केवल रंग रह जाएँ। आपके खुद रखे गए टेक्स्ट बने रहते हैं। आपकी लेबल पसंद बनी रहती है, और इसे बंद करने पर वे वापस आ जाती हैं।';
 $ec_lang['lpn_settings_color_key_position']='रंग लेजेंड की स्थिति';
 $ec_lang['lpn_settings_color_breaks']='रंग बैंड सीमाएँ';
 $ec_lang['lpn_settings_color_equal_intervals']='समान अंतराल';
@@ -1797,7 +1795,6 @@ $ec_lang['lpn_crs_place_projected']='एक प्रोजेक्टेड �
 $ec_lang['lpn_crs_none']='जियोरेफ़रेंस नहीं किया गया';
 
 $ec_lang['lpn_storage_unreadable']='सहेजा नहीं गया। इस प्रोजेक्ट को ब्राउज़र संग्रहण से पढ़ा नहीं जा सका। इसकी सहेजी गई प्रति बिल्कुल वैसी ही छोड़ दी गई है और उसके ऊपर कुछ नहीं लिखा जाएगा, इसलिए इस टैब पर कुछ भी सहेजा नहीं जा रहा। काम जारी रखने के लिए कोई फ़ाइल खोलें या नया प्रोजेक्ट बनाएँ।';
-$ec_lang['lpn_menu_cue']='ऊपर के मेनू से शुरू करें। त्वरित उपयोग के लिए टूलबार का प्रयोग करें।';
 $ec_lang['lpn_about_credits']='श्रेय';
 $ec_lang['lpn_help_welcome']='स्वागत पृष्ठ';
 $ec_lang['lpn_about_license']='GNU General Public License v3.0 या बाद के संस्करण के अंतर्गत लाइसेंस प्राप्त।';

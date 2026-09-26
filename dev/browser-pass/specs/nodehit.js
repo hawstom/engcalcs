@@ -553,7 +553,9 @@ async function applyTomSetup(a) {
 	await a.settle(250);
 	await setSettingNumber(a, await a.lang('lpn_settings_link_width'), TOM_LINK_PX);
 	await a.settle(250);
-	await setSettingCheck(a, await a.lang('lpn_settings_color_thematic'), true);
+	// "Thematic map (colors only)" is retired (2026-09-23): 0 in the labeling threshold now reads
+	// as colour-only, in place of the checkbox this used to click.
+	await setSettingNumber(a, await a.lang('lpn_settings_label_max_width'), 0);
 	await a.settle(400);
 	// The box lies over the canvas, and a popover swallows every probe under it.
 	await a.page.keyboard.press('Escape');

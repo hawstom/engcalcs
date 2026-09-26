@@ -1,24 +1,40 @@
 <?php
 /**
- * The usage report page (ROADMAP: Tom, 2026-09-17, *"Would it be a good idea to serve a usage
- * report web page? ... password protection might be nice. Historical graphs might be nice."*).
+ * spock.php -- the usage report page (ROADMAP: Tom, 2026-09-17, *"Would it be a good idea to serve
+ * a usage report web page? ... password protection might be nice. Historical graphs might be
+ * nice."* Tom, 2026-09-24, R-212: *"I would like a URL I can visit that gives scripted views of our
+ * logs ... It doesn't have to be secret, but we won't publish or link it. How about
+ * `engcalcs/spock.php` or `engcalcs/spock-cast.php`?"*).
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  *
- * A PRIVATE INSTRUMENT, NOT A SUITE PAGE. It is deliberately not in the nav, not in the menus, not
- * in the sitemap, not in the manifest and not in the service worker. It calls no page header helper, so
- * generate_sitemap.php, page_meta_check.php and calculator_page_check.php all read it as the
- * endpoint it is rather than as a page that forgot its furniture. It is in its own directory for
- * one reason: HTTP Basic auth is declared in .htaccess beside it, and a directory of its own means
- * a host that does not grant AllowOverride AuthConfig 500s THIS page instead of the whole suite.
- * That is the `Options -Indexes` lesson in the root .htaccess, applied before it bites.
+ * A PRIVATE INSTRUMENT, NOT A SUITE PAGE, AND NOT PASSWORD PROTECTED. Tom no longer wants a
+ * password (R-212: "it doesn't have to be secret"), so this lives at the suite root rather than in
+ * a directory of its own -- the earlier `usage-report/` directory existed only so an HTTP Basic
+ * directive could not 500 the whole suite if the host refused `AllowOverride AuthConfig`; with no
+ * auth directive there is nothing that can 500, so the directory-of-its-own reason is gone and this
+ * moved to the root. It is deliberately not in the nav, not in the menus, not in the sitemap, not
+ * in the manifest and not in the service worker precache (`ecSwPageExclusions()`), and it calls no
+ * page header helper, so `generate_sitemap.php`, `page_meta_check.php` and `calculator_page_check.php`
+ * all read it as the endpoint it is rather than as a page that forgot its furniture. "Not secret"
+ * is not "advertised": noindex is set both ways below (meta robots and `X-Robots-Tag`, since no
+ * `.htaccess` protects this file the way `usage-report/.htaccess` once did) and it is named nowhere
+ * a crawler or a visitor would find it.
+ *
+ * THIS FILE IS A DIFFERENT THING FROM `spock/`, the sibling directory. `spock/` holds rotated log
+ * archives (denied outright) and `spock/public/`, the ONE aggregate report Tom explicitly approved
+ * publishing ("spock: Make it reachable", 2026-08-23) via `publish_usage_report.sh`, generated on
+ * production and gitignored. A request for this file's exact name, `spock.php`, is unambiguous
+ * under Apache -- it never falls back to the `spock/` directory index, which stays undeniable by
+ * `spock/.htaccess`'s `Require all denied` regardless. `spock/public/` keeps its own separate
+ * grant and its own separate audience (an unguessable published URL); nothing here changes it.
  *
  * IT STORES NOTHING ON A VISITOR'S DEVICE. No cookie, no local storage, no session, no script at
  * all. It does not even require lib/config.inc.php, whose load-time behaviour reads and can clear
  * analytics cookies; the only thing it would have bought is the six log paths, and the six
  * basenames are already spelled in lib/UsageReport.lib.php with a selftest holding them against
- * config's own constants. The credential is HTTP Basic, which the BROWSER holds and we do not.
+ * config's own constants.
  *
  * IT WRITES NOTHING EITHER. It reads log/ and spock/<archive>/ and that is all: no row, no state
  * file, no cache. log/lang-log-stats.sh remains the authority, and every number here is
@@ -29,9 +45,14 @@
  * draws one bucket with its own scale.
  */
 
-require_once dirname(__DIR__) . '/lib/UsageReport.lib.php';
+require_once __DIR__ . '/lib/UsageReport.lib.php';
 
-$root     = dirname(__DIR__);
+// Belt and braces on the search engines, since the meta tag alone is not itself a promise of
+// non-indexing, and there is no .htaccess beside this file (it lives at the suite root) to add the
+// header the way usage-report/.htaccess and spock/public/.htaccess once did.
+header('X-Robots-Tag: noindex, nofollow');
+
+$root     = __DIR__;
 $liveDir  = $root . '/log';
 $spockDir = $root . '/spock';
 
@@ -234,6 +255,8 @@ ur_table($calc, 'page', 'Calculators actually used',
 
 <h2>Naming a calculation</h2>
 <?php
+ur_charts($naming, $range, 'Naming events per day',
+    'log/engcalcs-title.log, field 1 (timestamp)');
 ur_table($naming, 'field', 'Naming events by kind',
     'log/engcalcs-title.log, field 5: title or subtitle on a form calculator, save or rename on '
   . 'Looped-Network');
@@ -257,6 +280,8 @@ ur_table($reach, 'asked', 'Raw Accept-Language tag',
 
 <h2>Unit presets</h2>
 <?php
+ur_charts($presets, $range, 'Preset button clicks per day',
+    'log/engcalcs-signal.log, rows whose field 5 is units and whose field 6 begins preset:');
 ur_table($presets, 'detail', 'Preset button clicks',
     'log/engcalcs-signal.log, rows whose field 5 is units and whose field 6 begins preset:');
 ur_table($presets, 'asked', 'Preset clicks by raw Accept-Language tag',
@@ -265,6 +290,8 @@ ur_table($presets, 'asked', 'Preset clicks by raw Accept-Language tag',
 
 <h2>Behaviour signals</h2>
 <?php
+ur_charts($signal, $range, 'Behaviour signals per day',
+    'log/engcalcs-signal.log, field 1 (timestamp)');
 ur_table($signal, 'event', 'Signals by kind',
     'log/engcalcs-signal.log, field 5: outbound, touch, units, repeat, lpn or share');
 ur_table($signal, 'detail', 'Signal detail', 'log/engcalcs-signal.log, field 6', 60);
@@ -273,6 +300,12 @@ ur_table($signal, 'detail', 'Signal detail', 'log/engcalcs-signal.log, field 6',
 <h2>Contact funnel</h2>
 <p class="src">log/engcalcs-human-view.log rows whose page is contact, beside
 log/engcalcs-contact-send.log, which formmail.php writes only from its mail() success branch.</p>
+<?php
+ur_charts($contactViews, $range, 'Contact page viewed per day',
+    'log/engcalcs-human-view.log, field 1 (timestamp), rows whose page is contact');
+ur_charts($send, $range, 'Messages sent per day',
+    'log/engcalcs-contact-send.log, field 1 (timestamp)');
+?>
 <table><thead><tr><th>step</th><th>people</th><th>page loads</th></tr></thead><tbody>
 <tr><td>contact page viewed</td><td><?= $contactTot['visitor'] ?></td><td><?= $contactTot['visit'] ?></td></tr>
 <tr><td>message sent</td><td><?= $sends['visitor'] ?></td><td><?= $sends['visit'] ?></td></tr>
@@ -285,7 +318,7 @@ things and a ratio mixing them means nothing.</p>
 <code>bash log/lang-log-stats.sh</code>, which prints the same rows with Wilson intervals and a
 window fingerprint; this page is the same data drawn over time.</p>
 <p>This page stores nothing on your device: no cookie, no local storage, no session, and no script.
-Access is HTTP Basic, which your browser holds and this server does not record.</p>
+It carries no password; nobody publishes or links this URL.</p>
 <p>Generated <?= ur_h(gmdate('Y-m-d H:i')) ?> UTC.</p>
 </footer>
 </body>

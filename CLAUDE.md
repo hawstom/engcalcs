@@ -107,6 +107,7 @@ provenance rules: `dev/agents/README.md`.
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
 | `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
+| `dev/real-world-reviews.md` | What outside testers did and said, one entry per session |
 | `dev/scripts/` | All CLI tools and checks; `glossary.json` is the engineering term glossary |
 | `dev/calc-spike/`, `dev/lpn-spike/` | Headless tests. `dev/calc-spike/README.md` is the recipe for a worked example |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
