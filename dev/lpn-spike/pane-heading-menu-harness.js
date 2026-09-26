@@ -71,7 +71,6 @@ function docFire(type, ev) {
 }
 // A token match, so 'lpn-pane-sort' never answers for 'lpn-pane-sortarrow' or the reverse.
 function hasToken(el, tok) { return (' ' + (el.className || '') + ' ').indexOf(' ' + tok + ' ') !== -1; }
-function headingBtn(id, key) { return L.headCell(id, key).children.filter((c) => hasToken(c, 'lpn-pane-sort'))[0]; }
 function colMenuBtn(id, key) { return L.headCell(id, key).children.filter((c) => hasToken(c, 'lpn-pane-colmenu'))[0]; }
 function sortArrowBtn(id, key) { return L.headCell(id, key).children.filter((c) => hasToken(c, 'lpn-pane-sortarrow'))[0] || null; }
 function ctxMenuEl() { return global.document.body.children.filter((c) => c.className === 'lpn-pane-ctxmenu').slice(-1)[0]; }
@@ -100,18 +99,23 @@ L.renderTable('junctions');
 console.log('\n--- 1. a plain click SELECTS the column and never sorts ---');
 {
 	const before = L.sortState('junctions');
-	const b = headingBtn('junctions', 'demand');
-	fire(b, 'click', {});
+	// **THE CLICK LISTENER IS ON THE `<th>`, NOT THE HEADING BUTTON** (see
+	// js/looped-network.js's own comment: a percentage height on a table cell's child does not
+	// resolve to the cell's real height, so the click/mousedown/drag-start handlers that make the
+	// WHOLE cell one target had to move up a level). Firing on `headingBtn()` would find nothing
+	// in this stub, which does not simulate DOM event bubbling from a child to its ancestor --
+	// `L.headCell()` is the real target now.
+	fire(L.headCell('junctions', 'demand'), 'click', {});
 	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['demand']),
 		'a plain click on the heading selects that column alone', JSON.stringify(L.headSel('junctions')));
 	report(JSON.stringify(L.sortState('junctions')) === JSON.stringify(before),
 		'...and does not change the sort', JSON.stringify(L.sortState('junctions')));
 	// A second plain click on a DIFFERENT heading replaces the selection, it does not add to it.
-	fire(headingBtn('junctions', 'elev'), 'click', {});
+	fire(L.headCell('junctions', 'elev'), 'click', {});
 	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['elev']),
 		'a plain click on another heading replaces the selection', JSON.stringify(L.headSel('junctions')));
 	// Ctrl+click and Shift+click still build a multi-column selection, unaffected by the change.
-	fire(headingBtn('junctions', 'demand'), 'click', { ctrlKey: true });
+	fire(L.headCell('junctions', 'demand'), 'click', { ctrlKey: true });
 	report(L.headSel('junctions').sort().join(',') === ['demand', 'elev'].sort().join(','),
 		'Ctrl+click still ADDS a column to the standing selection', JSON.stringify(L.headSel('junctions')));
 	// Shift+click extends from the ANCHOR (the last heading a plain or Ctrl+click landed on --
@@ -120,7 +124,7 @@ console.log('\n--- 1. a plain click SELECTS the column and never sorts ---');
 	// table's own column order rather than a hard-coded count.
 	const cols = L.colKeys('junctions'), iAnchor = cols.indexOf('demand'), iTarget = cols.indexOf('id');
 	const expectedRange = cols.slice(Math.min(iAnchor, iTarget), Math.max(iAnchor, iTarget) + 1);
-	fire(headingBtn('junctions', 'id'), 'click', { shiftKey: true });
+	fire(L.headCell('junctions', 'id'), 'click', { shiftKey: true });
 	report(L.headSel('junctions').slice().sort().join(',') === expectedRange.slice().sort().join(','),
 		'Shift+click extends a range from the anchor (the last Ctrl+click) to here, inclusive',
 		JSON.stringify(L.headSel('junctions')));
@@ -139,7 +143,7 @@ console.log('\n--- 2. the "..." menu opens the column menu; a drag is not read a
 	const spec = L.paneTableById('junctions');
 	const before = L.headSel('junctions').slice();
 	spec.headDragged = true;
-	fire(headingBtn('junctions', 'id'), 'click', {});
+	fire(L.headCell('junctions', 'id'), 'click', {});
 	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(before),
 		'a click that ends a drag (headDragged) changes nothing', JSON.stringify(L.headSel('junctions')));
 	report(spec.headDragged === false, '...and the flag is consumed, not left standing for the next real click');

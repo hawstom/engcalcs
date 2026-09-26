@@ -44,7 +44,13 @@ const INJECT =
 	"\t\tcolKeys: function (id) { return paneCols(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\tallColKeys: function (id) { return paneColsAll(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\theadCell: function (id, key) { return paneTableById(id).headCells[key]; },\n" +
-	"\t\tsortBtn: function (id, key) { return paneTableById(id).headCells[key].children[0]; },\n" +
+	// **THE <th> ITSELF, NOT THE HEADING BUTTON** -- click/mousedown/drag-start moved from the
+	// button to the cell (2026-09-25, second pass: a percentage height on a table cell's child
+	// does not resolve to the cell's real height, so stretching the button could not make the
+	// WHOLE cell one target; see js/looped-network.js's own comment). Kept as its own name here
+	// rather than inlining `headCell()` at every call site below, since "the thing a click is
+	// fired on" is a clearer name for what these tests are doing than "the heading cell" is.
+	"\t\tsortBtn: function (id, key) { return paneTableById(id).headCells[key]; },\n" +
 	"\t\theadSel: function (id) { return (paneTableById(id).headSel || []).slice(); },\n" +
 	// **THROUGH paneColsAll(), NOT paneCols().** A test that needs to write a value into a
 	// currently-hidden column -- to prove hiding does not delete it -- would find nothing through

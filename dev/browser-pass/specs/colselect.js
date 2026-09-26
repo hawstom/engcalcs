@@ -311,4 +311,87 @@ exports.run = async function ({ browser, report }) {
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
+
+	// ---- (8) THE WHOLE CELL IS THE TARGET, DOWN TO THE PIXEL (pre-review, 2026-09-25, second
+	// pass: Tom's "one cursor for a heading... that is the entire cell" -- a single-line heading's
+	// button used to sit ~22px tall, centred in a cell as tall as the tallest WRAPPED heading
+	// beside it, so a press near the top/bottom padding or the left inset landed on nothing). A
+	// click 2px inside every edge of a SINGLE-LINE heading (never the "..." corner or the resize
+	// grip, both excepted by construction) must select that column. -----------------------------
+	{
+		const a = await openJunctions(browser, 'F');
+		const before = await state(a);
+		// A single-line heading in Net3's Junctions: short enough that it never wraps, so its
+		// text does not fill the row height the way a wrapped neighbour's does -- exactly the
+		// shape the dead zone was reported against.
+		const key = before.keys.find((k) => k !== 'id') || before.keys[1];
+		const rect = await a.page.evaluate((k) => {
+			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + k);
+			const r = th.getBoundingClientRect();
+			return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+		}, key);
+		const edges = [
+			['top edge', rect.left + (rect.right - rect.left) / 2, rect.top + 2],
+			['bottom edge', rect.left + (rect.right - rect.left) / 2, rect.bottom - 2],
+			['left inset', rect.left + 2, rect.top + (rect.bottom - rect.top) / 2]
+		];
+		for (const [label, x, y] of edges) {
+			await a.page.mouse.click(x, y);
+			await a.settle(100);
+			const s = await state(a);
+			report.ok(JSON.stringify(s.headSel) === JSON.stringify([key]),
+				'a click 2px from the ' + label + ' of a single-line heading selects it', JSON.stringify(s.headSel));
+			// Clear the selection (a body cell click) before the next edge, same idiom as (5)+(6).
+			await a.page.evaluate(() => {
+				const td = document.querySelector('#lpn_pane_junctions table tbody tr:nth-child(3) td.lpn-pane-col-id');
+				const focusable = td && (td.querySelector('input,select,button') || td);
+				if (focusable && focusable.focus) { focusable.focus(); }
+			});
+			await a.settle(100);
+		}
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
+
+	// ---- (9) NO TEXT LINE OF ANY JUNCTIONS HEADING RUNS UNDER THE "..." GLYPH OR ITS ARROW
+	// (pre-review, 2026-09-25, second pass: "Part of this network" and "Required fire flow (gpm)"
+	// overlapped by ~3px and ~8px) -- and the table's total width is unchanged, since the fix
+	// reserves space only on columns narrow enough to wrap, never by widening a <col>. ------------
+	{
+		const a = await openJunctions(browser, 'G');
+		const widthBefore = 1221.921875;
+		const result = await a.page.evaluate(() => {
+			const t = document.querySelector('#lpn_pane_junctions table');
+			const ths = [...t.querySelectorAll('thead th')];
+			const bad = [];
+			ths.forEach((th) => {
+				const b = th.querySelector('.lpn-pane-sort');
+				const glyph = th.querySelector('.lpn-pane-colmenu');
+				const arrow = th.querySelector('.lpn-pane-sortarrow');
+				const gRect = glyph ? glyph.getBoundingClientRect() : null;
+				const aRect = arrow ? arrow.getBoundingClientRect() : null;
+				const intersects = (q, r) => r && !(q.right <= r.left || q.left >= r.right || q.bottom <= r.top || q.top >= r.bottom);
+				const range = document.createRange();
+				const walker = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+				let tn;
+				while ((tn = walker.nextNode())) {
+					if (!tn.textContent.trim()) { continue; }
+					range.selectNodeContents(tn);
+					[...range.getClientRects()].forEach((q) => {
+						if (intersects(q, gRect) || intersects(q, aRect)) {
+							bad.push((th.className.match(/lpn-pane-col-(\S+)/) || [])[1]);
+						}
+					});
+				}
+			});
+			return { bad, tableWidth: t.getBoundingClientRect().width };
+		});
+		report.ok(result.bad.length === 0, 'no heading text line intersects the "..." glyph or the sort arrow',
+			JSON.stringify(result.bad));
+		report.ok(Math.abs(result.tableWidth - widthBefore) < 0.5,
+			'the Junctions table total width is unchanged by the gutter reservation',
+			result.tableWidth + ' vs ' + widthBefore);
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
 };

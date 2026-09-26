@@ -22030,7 +22030,7 @@ var EngCalcs = EngCalcs || {};
 		spec.headCells = {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button'),
-				grip = document.createElement('span'), menuBtn = document.createElement('button');
+				grip = document.createElement('span'), menuBtn = document.createElement('button'), arrow = null;
 			th.className = paneCellClass(c, i) +
 				(paneColUserWidth(spec.id, c) ? ' lpn-pane-tight' : '');
 			th._lpnColKey = c.key;
@@ -22043,51 +22043,49 @@ var EngCalcs = EngCalcs || {};
 			// spreadsheet's own A/B/C column head -- its label and nothing else, so there is nothing
 			// in the button's own text for a sort mark to collide with. The sorted column's arrow
 			// lives in the trailing gutter instead, under the "..." menu glyph (paneSortArrow below).
-			b.textContent = paneHeadingText(c);
+			//
+			// **A FLOATED, EMPTY SPACER RESERVES THAT GUTTER FOR WRAPPED TEXT, ON EVERY LINE IT
+			// COVERS AND NO OTHERS** (pre-review, 2026-09-25, second pass: on "Part of this network"
+			// and "Required fire flow (gpm)" a wrapped line ran under the "..." glyph, by ~3px and
+			// ~8px -- the button's own padding is only reduced by 6px on the trailing side, and the
+			// glyph badge needs 14px). A plain padding increase on the button would take that width
+			// off EVERY line, not only the ones the glyph and arrow actually cover, which regressed a
+			// narrow dragged column's wrap count between screen and print
+			// (`dev/browser-pass/specs/print.js`, "every heading wraps as it does on screen"). This
+			// spacer is `float: inline-end` in CSS, so ordinary inline text wraps around it exactly
+			// as it would around a floated image -- reserving the gutter only for the lines under it
+			// (one line's height for the "..." glyph alone, taller on the sorted column, which also
+			// carries the arrow) and leaving every line below that at the button's own full width.
+			// **NO TEXT NODE, SO print.js's PER-TEXT-NODE LINE WALK NEVER SEES IT** -- the same
+			// reasoning the glyphs themselves already follow, one level up: an EMPTY span contributes
+			// nothing to a walk that already skips whitespace-only text, unlike the real "▲" text
+			// node an earlier build of this arrow used and print.js caught.
+			//
+			// **ONLY ON A COLUMN NARROW ENOUGH TO WRAP** (`paneColWidthEm() > 0`: a declared `em` or
+			// a width the reader dragged) -- **measured, not assumed:** the first cut put this float
+			// on every heading and it widened four AUTO-width columns by exactly its own 15px each
+			// (Demand (gpm), Head, Pressure, Source share, none of which wrap and none of which Perry
+			// flagged), because a float competes for room on its line the same as real padding does,
+			// and a column with no declared width grows to give it that room. A column that never
+			// wraps has no line running under the glyph to protect in the first place, so it gets no
+			// float at all -- which is also why the table's total width is unchanged end to end.
+			if (paneColWidthEm(spec.id, c) > 0) {
+				(function () {
+					var gutter = document.createElement('span');
+					gutter.setAttribute('aria-hidden', 'true');
+					gutter.className = 'lpn-pane-sort-gutter' + (spec.sort.col === c.key ? ' lpn-pane-sort-gutter-tall' : '');
+					b.appendChild(gutter);
+				}());
+			}
+			b.appendChild(document.createTextNode(paneHeadingText(c)));
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
-			// **A PLAIN CLICK SELECTS THE COLUMN; IT NEVER SORTS** (Tom, 2026-09-25, second pass:
-			// *"No selectable text; there is only one selection possible and one cursor for a
-			// heading... A click anywhere on the cell selects the column."*). Sorting moved to the
-			// "..." menu (Sort ascending/descending) and to the arrow that appears on the sorted
-			// column once it exists (click reverses it) -- a heading click is now exactly the
-			// spreadsheet gesture of clicking a column letter: Ctrl/Cmd+click toggles it into a
-			// standing multi-column selection, Shift+click extends one from the last heading touched,
-			// and a plain click replaces the selection with this column alone.
-			b.addEventListener('click', function (ev) {
-				// The release that ends a drag is not a click on the heading it ended over.
-				if (spec.headDragged) { spec.headDragged = false; return; }
-				if (ev && (ev.ctrlKey || ev.metaKey)) { paneHeadSelToggle(spec, c.key); return; }
-				if (ev && ev.shiftKey) { paneHeadSelRange(spec, c.key); return; }
-				spec.headSel = [c.key];
-				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
-				paneHeadSelApply(spec);
-				paneHeadSelPaint(spec);
-			});
-			// **ONE GESTURE, ONE JOB** (pre-review, 2026-09-25, after Tom tried the one-motion drag
-			// master already had and could not move a column: R-221's "drag an unselected heading to
-			// select it, drag a selected one to move it" split the single press-and-drag master
-			// shipped and approved 2026-09-18 into two gestures that look identical until the pointer
-			// has already moved, so the one he reached for -- press any heading and drag it -- landed
-			// on the wrong one whenever the heading was not already selected, which is every heading
-			// on a fresh table). A click that never leaves its heading is still a sort. A press that
-			// travels is ALWAYS a move, selected or not: if the pressed heading is part of a standing
-			// multi-column selection the whole selection moves together; otherwise only the pressed
-			// column does. Whole-column SELECTION no longer has a drag gesture of its own -- it is
-			// Ctrl+click, Shift+click and Ctrl+Space, same as any other multi-select in this table. A
-			// modified press is the click handler's business (Ctrl/Cmd toggles, Shift extends), and
-			// the press must not also start a drag or select characters.
-			b.addEventListener('mousedown', function (ev) {
-				if (ev && ev.button) { return; }
-				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
-				// **THE MISSING LINE** (Ida, 2026-09-25): paneStartColDrag()'s siblings (the resize
-				// grip, and this button's own old select-drag path) both called preventDefault()
-				// before attaching their listeners; this call did not, so the browser's own mousedown
-				// handling raced the custom drag -- a press on a heading started native text
-				// selection or a focus ring instead of picking the column up.
-				if (ev && ev.preventDefault) { ev.preventDefault(); }
-				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
-				paneStartColDrag(spec, c.key, ev);
-			});
+			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
+			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
+			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
+			// per CSS2.1 10.5 -- confirmed in real Chromium, pre-review 2026-09-25: `b`'s own
+			// `height: 100%` measured 28.6px in a 91.3px cell -- so stretching the button itself
+			// cannot make the WHOLE cell clickable. Delegating to the `<th>`, which the browser DOES
+			// give the row's real height, does.)
 			th.appendChild(b);
 			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
 			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
@@ -22150,19 +22148,62 @@ var EngCalcs = EngCalcs || {};
 			// changes which column is sorted, that is the menu's job. Same `::after`-glyph trick as
 			// the menu button just above, for the same reason (print.js's per-text-node line count).
 			if (spec.sort.col === c.key) {
-				(function () {
-					var arrow = document.createElement('button');
-					arrow.type = 'button';
-					arrow.className = 'lpn-pane-sortarrow ec-help' + (spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-					arrow.title = pc.lpn_pane_sortarrow_tip || 'Reverse the sort';
-					arrow.setAttribute('aria-label', pc.lpn_pane_sortarrow_tip || 'Reverse the sort');
-					arrow.addEventListener('click', function (ev) {
-						if (ev && ev.stopPropagation) { ev.stopPropagation(); }
-						sortPaneTable(spec, c.key);
-					});
-					th.appendChild(arrow);
-				}());
+				arrow = document.createElement('button');
+				arrow.type = 'button';
+				arrow.className = 'lpn-pane-sortarrow ec-help' + (spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+				arrow.title = pc.lpn_pane_sortarrow_tip || 'Reverse the sort';
+				arrow.setAttribute('aria-label', pc.lpn_pane_sortarrow_tip || 'Reverse the sort');
+				arrow.addEventListener('click', function (ev) {
+					if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+					sortPaneTable(spec, c.key);
+				});
+				th.appendChild(arrow);
 			}
+			// **THE CLICK, MOUSEDOWN AND DRAG-START LISTENERS, ON THE `<th>` ITSELF** (see that
+			// rule's own CSS comment on why the button could not simply be stretched to the cell's
+			// full height). Every pixel of the cell reaches one of these two handlers EXCEPT the
+			// three controls named here by IDENTITY -- `grip`, `menuBtn` and `arrow` -- which paint
+			// on top of the button and are excepted so their own listeners (resize, the menu, the
+			// sort reversal) keep first claim on a press or click that lands on them. `menuBtn` and
+			// `arrow` already stop their own `click` from bubbling this far; `grip` does not (its
+			// own listeners are `mousedown`/`dblclick`, and a full click-cycle on it would otherwise
+			// reach here and select the column mid-resize), so the identity check below is the one
+			// place that matters for it.
+			th.addEventListener('click', function (ev) {
+				if (ev && (ev.target === grip || ev.target === menuBtn || ev.target === arrow)) { return; }
+				// The release that ends a drag is not a click on the heading it ended over.
+				if (spec.headDragged) { spec.headDragged = false; return; }
+				if (ev && (ev.ctrlKey || ev.metaKey)) { paneHeadSelToggle(spec, c.key); return; }
+				if (ev && ev.shiftKey) { paneHeadSelRange(spec, c.key); return; }
+				spec.headSel = [c.key];
+				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
+				paneHeadSelApply(spec);
+				paneHeadSelPaint(spec);
+			});
+			// **ONE GESTURE, ONE JOB** (pre-review, 2026-09-25, after Tom tried the one-motion drag
+			// master already had and could not move a column: R-221's "drag an unselected heading to
+			// select it, drag a selected one to move it" split the single press-and-drag master
+			// shipped and approved 2026-09-18 into two gestures that look identical until the pointer
+			// has already moved, so the one he reached for -- press any heading and drag it -- landed
+			// on the wrong one whenever the heading was not already selected, which is every heading
+			// on a fresh table). A click that never leaves its heading is still a select. A press
+			// that travels is ALWAYS a move, selected or not: if the pressed heading is part of a
+			// standing multi-column selection the whole selection moves together; otherwise only the
+			// pressed column does. A modified press is the click handler's business (Ctrl/Cmd
+			// toggles, Shift extends), and the press must not also start a drag or select characters.
+			th.addEventListener('mousedown', function (ev) {
+				if (ev && (ev.target === grip || ev.target === menuBtn || ev.target === arrow)) { return; }
+				if (ev && ev.button) { return; }
+				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { if (ev.preventDefault) { ev.preventDefault(); } return; }
+				// **THE MISSING LINE** (Ida, 2026-09-25): paneStartColDrag()'s siblings (the resize
+				// grip, and this button's own old select-drag path) both called preventDefault()
+				// before attaching their listeners; this call did not, so the browser's own mousedown
+				// handling raced the custom drag -- a press on a heading started native text
+				// selection or a focus ring instead of picking the column up.
+				if (ev && ev.preventDefault) { ev.preventDefault(); }
+				if (b.focus) { try { b.focus({ preventScroll: true }); } catch (e) { b.focus(); } }
+				paneStartColDrag(spec, c.key, ev);
+			});
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);

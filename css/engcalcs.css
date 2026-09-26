@@ -2334,6 +2334,18 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
    never the culprit -- a <button> already suppresses this -- but the heading cell itself was not
    covered, and neither was the sort glyph now living beside its label. */
 .lpn-pane-table thead th, .lpn-pane-sort { user-select: none; }
+/* **THE WHOLE CELL IS THE TARGET, DOWN TO THE PIXEL** (pre-review, 2026-09-25, second pass: Tom's
+   "one cursor for a heading... that is the entire cell" was not yet true -- on a single-line
+   heading the row is drawn as tall as the tallest WRAPPED heading beside it, so `.lpn-pane-sort`
+   sat as a ~22px button centred in a cell that could be 70px+, and a press in the dead top/bottom
+   padding or the left inset did nothing). **THE FIRST FIX TRIED WAS STRETCHING THE BUTTON ITSELF**
+   (`height: 100%`) and measured wrong in real Chromium: a percentage height on a table cell's
+   child resolves against the cell's SPECIFIED height, which for a row sized by its tallest
+   sibling is `auto`, not a number -- CSS2.1 10.5, and confirmed by measuring the button at 28.6px
+   tall inside a 91.3px cell. So the click, mousedown and drag-start listeners are wired on the
+   `<th>` itself instead (below, after `grip`/`menuBtn`/`arrow` exist to except them by identity),
+   which the browser DOES give the row's real height -- padding stays on the `<th>` exactly as it
+   always was, and the button (`.lpn-pane-sort`) is sized to its own content, same as before. */
 .lpn-pane-table thead th {
 	position: relative; background: #fff;
 	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
@@ -2464,7 +2476,28 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
 	text-align: inherit;
 }
-.lpn-pane-sort { font-weight: bold; }
+/* `display: block; width: 100%` so the button (inline by default) spans the cell's own content
+   width, which is what lets the floated gutter spacer below wrap ordinary text around it the way
+   it would around a floated image, at the width the CELL offers rather than the button's own
+   shrink-to-fit guess. Padding stays off the button and on the `<th>` -- see that rule's own
+   comment on why a click-area fix could not live here (percentage heights on a table cell's
+   child do not resolve to the cell's real height). */
+.lpn-pane-sort { font-weight: bold; display: block; width: 100%; }
+/* **A FLOATED, EMPTY SPACER RESERVES THE GLYPH GUTTER, ON ONLY THE LINES IT COVERS** (pre-review,
+   2026-09-25, second pass: on "Part of this network" and "Required fire flow (gpm)" a wrapped
+   line of heading text ran under the "..." glyph, by ~3px and ~8px -- the button's own 6px of
+   trailing padding is not the 14px the glyph badge needs). Widening the button's OWN padding
+   instead would take that width off EVERY line, not only the ones under a glyph, and did: it
+   changed a narrow dragged column's wrap count on screen without changing it on the print sheet
+   (`dev/browser-pass/specs/print.js`, caught in review). `float: inline-end` on an empty, leading
+   sibling of the heading text makes ordinary inline text wrap around it exactly as it would
+   around a floated image -- for exactly the height given here, and no further down the label.
+   `js/looped-network.js` gives the sorted column's own spacer the taller class, since that column
+   also carries the arrow just below the "..." glyph. **NO TEXT NODE**, so `print.js`'s
+   per-text-node line walk (which already skips whitespace-only nodes) never sees it at all -- the
+   same reasoning the glyphs themselves rely on one level up. */
+.lpn-pane-sort-gutter { float: inline-end; width: 15px; height: 1.35em; }
+.lpn-pane-sort-gutter-tall { height: 2.6em; }
 /* A tint rather than a colour: it says "this responds" without claiming a meaning of its own. */
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { background: #eef1f4; }
 /* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
@@ -2549,10 +2582,16 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    selection anywhere in it (`.lpn-pane-table thead th, .lpn-pane-sort` already declare
    `user-select: none` above), and the ordinary pointer everywhere except a heading that is part of
    a standing selection, which is the one that picks up and moves (his point (e)) and says so under
-   the pointer. `grab` rather than `move`: the column is not going anywhere until it is picked up. */
-.lpn-pane-sort { cursor: pointer; position: relative; }
-.lpn-pane-head-sel .lpn-pane-sort { cursor: grab; }
-.lpn-pane-head-sel .lpn-pane-sort:active { cursor: grabbing; }
+   the pointer. `grab` rather than `move`: the column is not going anywhere until it is picked up.
+   **THE CURSOR IS ON THE `<th>`, NOT THE BUTTON** -- the click/mousedown listeners moved there
+   (see the `<th>` rule's own comment on why), and a cursor declared only on the ~28px button would
+   have left the rest of the cell showing whatever the browser's own default is, which is exactly
+   the "not one cursor for the whole cell" Tom named. `.lpn-pane-colgrip`/`.lpn-pane-colmenu`/
+   `.lpn-pane-sortarrow` are all more specific selectors than a bare `th`, so they keep their own
+   cursor over this one without needing `!important`. */
+.lpn-pane-table thead th { cursor: pointer; position: relative; }
+.lpn-pane-table thead th.lpn-pane-head-sel { cursor: grab; }
+.lpn-pane-table thead th.lpn-pane-head-sel:active { cursor: grabbing; }
 /* **THE "..." COLUMN MENU, ALWAYS VISIBLE AND QUIET** (Tom, 2026-09-25, second pass: *"A menu
    glyph, likely three vertical dots."*, no longer a hover reveal now that sorting lives entirely
    behind it and the arrow below it -- a reader who does not hover or right-click still has to be

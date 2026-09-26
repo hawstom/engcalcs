@@ -255,8 +255,13 @@ console.log('\n--- (e) dragging ANY heading, selected or not, moves it in one mo
 	const from = 'elev', to = before[before.length - 1];
 	report(before.indexOf(from) < before.indexOf(to), 'the two columns start in this order',
 		before.indexOf(from) + ' < ' + before.indexOf(to));
-	fire(sortBtnOf(from), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: sortBtnOf(to) });
+	// **MOUSEDOWN AND CLICK FIRE ON THE `<th>` NOW, NOT THE HEADING BUTTON** (2026-09-25, second
+	// pass: js/looped-network.js's own comment on why a percentage height on a table cell's child
+	// could not make the whole cell one target, so the listeners moved up a level). This stub does
+	// not simulate DOM event bubbling from a child to its ancestor, so firing on `sortBtnOf()`
+	// would find no listener there any more.
+	fire(thFor(from), 'mousedown', { button: 0 });
+	docFire('mousemove', { target: thFor(to) });
 	docFire('mouseup', {});
 	const after = L.colKeys('junctions');
 	report(after.indexOf(from) === before.indexOf(to),
@@ -269,7 +274,7 @@ console.log('\n--- (e) dragging ANY heading, selected or not, moves it in one mo
 	// **A PRESS THAT NEVER TRAVELS IS A SORT, NOT A MOVE**, which is what keeps one heading doing
 	// two jobs honest.
 	const held = L.colKeys('junctions');
-	fire(sortBtnOf('elev'), 'mousedown', { button: 0 });
+	fire(thFor('elev'), 'mousedown', { button: 0 });
 	docFire('mouseup', {});
 	report(L.colKeys('junctions').join() === held.join(),
 		'a press and release on one heading moves nothing', L.colKeys('junctions').join() === held.join());
@@ -288,10 +293,10 @@ console.log('\n--- dragging a heading that is part of a multi-column selection m
 	const before = L.colKeys('junctions');
 	const a1 = before[1], a2 = before[2], dest = before[before.length - 1];
 	report(before.indexOf(a2) === before.indexOf(a1) + 1, 'two adjacent columns to select', a1 + ',' + a2);
-	fire(sortBtnOf(a1), 'click', { ctrlKey: true });
-	fire(sortBtnOf(a2), 'click', { ctrlKey: true });
-	fire(sortBtnOf(a1), 'mousedown', { button: 0 });
-	docFire('mousemove', { target: sortBtnOf(dest) });
+	fire(thFor(a1), 'click', { ctrlKey: true });
+	fire(thFor(a2), 'click', { ctrlKey: true });
+	fire(thFor(a1), 'mousedown', { button: 0 });
+	docFire('mousemove', { target: thFor(dest) });
 	docFire('mouseup', {});
 	const after = L.colKeys('junctions');
 	report(after.indexOf(a2) === after.indexOf(a1) + 1, '...they land beside each other still, in the same relative order',
