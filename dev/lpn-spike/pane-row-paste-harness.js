@@ -411,18 +411,19 @@ console.log('\n--- 9. Paste as new rows: the menu arms it, Ctrl+Shift+V does it,
 	const before5 = JSON.stringify(nodes());
 	L.selectCell('junctions', 'K5', 'id');
 	paste('K6\t50\t0');
-	report(nodes().length === 5, 'after Esc, a paste is ordinary again: it writes K5\'s cells and creates nothing');
-	L.undo();
-	report(JSON.stringify(nodes()) === before5, '...(undone, so K5 is as it was)');
+	report(nodes().length === 5 && dlgText() === say('lpn_pane_paste_ids_differ', { n: 1 }),
+		'after Esc, a paste is ordinary again: standing on K5 it would rename K5, so it asks', dlgText());
+	fire(dlgButton(PC.lpn_cancel), 'click');
+	report(JSON.stringify(nodes()) === before5, '...and Cancel leaves K5 as it was');
 	// Ctrl+Shift+V: the keydown marks the paste the browser then raises.
 	L.selectCell('junctions', 'K5', 'elev');
 	key('V', { ctrlKey: true, shiftKey: true });
 	paste('K6\t50\t0\nK7\t60\t0');
 	report(nodes().length === 7 && L.nodeById('K6') && L.nodeById('K7') && JSON.stringify(nodes().slice(0, 5)) === before5,
 		'Ctrl+Shift+V appends K6 and K7 without touching K1..K5', L.tableOrder('junctions').join(','));
-	L.selectCell('junctions', 'K7', 'id');
-	paste('K8\t70\t0');
-	report(nodes().length === 7, 'the next plain Ctrl+V is ordinary again');
+	L.selectCell('junctions', 'K7', 'elev');
+	paste('70');
+	report(nodes().length === 7 && L.nodeById('K7').elev === 70, 'the next plain Ctrl+V is ordinary again');
 	// Tables that cannot create rows offer nothing.
 	L.openPane('text'); L.renderTable('text');
 	report(!L.spec('text').appendArmed, 'the Text table has no such action');
@@ -479,6 +480,41 @@ console.log('\n--- 10. 100 rows pasted on the first of 50: the paste asks ---');
 		'...and only Fit only and Cancel are offered');
 	fire(dlgButton(PC.lpn_cancel), 'click');
 	report(JSON.stringify(nodes()) === orig, '...and Cancel leaves the table as it was');
+}
+
+console.log('\n--- 11. a paste that would change IDs asks first, in Tom\'s words ---');
+{
+	L.reset();
+	pasteIntoEmpty('junctions', 'M1\t0\t0\t\t\t1\t1\nM2\t10\t0\t\t\t1\t2\nM3\t20\t0\t\t\t1\t3\nM4\t30\t0\t\t\t1\t4');
+	L.openPane('junctions'); L.renderTable('junctions');
+	const orig = JSON.stringify(nodes()), d0 = L.undoDepth();
+	L.selectCell('junctions', 'M1', 'id');
+	let r = L.pasteAt('junctions', 'M1\t0\t0\t\t\t1\t11\nM2\t10\t0\t\t\t1\t12');
+	report(r && !r.asked && L.nodeById('M1').elev === 11 && L.nodeById('M2').elev === 12, 'matching IDs ask nothing', r && JSON.stringify(r));
+	L.undo();
+	L.selectCell('junctions', 'M1', 'id');
+	r = L.pasteAt('junctions', 'X1\t0\t0\nM2\t10\t0\nX3\t20\t0\nX4\t30\t0');
+	report(r && r.asked && r.idChanges === 3 && dlgText() === say('lpn_pane_paste_ids_differ', { n: 3 }),
+		'three differing IDs ask, with n = 3', dlgText());
+	report(dlgButtons().map((b) => b.textContent).join('|') === [PC.points_data_paste, PC.lpn_cancel].join('|'), '...offering Paste and Cancel');
+	fire(dlgButton(PC.lpn_cancel), 'click');
+	report(JSON.stringify(nodes()) === orig && L.undoDepth() === d0, 'Cancel changes nothing');
+	L.pasteAt('junctions', 'X1\t0\t0\nM2\t10\t0\nX3\t20\t0\nX4\t30\t0');
+	fire(dlgButton(PC.points_data_paste), 'click');
+	report(L.nodeById('X1') && L.nodeById('X3') && L.nodeById('X4') && !L.nodeById('M1') && nodes().length === 4,
+		'Paste renames the three', nodes().map((n) => n.id).join(','));
+	report(L.undoDepth() === d0 + 1, '...as one undo step', d0 + ' -> ' + L.undoDepth());
+	L.undo();
+	report(JSON.stringify(nodes()) === orig, 'and one Ctrl+Z puts the four IDs back');
+	// Both questions: the IDs first, then the overflow.
+	L.selectCell('junctions', 'M3', 'id');
+	r = L.pasteAt('junctions', 'Y3\t20\t0\nM4\t30\t0\nM5\t40\t0');
+	report(r && r.idChanges === 1, 'a paste that renames AND overflows asks about the IDs first');
+	fire(dlgButton(PC.points_data_paste), 'click');
+	report(dlgText() === say('lpn_pane_paste_overflow', { n: 3, fit: 2, extra: 1 }), '...then about the row left over', dlgText());
+	fire(dlgButton(say('lpn_pane_paste_overflow_add', { extra: 1 })), 'click');
+	report(L.nodeById('Y3') && L.nodeById('M5') && nodes().length === 5 && L.undoDepth() === d0 + 1,
+		'...and both land as one undo step', nodes().map((n) => n.id).join(','));
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

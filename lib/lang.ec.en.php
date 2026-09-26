@@ -886,6 +886,9 @@ $ec_lang['lpn_pane_paste_overflow_add']='Add {extra} rows';
 $ec_lang['lpn_pane_paste_overflow_fit']='Paste only the {fit} that fit';
 // The same question when the left-over rows could not be added; {reasons} names the rows and why.
 $ec_lang['lpn_pane_paste_overflow_bad']='This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}';
+// Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
+// that already exist; the buttons are Paste and Cancel.
+$ec_lang['lpn_pane_paste_ids_differ']='{n} IDs don\'t match. Paste anyway?';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';

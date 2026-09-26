@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**28 still to read on master**, of 292 untranslated keys, of 2123 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 293 untranslated keys, of 2124 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (292, 28 to read @@ NEEDS RULING)
+## lpn_  (293, 29 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -576,6 +576,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_paste_id_twice`**
   > Row {row}: the ID {id} is used twice in this paste.
   @@ NEEDS RULING
+- **`lpn_pane_paste_ids_differ`**
+  > {n} IDs don't match. Paste anyway?
+  @@ NEEDS RULING
 - **`lpn_pane_paste_more`**
   > Rows with problems not shown here: {n}.
   @@ NEEDS RULING
@@ -941,4 +944,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > {n} of {total} coordinate systems cover this network.
   @@ NEEDS RULING
 
-### feat/row-paste (`0cb5cf15`) — adds no English strings
+### feat/row-paste (`c011eb5b`) — adds no English strings

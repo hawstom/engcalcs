@@ -1819,6 +1819,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_paste_overflow_add: <?=json_encode($ec_lang['lpn_pane_paste_overflow_add'])?>,
 	lpn_pane_paste_overflow_fit: <?=json_encode($ec_lang['lpn_pane_paste_overflow_fit'])?>,
 	lpn_pane_paste_overflow_bad: <?=json_encode($ec_lang['lpn_pane_paste_overflow_bad'])?>,
+	lpn_pane_paste_ids_differ: <?=json_encode($ec_lang['lpn_pane_paste_ids_differ'])?>,
 	lpn_pane_paste_refused: <?=json_encode($ec_lang['lpn_pane_paste_refused'])?>,
 	lpn_pane_paste_more: <?=json_encode($ec_lang['lpn_pane_paste_more'])?>,
 	lpn_pane_paste_no_id: <?=json_encode($ec_lang['lpn_pane_paste_no_id'])?>,

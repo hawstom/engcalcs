@@ -24005,6 +24005,36 @@ var EngCalcs = EngCalcs || {};
 	 * when its answer would be refused: a failing overflow is named in the dialog, and only the
 	 * other two answers remain. Whichever runs, it is one paste and one undo step.
 	 */
+	// How many EXISTING rows this paste would give a different ID: the rows it lands on, where the
+	// ID column is inside the pasted block and the pasted text is not the row's own ID.
+	function paneCountIdChanges(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols) {
+		var r, cIdx, n = 0, t, el;
+		for (cIdx = 0; cIdx < nCols; cIdx++) {
+			if (cols[box.c0 + cIdx] && cols[box.c0 + cIdx].key === 'id') { break; }
+		}
+		if (cIdx >= nCols) { return 0; }
+		for (r = 0; r < nRows && box.r0 + r < rows.length; r++) {
+			el = rows[box.r0 + r];
+			t = cells[r % srcRows][cIdx % srcCols];
+			if (t === undefined || paneCellIsPlain(cols[box.c0 + cIdx], el)) { continue; }
+			if (String(t).trim() !== el.id) { n++; }
+		}
+		return n;
+	}
+	function paneAskIdChanges(spec, raw, n) {
+		var pc = EngCalcs.pageConfig || {},
+			text = String(pc.lpn_pane_paste_ids_differ || '{n} IDs don\'t match. Paste anyway?').replace('{n}', String(n));
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = text;
+			body.appendChild(p);
+		}, [
+			{ label: pc.points_data_paste || 'Paste', fn: function () { panePasteAt(spec, raw, { raw: raw, idsOk: true }); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () {} }
+		]);
+		return { asked: true, idChanges: n };
+	}
 	function paneAskOverflow(spec, raw, n, extra) {
 		var pc = EngCalcs.pageConfig || {}, fit = n - extra,
 			check = panePasteAt(spec, raw, { overflow: 'check', raw: raw }), errs = (check && check.errors) || [],
@@ -24023,10 +24053,10 @@ var EngCalcs = EngCalcs || {};
 		buttons = [];
 		if (!errs.length) {
 			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add {extra} rows'),
-				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw }); } });
+				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw, idsOk: true }); } });
 		}
 		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the {fit} that fit'),
-			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw }); } });
+			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw, idsOk: true }); } });
 		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () {} });
 		openDialog(function (body) {
 			var p = document.createElement('p');
@@ -24065,7 +24095,15 @@ var EngCalcs = EngCalcs || {};
 		nRows = Math.max(box.r1 - box.r0 + 1, srcRows);
 		nCols = Math.max(box.c1 - box.c0 + 1, srcCols);
 		extra = Math.max(0, box.r0 + nRows - rows.length);
-		if (mayAsk && extra) { return paneAskOverflow(spec, opts && opts.raw || cells, nRows, extra); }
+		// **A PASTE THAT WOULD RENAME ROWS ASKS FIRST, IN TOM'S WORDS** (2026-09-26: *"Yes, it is a
+		// big change to make silently. I think we should alert, '{n} IDs don't match. Paste
+		// anyway?'"*). Asked before the overflow question: the two are separate decisions, and the
+		// rename one is about rows that already exist, so it comes first.
+		if (!opts.append && !overflow && !opts.idsOk) {
+			i = paneCountIdChanges(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols);
+			if (i) { return paneAskIdChanges(spec, opts.raw, i); }
+		}
+		if (mayAsk && extra) { return paneAskOverflow(spec, opts.raw, nRows, extra); }
 		// The new rows, read and judged before anything is written.
 		if (canCreate) {
 			for (r = 0; r < nRows; r++) {
