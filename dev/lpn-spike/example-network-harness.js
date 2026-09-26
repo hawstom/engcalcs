@@ -986,12 +986,26 @@ console.log('\n--- Settings panel stays in sync ---');
     PC.calc_units_si = keepTok; PC.lpn_title_units = keepTpl;
   }
 
-  // NOTHING writes the browser tab any more. A source check, because the defect this guards is a
-  // line coming back, not a value being wrong.
+  // NOTHING writes the browser tab to reflect the unit-set strip any more. A source check,
+  // because the defect this guards is a line coming back, not a value being wrong.
+  //
+  // **ONE NARROW, REVIEWED EXCEPTION SINCE 2026-09-25**: printPaneTable()/paneEndPrint() borrow
+  // document.title for exactly as long as printing takes, to give the browser's own Save-as-PDF
+  // picker a useful default name ({project}-{table}, Tom: "make the Print table PDF name more
+  // useful"), and restore it immediately after. That is a different defect shape from the one
+  // this guard was written for -- the old one was a STANDING rewrite tied to the unit-set strip,
+  // reached from setUnits()/newProject() through refreshPageTitle() (removed, and still asserted
+  // gone below) -- so the check is narrowed to "nowhere OUTSIDE the print path", not lifted.
   {
     const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-    ok('the page never writes document.title', js.indexOf('document.title') < 0);
+    const printStart = js.indexOf('var panePrintArea = null;');
+    const printEnd = js.indexOf('function activePaneTableSpec(');
+    const printBlock = js.slice(printStart, printEnd);
+    const outsidePrint = js.slice(0, printStart) + js.slice(printEnd);
+    ok('document.title is touched only by the print path (a reviewed exception), nowhere else',
+      outsidePrint.indexOf('document.title') < 0 && printBlock.indexOf('document.title') >= 0);
     ok('...and nothing derives a preset name from the selects', js.indexOf('unitSetName') < 0);
+    ok('...and the old standing tab-title rewrite has not come back', js.indexOf('refreshPageTitle') < 0);
   }
 
   // The strings are real lang keys, not literals hiding behind a fallback -- the mistake that made
