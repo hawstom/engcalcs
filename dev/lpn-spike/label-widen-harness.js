@@ -345,16 +345,20 @@ function passLevelCheck() {
 		const c = {}; Object.keys(l).forEach(function (k) { c[k] = l[k]; }); c.widen = null; return c;
 	});
 	const off = C.placeLabelsFirstFit(bare, obstacles, { pad: 1 });
-	// **THE FIXTURE IS DELIBERATELY FULL, which the shipped pass refuses to widen on** (see the
-	// crowding bound in placeLabelsFirstFit): a longer leader is the answer for a few labels on a
-	// drawing with room elsewhere, not for a drawing with no elsewhere. So the rescue's own
-	// behaviour is measured with `widenCrowd` opened up, and the bound is asserted separately below.
+	// **THE FIXTURE IS DELIBERATELY FULL, which the shipped pass rescues only a quarter of** (see
+	// the crowding bound in placeLabelsFirstFit). So the rescue's own behaviour is measured with
+	// `widenCrowd` opened up, and the bound is asserted separately below.
 	const on = C.placeLabelsFirstFit(labels, obstacles, { pad: 1, widenCrowd: 1 });
 	const bounded = C.placeLabelsFirstFit(labels, obstacles, { pad: 1 });
-	report(bounded.filter(function (r) { return r.dropped; }).length
-			=== off.filter(function (r) { return r.dropped; }).length,
-		'pass level: and the shipped bound refuses to widen on a drawing this full',
-		off.filter(function (r) { return r.dropped; }).length + ' dropped either way');
+	// **GRADED SINCE 2026-09-26** (R-290): on a drawing this full the shipped pass rescues at most a
+	// quarter of the labels, the highest ranked first, instead of refusing outright -- the
+	// all-or-nothing cliff is what collapsed Net3-Novato-CA-World at 2x after master's text grew.
+	const offDropped = off.filter(function (r) { return r.dropped; }).length,
+		boundedDropped = bounded.filter(function (r) { return r.dropped; }).length;
+	report(offDropped - boundedDropped > 0 && offDropped - boundedDropped <= Math.floor(N * 0.25),
+		'pass level: and the shipped bound rescues at most a quarter on a drawing this full',
+		offDropped + ' dropped without the rescue, ' + boundedDropped + ' with it (at most '
+			+ Math.floor(N * 0.25) + ' rescued)');
 	const byId = {};
 	on.forEach(function (r) { byId[r.id] = r; });
 	let droppedOff = 0, rescued = 0, moved = 0, kept = 0;

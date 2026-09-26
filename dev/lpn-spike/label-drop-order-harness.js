@@ -36,7 +36,13 @@ const ZOOMS = [2, 3];
 // Re-measured the same day, after the slide was given the link labels' boxes to see: 18/5 -> 22/4
 // at 2x. The two trade against each other by construction -- a label that gives a value up is one
 // that did not have to be hidden -- so `hidden` is the one to read first.
-const CEILING = { 2: { shed: 22, hidden: 4 }, 3: { shed: 3, hidden: 1 } };
+// **RE-BASELINED 2026-09-26 ON MASTER'S DRAWING** (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26). Master's
+// example now opens at text 12 (was 11) and zoom to fit stops about 4% further out, so this "2x" is
+// a fuller drawing: the branch's own pre-merge code scores 77/1 at 2x and 18/0 at 3x HERE (22/4 and
+// 3/1 were measured on the old drawing and are unreachable on this one). The merge as it landed
+// scored 72/7 and 18/0; the graded rescue scores 49/7 and 16/1. The 3x hide is the rescue's gather
+// now covering a room claim's full width, which the old per-ring disc could miss.
+const CEILING = { 2: { shed: 49, hidden: 7 }, 3: { shed: 16, hidden: 1 } };
 
 let checks = 0, failures = 0;
 // **THE SHIPPED FILE'S LABELING THRESHOLD IS CLEARED ON LOAD.** Master's examples carry one (Net3

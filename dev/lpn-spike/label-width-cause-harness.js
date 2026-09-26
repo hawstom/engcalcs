@@ -74,8 +74,11 @@ const FIXTURES = [
 	// at Net3-World's fit view where this branch hid 13 before the merge. The defect this ratchets is
 	// real and is the width-blind lattice section 20b describes; the number moved for a reason
 	// outside this branch, and it is recorded here rather than silently absorbed.
-	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 28, wide: 42 } },
-	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 6 } }
+	// Re-baselined 2026-09-26 on master's drawing (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26): at text 12
+	// the pre-merge code with the old cap drops 34/51 with room at 5000 and 1 at 12000; master's
+	// cap, which stays, makes it 38/57 and 2.
+	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 38, wide: 57 } },
+	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 2, wide: 6 } }
 ];
 // His own test: the same field, with and without four characters of Before text.
 // **THE AFFIX IS OVERRIDABLE FOR EXPLORATION ONLY** -- `LPN_WIDE_AFFIX=12345678 node ...` runs his

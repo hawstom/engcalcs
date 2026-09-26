@@ -128,7 +128,10 @@ function partOne(Collide, quiet) {
 // harder: x1 goes 27 -> 8, 44 -> 15 and 49 -> 11, x2 goes 20 -> 9, 25 -> 11 and 28 -> 14, and x4 and
 // x8 are 0 across the board where they were allowed 2, 4, 8 and 2. Set to the measured numbers, so
 // every one of those is now held there.
-const CEILING = { '12=': [8, 9, 0, 0], '123=': [15, 11, 0, 0], '1234=': [11, 14, 0, 0] };
+// **RE-BASELINED 2026-09-26 ON MASTER'S DRAWING** (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26). The
+// branch's pre-merge code with the old cap moves 5/16, 16/19 and 24/18 at x1/x2 here; shipped code
+// moves 9/7, 16/11 and 17/18. x4 and x8 stay at 0.
+const CEILING = { '12=': [9, 9, 0, 0], '123=': [16, 11, 0, 0], '1234=': [17, 18, 0, 0] };
 
 function measureChild(prefix) {
 	const r = spawnSync(process.execPath, [__filename, '--measure', prefix],

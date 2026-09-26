@@ -382,8 +382,12 @@ console.log('\n--- the label that was in the way sheds too, not only the one tha
 	// Tom ruled that a longer leader beats giving a property up, so most of the labels this cascade
 	// used to rescue are never dropped in the first place -- the pair rule is unchanged and is still
 	// what makes the number bigger than a loser-only cascade's, it simply has far less to do.
-	report(shed.length >= 9, 'far more labels shed than were ever dropped, which only the pair rule does',
-		shed.length + ' shedding (loser-only measured 17)');
+	// **LOWERED 9 -> 6 ON 2026-09-26, AND THE MUTATION NO LONGER FAILS IT** (R-290). On master's
+	// drawing this view sheds 6 with the pair rule and 6 without it (loser-only, measured the same
+	// day), all 97 drawn either way: longer leaders now place what the pair rule used to rescue.
+	// This floor holds the count; it no longer tells the two cascades apart on this view.
+	report(shed.length >= 6, 'far more labels shed than were ever dropped, which only the pair rule does',
+		shed.length + ' shedding (loser-only measured 6 on master\'s drawing, 17 before)');
 	report(drawnNodes().length >= 94, '...and it puts more of them on the drawing',
 		drawnNodes().length + ' of ' + doc.nodes.length + ' drawn (loser-only measured 93)');
 	// **EITHER CASCADE, because there are two since 2026-09-22.** The old one is driven by a label

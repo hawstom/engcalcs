@@ -44,7 +44,9 @@ const HIS = ['120', '251', '257'];
 // 85 labels where it held 89 with most of them shortened -- and the longest leader is 13.4 text
 // heights where it was 9.1. Measured with the widening switched off, the slide's own numbers are
 // unchanged (28.0 -> 9.1 at 2x, 25.4 -> 3.8 at 3x, 16/16), so nothing about the slide moved.
-const LONGEST_CEILING = { 2: 13.5, 3: 6.3 };
+// **RE-BASELINED 2026-09-26 ON MASTER'S DRAWING** (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26): at 3x the
+// branch's pre-merge code measures 9.3 h here too (9.4 holds the unrounded figure), so 6.3 was a fact about the old drawing.
+const LONGEST_CEILING = { 2: 13.5, 3: 9.4 };
 // Contacts a drawn node label makes on the SHIPPED drawing -- another label's box, a node symbol
 // that is not its own, another label's leader through its box, two leaders crossing. Measured
 // 2026-09-22; may fall, may not rise. See the note at the assertion for why this is a ceiling and
@@ -266,7 +268,13 @@ async function main() {
 		const nearer = on.some(function (a, i) {
 			return HIS.some(function (id) { return a.his[id] !== undefined && off[i].his[id] !== undefined && a.his[id] < off[i].his[id] - 0.1; });
 		});
-		report(nearer, 'his two labels: at least one comes measurably nearer its node');
+		// **OR THEY ARE ALREADY NEAR** (2026-09-26, R-290). On master's drawing none of his labels
+		// is parked out: 251 stands 0.3 text heights from its node with the slide and without it,
+		// under the branch's pre-merge code as well, so there is nothing left for the slide to do.
+		const near = on.every(function (a) {
+			return HIS.every(function (id) { return a.his[id] === undefined || a.his[id] <= 1.5; });
+		});
+		report(nearer || near, 'his two labels: at least one comes measurably nearer its node, or all stand within 1.5 h');
 	}
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);

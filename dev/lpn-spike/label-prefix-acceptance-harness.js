@@ -54,9 +54,13 @@ const MULTS = [1, 2, 4, 8];
 // which took this to 43 moved; it now applies only to a label that HAS a property to lose, so a
 // drawing showing the node ID alone -- which is what this file measures -- is placed exactly as it
 // was. See `nodeFirstFitSpec()`.
+// **RE-BASELINED 2026-09-26 ON MASTER'S DRAWING** (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26). Hidden rose
+// with master's example (text 12) and master's symbol cap: the branch's pre-merge code with the OLD
+// cap hides 35 on each file here; with master's cap, which stays, 36 and 37. Moved fell (12 -> 8,
+// 9 -> 7), so moved keeps its old ceiling. R-075 itself (4x and 8x, nothing moves or hides) holds.
 const CEILING = {
-	'Net3-Novato-CA-World.lwn': { moved: 10, hidden: 29 },
-	'Net3.lwn': { moved: 10, hidden: 22 }
+	'Net3-Novato-CA-World.lwn': { moved: 10, hidden: 36 },
+	'Net3.lwn': { moved: 10, hidden: 37 }
 };
 
 // THE BEFORE: room to grow switched off through the stub's own source hook, so every label is
@@ -301,7 +305,9 @@ function median(a) {
 
 // The ratchet on the sweep: the worst top-of-column leader and the worst hidden count over all
 // eleven lengths, fit and 2x. Measured 2026-09-22; may fall, may not rise.
-const SWEEP_CEILING = { top: 3.6, hidden: 47, mean: 2.1 };
+// Re-baselined 2026-09-26 on master's drawing (R-290; the attribution is dev/lpn-spike/label-merge-attribution-measure.js, 3a1cba26): the
+// pre-merge code with the old cap measures top 2.2 h, hidden 56 here; with master's cap 3.8 h and 59.
+const SWEEP_CEILING = { top: 3.8, hidden: 59, mean: 2.1 };
 function sweepReport() {
 	const file = FILES[0], got = { now: child(file, false, 'sweep'), before: child(file, true, 'sweep') };
 	if (got.now.error || got.before.error) { report(false, 'prefix sweep', got.now.error || got.before.error); return; }
