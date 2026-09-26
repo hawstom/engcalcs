@@ -528,5 +528,30 @@ console.log('\n--- 11. a paste that would change IDs asks first, in Tom\'s words
 		'...and both land as one undo step', nodes().map((n) => n.id).join(','));
 }
 
+console.log('\n--- 12. twenty bad IDs in one paste: ONE message, not twenty alerts ---');
+{
+	L.reset();
+	const l = [];
+	for (let i = 1; i <= 25; i++) { l.push(['Z' + i, String(i), '0'].join('\t')); }
+	pasteIntoEmpty('junctions', l.join('\n'));
+	L.openPane('junctions'); L.renderTable('junctions');
+	const orig = JSON.stringify(nodes()), d0 = L.undoDepth();
+	let alerts = 0, notices = 0;
+	const oldAlert = global.window.alert, oldGAlert = global.alert;
+	global.window.alert = global.alert = () => { alerts++; };
+	const box = byId.lpn_map_notice, last = box.textContent;
+	const bad = [];
+	for (let i = 1; i <= 20; i++) { bad.push('Z' + (i + 1) + '\t' + i + '\t0'); }   // each names its neighbour: taken
+	L.selectCell('junctions', 'Z1', 'id');
+	const r = L.pasteAt('junctions', bad.join('\n'));
+	if (box.textContent !== last) { notices++; }
+	global.window.alert = oldAlert; global.alert = oldGAlert;
+	report(alerts === 0, 'no alert at all', String(alerts));
+	report(notices === 1 && r && r.refused === true && r.errors.length === 20, 'exactly one notice, refusing the paste with 20 reasons', r && String(r.errors.length));
+	report(L.notice().indexOf(REFUSED) === 0 && has(L.notice(), 'lpn_pane_paste_more', { n: 15 }) &&
+		has(L.notice(), 'lpn_pane_paste_id_taken', { row: 1, id: 'Z2' }), '...naming five rows and counting fifteen', L.notice());
+	report(JSON.stringify(nodes()) === orig && L.undoDepth() === d0, 'and nothing was written');
+}
+
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);
 process.exit(failures ? 1 : 0);

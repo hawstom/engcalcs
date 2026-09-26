@@ -24005,21 +24005,46 @@ var EngCalcs = EngCalcs || {};
 	 * when its answer would be refused: a failing overflow is named in the dialog, and only the
 	 * other two answers remain. Whichever runs, it is one paste and one undo step.
 	 */
-	// How many EXISTING rows this paste would give a different ID: the rows it lands on, where the
-	// ID column is inside the pasted block and the pasted text is not the row's own ID.
-	function paneCountIdChanges(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols) {
-		var r, cIdx, n = 0, t, el;
+	// The EXISTING rows this paste would give a different ID: the rows it lands on, where the ID
+	// column is inside the pasted block and the pasted text is not the row's own ID.
+	function paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols) {
+		var r, cIdx, out = [], t, el;
 		for (cIdx = 0; cIdx < nCols; cIdx++) {
 			if (cols[box.c0 + cIdx] && cols[box.c0 + cIdx].key === 'id') { break; }
 		}
-		if (cIdx >= nCols) { return 0; }
+		if (cIdx >= nCols) { return out; }
 		for (r = 0; r < nRows && box.r0 + r < rows.length; r++) {
 			el = rows[box.r0 + r];
 			t = cells[r % srcRows][cIdx % srcCols];
 			if (t === undefined || paneCellIsPlain(cols[box.c0 + cIdx], el)) { continue; }
-			if (String(t).trim() !== el.id) { n++; }
+			t = String(t).trim();
+			if (t !== el.id) { out.push({ r: r, el: el, id: t }); }
 		}
-		return n;
+		return out;
+	}
+	// validateNewId()'s rule for each rename, plus two renames in the block onto the same ID.
+	function paneRenameErrors(spec, renames, lineOffset) {
+		var seen = {}, errs = [];
+		renames.forEach(function (x) {
+			var row = x.r + 1 + lineOffset, ok;
+			if (!x.id) { errs.push(panePasteSay('lpn_pane_paste_no_id', 'Row {row}: a new row needs an ID.', row)); return; }
+			if (/[\s'"]/.test(x.id)) { errs.push(panePasteSay('lpn_pane_paste_bad_id', 'Row {row}: the ID {id} has a space or a quotation mark in it.', row, { id: x.id })); return; }
+			ok = validateNewId(x.id, x.el.id, spec.group);
+			if (ok !== true) { errs.push(panePasteSay('lpn_pane_paste_id_taken', 'Row {row}: the ID {id} is already in use.', row, { id: x.id })); return; }
+			if (seen[x.id]) { errs.push(panePasteSay('lpn_pane_paste_id_twice', 'Row {row}: the ID {id} is used twice in this paste.', row, { id: x.id })); return; }
+			seen[x.id] = 1;
+		});
+		return errs;
+	}
+	// ONE notice for a refused paste: up to five reasons, and a count of the rest.
+	function paneRefuse(errors) {
+		var pc = EngCalcs.pageConfig || {}, shown = errors.slice(0, 5), errs = shown.join(' ');
+		if (errors.length > shown.length) {
+			errs += ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.')
+				.replace('{n}', String(errors.length - shown.length));
+		}
+		setNotice(String(pc.lpn_pane_paste_refused || 'Nothing was pasted. {reasons}').replace('{reasons}', errs));
+		return { refused: true, errors: errors, wrote: 0, created: 0 };
 	}
 	function paneAskIdChanges(spec, raw, n) {
 		var pc = EngCalcs.pageConfig || {},
@@ -24071,7 +24096,7 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
-			creates = [], plan, made, created = [], firstId, errs, shown, i,
+			creates = [], plan, made, created = [], firstId, i,
 			overflow = (opts && opts.overflow) || '', mayAsk = false, extra;
 		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
 		// begins past the last existing row so not one of them can be written.
@@ -24099,9 +24124,14 @@ var EngCalcs = EngCalcs || {};
 		// big change to make silently. I think we should alert, '{n} IDs don't match. Paste
 		// anyway?'"*). Asked before the overflow question: the two are separate decisions, and the
 		// rename one is about rows that already exist, so it comes first.
-		if (!opts.append && !overflow && !opts.idsOk) {
-			i = paneCountIdChanges(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols);
-			if (i) { return paneAskIdChanges(spec, opts.raw, i); }
+		// **EVERY RENAME IN THE BLOCK IS JUDGED BEFORE ANY IS MADE**, so a paste of forty bad IDs
+		// is one notice rather than forty alerts from the ID cell's own refusal (paneColId()). Same
+		// rule as that cell, same shape as the add refusals: nothing written, up to five rows named.
+		if (!opts.append && overflow !== 'check') {
+			var renames = paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols),
+				renameErrs = paneRenameErrors(spec, renames, lineOffset);
+			if (renameErrs.length) { return paneRefuse(renameErrs); }
+			if (!overflow && !opts.idsOk && renames.length) { return paneAskIdChanges(spec, opts.raw, renames.length); }
 		}
 		if (mayAsk && extra) { return paneAskOverflow(spec, opts.raw, nRows, extra); }
 		// The new rows, read and judged before anything is written.
@@ -24121,19 +24151,9 @@ var EngCalcs = EngCalcs || {};
 			if (creates.length) {
 				plan = panePlanCreates(spec, creates);
 				if (overflow === 'check') { return { check: true, errors: plan.errors }; }
-				if (plan.errors.length) {
-					// **NOTHING WAS WRITTEN, AND IT SAYS WHICH ROWS AND WHY.** The first five, and a
-					// count of the rest: a notice line holding four hundred reasons helps nobody, and
-					// fixing the first five usually fixes the pattern behind the rest.
-					shown = plan.errors.slice(0, 5);
-					errs = shown.join(' ');
-					if (plan.errors.length > shown.length) {
-						errs += ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.')
-							.replace('{n}', String(plan.errors.length - shown.length));
-					}
-					setNotice(String(pc.lpn_pane_paste_refused || 'Nothing was pasted. {reasons}').replace('{reasons}', errs));
-					return { refused: true, errors: plan.errors, wrote: 0, created: 0 };
-				}
+				// **NOTHING WAS WRITTEN, AND IT SAYS WHICH ROWS AND WHY.** The first five, and a count
+				// of the rest: a notice line holding four hundred reasons helps nobody.
+				if (plan.errors.length) { return paneRefuse(plan.errors); }
 			}
 		}
 		if (overflow === 'check') { return { check: true, errors: [] }; }
