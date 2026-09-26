@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**6 still to read on master**, of 185 untranslated keys, of 2032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 214 untranslated keys, of 2053 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,68 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (185, 6 to read @@ NEEDS RULING)
+## lpn_  (214, 2 to read @@ NEEDS RULING)
 
+- **`lpn_convas_cancelled`**
+  > Nothing was converted. The copy is closed, and the original project is unchanged.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_coordsys_tip`**
+  > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_done`**
+  > The converted copy is {name}. The original project is unchanged.
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_epsg`**
+  > EPSG coordinate system
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_epsg_tip`**
+  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_from`**
+  > Current: {crs}
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_label_col`**
+  > Suffix
+  _Ruled OK 2026-09-25._
+- **`lpn_convas_label_tip`**
+  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
+  _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
+- **`lpn_convas_no_transform`**
+  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
+  @@ NEEDS RULING
+- **`lpn_convas_none_tip`**
+  > Local coordinates in the length unit, with no world map for now.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_ok`**
+  > Convert
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_oneway`**
+  > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round`**
+  > Round converted values
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_flow`**
+  > Demand and flow
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_none`**
+  > No rounding
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_round_tip`**
+  > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_title`**
+  > Convert as
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_units_tip`**
+  > The units the copy is converted to. The original keeps its own numbers and units.
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_unnamed`**
+  > Unnamed (local) georeference
+  _Ruled OK 2026-09-26._
+- **`lpn_convas_unnamed_tip`**
+  > Local coordinates in the length unit, with the world map attached.
+  _Ruled OK 2026-09-26._
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
@@ -37,11 +97,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > unnamed
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
-  > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
-  _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this tip?_
+  > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
+  @@ NEEDS RULING
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
+- **`lpn_crsbox_title`**
+  > Coordinate system
+  _Ruled OK 2026-09-26._
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
   _Ruled OK 2026-09-23._
@@ -71,7 +134,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_ff_skipped`**
   > {n} selected elements are not junctions, so they were not tested.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -99,12 +162,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_meter_lumped_tip`**
   > Nearest node; this customer's demands are added there.
   _Ruled OK 2026-09-23._
-- **`lpn_field_meter_node`**
-  > Connected to
-  @@ NEEDS RULING
-- **`lpn_field_meter_node_tip`**
-  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
-  @@ NEEDS RULING
 - **`lpn_field_meter_offset`**
   > Offset from the pipe
   _Ruled OK 2026-09-23._
@@ -141,24 +198,45 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_text_all_zoom_tip`**
   > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
   _Ruled 2026-09-23: Default needs to be off. I see that you turned it on by default, and that already has caused me grief. Only a few texts would be privileged to have this on. Otherwise ok._
+- **`lpn_file_convert_as`**
+  > Convert as…
+  _Ruled OK 2026-09-25._
+- **`lpn_file_convert_as_tip`**
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
+  _Ruled OK 2026-09-25._
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
 - **`lpn_file_import_survey_tip`**
   > Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.
   _Ruled OK 2026-09-23._
+- **`lpn_find_filter_none`**
+  > This query doesn't apply to any table.
+  _Ruled 2026-09-26: Edited. Is this even possible?_
+- **`lpn_find_filter_row`**
+  > {table}: {n} of {all}
+  _Ruled OK 2026-09-26._
+- **`lpn_find_filter_summary`**
+  > Filtered by {q}. {rows}.
+  _Ruled OK 2026-09-26._
+- **`lpn_georef_answered`**
+  > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
+  _Ruled OK 2026-09-25._
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
 - **`lpn_inp_export_flat_customers`**
   > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
   _Ruled OK 2026-09-23._
+- **`lpn_inp_report_no_crs`**
+  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
+  _Ruled OK 2026-09-25._
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
-  > Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
-  @@ NEEDS RULING
+  > Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
+  _Ruled OK 2026-09-26._
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -389,13 +467,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_settings_label_always`**
   > Always show
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_max_width`**
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
-  @@ NEEDS RULING
+  > Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -582,99 +660,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ts_title`**
   > Values versus time
   _Ruled OK 2026-09-17._
-
----
-
-# Strings waiting on a branch
-
-**28 still to read**, of 58 new keys across 7 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/convert-as (`b2c2a802`) — 28 new, 15 to read @@ NEEDS RULING
-
-- **`lpn_convas_cancelled`**
-  > Nothing was converted. The copy is closed, and the original project is unchanged.
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_coordsys_tip`**
-  > The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_done`**
-  > The converted copy is {name}. The original project is unchanged.
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_epsg`**
-  > EPSG coordinate system
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_epsg_tip`**
-  > Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_from`**
-  > Current: {crs}
-  @@ NEEDS RULING
-- **`lpn_convas_label_col`**
-  > Suffix
-  _Ruled OK 2026-09-25._
-- **`lpn_convas_label_tip`**
-  > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
-  @@ NEEDS RULING
-- **`lpn_convas_no_transform`**
-  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
-  @@ NEEDS RULING
-- **`lpn_convas_none_tip`**
-  > Local coordinates in the length unit, with no world map for now.
-  @@ NEEDS RULING
-- **`lpn_convas_ok`**
-  > Convert
-  @@ NEEDS RULING
-- **`lpn_convas_oneway`**
-  > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
-  @@ NEEDS RULING
-- **`lpn_convas_round`**
-  > Round converted values
-  @@ NEEDS RULING
-- **`lpn_convas_round_flow`**
-  > Demand and flow
-  @@ NEEDS RULING
-- **`lpn_convas_round_none`**
-  > No rounding
-  @@ NEEDS RULING
-- **`lpn_convas_round_tip`**
-  > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
-  @@ NEEDS RULING
-- **`lpn_convas_title`**
-  > Convert as
-  @@ NEEDS RULING
-- **`lpn_convas_units_tip`**
-  > The units the copy is converted to. The original keeps its own numbers and units.
-  @@ NEEDS RULING
-- **`lpn_convas_unnamed`**
-  > Unnamed (local) georeference
-  @@ NEEDS RULING
-- **`lpn_convas_unnamed_tip`**
-  > Local coordinates in the length unit, with the world map attached.
-  @@ NEEDS RULING
-- **`lpn_crsbox_title`**
-  > Coordinate system
-  @@ NEEDS RULING
-- **`lpn_file_convert_as`**
-  > Convert as…
-  _Ruled OK 2026-09-25._
-- **`lpn_file_convert_as_tip`**
-  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  _Ruled OK 2026-09-25._
-- **`lpn_georef_answered`**
-  > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
-  _Ruled OK 2026-09-25._
-- **`lpn_inp_report_no_crs`**
-  > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
-  _Ruled OK 2026-09-25._
 - **`lpn_units_mapcoords`**
   > Map coordinates
   _Ruled OK 2026-09-25._
@@ -685,7 +670,29 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   _Ruled OK 2026-09-25._
 
-### feat/customer-node (`ebdbba34`) — adds no English strings
+---
+
+# Strings waiting on a branch
+
+**27 still to read**, of 55 new keys across 7 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/customer-node (`da75608c`) — 2 new, all ruled
+
+- **`lpn_field_meter_node`**
+  > Connected to
+  _Ruled OK 2026-09-26._
+- **`lpn_field_meter_node_tip`**
+  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
+  _Ruled OK 2026-09-26._
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -699,21 +706,92 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/menu-button (`a82d32f5`) — adds no English strings
+### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/property-venue (`c02dcc59`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/property-venue (`f76a98e1`) — adds no English strings
 
-- **`lpn_find_filter_none`**
-  > No table has a property this query names.
+### feat/report (`4fad6782`) — 26 new, 26 to read @@ NEEDS RULING
+
+- **`lpn_full_col_id`**
+  > ID
   @@ NEEDS RULING
-- **`lpn_find_filter_row`**
-  > {table}: {n} of {all}
+- **`lpn_full_col_time`**
+  > Time
   @@ NEEDS RULING
-- **`lpn_find_filter_summary`**
-  > Filtered by {q}. {rows}.
+- **`lpn_full_col_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_full_download_csv`**
+  > Download CSV
+  @@ NEEDS RULING
+- **`lpn_full_needs_run`**
+  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
+  @@ NEEDS RULING
+- **`lpn_full_note`**
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.
+  @@ NEEDS RULING
+- **`lpn_full_print`**
+  > Print report
+  @@ NEEDS RULING
+- **`lpn_full_row_count`**
+  > {n} rows.
+  @@ NEEDS RULING
+- **`lpn_full_title`**
+  > Full report
+  @@ NEEDS RULING
+- **`lpn_reports_full`**
+  > Full report
+  @@ NEEDS RULING
+- **`lpn_reports_full_tip`**
+  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
+  @@ NEEDS RULING
+- **`lpn_reports_status`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_reports_status_tip`**
+  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
+  @@ NEEDS RULING
+- **`lpn_status_closed`**
+  > {type} {id} closed
+  @@ NEEDS RULING
+- **`lpn_status_col_event`**
+  > Event
+  @@ NEEDS RULING
+- **`lpn_status_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_status_dry`**
+  > {type} {id} is empty
+  @@ NEEDS RULING
+- **`lpn_status_empty`**
+  > Nothing changed status during this run.
+  @@ NEEDS RULING
+- **`lpn_status_emptying`**
+  > {type} {id} is emptying
+  @@ NEEDS RULING
+- **`lpn_status_filling`**
+  > {type} {id} is filling
+  @@ NEEDS RULING
+- **`lpn_status_full`**
+  > {type} {id} is full
+  @@ NEEDS RULING
+- **`lpn_status_needs_run`**
+  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
+  @@ NEEDS RULING
+- **`lpn_status_no_converge`**
+  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
+  @@ NEEDS RULING
+- **`lpn_status_note`**
+  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
+  @@ NEEDS RULING
+- **`lpn_status_opened`**
+  > {type} {id} opened
+  @@ NEEDS RULING
+- **`lpn_status_title`**
+  > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`b7398d0b`) — 17 new, 10 to read @@ NEEDS RULING
+### feat/table-editing (`b7398d0b`) — 17 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
@@ -723,7 +801,7 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-25._
 - **`lpn_pane_colmenu_tip`**
   > Sort, hide, or manage columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
   _Ruled OK 2026-09-25._
@@ -741,33 +819,33 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-25._
 - **`lpn_pane_manage_cols`**
   > Manage columns…
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_down`**
   > Move down
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_show`**
   > Show
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_title`**
   > Manage columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_up`**
   > Move up
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_show_all_cols`**
   > Show all columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_show_col`**
   > Show {col}
   _Ruled OK 2026-09-25._
 - **`lpn_pane_sort_asc`**
   > Sort ascending
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_sort_desc`**
   > Sort descending
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 
-### feat/zoom-control (`3200afa9`) — 7 new, all ruled
+### feat/zoom-control (`d95c0b27`) — 7 new, all ruled
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.

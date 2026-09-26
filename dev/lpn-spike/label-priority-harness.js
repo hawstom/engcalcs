@@ -154,9 +154,11 @@ ok(['status', 'quality', 'rate'].every(function (k) {
 // to give up its space.
 // The starting concentration joined it under the quality row on 2026-09-13 (Task 638), on the same
 // argument: it is only ever on because the chemical analysis is.
+// Tank water depth (`level`) slotted in just above head on 2026-09-25 (Task 696): head is DERIVED
+// from elevation and depth, so it is still the first of the three to give up its space.
 eq(dropOrderOf(def.priority.node),
-	['head', 'elev', 'pressure', 'demand', 'demandActual', 'initQuality', 'quality'],
-	'node drop order is head, elevation, pressure, base demand, demand, initial quality, water quality -- quality decides last and so wins');
+	['head', 'level', 'elev', 'pressure', 'demand', 'demandActual', 'initQuality', 'quality'],
+	'node drop order is head, depth, elevation, pressure, base demand, demand, initial quality, water quality -- quality decides last and so wins');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,

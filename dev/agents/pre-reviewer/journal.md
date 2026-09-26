@@ -737,6 +737,147 @@ directly and unconditionally, so it is very likely fine, but not independently r
 
 ---
 
+## 2026-09-23 — feat/convert-as (Task 696), head 263e0351
+
+OBSERVED unless marked otherwise, checked 2026-09-23 at this SHA.
+
+**Headless harness (`dev/lpn-spike/convert-as-harness.js`) is real and not decorated.** Ran it
+against `263e0351`: all 33 checks PASS, including byte-identical original, unit conversion +
+rounding on the right fields, the lat/lon wizard opening pre-answered, R-172(1)'s backdrop hold,
+and Cancel discarding the copy. Sanity-checked the harness itself by running it, unmodified,
+against `9a3eb379` (pre-696): it throws `ReferenceError: openConvertAsBox is not defined` before a
+single assertion runs — the harness genuinely depends on the new code and is not a green light
+wired to nothing.
+
+**Drove the real thing in Chromium** (`dev/browser-pass` + a scratch driver, ad hoc, not committed
+— `/tmp/.../scratchpad/convas-drive.js`): empty-tab Convert As correctly clicks the plain
+`<input type=file>` (`#lpn_geo_file`) rather than the fragile File System Access picker — reliable
+across browsers, matches "opens a file picker first". On Elm Street Center, chose the EPSG target:
+wizard opened at "Step 1 of 2 — quick"; dragged the map 80px mid-gesture; both a model node and the
+backdrop image held within 1px of their starting screen position (image jitter for depth) —
+R-172(1) is fixed, measured live, not just in the stub. Finished the wizard, opened Settings: the
+new "Map coordinates" row reads "degrees" on the now-lat/lon copy, confirming Task 693. Clicked the
+satellite corner button: it fired a real request to Mapbox with the real token and got **403**,
+which is the token's own domain restriction (127.0.0.1 is not an allowed referrer) and not a code
+defect — the request is correctly formed; whether it actually paints for a visitor at hawsedc.com
+needs a person there, not this environment. Confirmed `EngCalcs.pageConfig` never emits
+`lpn_georef_drop`/`lpn_georef_finish` as JS-string constants (they're only inline PHP button
+labels) — cost me one retry, not a defect.
+
+**THE MISS, and it is the one to lead with.** `git diff master -- lib/lang.ec.*.php` renamed the
+key `lpn_file_import_geo` to `lpn_file_convert_as` in all 26 non-English files (mechanical rename,
+correct per CLAUDE.md's tool), but **left the old translated VALUE in place** — every one of the 26
+still reads its own language's version of "Open an xy file on the map…", with a tip describing the
+old drag-only behaviour, no coordinate/units/rounding questions, and a button that no longer
+exists in this flow ("These are already lat/lon"/"Esto ya son lat/lon" per language). Verified
+directly in es, fr, pt, tr, de, ru, ar, zh. This is worse than an untranslated key (which falls
+back cleanly to English per `lib/base.inc.php`'s "load English first" merge) — the key is PRESENT
+so the fallback never fires, and a non-English visitor reads a menu row that promises the old
+paradigm and gets the new one. `lpn_` is core in all 26 languages per CLAUDE.md. None of the ~20
+brand-new keys this box needs (`lpn_convas_*`, `lpn_units_mapcoords*`, `lpn_georef_answered`) exist
+in any non-English file either — that part is fine, ordinary untranslated-key debt with a correct
+English fallback, not a defect.
+
+**Confirmed clean on vocabulary:** none of this branch's OWN new strings say "projection"; the
+refusal Tom named ("This project is already on lat/lon") no longer gates `File, Convert as…`
+(`georefStart()` at `js/looped-network.js:13706` explicitly overrides it for this path; the old
+refusal survives only on `Map, Custom georeference`'s own door, `mapgeoStart()`, where a
+lat/lon project genuinely has nothing to attach). The pre-existing New Project box (`lpn_new_crs`,
+`lpn_new_coordsys_geo`, etc.) still says "projection" repeatedly — untouched by this branch's diff,
+so not a regression here, but it is the same paradigm gap Tom's ruling covers and will read oddly
+placed one menu item away from a box that no longer says it.
+
+**Known, documented, and not re-litigated:** the "These are already lat/lon" button
+(`lpn_georef_asdeg_btn`) still exists on the shared placement bar and can appear mid-Convert-As-wizard
+for a small grid whose numbers happen to fall in ±180/±90 — inherited from the pre-existing georef
+bar, named as a leftover in the task brief, not a new defect. Emitter coefficients and tank volume
+curves are confirmed NOT touched by `convertSavedGeometry`/`convasApplyUnits` — matches the stated
+gap, not silently broader or narrower than advertised.
+
+## feat/property-venue (Task 708), head 50ce4e93, 2026-09-23
+
+**Verdict: NOT READY.** Two ranked gaps this branch closes (link/pump/valve `status`, tank
+`mixingModel`) are technically findable/replaceable but **practically undiscoverable and, for
+`status`, silently WRONG in translation** — measured live in a real Chromium, not inferred.
+
+**OBSERVED, measured live in Chromium, Spanish edition, Net3 example.** Find > Pipe > Status >
+"equal to" > typed **"cerrado"** (the Spanish word for closed, and the word a Spanish reader would
+naturally type, since every other Find value on this page is typed in the reader's own language or
+units) returned **"No hubo coincidencias"** — no matches, which reads as "nothing is closed" and is
+false; the network has a closed pipe. Typing the **English** word **"closed"** (undocumented
+anywhere in the Spanish interface) found it, and the result row printed literally **"330  closed"**
+in the middle of an otherwise fully Spanish page. This is a false negative in the reader's own
+language, not just an awkward English residue — the worse of the two failure modes Tom has hit
+before (R-054, R-027 were both "the code did something other than what was reported," here it is
+"the search silently answers wrong instead of finding what is actually there").
+
+**OBSERVED, same session: the mixing-model gap is worse, in every language including English.**
+The tank popup's own Mixing model dropdown shows "Complete mixing" / "Two-compartment mixing" /
+"FIFO plug flow" / "LIFO plug flow" (`lpn_mixing_mixed` etc., translated already, e.g. "Mezcla
+completa" in Spanish) and never shows the words MIXED/2COMP/FIFO/LIFO anywhere in the UI. Find's
+new `mixingModel` property requires typing exactly those four bare EPANET tokens — words that
+appear nowhere on screen in any language. No English speaker, let alone a Spanish one, would guess
+to type "MIXED" for a field the page itself calls "Complete mixing." Confirmed by reading
+`js/looped-network.js:19997-20000` (the popup's translated dropdown) against the new `choices:
+['MIXED','2COMP','FIFO','LIFO']` in `pushSpecList()` and `renderFindControls()`'s plain-text value
+box (no dropdown, no placeholder, no tip naming the valid words) — then not run live a second time,
+since the code path is identical to `status`'s and the live status failure already demonstrates the
+mechanism.
+
+**Root cause, read in the source:** `property_venue_check.php`'s own new exemption comment says the
+`status` name was chosen to match `linkStatusOf()`'s and the Labels panel's *existing* RESULT
+field (post-solve reading, e.g. "closed due to check valve") rather than the Table's own checkbox
+word for the INPUT, "Shut" (`lpn_field_closed`). That was a deliberate choice, but it is also
+exactly the mismatch the review brief asked me to check for ("does Find's label match the table
+column heading's own word for the property?") — it does not: the Table calls it Shut, Find calls it
+Status, and "Status" was already spoken for elsewhere on the same page as a different, RESULT-typed
+concept. Every other choice-like field on this page (the mixing model dropdown, the status
+checkbox's own derived word) shows a human, translated phrase to the reader while storing the
+EPANET token underneath; `status` and `mixingModel` are the only two places New in this branch
+where the raw internal token is what the reader must type and see. `findFmt()` (line 16729), the
+function that prints a matched value in a result row, was written for numbers (`typeof v !==
+'number'` falls through to `String(v)`) and was never taught about `choices`, which is why the
+untranslated token leaks into the results list too.
+
+**CONFIRMED, by mutation-testing the branch's own harnesses against master's `js/looped-network.js`
+copied into a scratch checkout** (`property-venue-find-harness.js`: 27 assertions FAIL on the old
+code and ALL PASS on the branch; `replace-harness.js`: the two "offers the pipe/junction inputs"
+assertions correctly regress on the old code, everything else was already green) **— these are real
+tests, not decoration.**
+
+**CONFIRMED live in Chromium: the "Apply these new-asset values to every existing asset" guard
+works.** Opened Net3, turned on the Length, Shut(map calls it "Status") and Diameter map labels,
+set a New-asset Diameter default, pressed the button. The confirm dialog named only "Elevation,
+Base demand, Diameter" — Length and Status were correctly excluded from the push (the fix's own
+second gate on `settings.defaults.hasOwnProperty`) — and no pipe row read `undefined` or `NaN`
+afterward. **No headless harness in the branch covers this guard at all** (searched every
+`dev/lpn-spike/*.js` for `pushSpecList`/`settings.defaults[` callers that reach the "New assets"
+button's click handler — none do); this real-browser probe is the only thing that exercised it.
+
+**CONFIRMED via the mutation-tested harness (not independently re-driven in a browser): a pipe's
+status replaced inside a scenario is an override, Base is untouched; pipe length is replaceable
+under both `us` and `si` with the typed number stored unconverted, and `lenAuto` is cleared so a
+later geometry pass cannot silently re-derive it (the *flag* is asserted; an actual node-drag
+afterward was not driven live — low risk, since the geometry pass that reads `lenAuto` is existing,
+unmodified code, but say so rather than claim it as measured).**
+
+**NOT CHECKED / UNVERIFIABLE FROM HERE:** whether Tom finds "Status" reusing the map-legend's
+existing RESULT-status wording confusing in practice — that is a judgment call for him at a
+browser, not something a script can rule on; I can only report that the two concepts now share one
+English word on one page. Also not independently re-driven live: tank min/max level round-tripping
+under both US and SI through the Replace UI (the harness tests only the default unit set for these
+four tank fields, unlike length which explicitly tests both — the code shape is identical to
+length's, so this is inherited confidence rather than a fresh measurement).
+
+**Ranked for Tom:**
+1. **MISSED** — Find's `status`/`mixingModel` values must be typed as bare, untranslated EPANET
+   tokens nowhere shown on screen; in Spanish this makes a real closed pipe unfindable by the
+   natural word, and in every language mixing model has no discoverable spelling at all.
+2. CONFIRMED — the New-asset push guard prevents `undefined` on Length/Status; verified live.
+3. CONFIRMED — status/length/emitter/tank/pump Find and Replace rows work as specced, mutation-
+   tested.
+4. UNVERIFIABLE FROM HERE — whether Tom is comfortable with "Status" (Find) naming the same word
+   as the pre-existing map-legend RESULT field of the same name.
 ## feat/label-limit (e1a19100), reviewed 2026-09-23
 
 Ask (2026-09-23, quoted): *"I noticed that we have a tip saying that 0 is never for Customer

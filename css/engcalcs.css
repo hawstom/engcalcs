@@ -1639,12 +1639,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
 .lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
 .lpn-find-pair select { max-width: 100%; }
-/* The table filter's own line, under the Find button (ROADMAP Task 597): a select saying which
-   table and the button that applies the query to it. `flex-end` so the button's baseline sits with
-   the select's box rather than with its label, which is the same alignment .lpn-find-pair uses. */
-.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; margin: 6px 0 0; }
-.lpn-find-filter > div { flex: 1 1 0; min-width: 0; margin: 0; }
-.lpn-find-filter select { max-width: 100%; }
+/* ONE ROW: the Find button, then the Filter in table button (ROADMAP Task 597; row layout, Tom
+   2026-09-23; the table selector cut R-197, 2026-09-25). Both buttons keep their natural width. */
+.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin: 6px 0 0; }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
    sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
    Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of
@@ -2016,6 +2013,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    otherwise set the width of the whole column. It is the same 9rem the setting rows give a control,
    so the strip and the rows are one design. */
 .lpn-units-item > select { max-width: 9rem; }
+/* The derived Map coordinates line (Task 693): read, not chosen, so it is plain text at a select's height. */
+.lpn-units-derived { max-width: 9rem; padding: 3px 2px; min-height: 1.6em; opacity: .8; }
 
 /* ==== The profile view (ROADMAP Task 409) ====================================================
    A chart, not a map: it shares no symbol, scale or colour rule with the drawing. The suite's
@@ -2748,6 +2747,26 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    button or pushing the row off a narrow box. */
 .lpn-new-crs-name { margin-left: .5em; overflow-wrap: anywhere; }
 .lpn-new-crs-name.lpn-dim { opacity: .55; }
+#lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
+#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
+/* **THE LABEL COLUMN TAKES THE FLEXIBLE SPACE, THE OTHER TWO ARE FIXED-WIDTH** (R-217, Tom,
+   2026-09-24: "All the rounding selectors are misaligned with each other and their label
+   heading."). `justify-content: space-between` on a row whose first child sizes to its own text
+   put a different amount of space in front of the select on every row -- Diameter, Depth, Flow and
+   Head are not the same width -- so the select's left edge moved row to row and never lined up
+   under its heading. Matching the header's own layout (label flexes, the two value columns are a
+   fixed width) fixes both at once: every select's left edge sits at the same x, and so does every
+   suffix box's. */
+.lpn-convas-round-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.lpn-convas-round-row label { flex: 1 1 auto; }
+.lpn-convas-round-row select { flex: 0 0 auto; width: 6.5rem; }
+.lpn-convas-suffix { flex: 0 0 auto; width: 5rem; box-sizing: border-box; padding: 2px 4px; }
+/* The two column headings over the rounding selects and the suffix boxes (Tom, 2026-09-23):
+   same widths as the row cells below them, so the two columns line up. */
+.lpn-convas-round-head { display: flex; align-items: flex-end; gap: 8px; font-size: .85em; margin: 2px 0; }
+.lpn-convas-round-head span:first-child { flex: 1 1 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(2) { width: 6.5rem; flex: 0 0 auto; }
+.lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: #f2f2f2; color: #777; cursor: not-allowed; }

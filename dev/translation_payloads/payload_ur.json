@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2030,
-        "delta_key_count": 185,
+        "expected_key_count": 2053,
+        "delta_key_count": 216,
         "exempt_key_count": 30,
         "exempt_keys": [
             "u_imgd",
@@ -554,9 +554,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -573,9 +602,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -638,7 +669,7 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
         "lpn_settings_label_always": "Always show",
         "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
         "lpn_settings_symbol_cap_mid": "times the length of the",
@@ -647,7 +678,7 @@
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -741,9 +772,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -760,9 +820,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -825,7 +887,7 @@
         "lpn_mapgeo_cancelled": "The world map is back where it was, and your drawing never moved.",
         "lpn_mapgeo_locked": "Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
-        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+        "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
         "lpn_settings_label_always": "Always show",
         "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
         "lpn_settings_symbol_cap_mid": "times the length of the",
@@ -834,7 +896,7 @@
         "lpn_time_clock_day": "Day {day}, {clock}",
         "lpn_settings_sym_customer": "Customer",
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
-        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
+        "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_library_import": "Import libraries…",
         "lpn_library_import_tip": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
@@ -1423,19 +1485,435 @@
                 }
             }
         },
+        "lpn_units_mapcoords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "لمبائی اور نقشے کے احداثیات",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "بلندی اور ہیڈ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_mapcoords_deg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "لمبائی اور نقشے کے احداثیات",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "بلندی اور ہیڈ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_usft": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "لمبائی اور نقشے کے احداثیات",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "بلندی اور ہیڈ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_file_convert_as": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
         "lpn_copy_of": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "نقشے پر xy فائل کھولیں…",
-                    "english": "Convert coordinates as…"
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
                 },
                 "next_translated": {
-                    "key": "lpn_file_import_geo_tip",
-                    "value": "اس صفحے پر، سڑکوں کے نقشے پر ایک نئے پراجیکٹ ٹیب میں کوئی پراجیکٹ فائل یا EPANET فائل کھولتا ہے۔ آپ ڈرائنگ کو دنیا پر خود ہاتھ سے رکھتے ہیں: مقام تک pan اور zoom کریں، پھر اسے فٹ کرنے کے لیے سائز اور موڑ دیں۔ اگر فائل کا x اور y پہلے سے طول بلد اور عرض بلد ہیں، تو یہ پہلے سے عرض بلد\/طول بلد ہیں بٹن دبائیں اور نیٹ ورک سیدھا اپنی جگہ پر پہنچ جائے گا۔ آپ کا لکھا ہوا ہر عدد جیسا ہے ویسا ہی رہتا ہے۔",
-                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_coordsys_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_none_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_oneway": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_no_transform": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_file_convert_as_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geomap",
+                    "value": "عرض بلد\/طول بلد",
+                    "english": "lat\/lon"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_georef_answered": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "اس فائل کا x اور y طول بلد اور عرض بلد کے طور پر پڑھا گیا، اس لیے نیٹ ورک پہلے ہی نقشے پر ہے اور کچھ منتقل نہیں کیا گیا۔ جانچ لیں کہ یہ درست جگہ پر ہے، پھر یہ جگہ برقرار رکھیں بٹن دبائیں۔",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "ماڈل رکھنے کے دو مرحلے ہیں۔ مرحلہ 1 تیز ہے: ماڈل ساکت رہتا ہے اور آپ اس کے پیچھے نقشہ حرکت دیتے ہیں، جب تک آپ کا مقام تقریباً درست سائز پر ماڈل کے نیچے نہ آ جائے۔ ابھی تک کوئی گردش نہیں ہوتی۔ مرحلہ 2 باریک بین ہے: آپ خود ماڈل کو گھسیٹتے، اس کا سائز بدلتے اور گھماتے ہیں۔ آپ کا پراجیکٹ شروع میں پوری دنیا کے نقشے پر ہوتا ہے، اس لیے پہلے اپنا مقام تلاش کریں، پھر ماڈل یہاں رکھیں بٹن دبائیں۔",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1468,6 +1946,54 @@
                     "key": "lpn_pane_print",
                     "value": "جدول پرنٹ کریں",
                     "english": "Print table"
+                }
+            }
+        },
+        "lpn_find_filter_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "نقشے کے نیچے موجود جدولوں میں سے کسی ایک میں صرف وہی حصے دکھائیں جو اس استفسار سے مطابقت رکھتے ہیں۔ ڈرائنگ تبدیل نہیں ہوتی اور کچھ حذف نہیں ہوتا۔",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "میں شامل ہو",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "نقشے کے نیچے موجود جدولوں میں سے کسی ایک میں صرف وہی حصے دکھائیں جو اس استفسار سے مطابقت رکھتے ہیں۔ ڈرائنگ تبدیل نہیں ہوتی اور کچھ حذف نہیں ہوتا۔",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "میں شامل ہو",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "نقشے کے نیچے موجود جدولوں میں سے کسی ایک میں صرف وہی حصے دکھائیں جو اس استفسار سے مطابقت رکھتے ہیں۔ ڈرائنگ تبدیل نہیں ہوتی اور کچھ حذف نہیں ہوتا۔",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "میں شامل ہو",
+                    "english": "contains"
                 }
             }
         },
@@ -1727,6 +2253,22 @@
                 }
             }
         },
+        "lpn_crsbox_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_crs",
+                    "value": "نقشہ پروجیکشن",
+                    "english": "Coordinate system"
+                },
+                "next_translated": {
+                    "key": "lpn_crs_view",
+                    "value": "نقشے کے منظر کے مطابق فلٹر کریں",
+                    "english": "Filter by map view"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,
@@ -1772,6 +2314,22 @@
                     "key": "lpn_crs_none",
                     "value": "جغرافیائی حوالہ نہیں دیا گیا",
                     "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_inp_report_no_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_label_anchor",
+                    "value": "متن لیبلز اسی طرح رکھے جاتے ہیں جیسے EPANET رکھتا ہے، ان کے اوپری بائیں کونے سے۔",
+                    "english": "Text labels are placed as EPANET places them, from their top left corner."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "یہ صفحہ EPANET کی ہر چیز استعمال نہیں کرتا، مگر آپ کی فائل میں کچھ بھی ضائع نہیں کیا جاتا۔ نیچے وہ ہے جو آپ کی فائل رکھتی ہے اور یہ صفحہ استعمال کیے بغیر محفوظ رکھتا ہے، اور جو فائل پڑھے جانے پر بدلا گیا:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
                 }
             }
         },

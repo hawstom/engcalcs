@@ -3301,6 +3301,13 @@ var EngCalcs = EngCalcs || {};
 	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	// **WGS 84 ITSELF, THE OTHER GEOGRAPHIC ANSWER** (Tom, 2026-09-25: EPSG:4326 was missing from
+	// the chooser and must be an ordinary, unmodified-name option). Its own stored numbers are the
+	// same longitude and latitude degrees LPN_CRS_WEBMERC already means here, so picking either one
+	// makes the identical lat/lon project -- crsIsLatLonCode() is where that equivalence is stated,
+	// and crsBoxOk() is where a 4326 pick is folded onto LPN_CRS_WEBMERC before anything reads it.
+	var LPN_CRS_GEOWGS84 = 'EPSG:4326';
+	function crsIsLatLonCode(code) { return code === LPN_CRS_WEBMERC || code === LPN_CRS_GEOWGS84; }
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3471,8 +3478,14 @@ var EngCalcs = EngCalcs || {};
 		var out = [], i, f, z;
 		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
 		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// **AND EPSG:4326 RIGHT BESIDE IT** (Tom, 2026-09-25), the register's own name for the plain
+		// longitude/latitude CRS this page's own lat/lon project actually stores. Both entries lead
+		// to the identical project -- crsIsLatLonCode() -- so neither is a projected CRS the register
+		// list below could duplicate.
+		out.push({ code: LPN_CRS_GEOWGS84, name: 'WGS 84' });
 		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
-		// CRS like any other, so it is skipped rather than offered twice.
+		// CRS like any other, so it is skipped rather than offered twice. EPSG:4326 is geographic,
+		// not projected, so the register (projected CRS only) never carries it and needs no skip.
 		if (crsRegisterReady()) {
 			for (i = 0; i < LPN_CRS_REG_LIST.length; i++) {
 				if (LPN_CRS_REG_LIST[i].code !== LPN_CRS_WEBMERC) { out.push(LPN_CRS_REG_LIST[i]); }
@@ -3525,6 +3538,9 @@ var EngCalcs = EngCalcs || {};
 		if (c === LPN_CRS_WEBMERC) {
 			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
 		}
+		// WGS 84 geographic has no Mercator pole cut -- it is plain latitude and covers the whole
+		// globe, pole to pole.
+		if (c === LPN_CRS_GEOWGS84) { return { w: -180, e: 180, s: -90, n: 90 }; }
 		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
 		// THE REGISTER'S OWN BOX WINS over anything derived here, and for a reason worth stating:
 		// the family table rounds a band OUTWARD across all of a family's zones, because one row
@@ -3575,10 +3591,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
-		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
-		// write a document claiming its longitudes were metres.
-		if (String(code) === LPN_CRS_WEBMERC) { return false; }
+		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
+		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
+		// ever reached here it would write a document claiming its longitudes were metres.
+		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
 			(doc.labels && doc.labels.length))) { return false; }
@@ -3600,8 +3616,21 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
+		// **R-218: NEVER "WGS 84 / Pseudo-Mercator (EPSG:3857)" HERE.** That is the catalogue's own
+		// name for the code this page uses internally to mark a lat/lon project (comment at
+		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
+		// projected metres when they are longitude and latitude degrees (R-188). This is the one
+		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
+		//
+		// **THROUGH THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A SEPARATE STRING** (Tom, 2026-09-25,
+		// closing R-218's own key: "probably no longer needed since we are not changing any of the
+		// entries"). The register's name for 4326 is "WGS 84", which crsOptionText() turns into
+		// "WGS 84 (EPSG:4326)" -- the exact fact this line used to spell out by hand, now read off
+		// the one place a CRS's name is allowed to live. **THIS IS THE SEAM**: any other surface
+		// naming a lat/lon project's coordinate system (the map status strip included) should call
+		// this function rather than grow a second copy of it.
 		if (isLatLonProject()) {
-			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
+			return crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) });
 		}
 		code = projectCrsCode();
 		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
@@ -3855,6 +3884,26 @@ var EngCalcs = EngCalcs || {};
 		if (!w || !h) { return null; }
 		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat),
 			s: Math.max(minScale(), Math.min(w, h) / degLat) };
+	}
+	// **PROJECT1's OWN HOME VIEW, KEPT SEPARATE FROM `LPN_GEO_HOME`** (R-208,
+	// dev/tom-review-queue.md: *"we start the Project1 on WGS84 zoomed to our favorite place ...
+	// possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center,
+	// Novato, CA."*). Repointing `LPN_GEO_HOME` itself would move every wizard-made blank
+	// geographic project to Novato too, surprising someone who explicitly chose "start blank,
+	// geographic" -- this constant and function exist only for the ONE tab nobody chose to make.
+	//
+	// Centre and span are the real Nominatim `jsonv2` result for "Downtown Novato Center, Novato,
+	// CA" (2026-09-24: centre from the result's lat/lon, span from its own `boundingbox`, the
+	// larger of the two sides) -- the same search a visitor's own place-name lookup would return,
+	// not a hand-picked point.
+	var LPN_FIRST_VISIT_HOME = { lon: -122.579669, lat: 38.108195 };
+	var LPN_FIRST_VISIT_SPAN = 0.0024; // degrees -- the geocoder's own bounding box, padded a hair
+	function firstVisitHomeView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return null; }
+		return { cx: inwardX(LPN_FIRST_VISIT_HOME.lon), cy: inwardY(LPN_FIRST_VISIT_HOME.lat),
+			s: Math.max(minScale(), Math.min(w, h) / LPN_FIRST_VISIT_SPAN) };
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
@@ -4783,7 +4832,103 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// ---- TASK 708: THE RANKED GAPS FROM dev/property-venue-matrix.md, CLOSED BELOW -------
+			//
+			// **THE EMITTER COEFFICIENT (gap #3).** Overridable, but its own `set` -- not a plain
+			// `prop` -- because it crosses the one two-unit boundary on this page (Task 638's own
+			// pair, flow per pressure^gamma): replaceWrite() calls setProp() directly for any spec
+			// carrying a `prop`, which would store the DISPLAYED number raw and skip
+			// emitterToStore() entirely. No `prop` here routes the write through this `set`
+			// instead, exactly the way paneColEmitter()'s own cell does.
+			{ key: 'emitter', group: 'node', field: 'emitter', label: pc.lpn_field_emitter || 'Emitter coefficient',
+				applies: function (n) { return n.type === 'junction'; },
+				get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+				set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } },
+			// **PIPE LENGTH (gap #6): FINDABLE SINCE FIND_EXTRA_LINK_FIELDS, NOW WRITABLE TOO.**
+			// Overridable, and again no `prop`: a Base-side write must also clear `lenAuto`
+			// (`paneColClosed()`'s neighbour `paneColLength`-shaped cell does this inline), or the
+			// next geometry pass silently throws the typed length away and re-derives it from the
+			// drawing (line 9862). Inside a scenario `lenAuto` is never consulted, so `setProp()`
+			// alone is correct there; only Base needs the extra line.
+			{ key: 'length', group: 'link', field: 'length', label: pc.lpn_field_length || 'Length',
+				applies: function (l) { return l.type === 'pipe'; },
+				get: function (l) { return effective(l, 'length'); },
+				set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+			// **A LINK'S OPEN/CLOSED STATUS (gap #2, ranked highest).** Overridable, and a `prop`
+			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
+			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
+			// logic to bypass -- unlike `emitter` and `length` above.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), THE TABLE COLUMN'S OWN KEY, NOT
+			// `lpn_result_status`** (pre-review, Task 708). `lpn_result_status` ("Status") already
+			// names a DIFFERENT concept elsewhere on this page -- the post-solve/EPS status the
+			// colour ramp and the Labels legend show (`linkFieldDefs()`, `COLOR_LINK_FIELDS`),
+			// which can differ from this stored input during a run a `[RULES]` control has closed.
+			// Reusing that word here would put "Status" on two different questions in one panel.
+			// `choices` is derived from findChoiceDefs() rather than spelled out again, so the
+			// codes here and the words a Find/Replace `<select>` shows can never drift apart.
+			{ key: 'status', group: 'link', field: 'status', prop: 'status',
+				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
+				label: pc.lpn_field_closed || 'Closed',
+				applies: function () { return true; },
+				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is base-owned (not in
+			// LPN_OVERRIDABLE), so no `prop`, and the write is the same clamp
+			// paneColPumpSpeed() applies: a blank, a zero or a negative all mean 1 rather than a
+			// pump switched off, which has its own property (`status`, above).
+			{ key: 'speed', group: 'link', field: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },
+			{ key: 'energyPrice', group: 'link', field: 'energyPrice', prop: 'energyPrice', label: pc.lpn_energy_price || 'Price of power',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPrice'); }, set: function (l, v) { l._energyPrice = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE ENERGY PRICE PATTERN, AN ID RATHER THAN A QUANTITY** -- the same shape as a
+			// customer's demand pattern in customerReplaceSpecs() below: `str` so a bulk write
+			// carries the exact bytes typed, and no `prop` so the write can refuse a name nothing
+			// in the library answers to rather than filling four hundred pumps with a dangling
+			// reference.
+			{ key: 'energyPattern', group: 'link', field: 'energyPattern', str: true, label: pc.lpn_energy_price_pattern || 'Price pattern',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPattern') || ''; },
+				set: function (l, v) {
+					var id = String(v === undefined || v === null ? '' : v).trim();
+					if (!id || !libPatternsRead().some(function (pp) { return pp.id === id; })) { return; }
+					setProp(l, 'energyPattern', id);
+				} },
+			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
+			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
+			// other three are base-owned geometry, written bare exactly as their table cells are.
+			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
+			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
+			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
+			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
+			// query keeps reading in every language -- but the WORDS a person picks from are the
+			// popup's own four (paneColMixingModel()'s `choices()`, read through findChoiceDefs()
+			// so there is exactly one list of them, not a second copy to drift out of translation).
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel',
+				choices: findChoiceDefs('mixingModel').map(function (o) { return o[0]; }),
+				label: pc.lpn_mixing_model || 'Mixing model',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
+			// **THE MIXING FRACTION, GATED EXACTLY AS THE TABLE CELL GATES IT** -- only a
+			// two-compartment tank has one, so `applies` refuses the rest rather than writing a
+			// number nothing reads.
+			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
+				applies: function (n) { return n.type === 'tank' && (n.mixingModel || 'MIXED') === '2COMP'; },
+				get: function (n) { return n.mixingFraction; }, set: function (n, v) { n.mixingFraction = v; } }
 		].concat(customPushSpecs());
 	}
 	/**
@@ -4914,7 +5059,11 @@ var EngCalcs = EngCalcs || {};
 			// them for a reason they did not ask for.
 			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
 				// OFF, like every other field a network does not have until it is asked for.
-				quality: false, initQuality: false },
+				quality: false, initQuality: false,
+				// **TANK WATER DEPTH, OFF BY DEFAULT** (Task 696, Tom, 2026-09-25: fix the missing
+				// coverage rather than disable it in Convert as). A junction and a reservoir have no
+				// 'level' to print, exactly as they have no diameter -- see the node loop below.
+				level: false },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -4978,7 +5127,9 @@ var EngCalcs = EngCalcs || {};
 				// water age and concentration exactly as before.
 				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
 				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1,
+				// level 2 -- a water depth reads in the same Elevation/Head unit and precision as
+				//   elev and head, which it sits between physically.
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, level: 2, quality: 1,
 					'quality:trace': 0, initQuality: 2 },
 				// The customer group's own two numbers, its own entries: this map is what decides
 				// which rows get a decimals spinner, so borrowing the node's would have tied a
@@ -5048,7 +5199,12 @@ var EngCalcs = EngCalcs || {};
 				// and "do not make this a criterion for which whole label wins a contested spot".
 				// initQuality ranks just under quality for the same argument: it is only ever on
 				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
-				node: { quality: 7, initQuality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				// **RENUMBERED AGAIN, NOT REORDERED** (Task 696): level (tank water depth) slots
+				// between elev and head, on the same argument nodeFieldDefs()'s ordering comment
+				// gives for elev trailing head/pressure -- head is DERIVED from elev and level, so
+				// it is still the first of the three to give up its space when a label is crowded.
+				node: { quality: 8, initQuality: 7, demandActual: 6, demand: 5, pressure: 4, elev: 3,
+					level: 2, head: 1 },
 				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
 				// neighbours it had, and the three new ones are slotted where they belong -- the
 				// friction factor beside the gradient it is derived from, the status and the
@@ -5445,6 +5601,9 @@ var EngCalcs = EngCalcs || {};
 		// through here again, so a measurement that recovers is picked up with nothing to reset.
 		if (!viewNumbersUsable()) { noteMapUnmeasurable(true); return; }
 		noteMapUnmeasurable(false);
+		// An empty geographic document re-origins under the camera first; the rebase ends in its
+		// own setTransform(), which has then done everything below.
+		if (followViewWhileEmpty()) { return; }
 		// **THE STROKE SIZES RIDE THE TRANSFORM, and that is the whole of the 2026-09-09 repair.**
 		// See publishScaleSizes(): a scale that reaches the world layer without them following it
 		// paints the map as one solid colour and makes every pipe's invisible grab band cover the
@@ -10370,6 +10529,10 @@ var EngCalcs = EngCalcs || {};
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696), same treatment elev/quality/initQuality
+			// get above: guarded, and with no extrema mark (null) since this is one label, not a pass.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, null, nd.level))); }
 			var qualVal = nodeQualityValue(n);
 			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
 			var initQualVal = nodeInitQuality(n);
@@ -10566,6 +10729,9 @@ var EngCalcs = EngCalcs || {};
 	// (Tasks 669 and 705) and the per-pipe one that hides a label longer than its own pipe -- and
 	// both must be answered for the scale being TESTED, or the fit reserves room for labels that
 	// will not be there.
+	// What a Zoom to fit shows round a drawing that is a single point: 250 m in a geographic
+	// project, a few streets either way; 250 drawing units (feet or metres) in a grid one.
+	var LPN_POINT_FIT_M = 250;
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
@@ -10648,7 +10814,23 @@ var EngCalcs = EngCalcs || {};
 		});
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
 		// returns maxScale() on a blank canvas.
-		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
+		if (!out.length) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); return out; }
+		// **A DRAWING WITH NO EXTENT IS ONE PLACE, AND IT IS FRAMED AT STREET SCALE THERE** (Tom,
+		// 2026-09-25, a single junction on Project1). The pair above used to be added whenever
+		// there were fewer than two items, so one bare junction was fitted together with the points
+		// (0, 0) and (10, 10) -- ten DEGREES in a geographic project, so the fit showed a continent
+		// with the junction somewhere in it -- and a junction plus its own label (two items at one
+		// anchor) fitted at maxScale(). Every anchor at one point means there is no extent to fit,
+		// so the frame is LPN_POINT_FIT_M centred on it.
+		var i0, same = true;
+		for (i0 = 1; i0 < out.length && same; i0++) {
+			same = out[i0].x === out[0].x && out[i0].y === out[0].y;
+		}
+		if (same) {
+			var half = LPN_POINT_FIT_M / 2 * (isLatLonProject() ? DEG_PER_M : 1);
+			fitItem(out, out[0].x - half, out[0].y - half, 0, 0, 0, 0);
+			fitItem(out, out[0].x + half, out[0].y + half, 0, 0, 0, 0);
+		}
 		return out;
 	}
 	// The translation window for one axis at one scale. `need > room` means this scale does not fit;
@@ -10901,6 +11083,11 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
+	// **R-208's OWN DEFERRAL, SEPARATE FROM `pendingView`/`pendingViewFor`.** Set once, in init(),
+	// for the ONE project a first visit is born with; consumed and cleared by `noteMapSized()`,
+	// which is the first moment the canvas has a real height to compute Novato's home view against.
+	// See the note where it is set for why it cannot be an ordinary `pendingView`.
+	var firstVisitPendingId = null;
 	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
@@ -11842,7 +12029,10 @@ var EngCalcs = EngCalcs || {};
 		// kind and, for a projected project, the CRS code. Changing either used to be safe because
 		// nothing survived the repaint; now something does.
 		var proj = projectedBasemapOk();
-		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
+		// ...and the ORIGIN, since a tile is placed in local units: followViewWhileEmpty() can move
+		// it under a tile that is still cached.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '') + '|' + (xg
 			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
 				'|' + xg.metersPerUnit + '|' + xg.rotDeg
 			: '');
@@ -13062,16 +13252,27 @@ var EngCalcs = EngCalcs || {};
 	// drawn, so a point lands on the same screen pixel it did then. One attribute, no arithmetic
 	// over the document, nothing rebuilt.
 	var georefSettleTimer = null;
+	// **THE BACKGROUND IMAGE IS HELD STILL WITH THE MODEL** (R-172, Tom 2026-09-22: *"In Step 1, a
+	// background image gets dragged around with the map (then snaps back on release of drag) instead
+	// of always staying with the project."*). The picture lives in backdropLayer, a sibling of
+	// modelLayer, so the compensation that held the model still never reached it: it rode the map
+	// during the gesture and jumped back when georefReproject() re-derived it at the settle. It is
+	// part of what is being placed (georefCaptureBackdrop), so it takes the same compensation.
 	function georefApplyCompensation() {
 		if (!modelLayer) { return; }
-		var f = georefDetached() ? georef.frozen : null;
+		var f = georefDetached() ? georef.frozen : null,
+			layers = [modelLayer].concat(backdropLayer && georef && georef.bd ? [backdropLayer] : []);
+		if (backdropLayer && !(georef && georef.bd)) { backdropLayer.removeAttribute('transform'); }
 		if (!f || (f.tx === state.tx && f.ty === state.ty && f.s === state.s)) {
-			modelLayer.removeAttribute('transform');
+			layers.forEach(function (g) { g.removeAttribute('transform'); });
+			if (backdropLayer) { backdropLayer.removeAttribute('transform'); }
 			return;
 		}
-		modelLayer.setAttribute('transform',
-			'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
-			') scale(' + (f.s / state.s) + ')');
+		layers.forEach(function (g) {
+			g.setAttribute('transform',
+				'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
+				') scale(' + (f.s / state.s) + ')');
+		});
 	}
 	// Called on every view change. While detached it holds the model still and books a settle;
 	// otherwise it makes sure the compensation is not left on.
@@ -13375,12 +13576,6 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
 		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = detached ? '' : 'none'; }
-		// Offered only while the model is still in hand, and only when the numbers COULD be
-		// coordinates -- see georefStart(). It is the one thing on this bar that says the drawing
-		// does not need placing at all.
-		if (georefBarEl('lpn_georef_asdeg')) {
-			georefBarEl('lpn_georef_asdeg').style.display = (detached && georef.mayBeDegrees) ? '' : 'none';
-		}
 		if (georefBarEl('lpn_georef_twopt')) { georefBarEl('lpn_georef_twopt').style.display = detached ? 'none' : ''; }
 		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
@@ -13418,13 +13613,6 @@ var EngCalcs = EngCalcs || {};
 		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
 		var go = georefBarEl('lpn_georef_goto');
 		if (go) { go.addEventListener('click', goToLatLon); }
-		var asdeg = georefBarEl('lpn_georef_asdeg');
-		if (asdeg) {
-			asdeg.addEventListener('click', function () {
-				if (!georef || !georef.mayBeDegrees) { return; }
-				georefArmAsDegrees();
-			});
-		}
 		// A TOGGLE, so the tool it arms can be put down again without leaving the wizard. There is no
 		// second label for the pressed state: the notice says what the next click will do, and it is
 		// the notice a user is reading while picking.
@@ -14051,10 +14239,12 @@ var EngCalcs = EngCalcs || {};
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
+		// **A lat/lon PROJECT IS NOT A REASON TO REFUSE** (Task 696; Tom, 2026-09-23: the wizard
+		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:3857 on
+		// this page, one coordinate system among hundreds, so being on it says nothing about whether
+		// somebody may convert to another. It says where the network already is, so the wizard opens
+		// with that answer in place rather than asking the question again from the whole world.
+		var fromGeo = isLatLonProject();
 		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
 		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
 		// project that states its own coordinate system. The xy grid it was built for states none.
@@ -14125,12 +14315,15 @@ var EngCalcs = EngCalcs || {};
 		// nearly every drawing made on a plain grid fits inside +/-180 and +/-90, so the test's
 		// false-positive rate on the case it is supposed to reject is close to 100%.
 		//
-		// So the wizard always opens at step 1, which is what the menu row the user chose promised,
-		// and the reinterpret case is a BUTTON on the bar instead of a guess. Nothing is lost by
-		// waiting: georefArmAsDegrees() rebuilds every point from `georef.restore`, the numbers the
-		// document arrived with, so arming it after a step of panning is exactly as exact as arming
-		// it on the first frame.
-		georef.mayBeDegrees = georefSrcReadsAsDegrees();
+		// So the wizard always opens at step 1, which is what the menu row the user chose promised.
+		// **THE MANUAL REINTERPRET BUTTON THAT USED TO SIT HERE IS GONE** (R-219; Tom, 2026-09-24,
+		// answering R-190). It offered, on this same range-test guess, to arm the model unmoved
+		// whenever every coordinate could pass for a longitude and a latitude; the identical result
+		// -- the file's own numbers used unchanged -- is reached by typing 1 into the Ground distance
+		// field on step 2, so it is dropped as a control that bought nothing a visitor could not
+		// already do. georefArmAsDegrees() itself is untouched and still runs automatically from
+		// georefOpenAnswered(), for the different case of a project that already STATES it is
+		// georeferenced -- a known fact about the file, not a guess from its coordinates.
 		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
 		// entire world, whatever location and zoom that is, so that they can zoom to their
 		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
@@ -14153,17 +14346,21 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
+		if (fromGeo) { georefOpenAnswered(); return; }
 		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.');
 	}
-	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
-	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
-	// That is why the answer only chooses where the wizard OPENS, and never what the project is.
-	function georefSrcReadsAsDegrees() {
-		var src = georef && georef.src;
-		if (!src || !src.length) { return false; }
-		return src.every(function (p) {
-			return isFinite(p.x) && isFinite(p.y) && Math.abs(p.x) <= 180 && Math.abs(p.y) <= 90;
-		});
+	// **STEPS 1 AND 2 OPEN ALREADY ANSWERED** (Tom, 2026-09-22: *"If a project already has an
+	// attached World map ... the next step (placement step 1) uses our current georeferencing. In
+	// fact, we could just convert ... without further question. But we step them through Steps 1 and
+	// 2 in case they want to make any changes."*). The coordinates the copy arrived with are
+	// longitudes and latitudes, so the reinterpret path places the model exactly where they say, and
+	// the wizard then steps back to step 1 so both steps are still walked. Pressing Put the model
+	// here and Keep this placement without touching anything commits the placement unchanged.
+	function georefOpenAnswered() {
+		var pc = EngCalcs.pageConfig || {};
+		georefArmAsDegrees();
+		georefDetach();
+		setNotice(pc.lpn_georef_answered || 'This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.');
 	}
 	// **REINTERPRET: the label was wrong, the geometry was not.** Nothing is repositioned here. The
 	// document keeps the exact numbers it arrived with, and pressing Keep this placement without
@@ -14292,7 +14489,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.')) { return; }
+		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		var unrotated = georefBackdropRotated(georef.t);
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
@@ -14326,9 +14523,11 @@ var EngCalcs = EngCalcs || {};
 		// an image to turn, and saying nothing would leave a site plan silently off its own network.
 		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
 		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any asset to move it closer to where it really is.')
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
+		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
+		convasPlaced();
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -14371,6 +14570,8 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
+		// File, Convert as: the copy never became what was asked for, so it is closed.
+		convasAbandon();
 	}
 
 	// ---- THE WORLD MAP BEHIND AN XY DRAWING (ROADMAP Task 646) ----------------------------------
@@ -15072,6 +15273,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+		convasPlaced();
 	}
 	function mapgeoCancel() {
 		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
@@ -15086,6 +15288,7 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		mapgeoRefreshBar();
 		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+		convasAbandon();
 	}
 	// ---- the bar ---------------------------------------------------------------------------------
 	function mapgeoBarEl(id) { return document.getElementById(id); }
@@ -16119,12 +16322,25 @@ var EngCalcs = EngCalcs || {};
 			['demand', 'lpn_field_base_demand', 'Base demand'],
 			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
+			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
+			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
+			// row and table column that Find had simply never been given a row for.
+			['emitter', 'lpn_field_emitter', 'Emitter coefficient'],
 			// **LAST IN BAND 2, BESIDE THE OTHER THINGS YOU TYPE** (Tom, 2026-09-14). It is an
 			// INPUT -- the concentration a node starts a run holding -- so it belongs here and
 			// not with the results, even though its only reader is a chemical run. The result it
 			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
 			// Tables pane both make.
-			['initQuality', 'lpn_quality_initial', 'Initial quality']
+			['initQuality', 'lpn_quality_initial', 'Initial quality'],
+			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
+			// #4). A tank is the one node type with several scalar inputs of its own; gated to
+			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
+			['level', 'lpn_field_tank_level', 'Water depth'],
+			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
+			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
+			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
+			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
@@ -16138,7 +16354,22 @@ var EngCalcs = EngCalcs || {};
 			['roughness', null, 'Roughness'],
 			['km', 'lpn_field_km_short', 'Minor loss, k'],
 			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
-			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient']
+			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient'],
+			// **ACTIVE/CLOSED, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
+			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
+			// gate is needed below -- the generic test already offers it to every link.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), NOT `lpn_result_status` ("Status")** --
+			// pre-review, Task 708: `lpn_result_status` already names the post-solve/EPS status
+			// the colour ramp and the Labels legend show (`COLOR_LINK_FIELDS`, `linkFieldDefs()`),
+			// a different, run-dependent reading of the same link. Reusing that word here would
+			// put "Status" on two different questions in this one panel.
+			['status', 'lpn_field_closed', 'Closed'],
+			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
+			// below exactly as the pipe reaction pair is gated to a pipe.
+			['speed', 'lpn_field_pump_speed', 'Relative speed'],
+			['energyPrice', 'lpn_energy_price', 'Price of power'],
+			['energyPattern', 'lpn_energy_price_pattern', 'Price pattern']
 		];
 		var RESULT_LINK = [
 			['flow', 'lpn_result_flow', 'Flow'],
@@ -16164,6 +16395,13 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
+				} else if (key === 'emitter') {
+					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
+				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
+					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
 				} else {
 					// Everything else is offered where the Labels list and the colour ramp agree it
 					// exists, which is the same test this function has always applied.
@@ -16365,9 +16603,56 @@ var EngCalcs = EngCalcs || {};
 		// the junction it lumps at. Both are ids, so they take the text conditions and sort in the
 		// reader's own alphabet exactly as an id does. Its description and its tag are already on
 		// this list, being the same two properties a node and a link carry.
+		// **A LINK'S OPEN/CLOSED STATUS AND A TANK'S MIXING MODEL ARE CHOICES, NOT NUMBERS** (Task
+		// 708, gaps #2 and #4). Neither has a colour ramp or a unit; each is one of a short, fixed
+		// set of internal tokens (`open`/`closed`, `MIXED`/`2COMP`/`FIFO`/`LIFO`), stated in
+		// EPANET's own vocabulary rather than translated, exactly as a curve's kind is -- so
+		// `contains` and `equals` are the right questions and there is no numeric reading of
+		// either. A pump's energy price PATTERN is the same shape of thing as a demand pattern
+		// reference: an id, not a quantity.
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
-			prop === 'link' || prop === 'atNode';
+			prop === 'link' || prop === 'atNode' ||
+			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
+	}
+	/**
+	 * **A CHOICE PROPERTY'S CODES AND THEIR TRANSLATED WORDS, IN EXACTLY ONE PLACE** (pre-review
+	 * fix, Task 708). The internal token (`'closed'`, `'MIXED'`) is what is stored, matched and
+	 * saved in a query -- so it stays English and untranslated, the same ruling a curve's kind
+	 * carries -- but nothing on screen should ever show it to a reader or ask a reader to type it.
+	 * Before this, `status` and `mixingModel` were `findPropIsText()` properties with a plain text
+	 * box: a Spanish reader typing "cerrado" found nothing (the stored word is English), and a
+	 * matched row printed the English word back regardless of the page's language.
+	 *
+	 * Returns `null` for every other property -- the caller's signal to fall back to the ordinary
+	 * text or number box -- or `[[code, translated label], ...]`, in the order Find's and Replace's
+	 * `<select>` should list them.
+	 *
+	 * **`mixingModel` READS paneColMixingModel()'S OWN `choices()`, RATHER THAN A SECOND COPY OF
+	 * ITS FOUR WORDS.** The popup, the table and now Find/Replace are one door for what those four
+	 * words are, so a translator (or a future fifth mixing model) changes one function and every
+	 * venue agrees. `status` has no `choices()` of its own to borrow -- its table cell is a
+	 * checkbox, not a picklist -- so its two words are the same ones linkStatusText() already
+	 * prints for a link's status everywhere else on this map (`lpn_result_status_open`/`_closed`).
+	 */
+	function findChoiceDefs(prop) {
+		var pc = EngCalcs.pageConfig || {};
+		if (prop === 'status') {
+			return [['open', pc.lpn_result_status_open || 'Open'],
+				['closed', pc.lpn_result_status_closed || 'Closed']];
+		}
+		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
+		return null;
+	}
+	function findPropIsChoice(prop) { return findChoiceDefs(prop) !== null; }
+	// The translated word for a stored code, or null where `prop` is not a choice property, or the
+	// code is not one of its choices (a document written by an older version, or hand-edited) --
+	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	function findChoiceLabelOf(prop, code) {
+		var defs = findChoiceDefs(prop), i;
+		if (!defs) { return null; }
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === code) { return defs[i][1]; } }
+		return null;
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -16667,6 +16952,57 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'fireFlow') {
 			return cand.group === 'node' ? fireFlowOwn(cand.el) : undefined;
 		}
+		// **THE EMITTER COEFFICIENT CROSSES A UNIT BOUNDARY EFFECTIVE() DOES NOT**, exactly as the
+		// popup and the table read it: it is the one field on this page whose unit is two units
+		// (flow per pressure^gamma), so emitterToDisplay() is the one door, here as everywhere
+		// else (Task 708, gap #3).
+		if (prop === 'emitter') {
+			return cand.group === 'node' ? emitterToDisplay(effective(cand.el, 'emitter')) : undefined;
+		}
+		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
+		// is read through effective() like every other overridable input; the other three are
+		// base-owned geometry, read straight off the node exactly as their table cells do.
+		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
+			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
+			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
+		// default, exactly as the table's own get() answers it.
+		if (prop === 'mixingModel') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? (cand.el.mixingModel || 'MIXED') : undefined;
+		}
+		// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, the same gate the popup and the table
+		// draw the row under (paneColMixingFraction()'s own `plainFor`).
+		if (prop === 'mixingFraction') {
+			return (cand.group === 'node' && cand.el.type === 'tank'
+				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
+				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
+				? cand.el.mixingFraction : undefined;
+		}
+		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
+		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
+		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
+		if (prop === 'status') {
+			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+		}
+		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5). Speed is base-owned (not in
+		// LPN_OVERRIDABLE) and read bare with the same "blank/zero/negative means 1" rule
+		// paneColPumpSpeed() states; the price and its pattern are overridable, read through
+		// effective() like every other input here.
+		if (prop === 'speed') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return (typeof cand.el.speed === 'number' && isFinite(cand.el.speed)) ? cand.el.speed : 1;
+		}
+		if (prop === 'energyPrice') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			var priceVal = effective(cand.el, 'energyPrice');
+			return (typeof priceVal === 'number' && isFinite(priceVal)) ? priceVal : undefined;
+		}
+		if (prop === 'energyPattern') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return effective(cand.el, 'energyPattern') || undefined;
+		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
 			// **AND IT IS READ THROUGH pipeK()**, so a search for k > 5 finds a pipe whose fittings
@@ -16923,12 +17259,20 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number') { return String(v); }
 		return String(+v.toFixed(4));
 	}
-	function findSelect(parent, labelText, options, value, onChange) {
+	// `hideLabel`: the wrapping <label> still carries labelText, so a screen reader still says
+	// what the selector is, but nothing is drawn on screen for it -- for a selector whose question
+	// is answered by a button beside it instead (R-225: "The word 'Table' is not needed").
+	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
-		lab.style.display = 'block';
+		if (hideLabel) {
+			lab.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;' +
+				'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+		} else {
+			lab.style.display = 'block';
+		}
 		options.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -17420,10 +17764,6 @@ var EngCalcs = EngCalcs || {};
 		}), findState.scope, function (v) {
 			findState.scope = v;
 			findNormalize();
-			// The filter's table follows the scope again -- see findFilterTarget(). A scope change
-			// already re-points the property and the condition; leaving the table pinned to the old
-			// scope's tab would be the one control that did not follow.
-			findFilterTable = null;
 			rebuildFindForm(); renderFindResults(null);
 		});
 		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
@@ -17437,13 +17777,54 @@ var EngCalcs = EngCalcs || {};
 		pair.className = 'lpn-find-pair';
 		box.appendChild(pair);
 		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
+			// **THE VALUE CONTROL IS REBUILT FOR THE NEW PROPERTY'S TYPE** (Tom, 2026-09-23, of
+			// Find > Pipes > Shut > equal to > Closed: *"Switching away from this leaves 'closed'
+			// in the Value field."*). Switching TO a choice property already discards a mismatched
+			// value, below -- this is the other direction: a choice property's own stored word is
+			// an EPANET code nobody should have to un-type out of the free-entry box that replaces
+			// the select, so it is cleared rather than carried over.
+			if (wasChoice && !findPropIsChoice(findState.prop)) { findState.value = ''; }
+			// **CHANGING FIND'S PROPERTY PUSHES REPLACE'S "PROPERTY TO CHANGE" TO MATCH** (Tom,
+			// 2026-09-23: *"normally that is what users want, and power users can learn"*), when
+			// the new property is one Replace can write at all. replaceNormalize() only falls back
+			// when the CURRENT Replace property has stopped applying -- it would leave Replace
+			// pointed at a still-valid but now-stale property, which is exactly what this pushes
+			// past.
+			if (replaceSpec(v)) {
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) {
+					replaceState.value = '';
+				}
+				replaceState.prop = v;
+			}
 			rebuildFindForm(); renderFindResults(null);
 		});
 		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
+		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
+		// `status`'s and `mixingModel`'s stored words are English EPANET tokens a reader is never
+		// shown and should never have to type or guess at -- the failure this replaces was a
+		// Spanish reader typing "cerrado" and finding nothing, because the box compared their
+		// typed word against the untranslated code. Only for the two conditions that actually
+		// compare against the property's OWN value: "n highest"/"n lowest" want a COUNT in this
+		// box and "empty" wants nothing at all, so both keep the plain text/number box below.
+		if (findPropIsChoice(findState.prop) && !findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op)) {
+			var choiceDefs = findChoiceDefs(findState.prop);
+			// A value left over from a different property (or from a document saved before this
+			// choice existed) is not one of these codes -- default to the first rather than
+			// leaving the select unable to show ANY option as chosen, which would silently search
+			// on the first one anyway without saying so.
+			if (!choiceDefs.some(function (o) { return o[0] === findState.value; })) {
+				findState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_find_value || 'Value', choiceDefs, findState.value, function (v) {
+				findState.value = v; updateFindQuery(); renderFindResults(null);
+			});
+			return;
+		}
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
 		valLab = document.createElement('label');
@@ -17531,11 +17912,12 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_find_go';
 		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
-		box.appendChild(btn);
-		// **NEXT TO THE FIND BUTTON, which on a 22rem box is the line under it** (Tom, 2026-09-06,
-		// Task 597). One select and one button: the whole of what filtering the tables costs the
-		// panel.
-		buildFilterRow(box);
+		// **ONE ROW: FIND, FILTER IN TABLE, THEN WHICH TABLE** (Tom, 2026-09-23: *"[Find][Filter in
+		// Table][tables_selector]"*). It used to be the Find button on its own line and a second,
+		// separate "Table to filter" row below it -- which read as two things being offered rather
+		// than one ("is this Filter in selected table, or Filter in active table?"). Built as one
+		// row here instead of appended to `box` twice.
+		buildFilterRow(box, btn);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
@@ -17584,15 +17966,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- THE FILTER BUTTON, BESIDE THE FIND BUTTON (ROADMAP Task 597) ---------------------------
 	//
-	// **WHICH TABLE IS DERIVED FROM THE SCOPE UNTIL THE USER SAYS OTHERWISE, and that is where the
-	// clicks are saved.** Somebody searching Pipes almost always wants the Pipes table, so the
-	// selector is already on it and the whole gesture is one press. Picking another one sticks;
-	// changing the scope hands the choice back to the derivation, because a scope change has already
-	// re-pointed the property and the condition for the same reason.
+	// **ONE BUTTON, NO SELECTOR** (Tom, 2026-09-25, of R-197's report that the selector was gone:
+	// *"I think what is simplest and closest to what we have is a simple 'Filter in table' button
+	// ... I think it implies that we filter all tables insofar as we can if 'Everything' is
+	// selected."*). A scope that names one table -- Junction, Pipe, ... -- filters that table
+	// alone, which is where the earlier selector always ended up anyway once it followed the
+	// scope. "Everything", and a typed compound query, name no single table, so the button filters
+	// every table the query can be asked of.
 	//
-	// `null` from the derivation means the scope names no single table -- Everything, and Text,
-	// which has no tab at all because nothing about a text label solves.
-	var findFilterTable = null;
+	// **A TABLE THE QUERY DOES NOT NAME A PROPERTY OF IS LEFT AS IT WAS, NEVER EMPTIED.** "Pressure
+	// above 40" is a fact about nodes; asking it of the Pipes table is not "zero pipes match", it
+	// is a question Pipes cannot answer, and those are different facts. `propAppliesToTable()`
+	// answers through the same menu findPropDefs() already builds for a scope's pull-down -- one
+	// list of "properties that exist here", read both to fill the menu and to test this.
 	function paneTableForScope(scope) {
 		var d = findScopeDef(scope), list = paneTables(), i;
 		if (d.key === 'all' || d.group === 'label') { return null; }
@@ -17601,33 +17987,102 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function findFilterTarget() {
-		return findFilterTable || paneTableForScope(findState.scope) || paneTables()[0].id;
+	// The scope key whose group/type matches this table -- the reverse of paneTableForScope().
+	// Unlike it, this matches Text too (paneTableForScope() answers "does this scope name ONE
+	// table", which Text does not, since Everything also reaches it; this answers "which scope
+	// speaks for this table's properties", which for the Text table is still 'text').
+	function scopeKeyForTable(spec) {
+		var defs = findScopeDefs(), i, d;
+		for (i = 0; i < defs.length; i++) {
+			d = defs[i];
+			if (d.group !== spec.group) { continue; }
+			if (!d.type || d.type === spec.type) { return d.key; }
+		}
+		return null;
+	}
+	function propAppliesToTable(prop, spec) {
+		var key = scopeKeyForTable(spec), save, defs, i;
+		if (!key) { return false; }
+		save = findState.scope;
+		findState.scope = key;
+		defs = findPropDefs();
+		findState.scope = save;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === prop) { return true; } }
+		return false;
+	}
+	// Every property named by a leaf condition, compound or not -- the set `propAppliesToTable()`
+	// tests a table against.
+	function findAstLeafProps(ast, out) {
+		if (!ast) { return out; }
+		if (ast.t === 'cond') { out[ast.prop] = true; return out; }
+		findAstLeafProps(ast.a, out); findAstLeafProps(ast.b, out);
+		return out;
+	}
+	function findQueryProps() {
+		if (findQueryAst) { return findAstLeafProps(findQueryAst, {}); }
+		var out = {};
+		out[findState.prop] = true;
+		return out;
+	}
+	function findQueryAppliesToTable(props, spec) {
+		var p;
+		for (p in props) {
+			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+		}
+		return true;
+	}
+	// One row of the multi-table receipt: "Junctions: 5 of 12".
+	function findFilterRowText(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_find_filter_row || '{table}: {n} of {all}')
+			.split('{table}').join(pc[spec.label] || spec.id)
+			.split('{n}').join(String(paneTableRowsInOrder(spec).length))
+			.split('{all}').join(String(paneTableAllElements(spec).length));
 	}
 	// **THE LINE THAT RUNS IS THE ONE IN THE BOX**, exactly as it is for the Find button: the query
 	// input is the single expression of what this panel selects, whether the controls wrote it or
 	// the user typed it. That is also what makes the filter and the search provably the same
 	// question -- there is one string and one evaluator.
 	function applyTableFilter() {
-		var text = findQueryInput ? findQueryInput.value : findQueryString(),
-			id = findFilterTarget(), spec, run;
+		var pc = EngCalcs.pageConfig || {},
+			text = findQueryInput ? findQueryInput.value : findQueryString(),
+			single = findQueryAst ? null : paneTableForScope(findState.scope),
+			run, props, firstId = null, rows = [];
 		run = findSelectByQuery(text);
 		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
 		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
 		if (!run.ok) { renderFindResults(run.msg); return; }
-		paneSetFilter(id, String(text).trim());
-		openPane(id);
-		spec = paneTableById(id);
-		// The receipt is the table's own banner text, so the panel and the table cannot say two
-		// different things about one filter.
-		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
+		if (single) {
+			paneSetFilter(single, String(text).trim());
+			openPane(single);
+			// The receipt is the table's own banner text, so the panel and the table cannot say two
+			// different things about one filter.
+			renderFindResults(paneFilterNoteText(paneTableById(single), paneTableRowsInOrder(paneTableById(single))));
+			return;
+		}
+		props = findQueryProps();
+		paneTables().forEach(function (spec) {
+			if (!findQueryAppliesToTable(props, spec)) { return; }
+			paneSetFilter(spec.id, String(text).trim());
+			if (!firstId) { firstId = spec.id; }
+			rows.push(findFilterRowText(spec));
+		});
+		if (!firstId) {
+			renderFindResults(pc.lpn_find_filter_none || 'No table has a property this query names.');
+			return;
+		}
+		openPane(firstId);
+		renderFindResults(String(pc.lpn_find_filter_summary || 'Filtered by {q}. {rows}.')
+			.split('{q}').join(String(text).trim())
+			.split('{rows}').join(rows.join(', ')));
 	}
-	function buildFilterRow(box) {
+	// **ONE ROW: [Find] [Filter in table]** (Tom, 2026-09-25: a plain button, no selector). `findBtn`
+	// is the Find button built in rebuildFindForm() -- passed in rather than built twice, so there
+	// is exactly one Find button and exactly one place that wires its click.
+	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
 		row.className = 'lpn-find-filter';
-		findSelect(row, pc.lpn_find_filter_table || 'Table to filter',
-			paneTables().map(function (s) { return [s.id, pc[s.label] || s.id]; }),
-			findFilterTarget(), function (v) { findFilterTable = v; });
+		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		btn.id = 'lpn_find_filter_go';
@@ -17636,8 +18091,8 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
+			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
 		box.appendChild(row);
@@ -17702,7 +18157,12 @@ var EngCalcs = EngCalcs || {};
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
 			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
-				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
+				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
+					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
+					// fix, Task 708), not the stored English code -- the second half of the same
+					// failure the value box had: a Spanish reader who somehow matched a closed
+					// pipe must not be shown "closed" back.
+					: (findChoiceLabelOf(findState.prop, val) || findFmt(val))));
 		// **NO LIST OF THE LINKS THAT MEET HERE** (Tom, 2026-08-27, reading his own result rows:
 		// *"The results say 'Connected: nnn, nnn, nnn', and I don't know what that means... I think
 		// that it arose from tunnel vision on the Connected links task. Even though it's useful, I
@@ -18105,6 +18565,14 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < specs.length; i++) { if (specs[i].field === field) { return specs[i]; } }
 		return null;
 	}
+	// Whether Replace shows a picklist for this field, the same test buildReplaceForm() makes
+	// before it draws one -- named so a property change can tell whether it is crossing INTO or
+	// OUT OF a choice, without repeating `replaceSpec(field) && replaceSpec(field).choices` at
+	// every call site.
+	function replacePropIsChoice(field) {
+		var s = replaceSpec(field);
+		return !!(s && s.choices);
+	}
 	// **THE PROPERTY BEING SEARCHED IS OFFERED FIRST, when it is writable.** "Find every 6 inch main,
 	// make it 8" is the core case and it names one property twice, so the common job needs no second
 	// choice. A search on something unwritable (a pressure, or an ID) falls back to the first
@@ -18172,6 +18640,19 @@ var EngCalcs = EngCalcs || {};
 		// it is flagged where it is READ rather than refused here -- Tom's own ruling, and the
 		// reason an empty box still refuses, since erasing a property on 400 assets is a real
 		// action that must not be spelled the same way as leaving a box alone.
+		// **A CHOICE PROPERTY (Task 708): status's open/closed, a tank's mixing model.** The value
+		// box is still plain text -- there is no dropdown here, only the Table pane has one -- so
+		// the typed word is matched case-insensitively against the fixed list of internal EPANET
+		// tokens `spec.choices` names, and normalized to the exact stored spelling. Anything else
+		// is refused exactly as an empty box is: `undefined` here is "type a valid value," not "no
+		// change," so a typo cannot be read as leaving four hundred pipes alone on purpose.
+		if (spec && spec.choices) {
+			var lc = raw.toLowerCase(), ci;
+			for (ci = 0; ci < spec.choices.length; ci++) {
+				if (String(spec.choices[ci]).toLowerCase() === lc) { return spec.choices[ci]; }
+			}
+			return undefined;
+		}
 		if (spec && spec.str) { return raw === '' ? undefined : raw; }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
@@ -18355,7 +18836,7 @@ var EngCalcs = EngCalcs || {};
 	// action, and a Replace dialog beside a Find dialog would ask for the same three pull-downs
 	// twice. `box` is already in the document, so renderReplace() can find its message div by id.
 	function buildReplaceForm(box) {
-		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg;
+		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg, curSpec, choiceDefs;
 		replaceBox = box;
 		box.textContent = '';
 		replaceNormalize();
@@ -18386,6 +18867,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
+				// Same rule as Find's own Property select: switching AWAY from a choice property
+				// (e.g. Shut) leaves its EPANET code sitting in the free-entry box that replaces
+				// the picklist, so it is cleared here instead of carried over.
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) { replaceState.value = ''; }
 				replaceState.prop = v; replacePending = null;
 				// Rebuilt, not just re-messaged: choosing Elevation is what makes the source select
 				// exist at all, and leaving it behind when the property moves off Elevation would
@@ -18416,6 +18901,29 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(btn);
 			box.appendChild(msg);
 			renderReplace(null);
+			return;
+		}
+		// **A CHOICE PROPERTY GETS THE SAME PICKLIST ON THE WRITE SIDE** (pre-review fix, Task
+		// 708): typing the internal code to REPLACE with is exactly the failure the Find box had,
+		// and a picklist is also how a bulk write refuses a typo outright rather than silently
+		// leaving four hundred pipes unchanged (replaceValueOf()'s `choices` gate still runs
+		// underneath this, so a value this select could never produce is still refused).
+		curSpec = replaceSpec(replaceState.prop);
+		if (curSpec && curSpec.choices) {
+			choiceDefs = findChoiceDefs(replaceState.prop) ||
+				curSpec.choices.map(function (c) { return [c, c]; });
+			if (!choiceDefs.some(function (o) { return o[0] === replaceState.value; })) {
+				replaceState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_replace_value || 'New value', choiceDefs, replaceState.value, function (v) {
+				replaceState.value = v; replacePending = null; renderReplace(null);
+			});
+			btn = document.createElement('button');
+			btn.type = 'button';
+			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
+			btn.addEventListener('click', runReplacePreview);
+			box.appendChild(btn);
+			box.appendChild(msg);
 			return;
 		}
 		valWrap = document.createElement('div');
@@ -20226,7 +20734,7 @@ var EngCalcs = EngCalcs || {};
 			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
 	}
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
-	// whether the scenario contains the link at all, Shut is whether water can pass through the one
+	// whether the scenario contains the link at all, Closed is whether water can pass through the one
 	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
 	function paneColClosed() {
 		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
@@ -20281,7 +20789,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1 here exactly as they do in the popup -- a pump at
 	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
-	// failure to avoid. Turning a pump off has its own column, Shut.
+	// failure to avoid. Turning a pump off has its own column, Closed.
 	function paneColPumpSpeed() {
 		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
 			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
@@ -21419,7 +21927,7 @@ var EngCalcs = EngCalcs || {};
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
 		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
-		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// column where every row ties (Active and Closed before anything is edited, Tag before
 		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
 		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
 		// row-id string is unchanged from the last render, so this fell into the refill branch
@@ -25689,9 +26197,14 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
-	function rebaseLiveGeoDoc() {
+	//
+	// `at`, when given, is a WORLD point (longitude, Mercator y) to put the origin's cell under
+	// instead of the model's own extent -- the one caller is followViewWhileEmpty(), for a document
+	// that has no model to choose from.
+	function rebaseLiveGeoDoc(at) {
 		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
+		if (at && isFinite(at.x) && isFinite(at.y)) { minX = at.x; minY = at.y; }
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
 		// cartesianY()'s call sites for exactly this reason -- a fifth site added later without the
@@ -25703,13 +26216,15 @@ var EngCalcs = EngCalcs || {};
 		// a departure of 1e-13 could only change the answer at an exact cell boundary, and both
 		// answers there are equally valid origins. NO COORDINATE IS MOVED BY THIS ROUND TRIP; the
 		// shift below is a subtraction of the chosen origin and nothing else.
-		eachStoredPoint(doc, function (pt, get) {
-			if (get) { return; }
-			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
-			var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
-			if (X < minX) { minX = X; }
-			if (Y < minY) { minY = Y; }
-		});
+		if (!at) {
+			eachStoredPoint(doc, function (pt, get) {
+				if (get) { return; }
+				if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+				var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
+				if (X < minX) { minX = X; }
+				if (Y < minY) { minY = Y; }
+			});
+		}
 		if (!isFinite(minX) || !isFinite(minY)) { return null; }
 		org = {
 			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
@@ -25741,6 +26256,41 @@ var EngCalcs = EngCalcs || {};
 		tv = tabViews[library.openId];
 		if (tv && isFinite(tv.cx) && isFinite(tv.cy)) { tv.cx += dx; tv.cy += dy; }
 		return { dx: dx, dy: dy };
+	}
+	// **AN EMPTY GEOGRAPHIC DOCUMENT'S ORIGIN FOLLOWS THE CAMERA** (Tom, 2026-09-25, on Project1:
+	// *"There are nodes, but they are not visible, even when I zoom to fit."*). Task 439 derives a
+	// geographic origin from the MODEL, so a document with no model keeps {0, 0} -- and a camera
+	// over Novato at street zoom is then `translate(-5e7, ...)`: past Chrome's layout range, so
+	// every junction drawn there and every tile under it is laid out millions of pixels off the
+	// canvas. Nothing was wrong with the symbols or the zoom limit; the drawn numbers were too big.
+	// Project1 is born exactly there, and a wizard-made blank project or a place-name search on an
+	// empty one reaches the same state by hand.
+	//
+	// So while the document holds no model at all, a view whose centre sits more than
+	// LPN_GEO_FOLLOW_PX from the origin re-origins onto the 1/128-degree cell under that centre,
+	// with the camera compensated inside rebaseLiveGeoDoc() so nothing on screen moves. With no
+	// model there is no user number to shift, and the first junction placed is then born small.
+	// Once a model exists, Task 439's own rule (origin from the model) is left alone.
+	//
+	// The bound: after a follow the centre is within one cell (1/128 degree) of the origin, which is
+	// 434,000 px at maxScale() -- under this, so a follow can never trigger another. Chrome's layout
+	// range is about 3.3e7 px, so this keeps every drawn number more than ten times inside it.
+	// Never mid-gesture: a pan holds `tx0` from before the shift and would jump by the whole origin.
+	var LPN_GEO_FOLLOW_PX = 2e6, followingView = false;
+	function geoDocHasModel() {
+		if (doc.nodes.length) { return true; }
+		var any = false;
+		eachStoredPoint(doc, function (pt, get) { if (!get) { any = true; } });
+		return any;
+	}
+	function followViewWhileEmpty() {
+		if (followingView || drag || georef || !doc || !isLatLonProject() || geoDocHasModel()) { return false; }
+		var v = currentView();
+		if (!v || Math.max(Math.abs(v.cx), Math.abs(v.cy)) * v.s < LPN_GEO_FOLLOW_PX) { return false; }
+		followingView = true;
+		try {
+			return !!rebaseLiveGeoDoc({ x: outwardX(v.cx), y: Geom.mercY(outwardY(v.cy)) });
+		} finally { followingView = false; }
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
@@ -27878,7 +28428,9 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { renameToNumbered(upId, name); georefStart(); }
+		// The file route of File, Convert as (an empty tab has nothing to copy): the file lands, then
+		// the same box is offered for it (Task 696).
+		if (asGeo && upId) { renameToNumbered(upId, name); convertAsLanded(); }
 	}
 	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
 	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
@@ -28613,6 +29165,19 @@ var EngCalcs = EngCalcs || {};
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
 			body.appendChild(sum);
+			// **THIS FILE STATES NO COORDINATE SYSTEM** (R-219; Tom, 2026-09-24: files with an
+			// unreferenced EPSG coordinate system can be scaled 1:1 in Step 2 of the Convert as…
+			// wizard, and both Import and Convert as should say so). `mapUnits` is 'degrees' only
+			// when [BACKDROP] UNITS said so; every other file -- Feet, Meters, None or no [BACKDROP]
+			// at all -- lands as a plain XY drawing (docFromInp() above), which is what "unreferenced"
+			// means here. This report is the one place BOTH doors show it: it renders for a plain
+			// Import EPANET file… and for the copy File, Convert as… lands before its own box opens.
+			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
+				var crsNote = document.createElement('p');
+				crsNote.style.margin = '0 0 8px';
+				crsNote.textContent = pc.lpn_inp_report_no_crs || 'EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
+				body.appendChild(crsNote);
+			}
 			// The one place an anchor mode is worth mentioning, and only to someone whose file had
 			// labels in it (Task 332). Deliberately NOT a setting: nobody can hold an opinion about
 			// an anchor mode before seeing it, and this report already says what is different about
@@ -28762,7 +29327,7 @@ var EngCalcs = EngCalcs || {};
 		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
-		if (asGeo) { renameToNumbered(id); georefStart(); }
+		if (asGeo) { renameToNumbered(id); convertAsLanded(); }
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -29181,52 +29746,656 @@ var EngCalcs = EngCalcs || {};
 		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
 	}
-	/**
-	 * **File, Convert coordinates as: a Save as that converts.** Tom's design, 2026-09-18, in
-	 * his own three steps: *"(1) the row becomes File, Convert coordinates as...; (2) it offers a
-	 * file picker OR makes a duplicate tab named `Copy of {project_name}`; (3) the redesigned
-	 * conversion wizard runs."*).
-	 *
-	 * **WHAT SHIPPED BEFORE THIS WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ
-	 * CORRECTLY.** The row opened a FILE and placed it; he wants a row that converts THIS project.
-	 * Tom: *"let's not fool ourselves, conversion of all coordinates is happening"* -- and the rule
-	 * this repository actually holds is never to convert IN PLACE, which a Save as does not: the
-	 * project you were looking at is still open, still unconverted, and still on its own tab.
-	 *
-	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
-	 * georeference is Map, World map, Attach, which moves no coordinate at all;
-	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
-	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
-	 * in most situations. As always, we prefer the preserve-the-inputs path."*
-	 *
-	 * **THE "OR" IN HIS STEP 2 IS ANSWERED BY THE PROJECT ITSELF RATHER THAN BY A DIALOG.** An
-	 * empty tab has nothing to copy, so that is the case where the picker is the only thing the
-	 * command can mean; a tab with a network in it is the thing being converted. Asking which of
-	 * the two somebody meant, when the answer is already on the screen, is a modal for nothing.
-	 */
-	function convertCoordsAs() {
-		var pc = EngCalcs.pageConfig || {}, saved, name;
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+	// ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing Tasks 688 and 693) ----------------------
+	//
+	// **ONE ROW FOR UNITS AND COORDINATES, AND IT IS A SAVE AS.** Tom, 2026-09-22/23: *"(a) Project
+	// and units (maybe this one menu row as 'Convert as...' can handle both units and coordinates),
+	// (b) step 1 (if CRS changed), (c) step 2 (if CRS changed)."* And: *"The first thing it needs to
+	// do is ask what coordinate system we are going to."* So the box asks the coordinate system
+	// first, then the units and the rounding, and the placement steps follow only when the
+	// coordinate system actually changes.
+	//
+	// **NEVER IN PLACE.** Tom: *"let's not fool ourselves, conversion of all coordinates is
+	// happening"*, and the rule this repository holds is that conversion never happens in place. The
+	// project on screen is serialized, the COPY is converted, and the copy lands in a new tab named
+	// `Copy of {name}`. The original's bytes are never touched (dev/lpn-spike/convert-as-harness.js).
+	//
+	// **THE UNIT SELECTOR BAN IS UNTOUCHED.** Changing a unit on the strip still reinterprets the
+	// typed number. This rewrites the stored numbers AND the recorded unit selection together, once,
+	// into a new project, which is Tom's own reconciliation of the two (Task 688: *"File, Convert
+	// units as...: I agree."*). Converting back is a second conversion and never an undo, because
+	// exact factors still fail in doubles (150 * 0.3048 / 0.3048 is 149.99999999999997).
+	//
+	// **THE THREE COORDINATE CASES ARE HIS** (R-155): an EPSG coordinate system (lat/lon is
+	// EPSG:3857 here, one of them), an unnamed (local) georeference, and not georeferenced.
+	//
+	// **WHERE THE COORDINATES ARE CONVERTED: ON THE SAVED DOCUMENT, NOT THE LIVE ONE.** A saved
+	// document states its frame plainly -- Cartesian, absolute through `origin`, and longitude and
+	// latitude for a lat/lon project -- so one pure function (convertSavedGeometry) can move every
+	// position, offset, scenario position and the background image without knowing about the live
+	// frame's Mercator y, its origin shift or its y-down memory. The placement steps between are the
+	// existing wizard, unchanged, which is where every conversion to a new place already went.
+	var convas = null;          // a conversion in flight, from the box to the end of the placement
+	var convasUnits = [];       // [{ name, sel, item }], cloned from the strip as the New project box does
+	var convasPick = { crs: LPN_CRS_WEBMERC, place: null };
+	var convasWired = false;
+	// Which of the three cases this project is, plus the EPSG code when it states one.
+	function projectCoordKind() {
+		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_WEBMERC }; }
+		if (projectCrsCode()) { return { kind: 'epsg', crs: projectCrsCode() }; }
+		return { kind: xyGeorefOk() ? 'unnamed' : 'none', crs: '' };
+	}
+	function convasCrsChanged(from, to) {
+		if (from.kind !== to.kind) { return true; }
+		return from.kind === 'epsg' && String(from.crs) !== String(to.crs);
+	}
+	// The menu row. An empty tab has nothing to copy, so there the row means the file picker, and the
+	// file that lands is then offered the same box (see landProjectText()).
+	function convertAs() {
+		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		if (!doc.nodes.length) { pickGeoFile(); return; }
+		openConvertAsBox();
+	}
+	// A file opened through the row's file route: the same box, unless there is nothing to convert.
+	function convertAsLanded() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!doc.nodes.length) {
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
 		}
-		// Nothing here to convert: the row can only mean the file route.
-		if (!doc.nodes.length) { pickGeoFile(); return; }
-		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		openConvertAsBox();
+	}
+	function convasEl() { return document.getElementById('lpn_convas_panel'); }
+	function convasKind() {
+		var k = ['epsg', 'unnamed', 'none'], i, r;
+		for (i = 0; i < k.length; i++) {
+			r = document.getElementById('lpn_convas_kind_' + k[i]);
+			if (r && r.checked) { return k[i]; }
+		}
+		return 'none';
+	}
+	function convasSetKind(kind) {
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.checked = (k === kind); }
+		});
+	}
+	// The chooser button and the name beside it, as the New project box shows its own.
+	function syncConvasCrs() {
+		var b = document.getElementById('lpn_convas_crs_pick'),
+			n = document.getElementById('lpn_convas_crs_name'),
+			off = convasKind() !== 'epsg';
+		if (b) { b.disabled = off; }
+		if (n) {
+			// R-218: the same lat/lon name crsDisplayName() reads off the catalogue's own EPSG:4326
+			// entry, not the catalogue's Pseudo-Mercator name -- crsBoxOk() has already folded any
+			// 4326 pick onto LPN_CRS_WEBMERC by the time convasPick.crs is read here, so this is the
+			// one comparison that still needs to ask which code it is.
+			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
+				? crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) })
+				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
+		}
+	}
+	function closeConvasBox() { hidePanel(convasEl()); }
+	function wireConvasBox() {
+		if (convasWired) { return; }
+		convasWired = true;
+		var box = convasEl();
+		if (!box) { return; }
+		var ok = document.getElementById('lpn_convas_ok'),
+			cancel = document.getElementById('lpn_convas_cancel'),
+			close = document.getElementById('lpn_convas_close'),
+			si = document.getElementById('lpn_convas_si'),
+			us = document.getElementById('lpn_convas_us'),
+			pick = document.getElementById('lpn_convas_crs_pick');
+		if (ok) { ok.addEventListener('click', convasOk); }
+		if (cancel) { cancel.addEventListener('click', closeConvasBox); }
+		if (close) { close.addEventListener('click', closeConvasBox); }
+		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); }); }
+		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); }); }
+		['epsg', 'unnamed', 'none'].forEach(function (k) {
+			var r = document.getElementById('lpn_convas_kind_' + k);
+			if (r) { r.addEventListener('change', syncConvasCrs); }
+		});
+		// Once each: the four suffix boxes are static markup, never re-cloned on open, so a typed
+		// edit is remembered for the life of the page rather than only until the next open.
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var el = document.getElementById('lpn_convas_suffix_' + k);
+			if (el) { el.addEventListener('input', function () { convasSuffixDirty[k] = true; }); }
+		});
+		if (pick) {
+			pick.addEventListener('click', function () {
+				openCrsBox(convasPick.crs, convasPick.place, function (code, ll) {
+					convasPick.crs = code;
+					convasPick.place = ll || convasPick.place;
+					convasSetKind('epsg');
+					syncConvasCrs();
+				});
+			});
+		}
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeConvasBox(); }
+		});
+	}
+	// **IT OPENS ON THE PROJECT AS IT IS**: its own coordinate case and system, its own units, and no
+	// rounding. Pressing Convert without changing anything therefore makes a plain copy.
+	function openConvertAsBox() {
+		var pc = EngCalcs.pageConfig || {}, box = convasEl(), from = projectCoordKind(), h, r, fromEl;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		wireConvasBox();
+		convasFor = library.openId;
+		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
+		convasSetKind(from.kind);
+		fromEl = document.getElementById('lpn_convas_from');
+		if (fromEl) {
+			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
+		}
+		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
+		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_roughness') { u.item.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
+		});
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k);
+			if (s) { s.value = ''; }
+		});
+		// The Label column (Task 696): fresh every open, pre-filled from this box's own units, and
+		// repainted as those units change -- until a row is typed into, see convasSuffixDirty.
+		convasSuffixDirty = {};
+		convasUnits.forEach(function (u) {
+			if (u.name === 'lpn_u_diameter' || u.name === 'lpn_u_elevhead' || u.name === 'lpn_u_flow') {
+				u.sel.addEventListener('change', refreshConvasSuffixPrefill);
+			}
+		});
+		refreshConvasSuffixPrefill();
+		syncConvasCrs();
+		box.style.display = 'block';
+		raisePanel(box);
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		initTipsIn(box);
+		var ok = document.getElementById('lpn_convas_ok');
+		if (ok && ok.focus) { ok.focus(); }
+	}
+	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
+	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
+	// **THE LABEL COLUMN (Task 696), ONE UNIT FAMILY PER ROUNDING ROW.** Read to pre-fill the box
+	// (' ' + the unit's own DISPLAY TEXT -- the option's textContent, what the dropdown itself
+	// shows, never its value/name -- matching a shipped quality suffix's own leading space --
+	// labelDefaultSuffix()) and to know which cloned select's change should refresh which row.
+	// **DEPTH PRE-FILLS FROM THE SAME UNIT HEAD DOES** (Task 696, Tom, 2026-09-25): a water depth
+	// is in the Elevation/Head family like Head is, and it now has a per-field label suffix to write
+	// into -- nodeFieldDefs()'s 'level' row, wired through convasApplyLabelSuffixes() below.
+	var LPN_CONVAS_SUFFIX_UNIT = { diameter: 'lpn_u_diameter', depth: 'lpn_u_elevhead', flow: 'lpn_u_flow', head: 'lpn_u_elevhead' };
+	// Sees an edit that started from the user, not from a pre-fill, so a row they typed into is
+	// never overwritten by a later unit change. Reset each time the box opens.
+	var convasSuffixDirty = {};
+	function convasSuffixUnitClone(famName) {
+		var i;
+		for (i = 0; i < convasUnits.length; i++) {
+			if (convasUnits[i].name === famName) { return convasUnits[i]; }
+		}
+		return null;
+	}
+	// **ONLY A ROW THE USER HAS NOT TOUCHED YET REPAINTS**, so a preset click or a per-field unit
+	// change keeps every box in step with what it would say fresh, without clobbering a suffix
+	// somebody already typed. A disabled row (depth) is skipped outright.
+	function refreshConvasSuffixPrefill() {
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			if (convasSuffixDirty[k]) { return; }
+			var el = document.getElementById('lpn_convas_suffix_' + k), u = convasSuffixUnitClone(LPN_CONVAS_SUFFIX_UNIT[k]);
+			if (!el || el.disabled || !u || !u.sel || !u.sel.options.length) { return; }
+			el.value = ' ' + u.sel.options[u.sel.selectedIndex].textContent;
+		});
+	}
+	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
+	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
+	function convasAnswers() {
+		var kind = convasKind(), units = {}, rounding = {}, suffix = {};
+		convasUnits.forEach(function (u) { units[u.name] = u.sel.value; });
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var s = document.getElementById('lpn_convas_round_' + k), sf = document.getElementById('lpn_convas_suffix_' + k);
+			rounding[k] = s ? String(s.value || '') : '';
+			suffix[k] = sf ? String(sf.value || '') : '';
+		});
+		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
+			units: units, rounding: rounding, suffix: suffix };
+	}
+	// The box is not modal, so a tab switch can happen under it; its answers were read off the
+	// project it opened on, so a different project gets the box again rather than those answers.
+	var convasFor = null;
+	function convasOk() {
+		var a = convasAnswers();
+		closeConvasBox();
+		if (convasFor !== library.openId) { convertAs(); return; }
+		runConvertAs(a);
+	}
+	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
+	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
+	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
+	// the visitor is missing a transform for.
+	function convasForeignCrs(from, to) {
+		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
+		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
+		return '';
+	}
+	function convasNoTransformMessage(pc, code) {
+		return String(pc.lpn_convas_no_transform
+			|| 'This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.')
+			.replace('{crs}', crsLabel(code) || String(code || ''));
+	}
+	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
+	// only when a project needs them. Both ends are checked before anything is copied, so a system
+	// this page cannot transform refuses up front rather than half way through.
+	function runConvertAs(a) {
+		var pc = EngCalcs.pageConfig || {}, from = projectCoordKind(),
+			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_WEBMERC) : '' },
+			changed = convasCrsChanged(from, to), need = [], bornAs = library.openId;
+		if (changed) {
+			if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { need.push(from.crs); }
+			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
+		}
+		if (!need.length) { convasProceed(a, from, to, changed); return; }
+		var refuse = function (code) {
+			setNotice(convasNoTransformMessage(pc, code));
+		};
+		if (!EngCalcs.lpnCrsLoad) { refuse(need[0]); return; }
+		EngCalcs.lpnCrsLoad(function () {
+			if (library.openId !== bornAs) { return; }
+			var missing = need.filter(function (c) { return !EngCalcs.lpnCrsHas(c); });
+			if (missing.length) { refuse(missing[0]); return; }
+			convasProceed(a, from, to, changed);
+		});
+	}
+	// Metres in one of a length unit, from the suite's one factor table ("that unit per SI unit").
+	function metersPerLengthUnit(key) {
+		var f = key && EngCalcs.unitFactors ? EngCalcs.unitFactors[key] : 0;
+		return (f > 0) ? 1 / f : 1;
+	}
+	// A SAVED document's position, as longitude and latitude in {x, y}, for each case that knows
+	// where it is. Null for the case that does not.
+	function savedLonLatReader(saved, from) {
+		var t = saved.project && saved.project.georef;
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC) { return function (p) { return { x: p.x, y: p.y }; }; }
+		if (from.kind === 'epsg') {
+			return function (p) {
+				var ll = EngCalcs.lpnCrsInverse(from.crs, p);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		if (from.kind === 'unnamed' && t) {
+			return function (p) {
+				var ll = EngCalcs.lpnGeorefToLonLat(t, p.x, p.y);
+				return ll ? { x: ll.lon, y: ll.lat } : null;
+			};
+		}
+		return null;
+	}
+	// **A LOCAL GRID FOR A PROJECT THAT KNOWS WHERE IT IS**: the tangent plane at the middle of the
+	// network, north up, in the copy's own length unit. The same transform an attached world map
+	// states, so "unnamed (local) georeference" is this plane with the transform kept, and "not
+	// georeferenced" is the same plane with it dropped.
+	function savedLocalPlane(saved, toLL, lenKey) {
+		var org = savedOrigin(saved), lon = 0, lat = 0, n = 0;
+		(saved.nodes || []).forEach(function (nd) {
+			if (!isFinite(nd.x) || !isFinite(nd.y)) { return; }
+			var ll = toLL({ x: nd.x + org.x, y: nd.y + org.y });
+			if (!ll) { return; }
+			lon += ll.x; lat += ll.y; n++;
+		});
+		if (!n) { return null; }
+		return { anchor: { x: 0, y: 0 }, origin: { lon: lon / n, lat: lat / n },
+			metersPerUnit: metersPerLengthUnit(lenKey), rotDeg: 0 };
+	}
+	function savedOrigin(saved) {
+		var geo = saved.project && saved.project.coords === LPN_COORDS_GEO, o = saved.origin;
+		return (!geo && o && isFinite(o.x) && isFinite(o.y)) ? { x: o.x, y: o.y } : { x: 0, y: 0 };
+	}
+	/**
+	 * **EVERY COORDINATE IN A SAVED DOCUMENT, THROUGH ONE MAP.** `map` takes an absolute POSITION in
+	 * the document's own frame -- longitude and latitude for a lat/lon document, the plane's own
+	 * numbers otherwise -- and returns the position in the new frame, or null. `dstGeo` says whether
+	 * the new frame is lat/lon, because that is the one frame whose DRAWING y (Mercator) differs from
+	 * its position y (latitude).
+	 *
+	 * Positions (nodes, vertices, free Text, detached customers, scenario positions) go through the
+	 * map directly. Offsets (label offsets, anchored Text, attached customers) are vectors, so they go
+	 * through the map's local derivative at their anchor, which carries a change of scale, a turn and
+	 * the Mercator stretch without a second opinion about any of them. The background image is moved
+	 * by its centre and rescaled by the same derivative; it is not turned, for the reason
+	 * georefWriteBackdrop() gives. The saved view is dropped, so the copy opens fitted to its network.
+	 *
+	 * Returns false if any position has no answer, and the caller converts nothing.
+	 */
+	function convertSavedGeometry(saved, map, dstGeo) {
+		var srcGeo = !!(saved.project && saved.project.coords === LPN_COORDS_GEO),
+			org = savedOrigin(saved), failed = false, nodeByOvKey = {}, linksById = {}, drawAt = {},
+			minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, eps, jobs = [];
+		function mapPos(p) {
+			var q = map(p);
+			if (!q || !isFinite(q.x) || !isFinite(q.y)) { failed = true; return null; }
+			return q;
+		}
+		// The two Mercator sites of File, Convert as (dev/lpn-spike/mercator-harness.js counts them):
+		// a lat/lon document's drawing y is Mercator and its position y is latitude, in the saved file
+		// exactly as outwardY()/inwardY() have it in memory.
+		function toMerc(p) { return { x: p.x, y: Geom.mercY(p.y) }; }
+		function drawToPos(d) { return srcGeo ? { x: d.x, y: Geom.mercLat(d.y) } : d; }
+		function posToDraw(p) { return dstGeo ? toMerc(p) : p; }
+		function mapDraw(d) { var q = mapPos(drawToPos(d)); return q ? posToDraw(q) : null; }
+		function absPos(p) { return { x: p.x + org.x, y: p.y + org.y }; }
+		function drawOfPos(p) { var a = absPos(p); return srcGeo ? toMerc(a) : a; }
+		// The derivative, read off the map itself, applied to one vector anchored at drawing point d.
+		function mapVec(d, v) {
+			var a = mapDraw(d), bx = mapDraw({ x: d.x + eps, y: d.y }), by = mapDraw({ x: d.x, y: d.y + eps });
+			if (!a || !bx || !by) { return null; }
+			return { x: ((bx.x - a.x) * v.x + (by.x - a.x) * v.y) / eps,
+				y: ((bx.y - a.y) * v.x + (by.y - a.y) * v.y) / eps };
+		}
+		(saved.nodes || []).forEach(function (n) {
+			nodeByOvKey[ovKeyFor('node', n.id)] = n;
+			if (!isFinite(n.x) || !isFinite(n.y)) { return; }
+			var d = drawOfPos(n);
+			drawAt[n.id] = d;
+			minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x);
+			minY = Math.min(minY, d.y); maxY = Math.max(maxY, d.y);
+		});
+		(saved.links || []).forEach(function (l) { linksById[l.id] = l; });
+		eps = isFinite(maxX) ? Math.max(maxX - minX, maxY - minY) * 1e-6 : 0;
+		if (!(eps > 0)) { eps = 1e-6; }
+		function linkAnchor(id) { var l = linksById[id]; return l ? (drawAt[l.from] || drawAt[l.to]) : null; }
+		// OFFSETS FIRST, while every anchor is still where the offset was measured from.
+		function offset(el, kx, ky, at) {
+			var hx = typeof el[kx] === 'number', hy = typeof el[ky] === 'number', v;
+			if ((!hx && !hy) || !at) { return; }
+			v = mapVec(at, { x: hx ? el[kx] : 0, y: hy ? el[ky] : 0 });
+			if (!v) { return; }
+			jobs.push(function () { if (hx) { el[kx] = v.x; } if (hy) { el[ky] = v.y; } });
+		}
+		(saved.nodes || []).forEach(function (n) { offset(n, 'lx', 'ly', drawAt[n.id]); });
+		(saved.links || []).forEach(function (l) { offset(l, 'lx', 'ly', linkAnchor(l.id)); });
+		(saved.labels || []).forEach(function (lb) {
+			if (lb.anchorNode) { offset(lb, 'x', 'y', drawAt[lb.anchorNode]); }
+			else if (lb.anchorLink) { offset(lb, 'x', 'y', linkAnchor(lb.anchorLink)); }
+		});
+		(saved.customers || []).forEach(function (c) { if (c.link) { offset(c, 'x', 'y', linkAnchor(c.link)); } });
+		// A SCENARIO'S OWN POSITIONS are absolute and may hold one axis only; the missing half comes
+		// from the node, as georefCaptureCoordOverrides() completes it, and only held axes are written.
+		(saved.scenarios || []).forEach(function (sc) {
+			if (sc.isBase) { return; }
+			Object.keys(sc.overrides || {}).forEach(function (key) {
+				var ov = sc.overrides[key], n = nodeByOvKey[key] || null, a, q;
+				if (!ov || !n || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
+				a = absPos(n);
+				q = mapPos({ x: typeof ov.x === 'number' ? ov.x : a.x, y: typeof ov.y === 'number' ? ov.y : a.y });
+				if (!q) { return; }
+				jobs.push(function () {
+					if (typeof ov.x === 'number') { ov.x = q.x; }
+					if (typeof ov.y === 'number') { ov.y = q.y; }
+				});
+			});
+		});
+		// The background image: its centre moves, its scale follows the map's east-west derivative.
+		var bd = saved.backdrop;
+		if (bd && isFinite(bd.tx) && isFinite(bd.ty) && bd.s > 0) {
+			var bw = (bd.x || 0) + (bd.width || 0) / 2, bh = (bd.y || 0) + (bd.height || 0) / 2,
+				c = { x: bd.tx + (srcGeo ? 0 : org.x) + bd.s * bw, y: bd.ty + (srcGeo ? 0 : org.y) - bd.s * bh },
+				c2 = mapDraw(c), east = mapVec(c, { x: 1, y: 0 });
+			if (c2 && east) {
+				jobs.push(function () {
+					var s = bd.s * Math.hypot(east.x, east.y);
+					bd.s = s;
+					bd.tx = c2.x - s * bw;
+					bd.ty = c2.y + s * bh;
+				});
+			}
+		}
+		// POSITIONS, through eachStoredPoint()'s own list so nothing is missed -- minus the two
+		// {get, set} points, which are the view (dropped) and the backdrop (done above).
+		eachStoredPoint(saved, function (pt, get) {
+			if (get || !isFinite(pt.x) || !isFinite(pt.y)) { return; }
+			var q = mapPos(absPos(pt));
+			if (!q) { return; }
+			jobs.push(function () {
+				pt.x = q.x; pt.y = q.y;
+				// The file's own characters no longer state these numbers.
+				if (pt.tok) { delete pt.tok.x; delete pt.tok.y; }
+			});
+		});
+		if (failed) { return false; }
+		jobs.forEach(function (j) { j(); });
+		delete saved.view;
+		// A lat/lon document states origin {0, 0} and applySaved() derives its own; a plane document
+		// is given one here, which is what a State Plane or UTM number needs to be drawable.
+		delete saved.origin;
+		if (dstGeo) { saved.origin = { x: 0, y: 0 }; } else { rebaseDocument(saved); }
+		return true;
+	}
+	function savedSetKind(saved, kind, crs, georefT) {
+		var p = saved.project;
+		delete p.coords; delete p.crs; delete p.georef;
+		if (kind === 'geo') { p.coords = LPN_COORDS_GEO; p.basemap = p.basemap || 'osm'; }
+		else if (kind === 'epsg') { p.crs = String(crs); }
+		else if (kind === 'unnamed') { p.georef = georefT; }
+		else { delete p.basemap; }
+	}
+	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Destructive
+	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
+	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
+	// unit names that actually changed, which is what the rounding reads.
+	function convasApplyUnits(a) {
+		var changed = {};
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
+			if (!to || !from || to === from) { return; }
+			fOld = EngCalcs.unitFactors[from];
+			fNew = EngCalcs.unitFactors[to];
+			if (!fOld || !fNew) { return; }
+			applyOneUnit(name, to);
+			if (unitKey(name) !== to) { return; }   // not an option this select offers
+			convertUnitValues(name, fNew / fOld);
+			changed[name] = true;
+		});
+		convasRound(changed, a.rounding || {});
+		rememberUnitSelections();
+		afterUnitChange();
+		return changed;
+	}
+	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
+	// not 12.299999999999999.
+	function roundToStep(v, step) {
+		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+		return +(Math.round(v / step) * step).toFixed(d);
+	}
+	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
+	// typed, and rounding it would be a second edit nobody asked for.
+	function convasRound(changed, rounding) {
+		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
+		function rnd(obj, prop, s) { if (obj && typeof obj[prop] === 'number') { obj[prop] = roundToStep(obj[prop], s); } }
+		function ovs(prop, s) {
+			scenarios.forEach(function (sc) {
+				Object.keys(sc.overrides || {}).forEach(function (k) { rnd(sc.overrides[k], prop, s); });
+			});
+		}
+		var s = step('diameter');
+		if (s && changed.lpn_u_diameter) {
+			doc.links.forEach(function (l) { rnd(l, '_diameter', s); });
+			ovs('diameter', s);
+		}
+		s = step('depth');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_level', s); rnd(n, 'minLevel', s); rnd(n, 'maxLevel', s); });
+			ovs('level', s);
+		}
+		s = step('head');
+		if (s && changed.lpn_u_elevhead) {
+			doc.nodes.forEach(function (n) { rnd(n, '_head', s); });
+			ovs('head', s);
+		}
+		s = step('flow');
+		if (s && changed.lpn_u_flow) {
+			doc.nodes.forEach(function (n) {
+				rnd(n, '_demand', s);
+				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
+			});
+			(doc.customers || []).forEach(function (c) { rnd(c, 'demand', s); });
+			doc.links.forEach(function (l) {
+				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { rnd(l, '_setting', s); }
+			});
+			ovs('demand', s);
+		}
+	}
+	// **THE LABEL COLUMN, INTO THE ONE SETTING THAT ALREADY DOES THIS JOB** (Task 333's
+	// labelSettings.suffix, read by labelSuffixFor() and written by setLabelAffix() -- the same seam
+	// a Labels row uses). Diameter, Depth and Head land straight on the field the rounding above just
+	// rewrote; Flow lands on both typed demand fields the rounding touches, junction and customer.
+	// **DEPTH (TANK LEVEL) NOW HAS ONE** (Task 696, Tom, 2026-09-25): nodeFieldDefs()'s 'level' row,
+	// the same field the Settings label columns for tanks offer. Runs on the COPY, after
+	// importProject() has switched context onto it, exactly as convasApplyUnits() already does.
+	function convasApplyLabelSuffixes(a) {
+		var s = a.suffix || {};
+		if (typeof s.diameter === 'string') { setLabelAffix('suffix', 'link', 'diameter', s.diameter); }
+		if (typeof s.depth === 'string') { setLabelAffix('suffix', 'node', 'level', s.depth); }
+		if (typeof s.head === 'string') { setLabelAffix('suffix', 'node', 'head', s.head); }
+		if (typeof s.flow === 'string') {
+			setLabelAffix('suffix', 'node', 'demand', s.flow);
+			setLabelAffix('suffix', 'customer', 'demand', s.flow);
+		}
+	}
+	/**
+	 * **THE COPY, CONVERTED IN THE ORDER THE TWO HALVES NEED.**
+	 *
+	 *   1. Serialize this project and give the copy its own name and no docId.
+	 *   2. Coordinates that need no placement are converted on the saved copy: a local grid rescaled
+	 *      with its length unit, a world map dropped, or a known location laid out as a local grid.
+	 *      A known location that is going to a new coordinate system is first expressed in lat/lon,
+	 *      so the placement steps open already answered.
+	 *   3. The copy lands in a new tab, and the units are converted in it.
+	 *   4. If the coordinate system changed, the placement steps run on the copy, and when they
+	 *      finish convasPlaced() lays the lat/lon result onto the chosen system.
+	 */
+	function convasProceed(a, from, to, changed) {
+		var pc = EngCalcs.pageConfig || {}, saved, name, id, origId = library.openId,
+			lenFrom = unitKey('lpn_u_length'), lenTo = (a.units && a.units.lpn_u_length) || lenFrom,
+			k = metersPerLengthUnit(lenFrom) / metersPerLengthUnit(lenTo), step = null, toLL, t2, ok = true;
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
 		if (!saved || !saved.project) {
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
-		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId
-		// is what the lock broker and every live file handle key on, so two tabs sharing one would
-		// be two documents claiming to be the same file. And the world map attached to the original
-		// is a statement about coordinates that are about to be replaced, so it goes too.
+		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
+		// what the lock broker and every live file handle key on.
 		delete saved.project.docId;
-		delete saved.project.georef;
 		saved.project.name = name;
-		landProjectText(JSON.stringify(saved), true, name);
+		if (!changed) {
+			// **A LOCAL GRID'S COORDINATES ARE IN ITS LENGTH UNIT** (Task 693), so a new length unit
+			// rescales them with the pipes, and an attached world map keeps its place on the ground.
+			if ((from.kind === 'none' || from.kind === 'unnamed') && k !== 1) {
+				ok = convertSavedGeometry(saved, function (p) { return { x: p.x * k, y: p.y * k }; }, false);
+				var g = saved.project.georef;
+				if (ok && g && g.anchor) {
+					g.anchor = { x: g.anchor.x * k, y: g.anchor.y * k };
+					g.metersPerUnit = g.metersPerUnit / k;
+				}
+			}
+		} else if (from.kind === 'unnamed' && to.kind === 'none') {
+			// Detaching changes no coordinate: the grid is the grid it always was.
+			savedSetKind(saved, 'none');
+		} else if (from.kind === 'none') {
+			// Nowhere yet: the steps start from the whole world, as they always have.
+			step = to.kind === 'unnamed' ? 'attach' : 'place';
+		} else {
+			toLL = savedLonLatReader(saved, from);
+			if (to.kind === 'none') {
+				t2 = toLL ? savedLocalPlane(saved, toLL, lenTo) : null;
+				ok = !!t2 && convertSavedGeometry(saved, function (p) {
+					var ll = toLL(p);
+					return ll ? EngCalcs.lpnGeorefFromLonLat(t2, ll.x, ll.y) : null;
+				}, false);
+				if (ok) { savedSetKind(saved, 'none'); }
+			} else {
+				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC)) {
+					ok = !!toLL && convertSavedGeometry(saved, toLL, true);
+					if (ok) { savedSetKind(saved, 'geo'); }
+				}
+				step = 'answered';
+			}
+		}
+		if (!ok) {
+			setNotice(convasNoTransformMessage(pc, convasForeignCrs(from, to)));
+			return;
+		}
+		id = importProject(saved);
+		if (!id) { return; }
+		convasApplyUnits(a);
+		convasApplyLabelSuffixes(a);
+		saveToStorage();
+		renderTabs();
+		// No zoomExtent() here or below: a converted copy carries no saved view, so opening it fits
+		// through restoreViewOrFit() like any document without one (view-memory-harness.js).
+		if (!step) {
+			setNotice(String(pc.lpn_convas_done || 'The converted copy is {name}. The original project is unchanged.')
+				.replace('{name}', name));
+			return;
+		}
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
+		georefStart();
+		if (!georefActive()) { convasAbandon(); }
+	}
+	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
+	// this lays it onto the system the box asked for, on the saved document, and installs it in the
+	// same tab. A conversion to lat/lon itself is already finished.
+	function convasPlaced() {
+		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_WEBMERC)) { return; }
+		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
+		if (!saved || !saved.project) { return; }
+		if (c.to.kind === 'epsg') {
+			ok = convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnCrsForward(c.to.crs, { lon: p.x, lat: p.y });
+			}, false);
+			if (ok) { savedSetKind(saved, 'epsg', c.to.crs); }
+		} else {
+			t2 = savedLocalPlane(saved, function (p) { return { x: p.x, y: p.y }; }, c.lenKey);
+			ok = !!t2 && convertSavedGeometry(saved, function (p) {
+				return EngCalcs.lpnGeorefFromLonLat(t2, p.x, p.y);
+			}, false);
+			if (ok) { savedSetKind(saved, c.to.kind, '', t2); }
+		}
+		if (!ok) {
+			setNotice(convasNoTransformMessage(pc, c.to.kind === 'epsg' ? c.to.crs : ''));
+			return;
+		}
+		writeJSON(projectKey(library.openId), saved);
+		prepared = prepareDocument(JSON.parse(JSON.stringify(saved)));
+		if (!prepared) { return; }
+		applySaved(prepared);
+		// The undo stack holds the lat/lon drawing the steps left, which is not this document's frame.
+		clearUndo();
+		saveToStorage();
+		refreshAllFromDocument();
+		renderTabs();
+		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+	}
+	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
+	// a half-converted duplicate left open is a second document nobody asked to keep.
+	function convasAbandon() {
+		var pc = EngCalcs.pageConfig || {}, c = convas;
+		convas = null;
+		if (!c || c.copyId !== library.openId) { return; }
+		if (indexEntry(c.origId)) { switchToTab(c.origId); }
+		discardProject(c.copyId);
+		renderTabs();
+		setNotice(pc.lpn_convas_cancelled || 'Nothing was converted. The copy is closed, and the original project is unchanged.');
 	}
 
 	// ---- Live file handles ----
@@ -31702,11 +32871,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function buildNewBoxUnits() {
-		var host = document.getElementById('lpn_new_units_fields');
-		if (!host) { return; }
+	// Shared with the File, Convert as box (Task 696), which asks the same units question of a copy.
+	function cloneUnitStrip(hostId) {
+		var host = document.getElementById(hostId), out = [];
+		if (!host) { return out; }
 		host.innerHTML = '';
-		newBoxUnits = [];
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var live = unitEl(name), item = unitStripItem(live), copy, sel;
 			if (!item) { return; }
@@ -31718,8 +32887,12 @@ var EngCalcs = EngCalcs || {};
 			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
 			host.appendChild(copy);
-			newBoxUnits.push({ name: name, sel: sel, item: copy });
+			out.push({ name: name, sel: sel, item: copy });
 		});
+		return out;
+	}
+	function buildNewBoxUnits() {
+		newBoxUnits = cloneUnitStrip('lpn_new_units_fields');
 	}
 	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
 	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
@@ -31735,10 +32908,11 @@ var EngCalcs = EngCalcs || {};
 	// A preset is a family => unit-key map and every select declares its family, which is exactly
 	// what EngCalcs.setUnits() does to the real strip. Applied to the clones here, because the real
 	// strip belongs to the project that is currently open.
-	function applyNewBoxPreset(system) {
+	function applyNewBoxPreset(system) { applyPresetToClones(newBoxUnits, system); }
+	function applyPresetToClones(list, system) {
 		var preset = (EngCalcs.unitSets || {})[system];
 		if (!preset) { return; }
-		newBoxUnits.forEach(function (u) {
+		list.forEach(function (u) {
 			var fam = (u.sel.dataset && u.sel.dataset.family) ||
 				(u.sel.getAttribute && u.sel.getAttribute('data-family')) || '';
 			var want = preset[fam];
@@ -31934,7 +33108,7 @@ var EngCalcs = EngCalcs || {};
 					// broken rather than that another projection over the same ground would work,
 					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
 					// the choice as well; this is the same sentence, after it.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.');
 				});
 			}
 		}
@@ -32066,9 +33240,18 @@ var EngCalcs = EngCalcs || {};
 	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
 	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 *
+	 * **NEITHER LAT/LON CODE EVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
+	 * beside "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the very projection the map is drawn in).
+	 * js/lpn-crs.js's proj4 definitions cover PROJECTED systems; EPSG:3857 and EPSG:4326 both mean
+	 * this page's own native lat/lon project, placed with the hand-written Mercator math
+	 * (Geom.mercLat/mercY) this page has always drawn its basemap with, never through proj4 --
+	 * lpnCrsHas('3857') and lpnCrsHas('4326') both correctly answer false, and asking either was the
+	 * defect, not the answer.
 	 */
 	function crsCannotBePlaced(code) {
-		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+		if (!code || crsIsLatLonCode(code)) { return false; }
+		return !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
 			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
 	}
 	function crsOptionText(entry) {
@@ -32125,7 +33308,7 @@ var EngCalcs = EngCalcs || {};
 			// A filter that is on and filtering nothing looks broken, so it says which it is.
 			note.textContent = (crsBoxViewOn() && !crsBox.place)
 				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
-				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
+				: (pc.lpn_crs_count || '{n} of {total} coordinate systems listed.')
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
 			// **THE ACKNOWLEDGEMENT THE IOGP TERMS REQUIRE, AND IT IS NOT A LANGUAGE KEY** -- the
 			// same rule as the OpenStreetMap and Nominatim credits: it names an owner rather than
@@ -32133,14 +33316,12 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
-			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
-			// "(no map)" mark in the option is what a person scanning the list sees; this is what
-			// they read once their choice has settled on one. Two sizes of the same fact, because
-			// the mark has to be short enough not to push a 50-character register name out of the
-			// select and the sentence has to be long enough to say what is lost.
-			if (crsCannotBePlaced(crsBox.code)) {
-				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
-			}
+			// **THE NOTE ENDS HERE, AFTER THE IOGP CREDIT** (Tom, 2026-09-25: the sentence this used
+			// to append -- lpn_crs_unplaceable's full explanation -- read as nonsense here). The
+			// "(no map)" mark in the option is what a person scanning the list sees for the rare
+			// unplaceable row; the key itself is still rendered, at the actual moment of consequence
+			// -- newProject()'s own refusal sentence a few hundred lines below this file, once
+			// somebody has gone ahead and created on one of the 106 anyway.
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -32162,7 +33343,12 @@ var EngCalcs = EngCalcs || {};
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
 			pick = crsBox.onPick;
 		closeCrsBox();
-		if (pick) { pick(code, crsBox.place); }
+		// **BOTH LAT/LON ENTRIES ANSWER AS LPN_CRS_WEBMERC**, the one code every caller downstream
+		// (New project, Convert as) already knows means "make the lat/lon project". EPSG:3857 and
+		// EPSG:4326 are offered as two unmodified, honestly-named rows so nothing in the register is
+		// hidden (Tom, 2026-09-25); which one somebody clicked never needs to be told apart again
+		// after this point, because both name the identical project.
+		if (pick) { pick(crsIsLatLonCode(code) ? LPN_CRS_WEBMERC : code, crsBox.place); }
 	}
 	var crsBoxWired = false;
 	function wireCrsBox() {
@@ -32328,27 +33514,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
-			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
-			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
-			// along. That is what this row is for, and it takes both kinds of file for exactly that
-			// reason.
-			//
-			// **THIRD, BELOW BOTH ROWS IT RESCUES.** Tom, 2026-08-19: *"But make it third since it is
-			// truly our fallback option."* The first two are what a person reaches for; this is what
-			// they reach for after one of those gave them the wrong coordinate kind. A fallback
-			// listed above the thing it falls back from reads as an equal alternative.
-			//
-			// **A ROW RATHER THAN A PROMPT ON Open…**, by Tom's standing rule that a choice must not
-			// stand in front of the common action: opening a file is common, placing a grid drawing
-			// on the world is rare, so the rare act carries the extra door.
-			//
-			// **NEVER DISABLED.** It opens a file, and there is always a file it could open --
-			// nothing about the project on screen makes this impossible, because the result is a new
-			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
-			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Convert coordinates as…',
-			  tip: pc.lpn_file_import_geo_tip, fn: convertCoordsAs },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -32429,6 +33594,17 @@ var EngCalcs = EngCalcs || {};
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
+			// **DIRECTLY AFTER SAVE AS..., NOT AMONG THE ROWS THAT OPEN A FILE** (Task 696, R-213;
+			// Tom, 2026-09-24: *"there is nothing else about converting, and it's not about
+			// importing or exporting"*). It copies THIS project and converts the copy (convertAs()),
+			// so it belongs with Save, Save as, Save all and Revert -- the rows that act on the open
+			// project -- rather than with Open, Open example and the import/export rows, each of
+			// which replaces it with something else. On an empty tab it opens a file first.
+			//
+			// It replaced Task 447's "Import XY to lat/lon…", which converted the open project in
+			// place and had to be greyed whenever that project was already on the map.
+			{ icon: 'globe', label: pc.lpn_file_convert_as || 'Convert as…',
+			  tip: pc.lpn_file_convert_as_tip, fn: convertAs },
 			// **Present always, disabled when it would do nothing.** A row that appears and
 			// disappears teaches no one it is there, and its absence reads as a missing feature
 			// rather than as a state. Every sibling here -- Save, Revert -- greys out instead.
@@ -33635,6 +34811,30 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
+			// GRID.** The reported defect was specific: attaching the world map to the default tab
+			// errored, because a schematic project has no coordinate system to place tiles with.
+			// Making Project1 geographic from birth removes the error at its source instead of
+			// routing the visitor around it -- see `firstVisitHomeView()` above for where the
+			// numbers come from and why `LPN_GEO_HOME` itself is untouched.
+			project.coords = LPN_COORDS_GEO;
+			// **AND THE STREET MAP IS ON, BEHIND THE GALLERY, FROM THE FIRST FRAME** (Tom,
+			// 2026-09-25: *"we need to have this visible on first load behind the gallery. I think
+			// we can suppress any disclosure at this time because it is a standard app request
+			// instead of a user request"*). A geographic project defaults its basemap on
+			// (`basemapOn()` is `project.basemap !== 'off'`), and this one is no longer the
+			// exception: a map application drawing its street map is the service the visitor came
+			// for. It fetches OpenStreetMap tiles with no gesture behind it, which is why
+			// privacy.php says the street map is shown on this first, empty project and can be
+			// hidden (Map, World map, Detach), while the other three outside requests still ask.
+			// It stores nothing new: `project.basemap` stays unset, as on every geographic project.
+			// **NOT `pendingView`/`pendingViewFor` HERE** -- `firstVisitHomeView()`, like
+			// `geoHomeView()`, needs the canvas's real height to compute a scale, and at this point
+			// in boot the canvas is still behind the curtain (height 0 until `applyMapHeight()` runs
+			// on `window load` -- see the Task 418 note above "AND IT IS BORN CLEAN"). Computed now,
+			// it would come back null and the camera would never move. `firstVisitPendingId` asks
+			// `noteMapSized()` to compute and apply it once the canvas actually has a size.
+			firstVisitPendingId = firstId;
 			// **AND IT IS BORN CLEAN.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
@@ -35611,6 +36811,10 @@ var EngCalcs = EngCalcs || {};
 			});
 		} else if (name === 'lpn_u_flow') {
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
+			// A junction's further demand categories (Task 468) and a customer's own demand (Task
+			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
+			doc.nodes.forEach(function (nd) { (nd.extraDemands || []).forEach(function (d) { conv(d, 'base'); }); });
+			(doc.customers || []).forEach(function (c) { conv(c, 'demand'); });
 			convOverrides('demand');
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
@@ -35981,9 +37185,29 @@ var EngCalcs = EngCalcs || {};
 			refreshMapStatus();
 		});
 	}
+	// **THE MAP COORDINATES LINE UNDER LENGTH** (Task 693, folded into 696). Derived, never chosen:
+	// degrees for lat/lon, the plane's own unit for an EPSG system, and the length unit for a local
+	// grid, attached or not, because that is what a local grid's numbers are in.
+	function mapCoordsUnitText() {
+		var pc = EngCalcs.pageConfig || {}, u;
+		if (isLatLonProject()) { return pc.lpn_units_mapcoords_deg || 'degrees'; }
+		if (!isProjectedProject()) { return unitLabel('lpn_u_length'); }
+		u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(projectCrsCode()) : null;
+		if (!u) { return projectCrsCode(); }
+		if (u.units === 'm') { return pc.u_m || 'm'; }
+		if (u.units === 'ft') { return pc.u_ft || 'ft'; }
+		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
+		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
+		return String(u.units);
+	}
+	function refreshMapCoordsUnit() {
+		var el = document.getElementById('lpn_u_mapcoords');
+		if (el) { el.textContent = mapCoordsUnitText(); }
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		ensureCrsForProject();
+		refreshMapCoordsUnit();
 		if (!el) { return; }
 		// A PIPE, not spaces. Three "Label: value" pairs run together are one undifferentiated string
 		// at 11px, and whitespace is the weakest divider there is.
@@ -36236,6 +37460,12 @@ var EngCalcs = EngCalcs || {};
 			['demand', pc.lpn_field_base_demand || 'Base demand'],
 			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			['elev', pc.lpn_field_elev || 'Elevation'],
+			// **TANK WATER DEPTH** (Task 696, Tom, 2026-09-25: give the coverage this was missing
+			// rather than disable it in Convert as). Trails Elevation on the same physical-order
+			// argument: a tank is the one node type that has it, and the node loop below prints it
+			// only where one is typed, exactly as Elevation prints nothing for an imported reservoir
+			// with none. The same key names it in the tank's own Properties popup (renderNodeFields).
+			['level', pc.lpn_field_tank_level || 'Water depth'],
 			// LAST, and off by default. It is the one field here that no network has until a run
 			// has been made with the analysis switched on, and its heading follows that switch.
 			['quality', qualityLabel()],
@@ -36401,7 +37631,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
@@ -36861,6 +38091,15 @@ var EngCalcs = EngCalcs || {};
 			fitWhenSized = false;
 			if (!(validView(v) && applyView(v))) { zoomExtent(wasAuto); }
 		}
+		// **R-208: PROJECT1's HOME VIEW, NOW THAT THE CANVAS CAN ANSWER `clientWidth`/`clientHeight`
+		// HONESTLY.** Guarded on the SAME project still being open and still empty -- a visitor who
+		// switched tabs or started drawing before the canvas ever sized must not have their camera
+		// moved out from under them, which is the same discipline `pendingViewFor` observes for the
+		// ordinary case.
+		if (firstVisitPendingId && firstVisitPendingId === library.openId && !doc.nodes.length) {
+			applyView(firstVisitHomeView());
+		}
+		firstVisitPendingId = null;
 		// **NOTHING THAT HAPPENED BEFORE THE CANVAS HAD A SIZE WAS A USER EDIT** (Task 418), so this
 		// re-baselines once, here, and never again -- the mapSized guard above makes this function
 		// run exactly once per page load, and rebaseSignatureIfClean() still refuses a project that
@@ -37969,7 +39208,18 @@ var EngCalcs = EngCalcs || {};
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
-			var active = pushSpecs.filter(pushFieldShown);
+			// **A SECOND GATE, BESIDE pushFieldShown()** (Task 708). This button seeds each
+			// property from `settings.defaults[s.key]`, and pushFieldShown() alone answers "is
+			// this shown on the map", not "does a New-asset default exist for it" -- the two used
+			// to be the same question for every entry in pushSpecList(), because every property
+			// with a map-label toggle also had a defaultRow() above. `length` and `status` break
+			// that: both are shown on the map by default option and NEITHER has a New-asset
+			// default (deliberately, for `length` -- see the comment above defaultRow's absence --
+			// and never given one for `status`). Without this second test, turning the Length or
+			// Status label on and pressing this button would push `undefined` onto every pipe.
+			var active = pushSpecs.filter(function (s) {
+				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(settings.defaults, s.key);
+			});
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
@@ -46528,7 +47778,7 @@ var EngCalcs = EngCalcs || {};
 		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
 		// order for the same control shape on the same popup.
 		var text = document.createElement('span');
-		setFieldLabel(text, pc.lpn_field_closed || 'Shut', pc.lpn_field_closed_tip);
+		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -48170,7 +49420,11 @@ var EngCalcs = EngCalcs || {};
 		// and a user who wants a prefix can type their own.
 		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
 		// quality row's own input, and neither half of that pair has a symbol a reader would know.
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '', initQuality: '' },
+		// **TANK WATER DEPTH DEFAULTS TO 'Y='** (Tom, 2026-09-25: "For Water depth, initial default
+		// prefix can be 'Y='"). 'd' was ruled out as ambiguous with a pipe's own diameter on the
+		// same label set (Task 696); Y is the standard hydraulics symbol for depth.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=',
+			level: 'Y=', quality: '', initQuality: '' },
 		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
 		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
 		// are. A status prints a WORD and would read as an equation with one; an average quality
@@ -48463,6 +49717,11 @@ var EngCalcs = EngCalcs || {};
 		// solver in SI and go through displayRound().
 		var nodeVal = {
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
+			// **TANK WATER DEPTH ONLY** (Task 696): a junction or reservoir has no 'level' to print,
+			// exactly as it has no diameter. plainRound(), not displayRound(): effective(n, 'level')
+			// is a typed number already in the Elevation/Head display unit, the same treatment elev
+			// gets above.
+			level: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(effective(n, 'level'), nd.level) : undefined; }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
@@ -48504,6 +49763,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
+			level: fieldExtrema(nodeVal.level.list),
 			demand: fieldExtrema(nodeVal.demand.list),
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
@@ -48590,6 +49850,13 @@ var EngCalcs = EngCalcs || {};
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
 			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
+			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
+			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
+			// nodeVal.level exists only to feed extrema.level above, the same division every other
+			// field on this list keeps.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, extrema.level, nd.level))); }
 			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.
