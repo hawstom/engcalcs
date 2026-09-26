@@ -59,8 +59,16 @@ ok('it is wired once, not on every rebuild', /!toolbarTipsWired/.test(src)
 	&& /toolbarTipsWired = true;/.test(src));
 
 console.log('\n--- and the button that started it is still wired to the command ---');
-ok('Zoom to fit still runs zoomExtent',
-	/extentBtn\.addEventListener\('click', zoomExtent\);/.test(src));
+// **THE BUTTON GAINED A SECOND MODE SINCE THIS WAS WRITTEN** (ROADMAP Task 682): its own click
+// listener now decides Zoom to fit vs Zoom Window before calling either, so the direct
+// `addEventListener('click', zoomExtent)` this once matched is gone by design -- see
+// zoom-control-harness.js for that decision itself. What this still owes the ORIGINAL defect
+// (a touch tip left standing after Zoom to fit) is that pressing the button, in its fit-shaped
+// state, still reaches zoomExtent() -- through the SAME delegated listener asserted above, which
+// dismisses the tip after ANY button's own handler returns, this one included.
+const extentClick = /extentBtn\.addEventListener\('click', function \(\) \{([\s\S]*?)\n\t\t\}\);/.exec(src);
+ok('Zoom to fit still has its own click handler', !!extentClick);
+ok('...and it still runs zoomExtent()', !!extentClick && /\bzoomExtent\(false\);/.test(extentClick[1]));
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all checks passed'));
 process.exit(fails ? 1 : 0);

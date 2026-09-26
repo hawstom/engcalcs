@@ -2671,6 +2671,13 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
+		// The one data label the pointer is carrying right now, if any. It is placed exactly where
+		// the pointer puts it (js/lpn-collide.js candidatesFor()), never pushed along its leader.
+		function labelHeldByDrag(key) {
+			if (!drag || drag.id === undefined) { return false; }
+			return (drag.type === 'nodelbl' && key === nodeLabelKey(drag.id)) ||
+				(drag.type === 'linklbl' && key === linkLabelKey(drag.id));
+		}
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -2681,7 +2688,7 @@ var EngCalcs = EngCalcs || {};
 			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
 			labels.push({
-				id: key, anchor: anchor, home: home, dragged: !!dragged,
+				id: key, anchor: anchor, home: home, dragged: !!dragged, held: labelHeldByDrag(key),
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
@@ -11020,7 +11027,40 @@ var EngCalcs = EngCalcs || {};
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
-	var LPN_FIT_SETTLE_PASSES = 5;
+	var LPN_FIT_SETTLE_PASSES = 8;
+	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
+	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
+	var lastFit = null;
+	// **A SOLVE FINISHING NEVER MOVES THE VIEW** (Tom, 2026-08-15, going through every automatic fit
+	// and rejecting nearly all of it: the post-solve re-fit *"illegal"*; see `view-memory-harness.js`).
+	// There used to be a `fitAwaitsSolve` here that let applySolveResult() re-run a Zoom to fit
+	// pressed just ahead of a due solve. Tom, 2026-09-25, catching that this had come back in a
+	// narrower form: *"Zoom to fit pressed before results arrive runs once more when they land: I
+	// think this is what I forbade."* Removed rather than guarded, so nobody reinstates it under a
+	// different name. See the note at the end of zoomExtent() for the fuller quote.
+	// Everything that sits OVER the map, as rectangles in canvas pixels (R-216): every occupant
+	// overlayOccupants() already lists for the legends to dodge -- the mode hint and notice strip,
+	// each cell of the bottom strip including the scale bar, the tile credit, the +/- chip -- plus
+	// the two legends themselves. Measured, never assumed, because most of them fill in or change
+	// size after the page has drawn.
+	function mapFurnitureRects(canvasRect) {
+		var wrap = svg && svg.parentNode, out = [], list, i, b, extra, cr = canvasRect;
+		if (!wrap || !wrap.getBoundingClientRect || !(cr.width > 0)) { return out; }
+		list = overlayOccupants(wrap.getBoundingClientRect()).map(function (o) { return o.rect; });
+		extra = [document.getElementById('lpn_labels_legend'), colorLegendBox];
+		for (i = 0; i < extra.length; i++) {
+			if (extra[i] && extra[i].style && extra[i].style.display !== 'none' && extra[i].getBoundingClientRect) {
+				list.push(extra[i].getBoundingClientRect());
+			}
+		}
+		for (i = 0; i < list.length; i++) {
+			b = list[i];
+			if (!b || !(b.width > 0) || !(b.height > 0)) { continue; }
+			if (b.right <= cr.left || b.left >= cr.right || b.bottom <= cr.top || b.top >= cr.bottom) { continue; }
+			out.push({ l: b.left - cr.left, r: b.right - cr.left, t: b.top - cr.top, b: b.bottom - cr.top });
+		}
+		return out;
+	}
 	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
 	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
 	// on the map, so it cannot be off it.
@@ -11057,18 +11097,36 @@ var EngCalcs = EngCalcs || {};
 		// It guarantees nothing is under an overlay IMMEDIATELY AFTER a fit, and nothing more -- the
 		// user can still pan or zoom content back under one, because the overlays are screen-fixed
 		// and the drawing is not. A guarantee needs the overlays out of the canvas (Task 253).
-		var r = svg.getBoundingClientRect(), pad = 16,
+		var r = svg.getBoundingClientRect(), pad = 16, padLeft = pad, padRight = pad,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
+			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
 				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function place(v, set) {
-			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, pad, pad).t,
+			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
 				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+		}
+		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
+		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
+		// threshold no data label is drawn, so a scale chosen to make room for dragged-out lettering
+		// fitted the network into a frame sized for labels that were not there. Measured on the
+		// geographic Net3 in a 1900 px window: two labels pulled 150 px out took the fit from 8,587
+		// to 5,856, with nothing but the network drawn. `sPast` hides the labels and `sShown` does
+		// not; the answer is the largest scale on the hidden side that still holds the network.
+		// Both steps that choose a scale for the labels' sake come through here.
+		// dev/lpn-spike/label-drag-fit-harness.js.
+		function hiddenSideFit(sPast, sShown) {
+			var lo = sPast, hi = sShown, mid, j;
+			for (j = 0; j < LPN_FIT_BISECTIONS; j++) {
+				mid = (lo + hi) / 2;
+				if (labelsPastThreshold(mid)) { lo = mid; } else { hi = mid; }
+			}
+			items = modelItems;
+			return Math.min(lo, solve());
 		}
 		// Is every node and vertex inside the canvas at scale v and translation p? The invariant
 		// Zoom to fit exists for (R-184): whatever else it does, it never shows empty paper.
@@ -11110,6 +11168,12 @@ var EngCalcs = EngCalcs || {};
 		var modelFit = s;
 		items = fitItems(s);
 		s = solve();
+		if (labelsPastThreshold(s)) {
+			var labelled = items, bare;
+			items = modelItems;
+			bare = solve();
+			if (!labelsPastThreshold(bare)) { s = hiddenSideFit(s, bare); } else { items = labelled; }
+		}
 		// **A LABEL WIDER THAN THE WINDOW MUST NOT DECIDE THE ZOOM** (Tom, 2026-09-16, on his EWB
 		// demo file: *"Zoom to fit ... does not show the entire network. It's close, but it's not
 		// what we aim for."*). `fitScaleFor()` answers `minScale()` when nothing fits even at the
@@ -11125,6 +11189,22 @@ var EngCalcs = EngCalcs || {};
 		// **AND THE FALLBACK IS CENTRED ON THE MODEL, NOT ON THE LETTERING** that just failed to
 		// fit, and it is also taken whenever the label-aware answer would leave a node off the
 		// canvas -- the one outcome a fit may never produce, whatever the lettering asks for.
+		// **A PRESS FROM THE VIEW THE LAST FIT LEFT IS NEARLY FREE** (pre-review 2026-09-24: about
+		// 1.2 s a press on the geographic Net3, every press). Steps 1 and 2 are arithmetic; step 3
+		// redraws. If steps 1 and 2 give the same seed they gave last time, on a canvas of the same
+		// size, and the view is still exactly the one that fit settled on, then the only question
+		// left is whether anything drawn has since moved under an overlay or off the frame -- one
+		// measurement, no relayout. Anything else (an edit, a resize, a pan, a zoom, new results)
+		// changes the seed or the view and takes the full path.
+		var seed = [modelFit, s, r.width, r.height].join(' ');
+		if (lastFit && lastFit.seed === seed && lastFit.s === state.s && lastFit.tx === state.tx &&
+			lastFit.ty === state.ty) {
+			padLeft = lastFit.pads[0]; padRight = lastFit.pads[1]; padTop = lastFit.pads[2]; padBottom = lastFit.pads[3];
+			if (!firstObstruction(modelItems.concat(drawnInkItems()))) {
+				if (auto) { rebaseSignatureIfClean(); }
+				return;
+			}
+		}
 		var at = place(s, items);
 		if (!(s > minScale()) || !modelInside(s, at)) {
 			apply(modelFit, place(modelFit, modelItems));
@@ -11132,35 +11212,79 @@ var EngCalcs = EngCalcs || {};
 			apply(s, at);
 			settleOnDrawnInk();
 		}
+		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
+		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
+		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
+		// the reasoning that a label about to gain a P= line deserved a frame drawn for it (pre-
+		// review 2026-09-24: Net2's node 1 ended 3 px under the coordinate readout). Tom, 2026-09-25,
+		// on exactly that behaviour: *"Zoom to fit pressed before results arrive runs once more when
+		// they land: I think this is what I forbade."* He has forbidden the view refitting itself
+		// after a solve, full stop -- **nothing about a solve finishing ever moves the view.** A
+		// press fits once, when pressed; a solve landing later leaves the view exactly where it was.
 		if (auto) { rebaseSignatureIfClean(); }
 		// Step 3. Each measured box becomes a fit item anchored at a WORLD point with a reach in
 		// PIXELS, which is the shape a label really has: a node label is anchored at its home
 		// endpoint (nodeLabelBase(), the user's drag included), anything else at its own centre.
 		// The nudge the placement pass added is then pixels of reach, which is what it is.
+		//
+		// **AND NOTHING MAY END UNDER THE MAP'S FURNITURE** (R-216, Tom 2026-09-24: *"Zooms almost
+		// to fit. Only the scale bar obscures a label."*). The two bands above reserve the top and
+		// bottom strips by their measured height, but a corner overlay -- the scale bar when the
+		// strip wraps, the tile credit, the +/- chip, a legend -- is a rectangle, not a band, and it
+		// changes size after the fit it sits over (the scale bar appears, a legend fills in). So the
+		// settle asks the real question: is any node or any piece of drawn lettering under any
+		// overlay, measured as drawn? For each one that is, the edge it hugs is reserved to the
+		// overlay's own measured depth -- whichever edge gives up the smaller share of the canvas --
+		// and the fit is solved again. Reserves only grow and the scale only steps down, so it ends.
 		function settleOnDrawnInk() {
-			var k, ink, all, s2, p2;
+			var k, all, s2, p2, hit;
 			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
 				reshedNow();
-				ink = drawnInkItems();
-				if (inkInside(ink)) { return; }
-				all = modelItems.concat(ink);
+				all = modelItems.concat(drawnInkItems());
+				hit = firstObstruction(all);
+				if (!hit) { return; }
+				if (hit !== true) { reserveEdgeFor(hit); }
 				items = all;
 				s2 = Math.min(state.s, solve());
 				if (!(s2 > minScale())) { return; }
 				p2 = place(s2, all);
+				// A step down that would hide the labels is not made for their sake: hiddenSideFit().
+				if (!labelsPastThreshold(state.s) && labelsPastThreshold(s2)) {
+					s2 = hiddenSideFit(s2, state.s);
+					p2 = place(s2, modelItems);
+				}
 				if (!modelInside(s2, p2)) { return; }
 				apply(s2, p2);
 			}
 			reshedNow();
 		}
-		function inkInside(ink) {
-			var i, it, x, y, e = 0.5;
-			for (i = 0; i < ink.length; i++) {
-				it = ink[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
-				if (x - it.l < pad - e || x + it.r > r.width - pad + e ||
-					y - it.t < padTop - e || y + it.b > r.height - padBottom + e) { return false; }
+		// `true` when something is outside the padded frame, the overlay's rectangle when something
+		// is under an overlay, null when all is clear.
+		function firstObstruction(all) {
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			for (i = 0; i < all.length; i++) {
+				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
+				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
+				for (j = 0; j < furn.length; j++) {
+					f = furn[j];
+					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				}
+				if (bl < padLeft - e || br > r.width - padRight + e ||
+					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
 			}
-			return true;
+			return outside || null;
+		}
+		function reserveEdgeFor(f) {
+			var gap = 4, cands = [
+				{ k: 'top', d: f.b, span: r.height }, { k: 'bottom', d: r.height - f.t, span: r.height },
+				{ k: 'left', d: f.r, span: r.width }, { k: 'right', d: r.width - f.l, span: r.width }
+			];
+			cands.sort(function (a, b) { return a.d / a.span - b.d / b.span; });
+			var c = cands[0], v = c.d + gap;
+			if (c.k === 'top') { padTop = Math.max(padTop, v); }
+			else if (c.k === 'bottom') { padBottom = Math.max(padBottom, v); }
+			else if (c.k === 'left') { padLeft = Math.max(padLeft, v); }
+			else { padRight = Math.max(padRight, v); }
 		}
 	}
 
@@ -12757,6 +12881,19 @@ var EngCalcs = EngCalcs || {};
 	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
 	// pinch come through here, so the two cannot come to different ideas about which is happening.
 	function wheelZoom(sx, sy, factor) {
+		// **ANY ZOOM BY ANY OTHER MEANS MAKES THE NEXT Zoom to fit PRESS A FIRST PRESS** (R-216, Tom
+		// 2026-09-24: *"Scrolling the map to zoom doesn't reset the Zoom to fit clicks, and this is
+		// startling."*). The wheel is not a pointerdown or a keydown, so wireZoomArmReset() never
+		// saw it; this door is the one the wheel, the pinch, the +/- chip and the keyboard all use.
+		//
+		// **AND IT RESETS THE FACE AS WELL AS THE FLAG.** Two presses in a row leave the button in
+		// Zoom Window, where `zoomToolArmed` is already false -- so clearing the flag alone left a
+		// + click or a wheel notch with the button still saying Zoom Window (pre-review,
+		// 2026-09-24). A Zoom Window with NO box started yet is dropped back to Select, which puts
+		// the face back to Zoom to fit; one with its first corner down is kept, because zooming to
+		// find the second corner is part of drawing that box, not a different action.
+		zoomToolArmed = false;
+		if (mode === 'zoom-window' && !zoomWinDrag && !zoomWinPressAt) { setMode('select'); }
 		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
 		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
 		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
@@ -12786,6 +12923,42 @@ var EngCalcs = EngCalcs || {};
 		state.tx = lx - wx * state.s; state.ty = ly - wy * state.s;
 		setTransform();
 		onZoomChanged();
+	}
+	// **THE ONE STEP EVERY NON-GESTURE ZOOM CONTROL TAKES** (ROADMAP Task 682). The wheel moves the
+	// point under the cursor by 1.1x/notch (`wirePointerEvents()`'s wheel listener); a keyboard or a
+	// button has no cursor position to hold still, so it zooms about the view's own centre instead,
+	// through the SAME `wheelZoom()` the wheel and the pinch already call -- one door, so the +/-
+	// keys, the on-map chip and the toolbar's own zoom cannot come to a different idea of what a
+	// "step" is, and so mapgeo's step-2 camera rule (see wheelZoom()'s own comment) covers them too.
+	function keyZoom(factor) {
+		if (!svg) { return; }
+		var r = svg.getBoundingClientRect();
+		wheelZoom(r.left + r.width / 2, r.top + r.height / 2, factor);
+	}
+	// **THE ON-MAP +/- CHIP** (ROADMAP Task 682) -- markup is the empty shell in Looped-Network.php;
+	// this fills it through the same icon+aria-label+tip door every toolbar icon button already
+	// uses. `EngCalcs.setIconLabel()` DIRECTLY, not the local `setIconLabel()` wrapper a few
+	// thousand lines down: that wrapper also feeds Help > "What the toolbar icons mean"
+	// (toolbarIconIndex), and this chip is not a toolbar button.
+	function wireZoomControl() {
+		var pc = EngCalcs.pageConfig || {},
+			inBtn = document.getElementById('lpn_zoom_in'),
+			outBtn = document.getElementById('lpn_zoom_out');
+		// **THE TIP IS THE WHOLE TIP, NOT "Name -- tip".** Tom, 2026-09-25: *"The + and - button tips
+		// both have their action repeated. Use this form: 'Zoom in. Shortcut: +'."* The tip already
+		// says the action, so setIconLabel()'s joined title would say it twice; the name stays as
+		// the accessible name alone.
+		function tipOnly(btn, tip) { if (tip) { EngCalcs.setTipText(btn, tip); } }
+		if (inBtn) {
+			EngCalcs.setIconLabel(inBtn, 'zoom-in', pc.lpn_zoom_in || 'Zoom in', pc.lpn_zoom_in_tip);
+			tipOnly(inBtn, pc.lpn_zoom_in_tip);
+			inBtn.addEventListener('click', function () { keyZoom(1.1); });
+		}
+		if (outBtn) {
+			EngCalcs.setIconLabel(outBtn, 'zoom-out', pc.lpn_zoom_out || 'Zoom out', pc.lpn_zoom_out_tip);
+			tipOnly(outBtn, pc.lpn_zoom_out_tip);
+			outBtn.addEventListener('click', function () { keyZoom(1 / 1.1); });
+		}
 	}
 
 	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A LAT/LON ONE (ROADMAP Task 145) -----------
@@ -13711,6 +13884,120 @@ var EngCalcs = EngCalcs || {};
 		s = Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity) * SEARCH_FIT_PAD;
 		if (!isFinite(s) || s <= 0) { return 0; }
 		return Math.min(s, w / (SEARCH_FIT_FLOOR_M * DEG_PER_M));
+	}
+
+	// ---- ZOOM WINDOW: Tom's own second half of Task 682, "drag a box and zoom to it" -------------
+	// This is NOT fitScaleForBox() above: that helper's floor is stated in DEGREES
+	// (`SEARCH_FIT_FLOOR_M * DEG_PER_M`), which is only ever a correct unit for a geographic
+	// project, and it is only ever called with a box built that way (goToLatLon()'s `xg` branch
+	// passes no box at all). A Zoom Window box is drawn in WHATEVER FRAME `screenToWorld()` already
+	// reads -- degrees, a projected plane, or a plain XY grid -- so its scale is the plain
+	// pixels-per-drawing-unit ratio, with min/maxScale()'s own per-frame clamp (applyView() applies
+	// it) doing the only bounding this needs.
+	function zoomWindowScale(box) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0, dx, dy;
+		if (!w || !h || !box) { return 0; }
+		dx = Math.abs(box.x2 - box.x1);
+		dy = Math.abs(box.y2 - box.y1);
+		if (!(dx > 0) && !(dy > 0)) { return 0; }
+		return Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity);
+	}
+	function zoomToBox(box) {
+		var s = zoomWindowScale(box);
+		if (!(s > 0) || !isFinite(s)) { return; }
+		applyView({ cx: (box.x1 + box.x2) / 2, cy: (box.y1 + box.y2) / 2, s: s });
+	}
+	// **ONE MARQUEE, DRAWN IN WORLD COORDINATES LIKE select-area's** (so a pan mid-drag moves the
+	// box with the map, though nothing here allows panning while it is open), built in init()
+	// beside selectAreaEl. Its own small state rather than sharing select-area's `areaRing` --
+	// select-area remembers its shape (window/lasso/polygon) ACROSS mode switches, and folding a
+	// second tool into that memory would mean a Zoom Window drag could silently change what
+	// select-area draws next, or vice versa.
+	var zoomWinEl = null;
+	var zoomWinDrag = null;   // { id: pointerId, start: {x,y}, live: {x,y} } in WORLD coords, or null
+	function zoomWinPoints() {
+		if (!zoomWinDrag) { return []; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live || a;
+		return EngCalcs.lpnGeom.rectRing(a.x, a.y, b.x, b.y);
+	}
+	function paintZoomWin() {
+		var pts = zoomWinPoints();
+		if (!zoomWinEl) { return; }
+		if (!pts.length) { zoomWinEl.style.display = 'none'; return; }
+		zoomWinEl.style.display = '';
+		zoomWinEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
+	}
+	function zoomWinBegin(w, pointerId) {
+		zoomWinDrag = { id: pointerId, start: { x: w.x, y: w.y }, live: { x: w.x, y: w.y } };
+		paintZoomWin();
+	}
+	function zoomWinMove(w) {
+		if (!zoomWinDrag) { return; }
+		zoomWinDrag.live = { x: w.x, y: w.y };
+		paintZoomWin();
+	}
+	// Leaving the mode mid-drag (Escape, another tool, undo's own snapshot) drops the box rather
+	// than zooming to a rectangle the user never finished asking for -- the same rule Task 266's
+	// half-drawn marquee follows.
+	function zoomWinCancel() { zoomWinDrag = null; zoomWinPressAt = null; paintZoomWin(); }
+	function zoomWinFinish() {
+		if (!zoomWinDrag) { return; }
+		var a = zoomWinDrag.start, b = zoomWinDrag.live;
+		zoomWinDrag = null;
+		paintZoomWin();
+		// A press that never travelled is a click, not a box, and has nothing to zoom to -- stay in
+		// the mode so the same press-drag-release can be retried, exactly as a mis-aimed
+		// select-area click leaves that tool armed.
+		if (Math.abs(b.x - a.x) < 1e-9 && Math.abs(b.y - a.y) < 1e-9) { return; }
+		zoomToBox({ x1: Math.min(a.x, b.x), y1: Math.min(a.y, b.y),
+			x2: Math.max(a.x, b.x), y2: Math.max(a.y, b.y) });
+		// **A COMPLETED DRAG IS A ONE-SHOT COMMAND, LIKE ZOOM TO FIT, NOT A LINGERING TOOL** -- the
+		// same reading of Tom's "second time you click it" that makes `zoomToolShape` reset to
+		// 'fit' rather than a remembered preference (see its own comment). setMode()'s own
+		// zoom-window exit hook does that reset and repaints the toolbar button.
+		setMode('select');
+	}
+	// **R-180 (Tom, 2026-09-23): "It seems inconsistent for us to use click for selection, but drag
+	// for zoom. I think we should have a consistent idiom."** Ida's answer: Zoom Window takes
+	// EXACTLY the gesture shape select-area's window already takes -- click-a-corner,
+	// click-the-opposite-corner, OR press-drag-release, both committing the same box (EPANET's own
+	// Zoom-In tool is click-click; the suite already defers to EPANET's conventions). This mirrors
+	// `areaPress()`/`areaPointerUp()` (`:15547`/`:15612` in Ida's own citation) but reads and writes
+	// `zoomWinDrag` alone, never `areaRing` -- the two tools' state stays deliberately unshared, per
+	// the comment on `zoomWinDrag`'s own declaration above.
+	//
+	// `zoomWinPressAt` is `areaPressAt`'s exact counterpart: recorded on every press, before the
+	// press itself runs, so `started` can still answer "did THIS press open the box" after the
+	// press has changed what `zoomWinDrag` holds.
+	var zoomWinPressAt = null;   // { id: pointerId, x, y, started } in SCREEN coords, or null
+	// One press in zoom-window mode. No box open yet: this press OPENS one, exactly like
+	// `areaPress()`'s first call. A box already open: this press is the "second click" of a
+	// click-click pair, and commits it immediately -- `zoomWinFinish()`'s own zero-movement guard
+	// then protects a genuine miss (two clicks on the same spot) by leaving the box open rather
+	// than zooming to nothing.
+	function zoomWinPress(w, pointerId) {
+		if (!zoomWinDrag) { zoomWinBegin(w, pointerId); return 'start'; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return 'commit';
+	}
+	// **THE RELEASE OF A PRESS-DRAG-RELEASE, ON A POINTER** -- `areaPointerUp()`'s counterpart. A
+	// release that never travelled past the tap threshold is the up-stroke of an ordinary click
+	// that just opened the box (or, before this existed, was silently discarded by
+	// `zoomWinFinish()`'s own zero-movement guard on every plain click -- the defect R-180 named).
+	// Leaving the box open there, instead of finishing, is what makes the SECOND click able to find
+	// it and close it. A release that DID travel is a genuine drag ending, and commits exactly as
+	// before.
+	function zoomWinPointerUp(e, w) {
+		var from = zoomWinPressAt;
+		if (!from || from.id !== e.pointerId) { return false; }
+		zoomWinPressAt = null;
+		if (!from.started || !zoomWinDrag) { return false; }
+		if (Math.hypot(e.clientX - from.x, e.clientY - from.y) < tapMovePx(e)) { return false; }
+		zoomWinMove(w);
+		zoomWinFinish();
+		return true;
 	}
 
 	// ---- Task 497: elevations read from the land surface ------------------------------------------
@@ -15791,6 +16078,59 @@ var EngCalcs = EngCalcs || {};
 	// it builds its button; before that (and in a harness that builds no toolbar) there is simply
 	// nothing to repaint.
 	var repaintAreaTool = null;
+	// **THE ZOOM TO FIT / ZOOM WINDOW DOUBLE DUTY'S OWN SHOWN SHAPE** (ROADMAP Task 682; Tom,
+	// 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select area button.
+	// ... The second time you click it, it changes to Zoom Window."). Unlike `selectAreaShape`,
+	// which is a standing PREFERENCE remembered across mode switches, this is a one-shot disclosure:
+	// leaving the tool (`setMode()`'s cancel block) always drops it back to 'fit', because the
+	// default and by far the more common press is Zoom to fit, and Zoom Window is reached by
+	// pressing it a second time rather than by a memory of what was last used.
+	var zoomToolShape = 'fit';   // 'fit' | 'window'
+	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
+	// **R-181 (Tom, 2026-09-23): "the first time you click, it does not change modes... I think
+	// that it should act like Select area. Click twice in a row to get mode change."** This is a
+	// SEPARATE flag from `zoomToolShape` above on purpose (Ida's spec) -- `zoomToolShape` is what
+	// the button currently SHOWS, and R-181 asks that the first press not change what it shows at
+	// all, so the paint decision and the "was the last press this same button, with nothing else
+	// pressed in between" question cannot share one variable. Set true the instant Zoom to fit
+	// fires; cleared on ANY other user action -- a mode change (setMode()'s own reset, kept as a
+	// belt-and-braces second door), OR an ordinary pointerdown/keydown anywhere that is not this
+	// same button (see `wireZoomArmReset()`).
+	//
+	// **THE FIRST SHIP OF THIS ONLY CLEARED IT ON A MODE CHANGE, AND THAT WAS WRONG** (pre-review,
+	// 2026-09-23, confirmed live in Chromium): press Zoom to fit once, click an ordinary map
+	// element to select or deselect it -- which never calls setMode(), since Select mode never
+	// leaves 'select' to look at something in it -- then press the button again, and it jumped
+	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
+	// TWICE IN A ROW", and a click on the map in between is not that.
+	var zoomToolArmed = false;
+	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
+	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
+	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
+	// otherwise leave a closure over a detached element.
+	var zoomToolButton = null;
+	var zoomArmResetWired = false;
+	// **THE ONE DOOR THAT UN-ARMS THE SECOND PRESS ON "ANYTHING ELSE"**, wired ONCE regardless of
+	// how many times wireToolbar() rebuilds the strip -- a second copy would just re-clear a flag
+	// that is already false, which is harmless, but a growing pile of document listeners is not
+	// nothing over a long session. Capture phase, so this runs before the target's own handler
+	// gets a chance to do anything, matching how Escape's own document listener is wired.
+	//
+	// **EXCLUDES THE BUTTON ITSELF** (`zoomToolButton.contains(e.target)`, true for a click landing
+	// on its icon's <svg>/<path> rather than the <button> element), because the button's own
+	// pointerdown fires before its own 'click' -- resetting there would un-arm the very press this
+	// flag exists to remember, one event early.
+	function wireZoomArmReset() {
+		if (zoomArmResetWired) { return; }
+		zoomArmResetWired = true;
+		function onOtherAction(e) {
+			if (!zoomToolArmed) { return; }
+			if (zoomToolButton && (e.target === zoomToolButton || (zoomToolButton.contains && zoomToolButton.contains(e.target)))) { return; }
+			zoomToolArmed = false;
+		}
+		document.addEventListener('pointerdown', onOtherAction, true);
+		document.addEventListener('keydown', onOtherAction, true);
+	}
 	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
 	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
 	// simply nothing to fade.
@@ -25153,7 +25493,8 @@ var EngCalcs = EngCalcs || {};
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text',
-		'vertices': 'lpn_mode_vertices'
+		'vertices': 'lpn_mode_vertices',
+		'zoom-window': 'lpn_mode_zoom_window'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
@@ -25176,6 +25517,21 @@ var EngCalcs = EngCalcs || {};
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// **R-181's ARMED FLAG UN-ARMS ON ANY MODE CHANGE, NOT ONLY A ZOOM-WINDOW EXIT** -- picking
+		// any other tool between the first and second press means there was no "second, consecutive
+		// press" left to complete (Ida's spec, Task 682 follow-up). This runs before the
+		// zoom-window-only block below because arming has nothing to do with being IN zoom-window
+		// mode -- the armed state lives entirely inside 'select', between the first Zoom to fit and
+		// a second press that has not happened yet.
+		if (newMode !== mode) { zoomToolArmed = false; }
+		// **ZOOM WINDOW IS THE SAME SHAPE OF HALF-DRAWN MARQUEE** (ROADMAP Task 682) -- and it also
+		// drops the toolbar button back to showing Zoom to fit, because the disclosure is one-shot
+		// rather than a remembered preference (see `zoomToolShape`'s own comment).
+		if (mode === 'zoom-window' && newMode !== 'zoom-window') {
+			zoomWinCancel();
+			zoomToolShape = 'fit';
+			if (repaintZoomTool) { repaintZoomTool(); }
+		}
 		// A half-placed meter dies with the tool, exactly as a half-drawn link does one line down:
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
@@ -25197,7 +25553,7 @@ var EngCalcs = EngCalcs || {};
 		// from sticking the way `lpn-panning` once did.
 		if (svg) {
 			svg.classList.toggle('lpn-placemode',
-				newMode.indexOf('add-') === 0 || newMode === 'select-area');
+				newMode.indexOf('add-') === 0 || newMode === 'select-area' || newMode === 'zoom-window');
 		}
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
@@ -34558,6 +34914,10 @@ var EngCalcs = EngCalcs || {};
 		// IN WORLD COORDINATES, like everything else in `world`: the ring is a shape on the
 		// drawing, so a pan mid-drag moves the map under it exactly as it moves the pipes.
 		selectAreaEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
+		// The Zoom Window box (ROADMAP Task 682) -- its own element rather than sharing
+		// selectAreaEl, because the two tools' state is deliberately not shared (see zoomWinDrag's
+		// own comment) and painting one over the other's element would race whichever tool last drew.
+		zoomWinEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
 		// The bends already picked (Task 567), in the same layer and the same red dash as the band:
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
@@ -34566,6 +34926,7 @@ var EngCalcs = EngCalcs || {};
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
+		wireZoomControl();
 		georefWireBar();
 		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
@@ -35049,11 +35410,60 @@ var EngCalcs = EngCalcs || {};
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
-		// **`zoomExtent` BY REFERENCE, so the click event arrives as its `auto` argument.** Left
-		// exactly as it was -- changing it is a behaviour change to the fit and belongs in its own
-		// task, not in a tooltip fix.
-		extentBtn.addEventListener('click', zoomExtent);
+		// **ZOOM TO FIT / ZOOM WINDOW: THE SAME DISCLOSURE IDIOM AS SELECT-AREA** (ROADMAP Task
+		// 682; Tom, 2026-09-17: "Make the Zoom to Fit toolbar button do double duty like the select
+		// area button. Give it a little triangle indicator. The second time you click it, it
+		// changes to Zoom Window."). `.lpn-tool-more` is the same class that draws select-area's
+		// corner triangle purely in CSS (`::after`, css/engcalcs.css) -- nothing new in the DOM for
+		// a screen reader to mistake for a second control.
+		extentBtn.className = 'lpn-tool-more';
+		extentBtn.dataset.tool = 'zoom-window';   // so setModeUI()'s generic aria-pressed sweep finds it
+		function paintZoomToolButton() {
+			if (zoomToolShape === 'window') {
+				setIconLabel(extentBtn, 'zoom-window', pc.lpn_tool_zoom_window || 'Zoom Window', pc.lpn_tool_zoom_window_tip);
+			} else {
+				setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
+			}
+			// ASSIGNED, not appended -- setIconLabel() adds .ec-help to whatever is already there,
+			// so a `+=` on a button repainted on every shape change would grow the class list
+			// without bound (the exact bug paintAreaButton()'s own comment names).
+			if (extentBtn.className.indexOf('lpn-tool-more') < 0) { extentBtn.className += ' lpn-tool-more'; }
+			extentBtn.dataset.tool = 'zoom-window';
+			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
+		}
+		extentBtn.addEventListener('click', function () {
+			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
+			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
+			// come back to, because Zoom to fit is what the button shows by default.
+			if (mode === 'zoom-window') { setMode('select'); return; }
+			// **R-181 (Tom, 2026-09-23): the FIRST press never changes what the button shows -- it
+			// only does what it already showed, exactly as select-area's own button never re-labels
+			// itself on the press that enters the tool.** `zoomToolArmed` is the one-shot memory of
+			// "the last thing pressed was this button, doing Zoom to fit, with nothing else in
+			// between" -- setMode()'s reset hook clears it on any other mode change, so it is only
+			// ever true here on a genuine SECOND, CONSECUTIVE press.
+			if (zoomToolArmed) {
+				zoomToolArmed = false;
+				zoomToolShape = 'window';
+				setMode('zoom-window');
+				paintZoomToolButton();
+				return;
+			}
+			// **`zoomExtent(false)`, EXPLICITLY, never a bare call** -- view-memory-harness.js
+			// greps the whole file for an unmarked `zoomExtent()` on the argument that every real
+			// call site must SAY whether it is a fit nobody asked for (Tom, 2026-08-15: "there are
+			// no automatic zooms or pans... a fit that establishes a view the document never had is
+			// not a change to it"). This one is a press, which is an edit, so it says so.
+			zoomExtent(false);
+			zoomToolArmed = true;
+			// **NO paintZoomToolButton() HERE, ON PURPOSE.** The face stays "Zoom to fit" -- Tom:
+			// "Changing the first time you click is confusing." `zoomToolShape` is untouched too,
+			// so a second press elsewhere (a different tool, then back here) starts this over.
+		});
+		repaintZoomTool = paintZoomToolButton;
+		zoomToolButton = extentBtn;
+		wireZoomArmReset();
+		paintZoomToolButton();
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
@@ -35273,6 +35683,13 @@ var EngCalcs = EngCalcs || {};
 			if (mode !== 'select-area') { return; }
 			areaMove(screenToWorld(e.clientX, e.clientY));
 		});
+		// The Zoom Window box, tracking only the ONE pointer that opened it (ROADMAP Task 682) --
+		// unlike the ring above, this gesture is a press-drag-release, so a hover with no button
+		// down must not move a box nobody is drawing.
+		svg.addEventListener('pointermove', function (e) {
+			if (mode !== 'zoom-window' || !zoomWinDrag || zoomWinDrag.id !== e.pointerId) { return; }
+			zoomWinMove(screenToWorld(e.clientX, e.clientY));
+		});
 		// The profile path chooser's hover (Task 433) -- the same shape as the rubber band above and
 		// for the same reason: between clicks the user must see what the next click would commit.
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
@@ -35345,6 +35762,18 @@ var EngCalcs = EngCalcs || {};
 					drag = { type: 'pan', tx0: state.tx, ty0: state.ty };
 				}
 				Object.assign(drag, common);
+				return;
+			}
+			// **ZOOM WINDOW IS ALSO ITS OWN MODE, FOR THE SAME REASON** (ROADMAP Task 682): the
+			// whole gesture is a press-drag-release box OR a click-click box (R-180), on a mouse or
+			// a finger alike, so `drag` (the pan/node/vertex/label state machine below) never arms
+			// while it is open.
+			if (mode === 'zoom-window') {
+				// Recorded BEFORE the press, exactly as select-area's own `areaPressAt` is, because
+				// `started` asks "did THIS press open the box" and there is no way left to ask that
+				// once zoomWinPress() has run.
+				zoomWinPressAt = { id: e.pointerId, x: e.clientX, y: e.clientY, started: !zoomWinDrag };
+				zoomWinPress(screenToWorld(e.clientX, e.clientY), e.pointerId);
 				return;
 			}
 			// **SELECT AREA IS ITS OWN MODE AND NOTHING ELSE HAPPENS IN IT** (Task 266). No node
@@ -35481,6 +35910,16 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
+			// The Zoom Window release (ROADMAP Task 682; R-180) -- a cancelled pointer drops the box
+			// rather than zooming to wherever the browser happened to take the gesture away, the
+			// same rule select-area's own cancel follows two lines down. A release that is not
+			// cancelled goes through `zoomWinPointerUp()`, exactly as select-area's own release
+			// does through `areaPointerUp()`: a release that never travelled leaves the box open
+			// for a second click, and only a release that DID travel commits it here.
+			if (mode === 'zoom-window') {
+				if (cancelled) { zoomWinPressAt = null; if (zoomWinDrag) { zoomWinCancel(); } }
+				else { zoomWinPointerUp(e, screenToWorld(e.clientX, e.clientY)); }
+			}
 			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
 			// because nothing else on this page owns that finger: select-area arms no `drag`.
 			if (mode === 'select-area') {
@@ -38094,6 +38533,9 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < host.childNodes.length; i++) { add(host.childNodes[i]); }
 		});
 		add(document.getElementById('lpn_basemap_credit'));
+		// The on-map zoom chip (ROADMAP Task 682) -- fixed top-right, the labels legend's own
+		// default corner, so a legend parked there dodges under it rather than through it.
+		add(document.getElementById('lpn_zoom_control'));
 		return out;
 	}
 	// **ONE FUNCTION PLACES BOTH LEGENDS**, in a fixed order, and each one placed becomes an occupant
@@ -47939,6 +48381,30 @@ var EngCalcs = EngCalcs || {};
 		setMode(m);
 	});
 
+	/**
+	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
+	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
+	 * entry's own citations for why not Ctrl/Cmd+`+`/`-`: every browser already claims that chord
+	 * for its own page zoom, and taking it back would surprise a visitor who has learned it.
+	 *
+	 * `=` IS BOUND TOO, because it is the unshifted key under `+` on a US layout and a QGIS-style
+	 * tool binds both -- a visitor should not have to hold Shift to zoom in.
+	 *
+	 * **THE GUARD IS THE ONE Ctrl+Z AND THE DIGIT PICKER ALREADY USE**, for the reason stated
+	 * beside the digit picker above: a bare `-` reaching a field would zoom the map out every time
+	 * somebody typed a negative elevation.
+	 *
+	 * The factor is `wheelZoom()`'s own 1.1 per notch (`wirePointerEvents()`'s wheel listener), so
+	 * a keyboard press is exactly one wheel notch -- through `keyZoom()`, the same door the wheel,
+	 * the pinch and the on-map chip all use, so none of them can disagree about what a "step" is.
+	 */
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key === '+' || e.key === '=') { e.preventDefault(); keyZoom(1.1); return; }
+		if (e.key === '-') { e.preventDefault(); keyZoom(1 / 1.1); }
+	});
+
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
 	// The solver's model shape is its own API and is NOT renamed here. doc.nodes/doc.links store
 	// every overridable property UNDERSCORED, so passing them through untouched hands the solver a
@@ -51975,6 +52441,8 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
+		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
 			lastSolveResult = null;
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 214 untranslated keys, of 2053 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 221 untranslated keys, of 2060 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (214, 2 to read @@ NEEDS RULING)
+## lpn_  (221, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -429,6 +429,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mode_add_meter`**
   > Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.
   _Ruled OK 2026-09-23._
+- **`lpn_mode_zoom_window`**
+  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
+  _Ruled OK 2026-09-25._
 - **`lpn_msglog_ago`**
   > {x} ago
   _Ruled OK 2026-09-23._
@@ -612,6 +615,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_tool_add_meter_tip`**
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   _Ruled OK 2026-09-23._
+- **`lpn_tool_zoom_window`**
+  > Zoom Window
+  _Ruled OK 2026-09-25._
+- **`lpn_tool_zoom_window_tip`**
+  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
+  _Ruled OK 2026-09-25._
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -669,12 +678,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_units_usft`**
   > US survey ft
   _Ruled OK 2026-09-25._
+- **`lpn_zoom_in`**
+  > Zoom in
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_in_tip`**
+  > Zoom in. Shortcut: +
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
+- **`lpn_zoom_out`**
+  > Zoom out
+  _Ruled OK 2026-09-25._
+- **`lpn_zoom_out_tip`**
+  > Zoom out. Shortcut: -
+  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
 
 ---
 
 # Strings waiting on a branch
 
-**32 still to read**, of 60 new keys across 6 unmerged branch(es).
+**31 still to read**, of 52 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -792,11 +813,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`0e0739c1`) — 21 new, 5 to read @@ NEEDS RULING
+### feat/table-editing (`850e3746`) — 20 new, 4 to read @@ NEEDS RULING
 
-- **`lpn_dialog_cancel`**
-  > Cancel
-  @@ NEEDS RULING
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>
   @@ NEEDS RULING
@@ -858,26 +876,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reverse the sort
   @@ NEEDS RULING
 
-### feat/zoom-control (`43902998`) — 7 new, all ruled
-
-- **`lpn_mode_zoom_window`**
-  > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
-  _Ruled OK 2026-09-25._
-- **`lpn_tool_zoom_window`**
-  > Zoom Window
-  _Ruled OK 2026-09-25._
-- **`lpn_tool_zoom_window_tip`**
-  > Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_in`**
-  > Zoom in
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_in_tip`**
-  > Zoom in. Shortcut: +
-  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
-- **`lpn_zoom_out`**
-  > Zoom out
-  _Ruled OK 2026-09-25._
-- **`lpn_zoom_out_tip`**
-  > Zoom out. Shortcut: -
-  _Ruled 2026-09-25: His own wording: "Use this form: 'Zoom in. Shortcut: +'."_
+### feat/zoom-control (`43902998`) — adds no English strings

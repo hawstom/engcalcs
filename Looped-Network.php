@@ -597,6 +597,27 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
 		      // 2026-07-30; default 'top-right' reproduces this div's original hardcoded position). ?>
 		<div id="lpn_labels_legend" style="display:none;position:absolute;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
+		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
+		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
+		      // (the one mapping vendor already on this page) puts its zoom stack in by default.
+		      //
+		      // TOP-RIGHT IS THE ONLY CALM CORNER (Ida, 2026-09-17): top-left already carries a
+		      // growing status column, bottom-left holds seven things, bottom-right is the
+		      // non-dismissible tile attribution. Styled like every other chip in that population --
+		      // rgba(255,255,255,.85), a thin border, nothing new drawn on the page.
+		      //
+		      // HIDDEN BELOW THE 640PX BREAKPOINT (css/engcalcs.css) -- a finger pinches instead.
+		      //
+		      // EMPTY IN THE MARKUP: filled by wireZoomControl() in js/looped-network.js, through the
+		      // same icon+aria-label+tip door every toolbar icon button already uses
+		      // (EngCalcs.setIconLabel()), so this gets an accessible name and a touch-reachable tip
+		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
+		      // labels legend dodges under it instead of through it. ?>
+		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:rgba(255,255,255,.85);border:1px solid #999">
+			<button type="button" id="lpn_zoom_in" style="width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
+		</div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>
@@ -1767,6 +1788,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_vertices_tip: <?=json_encode($ec_lang['lpn_tool_vertices_tip'])?>,
 	lpn_tool_delete: <?=json_encode($ec_lang['lpn_tool_delete'])?>,
 	lpn_tool_zoom_extent: <?=json_encode($ec_lang['lpn_tool_zoom_extent'])?>,
+	lpn_tool_zoom_window: <?=json_encode($ec_lang['lpn_tool_zoom_window'])?>,
+	lpn_zoom_in: <?=json_encode($ec_lang['lpn_zoom_in'])?>,
+	lpn_zoom_out: <?=json_encode($ec_lang['lpn_zoom_out'])?>,
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
@@ -2300,6 +2324,7 @@ EngCalcs.pageConfig = {
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
 	lpn_mode_vertices: <?=json_encode($ec_lang['lpn_mode_vertices'])?>,
+	lpn_mode_zoom_window: <?=json_encode($ec_lang['lpn_mode_zoom_window'])?>,
 	lpn_select_first: <?=json_encode($ec_lang['lpn_select_first'])?>,
 	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
 	lpn_mode_add_reservoir: <?=json_encode($ec_lang['lpn_mode_add_reservoir'])?>,
@@ -2527,6 +2552,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_delete_tip: <?=json_encode($ec_lang['lpn_tool_delete_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
+	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
+	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
 	lpn_tool_settings_tip: <?=json_encode($ec_lang['lpn_tool_settings_tip'])?>,
 	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
 	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,

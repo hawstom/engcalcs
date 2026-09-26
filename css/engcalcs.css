@@ -4141,7 +4141,29 @@ tr.lpn-ff-error { background: #f2f2f2; }
 		max-height: 33svh;
 		overflow-y: auto;
 	}
+
+	/* 9. THE ON-MAP ZOOM CHIP GOES BELOW ITS OWN BREAKPOINT (ROADMAP Task 682; Ida, 2026-09-17):
+	   the whole reason it exists is a visitor with no wheel and no pinch surface, and a
+	   touchscreen supplies one of its own -- Tom, 2026-08-22: "on a phone, zoom in is the answer.
+	   You can't see through your finger... A finger is not a mouse!" Hidden at the same width the
+	   toolbar's non-transport groups already collapse at, not a new figure. */
+	html:has(#lpn_canvas) #lpn_zoom_control { display: none; }
 }
+
+/* The on-map zoom chip's layout lives here, not inline, so the phone rule above can hide it: an
+   inline display would beat any stylesheet rule (Perry, 2026-09-23). */
+#lpn_zoom_control { display: flex; flex-direction: column; }
+
+/* R-179 (Tom, 2026-09-23): "The + and - glyphs are not centered in their boxes." Each button had
+   no layout of its own, so the icon fell back to being an ordinary inline glyph -- `button >
+   .ec-icon`'s `margin-inline-end: 0.4em` (the gap it earns everywhere it prefixes a WORD) shoved
+   it left of centre here, where there is no word to gap from, and `.ec-icon`'s
+   `vertical-align: -0.16em` (tuned to sit on a line of TEXT's optical centre) had no baseline to
+   sit on in an otherwise-empty button. Flex centring on the button answers both axes at once, and
+   the margin is zeroed the same way the lpn menu's icon column already zeroes it for its own
+   icon-only cells. */
+#lpn_zoom_in, #lpn_zoom_out { display: flex; align-items: center; justify-content: center; }
+#lpn_zoom_in > .ec-icon, #lpn_zoom_out > .ec-icon { margin-inline-end: 0; }
 
 /* ---- The profile's path chooser (Tasks 433, 504) ---------------------------------------------
    The line that says what the next press does. It lives in the profile panel's control row, which

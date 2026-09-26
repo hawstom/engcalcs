@@ -868,6 +868,9 @@ $ec_lang['lpn_tool_area_polygon']='Select a polygon';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
+$ec_lang['lpn_tool_zoom_window']='Zoom Window';
+$ec_lang['lpn_zoom_in']='Zoom in';
+$ec_lang['lpn_zoom_out']='Zoom out';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
 $ec_lang['lpn_field_text_bold']='Bold text';
@@ -1272,7 +1275,12 @@ $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Click a pipe to
 $ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
 $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map.';
+$ec_lang['lpn_tool_zoom_window_tip']='Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.';
+// Tom's wording, 2026-09-25.
+$ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
+// Tom's wording, 2026-09-25.
+$ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
@@ -2427,6 +2435,7 @@ $ec_lang['lpn_mode_select']='Mode: Select. Click an asset or a label to see or c
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an asset to remove it.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode.';
+$ec_lang['lpn_mode_zoom_window']='Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='Nothing is selected. Click an asset on the map first, then press Delete.';

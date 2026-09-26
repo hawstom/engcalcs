@@ -276,6 +276,16 @@ $ec_icons = array(
 	// magnifier as not-simplifiable and pointed at a zoom-to-extents mark; this is that idea —
 	// the frame growing to meet the drawing, with no lens to misread as plain "zoom in".
 	'zoom'       => '<path d="M3 9V3h6"/><path d="M21 9V3h-6"/><path d="M3 15v6h6"/><path d="M21 15v6h-6"/><path d="M9.5 9.5h5v5h-5z"/>',
+	// Zoom window: the Zoom to fit toolbar button's second mode (ROADMAP Task 682) -- a dashed
+	// rectangle, the same disclosure idiom as select-window, with a magnifier at its corner
+	// instead of select-window's plus, so the two double-duty buttons read as different commands.
+	'zoom-window' => '<rect x="3" y="4.5" width="12" height="10" stroke-dasharray="3 2.4"/><circle cx="16" cy="16" r="4"/><path d="M19.1 19.1l3 3" stroke-width="2"/>',
+	// The map-corner +/- chip (ROADMAP Task 682), for a visitor with no wheel and no pinch surface.
+	// Plain strokes, not the magnifier `zoom` above -- every zoom control this scope's own
+	// citations found (Mapbox's NavigationControl, Google Maps, QGIS) draws a bare plus and minus,
+	// and matching that is matching the ONE convention this space actually has.
+	'zoom-in'    => '<path d="M12 5v14M5 12h14"/>',
+	'zoom-out'   => '<path d="M5 12h14"/>',
 	'labels'     => '<path d="M20.6 13.4L13 21l-9-9V4h8z"/><circle cx="7.6" cy="7.6" r="1.5"/>',
 	// A LONG-SECTION, not a line chart (Tom, 2026-08-18: "a jagged profile arising from the
 	// baseline"). The difference is that the ground line is CLOSED down to the datum at both ends,
