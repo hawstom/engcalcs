@@ -194,8 +194,9 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   gated on `EC_MAPBOX_TOKEN`. Never cached, never precached, attribution required, stored as
   `project.basemap`. Elevation fill has exactly two doors — `Settings > New assets > Elevation
   source` and `From Mapbox DEM` in Find and replace. **Do not add a third.**
-- **Four third-party requests, all on this page, all opt-in:** OSM tiles, Mapbox satellite,
-  Nominatim search (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`).
+- **Four third-party requests, all on this page:** OSM tiles, Mapbox satellite, Nominatim search
+  (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`). OSM tiles show
+  behind the first, empty project (Tom, 2026-09-25); the other three are opt-in.
   Never write "the only third-party request". A fifth service is a new paragraph in `privacy.php`,
   not a `consent_body` change.
 - **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** Never store

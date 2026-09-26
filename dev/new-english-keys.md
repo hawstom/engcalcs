@@ -592,7 +592,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`47649c32`) — 28 new, 1 to read @@ NEEDS RULING
+### feat/convert-as (`019ffcd0`) — 28 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -679,7 +679,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   _Ruled OK 2026-09-25._
 
-### feat/customer-node (`cd7640b1`) — 2 new, all ruled
+### feat/customer-node (`6dd9fb71`) — 2 new, all ruled
 
 - **`lpn_field_meter_node`**
   > Connected to
@@ -688,7 +688,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
   _Ruled OK 2026-09-26._
 
-### feat/first-project (`f775f0a6`) — adds no English strings
+### feat/first-project (`f6760e1e`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -716,7 +716,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Filtered by {q}. {rows}.
   _Ruled OK 2026-09-26._
 
-### feat/table-editing (`34b757b8`) — 17 new, 1 to read @@ NEEDS RULING
+### feat/table-editing (`b7398d0b`) — 17 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
@@ -770,7 +770,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sort descending
   _Ruled OK 2026-09-26._
 
-### feat/zoom-control (`dc1fa5a9`) — 7 new, all ruled
+### feat/zoom-control (`3200afa9`) — 7 new, all ruled
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.

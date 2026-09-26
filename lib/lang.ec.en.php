@@ -974,7 +974,7 @@ $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save i
 $ec_lang['lpn_examples_open']='Open';
 $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb';
 $ec_lang['lpn_examples_menu']='Open example…';
-$ec_lang['lpn_examples_blank']='Or start with a blank map';
+$ec_lang['lpn_examples_blank']='Or start here';
 // The SAME exit, worded for the other way in. Opened from File the user already has work on
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
