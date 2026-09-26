@@ -37,9 +37,11 @@ function ok(label, cond, detail) {
 const html = execFileSync('php', [path.join(root, 'dev/scripts/render_page.php'), 'Looped-Network.php'],
 	{ encoding: 'utf8', maxBuffer: 1024 * 1024 * 32 });
 
-const wantGeo = PC.lpn_new_coordsys_geo;
+// convert-as (2026-09-25) deleted lpn_new_coordsys_geo; radio 1 now reuses the Convert as box's
+// own label, lpn_convas_epsg, so both doors name the choice the same way.
+const wantGeo = PC.lpn_convas_epsg;
 const wantLocal = PC.lpn_new_coordsys_local;
-ok('lib/lang.ec.en.php states lpn_new_coordsys_geo', typeof wantGeo === 'string', wantGeo);
+ok('lib/lang.ec.en.php states lpn_convas_epsg', typeof wantGeo === 'string', wantGeo);
 ok('lib/lang.ec.en.php states lpn_new_coordsys_local', typeof wantLocal === 'string', wantLocal);
 
 console.log('\n--- New project wizard: coordinate-system radios ---');
@@ -48,7 +50,7 @@ console.log('\n--- New project wizard: coordinate-system radios ---');
 	const localRow = (html.match(/<label><input type="radio" name="lpn_new_coords" value="local"[^>]*>[\s\S]*?<\/label>/) || [''])[0];
 
 	ok('radio 1 exists', !!geoRow);
-	ok('radio 1 reads exactly what lpn_new_coordsys_geo says, today',
+	ok('radio 1 reads exactly what lpn_convas_epsg says, today',
 		typeof wantGeo === 'string' && geoRow.indexOf('>' + wantGeo + ' <span class="ec-tip">?</span>') >= 0,
 		{ geoRow, wantGeo });
 
