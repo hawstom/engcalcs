@@ -1777,7 +1777,6 @@ EngCalcs.pageConfig = {
 	lpn_pane_manage_cols_bottom: <?=json_encode($ec_lang['lpn_pane_manage_cols_bottom'])?>,
 	lpn_pane_colmenu_tip: <?=json_encode($ec_lang['lpn_pane_colmenu_tip'])?>,
 	lpn_pane_sortarrow_tip: <?=json_encode($ec_lang['lpn_pane_sortarrow_tip'])?>,
-	lpn_dialog_cancel: <?=json_encode($ec_lang['lpn_dialog_cancel'])?>,
 	lpn_tool_area_window: <?=json_encode($ec_lang['lpn_tool_area_window'])?>,
 	lpn_tool_area_lasso: <?=json_encode($ec_lang['lpn_tool_area_lasso'])?>,
 	lpn_tool_area_polygon: <?=json_encode($ec_lang['lpn_tool_area_polygon'])?>,

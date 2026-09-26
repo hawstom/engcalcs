@@ -23863,7 +23863,7 @@ var EngCalcs = EngCalcs || {};
 				paneTableReset(spec);
 				renderPaneTable(spec);
 			} },
-			{ label: pc.lpn_dialog_cancel || 'Cancel', fn: function () { }, gapBefore: true }
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { }, gapBefore: true }
 		]);
 	}
 

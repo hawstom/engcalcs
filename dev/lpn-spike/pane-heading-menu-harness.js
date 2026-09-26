@@ -219,7 +219,7 @@ console.log('\n--- 4. Manage columns: nothing applies until OK; Cancel discards;
 	now = dialogRows();
 	report(rowLabel(now[now.length - 2]) === label1, 'Move down moves it back down one step', JSON.stringify(now.map(rowLabel)));
 	// Cancel: the live table must show the untouched original order and hidden state.
-	fire(dialogOkCancel(PC.lpn_dialog_cancel), 'click', {});
+	fire(dialogOkCancel(PC.lpn_cancel), 'click', {});
 	report(JSON.stringify(L.colKeys('junctions')) === JSON.stringify(before), 'Cancel discards every change made in the dialog',
 		JSON.stringify(L.colKeys('junctions')));
 	report(before.every((k, i) => L.colHidden('junctions', k) === beforeHidden[i]), '...including every Show checkbox');

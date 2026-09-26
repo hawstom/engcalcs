@@ -249,7 +249,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(labelsNow[labelsNow.length - 2] === rowLabels[1], '"' + moveDown + '" moves it back down one step', JSON.stringify(labelsNow));
 		// **CANCEL DISCARDS EVERYTHING** -- close this dialog without OK and reopen: the live table
 		// (and a fresh dialog) must show the ORIGINAL order and every column still checked.
-		await a.dialogClick(await a.lang('lpn_dialog_cancel') || 'Cancel');
+		await a.dialogClick(await a.lang('lpn_cancel') || 'Cancel');
 		await a.settle(150);
 		report.ok(JSON.stringify(await keys(a)) === JSON.stringify(before), 'Cancel discards every change made in the dialog', JSON.stringify(await keys(a)));
 		// Reopen and this time press OK: the move-to-top and the unchecked third row both land.

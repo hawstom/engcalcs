@@ -1891,7 +1891,6 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
-$ec_lang['lpn_dialog_cancel']='Cancel';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';

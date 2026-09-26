@@ -187,6 +187,22 @@ async function main() {
 				await page.click('#lpn_pane_tab_junctions');
 				await page.waitForTimeout(300);
 
+				// **HIDE THE "..." MENU GLYPH AND THE SORT ARROW BEFORE SAMPLING** (2026-09-25, second
+				// pass: the "..." glyph became ALWAYS-VISIBLE rather than hover-only, so a plain
+				// screenshot now paints it on every heading where it used to be invisible opacity:0
+				// pixels). Both sit in the same trailing gutter this harness's y=6 sample row crosses
+				// (`.lpn-pane-colmenu` is `top:1px; height:1.1em`), a few device pixels inboard of the
+				// REAL divider -- which is exactly the "extra vertical divider 8-16 device px before
+				// the real one" a browser-pass reviewer measured. `visibility: hidden` removes only
+				// their own pixels; it does not touch the TH's own box-shadow divider, which is what
+				// this harness exists to compare. Confirmed the cause, not guessed: with these two
+				// selectors NOT hidden, heading-only extra single-pixel columns (e.g. 154, 767, 961 at
+				// dsf=1.5) sit ~10-14px inboard of every real, PAIRED divider reading (e.g. 165,166),
+				// and the real divider pairs already matched the body's, at every dsf tried -- so the
+				// box-shadow alignment fix this harness guards is intact; only the sample was picking
+				// up a second, unrelated control that was never a divider.
+				await page.addStyleTag({ content: '.lpn-pane-colmenu, .lpn-pane-sortarrow { visibility: hidden; }' });
+
 				if (forceScrollbarGutter) {
 					await page.evaluate(() => {
 						const host = document.getElementById('lpn_pane_junctions');

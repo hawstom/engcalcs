@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 235 untranslated keys, of 2074 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read on master**, of 234 untranslated keys, of 2073 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (235, 7 to read @@ NEEDS RULING)
+## lpn_  (234, 6 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -117,9 +117,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
-- **`lpn_dialog_cancel`**
-  > Cancel
-  @@ NEEDS RULING
 - **`lpn_engine_bar_label`**
   > Solver loading progress
   _Ruled OK 2026-09-23._
@@ -737,7 +734,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**29 still to read**, of 39 new keys across 6 unmerged branch(es).
+**29 still to read**, of 39 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -747,6 +744,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/handoff-0925d (`baea1c8e`) — adds no English strings
 
 ### feat/customer-node (`105d9f68`) — 2 new, all ruled
 
@@ -855,7 +854,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`de8b77de`) — adds no English strings
+### feat/table-editing (`0e0739c1`) — adds no English strings
 
 ### feat/zoom-control (`43902998`) — 7 new, 2 to read @@ NEEDS RULING
 
