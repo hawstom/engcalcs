@@ -10375,10 +10375,11 @@ var EngCalcs = EngCalcs || {};
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
-	function mapHitAt(cx, cy) {
+	function mapHitAt(cx, cy, skip) {
 		var list = document.elementsFromPoint(cx, cy) || [], i, t;
 		for (i = 0; i < list.length; i++) {
 			if (list[i] === svg) { break; }
+			if (skip && list[i] === skip) { continue; }   // see gripClickHandsThrough()
 			if (!svg.contains(list[i])) { break; }   // page furniture over the map -- not a map hit
 			t = resolveLabelHit(list[i]);
 			// SKIPPED, not returned as a miss: something visible may be under the invisible thing,
@@ -10388,6 +10389,31 @@ var EngCalcs = EngCalcs || {};
 			if (hitConfirmed(t, cx, cy)) { return t; }
 		}
 		return svg;
+	}
+	/**
+	 * **THE GRIP IS FOR DRAGGING; A CLICK ON IT GOES TO WHAT IS UNDER IT** (Perry's pre-review of
+	 * Tom's 2026-09-25 finding *"Customer zindex is higher than Junction. Fix that."*). A customer
+	 * draws under pipes and junctions now, but its connection grip has to stay on top or it cannot
+	 * be grabbed -- and the grip sits exactly ON the junction of a node-connected customer, which is
+	 * selected the moment it is placed. So a plain click on that junction opened the customer.
+	 *
+	 * **HANDED THROUGH RATHER THAN DRAWN UNDER.** Drawing the grip under a node when it sits on one
+	 * would have fixed the click and taken the drag away: the press would grab the junction and move
+	 * it, and a node-connected customer could never be re-connected by its grip again. So the grip
+	 * keeps the press (a drag from it still moves the connection), and a press that did NOT move
+	 * asks what is beneath the grip. A junction or a pipe there wins, which is Tom's order of
+	 * precedence -- customer below link and junction -- applied to the one thing still drawn above
+	 * them. The customer's own dot beneath it, or bare map, leaves the click on the customer.
+	 */
+	function gripClickHandsThrough(t, cx, cy) {
+		var d = (t && t.dataset) || {}, under, ud;
+		if (d.custhandle === undefined || !custHandleEl) { return t; }
+		under = mapHitAt(cx, cy, custHandleEl);
+		ud = (under && under.dataset) || {};
+		if (under === svg || !hitIsElement(under) || ud.cust !== undefined ||
+				ud.custhandle !== undefined || ud.custlbl !== undefined) { return t; }
+		selectFromHit(under);
+		return under;
 	}
 	// **ONE NODE MOVING IS A LAYOUT PASS, AND IT NOW SAYS SO** (Task 690, Tom 2026-09-19: *"There is
 	// still an unbelievable delay when speed-entering a column."*). The loops below re-lay-out every
@@ -35868,6 +35894,14 @@ var EngCalcs = EngCalcs || {};
 					var nearMeter = nearestCustomerNearScreen(e.clientX, e.clientY, TOUCH_REACH_PX);
 					if (nearMeter && custEls[nearMeter.id]) { t = custEls[nearMeter.id].box; }
 				}
+			}
+			// **A CLICK ON THE CONNECTION GRIP IS A CLICK ON WHAT THE GRIP SITS ON** -- see
+			// gripClickHandsThrough(). This line is past the drag test above, so a drag that starts
+			// on the grip still carries the connection; only a press that did not move is handed
+			// through. Not with Shift (that toggles, on the press), nor while the profile's path
+			// tools own every press.
+			if (mode === 'select' && !e.shiftKey && !profileDrawActive() && !profileEditActive()) {
+				t = gripClickHandsThrough(t, e.clientX, e.clientY);
 			}
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.

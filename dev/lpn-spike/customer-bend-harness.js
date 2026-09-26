@@ -94,7 +94,10 @@ const L = loadLoopedNetwork(
 	"\t\tcustHandle: function () { return custHandleEl; },\n" +
 	"\t\tcustBox: function (id) { return custEls[id] && custEls[id].box; },\n" +
 	"\t\tcustStub: function (id) { return custEls[id] && custEls[id].stub; },\n" +
-	"\t\tsetSelection: setSelection,\n" +
+	"\t\tsetSelection: setSelection, selectedRef: selectedRef,\n" +
+	"\t\tnodeHit: function (id) { return nodeEls[id] && (nodeEls[id].hit || nodeEls[id].circle); },\n" +
+	"\t\tpopupNow: function () { return currentPopup ? { kind: currentPopup.kind || 'node', id: currentPopup.id } : null; },\n" +
+	"\t\tnodeXY: function (id) { var n = nodeById(id); return { x: n.x, y: n.y }; },\n" +
 	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tapplyDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; } },\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
@@ -250,6 +253,54 @@ console.log('\n--- 2d. a customer square to a leg is unchanged ---');
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+console.log('\n--- 2e. a click on a junction under a selected customer\'s grip picks the junction ---');
+// ---------------------------------------------------------------------------
+{
+	// Perry's pre-review: a node-connected customer is selected on placement, and its grip sits
+	// exactly on the junction. The grip stays on top so it can be dragged; a CLICK hands through.
+	L.setMode('select');
+	const c = L.addCustomer(60, 150, { link: bent.id, t: 0 });
+	ok('2e.0 the customer is connected exactly at junction A', L.customerT(c) === 0 &&
+		near(L.customerAttachPoint(c).x, 100) && near(L.customerAttachPoint(c).y, 200));
+	L.setSelection('customer', c.id);
+	const grip = L.custHandle(), nodeEl = L.nodeHit(jA.id);
+	ok('2e.1 the selected customer\'s grip sits on the junction', !!grip &&
+		near(+grip.getAttribute('cx'), 100) && near(+grip.getAttribute('cy'), 200));
+	const s = L.worldToScreen(100, 200);
+	// The browser's stack at that point: the grip on top, the junction under it.
+	down(s.x, s.y, [grip, nodeEl]);
+	up(s.x, s.y, [grip, nodeEl]);
+	const sel = L.selectedRef(), pop = L.popupNow();
+	ok('2e.2 a plain click there selects the JUNCTION, not the customer',
+		!!sel && sel.kind === 'node' && sel.id === jA.id, JSON.stringify(sel));
+	ok('2e.3 ...and opens the junction\'s box', !!pop && pop.id === jA.id, JSON.stringify(pop));
+	ok('2e.4 ...and the customer\'s connection is untouched', L.customerT(c) === 0 && L.customerLink(c).id === bent.id);
+
+	// The drag still belongs to the grip.
+	L.setSelection('customer', c.id);
+	const g2 = L.custHandle();
+	down(s.x, s.y, [g2, nodeEl]);
+	ok('2e.5 a press on the grip over the junction still begins a CONNECTION drag',
+		(L.dragNow() || {}).type === 'custanchor', JSON.stringify(L.dragNow()));
+	const onOther = L.worldToScreen(1000, 400);
+	move(onOther.x, onOther.y); L.applyDrag();
+	up(onOther.x, onOther.y);
+	ok('2e.6 ...which carries the connection to the other main', L.customerLink(c).id === other.id);
+	ok('2e.7 ...and the junction it started on did not move', near(L.nodeXY(jA.id).x, 100) && near(L.nodeXY(jA.id).y, 200));
+	ok('2e.8 ...and the customer stays selected', (L.selectedRef() || {}).kind === 'customer');
+
+	// A click on the grip over bare map (nothing but the grip there) still means the customer.
+	const c2 = L.addCustomer(700, 150, { link: other.id });
+	L.setSelection('customer', c2.id);
+	const g3 = L.custHandle(), a3 = L.customerAttachPoint(c2), s3 = L.worldToScreen(a3.x, a3.y);
+	down(s3.x, s3.y, [g3]);
+	up(s3.x, s3.y, [g3]);
+	ok('2e.9 a click on a grip with nothing under it keeps the customer',
+		(L.selectedRef() || {}).kind === 'customer' && L.selectedRef().id === c2.id, JSON.stringify(L.selectedRef()));
+	doc.customers.length = 0; L.buildDom();
+}
+
 console.log('\n--- 3. every example project opens at Text 12, Symbol 12, Link line width 4 ---');
 // ---------------------------------------------------------------------------
 {

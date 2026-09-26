@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 214 untranslated keys, of 2053 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 216 untranslated keys, of 2055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (214, 2 to read @@ NEEDS RULING)
+## lpn_  (216, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -162,6 +162,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_meter_lumped_tip`**
   > Nearest node; this customer's demands are added there.
   _Ruled OK 2026-09-23._
+- **`lpn_field_meter_node`**
+  > Connected to
+  _Ruled OK 2026-09-26._
+- **`lpn_field_meter_node_tip`**
+  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
+  _Ruled OK 2026-09-26._
 - **`lpn_field_meter_offset`**
   > Offset from the pipe
   _Ruled OK 2026-09-23._
@@ -674,7 +680,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**27 still to read**, of 55 new keys across 7 unmerged branch(es).
+**31 still to read**, of 57 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -685,14 +691,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-node (`da75608c`) — 2 new, all ruled
-
-- **`lpn_field_meter_node`**
-  > Connected to
-  _Ruled OK 2026-09-26._
-- **`lpn_field_meter_node_tip`**
-  > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
-  _Ruled OK 2026-09-26._
+### feat/customer-node (`fbbba6c3`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -707,8 +706,6 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-23._
 
 ### feat/menu-button (`eceab3ab`) — adds no English strings
-
-### feat/property-venue (`f76a98e1`) — adds no English strings
 
 ### feat/report (`4fad6782`) — 26 new, 26 to read @@ NEEDS RULING
 
@@ -791,10 +788,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`b7398d0b`) — 17 new, 1 to read @@ NEEDS RULING
+### feat/table-editing (`39d3b3f8`) — 21 new, 5 to read @@ NEEDS RULING
 
+- **`lpn_dialog_cancel`**
+  > Cancel
+  @@ NEEDS RULING
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table keyboard shortcuts
@@ -820,6 +820,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_manage_cols`**
   > Manage columns…
   _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_bottom`**
+  > Move to end
+  @@ NEEDS RULING
 - **`lpn_pane_manage_cols_down`**
   > Move down
   _Ruled OK 2026-09-26._
@@ -829,6 +832,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_manage_cols_title`**
   > Manage columns
   _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_top`**
+  > Move to beginning
+  @@ NEEDS RULING
 - **`lpn_pane_manage_cols_up`**
   > Move up
   _Ruled OK 2026-09-26._
@@ -844,6 +850,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_sort_desc`**
   > Sort descending
   _Ruled OK 2026-09-26._
+- **`lpn_pane_sortarrow_tip`**
+  > Reverse the sort
+  @@ NEEDS RULING
 
 ### feat/zoom-control (`d95c0b27`) — 7 new, all ruled
 
