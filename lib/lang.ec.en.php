@@ -1511,10 +1511,24 @@ $ec_lang['lpn_find_value']='Value';
 $ec_lang['lpn_find_btn']='Find';
 // THE TABLE FILTER (Task 597). {q} is the query line as the reader wrote it, {n} and {all} are
 // whole numbers. Tom, 2026-09-06: "Maybe Find could have next to the Find button a Filter in tables
-// button ... with a selector for which table."
-$ec_lang['lpn_find_filter_btn']='Filter in current table';
-$ec_lang['lpn_find_filter_table']='Table to filter';
-$ec_lang['lpn_find_filter_tip']='Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
+// button ... with a selector for which table." Task 708, 2026-09-23: the button sits on the
+// same line as Find. R-197 (2026-09-25), after the selector was cut and Tom reported "We lost the
+// selector now": "I think what is simplest and closest to what we have is a simple 'Filter in
+// table' button ... I think it implies that we filter all tables insofar as we can if 'Everything'
+// is selected." One button, no selector; which table(s) it fills follows the scope in
+// buildFilterRow()/applyTableFilter(), never a control of its own.
+$ec_lang['lpn_find_filter_btn']='Filter in table';
+$ec_lang['lpn_find_filter_tip']='Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+// The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
+// one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
+// into {rows} of the summary line below. Every number is a count already shown on the table's own
+// banner; this line only says which tables got one.
+$ec_lang['lpn_find_filter_row']='{table}: {n} of {all}';
+$ec_lang['lpn_find_filter_summary']='Filtered by {q}. {rows}.';
+// The one case a typed query can reach with no table left to fill: every property it names is one
+// no table on this page carries (Everything.Connectivity, filtering junctions and reservoirs and
+// tanks, does not reach this line; it is here for a future property that names nothing at all).
+$ec_lang['lpn_find_filter_none']='This query doesn\'t apply to any table.';
 // The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
 // (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
@@ -2435,16 +2449,18 @@ $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on th
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. The label highlights briefly to alert you that it was moved. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
-// "Shut", not "Closed" (Tom, 2026-08-14: *"We change in English to ... good catch!"*). Wave 0 found
-// that "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is a full, pressurised pipe
-// as opposed to an open channel, and every pipe on this page is one, so the wrong reading is not
-// obviously wrong to a translator. Fixing the English fixes all 27 languages and needs no _syn.
-// Chosen over Tom's other candidates for reasons worth keeping: "Blocked" and "Plugged" imply a
-// FAULT rather than a state the user chose; "Off" is vague on a pipe; "No flow" names the RESULT, on
-// a page where flow is a computed output. And this label's own tip already said "Shut this pipe so
-// no water can pass through it" -- the English had already picked the word, in the sentence beside it.
-$ec_lang['lpn_field_closed']='Shut';
-$ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
+// "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
+// What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
+// chosen (2026-08-14) because "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is
+// a full, pressurised pipe as opposed to an open channel, and every pipe on this page is one, so
+// the wrong reading was not obviously wrong to a translator. Tom's ruling overrides that: EPANET's
+// own word wins, translators already had EPANET's dictionary for it (every language here that had
+// translated this key had independently landed on its own word for "closed", not "shut"), and one
+// polysemy risk does not outweigh the suite running two words for one state. This is unrelated to
+// Active, which is a different question -- whether the scenario contains the link at all
+// (paneColClosed() in js/looped-network.js) -- and stays "Active".
+$ec_lang['lpn_field_closed']='Closed';
+$ec_lang['lpn_field_closed_tip']='Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 // A geographic project's coordinates (Task 145). The SAME two rows as X and Y, in the vocabulary

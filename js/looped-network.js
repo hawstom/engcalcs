@@ -4829,7 +4829,103 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// ---- TASK 708: THE RANKED GAPS FROM dev/property-venue-matrix.md, CLOSED BELOW -------
+			//
+			// **THE EMITTER COEFFICIENT (gap #3).** Overridable, but its own `set` -- not a plain
+			// `prop` -- because it crosses the one two-unit boundary on this page (Task 638's own
+			// pair, flow per pressure^gamma): replaceWrite() calls setProp() directly for any spec
+			// carrying a `prop`, which would store the DISPLAYED number raw and skip
+			// emitterToStore() entirely. No `prop` here routes the write through this `set`
+			// instead, exactly the way paneColEmitter()'s own cell does.
+			{ key: 'emitter', group: 'node', field: 'emitter', label: pc.lpn_field_emitter || 'Emitter coefficient',
+				applies: function (n) { return n.type === 'junction'; },
+				get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+				set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } },
+			// **PIPE LENGTH (gap #6): FINDABLE SINCE FIND_EXTRA_LINK_FIELDS, NOW WRITABLE TOO.**
+			// Overridable, and again no `prop`: a Base-side write must also clear `lenAuto`
+			// (`paneColClosed()`'s neighbour `paneColLength`-shaped cell does this inline), or the
+			// next geometry pass silently throws the typed length away and re-derives it from the
+			// drawing (line 9862). Inside a scenario `lenAuto` is never consulted, so `setProp()`
+			// alone is correct there; only Base needs the extra line.
+			{ key: 'length', group: 'link', field: 'length', label: pc.lpn_field_length || 'Length',
+				applies: function (l) { return l.type === 'pipe'; },
+				get: function (l) { return effective(l, 'length'); },
+				set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+			// **A LINK'S OPEN/CLOSED STATUS (gap #2, ranked highest).** Overridable, and a `prop`
+			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
+			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
+			// logic to bypass -- unlike `emitter` and `length` above.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), THE TABLE COLUMN'S OWN KEY, NOT
+			// `lpn_result_status`** (pre-review, Task 708). `lpn_result_status` ("Status") already
+			// names a DIFFERENT concept elsewhere on this page -- the post-solve/EPS status the
+			// colour ramp and the Labels legend show (`linkFieldDefs()`, `COLOR_LINK_FIELDS`),
+			// which can differ from this stored input during a run a `[RULES]` control has closed.
+			// Reusing that word here would put "Status" on two different questions in one panel.
+			// `choices` is derived from findChoiceDefs() rather than spelled out again, so the
+			// codes here and the words a Find/Replace `<select>` shows can never drift apart.
+			{ key: 'status', group: 'link', field: 'status', prop: 'status',
+				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
+				label: pc.lpn_field_closed || 'Closed',
+				applies: function () { return true; },
+				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is base-owned (not in
+			// LPN_OVERRIDABLE), so no `prop`, and the write is the same clamp
+			// paneColPumpSpeed() applies: a blank, a zero or a negative all mean 1 rather than a
+			// pump switched off, which has its own property (`status`, above).
+			{ key: 'speed', group: 'link', field: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },
+			{ key: 'energyPrice', group: 'link', field: 'energyPrice', prop: 'energyPrice', label: pc.lpn_energy_price || 'Price of power',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPrice'); }, set: function (l, v) { l._energyPrice = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE ENERGY PRICE PATTERN, AN ID RATHER THAN A QUANTITY** -- the same shape as a
+			// customer's demand pattern in customerReplaceSpecs() below: `str` so a bulk write
+			// carries the exact bytes typed, and no `prop` so the write can refuse a name nothing
+			// in the library answers to rather than filling four hundred pumps with a dangling
+			// reference.
+			{ key: 'energyPattern', group: 'link', field: 'energyPattern', str: true, label: pc.lpn_energy_price_pattern || 'Price pattern',
+				applies: function (l) { return l.type === 'pump'; },
+				get: function (l) { return effective(l, 'energyPattern') || ''; },
+				set: function (l, v) {
+					var id = String(v === undefined || v === null ? '' : v).trim();
+					if (!id || !libPatternsRead().some(function (pp) { return pp.id === id; })) { return; }
+					setProp(l, 'energyPattern', id);
+				} },
+			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
+			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
+			// other three are base-owned geometry, written bare exactly as their table cells are.
+			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
+			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
+			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
+			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
+			// query keeps reading in every language -- but the WORDS a person picks from are the
+			// popup's own four (paneColMixingModel()'s `choices()`, read through findChoiceDefs()
+			// so there is exactly one list of them, not a second copy to drift out of translation).
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel',
+				choices: findChoiceDefs('mixingModel').map(function (o) { return o[0]; }),
+				label: pc.lpn_mixing_model || 'Mixing model',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
+			// **THE MIXING FRACTION, GATED EXACTLY AS THE TABLE CELL GATES IT** -- only a
+			// two-compartment tank has one, so `applies` refuses the rest rather than writing a
+			// number nothing reads.
+			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
+				applies: function (n) { return n.type === 'tank' && (n.mixingModel || 'MIXED') === '2COMP'; },
+				get: function (n) { return n.mixingFraction; }, set: function (n, v) { n.mixingFraction = v; } }
 		].concat(customPushSpecs());
 	}
 	/**
@@ -16078,12 +16174,25 @@ var EngCalcs = EngCalcs || {};
 			['demand', 'lpn_field_base_demand', 'Base demand'],
 			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
+			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
+			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
+			// row and table column that Find had simply never been given a row for.
+			['emitter', 'lpn_field_emitter', 'Emitter coefficient'],
 			// **LAST IN BAND 2, BESIDE THE OTHER THINGS YOU TYPE** (Tom, 2026-09-14). It is an
 			// INPUT -- the concentration a node starts a run holding -- so it belongs here and
 			// not with the results, even though its only reader is a chemical run. The result it
 			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
 			// Tables pane both make.
-			['initQuality', 'lpn_quality_initial', 'Initial quality']
+			['initQuality', 'lpn_quality_initial', 'Initial quality'],
+			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
+			// #4). A tank is the one node type with several scalar inputs of its own; gated to
+			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
+			['level', 'lpn_field_tank_level', 'Water depth'],
+			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
+			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
+			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
+			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
@@ -16097,7 +16206,22 @@ var EngCalcs = EngCalcs || {};
 			['roughness', null, 'Roughness'],
 			['km', 'lpn_field_km_short', 'Minor loss, k'],
 			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
-			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient']
+			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient'],
+			// **ACTIVE/CLOSED, FOR ANY LINK** (Task 708, gap #2, ranked highest: "a plausible
+			// question with no answer on this page"). Already in COLOR_LINK_FIELDS, so no bespoke
+			// gate is needed below -- the generic test already offers it to every link.
+			//
+			// **LABELLED `lpn_field_closed` ("Closed"), NOT `lpn_result_status` ("Status")** --
+			// pre-review, Task 708: `lpn_result_status` already names the post-solve/EPS status
+			// the colour ramp and the Labels legend show (`COLOR_LINK_FIELDS`, `linkFieldDefs()`),
+			// a different, run-dependent reading of the same link. Reusing that word here would
+			// put "Status" on two different questions in this one panel.
+			['status', 'lpn_field_closed', 'Closed'],
+			// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), gated to `d.type === 'pump'`
+			// below exactly as the pipe reaction pair is gated to a pipe.
+			['speed', 'lpn_field_pump_speed', 'Relative speed'],
+			['energyPrice', 'lpn_energy_price', 'Price of power'],
+			['energyPattern', 'lpn_energy_price_pattern', 'Price pattern']
 		];
 		var RESULT_LINK = [
 			['flow', 'lpn_result_flow', 'Flow'],
@@ -16123,6 +16247,13 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
+				} else if (key === 'emitter') {
+					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
+				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
+					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
 				} else {
 					// Everything else is offered where the Labels list and the colour ramp agree it
 					// exists, which is the same test this function has always applied.
@@ -16324,9 +16455,56 @@ var EngCalcs = EngCalcs || {};
 		// the junction it lumps at. Both are ids, so they take the text conditions and sort in the
 		// reader's own alphabet exactly as an id does. Its description and its tag are already on
 		// this list, being the same two properties a node and a link carry.
+		// **A LINK'S OPEN/CLOSED STATUS AND A TANK'S MIXING MODEL ARE CHOICES, NOT NUMBERS** (Task
+		// 708, gaps #2 and #4). Neither has a colour ramp or a unit; each is one of a short, fixed
+		// set of internal tokens (`open`/`closed`, `MIXED`/`2COMP`/`FIFO`/`LIFO`), stated in
+		// EPANET's own vocabulary rather than translated, exactly as a curve's kind is -- so
+		// `contains` and `equals` are the right questions and there is no numeric reading of
+		// either. A pump's energy price PATTERN is the same shape of thing as a demand pattern
+		// reference: an id, not a quantity.
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
-			prop === 'link' || prop === 'atNode';
+			prop === 'link' || prop === 'atNode' ||
+			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
+	}
+	/**
+	 * **A CHOICE PROPERTY'S CODES AND THEIR TRANSLATED WORDS, IN EXACTLY ONE PLACE** (pre-review
+	 * fix, Task 708). The internal token (`'closed'`, `'MIXED'`) is what is stored, matched and
+	 * saved in a query -- so it stays English and untranslated, the same ruling a curve's kind
+	 * carries -- but nothing on screen should ever show it to a reader or ask a reader to type it.
+	 * Before this, `status` and `mixingModel` were `findPropIsText()` properties with a plain text
+	 * box: a Spanish reader typing "cerrado" found nothing (the stored word is English), and a
+	 * matched row printed the English word back regardless of the page's language.
+	 *
+	 * Returns `null` for every other property -- the caller's signal to fall back to the ordinary
+	 * text or number box -- or `[[code, translated label], ...]`, in the order Find's and Replace's
+	 * `<select>` should list them.
+	 *
+	 * **`mixingModel` READS paneColMixingModel()'S OWN `choices()`, RATHER THAN A SECOND COPY OF
+	 * ITS FOUR WORDS.** The popup, the table and now Find/Replace are one door for what those four
+	 * words are, so a translator (or a future fifth mixing model) changes one function and every
+	 * venue agrees. `status` has no `choices()` of its own to borrow -- its table cell is a
+	 * checkbox, not a picklist -- so its two words are the same ones linkStatusText() already
+	 * prints for a link's status everywhere else on this map (`lpn_result_status_open`/`_closed`).
+	 */
+	function findChoiceDefs(prop) {
+		var pc = EngCalcs.pageConfig || {};
+		if (prop === 'status') {
+			return [['open', pc.lpn_result_status_open || 'Open'],
+				['closed', pc.lpn_result_status_closed || 'Closed']];
+		}
+		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
+		return null;
+	}
+	function findPropIsChoice(prop) { return findChoiceDefs(prop) !== null; }
+	// The translated word for a stored code, or null where `prop` is not a choice property, or the
+	// code is not one of its choices (a document written by an older version, or hand-edited) --
+	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	function findChoiceLabelOf(prop, code) {
+		var defs = findChoiceDefs(prop), i;
+		if (!defs) { return null; }
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === code) { return defs[i][1]; } }
+		return null;
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -16626,6 +16804,57 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'fireFlow') {
 			return cand.group === 'node' ? fireFlowOwn(cand.el) : undefined;
 		}
+		// **THE EMITTER COEFFICIENT CROSSES A UNIT BOUNDARY EFFECTIVE() DOES NOT**, exactly as the
+		// popup and the table read it: it is the one field on this page whose unit is two units
+		// (flow per pressure^gamma), so emitterToDisplay() is the one door, here as everywhere
+		// else (Task 708, gap #3).
+		if (prop === 'emitter') {
+			return cand.group === 'node' ? emitterToDisplay(effective(cand.el, 'emitter')) : undefined;
+		}
+		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
+		// is read through effective() like every other overridable input; the other three are
+		// base-owned geometry, read straight off the node exactly as their table cells do.
+		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
+			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
+			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
+		// default, exactly as the table's own get() answers it.
+		if (prop === 'mixingModel') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? (cand.el.mixingModel || 'MIXED') : undefined;
+		}
+		// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, the same gate the popup and the table
+		// draw the row under (paneColMixingFraction()'s own `plainFor`).
+		if (prop === 'mixingFraction') {
+			return (cand.group === 'node' && cand.el.type === 'tank'
+				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
+				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
+				? cand.el.mixingFraction : undefined;
+		}
+		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
+		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
+		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
+		if (prop === 'status') {
+			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+		}
+		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5). Speed is base-owned (not in
+		// LPN_OVERRIDABLE) and read bare with the same "blank/zero/negative means 1" rule
+		// paneColPumpSpeed() states; the price and its pattern are overridable, read through
+		// effective() like every other input here.
+		if (prop === 'speed') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return (typeof cand.el.speed === 'number' && isFinite(cand.el.speed)) ? cand.el.speed : 1;
+		}
+		if (prop === 'energyPrice') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			var priceVal = effective(cand.el, 'energyPrice');
+			return (typeof priceVal === 'number' && isFinite(priceVal)) ? priceVal : undefined;
+		}
+		if (prop === 'energyPattern') {
+			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
+			return effective(cand.el, 'energyPattern') || undefined;
+		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
 			// **AND IT IS READ THROUGH pipeK()**, so a search for k > 5 finds a pipe whose fittings
@@ -16882,12 +17111,20 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number') { return String(v); }
 		return String(+v.toFixed(4));
 	}
-	function findSelect(parent, labelText, options, value, onChange) {
+	// `hideLabel`: the wrapping <label> still carries labelText, so a screen reader still says
+	// what the selector is, but nothing is drawn on screen for it -- for a selector whose question
+	// is answered by a button beside it instead (R-225: "The word 'Table' is not needed").
+	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
-		lab.style.display = 'block';
+		if (hideLabel) {
+			lab.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;' +
+				'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+		} else {
+			lab.style.display = 'block';
+		}
 		options.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -17379,10 +17616,6 @@ var EngCalcs = EngCalcs || {};
 		}), findState.scope, function (v) {
 			findState.scope = v;
 			findNormalize();
-			// The filter's table follows the scope again -- see findFilterTarget(). A scope change
-			// already re-points the property and the condition; leaving the table pinned to the old
-			// scope's tab would be the one control that did not follow.
-			findFilterTable = null;
 			rebuildFindForm(); renderFindResults(null);
 		});
 		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
@@ -17396,13 +17629,54 @@ var EngCalcs = EngCalcs || {};
 		pair.className = 'lpn-find-pair';
 		box.appendChild(pair);
 		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
+			// **THE VALUE CONTROL IS REBUILT FOR THE NEW PROPERTY'S TYPE** (Tom, 2026-09-23, of
+			// Find > Pipes > Shut > equal to > Closed: *"Switching away from this leaves 'closed'
+			// in the Value field."*). Switching TO a choice property already discards a mismatched
+			// value, below -- this is the other direction: a choice property's own stored word is
+			// an EPANET code nobody should have to un-type out of the free-entry box that replaces
+			// the select, so it is cleared rather than carried over.
+			if (wasChoice && !findPropIsChoice(findState.prop)) { findState.value = ''; }
+			// **CHANGING FIND'S PROPERTY PUSHES REPLACE'S "PROPERTY TO CHANGE" TO MATCH** (Tom,
+			// 2026-09-23: *"normally that is what users want, and power users can learn"*), when
+			// the new property is one Replace can write at all. replaceNormalize() only falls back
+			// when the CURRENT Replace property has stopped applying -- it would leave Replace
+			// pointed at a still-valid but now-stale property, which is exactly what this pushes
+			// past.
+			if (replaceSpec(v)) {
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) {
+					replaceState.value = '';
+				}
+				replaceState.prop = v;
+			}
 			rebuildFindForm(); renderFindResults(null);
 		});
 		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
+		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
+		// `status`'s and `mixingModel`'s stored words are English EPANET tokens a reader is never
+		// shown and should never have to type or guess at -- the failure this replaces was a
+		// Spanish reader typing "cerrado" and finding nothing, because the box compared their
+		// typed word against the untranslated code. Only for the two conditions that actually
+		// compare against the property's OWN value: "n highest"/"n lowest" want a COUNT in this
+		// box and "empty" wants nothing at all, so both keep the plain text/number box below.
+		if (findPropIsChoice(findState.prop) && !findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op)) {
+			var choiceDefs = findChoiceDefs(findState.prop);
+			// A value left over from a different property (or from a document saved before this
+			// choice existed) is not one of these codes -- default to the first rather than
+			// leaving the select unable to show ANY option as chosen, which would silently search
+			// on the first one anyway without saying so.
+			if (!choiceDefs.some(function (o) { return o[0] === findState.value; })) {
+				findState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_find_value || 'Value', choiceDefs, findState.value, function (v) {
+				findState.value = v; updateFindQuery(); renderFindResults(null);
+			});
+			return;
+		}
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
 		valLab = document.createElement('label');
@@ -17490,11 +17764,12 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_find_go';
 		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
-		box.appendChild(btn);
-		// **NEXT TO THE FIND BUTTON, which on a 22rem box is the line under it** (Tom, 2026-09-06,
-		// Task 597). One select and one button: the whole of what filtering the tables costs the
-		// panel.
-		buildFilterRow(box);
+		// **ONE ROW: FIND, FILTER IN TABLE, THEN WHICH TABLE** (Tom, 2026-09-23: *"[Find][Filter in
+		// Table][tables_selector]"*). It used to be the Find button on its own line and a second,
+		// separate "Table to filter" row below it -- which read as two things being offered rather
+		// than one ("is this Filter in selected table, or Filter in active table?"). Built as one
+		// row here instead of appended to `box` twice.
+		buildFilterRow(box, btn);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
@@ -17543,15 +17818,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- THE FILTER BUTTON, BESIDE THE FIND BUTTON (ROADMAP Task 597) ---------------------------
 	//
-	// **WHICH TABLE IS DERIVED FROM THE SCOPE UNTIL THE USER SAYS OTHERWISE, and that is where the
-	// clicks are saved.** Somebody searching Pipes almost always wants the Pipes table, so the
-	// selector is already on it and the whole gesture is one press. Picking another one sticks;
-	// changing the scope hands the choice back to the derivation, because a scope change has already
-	// re-pointed the property and the condition for the same reason.
+	// **ONE BUTTON, NO SELECTOR** (Tom, 2026-09-25, of R-197's report that the selector was gone:
+	// *"I think what is simplest and closest to what we have is a simple 'Filter in table' button
+	// ... I think it implies that we filter all tables insofar as we can if 'Everything' is
+	// selected."*). A scope that names one table -- Junction, Pipe, ... -- filters that table
+	// alone, which is where the earlier selector always ended up anyway once it followed the
+	// scope. "Everything", and a typed compound query, name no single table, so the button filters
+	// every table the query can be asked of.
 	//
-	// `null` from the derivation means the scope names no single table -- Everything, and Text,
-	// which has no tab at all because nothing about a text label solves.
-	var findFilterTable = null;
+	// **A TABLE THE QUERY DOES NOT NAME A PROPERTY OF IS LEFT AS IT WAS, NEVER EMPTIED.** "Pressure
+	// above 40" is a fact about nodes; asking it of the Pipes table is not "zero pipes match", it
+	// is a question Pipes cannot answer, and those are different facts. `propAppliesToTable()`
+	// answers through the same menu findPropDefs() already builds for a scope's pull-down -- one
+	// list of "properties that exist here", read both to fill the menu and to test this.
 	function paneTableForScope(scope) {
 		var d = findScopeDef(scope), list = paneTables(), i;
 		if (d.key === 'all' || d.group === 'label') { return null; }
@@ -17560,33 +17839,102 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	function findFilterTarget() {
-		return findFilterTable || paneTableForScope(findState.scope) || paneTables()[0].id;
+	// The scope key whose group/type matches this table -- the reverse of paneTableForScope().
+	// Unlike it, this matches Text too (paneTableForScope() answers "does this scope name ONE
+	// table", which Text does not, since Everything also reaches it; this answers "which scope
+	// speaks for this table's properties", which for the Text table is still 'text').
+	function scopeKeyForTable(spec) {
+		var defs = findScopeDefs(), i, d;
+		for (i = 0; i < defs.length; i++) {
+			d = defs[i];
+			if (d.group !== spec.group) { continue; }
+			if (!d.type || d.type === spec.type) { return d.key; }
+		}
+		return null;
+	}
+	function propAppliesToTable(prop, spec) {
+		var key = scopeKeyForTable(spec), save, defs, i;
+		if (!key) { return false; }
+		save = findState.scope;
+		findState.scope = key;
+		defs = findPropDefs();
+		findState.scope = save;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === prop) { return true; } }
+		return false;
+	}
+	// Every property named by a leaf condition, compound or not -- the set `propAppliesToTable()`
+	// tests a table against.
+	function findAstLeafProps(ast, out) {
+		if (!ast) { return out; }
+		if (ast.t === 'cond') { out[ast.prop] = true; return out; }
+		findAstLeafProps(ast.a, out); findAstLeafProps(ast.b, out);
+		return out;
+	}
+	function findQueryProps() {
+		if (findQueryAst) { return findAstLeafProps(findQueryAst, {}); }
+		var out = {};
+		out[findState.prop] = true;
+		return out;
+	}
+	function findQueryAppliesToTable(props, spec) {
+		var p;
+		for (p in props) {
+			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+		}
+		return true;
+	}
+	// One row of the multi-table receipt: "Junctions: 5 of 12".
+	function findFilterRowText(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_find_filter_row || '{table}: {n} of {all}')
+			.split('{table}').join(pc[spec.label] || spec.id)
+			.split('{n}').join(String(paneTableRowsInOrder(spec).length))
+			.split('{all}').join(String(paneTableAllElements(spec).length));
 	}
 	// **THE LINE THAT RUNS IS THE ONE IN THE BOX**, exactly as it is for the Find button: the query
 	// input is the single expression of what this panel selects, whether the controls wrote it or
 	// the user typed it. That is also what makes the filter and the search provably the same
 	// question -- there is one string and one evaluator.
 	function applyTableFilter() {
-		var text = findQueryInput ? findQueryInput.value : findQueryString(),
-			id = findFilterTarget(), spec, run;
+		var pc = EngCalcs.pageConfig || {},
+			text = findQueryInput ? findQueryInput.value : findQueryString(),
+			single = findQueryAst ? null : paneTableForScope(findState.scope),
+			run, props, firstId = null, rows = [];
 		run = findSelectByQuery(text);
 		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
 		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
 		if (!run.ok) { renderFindResults(run.msg); return; }
-		paneSetFilter(id, String(text).trim());
-		openPane(id);
-		spec = paneTableById(id);
-		// The receipt is the table's own banner text, so the panel and the table cannot say two
-		// different things about one filter.
-		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
+		if (single) {
+			paneSetFilter(single, String(text).trim());
+			openPane(single);
+			// The receipt is the table's own banner text, so the panel and the table cannot say two
+			// different things about one filter.
+			renderFindResults(paneFilterNoteText(paneTableById(single), paneTableRowsInOrder(paneTableById(single))));
+			return;
+		}
+		props = findQueryProps();
+		paneTables().forEach(function (spec) {
+			if (!findQueryAppliesToTable(props, spec)) { return; }
+			paneSetFilter(spec.id, String(text).trim());
+			if (!firstId) { firstId = spec.id; }
+			rows.push(findFilterRowText(spec));
+		});
+		if (!firstId) {
+			renderFindResults(pc.lpn_find_filter_none || 'No table has a property this query names.');
+			return;
+		}
+		openPane(firstId);
+		renderFindResults(String(pc.lpn_find_filter_summary || 'Filtered by {q}. {rows}.')
+			.split('{q}').join(String(text).trim())
+			.split('{rows}').join(rows.join(', ')));
 	}
-	function buildFilterRow(box) {
+	// **ONE ROW: [Find] [Filter in table]** (Tom, 2026-09-25: a plain button, no selector). `findBtn`
+	// is the Find button built in rebuildFindForm() -- passed in rather than built twice, so there
+	// is exactly one Find button and exactly one place that wires its click.
+	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
 		row.className = 'lpn-find-filter';
-		findSelect(row, pc.lpn_find_filter_table || 'Table to filter',
-			paneTables().map(function (s) { return [s.id, pc[s.label] || s.id]; }),
-			findFilterTarget(), function (v) { findFilterTable = v; });
+		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		btn.id = 'lpn_find_filter_go';
@@ -17595,8 +17943,8 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
+			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
 		box.appendChild(row);
@@ -17661,7 +18009,12 @@ var EngCalcs = EngCalcs || {};
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
 			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
-				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
+				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
+					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
+					// fix, Task 708), not the stored English code -- the second half of the same
+					// failure the value box had: a Spanish reader who somehow matched a closed
+					// pipe must not be shown "closed" back.
+					: (findChoiceLabelOf(findState.prop, val) || findFmt(val))));
 		// **NO LIST OF THE LINKS THAT MEET HERE** (Tom, 2026-08-27, reading his own result rows:
 		// *"The results say 'Connected: nnn, nnn, nnn', and I don't know what that means... I think
 		// that it arose from tunnel vision on the Connected links task. Even though it's useful, I
@@ -18059,6 +18412,14 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < specs.length; i++) { if (specs[i].field === field) { return specs[i]; } }
 		return null;
 	}
+	// Whether Replace shows a picklist for this field, the same test buildReplaceForm() makes
+	// before it draws one -- named so a property change can tell whether it is crossing INTO or
+	// OUT OF a choice, without repeating `replaceSpec(field) && replaceSpec(field).choices` at
+	// every call site.
+	function replacePropIsChoice(field) {
+		var s = replaceSpec(field);
+		return !!(s && s.choices);
+	}
 	// **THE PROPERTY BEING SEARCHED IS OFFERED FIRST, when it is writable.** "Find every 6 inch main,
 	// make it 8" is the core case and it names one property twice, so the common job needs no second
 	// choice. A search on something unwritable (a pressure, or an ID) falls back to the first
@@ -18126,6 +18487,19 @@ var EngCalcs = EngCalcs || {};
 		// it is flagged where it is READ rather than refused here -- Tom's own ruling, and the
 		// reason an empty box still refuses, since erasing a property on 400 assets is a real
 		// action that must not be spelled the same way as leaving a box alone.
+		// **A CHOICE PROPERTY (Task 708): status's open/closed, a tank's mixing model.** The value
+		// box is still plain text -- there is no dropdown here, only the Table pane has one -- so
+		// the typed word is matched case-insensitively against the fixed list of internal EPANET
+		// tokens `spec.choices` names, and normalized to the exact stored spelling. Anything else
+		// is refused exactly as an empty box is: `undefined` here is "type a valid value," not "no
+		// change," so a typo cannot be read as leaving four hundred pipes alone on purpose.
+		if (spec && spec.choices) {
+			var lc = raw.toLowerCase(), ci;
+			for (ci = 0; ci < spec.choices.length; ci++) {
+				if (String(spec.choices[ci]).toLowerCase() === lc) { return spec.choices[ci]; }
+			}
+			return undefined;
+		}
 		if (spec && spec.str) { return raw === '' ? undefined : raw; }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
@@ -18309,7 +18683,7 @@ var EngCalcs = EngCalcs || {};
 	// action, and a Replace dialog beside a Find dialog would ask for the same three pull-downs
 	// twice. `box` is already in the document, so renderReplace() can find its message div by id.
 	function buildReplaceForm(box) {
-		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg;
+		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg, curSpec, choiceDefs;
 		replaceBox = box;
 		box.textContent = '';
 		replaceNormalize();
@@ -18340,6 +18714,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
+				// Same rule as Find's own Property select: switching AWAY from a choice property
+				// (e.g. Shut) leaves its EPANET code sitting in the free-entry box that replaces
+				// the picklist, so it is cleared here instead of carried over.
+				if (replacePropIsChoice(replaceState.prop) && !replacePropIsChoice(v)) { replaceState.value = ''; }
 				replaceState.prop = v; replacePending = null;
 				// Rebuilt, not just re-messaged: choosing Elevation is what makes the source select
 				// exist at all, and leaving it behind when the property moves off Elevation would
@@ -18370,6 +18748,29 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(btn);
 			box.appendChild(msg);
 			renderReplace(null);
+			return;
+		}
+		// **A CHOICE PROPERTY GETS THE SAME PICKLIST ON THE WRITE SIDE** (pre-review fix, Task
+		// 708): typing the internal code to REPLACE with is exactly the failure the Find box had,
+		// and a picklist is also how a bulk write refuses a typo outright rather than silently
+		// leaving four hundred pipes unchanged (replaceValueOf()'s `choices` gate still runs
+		// underneath this, so a value this select could never produce is still refused).
+		curSpec = replaceSpec(replaceState.prop);
+		if (curSpec && curSpec.choices) {
+			choiceDefs = findChoiceDefs(replaceState.prop) ||
+				curSpec.choices.map(function (c) { return [c, c]; });
+			if (!choiceDefs.some(function (o) { return o[0] === replaceState.value; })) {
+				replaceState.value = choiceDefs[0][0];
+			}
+			findSelect(box, pc.lpn_replace_value || 'New value', choiceDefs, replaceState.value, function (v) {
+				replaceState.value = v; replacePending = null; renderReplace(null);
+			});
+			btn = document.createElement('button');
+			btn.type = 'button';
+			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
+			btn.addEventListener('click', runReplacePreview);
+			box.appendChild(btn);
+			box.appendChild(msg);
 			return;
 		}
 		valWrap = document.createElement('div');
@@ -20180,7 +20581,7 @@ var EngCalcs = EngCalcs || {};
 			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
 	}
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
-	// whether the scenario contains the link at all, Shut is whether water can pass through the one
+	// whether the scenario contains the link at all, Closed is whether water can pass through the one
 	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
 	function paneColClosed() {
 		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
@@ -20235,7 +20636,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1 here exactly as they do in the popup -- a pump at
 	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
-	// failure to avoid. Turning a pump off has its own column, Shut.
+	// failure to avoid. Turning a pump off has its own column, Closed.
 	function paneColPumpSpeed() {
 		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
 			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
@@ -21361,7 +21762,7 @@ var EngCalcs = EngCalcs || {};
 	function paneTableSignature(spec, rows) {
 		var cols = paneCols(spec);
 		// **THE SORT ARROW IS PART OF THE SIGNATURE, NOT JUST THE ROW ORDER.** A first click on a
-		// column where every row ties (Active and Shut before anything is edited, Tag before
+		// column where every row ties (Active and Closed before anything is edited, Tag before
 		// anyone has typed one) sorts to exactly the row order already on screen -- the tie-break
 		// is by id, which is what an unsorted table already shows. Without `spec.sort` here, that
 		// row-id string is unchanged from the last render, so this fell into the refill branch
@@ -38609,7 +39010,18 @@ var EngCalcs = EngCalcs || {};
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
-			var active = pushSpecs.filter(pushFieldShown);
+			// **A SECOND GATE, BESIDE pushFieldShown()** (Task 708). This button seeds each
+			// property from `settings.defaults[s.key]`, and pushFieldShown() alone answers "is
+			// this shown on the map", not "does a New-asset default exist for it" -- the two used
+			// to be the same question for every entry in pushSpecList(), because every property
+			// with a map-label toggle also had a defaultRow() above. `length` and `status` break
+			// that: both are shown on the map by default option and NEITHER has a New-asset
+			// default (deliberately, for `length` -- see the comment above defaultRow's absence --
+			// and never given one for `status`). Without this second test, turning the Length or
+			// Status label on and pressing this button would push `undefined` onto every pipe.
+			var active = pushSpecs.filter(function (s) {
+				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(settings.defaults, s.key);
+			});
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
@@ -47142,7 +47554,7 @@ var EngCalcs = EngCalcs || {};
 		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
 		// order for the same control shape on the same popup.
 		var text = document.createElement('span');
-		setFieldLabel(text, pc.lpn_field_closed || 'Shut', pc.lpn_field_closed_tip);
+		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);

@@ -1675,7 +1675,6 @@ $ec_lang['lpn_pane_filter_clear']='Tampilkan semua';
 $ec_lang['lpn_pane_filter_none']='Tidak ada yang cocok dengan filter di tabel ini.';
 $ec_lang['lpn_help_screenshots']='Galeri tangkapan layar';
 $ec_lang['lpn_find_filter_btn']='Filter di tabel saat ini';
-$ec_lang['lpn_find_filter_table']='Tabel yang akan difilter';
 $ec_lang['lpn_find_filter_tip']='Tampilkan hanya bagian yang cocok dengan kueri ini pada salah satu tabel di bawah peta. Gambar tidak berubah dan tidak ada yang dihapus.';
 $ec_lang['lpn_engine_needed_loading']='Memuat penyelesai EPANET saat Anda membangun. Hasil akan tersedia setelah selesai dimuat sepenuhnya.';
 $ec_lang['lpn_engine_needed_failed']='Penyelesai EPANET belum dimuat, tidak dapat dimuat, dan jaringan ini hanya dapat diselesaikan olehnya. Penyelesai ini akan dimuat saat Anda tersambung ke internet.';

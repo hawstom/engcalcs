@@ -1673,7 +1673,6 @@ $ec_lang['lpn_pane_filter_clear']='Alle anzeigen';
 $ec_lang['lpn_pane_filter_none']='Nichts in dieser Tabelle entspricht dem Filter.';
 $ec_lang['lpn_help_screenshots']='Screenshot-Galerie';
 $ec_lang['lpn_find_filter_btn']='In aktueller Tabelle filtern';
-$ec_lang['lpn_find_filter_table']='Zu filternde Tabelle';
 $ec_lang['lpn_find_filter_tip']='Zeigt nur die Teile an, die dieser Abfrage in einer der Tabellen unter der Karte entsprechen. Die Zeichnung wird nicht verändert, und es wird nichts gelöscht.';
 $ec_lang['lpn_engine_needed_loading']='EPANET-Löser wird geladen, während Sie bauen. Ergebnisse stehen zur Verfügung, sobald das Laden abgeschlossen ist.';
 $ec_lang['lpn_engine_needed_failed']='Der EPANET-Löser wurde noch nicht geladen, kann nicht geladen werden, und dieses Netz kann nur von ihm gelöst werden. Er wird geladen, sobald Sie mit dem Internet verbunden sind.';

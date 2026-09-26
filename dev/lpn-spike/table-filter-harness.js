@@ -1,8 +1,8 @@
 // The TABLE FILTER and DICTIONARY ORDER -- ROADMAP Tasks 597 and 598. Run with:
 //   node dev/lpn-spike/table-filter-harness.js
 //
-// WHY THIS EXISTS. Two things here can regress silently, and only two, so this harness asserts
-// those and leaves the rest to pane-harness.js and find-harness.js.
+// WHY THIS EXISTS. Three things here can regress silently, so this harness asserts those and
+// leaves the rest to pane-harness.js and find-harness.js.
 //
 //   1. **THE FILTER AND FIND MUST RETURN THE SAME ELEMENT SET FOR THE SAME CONDITION.** That is the
 //      one-predicate rule made into an assertion rather than a promise. The filter is Find's query
@@ -14,6 +14,9 @@
 //      accented letter after `z`, sorts Cyrillic and Arabic by codepoint block, and puts P10 before
 //      P2. Each of those is a fixture below, and each of them FAILS under a plain `<` -- which is
 //      the only way to know this test is testing anything.
+//   3. **"EVERYTHING" MUST FILTER EVERY TABLE THE QUERY CAN BE ASKED OF, AND LEAVE THE REST ALONE**
+//      (R-197, section 9) -- the button has no selector any more, so which tables it touches is
+//      logic now, not a click somebody made.
 //
 // The stub gives `document.documentElement` no `lang`, so the collator is built on the
 // environment's own locale. That is deliberate: the failures above are failures of code-unit order
@@ -69,7 +72,6 @@ const L = loadLoopedNetwork(
 	"\t\tsignature: function (id) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneTableSignature(s, paneTableRowsInOrder(s)); },\n" +
 	"\t\ttableForScope: paneTableForScope,\n" +
-	"\t\tfilterTarget: function (scope) { findState.scope = scope; return findFilterTarget(); },\n" +
 	// THE PANEL, built by the page's own rebuildFindForm() into the real #lpn_find_form.
 	"\t\tbuildPanel: function () { rebuildFindForm(); },\n" +
 	"\t\ttype: function (text) { findQueryInput.value = text;\n" +
@@ -94,7 +96,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
 	"\t\t\tproject = { name: '', activeScenario: 'base' }; scenarios = defaultScenarios();\n" +
 	"\t\t\tselection = null; findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };\n" +
-	"\t\t\tpaneFilters = {}; findFilterTable = null;\n" +
+	"\t\t\tpaneFilters = {};\n" +
 	"\t\t\tsettings = defaultSettings(); seedDefaultInputs();\n" +
 	"\t\t\tpaneTables().forEach(function (s) { paneTableReset(s); });\n" +
 	"\t\t\tsvg = document.getElementById('lpn_canvas');\n" +
@@ -261,19 +263,16 @@ console.log('\n--- the filter is stored nowhere ---');
 }
 
 // ---- 5. WHICH TABLE, DERIVED FROM THE SCOPE ---------------------------------------------------
-console.log('\n--- which table the button points at ---');
+console.log('\n--- which table a scope names ---');
 {
 	build();
 	ok('a pipe scope points at the Pipes table', L.tableForScope('pipe') === 'pipes');
 	ok('a junction scope at Junctions', L.tableForScope('junction') === 'junctions');
 	ok('a valve scope at Valves', L.tableForScope('valve') === 'valves');
-	// Everything and Text name no single table: Text has no tab at all, because nothing about a
-	// text label solves.
+	// Everything and Text name no single table -- see section 9 for what "Everything" does instead
+	// (R-197): every table the query can be asked of, rather than one picked by hand.
 	ok('Everything names no one table', L.tableForScope('all') === null);
 	ok('...and neither does Text', L.tableForScope('text') === null);
-	ok('the button still has somewhere to point under Everything',
-		L.filterTarget('all') === 'junctions', L.filterTarget('all'));
-	ok('...and follows the scope where there is one', L.filterTarget('pump') === 'pumps');
 }
 
 // ---- 6. THE BUTTON, PRESSED THE WAY A PERSON PRESSES IT ---------------------------------------
@@ -389,6 +388,44 @@ console.log('\n--- Below, Equal to, Above ---');
 		JSON.stringify(L.selectByQuery('Pipe.Diameter greater than 8')));
 	ok('...both ways', same(L.selectByQuery('Pipe.Diameter less than 8'),
 		L.selectByQuery('Pipe.Diameter below 8')));
+}
+
+// ---- 9. "EVERYTHING" FILTERS EVERY TABLE THE QUERY CAN BE ASKED OF (R-197) --------------------
+//
+// Tom, 2026-09-25, after the table selector was cut and he reported "We lost the selector now":
+// "I think what is simplest and closest to what we have is a simple 'Filter in table' button ...
+// I think it implies that we filter all tables insofar as we can if 'Everything' is selected."
+//
+// Connectivity is the one property "Everything" actually offers through the controls -- Pressure
+// and the rest are per-scope only findPropDefs() offerings -- and it is node-only, which is the
+// same shape as his "pressure query" example: some tables can answer it, some cannot, and the ones
+// that cannot are left exactly as they were, never emptied.
+console.log('\n--- Everything filters every table the query can be asked of ---');
+{
+	build();
+	// A fifth junction, born with no pipe at all -- the one node "no links at node" is true of.
+	const j5 = L.addNode('junction', 500, 0).id;
+	L.buildDom();
+	L.buildPanel();
+	L.type(L.queryFor('all', 'connection', 'conn-unlinked', ''));
+	const before = JSON.stringify(L.serialize());
+	L.pressFilter();
+	ok('the node tables all get the filter -- Connectivity is offered under Everything for nodes',
+		L.filterQuery('junctions') !== '' && L.filterQuery('reservoirs') !== '' && L.filterQuery('tanks') !== '',
+		JSON.stringify([L.filterQuery('junctions'), L.filterQuery('reservoirs'), L.filterQuery('tanks')]));
+	ok('...and the link, customer and text tables are left alone, not emptied',
+		L.filterQuery('pipes') === '' && L.filterQuery('pumps') === '' && L.filterQuery('valves') === '' &&
+		L.filterQuery('customers') === '' && L.filterQuery('text') === '');
+	ok('the one disconnected junction is the whole Junctions result',
+		same(L.filteredIds('junctions'), [j5]), JSON.stringify(L.filteredIds('junctions')));
+	ok('the receipt names the tables it touched, with a count for each',
+		L.resultsText().indexOf('Junctions') >= 0 && L.resultsText().indexOf('1 of 5') >= 0,
+		L.resultsText());
+	ok('the document itself never changed', JSON.stringify(L.serialize()) === before);
+	// Clearing is the same per-table door section 3 already proved -- nothing second invented for
+	// the multi-table case.
+	L.setFilter('junctions', ''); L.setFilter('reservoirs', ''); L.setFilter('tanks', '');
+	ok('clearing brings every row back', same(L.filteredIds('junctions'), L.allIds('junctions')));
 }
 
 console.log('\n' + checks + ' checks, ' + fails + ' failed');

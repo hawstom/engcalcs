@@ -1674,7 +1674,6 @@ $ec_lang['lpn_pane_filter_clear']='Zobrazit vše';
 $ec_lang['lpn_pane_filter_none']='Ničemu v této tabulce filtr neodpovídá.';
 $ec_lang['lpn_help_screenshots']='Galerie snímků obrazovky';
 $ec_lang['lpn_find_filter_btn']='Filtrovat v aktuální tabulce';
-$ec_lang['lpn_find_filter_table']='Tabulka k filtrování';
 $ec_lang['lpn_find_filter_tip']='Zobrazí pouze části, které odpovídají tomuto dotazu v jedné z tabulek pod mapou. Kresba se nemění a nic se nemaže.';
 $ec_lang['lpn_engine_needed_loading']='Řešič EPANET se načítá, zatímco síť vytváříte. Výsledky budou k dispozici po úplném načtení.';
 $ec_lang['lpn_engine_needed_failed']='Řešič EPANET zatím nebyl načten, nelze jej načíst a tuto síť lze řešit pouze jím. Načte se, jakmile budete připojeni k internetu.';

@@ -1678,7 +1678,6 @@ $ec_lang['lpn_pane_filter_clear']='Prikaži sve';
 $ec_lang['lpn_pane_filter_none']='Ništa u ovoj tablici ne odgovara filtru.';
 $ec_lang['lpn_help_screenshots']='Galerija snimaka zaslona';
 $ec_lang['lpn_find_filter_btn']='Filtriraj u trenutnoj tablici';
-$ec_lang['lpn_find_filter_table']='Tablica za filtriranje';
 $ec_lang['lpn_find_filter_tip']='Prikaži samo dijelove koji odgovaraju ovom upitu u jednoj od tablica ispod karte. Crtež se ne mijenja i ništa se ne briše.';
 $ec_lang['lpn_engine_needed_loading']='Učitavanje EPANET rješavača dok gradite. Rezultati će biti dostupni kada bude potpuno učitan.';
 $ec_lang['lpn_engine_needed_failed']='EPANET rješavač još nije učitan, ne može se učitati, a ova mreža može se riješiti samo njime. Bit će učitan kada budete povezani s internetom.';

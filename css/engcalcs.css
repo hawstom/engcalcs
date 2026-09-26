@@ -1638,12 +1638,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
 .lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
 .lpn-find-pair select { max-width: 100%; }
-/* The table filter's own line, under the Find button (ROADMAP Task 597): a select saying which
-   table and the button that applies the query to it. `flex-end` so the button's baseline sits with
-   the select's box rather than with its label, which is the same alignment .lpn-find-pair uses. */
-.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; margin: 6px 0 0; }
-.lpn-find-filter > div { flex: 1 1 0; min-width: 0; margin: 0; }
-.lpn-find-filter select { max-width: 100%; }
+/* ONE ROW: the Find button, then the Filter in table button (ROADMAP Task 597; row layout, Tom
+   2026-09-23; the table selector cut R-197, 2026-09-25). Both buttons keep their natural width. */
+.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin: 6px 0 0; }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
    sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
    Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of

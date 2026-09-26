@@ -1691,7 +1691,6 @@ $ec_lang['lpn_pane_filter_clear']='Hepsini göster';
 $ec_lang['lpn_pane_filter_none']='Bu tabloda filtreyle eşleşen hiçbir şey yok.';
 $ec_lang['lpn_help_screenshots']='Ekran görüntüsü galerisi';
 $ec_lang['lpn_find_filter_btn']='Geçerli tabloda filtrele';
-$ec_lang['lpn_find_filter_table']='Filtrelenecek tablo';
 $ec_lang['lpn_find_filter_tip']='Haritanın altındaki tablolardan birinde yalnızca bu sorguyla eşleşen parçaları gösterin. Çizim değişmez ve hiçbir şey silinmez.';
 $ec_lang['lpn_engine_needed_loading']='Siz kurarken EPANET çözücüsü yükleniyor. Sonuçlar tamamen yüklendiğinde kullanılabilir olacak.';
 $ec_lang['lpn_engine_needed_failed']='EPANET çözücüsü henüz yüklenmedi, yüklenemiyor ve bu şebeke yalnızca onun tarafından çözülebilir. İnternete bağlandığınızda yüklenecektir.';

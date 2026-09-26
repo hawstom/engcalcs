@@ -1680,7 +1680,6 @@ $ec_lang['lpn_pane_filter_clear']='ሁሉንም አሳይ';
 $ec_lang['lpn_pane_filter_none']='በዚህ ሠንጠረዥ ውስጥ ከማጣሪያው ጋር የሚስማማ ምንም ነገር የለም።';
 $ec_lang['lpn_help_screenshots']='የስክሪንሾት ማዕከለ-ስዕላት';
 $ec_lang['lpn_find_filter_btn']='በአሁኑ ሠንጠረዥ ውስጥ አጣራ';
-$ec_lang['lpn_find_filter_table']='የሚጣራ ሠንጠረዥ';
 $ec_lang['lpn_find_filter_tip']='ከካርታው በታች ካሉት ሠንጠረዦች በአንዱ ውስጥ ከዚህ ጥያቄ ጋር የሚስማሙትን ክፍሎች ብቻ ያሳዩ። ስዕሉ አይለወጥም፣ ምንም አይሰረዝም።';
 $ec_lang['lpn_engine_needed_loading']='እየገነቡ ሳሉ የEPANET ፈታች እየተጫነ ነው። ሙሉ በሙሉ ከተጫነ በኋላ ውጤቶች ይገኛሉ።';
 $ec_lang['lpn_engine_needed_failed']='የEPANET ፈታች እስካሁን አልተጫነም፣ ሊጫንም አልቻለም፣ ይህ መረብ ደግሞ በእሱ ብቻ ሊፈታ ይችላል። ከኢንተርኔት ጋር ሲገናኙ ይጫናል።';

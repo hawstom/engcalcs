@@ -1675,7 +1675,6 @@ $ec_lang['lpn_pane_filter_clear']='הצג הכול';
 $ec_lang['lpn_pane_filter_none']='שום דבר בטבלה זו אינו תואם למסנן.';
 $ec_lang['lpn_help_screenshots']='גלריית צילומי מסך';
 $ec_lang['lpn_find_filter_btn']='סינון בטבלה הנוכחית';
-$ec_lang['lpn_find_filter_table']='טבלה לסינון';
 $ec_lang['lpn_find_filter_tip']='הצג רק את החלקים התואמים לשאילתה זו באחת מהטבלאות שמתחת למפה. השרטוט אינו משתנה ושום דבר אינו נמחק.';
 $ec_lang['lpn_engine_needed_loading']='טעינת פותר EPANET מתבצעת בזמן שאתם בונים. התוצאות יהיו זמינות לאחר הטעינה המלאה.';
 $ec_lang['lpn_engine_needed_failed']='פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.';

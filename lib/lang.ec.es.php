@@ -1780,7 +1780,6 @@ $ec_lang['lpn_pane_filter_clear']='Mostrar todo';
 $ec_lang['lpn_pane_filter_none']='Nada en esta tabla coincide con el filtro.';
 $ec_lang['lpn_help_screenshots']='Galería de capturas de pantalla';
 $ec_lang['lpn_find_filter_btn']='Filtrar en la tabla actual';
-$ec_lang['lpn_find_filter_table']='Tabla para filtrar';
 $ec_lang['lpn_find_filter_tip']='Muestra solo las partes que coinciden con esta consulta en una de las tablas debajo del mapa. El dibujo no se modifica y no se elimina nada.';
 $ec_lang['lpn_engine_needed_loading']='Cargando el solucionador de EPANET mientras usted construye. Los resultados estarán disponibles cuando termine de cargarse.';
 $ec_lang['lpn_engine_needed_failed']='El solucionador de EPANET aún no se cargó, no se puede cargar, y esta red solo se puede resolver con él. Se cargará cuando esté conectado a internet.';

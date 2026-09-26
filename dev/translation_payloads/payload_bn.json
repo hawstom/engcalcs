@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2030,
-        "delta_key_count": 186,
+        "expected_key_count": 2053,
+        "delta_key_count": 217,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -559,9 +559,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -578,9 +607,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -747,9 +778,38 @@
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_offscreen_intact": "Your network is intact.",
+        "lpn_units_mapcoords": "Map coordinates",
+        "lpn_units_mapcoords_deg": "degrees",
+        "lpn_units_usft": "US survey ft",
+        "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
+        "lpn_convas_title": "Convert as",
+        "lpn_convas_coordsys_tip": "The coordinate system the copy is converted to. When it differs from this project's, two placement steps follow. A project that already knows where it is opens both steps already answered, so you can accept them as they are or make changes.",
+        "lpn_convas_from": "Current: {crs}",
+        "lpn_convas_epsg": "EPSG coordinate system",
+        "lpn_convas_epsg_tip": "Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).",
+        "lpn_convas_unnamed": "Unnamed (local) georeference",
+        "lpn_convas_unnamed_tip": "Local coordinates in the length unit, with the world map attached.",
+        "lpn_convas_none_tip": "Local coordinates in the length unit, with no world map for now.",
+        "lpn_convas_units_tip": "The units the copy is converted to. The original keeps its own numbers and units.",
+        "lpn_convas_round": "Round converted values",
+        "lpn_convas_round_tip": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+        "lpn_convas_round_none": "No rounding",
+        "lpn_convas_round_flow": "Demand and flow",
+        "lpn_convas_label_col": "Suffix",
+        "lpn_convas_label_tip": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+        "lpn_convas_oneway": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+        "lpn_convas_ok": "Convert",
+        "lpn_convas_no_transform": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+        "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
+        "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_find_filter_row": "{table}: {n} of {all}",
+        "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
+        "lpn_find_filter_none": "This query doesn't apply to any table.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -766,9 +826,11 @@
         "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crsbox_title": "Coordinate system",
         "lpn_crs_unplaceable_mark": "(no map)",
-        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_crs_unplaceable": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
         "lpn_crs_unnamed": "unnamed",
+        "lpn_inp_report_no_crs": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
         "lpn_lock_open_inuse": "This file appears to be in use.",
         "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
         "lpn_lock_age_inuse": "It has been in use for {x}.",
@@ -1430,19 +1492,435 @@
                 }
             }
         },
+        "lpn_units_mapcoords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "দৈর্ঘ্য ও মানচিত্র স্থানাঙ্ক",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "উচ্চতা ও জলশীর্ষ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_mapcoords_deg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "দৈর্ঘ্য ও মানচিত্র স্থানাঙ্ক",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "উচ্চতা ও জলশীর্ষ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_units_usft": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_length",
+                    "value": "দৈর্ঘ্য ও মানচিত্র স্থানাঙ্ক",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_units_elevhead",
+                    "value": "উচ্চতা ও জলশীর্ষ",
+                    "english": "Elevation and head"
+                }
+            }
+        },
+        "lpn_file_convert_as": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
         "lpn_copy_of": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "একটি xy ফাইল মানচিত্রে খুলুন…",
-                    "english": "Convert coordinates as…"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_file_import_geo_tip",
-                    "value": "এই পৃষ্ঠায় একটি নতুন প্রকল্প ট্যাবে, রাস্তার মানচিত্রে একটি প্রকল্প ফাইল বা একটি EPANET ফাইল খোলে। আপনি হাতে অঙ্কনটি পৃথিবীতে বসান: সাইটে প্যান ও জুম করুন, তারপর মাপ ও দিক ঠিক করে বসিয়ে দিন। যদি ফাইলের x ও y ইতিমধ্যে একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হয়, তাহলে এগুলো ইতিমধ্যে lat\/lon বোতাম চাপুন এবং নেটওয়ার্কটি সরাসরি তার প্রকৃত জায়গায় চলে যাবে। আপনার লেখা প্রতিটি সংখ্যা যেমন আছে তেমনই থাকে।",
-                    "english": "Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead."
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_coordsys_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_epsg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_unnamed_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_none_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_round_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_label_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_oneway": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_no_transform": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_convas_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_file_convert_as_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "উপগ্রহ চিত্র দেখান",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                }
+            }
+        },
+        "lpn_georef_answered": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_asdegrees",
+                    "value": "এই ফাইলের x ও y একটি দ্রাঘিমাংশ ও একটি অক্ষাংশ হিসেবে পড়া হয়েছে, তাই নেটওয়ার্কটি ইতিমধ্যে মানচিত্রে আছে এবং কিছু সরানো হয়নি। এটি সঠিক জায়গায় আছে কিনা যাচাই করুন, তারপর এই অবস্থান রাখুন বোতাম চাপুন।",
+                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "মডেলটি বসাতে দুটি ধাপ লাগে। ধাপ ১ হলো দ্রুততম: মডেলটি স্থির থাকে এবং আপনি এর পেছনের মানচিত্রটি সরান, যতক্ষণ না আপনার সাইটটি মডেলের নিচে মোটামুটি সঠিক আকারে চলে আসে। এখনও কোনো ঘূর্ণন নেই। ধাপ ২ হলো নিখুঁততম: আপনি মডেলটি নিজেই টেনে আনেন, আকার পরিবর্তন করেন ও ঘোরান। আপনার প্রকল্প শুরুতে সারা পৃথিবীর একটি মানচিত্রে থাকে, তাই প্রথমে আপনার অবস্থান খুঁজুন, তারপর মডেলটি এখানে বসান বোতাম চাপুন।",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1475,6 +1953,54 @@
                     "key": "lpn_pane_print",
                     "value": "টেবিল প্রিন্ট করুন",
                     "english": "Print table"
+                }
+            }
+        },
+        "lpn_find_filter_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "মানচিত্রের নিচের সারণিগুলোর একটিতে এই অনুসন্ধানের সাথে মেলে এমন অংশগুলোই দেখান। অঙ্কন পরিবর্তিত হয় না এবং কিছুই মুছে ফেলা হয় না।",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "ধারণ করে",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "মানচিত্রের নিচের সারণিগুলোর একটিতে এই অনুসন্ধানের সাথে মেলে এমন অংশগুলোই দেখান। অঙ্কন পরিবর্তিত হয় না এবং কিছুই মুছে ফেলা হয় না।",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "ধারণ করে",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_filter_tip",
+                    "value": "মানচিত্রের নিচের সারণিগুলোর একটিতে এই অনুসন্ধানের সাথে মেলে এমন অংশগুলোই দেখান। অঙ্কন পরিবর্তিত হয় না এবং কিছুই মুছে ফেলা হয় না।",
+                    "english": "Hide rows that do not match this query in the Table(s) that match \"What to search\" above. Nothing is deleted."
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "ধারণ করে",
+                    "english": "contains"
                 }
             }
         },
@@ -1734,6 +2260,22 @@
                 }
             }
         },
+        "lpn_crsbox_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_crs",
+                    "value": "মানচিত্র প্রক্ষেপণ",
+                    "english": "Coordinate system"
+                },
+                "next_translated": {
+                    "key": "lpn_crs_view",
+                    "value": "মানচিত্র দৃশ্য দিয়ে ফিল্টার করুন",
+                    "english": "Filter by map view"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,
@@ -1779,6 +2321,22 @@
                     "key": "lpn_crs_none",
                     "value": "জিওরেফারেন্সড নয়",
                     "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_inp_report_no_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_label_anchor",
+                    "value": "টেক্সট লেবেলগুলো EPANET যেভাবে বসায় সেভাবেই বসানো হয়েছে, তাদের উপরের বাম কোণ থেকে।",
+                    "english": "Text labels are placed as EPANET places them, from their top left corner."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "এই পৃষ্ঠা EPANET যা করে তার সবকিছু ব্যবহার করে না, কিন্তু আপনার ফাইলের কিছুই ফেলে দেওয়া হয় না। নিচে দেখানো হলো আপনার ফাইলে যা আছে যা এই পৃষ্ঠা ব্যবহার না করেই রাখে, এবং ফাইলটি পড়ার সময় কী পরিবর্তিত হয়েছিল:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
                 }
             }
         },

@@ -64,11 +64,11 @@ function allText(n) {
 //
 // IT MATCHES ON THE LIVE LANG STRING, NEVER ON A HARDCODED WORD. This used to test /Closed/, and
 // on 2026-08-14 the English label became "Shut" (the word "closed" is a polysemy inside hydraulics
-// -- a closed conduit is a pressurised pipe) and all ten assertions below failed at once. The
-// harness was right to fail: it had a real coupling to the label. But it was coupled to the wrong
-// thing -- a test that breaks when a WORD changes is testing the wording, and this one would have
-// broken identically for any of the 26 translations. Reading pageConfig makes it track whatever the
-// label says, in whatever language the stub is running.
+// -- a closed conduit is a pressurised pipe) and all ten assertions below failed at once. R-224
+// (2026-09-24) reversed that: Tom ruled that one suite-wide word (EPANET's "Closed") beats one
+// translator's polysemy risk, so the label is "Closed" again. The harness did not need to change
+// either time -- it had a real coupling to the label, just never to a hardcoded word. Reading
+// pageConfig makes it track whatever the label says, in whatever language the stub is running.
 //
 // NOTE two shapes of the DOM stub: tagName is UPPERCASE (mkEl uppercases it), and there is no
 // dispatchEvent -- the house pattern in these harnesses is to call the registered _listeners
@@ -82,7 +82,7 @@ function closedBoxIn(fields) {
 			walk(c);
 		}
 	})(fields);
-	const label = (global.EngCalcs && EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_field_closed) || 'Shut';
+	const label = (global.EngCalcs && EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_field_closed) || 'Closed';
 	for (const f of found) {
 		if (allText(f.parent).indexOf(label) !== -1) { return f.box; }
 	}

@@ -40,7 +40,7 @@ by design.
 | Resolved demand (result) | ✓ | n/a *(result)* | n/a *(result)* | ✓ | ✓ | n/a *(computed, not stored)* |
 | Demand category description | ✓ | — *(junction only, gated)* | n/a *(a list entry, not a scalar)* | n/a | n/a | `[DEMANDS]` (as a pattern name) |
 | Required fire flow | ✓ | ✓ *(junction only)* | ✓ | — | n/a *(design input, not a map quantity)* | n/a *(this suite's own concept, no EPANET section)* |
-| Emitter coefficient | ✓ | — | — | — | n/a | `[EMITTERS]` |
+| Emitter coefficient | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, own `set` -- not `prop` -- so the two-unit conversion runs)* | — | n/a | `[EMITTERS]` |
 | Head (result) | ✓ | ✓ | n/a *(result)* | ✓ | ✓ | n/a *(computed)* |
 | Pressure (result) | ✓ | ✓ | n/a *(result)* | ✓ | ✓ | n/a *(computed)* |
 | Initial quality | ✓ | ✓ *(chemical mode)* | n/a *(not in `pushSpecList`)* | ✓ | ✓ *(chemical mode)* | `[QUALITY]` |
@@ -70,10 +70,10 @@ by design.
 | Coordinates | ✓ | — | — | n/a | n/a | `[COORDINATES]` |
 | Active / included | ✓ | — | — | n/a | n/a | n/a |
 | Elevation | ✓ | ✓ *(shared node band)* | ✓ | ✓ | ✓ | `[TANKS]` |
-| Level (current) | ✓ | — | — | — | ✓ *(Task 696, 2026-09-25)* | `[TANKS]` (`InitLvl`) |
-| Min / max level | ✓ | — | — | — | — | `[TANKS]` |
-| Tank diameter | ✓ | — | — | — | — | `[TANKS]` |
-| Mixing model / fraction | ✓ | — | — | n/a *(categorical)* | n/a | `[MIXING]` |
+| Level (current) | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, overridable, `prop: 'level'`)* | — | ✓ *(Task 696, 2026-09-25)* | `[TANKS]` (`InitLvl`) |
+| Min / max level | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, base-owned)* | — | — | `[TANKS]` |
+| Tank diameter | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, base-owned)* | — | — | `[TANKS]` |
+| Mixing model / fraction | ✓ | ✓ *(Task 708, the internal EPANET tokens, via the new `choices` door in `replaceValueOf()`)* | ✓ *(Task 708)* | n/a *(categorical)* | n/a | `[MIXING]` |
 | Reaction coefficient (tank) | ✓ | n/a *(no per-type Find row; see pipe's pair for the pattern)* | — | n/a | n/a | `[REACTIONS]` |
 | Water surface (result) | ✓ | n/a | n/a | n/a | ✓ | n/a *(computed; `[TANKS]`'s `InitLvl` is the input)* |
 | Initial quality | ✓ | ✓ *(chemical mode)* | — | ✓ | ✓ | `[QUALITY]` |
@@ -86,10 +86,10 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[PIPES]`/`[TAGS]` |
 | Endpoints | ✓ | n/a *(a connectivity fact, asked through the "Connection" row instead)* | n/a | n/a | ✓ | `[PIPES]` |
-| Active / Shut | ✓ | — | — | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, internal key `status`, labelled `lpn_field_closed`/"Closed"; the table's own `closed` checkbox key is a declared exemption in `property_venue_check.php`)* | ✓ *(Task 708, a `<select>` of the translated Open/Closed words, `choices: ['open','closed']` underneath)* | n/a *(boolean)* | ✓ *(Status)* | `[STATUS]` |
 | Pipe type | ✓ | n/a *(a type reference; a type's stated diameter/roughness are what Find offers)* | n/a | n/a *(categorical)* | n/a | n/a *(this suite's own concept; exports the resolved diameter/roughness)* |
 | Diameter | ✓ | ✓ | ✓ | ✓ | ✓ | `[PIPES]` |
-| Length | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | — | n/a *(declared not colourable, `FIND_EXTRA_LINK_FIELDS`'s own comment)* | ✓ | `[PIPES]` |
+| Length | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | ✓ *(Task 708, own `set` -- not `prop` -- so `lenAuto` is cleared in Base, matching the table's own cell)* | n/a *(declared not colourable, `FIND_EXTRA_LINK_FIELDS`'s own comment)* | ✓ | `[PIPES]` |
 | Roughness | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | ✓ | ✓ | ✓ | `[PIPES]` |
 | Minor loss, k | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`)* | ✓ | n/a *(declared not colourable)* | ✓ | `[PIPES]` |
 | Fittings list | ✓ | n/a *(a list; its total is the k column above)* | n/a | n/a | n/a | n/a *(this suite's own concept; exports the resolved k)* |
@@ -103,12 +103,12 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[PUMPS]`/`[TAGS]` |
 | Endpoints | ✓ | n/a | n/a | n/a | ✓ | `[PUMPS]` |
-| Active / Shut | ✓ | — | — | n/a | ✓ | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
 | Pump curve reference | ✓ | n/a *(a curve is a document object, Library-edited, per `dev/lpn-rulings.md`)* | n/a | n/a | n/a | `[PUMPS]`/`[CURVES]` |
-| Relative speed | ✓ | — | — | — | — | `[PUMPS]` |
+| Relative speed | ✓ | ✓ *(Task 708)* | ✓ *(Task 708, base-owned, the same 1-if-blank/zero/negative rule the table cell uses)* | — | — | `[PUMPS]` |
 | Speed pattern | ✓ | — | — | n/a | n/a | `[PUMPS]` |
 | Efficiency curve reference | ✓ | n/a *(curve object)* | n/a | n/a | n/a | `[ENERGY]`/`[CURVES]` |
-| Energy price / pattern | ✓ | — | — | — | n/a | `[ENERGY]` |
+| Energy price / pattern | ✓ | ✓ *(Task 708)* | ✓ *(Task 708; the pattern is an id, `str`-flagged and validated against the pattern library, the same shape as a customer's demand pattern)* | — | n/a | `[ENERGY]` |
 | Flow, head loss (results) | ✓ | ✓ | n/a | ✓ | ✓ | n/a *(computed)* |
 
 ## Valve
@@ -117,7 +117,7 @@ by design.
 |---|---|---|---|---|---|---|
 | ID, tag, description | ✓ | ✓ | tag/desc ✓, ID n/a | n/a | ✓ | `[VALVES]`/`[TAGS]` |
 | Endpoints | ✓ | n/a | n/a | n/a | ✓ | `[VALVES]` |
-| Active / Shut | ✓ | — | — | n/a | ✓ | `[STATUS]` |
+| Active / Closed | ✓ | ✓ *(Task 708, as `status`, the same declared exemption as the pipe's row)* | ✓ *(Task 708)* | n/a | ✓ | `[STATUS]` |
 | Valve type | ✓ | n/a *(categorical)* | n/a | n/a | ✓ | `[VALVES]` |
 | Setting | ✓ | n/a *(no shared unit across types; `EC_TABLE_PARITY_EXEMPT`'s own reason)* | ✓ *(exempt from the popup-side check by kind, see `lpn_field_valve_setting_*`)* | n/a | ✓ | `[VALVES]` |
 | Diameter | ✓ | ✓ *(shared link band)* | ✓ *(TCV only, per `pushSpecList`'s own comment)* | ✓ | ✓ | `[VALVES]` |
@@ -164,32 +164,64 @@ report).** In flight on the unmerged `feat/zoom-scale-rules` branch (R-174), whi
 `table_column_parity_check.php`'s `EC_TABLE_PARITY_EXEMPT` already names and refuses to let the
 check go green without. Once that branch merges this row disappears from the matrix.
 
-**2. A closed/inactive pipe, pump or valve cannot be found or bulk-replaced.** "Active"/"Shut" is
-editable in every asset's own table and printed on the map as Status, but there is no Find row for
-it at all, on any element. *"Find every closed valve"* is a plausible question with no answer on
-this page today. Ranked high: it is exactly the shape of the gap Tom asked the audit to catch, on
-a property every table already carries.
+**2. CLOSED (Task 708).** A closed/inactive pipe, pump or valve is now findable and replaceable
+under a new Find/Replace property, internally `status` (`'open'`/`'closed'`, matched
+case-insensitively through the new `choices` door in `replaceValueOf()`). It reads and writes the
+same `effective(l, 'status')` / `setProp(l, 'status', ...)` seam the table's own `closed` checkbox
+does (`paneColClosed()`), under Find's own KEY for it rather than the checkbox's inverted one --
+`property_venue_check.php` declares `pipe/closed`, `pump/closed` and `valve/closed` as exemptions
+for exactly that key-name mismatch. **Labelled `lpn_field_closed` ("Closed"), not `lpn_result_status`
+("Status")** -- pre-review fix: that word already names a different, run-dependent concept
+elsewhere on this page (the post-solve/EPS status the colour ramp and the Labels legend show), and
+using it here too would put "Status" on two different questions in one panel.
 
-**3. Emitter coefficient (junction) is not findable or replaceable.** It is a per-junction fire
-protection input with its own table column and popup row, and Find offers `demandCategory` and
-`fireFlow` at the same junction-only gate but skips this one. Plausibly an oversight rather than a
-decision -- nothing in `findPropDefs()` argues against it the way the reaction pair's or roughness's
-comments do for their own exclusions.
+**3. CLOSED (Task 708).** Emitter coefficient (junction) is now findable and replaceable. Its own
+`pushSpecList()` entry has no `prop` and goes through `emitterToDisplay()`/`emitterToStore()`
+directly in a custom `set`, because `replaceWrite()` calls `setProp()` straight through for any
+spec carrying a `prop` -- which would have stored the displayed number raw and skipped the one
+two-unit conversion on this page.
 
-**4. Tank level, min/max level, diameter, and mixing model/fraction have no Find or Replace row
-at all.** A tank is the one node type with several of its own scalar inputs, and none of them are
-reachable outside the popup and the table. *"Find every tank under 20 ft diameter"* has no answer.
-Ranked above the pump/valve gaps below because these are plain numbers with an obvious comparison,
-not a curve reference or a categorical choice.
+**4. CLOSED (Task 708).** Tank level, min/max level, diameter, and mixing model/fraction all have
+Find and Replace rows now, gated to `d.type === 'tank'` in `findPropDefs()` exactly as the fire
+flow pair is gated to a junction. Mixing model is matched through the same `choices` door as
+`status`, against EPANET's own four tokens (`MIXED`/`2COMP`/`FIFO`/`LIFO`), never translated --
+the CODE is never translated and never has to be, because nobody now types it (see below).
 
-**5. Pump relative speed and energy price/pattern are not findable or replaceable.** Same shape as
-#4 -- ordinary numbers, no Find row, no argument on record for the omission.
+**A pre-review fix to 2 and 4: a choice property is picked from a `<select>`, never typed.** Tom's
+pre-reviewer caught what the first pass of 2 and 4 missed: `status` and `mixingModel` were given
+the ordinary text box every other Find/Replace property uses, so a Spanish reader had to type the
+English word `cerrado` to find a closed pipe, and a matched row printed the English word `closed`
+straight back regardless of the page's language -- and the same failure for `mixingModel`'s four
+EPANET tokens. `findChoiceDefs(prop)` is now the one list of `[code, translated label]` pairs a
+choice property offers (reusing existing keys throughout: `lpn_result_status_open`/`_closed` for
+`status`, and `mixingModel`'s own `paneColMixingModel().choices()` -- the popup's and the table's
+own four words, read rather than copied); `findPropIsChoice()`/`renderFindControls()` and
+`buildReplaceForm()` render it as a `<select>` in place of the text box, and `findResultRow()`
+prints the translated word for a matched value instead of the stored code. The codes themselves
+stay English EPANET tokens, unseen and untyped, exactly as a curve's kind is.
 
-**6. Length is findable but not writable through Replace.** `FIND_EXTRA_LINK_FIELDS` explicitly
-adds it to Find; `pushSpecList()` does not carry it, so *"find every 500 ft run, set it to 520"*
-finds the run and cannot make the edit. Everything else `FIND_EXTRA_LINK_FIELDS` adds (`km`,
-`bulkCoeff`, `wallCoeff`) IS in `pushSpecList()` -- length looks like the one left out rather than a
-decision.
+**5. CLOSED (Task 708).** Pump relative speed and energy price/pattern are now findable and
+replaceable. Speed is base-owned (not in `LPN_OVERRIDABLE`), so its spec carries no `prop` and
+writes bare, with the same "blank/zero/negative means 1" rule `paneColPumpSpeed()` states. The
+price pattern is an id rather than a quantity, `str`-flagged and validated against
+`libPatternsRead()` before it is written, the same shape `customerReplaceSpecs()`'s `custPattern`
+already uses.
+
+**6. CLOSED (Task 708).** Length is now writable through Replace as well as findable. Its
+`pushSpecList()` entry also has no `prop`: a Base-side write must clear `lenAuto` the way the
+table's own length cell does, or the next geometry pass silently re-derives the length from the
+drawing and throws the typed value away. Inside a scenario `lenAuto` is never consulted, so
+`setProp()` alone is correct there.
+
+**A guard closing gaps 2-6 exposed, fixed alongside them.** "Settings > New assets > Apply these
+new-asset values to every existing asset" used to assume every `pushSpecList()` entry with a
+map-label toggle also had a `defaultRow()`-seeded `settings.defaults` entry -- true for every
+property already in the list. `length` and `status` are shown on the map by default option and
+have neither, so without a second gate at that button's own filter, turning either label on and
+pressing the button would have pushed `undefined` onto every pipe. Fixed at the one call site
+(`pushSpecs.filter(...)`, the "New assets" push in `js/looped-network.js`), not in
+`pushFieldShown()` itself, which the scenario push still uses unguarded and correctly (it discards
+overrides rather than reading `settings.defaults`).
 
 **7. Coordinates (x, y) are not offered in Find, while a Customer's Station and Offset -- also
 positions -- were added to Find on Tom's own request (2026-09-19: *"Bad decision. Put them in."*).**

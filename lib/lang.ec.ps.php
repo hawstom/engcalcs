@@ -1675,7 +1675,6 @@ $ec_lang['lpn_pane_filter_clear']='ټول وښایاست';
 $ec_lang['lpn_pane_filter_none']='په دې جدول کې هیڅ شی له فلټر سره سمون نه خوري.';
 $ec_lang['lpn_help_screenshots']='د سکرین‌شاټونو ګالري';
 $ec_lang['lpn_find_filter_btn']='په اوسني جدول کې فلټر';
-$ec_lang['lpn_find_filter_table']='د فلټر کولو جدول';
 $ec_lang['lpn_find_filter_tip']='یوازې هغه برخې وښایاست چې د نقشې لاندې جدولونو کې د دې پوښتنې سره سمون خوري. رسم نه بدلیږي او هیڅ شی نه ړنګیږي.';
 $ec_lang['lpn_engine_needed_loading']='ستاسو د جوړولو پرمهال د EPANET حل کوونکی بارول کیږي. پایلې به هغه وخت شته وي کله چې بشپړ بار شي.';
 $ec_lang['lpn_engine_needed_failed']='د EPANET حل کوونکی تر اوسه نه دی بار شوی، نشي بارېدلی، او دا شبکه یوازې د هغه لخوا حل کیدلی شي. کله چې انټرنیټ سره وصل شئ نو بار به شي.';
