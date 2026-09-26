@@ -130,7 +130,7 @@ by design.
 | Property | Popup | Multi-properties | Tables | Find | Replace | Symbology | Labels | `.inp` |
 |---|---|---|---|---|---|---|---|---|
 | ID | n/a *(a Text has no id reachable from any screen -- `findPropDefs()`'s own comment, Task quoting Tom 2026-08-29)* | n/a | ✓ *(a display key only)* | n/a | n/a | n/a | n/a | n/a |
-| Words (the text itself) | ✓ | ✓ | ✓ | ✓ | n/a *(no Replace row; see ranking)* | n/a | n/a *(it IS the label)* | `[LABELS]` |
+| Words (the text itself) | ✓ | ✓ | ✓ | ✓ | ✓ *(Task 708, gap #8, closed; whole-field only, no substring replace)* | n/a | n/a *(it IS the label)* | `[LABELS]` |
 | Size multiplier | ✓ | ✓ | ✓ | ✓ | — | n/a | n/a | n/a *(`[LABELS]` carries no size column)* |
 | Bold | ✓ | ✓ | ✓ | — | — | n/a | n/a | n/a |
 | Rotation | ✓ | ✓ | ✓ | — | — | n/a | n/a | n/a |
@@ -237,10 +237,13 @@ with the node through the same `updateNode()` call, because a pipe holds no vert
 endpoint. A Customer's own position stays answered by Station and Offset (closed above, gap
 unnumbered): it has no separate x/y of its own to add here.
 
-**8. A Text's words have no Replace row**, though every other identity-like property (description,
-tag) does. Ranked low: a Text's words are closer to a description than to a design variable, and
-Find already supports `contains` on it, which is most of what a bulk edit on free text would need
-anyway.
+**8. CLOSED.** A Text's words now have a Replace row (Tom: *"Should a Text's words be replaceable?
+Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace
+within texts (partial replace)."*). Whole-field only, on the same terms every other Replace
+property here obeys: the matched Texts' content BECOMES the typed value, never a substring
+substitution -- Find's own `contains` is still the tool for a partial match. `str: true`, like a
+description, so the exact bytes typed survive; the write is a plain `prop` through `setProp()`,
+exactly as the popup's textarea and the Tables column's own `text` cell write it.
 
 **9. Correct by design, listed so nobody re-proposes them:** results (head, pressure, flow,
 velocity, head loss, gradient, friction factor, status text, reaction rate, water age, resolved

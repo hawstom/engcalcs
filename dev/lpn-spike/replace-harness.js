@@ -50,6 +50,7 @@ const L = loadLoopedNetwork(
 	// words (gap #8): read straight off the real functions Properties and the Tables column use,
 	// not a second copy of the arithmetic.
 	"\t\taxisNames: axisNames, nodeCoordAxis: nodeCoordAxis, nodeById: nodeById, linkById: linkById,\n" +
+	"\t\tlabelById: labelById,\n" +
 	"\t\tgeomLength: function (id) { return linkGeomLength(linkById(id)); },\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tundo: undo, undoDepth: function () { return undoStack.length; },\n" +
@@ -432,6 +433,55 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	ok('the scenario sees the new position', L.effective(b2, 'x') === 260, String(L.effective(b2, 'x')));
 	ok('...BASE DOES NOT MOVE', L.baseValue(b2, 'x') === 200, String(L.baseValue(b2, 'x')));
 	ok('...and it is recorded as an override', L.hasOverride(b2, 'x') === true);
+}
+
+// ---- 9. A TEXT'S WORDS (Task 708, ranked gap #8) ------------------------------------------------
+//
+// Tom: *"Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay
+// with whole-field replace. No string replace within texts (partial replace)."* So what is
+// asserted is that the matched Text's WHOLE content becomes the typed value -- not a substring
+// substitution inside it -- and that one undo puts the old words back.
+{
+	console.log('\n--- Find and Replace a Text\'s words ---');
+	L.reset();
+	const t1id = L.addText(50, 50, null).id;
+	L.setProp(L.labelById(t1id), 'text', 'Old pump house note');
+	const t2id = L.addText(60, 60, null).id;
+	L.setProp(L.labelById(t2id), 'text', 'Valve vault');
+	L.buildDom();
+
+	ok('a Text scope now offers its words to Replace',
+		L.specFields('text').indexOf('text') >= 0, JSON.stringify(L.specFields('text')));
+
+	L.query('text', 'text', 'contains', 'pump');
+	L.setReplace('text', 'Chlorine booster station');
+	L.preview();
+	ok('the one matching Text is pending', L.pending() && L.pending().length === 1, JSON.stringify(L.pending()));
+	const applied = L.apply();
+	ok('the write reports one Text changed', applied === 1, String(applied));
+	// **WHOLE FIELD, NOT A SUBSTRING SPLICE.** A partial replace would still contain the words
+	// "pump house"; this must not.
+	ok('the matched Text\'s whole content became the typed value',
+		L.effective(L.labelById(t1id), 'text') === 'Chlorine booster station',
+		L.effective(L.labelById(t1id), 'text'));
+	ok('...and the Text that did not match is untouched',
+		L.effective(L.labelById(t2id), 'text') === 'Valve vault');
+
+	// Re-fetched by id, not through the object returned at creation: undo restores the document
+	// from a snapshot, and the old object reference is stale the moment that happens.
+	L.undo();
+	ok('one undo puts the old words back',
+		L.effective(L.labelById(t1id), 'text') === 'Old pump house note',
+		L.effective(L.labelById(t1id), 'text'));
+
+	// **A BLANK BOX IS STILL A REFUSAL, THE SAME RULE A DESCRIPTION AND A TAG OBEY** -- erasing a
+	// Text's words on every match is a real, destructive action and must not be spelled the same
+	// way as leaving the box alone.
+	L.query('text', 'text', 'contains', 'valve');
+	L.setReplace('text', '');
+	L.preview();
+	ok('an empty box refuses rather than blanking the Text', L.pending() === null &&
+		L.effective(L.labelById(t2id), 'text') === 'Valve vault');
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
