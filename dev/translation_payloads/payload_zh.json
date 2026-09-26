@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2106,
-        "delta_key_count": 268,
+        "expected_key_count": 2101,
+        "delta_key_count": 270,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -572,6 +572,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -594,7 +596,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -842,6 +844,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -864,7 +868,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -1967,19 +1971,51 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1988,14 +2024,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2004,14 +2040,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2020,14 +2056,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2036,14 +2072,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2052,14 +2088,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2068,14 +2104,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2084,14 +2120,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2100,14 +2136,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2116,14 +2152,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2132,14 +2168,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2148,14 +2184,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2164,14 +2200,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2180,14 +2216,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2196,14 +2232,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2212,14 +2248,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2228,14 +2264,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2244,14 +2280,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2260,14 +2296,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2276,14 +2312,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2292,14 +2328,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2308,14 +2344,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2324,14 +2360,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_xymap",
-                    "value": "xy 坐标",
-                    "english": "xy"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2340,9 +2376,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "此文件中的 x 和 y 已被读取为经度和纬度，因此管网已经出现在地图上，未作任何移动。请检查其位置是否正确，然后点击“保留此位置”。",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "显示卫星影像",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2756,9 +2792,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "已投影的项目会在其自身的平面上打开，而不是在您搜索到的地点。要将该平面对应到地球上，需要进行坐标转换，而本页面目前尚不具备这一功能。",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "已列出 {total} 个投影中的 {n} 个。",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2772,9 +2808,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "已投影的项目会在其自身的平面上打开，而不是在您搜索到的地点。要将该平面对应到地球上，需要进行坐标转换，而本页面目前尚不具备这一功能。",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "已列出 {total} 个投影中的 {n} 个。",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2788,9 +2824,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "已投影的项目会在其自身的平面上打开，而不是在您搜索到的地点。要将该平面对应到地球上，需要进行坐标转换，而本页面目前尚不具备这一功能。",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "已列出 {total} 个投影中的 {n} 个。",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -5200,5 +5236,8 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map"
+    }
 }

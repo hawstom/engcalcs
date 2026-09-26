@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2106,
-        "delta_key_count": 268,
-        "exempt_key_count": 31,
+        "expected_key_count": 2101,
+        "delta_key_count": 270,
+        "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -24,8 +24,6 @@
             "lpn_ex_net3_title",
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
-            "lpn_geomap",
-            "lpn_xymap",
             "lpn_tip_join",
             "lpn_field_x",
             "lpn_field_y",
@@ -579,6 +577,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -601,7 +601,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -849,6 +849,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -871,7 +873,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -1974,6 +1976,38 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Показати супутникові знімки",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Показати супутникові знімки",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
@@ -1984,9 +2018,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2000,9 +2034,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2016,9 +2050,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2032,9 +2066,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2048,9 +2082,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2064,9 +2098,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2080,9 +2114,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2096,9 +2130,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2112,9 +2146,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2128,9 +2162,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2144,9 +2178,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2160,9 +2194,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2176,9 +2210,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2192,9 +2226,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2208,9 +2242,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2224,9 +2258,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2240,9 +2274,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2256,9 +2290,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2272,9 +2306,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2288,9 +2322,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2304,9 +2338,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2320,9 +2354,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2336,9 +2370,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Розміщення моделі складається з двох кроків. Крок 1 — швидкий: модель лишається нерухомою, а ви пересуваєте карту позаду неї, доки ваша ділянка не опиниться під моделлю приблизно потрібного розміру. Повороту ще немає. Крок 2 — точний: ви перетягуєте, змінюєте розмір і повертаєте саму модель. Спочатку ваш проєкт на карті всього світу, тож знайдіть своє місце, а потім натисніть кнопку «Розмістити модель тут».",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2347,9 +2381,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "X та y в цьому файлі прочитано як довготу та широту, тож мережа вже на карті, і нічого не пересунуто. Перевірте, чи вона на правильному місці, потім натисніть «Залишити це розміщення».",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Показати супутникові знімки",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2763,9 +2797,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Проєкт із проєкцією відкривається на власній площині, а не в місці, яке ви шукали. Щоб розмістити цю площину на Землі, потрібне перетворення координат, якого ця сторінка ще не має.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "Показано {n} із {total} проєкцій.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2779,9 +2813,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Проєкт із проєкцією відкривається на власній площині, а не в місці, яке ви шукали. Щоб розмістити цю площину на Землі, потрібне перетворення координат, якого ця сторінка ще не має.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "Показано {n} із {total} проєкцій.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2795,9 +2829,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Проєкт із проєкцією відкривається на власній площині, а не в місці, яке ви шукали. Щоб розмістити цю площину на Землі, потрібне перетворення координат, якого ця сторінка ще не має.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "Показано {n} із {total} проєкцій.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -5207,5 +5241,8 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map"
+    }
 }

@@ -631,14 +631,16 @@ setUnitSet('si');
 			v ? v.cx + ', ' + v.cy + ' @ ' + v.s : 'no view');
 	}
 
-	// **AND THE HONEST HALF.** A projected project cannot be placed, so what is asserted is that it
-	// says so -- in the language file's own words, never in an English literal.
+	// **AND THE HONEST HALF.** This harness loads the editor WITHOUT js/lpn-crs.js, so a plane cannot
+	// be placed, and what is asserted is that the page says so -- in the language file's own words,
+	// never an English literal. A missing module is a page that did not load, so it says reload
+	// (Task 696 retired the sentence that said this page "does not have yet" a transform).
 	noticeEl.textContent = '';
 	L.reset();
 	L.setCanvas(W, H);
 	L.createProjectFrom({ geo: false, crs: ZONE12N, units: {}, method: 'hw', place: PETALUMA });
-	ok('a projected project made from the wizard states that it cannot travel there',
-		noticeEl.textContent === PC.lpn_crs_place_projected, noticeEl.textContent);
+	ok('an EPSG project made while the transforms are missing says to reload',
+		noticeEl.textContent === PC.lpn_georef_unavailable, noticeEl.textContent);
 	ok('...and holds the projection it was given', L.crsCode() === ZONE12N, L.crsCode());
 	{
 		const v = L.currentView();

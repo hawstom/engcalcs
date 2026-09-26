@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2106,
-        "delta_key_count": 272,
-        "exempt_key_count": 39,
+        "expected_key_count": 2101,
+        "delta_key_count": 274,
+        "exempt_key_count": 37,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -25,8 +25,6 @@
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
             "lpn_tool_file",
-            "lpn_geomap",
-            "lpn_xymap",
             "lpn_dialog_ok",
             "lpn_field_auto",
             "lpn_field_x",
@@ -587,6 +585,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -609,7 +609,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -861,6 +861,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -883,7 +885,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -1990,6 +1992,38 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Mostra immagini satellitari",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Mostra immagini satellitari",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
@@ -2000,9 +2034,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2016,9 +2050,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2032,9 +2066,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2048,9 +2082,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2064,9 +2098,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2080,9 +2114,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2096,9 +2130,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2112,9 +2146,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2128,9 +2162,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2144,9 +2178,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2160,9 +2194,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2176,9 +2210,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2192,9 +2226,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2208,9 +2242,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2224,9 +2258,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2240,9 +2274,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2256,9 +2290,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2272,9 +2306,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2288,9 +2322,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2304,9 +2338,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2320,9 +2354,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2336,9 +2370,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2352,9 +2386,9 @@
                     "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "Collocare il modello richiede due passaggi. Il passaggio 1 è quello rapido: il modello resta fermo e sposti tu la mappa dietro di esso, finché il tuo sito non è sotto il modello all'incirca alla dimensione giusta. Non c'è ancora rotazione. Il passaggio 2 è quello preciso: trascini, ridimensioni e ruoti il modello stesso. Il tuo progetto si trova all'inizio su una mappa del mondo intero, quindi trova prima la tua posizione, poi premi il pulsante Colloca il modello qui.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2363,9 +2397,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "La x e la y in questo file sono state lette come una longitudine e una latitudine, quindi la rete è già sulla mappa e non è stato spostato nulla. Controlla che sia nel posto giusto, poi premi il pulsante Mantieni questo posizionamento.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "Mostra immagini satellitari",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2811,9 +2845,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Un progetto proiettato si apre sul proprio piano, non nel luogo cercato. Collocare quel piano sulla Terra richiede una trasformazione di coordinate, che questa pagina non ha ancora.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} di {total} proiezioni elencate.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2827,9 +2861,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Un progetto proiettato si apre sul proprio piano, non nel luogo cercato. Collocare quel piano sulla Terra richiede una trasformazione di coordinate, che questa pagina non ha ancora.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} di {total} proiezioni elencate.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2843,9 +2877,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "Un progetto proiettato si apre sul proprio piano, non nel luogo cercato. Collocare quel piano sulla Terra richiede una trasformazione di coordinate, che questa pagina non ha ancora.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} di {total} proiezioni elencate.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -5288,6 +5322,8 @@
         }
     },
     "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

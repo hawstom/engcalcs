@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 2106,
-        "delta_key_count": 270,
-        "exempt_key_count": 27,
+        "expected_key_count": 2101,
+        "delta_key_count": 272,
+        "exempt_key_count": 26,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -19,7 +19,6 @@
             "bpn_method_manning",
             "lpn_ex_net2_title",
             "lpn_ex_net3_title",
-            "lpn_xymap",
             "lpn_field_x",
             "lpn_field_y",
             "lpn_cp_val_camel",
@@ -575,6 +574,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -597,7 +598,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -847,6 +848,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -869,7 +872,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -1974,19 +1977,51 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -1995,14 +2030,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2011,14 +2046,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2027,14 +2062,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2043,14 +2078,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2059,14 +2094,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2075,14 +2110,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2091,14 +2126,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2107,14 +2142,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2123,14 +2158,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2139,14 +2174,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2155,14 +2190,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2171,14 +2206,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2187,14 +2222,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2203,14 +2238,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2219,14 +2254,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2235,14 +2270,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2251,14 +2286,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2267,14 +2302,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2283,14 +2318,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2299,14 +2334,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2315,14 +2350,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2331,14 +2366,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "عرض\/طول جغرافیایی",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "جای‌گذاری مدل دو گام دارد. گام 1 گامِ سریع است: مدل بی‌حرکت می‌ماند و شما نقشهٔ پشت آن را جابه‌جا می‌کنید، تا سایت شما تقریباً با اندازهٔ درست زیر مدل قرار گیرد. هنوز چرخشی در کار نیست. گام 2 گامِ دقیق است: خودِ مدل را می‌کشید، اندازه‌اش را تغییر می‌دهید و می‌چرخانید. پروژهٔ شما در آغاز روی نقشه‌ای از کل جهان است، پس نخست مکان خود را بیابید، سپس دکمهٔ «مدل را اینجا بگذار» را بزنید.",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2347,9 +2382,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "x و y در این فایل به‌عنوان طول و عرض جغرافیایی خوانده شدند، پس شبکه از پیش روی نقشه است و چیزی جابه‌جا نشده. بررسی کنید که در جای درست باشد، سپس دکمهٔ «این جای‌گیری نگه داشته شود» را بزنید.",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "نمایش تصاویر ماهواره‌ای",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2763,9 +2798,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "یک پروژهٔ فرافکنی‌شده روی صفحهٔ خودش باز می‌شود، نه در مکانی که جست‌وجو کرده‌اید. گذاشتن آن صفحه روی کرهٔ زمین به یک تبدیل مختصات نیاز دارد، که این صفحه هنوز آن را ندارد.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} از {total} فرافکنی فهرست شده.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2779,9 +2814,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "یک پروژهٔ فرافکنی‌شده روی صفحهٔ خودش باز می‌شود، نه در مکانی که جست‌وجو کرده‌اید. گذاشتن آن صفحه روی کرهٔ زمین به یک تبدیل مختصات نیاز دارد، که این صفحه هنوز آن را ندارد.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} از {total} فرافکنی فهرست شده.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2795,9 +2830,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "یک پروژهٔ فرافکنی‌شده روی صفحهٔ خودش باز می‌شود، نه در مکانی که جست‌وجو کرده‌اید. گذاشتن آن صفحه روی کرهٔ زمین به یک تبدیل مختصات نیاز دارد، که این صفحه هنوز آن را ندارد.",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{n} از {total} فرافکنی فهرست شده.",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -5240,6 +5275,8 @@
         }
     },
     "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

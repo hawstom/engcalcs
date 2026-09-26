@@ -11360,6 +11360,18 @@ var EngCalcs = EngCalcs || {};
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
 		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
 		var modelFit = s;
+		// **WHILE A MODEL IS BEING PLACED, THE FIT IS THE MODEL'S ALONE.** The labels are off for the
+		// duration (georefSuspend(); Tom, 2026-08-18: *"hide labels temporarily during conversion"*),
+		// so the lettering steps 2 and 3 would measure is left over from an earlier frame -- on the
+		// answered steps of File, Convert as, from the whole-world opening -- and the settle stepped
+		// the zoom down to meet it until Elm Street Center was a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5).
+		if (georefActive()) {
+			apply(modelFit, place(modelFit, modelItems));
+			lastFit = null;
+			if (auto) { rebaseSignatureIfClean(); }
+			return;
+		}
 		items = fitItems(s);
 		s = solve();
 		if (labelsPastThreshold(s)) {
@@ -13745,10 +13757,30 @@ var EngCalcs = EngCalcs || {};
 	// The one write seam for "the placement changed". buildDom() rather than
 	// refreshAllFromDocument(): the elements have moved, and nothing about the project, the units,
 	// the view or the solve has. A full refresh here would re-fit the view on every frame of a drag.
+	// **KEEP THE DRAWN NUMBERS INSIDE CHROME'S LAYOUT RANGE WHILE PLACING** (Task 696, found by
+	// dev/lpn-spike/convert-as-browser-harness.js). georefStart() zeroes the origin, because degrees
+	// start from zero, and georefFinish() re-origins only at the end -- so a model placed at street
+	// zoom anywhere far from 0 N 0 E was drawn at `translate(6.5e7, ...)`, past Chrome's ~3.3e7 px
+	// layout range, and every pipe collapsed into one clamped point (Elm Street Center at Novato:
+	// a 13 px dot). followViewWhileEmpty() already guards the empty document against exactly this;
+	// this is the same rule for a model in mid-placement, through the same rebaseLiveGeoDoc(), which
+	// compensates the view itself. The step 1 freeze is a view too, so it moves by the same amount
+	// and the held model does not jump. Never mid-gesture: a pan holds a translation from before.
+	function georefKeepDrawable() {
+		if (!georef || drag || !isLatLonProject()) { return; }
+		var f = georef.frozen, big = Math.max(Math.abs(state.tx), Math.abs(state.ty),
+			f ? Math.abs(f.tx) : 0, f ? Math.abs(f.ty) : 0);
+		if (big < LPN_GEO_FOLLOW_PX) { return; }
+		var shift = rebaseLiveGeoDoc();
+		if (!shift) { return; }
+		if (f) { f.tx -= f.s * shift.dx; f.ty -= f.s * shift.dy; }
+		georefApplyCompensation();
+	}
 	function georefSetTransform(t) {
 		georef.t = t;
 		georef.rotDeg = t.rotDeg;
 		perfDebugTime('write', function () { georefWrite(t); });
+		georefKeepDrawable();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		// Anything sized in screen pixels was left at the scale of the LAST redraw while the model
 		// was being held still (onZoomChanged does no work at all while detached), so the settle
@@ -13805,8 +13837,11 @@ var EngCalcs = EngCalcs || {};
 			// The scale is shown as WHAT ONE DRAWING UNIT IS ON THE GROUND, in the project's own
 			// length unit -- the sentence a person can check against the drawing they made, unlike
 			// "metres per unit" which is our internal term.
+			// `unitK` is 1 except on the answered steps, where the drawing was re-expressed in
+			// degree-sized units and this says what one of the FILE's own units is on the ground
+			// (georefArmAsDegrees()), so R-219's "type 1" still means the file's numbers unchanged.
 			georefBarEl('lpn_georef_scale_in').value =
-				toDisplay(georef.t.metersPerUnit, 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
+				toDisplay(georef.t.metersPerUnit * (georef.unitK || 1), 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
 			georefBarEl('lpn_georef_rot_in').value = (Math.round(georef.t.rotDeg * 100) / 100);
 		}
 		georefBarEl('lpn_georef_unit').textContent = unitLabel('lpn_u_length');
@@ -13819,7 +13854,7 @@ var EngCalcs = EngCalcs || {};
 		// model where the user has already put it.
 		scale.addEventListener('change', function () {
 			if (!georef || !georef.t) { return; }
-			var m = toSI(+scale.value, 'lpn_u_length');
+			var m = toSI(+scale.value, 'lpn_u_length') / (georef.unitK || 1);
 			if (!(m > 0)) { georefRefreshBar(); return; }
 			var c = georefSrcCentre(), ll = EngCalcs.lpnGeorefToLonLat(georef.t, c.x, c.y);
 			georefSetTransform(EngCalcs.lpnGeorefWithScale(georef.t, m / georef.t.metersPerUnit, ll));
@@ -13973,7 +14008,9 @@ var EngCalcs = EngCalcs || {};
 			var p = projectLocatable()
 				? EngCalcs.lpnCrsForward(projectCrsCode(), { lon: ll.lon, lat: ll.lat }) : null;
 			if (!p) {
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// One of the few systems this page lists without a transform: Tom's own sentence,
+				// naming it (the retired "which this page does not have yet" sentence said otherwise).
+				setNotice(String((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || '{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.').replace('{crs}', crsLabel(projectCrsCode()) || String(projectCrsCode() || '')));
 				return;
 			}
 			applyView({
@@ -14581,14 +14618,14 @@ var EngCalcs = EngCalcs || {};
 		// somebody may convert to another. It says where the network already is, so the wizard opens
 		// with that answer in place rather than asking the question again from the whole world.
 		var fromGeo = isLatLonProject();
-		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
-		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
-		// project that states its own coordinate system. The xy grid it was built for states none.
-		if (isProjectedProject()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// **A DECLARED COORDINATE SYSTEM IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites
+		// every coordinate in the document, which is exactly what ruling P2 says no door may do to a
+		// project that states its own coordinate system in place. Its one door, File, Convert as,
+		// lays an EPSG copy out in lat/lon BEFORE calling this (convasProceed()), so the guard is a
+		// net and says nothing: its old "already states a map projection" sentence was deleted (Task 696; Tom:
+		// *"Obsolete. A project that is already georeferenced is easier (more precise) to convert,
+		// not harder."*).
+		if (isProjectedProject()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -14734,6 +14771,24 @@ var EngCalcs = EngCalcs || {};
 		// or the user's first drag would move them by exactly the ratio this corrects (Task 674).
 		(georef.ovs || []).forEach(function (o) {
 			o.src = EngCalcs.lpnGeorefFromLonLat(t, o.src.x, o.src.y);
+			// ...and they go back to the numbers they arrived with, which georefStart() had already
+			// rewritten through its whole-world opening transform.
+			if (o.hasX) { o.ov.x = o.was.x; }
+			if (o.hasY) { o.ov.y = o.was.y; }
+		});
+		// **THE OFFSETS COME BACK TOO** (label offsets, anchored Text, attached customers). The same
+		// opening transform had scaled them to the size of a continent, which left every label that
+		// far from its node until the first settle -- and, with the labels drawn, made the fit below
+		// back off to the minimum zoom: Elm Street Center opened as a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5). doc.origin is zero now, so the
+		// arrival offset is the plain difference of the captured tip and base; then both are
+		// re-expressed in this transform's frame, like `src`, for every settle after this one.
+		(georef.offs || []).forEach(function (o) {
+			var bx = inwardX(o.base.x), by = inwardY(o.base.y), px = inwardX(o.tip.x), py = inwardY(o.tip.y);
+			if (o.keys.x) { o.el[o.keys.x] = px - bx; }
+			if (o.keys.y) { o.el[o.keys.y] = py - by; }
+			o.base = EngCalcs.lpnGeorefFromLonLat(t, o.base.x, o.base.y);
+			o.tip = EngCalcs.lpnGeorefFromLonLat(t, o.tip.x, o.tip.y);
 		});
 		// The backdrop is re-expressed in the same frame for the same reason, and its SCALE with it:
 		// reinterpret's promise is that nothing moves, so the picture has to come out the size it
@@ -14746,12 +14801,24 @@ var EngCalcs = EngCalcs || {};
 			// `mpd` is already at t.origin.lat, which is the latitude georefWriteBackdrop() reads.
 			georef.bd.s = georef.bd.s * mpd.lon / t.metersPerUnit;
 		}
+		// **AND THE PICTURE IS DRAWN THROUGH IT NOW, not at the first settle** (R-172 (1), found by
+		// dev/lpn-spike/convert-as-browser-harness.js section 5). georefStart() had already written it
+		// through its whole-world opening transform, so without this the site plan sat there --
+		// enormous and off the network -- until the first drag's settle wrote it here, which is the
+		// jump on release Tom saw. The round trip through `bd.s` above returns the scale it arrived at.
+		georefWriteBackdrop(t);
 		// ATTACHED from the first frame: the model is already on the ground, which is what step 2
 		// means. Step 1 exists to aim a drawing that is nowhere in particular.
 		georef.step = GEOREF_STEP_ATTACHED;
 		georef.frozen = null;
 		georef.t = t;
 		georef.rotDeg = 0;
+		// **THE GROUND DISTANCE IS SHOWN PER UNIT OF THE FILE THE COPY CAME FROM.** One unit of `t`
+		// is a degree of latitude's worth of metres, so step 2 read "364168 ft per drawing unit" on
+		// Elm Street Center; File, Convert as knows what one of the original's own units was (a
+		// foot, a UTM metre), and the bar shows and takes the ground distance in those.
+		georef.unitK = (convas && convas.copyId === library.openId && convas.srcUnitM > 0)
+			? convas.srcUnitM / t.metersPerUnit : 1;
 		georefSuspend(true);
 		// **AND THE VIEW GOES TO THE MODEL.** Refusing to fit -- on the argument that the view is
 		// still the one fitted to these very coordinates when the project opened -- holds only while
@@ -14759,16 +14826,28 @@ var EngCalcs = EngCalcs || {};
 		// bar, by which time step 1 has carried them out to the whole Earth. Fitting re-baselines
 		// nothing: not one coordinate moves here, the camera merely points at where the numbers say
 		// the network already is.
+		// The origin goes under the model first, since the fit below goes to street zoom on it --
+		// see georefKeepDrawable(). A shift of the frame, not of any coordinate; the view follows.
+		rebaseLiveGeoDoc();
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
+		// **THE COMPENSATION GOES FIRST, AND THE FIT SECOND.** georefStart() drew the model through
+		// its whole-world step 1 compensation, and the fit's last step measures the labels AS DRAWN:
+		// under that stale transform every label reads as sitting far from its node, and the fit
+		// backed off to the minimum zoom, leaving Elm Street Center a 13 px dot on a 500,000 ft
+		// scale (dev/lpn-spike/convert-as-browser-harness.js section 5). Attached, it is identity.
+		georefApplyCompensation();
 		// AUTOMATIC, because the user asked to reinterpret the coordinates and not to change the
 		// view: a bare fit here would set the asterisk for a camera move nobody made.
 		zoomExtent(true);
 		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_asdegrees || 'The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.');
+		// No notice of its own: the one caller, georefOpenAnswered(), says what is true of the
+		// project it is reading, and the "x and y in this file were read as a longitude and a
+		// latitude" sentence this used to say, only for that caller to overwrite it at once, was
+		// deleted with its key.
 	}
 	// Whole-world framing puts a little more land on the screen than the equator does, and the
 	// clamp in applyView() takes care of the rest.
@@ -14827,7 +14906,11 @@ var EngCalcs = EngCalcs || {};
 		// and that is Tom's.
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		var unrotated = georefBackdropRotated(georef.t);
+		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
+		// before the steps began, so the steps see 0 degrees while the picture was left unturned
+		// all the same; convas.bdTurn carries that turn here so the sentence is still said.
+		var unrotated = georefBackdropRotated(georef.t) ||
+			!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
@@ -14863,7 +14946,7 @@ var EngCalcs = EngCalcs || {};
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
-		convasPlaced();
+		convasPlaced(unrotated);
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -15267,17 +15350,14 @@ var EngCalcs = EngCalcs || {};
 	function mapgeoStart() {
 		var pc = EngCalcs.pageConfig || {}, ext;
 		if (mapgeo || georefActive()) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
-		// A project that STATES a coordinate system already says where it is, and a second answer
-		// to that question is the drift ruling P2 exists to stop.
-		if (!xyMapAttachable()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// A project that STATES a coordinate system (lat/lon, EPSG:4326, is one) already says where
+		// it is, and a second answer to that question is the drift ruling P2 exists to stop. **NO
+		// SENTENCE, BECAUSE NO DOOR REACHES THIS** (Task 696): World map, Attach calls this only for
+		// a grid (xyMapAttachable()), and File, Convert as only from "not georeferenced". The two
+		// refusals that stood here ("This project is already on lat/lon." and "...already states a
+		// map projection...") were deleted with their keys; the first is the sentence Tom ruled wrong
+		// on 2026-09-23.
+		if (!xyMapAttachable()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -31096,9 +31176,9 @@ var EngCalcs = EngCalcs || {};
 		runConvertAs(a);
 	}
 	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
-	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
-	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
-	// the visitor is missing a transform for.
+	// system'?"). Both sides can be EPSG planes (UTM zone 10N to State Plane, say), and then the
+	// FROM side is named: its caller, convasProceed(), fails only while reading the project's own
+	// coordinates. runConvertAs() names the missing side itself, before anything is copied.
 	function convasForeignCrs(from, to) {
 		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
 		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
@@ -31408,6 +31488,12 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
+		// Metres in one of THIS project's own coordinate units, for the answered steps' Ground
+		// distance box (georefArmAsDegrees()): the attached map's own scale, or the plane's unit.
+		// Null for lat/lon, whose unit is a degree and has no one ground length.
+		var bdTurn = saved.project.georef && isFinite(saved.project.georef.rotDeg) ? saved.project.georef.rotDeg : 0;
+		var srcUnitM = from.kind === 'unnamed' && saved.project.georef ? saved.project.georef.metersPerUnit
+			: (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC ? planeUnitMetres(from.crs) : null);
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
@@ -31464,7 +31550,8 @@ var EngCalcs = EngCalcs || {};
 				.replace('{name}', name));
 			return;
 		}
-		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
+			bdTurn: (from.kind === 'unnamed' && saved.backdrop && bdTurn) ? bdTurn : 0 };
 		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
 		georefStart();
 		if (!georefActive()) { convasAbandon(); }
@@ -31472,7 +31559,7 @@ var EngCalcs = EngCalcs || {};
 	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
 	// this lays it onto the system the box asked for, on the saved document, and installs it in the
 	// same tab. A conversion to lat/lon itself is already finished.
-	function convasPlaced() {
+	function convasPlaced(unrotated) {
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
 		if (!c || c.copyId !== library.openId) { return; }
@@ -31504,7 +31591,10 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		refreshAllFromDocument();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+		// The same two sentences georefFinish() said a moment ago, which this would otherwise erase.
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
+			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 	}
 	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
 	// a half-converted duplicate left open is a second document nobody asked to keep.
@@ -33390,7 +33480,7 @@ var EngCalcs = EngCalcs || {};
 			return true;
 		}
 		if (!georefActive()) { return false; }
-		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the conversion with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
 	}
 	function switchToTab(id) {
@@ -34220,7 +34310,10 @@ var EngCalcs = EngCalcs || {};
 				// js/lpn-crs.js: the first draft skipped the whole branch and the user got
 				// neither the arrival nor the explanation -- a project silently on its own plane
 				// with nothing said about it, which is the state this notice exists to prevent.
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// A module that did not load is a page that did not load, so it says what every such
+				// failure here says (Task 696 retired the "does not have yet" sentence, which Tom asked "Isn't
+				// this obsolete?" of: the page does have the transforms, when it has loaded).
+				setNotice((EngCalcs.pageConfig || {}).lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			} else {
 				EngCalcs.lpnCrsLoad(function () {
 					if (library.openId !== bornAs) { return; }
@@ -34231,7 +34324,7 @@ var EngCalcs = EngCalcs || {};
 						return;
 					}
 					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
-					// to reach for lpn_crs_place_projected, which says the transform is something
+					// to reach for the retired "does not have yet" sentence, which said the transform is something
 					// "this page does not have yet" -- true of the module being absent and false
 					// here, where the page has 5,240 transforms and not this one. A reader who
 					// has just watched a blank plane arrive at 0,0 concludes the feature is
@@ -38427,6 +38520,15 @@ var EngCalcs = EngCalcs || {};
 		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
 		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
 		return String(u.units);
+	}
+	// Metres in one of a plane's DECLARED units (a UTM metre, a US survey foot), from its own
+	// definition rather than measured on the ground, so it carries no zone scale factor. Null when
+	// the definition is not loaded or states a unit this does not know.
+	function planeUnitMetres(code) {
+		var u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null;
+		if (!u) { return null; }
+		if (isFinite(u.toMeter) && u.toMeter > 0) { return u.toMeter; }
+		return { m: 1, ft: 0.3048, 'us-ft': 1200 / 3937 }[u.units] || null;
 	}
 	function refreshMapCoordsUnit() {
 		var el = document.getElementById('lpn_u_mapcoords');
