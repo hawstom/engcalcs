@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**105 open tasks.** Next (100): 7 · Soon (75): 22 · Someday (50): 38 · Maybe (25): 14 · Parked (5): 18 · priority 99 (99): 6
+**106 open tasks.** Next (100): 7 · Soon (75): 22 · Someday (50): 38 · Maybe (25): 14 · Parked (5): 19 · priority 99 (99): 6
 
 ## 100 — Next (7)
 
@@ -111,7 +111,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 723 — WaterCAD's element list, against ours.
 - Task 729 — Type a node's location in State Plane or UTM.
 
-## 5 — Parked (18)
+## 5 — Parked (19)
 
 *Ruled against, or set aside, and kept here for documentation. A row is alive only so that it is not re-proposed from scratch.*
 
@@ -133,8 +133,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 492 — [H] · Rewriting the 986 existing commit messages is NOT recommended.
 - ! Task 537 — [H] · PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.
 - Task 616 — Visual feedback: a prompt history in the banner area.
+- Task 730 — Ctrl+Space selects the current column in the Tables pane.
 
 ---
 
-96 of 105 titles are within 4–12 words. `!` marks the rest;
+97 of 106 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

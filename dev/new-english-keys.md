@@ -52,8 +52,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
 - **`lpn_convas_no_transform`**
-  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
-  _Ruled 2026-09-26: I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?_
+  > {crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.
+  _Ruled 2026-09-26: His own wording, 2026-09-26 ("cannot be convert" corrected to "converted")._
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
   _Ruled OK 2026-09-26._
@@ -97,8 +97,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > unnamed
   _Ruled OK 2026-09-23._
 - **`lpn_crs_unplaceable`**
-  > This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.
-  _Ruled 2026-09-26: I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?_
+  > {crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.
+  _Ruled 2026-09-26: His own wording, 2026-09-26._
 - **`lpn_crs_unplaceable_mark`**
   > (no map)
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
@@ -782,7 +782,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**2 still to read**, of 21 new keys across 2 unmerged branch(es).
+**2 still to read**, of 21 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -792,6 +792,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/queue-0926 (`06b7976e`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 

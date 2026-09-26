@@ -162,9 +162,9 @@
             "answer": "OK. Did we prefill with a space? I believe that SI uses no space and US uses a space."
         },
         "lpn_convas_no_transform": {
-            "on": "This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.",
+            "on": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
             "ruled": "2026-09-26",
-            "answer": "I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?"
+            "answer": "His own wording, 2026-09-26 (\"cannot be convert\" corrected to \"converted\")."
         },
         "lpn_convas_none_tip": {
             "on": "Local coordinates in the length unit, with no world map for now.",
@@ -567,9 +567,9 @@
             "answer": "OK."
         },
         "lpn_crs_unplaceable": {
-            "on": "This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.",
+            "on": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
             "ruled": "2026-09-26",
-            "answer": "I still need context for this. Is it possible to select from the catalogue a CRS that isn't in the catalogue? What am I missing?"
+            "answer": "His own wording, 2026-09-26."
         },
         "lpn_crs_unplaceable_mark": {
             "on": "(no map)",

@@ -1226,7 +1226,7 @@ $ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an un
 $ec_lang['lpn_convas_ok']='Convert';
 // {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
 // 2026-09-25: "What, specifically, is 'that coordinate system'?").
-$ec_lang['lpn_convas_no_transform']='This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.';
+$ec_lang['lpn_convas_no_transform']='{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.';
 // {name} is the new project's name.
 $ec_lang['lpn_convas_done']='The converted copy is {name}. The original project is unchanged.';
 $ec_lang['lpn_convas_cancelled']='Nothing was converted. The copy is closed, and the original project is unchanged.';
@@ -1828,7 +1828,7 @@ $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane,
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 // The same fact in a sentence, under the chooser's list and again if such a project is created.
-$ec_lang['lpn_crs_unplaceable']='This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.';
+$ec_lang['lpn_crs_unplaceable']='{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 // **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,

@@ -30391,7 +30391,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function convasNoTransformMessage(pc, code) {
 		return String(pc.lpn_convas_no_transform
-			|| 'This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.')
+			|| '{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.')
 			.replace('{crs}', crsLabel(code) || String(code || ''));
 	}
 	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
@@ -33523,7 +33523,7 @@ var EngCalcs = EngCalcs || {};
 					// broken rather than that another projection over the same ground would work,
 					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
 					// the choice as well; this is the same sentence, after it.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that coordinate system, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another coordinate system covering the same area will have all three.');
+					setNotice(String((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || '{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.').replace('{crs}', crsLabel(crs) || String(crs || '')));
 				});
 			}
 		}

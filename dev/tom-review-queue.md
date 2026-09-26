@@ -165,7 +165,8 @@ judgement and does not belong to a script.
 ### feat/convert-as (8104)
 
 - [x] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!" -- merged, master 017ee4de
-- [?] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space." -- the prefill is always one space. The SI Brochure and NIST SP 811 both put a space between number and unit symbol ("10 mm"), so one space is right for SI and US alike. Keep it?
+- [x] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space." -- the prefill is always one space. The SI Brochure and NIST SP 811 both put a space between number and unit symbol ("10 mm"), so one space is right for SI and US alike. Keep it?
+  - [TGH 2026-09-26: "OK." One space stays.]
 - [?] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?" -- it fires when a chosen EPSG system has no transform in this page's catalogue; reworded to name it: "This page has no coordinate transform for {crs}, ..." -- merged, awaiting your ruling
 
 ### feat/table-editing (8105)
@@ -174,14 +175,17 @@ judgement and does not belong to a script.
 - [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed
 - [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it
 - [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list
-- [?] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
+- [x] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
+  - [TGH 2026-09-26: "Let's remove it and park it in our roadmap. 'More trouble to debug than the feature is worth.'" -- removed on feat/table-editing; parked as Task 730]
 - [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf
 
 ### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
 
-- [?] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap." -- not reproduced on the merged code: Everything, ID, is empty finds only Text items on Net3-Novato. Which project was open? A retest after you pull would settle it
+- [x] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap." -- not reproduced on the merged code: Everything, ID, is empty finds only Text items on Net3-Novato. Which project was open? A retest after you pull would settle it
+  - [TGH 2026-09-26: "You are right. It found text 'LAKE' and 'RIVER'. My bad." -- they are Text items with no ID; nothing to fix]
 - [x] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work." -- merged, master 017ee4de
-- [?] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?" -- yes, rarely: a typed query naming a node-only and a link-only property together fits no single table
+- [x] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?" -- yes, rarely: a typed query naming a node-only and a link-only property together fits no single table
+  - [TGH 2026-09-26: "OK."]
 
 ### feat/zoom-control (8103)
 
