@@ -2073,3 +2073,112 @@ already on so no explicit Calculate press needed):
 - printPaneTable() (Tables pane print) also does not touch document.title anywhere in this tree, so
   its PDF suggestion is equally generic -- confirms R-259 is still open suite-wide, unaffected by
   this branch either way.
+
+---
+
+## 2026-09-26 pre-review of feat/table-editing (HEAD 98a7c52d), Tom's fifth pass
+
+OBSERVED (real headless Chromium, own scripts against dev/browser-pass/lib env+session, plus the
+build's own dev/browser-pass colselect.js/colmanage.js specs, flock'd):
+
+- CONFIRMED: 117/117 checks in the build's own colselect.js + colmanage.js pass, real mouse events
+  throughout (not direct handler calls). Covers jitter-free clicks, hold-vs-travel drag start,
+  ghost/marker shape, own-edge no-op, hide-during-drag, Manage columns apply-on-OK, Tab ring only.
+- CONFIRMED, independently: a 1-5px jitter on mousedown/up on both a narrow (79px) and medium
+  (115px) column never reorders columns -- three separate columns, three jitter sizes each, order
+  byte-identical before/after every time.
+- CONFIRMED, independently: a 450ms hold with zero travel starts the drag (ghost drawn); a further
+  2px jitter after the hold does not cancel it.
+- MISSED-ish, real finding Tom asked me to specifically check ("Is half-a-column-width a sane
+  threshold on a very wide Description column?"): on a column forced to 576px (a plausible width
+  after a reader manually widens Description to read long text -- an already-supported action),
+  a deliberate 250px mouse drag -- nearly half the visible pane's width -- still does NOT start a
+  drag; the required travel is 288px. Even the widest column already shipped in Net3's own Pipes
+  table (217.9px, unwidened) needs ~109px of travel before anything visibly happens. Below that
+  threshold there is zero feedback (no cursor change, no ghost) -- a reader who does not go far
+  enough will see NOTHING and reasonably conclude the drag "isn't working" or is "unusably
+  sluggish," which is the exact wording of his prior complaint (R-280) reappearing under the
+  letter-perfect implementation of his own words ("at least 1/2 column width"). The escape hatch
+  (450ms hold, confirmed working regardless of width) is silent and undiscoverable unless already
+  known. Recommend flagging to Tom: does he want the threshold capped at some absolute pixel value
+  (e.g. min(half-width, 80px)) rather than a pure fraction, now that we can show him the number?
+- CONFIRMED: gap between the "..." menu and sort arrow is a real ~5px visual gap (arrow's own
+  padding-top, background-clip: content-box), holds identically at CSS zoom 100% and 125%
+  (menuRect/arrowRect touch with 0 box-gap, 5px of that is transparent padding at both zooms since
+  it's declared in em). Matches "a little vertical space" and is worth showing him as a screenshot
+  rather than a number, since 5px is a judgement call about "pleasing" I cannot make from here.
+- CONFIRMED: with no hover and no focus, both glyphs are opacity 0 on every column except the one
+  actively sorted (by design, .lpn-pane-sortarrow-active stays visible) -- there is NO static
+  affordance at all (cursor stays plain pointer) hinting the top-right corner does anything. This
+  is exactly what Tom asked for in his third pass ("show only when the cursor is directly over
+  their area"), so not a defect against his own words, but it is worth naming back to him plainly:
+  a first-time user has no visual cue that any given heading's corner is live. Genuinely a question
+  for a browser pass, not code.
+- CONFIRMED: selected (solid-blue, #0b57d0) heading keeps its menu/arrow legible -- unhovered white,
+  hovered light blue (#d3e3fd) on the menu, matching the CSS's stated intent; measured live, not
+  just read.
+- CONFIRMED: Tab through read-only cells (ID and two result columns, before and after triggering a
+  sort via the arrow) shows selectionStart===selectionEnd===0 throughout, i.e. no highlighted text
+  range, on the first cell reached from a heading and every subsequent Tab.
+- UNVERIFIABLE FROM HERE, and a gap in the build's own harness too: I could not find a single
+  genuinely EDITABLE (non-read-only) input in the Base demand column on either Net1 or Net3 -- every
+  junction in both example networks reads readOnly=true there (multi-category demand makes the cell
+  "plain" per plainFor()). The build's own harness's "Tab through Ready cells" check (colselect.js)
+  also only exercises two read-only inputs, never a genuinely editable one. So Tom's original
+  complaint ("no highlighting except cell outline") is confirmed only for read-only cells; a person
+  should type into an actually-editable numeric field (a junction with NO demand categories, or a
+  fresh hand-placed junction) and confirm Tab past it shows no highlighted text either.
+- Traced down a false alarm of my own: querying `.lpn-pane-table thead th.lpn-pane-col-desc`
+  without scoping to `.lpn-pane-panel.on` picks up the (correctly) content-visibility:hidden
+  previous tab's same-named column instead of the active one -- by design
+  (`.lpn-pane-panel.lpn-pane-scroll` keeps `display:block`/`content-visibility:hidden` off-screen
+  panels for perf, per the R-111 comment), and `elementFromPoint`/real clicks correctly skip it.
+  Not a defect; a note so a future check does not repeat the wasted hour.
+- Not independently re-checked: the destination-marker's exact crossing point (ghost middle vs.
+  neighbour middle, both directions) and the do-nothing-at-own-edges case -- the build's own harness
+  drives these with real mouse events and asserts the marker's left/x against the actual divider
+  position (`458.984 vs 460.984`), which is a real measurement, not a decorative check; I read it
+  and did not see reason to redo it.
+- UNVERIFIABLE FROM HERE (visual/aesthetic only): whether the 5px gap and the corner-badge
+  placement actually read as "pleasing" rather than merely present -- that is a screenshot judgement
+  only Tom can make.
+
+Verdict, ranked by cost to Tom:
+1. The half-column-width drag threshold is measured to make dragging effectively non-functional by
+   mouse motion on any column wider than ~160px (needs >80px of travel with zero feedback below
+   that), and a widened Description column needs 288px. This is the likeliest thing to reproduce
+   his R-280 "unusably sluggish" complaint again, this round under new code. Worth surfacing before
+   his browser pass, not left for him to rediscover.
+2. Zero-affordance corner glyphs are exactly what he asked for; flagging only so he isn't surprised
+   twice by "how do I know it's there."
+3. Everything else asked this round (gap spacing, drag-suppress-glyphs, ghost/marker mechanics,
+   selected-heading legibility, Tab no-highlight on read-only cells) is CONFIRMED, measured live,
+   not just read from the diff or the build's own report.
+
+## 2026-09-26 — feat/convert-as (483da66b), Task 696 / R-172 round
+
+OBSERVED: reran dev/lpn-spike/convert-as-browser-harness.js myself on 483da66b: 59/59 pass. Then
+git worktree'd master's merge-base (bf8b4461), copied the same harness file in (it does not exist
+pre-fix), and reran it there: 8 of 59 FAIL, reproducing R-172(1)'s 3,572 px snap, the 0x0/step-2
+"364168" wrong-unit defect, and the missing "could not be rotated" sentence. This is a real
+mutation test, not decoration — I ran both sides myself.
+
+OBSERVED: the harness's satellite check (section 6) mocks the network (`page.route` fulfills every
+api.mapbox.com request with a fake 1x1 PNG) — it never proves the real token draws real imagery. I
+wrote my own script, no route mocking, real network. On the harness's own origin (http://127.0.0.1:PORT)
+the real Mapbox token returns 403 for every satellite tile (confirmed independently with curl: a
+Referer of 127.0.0.1 is rejected, a Referer of "localhost" is accepted, same token). Rebinding the
+page to http://localhost:PORT (same PHP server, same port, just a different Referer) got 16/16 real
+200s and a real satellite image render (screenshot: Greenland/oceans visible, not blank). So the
+app-side fix is real, but "restricted by host; localhost is allowed" is literal — 127.0.0.1 does not
+count as localhost to this Mapbox token. Worth remembering for any future headless satellite check.
+
+OBSERVED: dev/branch-policy.json on this branch (483da66b) is missing two "protected" entries
+(feat/property-venue, feat/convert-as) that master ALREADY re-added at 7a33b75e today, after this
+branch's merge-base. Not a self-authorized bypass — the branch is just stale on this file and a
+`git merge master` first would pick up master's addition cleanly (no conflicting lines). Still,
+if the branch were merged into master before that catch-up merge, master's own re-protection
+would survive (git merge is additive here), so the all-clear gate is not actually at risk — but I'd
+still tell the orchestrator to merge master in first, on the standing rule.
+
+CITED: dev/tom-review-queue.md R-172 (2026-09-19), Tom's own three complaints, folded into Task 696.
