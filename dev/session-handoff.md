@@ -9,7 +9,8 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Two branches may not merge without Tom's all-clear** (in `protected` in
-  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/table-editing`.
+  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/table-editing`,
+  `feat/convert-as`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -43,7 +44,7 @@ lines rather than appending corrections.
 ## TRAPS
 
 - **The Mapbox token is restricted by host.** Allowed hosts include `localhost` and `hawsedc.local`,
-  so a new preview port needs nothing; a new hostname does. A token being present is not a token
+  so a new preview port needs nothing; a new hostname does, and `127.0.0.1` is refused (403). A token being present is not a token
   being accepted — test with a real tile request.
 - **A clean merge can still break the tree** (a rename on one side, an old call on the other). That
   is why the suite runs on the merge commit.
@@ -67,6 +68,12 @@ lines rather than appending corrections.
 
 ---
 
+- **A worktree's `check_all` never stamps**, because its `.git` is a file; a master push needs its
+  own run in the main checkout. And never switch the main checkout's branch while its run is queued.
+- **The roadmap lags the code.** 2026-09-26 two agents were briefed on Tasks 708 and 696 and found
+  both already shipped. Run `git log --oneline --all --grep=<task>` before briefing one.
+- **A check whose "before" run reads `master` breaks the merge that fixes it**; pin a SHA.
+
 - **A stub harness can pass over the very defect it names.** 2026-09-23 the zoom-control harness
   emptied the document, so "Tom's exact sequence" passed while the real page went blank, and the
   build agent then told us Tom had tested an old build. When a stub cannot reproduce his report,
@@ -88,36 +95,37 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-26
+## STATE — 2026-09-26 (evening)
 
 ### Production is 83bf02d5 (Tom pulled 2026-09-26; checked over ssh)
 
-Master is ahead of it: 410ca3ce adds his two coordinate-system sentences (lpn_crs_unplaceable and
-lpn_convas_no_transform, both naming {crs}), Task 730, and queue answers. He deploys at his pleasure.
-librewaternet.org eef380e and not-epanet.org a058b5d are deployed and clean.
-
-Merged 2026-09-26 on his all-clears: zoom-control, customer-node, menu-button, report; also the
-lone-junction offscreen fix and the example texts (lat/lon Net3 got "Zoom in to see labels", Net2
-lost its note; the text-all-zoom harness now allows an example to keep none).
+Master d6132d0c is ahead of it and fixes both production error_log fatals: an Accept-Language
+q-value with a space ("en; q=0.8") answered 500 (`accept_language_check.php`), and `spock.php` ran
+out of memory on the 11 MB lang log (now streams; `usage_report_memory_selftest.php`). Also: Task
+708's guard now fails on a reopened gap; Tasks 682, 715, 716 closed. He deploys at his pleasure.
 
 ### Awaiting his browser pass
 
-- **8105 `feat/table-editing`** 410ddadc, green but for payloads: his fourth round. Heading text
-  inert, ring on the whole cell, ⋮ and arrow zero-space and hover-only, arrow is the only sort,
-  menu is Hide / Show all / Manage, drag has a ghost, a marker and a page-wide grabbing cursor,
-  Ctrl+Space removed (Task 730), tab tip ends "See Help, Notes for keyboard shortcuts." Tom:
-  "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click
-  selects, drag moves. Not re-reviewed by Perry since round three.
-- **8090 `feat/label-gang-search`**: unchanged.
+- **8105 `feat/table-editing`** c28c6f3c, green but for payloads, Perry-reviewed: his fifth round,
+  R-283..R-289. Open question R-285: the half-column drag threshold is 288 px on a widened
+  Description column. Leftovers: the sorted arrow covers the heading's last letter; no dark theme.
+- **8116 `feat/convert-as`** 483da66b, green but for payloads: four defects fixed on the answered
+  path (R-172(1) image lag, a 13 px Step 1, Step 2's unit, the turn sentence); R-172(2) satellite
+  not reproduced. His 09-16 wording implemented; five keys deleted; a `$ec_lang_syn` diff for
+  lpn_geomap / lpn_xymap proposed, NOT applied. Perry confirmed all four against the pre-fix code.
+  Port 8116 needs his Apache reload. Merge master in before merging it up.
+- **8090 `feat/label-gang-search`** c0104534: master merged in, and six of its own harnesses now
+  fail on its limits, because master's symbol-size rule (d039bb13) and zoom-to-fit (9ba0d25e) undo
+  part of its gains (x2 Novato: 72 labels give up a value, was 22). Limits NOT relaxed. Needs a
+  design decision before any pass. R-075 still holds at 4x and 8x.
 
 ### Open with him
 
-- R-235, the WaterCAD sample .inp from IOD, as before. Everything else from 09-25 is answered.
+- R-235, the WaterCAD sample .inp from IOD. R-285 above. Task 708 gaps 7 and 8.
 
 ### Translation sprint
 
-Not launched. Master carries 250 untranslated keys, all ruled. Launch after table-editing merges,
-so one sprint covers it.
+Not launched. Launch after table-editing merges, so one sprint covers it.
 
 ## Commands to hand Tom with any panel change
 
