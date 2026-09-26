@@ -2329,3 +2329,37 @@ necessary here rather than trusting a green run on the branch alone.
 SPECULATION: the mid-session orchestrator correction said Tom himself settled item 5 ("Step 1
 already opened on your location: I think that is right") -- not independently verified with Tom,
 relayed as given.
+
+# Perry journal — feat/row-paste, 2026-09-26
+
+OBSERVED (verified live against branch a7e9a246, will decay): `paneSelSet()` (js/looped-network.js:23262)
+clamps r to `Math.min(rows.length-1, r)`; `paneSelBox()` resolves aId/fId against existing row IDs
+only (paneIndexOfId). So on a non-empty table, box.r0 is always an EXISTING row's index — there is
+no selection state representing "one past the last row". Confirmed by a direct node repro
+(script at scratchpad/perry-append-check.js): 3 existing junctions A,B,C; select C; paste 3 new
+rows D/E/F (no repeat of C's own data) -> result: junction C is GONE, replaced in place by D
+(id renamed, position overwritten to D's pasted x); only E,F are net-new. created:2, but the
+table lost C's identity entirely. This is exactly the builder's own confession in the task
+handoff, and it is NOT exercised by dev/lpn-spike/pane-row-paste-harness.js — every harness case
+that "covers" an existing row deliberately RE-TYPES that row's own current values as the first
+pasted line (see harness lines ~137-139, comment "so the block covers C and runs past the last
+row"), which papers over the destructive gesture rather than testing the ordinary case of a clerk
+who just wants to add 3 rows to a full table.
+
+OBSERVED: allIds() pools nodes+links+labels+customers in one namespace (js/looped-network.js:47032),
+pre-existing app-wide rule, not new to this branch. Net1.inp genuinely has junction "10" and pipe
+"10" (dev/water-network-examples/Net1.inp). Harness §8 confirms and documents this: pasting Net1's
+own pipe sheet verbatim is refused whole, naming rows 2-6 as ID collisions with the junctions
+already pasted. Harness explicitly frames this as "the finding this section exists to record",
+so the builder disclosed it deliberately, not by omission.
+
+OBSERVED: ran dev/lpn-spike/pane-row-paste-harness.js under flock — 69/69 pass, no failures. Vertex
+cell format matches dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md exactly (n/n/n/n
+pairs, whole-cell refuse-or-commit, comma rejected, lat/lon public order on geo project, x/y on
+grid, header states the order). One-paste-one-undo confirmed (400 rows -> one snapshot, one
+Ctrl+Z removes all 400). 400-row paste into an empty table measured 2663 ms in the Node/jsdom-style
+stub — real Chrome timing not measured here (UNVERIFIABLE FROM HERE).
+
+No keyboard path (Enter/Tab/Arrow at the last row) creates a row either — paneHandleKey navigation
+uses the same clamped paneSelSet, confirming paste is the ONLY door and the append-destroys-a-row
+finding is not sidesteppable by any other gesture.
