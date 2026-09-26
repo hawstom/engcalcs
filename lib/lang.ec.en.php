@@ -867,10 +867,8 @@ $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
 $ec_lang['lpn_pane_hide_col']='Hide this column';
 $ec_lang['lpn_pane_hide_cols']='Hide these columns';
-$ec_lang['lpn_pane_show_col']='Show {col}';
 $ec_lang['lpn_pane_show_all_cols']='Show all columns';
 $ec_lang['lpn_pane_sort_asc']='Sort ascending';
-$ec_lang['lpn_pane_sort_desc']='Sort descending';
 $ec_lang['lpn_pane_manage_cols']='Manage columns…';
 $ec_lang['lpn_pane_manage_cols_title']='Manage columns';
 $ec_lang['lpn_pane_manage_cols_show']='Show';
@@ -878,7 +876,7 @@ $ec_lang['lpn_pane_manage_cols_up']='Move up';
 $ec_lang['lpn_pane_manage_cols_down']='Move down';
 $ec_lang['lpn_pane_manage_cols_top']='Move to beginning';
 $ec_lang['lpn_pane_manage_cols_bottom']='Move to end';
-$ec_lang['lpn_pane_colmenu_tip']='Sort, hide, or manage columns';
+$ec_lang['lpn_pane_colmenu_tip']='Hide or manage columns';
 $ec_lang['lpn_pane_sortarrow_tip']='Reverse the sort';
 $ec_lang['lpn_tool_area_window']='Select a window';
 $ec_lang['lpn_tool_area_lasso']='Select a lasso';
@@ -1420,7 +1418,6 @@ $ec_lang['lpn_pane_filter_clear']='Show all';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
-$ec_lang['lpn_pane_sort_tip']='Select this column. Use the menu (⋮) to sort by it.';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -2227,7 +2224,7 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 $ec_lang['lpn_notes_4_term']='Also on this page';
 $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table keyboard shortcuts';
-$ec_lang['lpn_notes_6_def']='<ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>';
+$ec_lang['lpn_notes_6_def']='<ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

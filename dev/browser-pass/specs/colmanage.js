@@ -82,47 +82,62 @@ async function arrowState(a, key) {
 	return a.page.evaluate((key) => {
 		const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
 		const arrow = th && th.querySelector('.lpn-pane-sortarrow');
-		return arrow ? { present: true, desc: arrow.classList.contains('lpn-pane-sortarrow-desc') } : { present: false };
+		return arrow ? { present: true, desc: arrow.classList.contains('lpn-pane-sortarrow-desc'),
+			active: arrow.classList.contains('lpn-pane-sortarrow-active') } : { present: false };
 	}, key);
 }
 
+// Real hover, not a synthetic mouseenter dispatch: CSS `:hover` only ever comes from the browser's
+// own pointer tracking, so a `page.mouse.move()` onto the heading is the only way to see the
+// opacity gate actually open (`.dispatchEvent(new MouseEvent('mouseover'))` does not set `:hover`).
+async function hoverHeading(a, key) {
+	const box = await a.page.evaluate((key) => {
+		const r = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key).getBoundingClientRect();
+		return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+	}, key);
+	await a.page.mouse.move(box.x, box.y);
+}
+async function opacityOf(a, key, cls) {
+	return a.page.evaluate(({ key, cls }) => {
+		const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
+		return getComputedStyle(th.querySelector(cls)).opacity;
+	}, { key, cls });
+}
+
 exports.run = async function ({ browser, report }) {
-	// ---- the "..." glyph is ALWAYS visible (Tom, second pass: no longer a hover reveal), opens the
-	// same menu, with Sort ascending/descending on it; the arrow appears ONLY on the sorted column,
-	// directly under the glyph, and reverses the sort on click -----------------------------------
+	// ---- Tom, 2026-09-26, third pass, REVERSING the second pass: the "..." and the arrow take
+	// zero space and stay INVISIBLE until the heading is hovered or focused (real Chromium
+	// `:hover`, not a synthetic event) -- "Possibly the arrow and the menu can take up zero space
+	// and appear with 100% opacity over any heading text on hover. Try that." An arrow now exists
+	// on EVERY heading (sorting is the arrow's job alone, never the menu's), and clicking any of
+	// them sorts ascending first, then toggles -- except the CURRENTLY SORTED column's own arrow,
+	// which stays visible without hovering, so there is still something to look at from a glance. --
 	{
 		const a = await openJunctions(browser, 'A');
 		const before = await keys(a);
-		const opacity = await a.page.evaluate((key) => {
-			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
-			return getComputedStyle(th.querySelector('.lpn-pane-colmenu')).opacity;
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-colmenu')) === '0', 'the "..." glyph is invisible with no hover or focus');
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '0', '...and so is the sort arrow');
+		let arrow = await arrowState(a, before[1]);
+		report.ok(arrow.present && !arrow.active, 'the arrow element exists on an unsorted column too, just not "active"', JSON.stringify(arrow));
+		await hoverHeading(a, before[1]);
+		await a.settle(100);
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-colmenu')) === '1', 'hovering the heading reveals the "..." glyph');
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '1', '...and the sort arrow, at the same time');
+		// Clicking an UNSORTED column's arrow sorts it ascending -- the menu no longer sorts at all.
+		await a.page.evaluate((key) => {
+			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sortarrow').click();
 		}, before[1]);
-		report.ok(opacity === '1', 'the "..." glyph is visible with no hover or focus', opacity);
-		report.ok(!(await arrowState(a, before[1])).present, 'no arrow yet: this column is not sorted', JSON.stringify(await arrowState(a, before[1])));
-		const opened = await clickColMenuGlyph(a, before[1]);
-		await a.settle(150);
-		report.ok(opened, 'the "..." button exists on a heading and is clickable');
-		const items = await menuItems(a);
-		const sortAsc = await a.lang('lpn_pane_sort_asc');
-		const sortDesc = await a.lang('lpn_pane_sort_desc');
-		const manage = await a.lang('lpn_pane_manage_cols');
-		report.ok(items.indexOf(sortAsc) !== -1 && items.indexOf(sortDesc) !== -1,
-			'...and the menu it opens offers Sort ascending and Sort descending', JSON.stringify(items));
-		report.ok(items.indexOf(manage) !== -1, '...and Manage columns…', JSON.stringify(items));
-		await clickMenu(a, sortAsc);
 		await a.settle(200);
 		let s = await a.page.evaluate((T) => {
 			const th = document.querySelector(T + ' thead th[aria-sort]');
 			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
 		}, T);
-		report.ok(s && s.col === before[1] && s.dir === 'ascending', 'Sort ascending sorts that column ascending', JSON.stringify(s));
-		let arrow = await arrowState(a, before[1]);
-		report.ok(arrow.present && !arrow.desc, 'the sorted column now carries an ascending arrow under the "..." glyph', JSON.stringify(arrow));
-		const others = before.filter((k) => k !== before[1]);
-		const anyOtherArrow = await a.page.evaluate((keys) => keys.some((k) =>
-			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + k + ' .lpn-pane-sortarrow')), others);
-		report.ok(!anyOtherArrow, 'no other column carries an arrow', anyOtherArrow);
-		// Clicking the arrow itself reverses the sort, without reopening the menu.
+		report.ok(s && s.col === before[1] && s.dir === 'ascending', 'clicking an unsorted column\'s arrow sorts it ascending, first click', JSON.stringify(s));
+		arrow = await arrowState(a, before[1]);
+		report.ok(arrow.present && arrow.active && !arrow.desc, 'the sorted column\'s arrow is now "active" and points ascending', JSON.stringify(arrow));
+		report.ok((await opacityOf(a, before[1], '.lpn-pane-sortarrow')) === '1',
+			'...and stays visible even with the pointer moved elsewhere (a deliberate exception, not hover-gated)');
+		// Clicking the SAME arrow again toggles the direction.
 		await a.page.evaluate((key) => {
 			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sortarrow').click();
 		}, before[1]);
@@ -131,18 +146,19 @@ exports.run = async function ({ browser, report }) {
 			const th = document.querySelector(T + ' thead th[aria-sort]');
 			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
 		}, T);
-		report.ok(s && s.col === before[1] && s.dir === 'descending', 'clicking the arrow reverses the sort', JSON.stringify(s));
+		report.ok(s && s.col === before[1] && s.dir === 'descending', 'clicking the same arrow again reverses the sort', JSON.stringify(s));
 		arrow = await arrowState(a, before[1]);
-		report.ok(arrow.present && arrow.desc, '...and the arrow itself now points the other way', JSON.stringify(arrow));
-		await clickColMenuGlyph(a, before[1]);
+		report.ok(arrow.present && arrow.active && arrow.desc, '...and the arrow itself now points the other way', JSON.stringify(arrow));
+		// The menu itself no longer offers to sort at all.
+		const opened = await clickColMenuGlyph(a, before[1]);
 		await a.settle(150);
-		await clickMenu(a, sortDesc);
-		await a.settle(200);
-		s = await a.page.evaluate((T) => {
-			const th = document.querySelector(T + ' thead th[aria-sort]');
-			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
-		}, T);
-		report.ok(s && s.col === before[1] && s.dir === 'descending', '...and Sort descending from the menu still works too', JSON.stringify(s));
+		report.ok(opened, 'the "..." button still exists and is clickable');
+		const items = await menuItems(a);
+		const sortAsc = await a.lang('lpn_pane_sort_asc');
+		const manage = await a.lang('lpn_pane_manage_cols');
+		report.ok(items.indexOf(sortAsc) === -1 && items.every((t) => t.toLowerCase().indexOf('descend') === -1),
+			'Sort ascending/descending are gone from the menu -- sorting is the arrow\'s job alone', JSON.stringify(items));
+		report.ok(items.indexOf(manage) !== -1, '...Manage columns… is still there', JSON.stringify(items));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}

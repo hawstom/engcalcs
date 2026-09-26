@@ -1052,7 +1052,6 @@ $ec_lang['lpn_pane_resize']='អូសដើម្បីធ្វើឲ្យផ
 $ec_lang['lpn_pane_tab_junctions']='ថ្នាំង';
 $ec_lang['lpn_pane_tab_tip']='ផ្ទាំងនេះបង្ហាញធាតុប្រភេទនេះជាតារាងមួយ ដែលអ្នកអាចតម្រៀប និងកែសម្រួល។ ជួរឈរលទ្ធផលមិនអាចកែសម្រួលបានទេ។';
 $ec_lang['lpn_pane_none']='បណ្ដាញនេះមិនទាន់មានធាតុទាំងនេះនៅឡើយទេ។';
-$ec_lang['lpn_pane_sort_tip']='តម្រៀបតាមជួរឈរនេះ។ ចុចម្ដងទៀតដើម្បីបញ្ច្រាស។';
 $ec_lang['lpn_find_menu']='រក និងជំនួស';
 $ec_lang['lpn_find_title']='រក និងជំនួស';
 $ec_lang['lpn_find_scope']='អ្វីត្រូវរក';

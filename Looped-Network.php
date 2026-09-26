@@ -1764,10 +1764,8 @@ EngCalcs.pageConfig = {
 	lpn_pane_fill_none: <?=json_encode($ec_lang['lpn_pane_fill_none'])?>,
 	lpn_pane_hide_col: <?=json_encode($ec_lang['lpn_pane_hide_col'])?>,
 	lpn_pane_hide_cols: <?=json_encode($ec_lang['lpn_pane_hide_cols'])?>,
-	lpn_pane_show_col: <?=json_encode($ec_lang['lpn_pane_show_col'])?>,
 	lpn_pane_show_all_cols: <?=json_encode($ec_lang['lpn_pane_show_all_cols'])?>,
 	lpn_pane_sort_asc: <?=json_encode($ec_lang['lpn_pane_sort_asc'])?>,
-	lpn_pane_sort_desc: <?=json_encode($ec_lang['lpn_pane_sort_desc'])?>,
 	lpn_pane_manage_cols: <?=json_encode($ec_lang['lpn_pane_manage_cols'])?>,
 	lpn_pane_manage_cols_title: <?=json_encode($ec_lang['lpn_pane_manage_cols_title'])?>,
 	lpn_pane_manage_cols_show: <?=json_encode($ec_lang['lpn_pane_manage_cols_show'])?>,
@@ -1977,7 +1975,6 @@ EngCalcs.pageConfig = {
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
-	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
 	// Borrowed, not owned here: the row-table point grid's own Copy/Paste labels, reused verbatim
 	// by the pane table's right-click menu (Task 690) rather than re-keyed under lpn_.

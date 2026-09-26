@@ -22040,48 +22040,16 @@ var EngCalcs = EngCalcs || {};
 			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
-			// **THE HEADING NO LONGER CARRIES THE SORT ARROW** (Tom, 2026-09-25, second pass: *"We
-			// currently have a problem with a sort arrow in the middle of the cell conflicting with
-			// the heading text. I suppose that should go."*). The whole cell is now ONE target, like a
-			// spreadsheet's own A/B/C column head -- its label and nothing else, so there is nothing
-			// in the button's own text for a sort mark to collide with. The sorted column's arrow
-			// lives in the trailing gutter instead, under the "..." menu glyph (paneSortArrow below).
-			//
-			// **A FLOATED, EMPTY SPACER RESERVES THAT GUTTER FOR WRAPPED TEXT, ON EVERY LINE IT
-			// COVERS AND NO OTHERS** (pre-review, 2026-09-25, second pass: on "Part of this network"
-			// and "Required fire flow (gpm)" a wrapped line ran under the "..." glyph, by ~3px and
-			// ~8px -- the button's own padding is only reduced by 6px on the trailing side, and the
-			// glyph badge needs 14px). A plain padding increase on the button would take that width
-			// off EVERY line, not only the ones the glyph and arrow actually cover, which regressed a
-			// narrow dragged column's wrap count between screen and print
-			// (`dev/browser-pass/specs/print.js`, "every heading wraps as it does on screen"). This
-			// spacer is `float: inline-end` in CSS, so ordinary inline text wraps around it exactly
-			// as it would around a floated image -- reserving the gutter only for the lines under it
-			// (one line's height for the "..." glyph alone, taller on the sorted column, which also
-			// carries the arrow) and leaving every line below that at the button's own full width.
-			// **NO TEXT NODE, SO print.js's PER-TEXT-NODE LINE WALK NEVER SEES IT** -- the same
-			// reasoning the glyphs themselves already follow, one level up: an EMPTY span contributes
-			// nothing to a walk that already skips whitespace-only text, unlike the real "▲" text
-			// node an earlier build of this arrow used and print.js caught.
-			//
-			// **ONLY ON A COLUMN NARROW ENOUGH TO WRAP** (`paneColWidthEm() > 0`: a declared `em` or
-			// a width the reader dragged) -- **measured, not assumed:** the first cut put this float
-			// on every heading and it widened four AUTO-width columns by exactly its own 15px each
-			// (Demand (gpm), Head, Pressure, Source share, none of which wrap and none of which Perry
-			// flagged), because a float competes for room on its line the same as real padding does,
-			// and a column with no declared width grows to give it that room. A column that never
-			// wraps has no line running under the glyph to protect in the first place, so it gets no
-			// float at all -- which is also why the table's total width is unchanged end to end.
-			if (paneColWidthEm(spec.id, c) > 0) {
-				(function () {
-					var gutter = document.createElement('span');
-					gutter.setAttribute('aria-hidden', 'true');
-					gutter.className = 'lpn-pane-sort-gutter' + (spec.sort.col === c.key ? ' lpn-pane-sort-gutter-tall' : '');
-					b.appendChild(gutter);
-				}());
-			}
+			// **THE TEXT IS INERT** (Tom, 2026-09-26, third pass: *"The headings text is still
+			// acting like text, and this seems like sloppy programming. It should be a non-entity as
+			// far as the cursor and the display changes go. No hover shading, no cursor change."*).
+			// No title/tip on the text itself any more (a tip is a hover affordance, which is
+			// exactly what this button must not have), no class of its own beyond what lays it out,
+			// and CSS gives it no `:hover` rule and `cursor: inherit` so it never overrides the
+			// `<th>`'s own uniform pointer. Every glyph that used to compete with this text for
+			// room -- the "..." menu and the sort arrow -- now overlays it, at zero layout cost; see
+			// their own comments below for why no space is reserved for either any more.
 			b.appendChild(document.createTextNode(paneHeadingText(c)));
-			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
 			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
 			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
 			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
@@ -22117,51 +22085,54 @@ var EngCalcs = EngCalcs || {};
 				if (ev.stopPropagation) { ev.stopPropagation(); }
 				paneHeadMenuTrigger(spec, c.key, ev.clientX || 0, ev.clientY || 0);
 			});
-			// **AN ALWAYS-VISIBLE, QUIET "..." AT THE TRAILING EDGE OF EVERY HEADING** (Tom,
-			// 2026-09-25, second pass: *"A menu glyph, likely three vertical dots."*, named as a
-			// standing control rather than a hover reveal now that a plain click no longer sorts --
-			// with sorting moved entirely behind this menu and the arrow below it, a reader must be
-			// able to find it without hovering or already knowing to right-click). Muted ink rather
-			// than hidden: `opacity` no longer gates it, only `:hover`/`:focus-visible` darken it. It
-			// opens the exact same menu the right-click/long-press does, positioned under itself
-			// rather than the pointer -- `position: absolute` in CSS, so it costs no heading width.
-			// **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- a real "⋮" character in the
-			// button would be one more text node under the heading for `print.js`'s screen/print
-			// line-count walk to trip over on every column, not only the sorted one. The accessible
-			// name comes from `title` instead (picked up by `ec-help` for the styled tip, same as
-			// every other icon-only button on this page).
+			// **A "..." AT THE TRAILING EDGE OF EVERY HEADING, HIDDEN UNTIL HOVER (OR FOCUS, OR
+			// TOUCH)** (Tom, 2026-09-26, third pass, reversing the second pass's "always visible":
+			// *"Possibly the arrow and the menu can take up zero space and appear with 100% opacity
+			// over any heading text on hover. Try that."*). `position: absolute` already gave it zero
+			// width; the change here is CSS-only (`opacity: 0` at rest, `1` under `:hover`/
+			// `:focus-within`, and unconditionally on a device with no hover at all) -- opens the
+			// exact same menu the right-click/long-press does, positioned under itself rather than
+			// the pointer. **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- a real "⋮"
+			// character in the button would be one more text node under the heading for
+			// `print.js`'s screen/print line-count walk to trip over on every column. The accessible
+			// name comes from `title` instead (picked up by `ec-help` for the styled tip).
 			menuBtn.type = 'button';
 			menuBtn.className = 'lpn-pane-colmenu ec-help';
 			menuBtn.setAttribute('aria-haspopup', 'menu');
-			menuBtn.setAttribute('aria-label', pc.lpn_pane_colmenu_tip || 'Sort, hide, or manage columns');
-			menuBtn.title = pc.lpn_pane_colmenu_tip || 'Sort, hide, or manage columns';
+			menuBtn.setAttribute('aria-label', pc.lpn_pane_colmenu_tip || 'Hide or manage columns');
+			menuBtn.title = pc.lpn_pane_colmenu_tip || 'Hide or manage columns';
 			menuBtn.addEventListener('click', function (ev) {
 				var r = menuBtn.getBoundingClientRect();
 				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
 				paneHeadMenuTrigger(spec, c.key, r.left, r.bottom);
 			});
 			th.appendChild(menuBtn);
-			// **THE SORT ARROW, ONLY ON THE COLUMN THAT IS ACTUALLY SORTED, DIRECTLY BELOW THE "..."
-			// GLYPH** (Tom, 2026-09-25, second pass: *"I think that an arrow could be fine if we
-			// fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the
-			// menu."*). Built only when this IS the sorted column, so an unsorted heading carries no
-			// extra node at all -- the table is already rebuilt in full on every sort (the sort
-			// column/direction is part of paneTableSignature()), so there is no live-refill path that
-			// would need this element to already exist. A click reverses the direction; it never
-			// changes which column is sorted, that is the menu's job. Same `::after`-glyph trick as
-			// the menu button just above, for the same reason (print.js's per-text-node line count).
-			if (spec.sort.col === c.key) {
-				arrow = document.createElement('button');
-				arrow.type = 'button';
-				arrow.className = 'lpn-pane-sortarrow ec-help' + (spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-				arrow.title = pc.lpn_pane_sortarrow_tip || 'Reverse the sort';
-				arrow.setAttribute('aria-label', pc.lpn_pane_sortarrow_tip || 'Reverse the sort');
-				arrow.addEventListener('click', function (ev) {
-					if (ev && ev.stopPropagation) { ev.stopPropagation(); }
-					sortPaneTable(spec, c.key);
-				});
-				th.appendChild(arrow);
-			}
+			// **THE SORT ARROW, ON EVERY HEADING NOW -- SORTING IS THE ARROW'S JOB AND ONLY THE
+			// ARROW'S** (Tom, 2026-09-26, third pass: *"Sorting still feels schizophrenic. Either the
+			// dots or the arrow, not both... clicking the arrow sorts (ascending first, then
+			// toggles)."*). `sortPaneTable()` already IS exactly that rule (same column: flip
+			// direction; a different column: ascending) -- see its own definition -- so every
+			// heading's arrow calls it with no branching here. Same hidden-until-hover treatment as
+			// the "..." glyph just above, in the gutter directly below it, **WITH ONE EXCEPTION**:
+			// the CURRENTLY SORTED column's own arrow stays visible without hovering
+			// (`lpn-pane-sortarrow-active`, below) -- a judgement call, not Tom's literal words, made
+			// because an arrow that only ever shows on hover would leave no way to SEE which column
+			// is sorted or which direction from a glance at the table, only from touching each
+			// heading in turn. Direction shows as the glyph itself (`▲`/`▼`); an unsorted column's
+			// arrow always reads `▲`, since a first click there always sorts ascending.
+			arrow = document.createElement('button');
+			arrow.type = 'button';
+			arrow.className = 'lpn-pane-sortarrow ec-help' +
+				(spec.sort.col === c.key ? ' lpn-pane-sortarrow-active' : '') +
+				(spec.sort.col === c.key && spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+			arrow.title = (spec.sort.col === c.key) ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort')
+				: (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.setAttribute('aria-label', arrow.title);
+			arrow.addEventListener('click', function (ev) {
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				sortPaneTable(spec, c.key);
+			});
+			th.appendChild(arrow);
 			// **THE CLICK, MOUSEDOWN AND DRAG-START LISTENERS, ON THE `<th>` ITSELF** (see that
 			// rule's own CSS comment on why the button could not simply be stretched to the cell's
 			// full height). Every pixel of the cell reaches one of these two handlers EXCEPT the
@@ -23691,18 +23662,22 @@ var EngCalcs = EngCalcs || {};
 		}
 		paneOpenColMenu(spec, x, y, key);
 	}
-	// **THE HEADING'S OWN MENU: SORT, HIDE (OR HIDE SEVERAL), SHOW ONE BACK, SHOW ALL, MANAGE.** A
-	// right-click (or long-press) on any heading offers it; whenever this table has a hidden
-	// column, the same menu lists each one by name so showing it again is never more than a
-	// right-click away -- the "obvious way back" Declan's design asks for, with no separate popover
-	// to build. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can we select multiple heading
-	// cells to hide multiple columns at once?"*) -- when the triggering heading is part of a
-	// standing multi-selection, Hide acts on the whole selection in one write; otherwise it is
-	// exactly the single-column case this always was. ID is dropped from the targets rather than
-	// blocking the whole menu, so hiding a selection that happens to include ID still hides the
-	// rest -- ID itself is never hideable (paneSetColsHidden already refuses it).
-	// Sort acts on `key` alone (the heading that was triggered), never the selection: sorting by
-	// several columns at once is not a thing this table offers anywhere else.
+	// **THE HEADING'S OWN MENU: HIDE (OR HIDE SEVERAL), SHOW ALL, MANAGE.** A right-click (or
+	// long-press) on any heading offers it. **SEVERAL HEADINGS CAN BE SELECTED FIRST** (Tom: *"can
+	// we select multiple heading cells to hide multiple columns at once?"*) -- when the triggering
+	// heading is part of a standing multi-selection, Hide acts on the whole selection in one write;
+	// otherwise it is exactly the single-column case this always was. ID is dropped from the
+	// targets rather than blocking the whole menu, so hiding a selection that happens to include ID
+	// still hides the rest -- ID itself is never hideable (paneSetColsHidden already refuses it).
+	//
+	// **SORT AND THE PER-COLUMN "Show {col}" ROWS ARE BOTH GONE** (Tom, 2026-09-26, third pass:
+	// *"Sorting still feels schizophrenic. Either the dots or the arrow, not both."* and *"Remove
+	// the itemized Show {column} rows from the column menu."*). Sorting is the arrow's job now,
+	// every heading's own (paneSortArrow(), built in renderPaneTable() beside this menu's glyph);
+	// putting it here too was the second voice Tom named. Showing one hidden column back by name is
+	// now Manage columns' job, which already lists every column with a checkbox -- the per-column
+	// rows here were a second, narrower door onto the same list. Show all columns stays, as the
+	// fast path for "I hid a few and want them all back" without opening a dialog for it.
 	function paneOpenColMenu(spec, x, y, key) {
 		var pc = EngCalcs.pageConfig || {}, cols = paneColsAll(spec), menu, mk, hidden, sel, targets;
 		paneCloseContextMenu();
@@ -23720,12 +23695,6 @@ var EngCalcs = EngCalcs || {};
 			menu.appendChild(b);
 			return b;
 		};
-		mk(pc.lpn_pane_sort_asc || 'Sort ascending', function () {
-			spec.sort.col = key; spec.sort.dir = 1; spec.orderIds = null; renderPaneTable(spec);
-		});
-		mk(pc.lpn_pane_sort_desc || 'Sort descending', function () {
-			spec.sort.col = key; spec.sort.dir = -1; spec.orderIds = null; renderPaneTable(spec);
-		});
 		sel = paneHeadSel(spec);
 		targets = (sel.length > 1 && sel.indexOf(key) !== -1) ? sel.slice() : [key];
 		targets = targets.filter(function (k) { return k !== 'id'; });
@@ -23734,14 +23703,10 @@ var EngCalcs = EngCalcs || {};
 				function () { paneSetColsHidden(spec, targets, true); paneHeadSelClear(spec); });
 		}
 		hidden = cols.filter(function (c) { return paneColHidden(spec.id, c.key); });
-		hidden.forEach(function (c) {
-			mk(String(pc.lpn_pane_show_col || 'Show {col}').replace('{col}', paneHeadingText(c)),
-				function () { paneSetColHidden(spec, c.key, false); });
-		});
 		// **NOT THE FILTER'S "Show all"** (`lpn_pane_filter_clear`, which clears the ROW filter and
 		// lives in the same pane) -- a different command reusing that string would say one thing in
 		// two places, which CLAUDE.md's label-normalization rule forbids for anything past a whole
-		// sentence. Shown only once something is hidden, same as the per-column entries above it.
+		// sentence. Shown only once something is hidden.
 		if (hidden.length) {
 			mk(pc.lpn_pane_show_all_cols || 'Show all columns', function () {
 				paneSetColsHidden(spec, hidden.map(function (c) { return c.key; }), false);

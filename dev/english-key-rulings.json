@@ -2654,18 +2654,8 @@
             "ruled": "2026-09-26",
             "answer": "OK."
         },
-        "lpn_pane_show_col": {
-            "on": "Show {col}",
-            "ruled": "2026-09-25",
-            "answer": "OK."
-        },
         "lpn_pane_sort_asc": {
             "on": "Sort ascending",
-            "ruled": "2026-09-26",
-            "answer": "OK."
-        },
-        "lpn_pane_sort_desc": {
-            "on": "Sort descending",
             "ruled": "2026-09-26",
             "answer": "OK."
         },

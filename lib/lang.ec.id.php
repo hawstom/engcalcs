@@ -1051,7 +1051,6 @@ $ec_lang['lpn_pane_resize']='Seret untuk membuat panel lebih tinggi atau lebih p
 $ec_lang['lpn_pane_tab_junctions']='Simpul';
 $ec_lang['lpn_pane_tab_tip']='Tab ini menampilkan elemen jenis ini sebagai tabel yang dapat Anda urutkan dan edit. Kolom hasil tidak dapat diedit.';
 $ec_lang['lpn_pane_none']='Jaringan ini belum memiliki elemen jenis ini.';
-$ec_lang['lpn_pane_sort_tip']='Urutkan berdasarkan kolom ini. Klik lagi untuk membalik urutannya.';
 $ec_lang['lpn_find_menu']='Cari dan ganti';
 $ec_lang['lpn_find_title']='Cari dan ganti';
 $ec_lang['lpn_find_scope']='Apa yang dicari';

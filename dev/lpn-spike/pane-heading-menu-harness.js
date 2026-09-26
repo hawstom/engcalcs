@@ -130,14 +130,21 @@ console.log('\n--- 1. a plain click SELECTS the column and never sorts ---');
 		JSON.stringify(L.headSel('junctions')));
 }
 
-console.log('\n--- 2. the "..." menu opens the column menu; a drag is not read as the click after it ---');
+console.log('\n--- 2. the "..." menu is Hide/Show all/Manage ONLY -- sorting moved off it entirely; a drag is not read as the click after it ---');
 {
+	// Tom, 2026-09-26, third pass: "Sorting still feels schizophrenic. Either the dots or the
+	// arrow, not both... Since we are going to try auto-hiding and heading overwriting arrows,
+	// remove the sort rows from the column menu." "Remove the itemized Show {column} rows... Leave
+	// only Hide this, Show all, and Manage."
 	const menu = (fire(colMenuBtn('junctions', 'demand'), 'click', { stopPropagation: function () {} }), ctxMenuEl());
 	report(!!menu, 'the "..." button opens a menu');
-	const sortAsc = menuItem(menu, PC.lpn_pane_sort_asc), sortDesc = menuItem(menu, PC.lpn_pane_sort_desc),
-		manage = menuItem(menu, PC.lpn_pane_manage_cols);
-	report(!!sortAsc && !!sortDesc, 'it offers Sort ascending and Sort descending', JSON.stringify(menu.children.map((b) => b.textContent)));
-	report(!!manage, '...and Manage columns…');
+	const items = menu.children.map((b) => b.textContent);
+	report(items.indexOf(PC.lpn_pane_sort_asc) === -1, 'Sort ascending is gone from the menu', JSON.stringify(items));
+	report(items.every((t) => t !== 'Sort descending' && !/^Show [A-Z]/.test(t)),
+		'...and so is Sort descending and every itemized "Show {col}" row', JSON.stringify(items));
+	const manage = menuItem(menu, PC.lpn_pane_manage_cols);
+	report(!!manage, '...only Hide this column, Show all columns (once something is hidden) and Manage columns… remain',
+		JSON.stringify(items));
 	// A press that travels is a drag, not a click: the heading button's own click handler checks
 	// spec.headDragged and returns without changing the selection when it is set (renderPaneTable()).
 	const spec = L.paneTableById('junctions');
@@ -149,25 +156,34 @@ console.log('\n--- 2. the "..." menu opens the column menu; a drag is not read a
 	report(spec.headDragged === false, '...and the flag is consumed, not left standing for the next real click');
 }
 
-console.log('\n--- 3. sort from the menu; the arrow exists ONLY on the sorted column, and reverses it ---');
+console.log('\n--- 3. every heading carries an arrow now; clicking ANY of them sorts (ascending first, then toggles) ---');
 {
-	report(!sortArrowBtn('junctions', 'demand'), 'no arrow yet: nothing is sorted by Demand');
-	fire(colMenuBtn('junctions', 'demand'), 'click', { stopPropagation: function () {} });
-	fire(menuItem(ctxMenuEl(), PC.lpn_pane_sort_asc), 'click', {});
+	// Tom, 2026-09-26, third pass: "clicking the arrow sorts (ascending first, then toggles)."
+	// sortPaneTable() already IS that rule; the arrow just calls it unconditionally now.
+	report(!!sortArrowBtn('junctions', 'demand') && !!sortArrowBtn('junctions', 'id'),
+		'an arrow exists on every heading, not only a sorted one');
+	report(!hasToken(sortArrowBtn('junctions', 'demand'), 'lpn-pane-sortarrow-active'),
+		'...but only the SORTED column carries the "always visible" class -- nothing is sorted yet');
+	fire(sortArrowBtn('junctions', 'demand'), 'click', { stopPropagation: function () {} });
 	report(JSON.stringify(L.sortState('junctions')) === JSON.stringify({ col: 'demand', dir: 1 }),
-		'Sort ascending from the menu sorts by that column', JSON.stringify(L.sortState('junctions')));
+		'clicking an UNSORTED column\'s arrow sorts it ascending, the first click', JSON.stringify(L.sortState('junctions')));
 	const arrow = sortArrowBtn('junctions', 'demand');
-	report(!!arrow, 'the sorted column now carries an arrow');
-	report(!hasToken(arrow, 'lpn-pane-sortarrow-desc'), '...pointing ascending', arrow.className);
-	['id', 'elev'].forEach((k) => report(!sortArrowBtn('junctions', k), 'and no OTHER column carries one: ' + k));
+	report(hasToken(arrow, 'lpn-pane-sortarrow-active') && !hasToken(arrow, 'lpn-pane-sortarrow-desc'),
+		'...and now carries the active class, pointing ascending', arrow.className);
+	report(!hasToken(sortArrowBtn('junctions', 'id'), 'lpn-pane-sortarrow-active'),
+		'...while every OTHER heading\'s arrow stays plain (hover-revealed only, not "active")');
 	fire(arrow, 'click', { stopPropagation: function () {} });
 	report(JSON.stringify(L.sortState('junctions')) === JSON.stringify({ col: 'demand', dir: -1 }),
-		'clicking the arrow reverses the sort, without touching WHICH column is sorted', JSON.stringify(L.sortState('junctions')));
+		'clicking the SAME column\'s arrow again toggles the direction, without touching WHICH column is sorted',
+		JSON.stringify(L.sortState('junctions')));
 	report(hasToken(sortArrowBtn('junctions', 'demand'), 'lpn-pane-sortarrow-desc'), '...and the arrow itself now points the other way');
-	// Menu-driven Sort descending still works, on top of the arrow.
-	fire(colMenuBtn('junctions', 'demand'), 'click', { stopPropagation: function () {} });
-	fire(menuItem(ctxMenuEl(), PC.lpn_pane_sort_desc), 'click', {});
-	report(L.sortState('junctions').dir === -1, 'Sort descending from the menu still works too');
+	// Clicking a DIFFERENT column's arrow moves the sort there, ascending -- never a second click
+	// away from what that column was doing before.
+	fire(sortArrowBtn('junctions', 'elev'), 'click', { stopPropagation: function () {} });
+	report(JSON.stringify(L.sortState('junctions')) === JSON.stringify({ col: 'elev', dir: 1 }),
+		'a different column\'s arrow takes over the sort, ascending', JSON.stringify(L.sortState('junctions')));
+	report(!hasToken(sortArrowBtn('junctions', 'demand'), 'lpn-pane-sortarrow-active'),
+		'...and the old column\'s arrow drops the active class');
 }
 
 console.log('\n--- 4. Manage columns: nothing applies until OK; Cancel discards; a SELECTION moves as a block ---');

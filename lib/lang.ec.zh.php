@@ -985,7 +985,6 @@ $ec_lang['lpn_georef_goto']='前往…';
 $ec_lang['lpn_pane_toggle']='底部面板';
 $ec_lang['lpn_pane_resize']='拖动可调整面板高度';
 $ec_lang['lpn_pane_tab_junctions']='节点';
-$ec_lang['lpn_pane_sort_tip']='按此列排序。再次点击可反转排序方向。';
 
 $ec_lang['lpn_find_scope']='搜索范围';
 $ec_lang['lpn_find_scope_all']='全部';

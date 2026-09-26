@@ -2476,30 +2476,18 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
 	text-align: inherit;
 }
-/* `display: block; width: 100%` so the button (inline by default) spans the cell's own content
-   width, which is what lets the floated gutter spacer below wrap ordinary text around it the way
-   it would around a floated image, at the width the CELL offers rather than the button's own
-   shrink-to-fit guess. Padding stays off the button and on the `<th>` -- see that rule's own
-   comment on why a click-area fix could not live here (percentage heights on a table cell's
-   child do not resolve to the cell's real height). */
-.lpn-pane-sort { font-weight: bold; display: block; width: 100%; }
-/* **A FLOATED, EMPTY SPACER RESERVES THE GLYPH GUTTER, ON ONLY THE LINES IT COVERS** (pre-review,
-   2026-09-25, second pass: on "Part of this network" and "Required fire flow (gpm)" a wrapped
-   line of heading text ran under the "..." glyph, by ~3px and ~8px -- the button's own 6px of
-   trailing padding is not the 14px the glyph badge needs). Widening the button's OWN padding
-   instead would take that width off EVERY line, not only the ones under a glyph, and did: it
-   changed a narrow dragged column's wrap count on screen without changing it on the print sheet
-   (`dev/browser-pass/specs/print.js`, caught in review). `float: inline-end` on an empty, leading
-   sibling of the heading text makes ordinary inline text wrap around it exactly as it would
-   around a floated image -- for exactly the height given here, and no further down the label.
-   `js/looped-network.js` gives the sorted column's own spacer the taller class, since that column
-   also carries the arrow just below the "..." glyph. **NO TEXT NODE**, so `print.js`'s
-   per-text-node line walk (which already skips whitespace-only nodes) never sees it at all -- the
-   same reasoning the glyphs themselves rely on one level up. */
-.lpn-pane-sort-gutter { float: inline-end; width: 15px; height: 1.35em; }
-.lpn-pane-sort-gutter-tall { height: 2.6em; }
-/* A tint rather than a colour: it says "this responds" without claiming a meaning of its own. */
-.lpn-pane-sort:hover, .lpn-pane-goto:hover { background: #eef1f4; }
+/* **THE TEXT IS A NON-ENTITY** (Tom, 2026-09-26, third pass: *"The headings text is still acting
+   like text... It should be a non-entity as far as the cursor and the display changes go. No
+   hover shading, no cursor change."*). `cursor: inherit` so the button never overrides the `<th>`'s
+   own uniform pointer with a button's native one, and no `:hover` rule at all -- the tint this
+   heading used to gain under the pointer is gone, on purpose, not merely unstyled. `display:
+   block; width: 100%` so the button (inline by default) spans the cell's own content width; no
+   space is reserved for the "..." glyph or the sort arrow any more (both moved to `position:
+   absolute`, overlaying the text at zero layout cost -- see their own rules). Padding stays off
+   the button and on the `<th>` -- see that rule's own comment on why a click-area fix could not
+   live here (percentage heights on a table cell's child do not resolve to the cell's real
+   height). */
+.lpn-pane-sort { font-weight: bold; display: block; width: 100%; cursor: inherit; }
 /* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
    text alignment with it -- it sits after the box, in its own ink. */
 .lpn-pane-goto {
@@ -2592,14 +2580,16 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-table thead th { cursor: pointer; position: relative; }
 .lpn-pane-table thead th.lpn-pane-head-sel { cursor: grab; }
 .lpn-pane-table thead th.lpn-pane-head-sel:active { cursor: grabbing; }
-/* **THE "..." COLUMN MENU, ALWAYS VISIBLE AND QUIET** (Tom, 2026-09-25, second pass: *"A menu
-   glyph, likely three vertical dots."*, no longer a hover reveal now that sorting lives entirely
-   behind it and the arrow below it -- a reader who does not hover or right-click still has to be
-   able to find it). Opens the same menu the right-click/long-press does
-   (`paneHeadMenuTrigger()`), so it is a second door onto one room rather than a second menu to
-   keep in step. `position: absolute` for "no extra heading width": an out-of-flow box contributes
-   nothing to the button's own min-content, so `.lpn-pane-sort` above declares `position: relative`
-   for this (and the arrow below it) to sit against.
+/* **THE "..." COLUMN MENU, HIDDEN UNTIL HOVER, FOCUS OR TOUCH** (Tom, 2026-09-26, third pass,
+   reversing the second pass's "always visible": *"Possibly the arrow and the menu can take up
+   zero space and appear with 100% opacity over any heading text on hover. Try that."*). Opens the
+   same menu the right-click/long-press does (`paneHeadMenuTrigger()`), so it is a second door onto
+   one room rather than a second menu to keep in step. `position: absolute` for "no extra heading
+   width": an out-of-flow box contributes nothing to the button's own min-content, so
+   `.lpn-pane-sort` above declares `position: relative` for this (and the arrow below it) to sit
+   against -- **OVERLAYING THE TEXT ON PURPOSE, NOT BESIDE IT**: no space is reserved for either
+   glyph any more (the floated gutter spacer a pre-review round added is gone), which is what "zero
+   space" means here.
    **PINNED TO THE TOP-RIGHT CORNER OF THE CELL, NOT ITS FULL HEIGHT, AND OPAQUE** (pre-review,
    2026-09-25: on a narrow column -- "Base demand (gpm)" wraps to four lines at its declared 3.5em
    -- a full-height, transparent glyph sat centred over the SECOND line of wrapped text, which read
@@ -2611,28 +2601,44 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	position: absolute; inset-inline-end: 1px; top: 1px; height: 1.1em; width: 13px;
 	display: flex; align-items: center; justify-content: center;
 	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
-	font-weight: normal; color: #99a; cursor: pointer;
+	font-weight: normal; color: #99a; cursor: pointer; opacity: 0;
 }
 /* The glyph itself, same reasoning as the sort arrow below: `content:` rather than a text node, so
    print.js's per-text-node line count never sees it. */
 .lpn-pane-colmenu::after { content: '⋮'; }
+/* Hovering OR focusing anywhere in the heading reveals it -- not only hovering the dot itself,
+   which nobody can aim at while it is invisible. `:focus-within` is the keyboard equivalent of
+   hover (Tab into the heading), and a touch screen never fires `:hover` at all, so `(hover: none)`
+   shows it unconditionally there -- the one place a mouse and a finger are told apart in this file. */
+.lpn-pane-table thead th:hover .lpn-pane-colmenu,
+.lpn-pane-table thead th:focus-within .lpn-pane-colmenu,
+.lpn-pane-colmenu:focus-visible { opacity: 1; }
 .lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible { color: #0645ad; outline: 0; }
-/* **THE ARROW, ONLY ON THE SORTED COLUMN, DIRECTLY BELOW THE "..." GLYPH** (Tom, 2026-09-25,
-   second pass: *"I am not sure where the arrow would/should go. Maybe just below the menu."*). No
-   arrow anywhere else -- js/looped-network.js only builds this element for the column
-   `spec.sort.col` names, so an unsorted heading has no `.lpn-pane-sortarrow` node to hide. Same
-   corner-badge shape and the same `content:`-not-text-node reasoning as the menu glyph just above,
-   stacked directly under it in the same gutter so neither ever overlaps the heading's own label. A
-   click reverses the sort direction; it never changes which column is sorted (the menu does that). */
+@media (hover: none) { .lpn-pane-colmenu { opacity: 1; } }
+/* **THE ARROW, ON EVERY HEADING, DIRECTLY BELOW THE "..." GLYPH** (Tom, 2026-09-26, third pass:
+   *"Sorting still feels schizophrenic. Either the dots or the arrow, not both... clicking the
+   arrow sorts (ascending first, then toggles)."* -- sorting is the arrow's job alone now, so every
+   heading gets one, not only the sorted column). Same corner-badge shape, the same
+   `content:`-not-text-node reasoning, and the same hover/focus/touch reveal as the menu glyph just
+   above -- **EXCEPT the column that IS sorted**, whose own arrow is a judgement call kept visible
+   at all times (`.lpn-pane-sortarrow-active`, below): an arrow that only ever appeared on hover
+   would leave no way to see which column is sorted, or which direction, without touching every
+   heading in turn. Clicking ANY heading's arrow calls `sortPaneTable()`, which is already exactly
+   "ascending first, then toggles" for whichever column it is handed. */
 .lpn-pane-sortarrow {
 	position: absolute; inset-inline-end: 1px; top: 1.25em; height: 1em; width: 13px;
 	display: flex; align-items: center; justify-content: center;
 	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
-	font-size: .8em; font-weight: normal; color: #667; cursor: pointer;
+	font-size: .8em; font-weight: normal; color: #667; cursor: pointer; opacity: 0;
 }
 .lpn-pane-sortarrow::after { content: '▲'; }
 .lpn-pane-sortarrow-desc::after { content: '▼'; }
+.lpn-pane-table thead th:hover .lpn-pane-sortarrow,
+.lpn-pane-table thead th:focus-within .lpn-pane-sortarrow,
+.lpn-pane-sortarrow:focus-visible,
+.lpn-pane-sortarrow-active { opacity: 1; }
 .lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: #0645ad; outline: 0; }
+@media (hover: none) { .lpn-pane-sortarrow { opacity: 1; } }
 /* The Manage columns dialog (openDialog(), #lpn_dialog): one row per column, a Show checkbox and
    two reorder buttons. Plain and compact -- this dialog is open for a few seconds, not a page of
    its own. **REWORKED TO A SELECTABLE LIST WITH BUTTONS OUTSIDE IT** (Tom, 2026-09-25, second

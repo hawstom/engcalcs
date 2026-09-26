@@ -715,7 +715,6 @@ $ec_lang['lpn_pane_tab_junctions']='Nudos';
 $ec_lang['lpn_pane_tab_tip']='Esta pestaña muestra los elementos de este tipo como una tabla que puede ordenar y editar. Las columnas de resultados no se pueden editar.';
 $ec_lang['lpn_pane_none']='Esta red todavía no tiene ninguno de estos.';
 $ec_lang['lpn_pane_text_attached']='Adjunto';
-$ec_lang['lpn_pane_sort_tip']='Ordenar por esta columna. Vuelva a hacer clic para invertir el orden.';
 $ec_lang['lpn_basemap_show']='Mostrar mapa de calles';
 $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';

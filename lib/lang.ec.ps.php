@@ -1050,7 +1050,6 @@ $ec_lang['lpn_pane_resize']='راکاږئ ترڅو پینل اوږد یا لنډ
 $ec_lang['lpn_pane_tab_junctions']='جنکشنونه';
 $ec_lang['lpn_pane_tab_tip']='دا ټب د دې ډول عناصر د یوه جدول په توګه ښیي چې تاسو یې ترتیبولی او سمولی شئ. د پایلو کالمونه نشي سمیدی.';
 $ec_lang['lpn_pane_none']='دا شبکه تر اوسه لدې نه هیڅ یو نلري.';
-$ec_lang['lpn_pane_sort_tip']='د دې کالم له مخې ترتیب کړئ. بیا کلیک وکړئ ترڅو بدل کړئ.';
 $ec_lang['lpn_find_menu']='لټون او ځای پرځای کول';
 $ec_lang['lpn_find_title']='لټون او ځای پرځای کول';
 $ec_lang['lpn_find_scope']='څه ولټول شي';

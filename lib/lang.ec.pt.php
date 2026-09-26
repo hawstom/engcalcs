@@ -670,7 +670,6 @@ $ec_lang['lpn_storage_too_new']='Este projeto foi salvo por uma versão mais rec
 $ec_lang['lpn_tool_file']='Arquivo';
 $ec_lang['lpn_menu_edit']='Editar';
 $ec_lang['lpn_menu_insert']='Inserir';
-$ec_lang['lpn_pane_sort_tip']='Ordenar por esta coluna. Clique novamente para inverter a ordem.';
 $ec_lang['lpn_pane_none']='Esta rede ainda não tem nenhum destes.';
 $ec_lang['lpn_pane_tab_tip']='Esta aba mostra os elementos deste tipo como uma tabela que você pode ordenar e editar. As colunas de resultados não podem ser editadas.';
 $ec_lang['lpn_pane_tab_junctions']='Junções';

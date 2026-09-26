@@ -153,14 +153,20 @@ console.log('\n--- ID cannot be hidden ---');
 	report(L.colKeys('junctions').indexOf('id') >= 0, 'paneSetColHidden() itself refuses to hide ID');
 }
 
-console.log('\n--- the obvious way back: the menu on ANY heading lists a hidden column by name ---');
+// **THE ITEMIZED "Show {col}" ROW IS GONE** (Tom, 2026-09-26, third pass: *"Remove the itemized
+// Show {column} rows from the column menu."*). "Show all columns" is still the fast path when
+// several are hidden; bringing back exactly ONE by name is now Manage columns' job alone -- it
+// already lists every column with its own checkbox, so the per-column menu row was a second,
+// narrower door onto the same list. pane-heading-menu-harness.js covers Manage columns in full;
+// this just confirms the menu itself no longer offers the row.
+console.log('\n--- the menu no longer lists a hidden column by name; "Show all columns" still does the fast case ---');
 {
-	const label = String(PC.lpn_pane_show_col || 'Show {col}').replace('{col}', demandLabel);
 	const menu = rightClickHeading('junctions', 'elev');
-	const item = menuItem(menu, label);
-	report(!!item, 'a right-click on Elevation offers "' + label + '"',
-		menu && menu.children.map((b) => b.textContent).join(' | '));
-	fire(item, 'click', {});
+	const items = menu ? menu.children.map((b) => b.textContent) : [];
+	report(items.indexOf(String(PC.lpn_pane_show_col || 'Show {col}').replace('{col}', demandLabel)) === -1,
+		'no "Show Demand" row on Elevation\'s own menu', JSON.stringify(items));
+	report(items.indexOf(PC.lpn_pane_show_all_cols) !== -1, '...but "Show all columns" is there', JSON.stringify(items));
+	fire(menuItem(menu, PC.lpn_pane_show_all_cols), 'click', {});
 	report(L.colKeys('junctions').indexOf('demand') >= 0, '...and clicking it brings Demand back');
 	report(!!L.headCell('junctions', 'demand'), '...with a real <th> for it again');
 }

@@ -1050,7 +1050,6 @@ $ec_lang['lpn_pane_resize']='ፓነሉን ረዘም ወይም አጥር ለማ�
 $ec_lang['lpn_pane_tab_junctions']='መገናኛዎች';
 $ec_lang['lpn_pane_tab_tip']='ይህ ትር ከዚህ ዓይነት ያሉትን አካሎች እንደ ሠንጠረዥ ያሳያል፣ መደርደርና ማስተካከል ይችላሉ። የውጤት አምዶች ሊታረቱ አይችሉም።';
 $ec_lang['lpn_pane_none']='ይህ መረብ እስካሁን ከእነዚህ ምንም የለውም።';
-$ec_lang['lpn_pane_sort_tip']='በዚህ አምድ ደርድር። ለመገልበጥ እንደገና ይጫኑ።';
 $ec_lang['lpn_find_menu']='ፈልግና ተካ';
 $ec_lang['lpn_find_title']='ፈልግና ተካ';
 $ec_lang['lpn_find_scope']='ምን መፈለግ';

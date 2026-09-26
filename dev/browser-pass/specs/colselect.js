@@ -353,43 +353,38 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// ---- (9) NO TEXT LINE OF ANY JUNCTIONS HEADING RUNS UNDER THE "..." GLYPH OR ITS ARROW
-	// (pre-review, 2026-09-25, second pass: "Part of this network" and "Required fire flow (gpm)"
-	// overlapped by ~3px and ~8px) -- and the table's total width is unchanged, since the fix
-	// reserves space only on columns narrow enough to wrap, never by widening a <col>. ------------
+	// ---- (9) THE "..." GLYPH AND THE ARROW TAKE ZERO LAYOUT SPACE, ON EVERY HEADING, AND THE
+	// TABLE'S TOTAL WIDTH IS UNCHANGED (Tom, 2026-09-26, third pass, REVERSING the prior round's
+	// gutter reservation: "Possibly the arrow and the menu can take up zero space and appear with
+	// 100% opacity over any heading text on hover. Try that." Overlapping the text on hover is now
+	// the INTENDED behaviour, not a defect -- so this no longer asserts "never overlaps"; it asserts
+	// the two things Tom actually asked for: no space reserved (so nothing widens), and both glyphs
+	// invisible until hovered or focused. -----------------------------------------------------------
 	{
 		const a = await openJunctions(browser, 'G');
 		const widthBefore = 1221.921875;
 		const result = await a.page.evaluate(() => {
 			const t = document.querySelector('#lpn_pane_junctions table');
 			const ths = [...t.querySelectorAll('thead th')];
-			const bad = [];
+			const notInvisible = [];
 			ths.forEach((th) => {
-				const b = th.querySelector('.lpn-pane-sort');
 				const glyph = th.querySelector('.lpn-pane-colmenu');
 				const arrow = th.querySelector('.lpn-pane-sortarrow');
-				const gRect = glyph ? glyph.getBoundingClientRect() : null;
-				const aRect = arrow ? arrow.getBoundingClientRect() : null;
-				const intersects = (q, r) => r && !(q.right <= r.left || q.left >= r.right || q.bottom <= r.top || q.top >= r.bottom);
-				const range = document.createRange();
-				const walker = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
-				let tn;
-				while ((tn = walker.nextNode())) {
-					if (!tn.textContent.trim()) { continue; }
-					range.selectNodeContents(tn);
-					[...range.getClientRects()].forEach((q) => {
-						if (intersects(q, gRect) || intersects(q, aRect)) {
-							bad.push((th.className.match(/lpn-pane-col-(\S+)/) || [])[1]);
-						}
-					});
+				const key = (th.className.match(/lpn-pane-col-(\S+)/) || [])[1];
+				// The currently sorted column's own arrow is a deliberate exception (stays visible);
+				// every other heading's glyph and arrow must both be at opacity 0 with no hover.
+				if (!arrow.classList.contains('lpn-pane-sortarrow-active') && getComputedStyle(arrow).opacity !== '0') {
+					notInvisible.push(key + ':arrow');
 				}
+				if (getComputedStyle(glyph).opacity !== '0') { notInvisible.push(key + ':menu'); }
 			});
-			return { bad, tableWidth: t.getBoundingClientRect().width };
+			return { notInvisible, tableWidth: t.getBoundingClientRect().width };
 		});
-		report.ok(result.bad.length === 0, 'no heading text line intersects the "..." glyph or the sort arrow',
-			JSON.stringify(result.bad));
+		report.ok(result.notInvisible.length === 0,
+			'with no hover or focus anywhere, every heading\'s "..." glyph and (unsorted) arrow are invisible',
+			JSON.stringify(result.notInvisible));
 		report.ok(Math.abs(result.tableWidth - widthBefore) < 0.5,
-			'the Junctions table total width is unchanged by the gutter reservation',
+			'the Junctions table total width is unchanged -- no space is reserved for either glyph',
 			result.tableWidth + ' vs ' + widthBefore);
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
