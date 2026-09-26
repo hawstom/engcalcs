@@ -17940,7 +17940,7 @@ var EngCalcs = EngCalcs || {};
 			rows.push(findFilterRowText(spec));
 		});
 		if (!firstId) {
-			renderFindResults(pc.lpn_find_filter_none || 'No table has a property this query names.');
+			renderFindResults(pc.lpn_find_filter_none || 'This query doesn\'t apply to any table.');
 			return;
 		}
 		openPane(firstId);
