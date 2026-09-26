@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2106,
-        "delta_key_count": 270,
-        "exempt_key_count": 36,
+        "expected_key_count": 2101,
+        "delta_key_count": 272,
+        "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -24,7 +24,6 @@
             "lpn_ex_net2_title",
             "lpn_ex_net3_title",
             "lpn_ex_elm_street_title",
-            "lpn_xymap",
             "lpn_tip_join",
             "lpn_field_x",
             "lpn_field_y",
@@ -584,6 +583,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -606,7 +607,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -856,6 +857,8 @@
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
         "lpn_units_usft": "US survey ft",
+        "lpn_geomap": "georeferenced",
+        "lpn_xymap": "local",
         "lpn_file_convert_as": "Convert as…",
         "lpn_copy_of": "Copy of {name}",
         "lpn_convas_title": "Convert as",
@@ -878,7 +881,7 @@
         "lpn_convas_no_transform": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
         "lpn_convas_done": "The converted copy is {name}. The original project is unchanged.",
         "lpn_convas_cancelled": "Nothing was converted. The copy is closed, and the original project is unchanged.",
-        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
+        "lpn_file_convert_as_tip": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
         "lpn_georef_answered": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
         "lpn_tool_zoom_window_tip": "Click two opposite corners of a box, or drag one, on the map to zoom in on it. Press this button again for Zoom to fit.",
         "lpn_zoom_in_tip": "Zoom in. Shortcut: +",
@@ -1983,19 +1986,51 @@
                 }
             }
         },
+        "lpn_geomap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
+        "lpn_xymap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
+                }
+            }
+        },
         "lpn_file_convert_as": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2004,14 +2039,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2020,14 +2055,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2036,14 +2071,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2052,14 +2087,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2068,14 +2103,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2084,14 +2119,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2100,14 +2135,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2116,14 +2151,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2132,14 +2167,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2148,14 +2183,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2164,14 +2199,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2180,14 +2215,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2196,14 +2231,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2212,14 +2247,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2228,14 +2263,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2244,14 +2279,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2260,14 +2295,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2276,14 +2311,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2292,14 +2327,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2308,14 +2343,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2324,14 +2359,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2340,14 +2375,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_geomap",
-                    "value": "လတ္တီတွဒ်\/လောင်ဂျီတွဒ်",
-                    "english": "lat\/lon"
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_georef_intro",
+                    "value": "မော်ဒယ်ကို ချထားခြင်းသည် အဆင့် နှစ်ဆင့် ရှိသည်။ အဆင့် ၁ သည် လျင်မြန်သော အဆင့်ဖြစ်သည် - မော်ဒယ်ကို ငြိမ်ထားပြီး၊ သင့်နေရာသည် မော်ဒယ်၏ အောက်တွင် ခန့်မှန်း မှန်ကန်သော အရွယ်အစားဖြင့် ရှိလာသည်အထိ နောက်ခံမြေပုံကို ရွှေ့ပါ။ ဤအဆင့်တွင် လှည့်ခြင်း မပါသေးပါ။ အဆင့် ၂ သည် တိကျသော အဆင့်ဖြစ်သည် - မော်ဒယ်ကိုယ်တိုင်ကို ဆွဲပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ သင့်ပရောဂျက်သည် အစတွင် ကမ္ဘာတစ်ဝှမ်းလုံး မြေပုံပေါ်၌ ရှိနေသောကြောင့်၊ ဦးစွာ သင့်တည်နေရာကို ရှာပြီး၊ မော်ဒယ်ကို ဤနေရာတွင် ထားရန် ခလုတ်ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button."
                 }
             }
         },
@@ -2356,9 +2391,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_georef_asdegrees",
-                    "value": "ဤဖိုင်ရှိ x နှင့် y တို့ကို လောင်ဂျီတွဒ်နှင့် လတ္တီတွဒ်အဖြစ် ဖတ်ယူထားသောကြောင့်၊ ကွန်ရက်သည် မြေပုံပေါ်တွင် ရှိပြီးသားဖြစ်ပြီး မည်သည့်အရာမျှ မရွှေ့ရသေးပါ။ မှန်ကန်သောနေရာတွင် ရှိမရှိ စစ်ဆေးပြီး၊ ဤနေရာချထားမှုကို ထားရှိရန် ခလုတ်ကို နှိပ်ပါ။",
-                    "english": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button."
+                    "key": "lpn_basemap_satellite_show",
+                    "value": "ဂြိုဟ်တု ပုံရိပ်များ ပြရန်",
+                    "english": "Show satellite images"
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -2772,9 +2807,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "ပရောဂျက်ရှင်တပ်ဆင်ထားပြီးသား ပရောဂျက်တစ်ခုသည် ၎င်းကိုယ်ပိုင် ပြားပြင်ပေါ်တွင် ဖွင့်မည်ဖြစ်ပြီး၊ သင်ရှာဖွေခဲ့သော နေရာတွင် မဟုတ်ပါ။ ထိုပြားပြင်ကို ကမ္ဘာပေါ်တွင် တင်ရန် ကိုဩဒိနိတ် ပြောင်းလဲမှု တစ်ခု လိုအပ်ပြီး၊ ဤစာမျက်နှာတွင် ယခုအချိန်ထိ မရှိသေးပါ။",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total} အနက် {n} ပရောဂျက်ရှင်ကို စာရင်းပြုထားသည်။",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2788,9 +2823,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "ပရောဂျက်ရှင်တပ်ဆင်ထားပြီးသား ပရောဂျက်တစ်ခုသည် ၎င်းကိုယ်ပိုင် ပြားပြင်ပေါ်တွင် ဖွင့်မည်ဖြစ်ပြီး၊ သင်ရှာဖွေခဲ့သော နေရာတွင် မဟုတ်ပါ။ ထိုပြားပြင်ကို ကမ္ဘာပေါ်တွင် တင်ရန် ကိုဩဒိနိတ် ပြောင်းလဲမှု တစ်ခု လိုအပ်ပြီး၊ ဤစာမျက်နှာတွင် ယခုအချိန်ထိ မရှိသေးပါ။",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total} အနက် {n} ပရောဂျက်ရှင်ကို စာရင်းပြုထားသည်။",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -2804,9 +2839,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_crs_place_projected",
-                    "value": "ပရောဂျက်ရှင်တပ်ဆင်ထားပြီးသား ပရောဂျက်တစ်ခုသည် ၎င်းကိုယ်ပိုင် ပြားပြင်ပေါ်တွင် ဖွင့်မည်ဖြစ်ပြီး၊ သင်ရှာဖွေခဲ့သော နေရာတွင် မဟုတ်ပါ။ ထိုပြားပြင်ကို ကမ္ဘာပေါ်တွင် တင်ရန် ကိုဩဒိနိတ် ပြောင်းလဲမှု တစ်ခု လိုအပ်ပြီး၊ ဤစာမျက်နှာတွင် ယခုအချိန်ထိ မရှိသေးပါ။",
-                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                    "key": "lpn_crs_count",
+                    "value": "{total} အနက် {n} ပရောဂျက်ရှင်ကို စာရင်းပြုထားသည်။",
+                    "english": "{n} of {total} coordinate systems listed."
                 },
                 "next_translated": {
                     "key": "lpn_crs_none",
@@ -5249,6 +5284,8 @@
         }
     },
     "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
+        "lpn_xymap": "Cartesian map or plane map",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }
