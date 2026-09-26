@@ -557,7 +557,8 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		L.createProjectFrom({ geo: false, crs: ACCRA, units: {}, method: 'hw', place: PHOENIX });
 		await new Promise((res) => setTimeout(res, 20));
 		ok('creating one anyway states the projection\'s own limit',
-			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable,
+			// Tom, 2026-09-26: the sentence now names the system ({crs}).
+			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable.replace('{crs}', L.crsLabel(ACCRA)),
 			byId.lpn_map_notice.textContent);
 	}
 
