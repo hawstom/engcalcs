@@ -7,16 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 6 · Soon (75): 19 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
+**92 open tasks.** Next (100): 7 · Soon (75): 20 · Someday (50): 29 · Maybe (25): 12 · Parked (5): 18 · priority 99 (99): 6
 
-## 100 — Next (6)
+## 100 — Next (7)
 
-- Task 647 — A project that is whole but entirely off screen should say so.
 - Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
 - Task 708 — Every property in every venue: an audit, then a check.
+- Task 715 — Full Report: every element at every time step, as one exportable document.
+- Task 716 — Status Report: what switched, when, in time order.
 
 ## 99 — Priority 99 (6)
 
@@ -27,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 
-## 75 — Soon (19)
+## 75 — Soon (20)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -48,6 +49,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 711 — A pan is lost when File, New project opens beside it.
+- Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
 
 ## 50 — Someday (29)
 
@@ -121,5 +123,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-82 of 90 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

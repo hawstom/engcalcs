@@ -5,6 +5,34 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0b1. Get one real WaterCAD-exported `.inp` and run it through `js/lpn-inp.js` — cheapest possible unlock
+
+2026-09-25, answering Tom's WaterCAD-migration question (`dev/agents/market-researcher/
+watercad-migration.md`). This is not a build item — it's a request for one artifact. The importer
+and its full `lpn_inp_drop_*` message family already exist and already report a pressure-driven-
+analysis flag being dropped (`lib/lang.ec.en.php:1863`); what's missing is knowing whether current
+(CONNECT Edition, 2023+) WaterCAD export still has the fidelity problems a 2002-2003 Haestad-era
+forum reported (labels with spaces, tank dimensions, pump controls, pipe vertices — all CITED,
+dated, in the migration file). **Cost: half a day of engineering, given the file; zero without it.**
+Ask IOD directly, since he raised the question and plausibly has a model to export from. Ranked
+first because it is the one thing that actually unblocks every other WaterCAD-migration question,
+and it costs Tom one email, not us any engineering time until the file exists.
+
+## 0b2. A GIS shapefile/geodatabase importer — a WaterCAD-independent on-ramp, lower legal and naming risk
+
+2026-09-25, same source. Bentley's own ModelBuilder documentation (CITED) confirms WaterCAD models
+are frequently built FROM a utility's own GIS asset layer, not authored by hand — meaning a
+shapefile importer would let a migrating utility bring the same underlying data WaterCAD itself was
+built from, without touching WaterCAD's proprietary `.wtg.sqlite` (undocumented schema, EULA
+reverse-engineering clause, §2 of the migration file) or naming WaterCAD in public copy at all (Task
+296's trademark ban, `dev/positioning.md:43-45`). **Sized honestly as SPECULATION on scope/cost** — I
+have not scoped what "read a shapefile" would take against `lpn_`'s current `.inp`-only import
+(`js/lpn-inp.js`), and this is a build recommendation for the roadmap-holder to size properly, not a
+research finding with a cost attached. Ranked second, above the `.wtg.sqlite` idea (not listed at
+all — actively recommended against, per the migration file §2), because it is useful independent of
+the WaterCAD question and carries the least legal or positioning risk of anything this pass turned
+up.
+
 ## 0c. Document "point Save at your synced Drive/OneDrive/Dropbox folder" — likely already true, costs a sentence
 
 2026-09-15, answering Task 667(d): the suite's existing `showSaveFilePicker()`/`showOpenFilePicker()`
@@ -386,3 +414,36 @@ reading this first. The one place a genuine `8:00 - 9:00` range would be correct
 accumulated OVER an interval (hourly energy cost, tank volume change that hour) — this suite has no
 such control today, and if one is ever built, it should keep the range framing; the toolbar transport
 is not that control. Full citations: journal, 2026-09-22 entry.
+
+## 11. EPANET gap audit (R-210) — ranked short list, and the scope-doc correction that outranks it
+
+2026-09-24: full table in `dev/agents/market-researcher/epanet-gap-audit.md`. Ranked, in the order a
+practising EPANET user would notice the absence:
+
+1. **Full Report — an exportable dump of every timestep's results, not just the on-screen Tables
+   pane.** MISSING. Medium cost — the per-step data already exists in `js/lpn-time.js`; the gap is
+   formatting/export, not new computation.
+2. **Status Report — a narrative list of run-time status changes** (pump switches, valve status
+   changes, warnings, in time order). MISSING. Medium cost, same reasoning.
+3. Calibration data/report — already Task 601, priority 75; this pass adds nothing new.
+4. `.PRO` profile import — already Task 604, priority 75; ditto.
+5. Meter-on-a-label — already Task 482, priority 5, deliberately deferred by Tom; ditto.
+6. Multi-species reactive transport (MSX) — genuinely absent, low priority for this suite's actual
+   audience (small/rural systems, one-off design tasks), not a research/large-utility tool.
+7. An overview/locator inset for panning a large network — low priority at the suite's own 10-20
+   node target scale.
+8. Multiple document windows (Tile/Cascade) — not a real gap; browser tabs already answer it.
+
+**Ranked ABOVE all of these: a correction, not a feature request.** `dev/looped-network-calculator-
+scope.md`'s cut list still says water quality (all forms) and PBV/GPV are permanently cut. Both are
+false today — single-chemical water quality (age, trace, a reacting chemical) and both valve types
+shipped, closed under Tasks 586/588/248. This is a documentation defect, not a build, but it is the
+highest-value single correction in this pass: a reader trusting that doc as written would tell Tom
+"we don't do water quality," which understates the product before an EPANET++ release specifically
+meant to show it as an extension of EPANET. Cost: one edit, not mine to make (out of this seat's
+write access) — flagging for whoever next touches that file.
+
+**On EPANET++ itself:** this audit supports Tom's own §6 reasoning in `dev/positioning.md` (an
+extension, not a claim of being more free) and finds nothing against it. The one thing that must
+travel with any of this is §2's own rule: never write a completeness claim against EPANET. A gap
+list from one session is a sample of the gap, not its boundary.

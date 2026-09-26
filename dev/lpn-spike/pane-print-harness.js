@@ -406,82 +406,49 @@ console.log('\n--- what the print stylesheet promises ---');
 		unqualified.join(' / '));
 	report(/\.lpn-print-table thead \{ display: table-header-group; \}/.test(css),
 		'the heading row repeats on every sheet of a long table');
-	report(/\.lpn-print-table thead th \{ position: static/.test(css),
+	report(/#lpn_print_area \.lpn-print-table thead th \{\s*position: static/.test(css),
 		'...and is not the screen’s sticky row, which has no meaning on paper');
 	report(/\.lpn-pane-print \{/.test(css), 'the button has a style of its own');
 }
 
-// **THE SHEET USES THE WIDTHS THE READER DRAGGED -- AND, SINCE, THE ONES NOBODY TOUCHED TOO**
-// (Tom, 2026-09-21: *"I think that 'Print table' has not been revisited since we added column
-// resizing. And I think that it's important to use the column widths adjusted by the user."*
-// 2026-09-22: *"Print is not respecting on-screen column widths."* And again: *"Print table does
-// not respect column widths. It expands to 100% of printable area."*). The third round is why an
-// UNTOUCHED table no longer takes a different path from a dragged one: it used to print at the
-// browser's own auto-layout content width, with no budget and no scaling -- exactly what "expands
-// to 100%" describes on a many-column table. panePrintWidths() now reads every column's drawn
-// width, dragged or not, so the budget/scale step always runs.
-console.log('\n--- the sheet uses the column widths the reader dragged -- and now ALSO the ones nobody touched ---');
+// **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to
+// use the column widths adjusted by the user"*; 2026-09-22: *"Print is not respecting on-screen
+// column widths"*; 2026-09-24, R-215: *"Widths seem to be trying, but not succeeding (tighter fit
+// on print than on screen)"*). This stub holds only what the code WRITES: every column its DRAWN
+// width in em plus its 1px rule, and a font that is the screen's or the sheet's width divided by
+// the table's, whichever is smaller. Whether the browser then draws the screen at one scale is a
+// layout question this stub cannot answer; dev/browser-pass/specs/print.js measures it in Chromium.
+console.log('\n--- the sheet is the screen table at one scale ---');
 {
 	const cg = (sheetEl) => {
 		const t = (sheetEl.children || []).filter((c) => c._tag === 'table')[0];
 		return { t, cols: t ? ((t.children || []).filter((c) => c._tag === 'colgroup')[0] || { children: [] }).children : [] };
 	};
+	const spec = L.paneTables().filter((s) => s.id === 'junctions')[0];
+	const keys = L.paneCols(spec).map((c) => c.key);
 	L.forgetWidths('junctions');
-	L.renderTable('junctions');
-	let got = cg(L.buildPrintable('junctions'));
-	report(got.cols.length === L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).length &&
-			String(got.t.className).indexOf('lpn-print-fixed') >= 0,
-		'a table nobody has resized STILL goes through the fixed-layout/budget path', got.cols.length + ' cols, class=' + got.t.className);
-	report(!!got.t.style.fontSize, '...and, drawn at the stub\'s generous default width, its font is already scaled to the page budget',
-		got.t.style.fontSize);
-	const keys = L.paneCols(L.paneTables().filter((s) => s.id === 'junctions')[0]).map((c) => c.key);
 	L.setUserWidth('junctions', keys[1], 20);
 	L.renderTable('junctions');
-	// The stub draws every box 1000 px wide; a heading is drawn at 2 em here (32 px at the stub's
-	// 16 px em) so this scenario's sum stays comfortably under the 60em print budget -- the second
-	// scenario below is the one that tests going past it.
+	// The stub's em is 16px. Column 1 is drawn at 80px (5em) and every other at 32px (2em) -- the
+	// DRAWN width wins over the stored 20em, because the drawn one is what the reader is looking at.
 	const heads = L.headCells('junctions');
-	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 32, bottom: 20, width: 32, height: 20 }); });
-	got = cg(L.buildPrintable('junctions'));
-	// **LITERAL `em`, NOT A PERCENTAGE OF THE TABLE'S OWN CAPPED WIDTH** (Tom, 2026-09-22: "Print
-	// is not respecting on-screen column widths"). A percentage share stayed proportional even
-	// when `max-width: 100%` squeezed the table narrower than its declared width, while the 9pt
-	// font did not shrink with it — see panePrintWidths()'s own comment for the failure this
-	// replaced.
-	const ems = got.cols.map((c) => parseFloat(c.style.width));
-	const total = ems.reduce((a, b) => a + b, 0);
-	report(got.cols.length === keys.length, 'once a column is dragged, every printed column is given a width',
-		got.cols.length + ' / ' + keys.length);
-	report(got.cols.every((c) => /em$/.test(c.style.width)), '...each one a literal em, not a share of the page');
-	report(Math.abs(ems[1] / ems[0] - 10) < 0.02, '...in the screen’s proportions: the column dragged to 20 em is ten times a 2 em one',
-		ems[1] + 'em / ' + ems[0] + 'em');
-	report(/em$/.test(got.t.style.width) && String(got.t.className).indexOf('lpn-print-fixed') >= 0,
-		'the table is the sum of the widths in em, fixed layout, so the widths are obeyed', got.t.style.width);
-	report(!got.t.style.fontSize, '...and a table under the page budget keeps the sheet’s own font size',
-		JSON.stringify(got.t.style.fontSize));
-	report(/\.lpn-print-table\.lpn-print-fixed \{ table-layout: fixed; max-width: 100%; \}/.test(css),
-		'...never wider than the sheet, as a safety net for a page narrower than assumed');
-	L.forgetWidths('junctions');
-
-	// **A TABLE WIDER THAN THE ASSUMED PAGE SHRINKS ITS OWN FONT, NOT ITS COLUMNS' SHARE OF IT.**
-	// Fourteen ordinary columns (Net3's own Junctions table has thirteen) at a generous drawn width
-	// is the everyday case this was written for, not an edge case: the fix has to hold with no
-	// column dragged to an extreme, just enough of them to add past the budget.
-	L.setUserWidth('junctions', keys[1], 20);
-	Object.keys(heads).forEach((k) => { heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: 80, bottom: 20, width: 80, height: 20 }); });
-	L.renderTable('junctions');
-	got = cg(L.buildPrintable('junctions'));
-	const ems2 = got.cols.map((c) => parseFloat(c.style.width));
-	const sum2 = ems2.reduce((a, b) => a + b, 0);
-	report(sum2 > 60, 'this scenario really is past the 60em budget', sum2.toFixed(2) + 'em');
-	report(Math.abs(ems2[1] / ems2[0] - 4) < 0.02,
-		'...the columns keep the screen’s proportions regardless', ems2[1] + 'em / ' + ems2[0] + 'em');
-	const wantScale = 60 / sum2, wantPt = Math.round(9 * wantScale * 100) / 100;
-	report(got.t.style.fontSize === wantPt + 'pt',
-		'...and the SHEET’S FONT shrinks by the same factor a column would have been squeezed by',
-		got.t.style.fontSize + ' vs expected ' + wantPt + 'pt');
-	report(parseFloat(got.t.style.width) === Math.round(sum2 * 100) / 100,
-		'...while every column keeps its true em width, so text and box shrink together');
+	Object.keys(heads).forEach((k, i) => {
+		const w = k === keys[1] ? 80 : 32;
+		heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: w, bottom: 20, width: w, height: 20 });
+	});
+	const got = cg(L.buildPrintable('junctions'));
+	const parsed = got.cols.map((c) => /^calc\(([\d.]+)em \+ 1px\)$/.exec(c.style.width));
+	report(got.cols.length === keys.length && String(got.t.className).indexOf('lpn-print-fixed') >= 0,
+		'every printed column is given a width, fixed layout', got.cols.length + ' / ' + keys.length);
+	report(parsed.every(Boolean), '...each one its drawn em plus its 1px rule', got.cols.map((c) => c.style.width).slice(0, 3).join(' '));
+	const ems = parsed.map((m) => m ? parseFloat(m[1]) : NaN);
+	report(ems[1] === 5 && ems.every((e, i) => i === 1 || e === 2), '...at the width it is DRAWN, dragged or not', ems.join(','));
+	const sum = ems.reduce((x, y) => x + y, 0), n = keys.length + 1;
+	report(got.t.style.width === 'calc(' + sum + 'em + ' + n + 'px)', 'the table is the sum of those widths', got.t.style.width);
+	report(got.t.style.fontSize === 'min(16px, calc((100cqw - ' + n + 'px) / ' + sum + '))',
+		'...and its font is the screen\u2019s, or the size at which it exactly fills the sheet', got.t.style.fontSize);
+	report(/body\.lpn-printing-table #lpn_print_area \{ container-type: inline-size; \}/.test(css),
+		'...measured against the print area, which is the container `cqw` needs');
 	L.forgetWidths('junctions');
 }
 

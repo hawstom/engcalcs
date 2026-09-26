@@ -1714,3 +1714,106 @@ toolbar is not that control and should go back to naming one instant, for exampl
 than `24:00 - 25:00`.
 
 — Mary
+
+## 2026-09-24 — R-210: EPANET gap audit before the EPANET++ release
+
+Tom's question via the orchestrator: a deep pass through EPANET Help to find anything EPANET has
+that `lpn_` does not, excluding graphs (Task 600). Full table, ranked gaps, and the "does this bear
+on the EPANET++ name" question are in `dev/agents/market-researcher/epanet-gap-audit.md` — not
+duplicated here in full; this entry is the pointer plus the two findings worth carrying independent
+of that file.
+
+**OBSERVED, and the most consequential single thing this pass found: `dev/looped-network-
+calculator-scope.md`'s "Cut, not deferred" list is stale on two items, not superseded-in-place the
+way tank/PRV/PSV/FCV already were.** It still reads (checked today) "Water quality, in every form
+(age, trace, chlorine decay, multi-species)" as permanently cut, and "PBV and GPV stay cut." Both
+are false today: `js/looped-network.js:40531-40535` and `js/lpn-epanet.js` ship single-chemical
+water quality (age, source trace, a reacting chemical) through the EPANET engine, confirmed in the
+page's own visitor-facing Notes text (`lib/lang.ec.en.php:2120`, `lpn_notes_2_def`: "Water quality is
+modeled..."); GPV and PBV are both real valve types with `.inp` round-trip, closed under ROADMAP
+Tasks 586/588 (`dev/roadmap-closed-ids.md:558-559`). Multi-species (EPANET-MSX) genuinely is absent
+(grepped, zero hits) — so the honest present-tense sentence is "single-chemical, not multi-species,"
+not "water quality is cut." I have not edited that doc — out of this seat's write access — flagging
+it here so whoever next touches it makes the same edit that already happened for tank/PRV/PSV/FCV
+in that same section.
+
+**The ranked short list (audit file §3), independent of build-cost sizing, in order: Full Report
+export, Status Report (narrative of run-time status changes), Calibration (already Task 601, this
+pass adds nothing new), `.PRO` profile import (already Task 604, ditto), Meter-on-a-label (already
+Task 482, deliberately deferred, ditto), multi-species water quality (low priority for this suite's
+actual audience), an overview/locator inset (low priority at the 10-20 node target scale), and
+multiple document windows (not a real gap — browser tabs already answer the same need).** Full
+reasoning and cost notes for each are in the audit file; not repeating them here.
+
+**On the EPANET++ name (Tom's stated reason for asking):** this pass supports, and if anything
+understates, his own argument in `dev/positioning.md` §6 that the suite is "an extension of EPANET
+with scenarios, fire flow, libraries, and more" — the multi-scenario compare tool in particular has
+no first-class equivalent in EPANET's own desktop GUI. **The one thing that must travel with that
+finding is `dev/positioning.md` §2's own standing rule: never write a completeness claim against
+EPANET.** This audit is evidence FOR "we extend EPANET," not evidence that the gap is closed or
+bounded — a gap list from one session is a sample, not a boundary, and the file says so in its own
+closing section.
+
+Provenance for the audit file itself: outward sources are this seat's own prior CITED fetches
+(EPANET 2.2 manual, OWA-EPANET README) from 2026-09-08/09-15, re-cited rather than re-fetched (they
+do not change); the Status/Full/Energy/Calibration/Query/Group-Edit menu-shape knowledge is this
+seat's general familiarity with EPANET's desktop UI, NOT re-verified against a live install this
+session — flagged explicitly in the audit file as needing confirmation before anyone writes public
+copy naming those EPANET features by their EPANET names, the same discipline Task 601 already
+imposed on itself for the Calibration Report.
+
+— Mary
+
+## 2026-09-25 — WaterCAD migration, after IOD's session
+
+Tom's note, relayed by the orchestrator: IOD (a senior civil engineer) tested `lpn_`, was impressed,
+latched onto "EPANET++," and said *"we need to make migration from WaterCAD easy... import WaterCAD
+files."* Tom asked whether this needs a dedicated WaterCAD-expert seat or is Mary-plus-Sue, and
+whether any of it is answerable without buying WaterCAD, a demo, or a video. Full answer, all six
+questions, fully cited: `dev/agents/market-researcher/watercad-migration.md`. Summary of what
+carries forward:
+
+**The governing tension, stated up front in that file: `dev/positioning.md:88` already says "We are
+not running a migration campaign," and lines 85-87 reserve any WaterCAD-vs-us comparison page as
+undecided.** This research answers IOD's technical question; it is not itself a green light to
+publish migration copy — that is still Tom's call, unmade.
+
+**What I found, in one paragraph:** WaterCAD's model lives in `.wtg.sqlite` (plain SQLite, CITED,
+Bentley's own help page — but its schema is undocumented anywhere I could find, and no open-source
+reader exists, three searches, zero hits); WaterCAD has exported/imported `.inp` since the
+Haestad-Methods era, and this repo's own `js/lpn-inp.js` already has a purpose-built family of
+`lpn_inp_drop_*` sentences (OBSERVED, `lib/lang.ec.en.php:1830-1871`) that report every difference on
+import — including, directly on point, that pressure-driven-analysis flags are dropped
+(`lpn_inp_drop_demand_model`). **Pressure-dependent demand is the gap a WaterCAD migrator would hit
+fastest**; Darwin Designer, Darwin Calibrator, and Criticality analysis are three whole capabilities
+`lpn_` has no analogue of at all (not a gap in degree, a gap in kind — CITED via Bentley help-page
+titles and two Bentley/Haestad patents naming Criticality and PDD explicitly). The forum evidence on
+WaterCAD's `.inp` export quality (labels with spaces failing, tank dimensions and pump controls not
+surviving) is all **2001-2003, pre-Bentley-acquisition** — too old to trust as current, and I could
+not read Bentley's own current-version limitations KB (JS-rendered ServiceNow portal, returned only
+page chrome twice) or the one PDF that likely has the answer (Autodesk's own WaterGEMS/WaterCAD-to-
+InfoWater-Pro conversion procedure — no PDF text tool available in this environment, same gap as the
+2026-09-22 entry).
+
+**The one thing that actually unblocks progress is not ours to build: a real WaterCAD-exported
+`.inp` file from IOD or a friendly utility.** Running it through the existing importer and reading
+its own drop-messages is half a day of engineering, once the file exists — cheaper and more direct
+than buying, demoing, or watching a video of WaterCAD, none of which would answer the one live
+question (does the current export still have the old quirks) anyway.
+
+**A second, independently promising path this pass surfaced: WaterCAD models are frequently built
+FROM a utility's own GIS layer (shapefile/geodatabase) via Bentley's own ModelBuilder tool** (CITED,
+Bentley's ModelBuilder help pages) — meaning a shapefile importer would open a WaterCAD-independent
+on-ramp, sidestepping both the reverse-engineering legal question (§2 of the migration file) and the
+Task-296 trademark-naming ban, since the public claim would be "reads your GIS asset layer," not
+"reads WaterCAD."
+
+**Who:** recommended no new seat. This is answerable from documentation plus one artifact (a sample
+`.inp`, or better, a GIS shapefile). Whether "Sue" is herself a WaterCAD migrator is a question only
+Tom or Sue can answer — not discoverable externally, and I did not invent an answer to it.
+
+Wishlist rows added (both provisional pending the one artifact): a GIS shapefile importer, and
+verifying `js/lpn-inp.js` against a real WaterCAD `.inp` export. Full sizing in
+`dev/agents/market-researcher/wishlist.md`.
+
+— Mary

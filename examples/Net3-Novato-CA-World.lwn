@@ -2671,7 +2671,8 @@
 		"symbolSize": 12,
 		"linkWidth": 6,
 		"symbolOpacity": 1,
-		"backdropOpacity": 1,
+		"backdropOpacity": 0.5,
+		"labelMaxWidth": 65000,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,
@@ -2686,7 +2687,6 @@
 		"colorClassesLink": 7,
 		"colorReverseNode": false,
 		"colorReverseLink": false,
-		"colorThematic": false,
 		"colorLegendPosition": "middle-right",
 		"colorBreaks": {
 			"node.demand": [

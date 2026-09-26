@@ -135,6 +135,8 @@ function ecSwPageExclusions() {
         'consent.php'           => 'records the consent choice; must always reach the server',
         'sw.php'                => 'the service worker itself; the browser manages its own copy',
         'manifest.php'          => 'the web app manifest, generated per mount; the browser keeps its own copy',
+        'spock.php'             => 'the private usage report, not a suite page; no offline visitor is '
+                                  . 'looking for it and it should not ride along in the install',
         // Pages that need the network by definition, or that no offline user is looking for.
         'contact.php'           => 'a form that cannot be sent offline',
         'Compare-Languages.php' => 'a translation-review tool, not a calculator',

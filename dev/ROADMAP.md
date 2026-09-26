@@ -421,6 +421,14 @@ the block.
       DISPLAY of what the coordinate system already says, never an input that rewrites anything.
     - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
       Save-as side.
+- 100|715| **Full Report: every element at every time step, as one exportable document.**
+  Tom, 2026-09-25: *"Make the reports roadmap tasks before EPANET++."* EPANET's Report > Full, the
+  gap Mary ranked first (`dev/agents/market-researcher/epanet-gap-audit.md` §3.1). The per-step
+  results already exist in `js/lpn-time.js`; the work is layout and export. Before Task 697.
+- 100|716| **Status Report: what switched, when, in time order.**
+  EPANET's Report > Status: pump starts and stops, valve status changes, tanks filling or emptying,
+  warnings, per time step. Mary's second-ranked gap (same audit, §3.2). Read with the Net3 Pump 10
+  status defect (R-231), which is the same event stream. Before Task 697.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -441,6 +449,7 @@ the block.
     file before drafting a word of it, and expect the completeness question (never a completeness
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+  - **Tasks 715 and 716 (Full and Status Report) come first** (Tom, 2026-09-25).
 
 - 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
@@ -598,23 +607,6 @@ the block.
   - **(e) CONCURRENT EDITING, THE GOOGLE DOCS SHAPE.** Tom already priced it himself in the
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
-
-- 100|647| **A project that is whole but entirely off screen should say so.**
-  Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
-  on the map and alert that project is intact, but entirely outside the current view?"*
-  - **THE ARITHMETIC ALREADY EXISTS AND IS NOT WIRED TO A MESSAGE.** `viewShowsModel()`'s third leg
-    asks exactly this question -- can the window at this scale intersect the model extent -- and on
-    a NO it silently refits. That is right at load. This task is the same question asked AFTER load,
-    when the user has panned away by hand and nothing refits.
-  - **628 CHOSE SILENCE DELIBERATELY AND THIS IS NOT A REVERSAL OF THAT.** At load the recovery is
-    indistinguishable from opening a document with no view, so there is nothing to say. Panning your
-    own work off screen is a different situation: the user did it, nothing is going to undo it, and
-    "your network is intact and off to the north west" is information they cannot get any other way.
-  - **THE DISTINCTION THAT MAKES IT WORTH BUILDING IS TOM'S OWN:** *"a blank map is equally fatal as
-    a lost project. User doesn't know the difference."* This is the message that tells them the
-    difference. Pair it with Zoom to fit as the action.
-  - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
-    nobody is looking at is measured, twice, not to work.
 
 - 50|664| **A link's status colours correctly and its legend prints numbers.**
   Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
@@ -1815,6 +1807,14 @@ the block.
     declarations and several genuine judgement calls about what counts as a panel, on a branch Tom
     has already passed in the browser. The limitation is now written at the top of the harness so it
     no longer implies coverage it does not have.
+
+- 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
+  important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
+  colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
+  hard-coded chrome colour; phases 2-3 are a dark token set and the Settings row (a browser setting).
+  - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
+    toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 
 - 100|708| **Every property in every venue: an audit, then a check.**
   Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in

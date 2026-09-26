@@ -953,6 +953,11 @@ $ec_lang['lpn_close']='Close';
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='Properties';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
+// ROADMAP Task 647, Tom 2026-09-13: a project with elements, none of which the current view can
+// see, reads exactly like a lost project unless something says otherwise. Shown in a centred
+// overlay on the map (see #lpn_offscreen_notice in Looped-Network.php), paired with a "Zoom to
+// fit" button that reuses lpn_tool_zoom_extent rather than a second copy of that string.
+$ec_lang['lpn_offscreen_intact']='Your network is intact.';
 // The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
 // -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
 // the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
@@ -1017,15 +1022,15 @@ $ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minut
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='The smallest of EPANET’s own three sample networks: one reservoir, a pump and a single loop.';
+$ec_lang['lpn_ex_net1_desc']='The smallest of EPANET’s own three example networks: one reservoir, a pump and a single loop.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s samples.';
+$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s examples.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET’s large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
+$ec_lang['lpn_ex_net3_desc']='EPANET’s large example: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='The same network as EPANET Net3, put down at an arbitrary place on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.';
+$ec_lang['lpn_ex_net3_world_desc']='The EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1245,8 +1250,8 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // **ONE STRING FOR EIGHT BUTTONS** (Task 595). The digit is substituted at render time from
 // LPN_TOOL_KEYS, so the mapping has a single home and no translator has to keep a number in step
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
-$ec_lang['lpn_tool_key_hint']='Shortcut: press {key}.';
-$ec_lang['lpn_tool_key_hint_two']='Shortcut: press {key} or {key2}.';
+$ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
+$ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
 $ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
 $ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';
@@ -2127,7 +2132,6 @@ $ec_lang['lpn_storage_unreadable']='Not saved. This project could not be read fr
 // The one-time cue that points from the toolbar up to the menu bar (Task 625). Says where the
 // menus ARE rather than what they contain: a reader who has not noticed the row does not need a
 // list of it, they need to look up once.
-$ec_lang['lpn_menu_cue']='Start with the menus above. Use the toolbar for quick access.';
 // **THE WAY HOME IS A HELP ROW NOW** (Tom, 2026-09-11). This was `lpn_menu_home_tip`, the tip on
 // a product mark at the far left of the menu bar; the mark is gone and the row replaced it, on
 // his instruction: *"Help menu to include Welcome Page ... as last item in top group."* The key
@@ -2953,8 +2957,16 @@ $ec_lang['lpn_settings_label_max_width']='Show labels when zoomed to this map wi
 // **NO LONGER SAYS ANYTHING ABOUT SYMBOL SIZE** (Task 705, Tom, 2026-09-22: *"I'd prefer not to have
 // two rules"*, removing the "piggyback" where a blank box here also decided where symbols stopped
 // growing). That rule now lives entirely in lpn_settings_symbol_cap_tip below.
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.';
-$ec_lang['lpn_settings_label_always']='Always show labels';
+// **0 IS NEVER, IN THE CUSTOMER TIP'S OWN WORDING** (2026-09-23, replacing "Thematic map
+// (colors only)"). See lpn_labels_customer_width_tip above for the pattern this follows.
+// **LAST SENTENCE REMOVED** (Tom, 2026-09-23 (c): "similar to the all labels tip, but with the
+// last sentence removed since it's misleading") -- "Text you placed yourself stays, and your label
+// choices are kept either way" implied this row decides what survives, which it does not.
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.';
+// **"ALWAYS SHOW", NOT "ALWAYS SHOW LABELS"** (Tom, 2026-09-23 (a)) -- shared as the placeholder
+// for both the all-labels row above and the customer row (lpn_labels_customer_width_tip's row),
+// so a word this generic does not need "labels" or "customer labels" to say what a blank box means.
+$ec_lang['lpn_settings_label_always']='Always show';
 // **THE ONE MAXIMUM-SYMBOL-SIZE RULE** (Task 705, his own wording, 2026-09-22: *"Prevent nodes from
 // scaling larger than __ times the length of the __ percentile pipe"*). Split across three keys
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
@@ -3012,8 +3024,6 @@ $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color f
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
 $ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
-$ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
-$ec_lang['lpn_settings_color_thematic_tip']='Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band boundaries';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
@@ -3107,7 +3117,13 @@ $ec_lang['lpn_time_speed_tip']='Playback speed';
 // each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Search settings';
-$ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that mention it. The explanations are searched too, not just the names.';
+// **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
+// search? I think it currently works as an entire string search."). It did -- filterSetboxContainer()
+// tested the whole typed string as one substring. It now splits on whitespace and requires every
+// word somewhere in a row's own searchable text (setboxUnitText()'s name+tip+aria-label+placeholder
+// join), so "zoom label" finds a row without either word next to the other. His own sentence is the
+// tip, verbatim.
+$ec_lang['lpn_settings_search_tip']='Type a word or multiple words to see settings that mention all of them.';
 $ec_lang['lpn_settings_no_match']='No setting mentions that word.';
 // The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
 // than an instruction: what the control adjusts, not how to operate it.
@@ -3135,8 +3151,13 @@ $ec_lang['lpn_settings_sym_link']='Link';
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='Customer';
 $ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
-$ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
-$ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
+// **THE ROW NAME IS lpn_settings_label_max_width NOW, NOT A KEY OF ITS OWN** (Tom, 2026-09-23:
+// "Make the Customer labels and All labels zoom limits settings interfaces identical... Both to
+// say 'Show labels when zoomed to this map width or less'"). KEY DELETED: lpn_labels_customer_width
+// -- nothing renders it and nothing checks it; it was untranslated in every other language, so
+// deleting it costs no translation. The tip stays its own key, since its WORDS differ from the
+// all-labels tip (this row's own gate, plus the (e) qualifier that the all-labels limit wins).
+$ec_lang['lpn_labels_customer_width_tip']='Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.';
 // ROADMAP Task 247. The capture button beside the width above (Tom, 2026-09-19: "Widest view: Add a
 // 'Use current view' button like the other one we restored in a different branch."). The SAME key
 // name and the same words as that control, deliberately: it is one idea and a reader who has met it
@@ -3154,7 +3175,7 @@ $ec_lang['lpn_settings_quality_source_tip']='The node whose water is traced. Eve
 $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
-$ec_lang['lpn_quality_chemical']='A chemical that reacts';
+$ec_lang['lpn_quality_chemical']='A reactive chemical';
 $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation. Set a Total run time under Time, then press the Calculate button.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
@@ -3718,9 +3739,10 @@ $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on 
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
 $ec_lang['lpn_ff_scope_all']='Every junction';
-$ec_lang['lpn_ff_scope_selected']='The selected junction only';
+$ec_lang['lpn_ff_scope_selected']='The selected junctions';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
 $ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map, or test every junction.';
+$ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
 $ec_lang['lpn_ff_required_own']='Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.';

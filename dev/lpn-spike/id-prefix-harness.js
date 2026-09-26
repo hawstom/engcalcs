@@ -17,8 +17,9 @@
 //      prefix), so its id is never going to come free. "They are all in this batch, so it is fine"
 //      produces two elements answering to one id, and nothing else in the app would report it.
 
-const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
+const PC = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
@@ -29,6 +30,7 @@ const L = loadLoopedNetwork(
 	"\t\tapplyToAll: applyIdPrefixToAll, addNode: addNode, addLink: addLink,\n" +
 	"\t\tapplyNodeRename: applyNodeRename,\n" +
 	"\t\tnotice: function () { return document.getElementById('lpn_map_notice').textContent; },\n" +
+	"\t\tdefaultSettings: defaultSettings, rebuildSettings: rebuildSettingsFields,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -198,6 +200,44 @@ answer = true;
 		/valve: 'V'/.test(src) && /idPrefixes: \{[^}]*V: 'V'/.test(src) && /V: 1/.test(src));
 	ok('...and a pipe keys off L, so a link ID starts at L by default',
 		/pipe: 'L'/.test(src) && /idPrefixes: \{[^}]*L: 'L'/.test(src));
+}
+
+// ---- R-229: Customer's default prefix is 'C', not 'M', and it lives in the Settings list --------
+// The structural (internal) letter stays M -- LPN_ID_KEY.meter -- so an existing document's IDs and
+// override keys are untouched; only the DISPLAYED default that a brand-new project starts with
+// changes. Per CLAUDE.md's unit/storage rule ("only the user touches a file's data"), a project that
+// already stored 'M' keeps it -- that is exercised by every example/scenario test above using the
+// SAME defaultSettings() a fresh project gets, not a fixed literal.
+console.log('\n=== R-229: Customer default prefix is C, alongside the other elements ===');
+{
+	const fresh = L.defaultSettings();
+	ok('a brand-new project defaults Customer\'s prefix to C, not M',
+		fresh.idPrefixes.M === 'C', JSON.stringify(fresh.idPrefixes));
+
+	L.rebuildSettings();
+	const rows = Array.prototype.slice.call(byId.lpn_set_id_fields.children || [])
+		.filter(function (n) { return n.tagName === 'LABEL'; });
+	function rowText(line) {
+		const span = (line.children || []).filter(function (c) { return c.tagName === 'SPAN'; })[0];
+		return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
+	}
+	const custRow = rows.find(function (r) { return rowText(r).indexOf(PC.lpn_tool_add_meter || 'Customer') === 0; });
+	ok('Customer sits in the Settings > ID prefixes list, beside the other elements',
+		!!custRow, rows.map(rowText).join(' | '));
+	if (custRow) {
+		const input = (custRow.children || []).reduce(function (found, n) {
+			if (found) { return found; }
+			return (n.children || []).filter(function (c) { return c.tagName === 'INPUT'; })[0];
+		}, null);
+		ok('...and its box shows the project\'s own stored prefix', !!input && input.value === L.settings().idPrefixes.M,
+			input && input.value);
+	}
+
+	// Settings filter: a search must find this row the same way it finds any other -- by its text,
+	// case-insensitively (applySetboxFilter() lower-cases both sides).
+	const label = (PC.lpn_tool_add_meter || 'Customer');
+	ok('the Settings filter would match this row on its own label text',
+		rowText(custRow).toLowerCase().indexOf(label.toLowerCase()) >= 0, rowText(custRow));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

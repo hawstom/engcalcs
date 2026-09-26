@@ -2783,7 +2783,6 @@
         "lpn_main_menu": "19e15729a6d4e367d574cdb2c598b11c8d6a5e05",
         "lpn_main_title": "240a7028b367c659717c984b8588c008043744fc",
         "lpn_map_unmeasurable": "7eac1bfe88d67f6689d2b6e4ad6fa6db6239749f",
-        "lpn_menu_cue": "413e023e5de5ee7896a7a08d637f8929bea7b4c6",
         "lpn_menu_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
         "lpn_menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
@@ -7493,10 +7492,6 @@
         },
         "lpn_map_unmeasurable": {
             "words": 47,
-            "ends_sentence": true
-        },
-        "lpn_menu_cue": {
-            "words": 11,
             "ends_sentence": true
         },
         "lpn_menu_edit": {
