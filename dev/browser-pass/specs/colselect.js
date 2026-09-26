@@ -654,4 +654,55 @@ exports.run = async function ({ browser, report }) {
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
+	// ---- (15) NAVIGATION MODE ON GENUINELY EDITABLE CELLS (pre-review of 98a7c52d): section (14)
+	// Tabbed through Junctions' coordinates; this walks the Pipes table's Diameter and Length -- cells a
+	// person types into -- arriving by Tab, and again after typing and committing an edit with Tab.
+	// In Navigation (Ready) mode no cell may show a selected text range. ----------------------------
+	{
+		const a = await openJunctions(browser, 'M');
+		await a.page.evaluate(() => { document.getElementById('lpn_pane_tab_pipes').click(); });
+		await a.settle(500);
+		const P = '#lpn_pane_pipes table';
+		const snap = () => a.page.evaluate(() => {
+			const e = document.activeElement, td = e && e.closest && e.closest('td');
+			const ws = window.getSelection();
+			return { key: td && (td.className.match(/lpn-pane-col-(\S+)/) || [])[1], tag: e.tagName, val: e.value, ro: e.readOnly,
+				s: e.selectionStart, e: e.selectionEnd, docSel: ws ? ws.toString() : '', cur: !!(td && td.classList.contains('lpn-pane-cur')) };
+		});
+		const quiet = (t) => t.tag === 'INPUT' && t.ro && t.s === t.e && !t.docSel && t.cur;
+		// Click Diameter (a pull-down sits before it, which a click would open), then Tab on into
+		// Length and Shift+Tab back into Diameter: both arrivals are by Tab.
+		const box = await a.page.evaluate((P) => {
+			const r = document.querySelector(P + ' tbody tr:nth-child(2) td.lpn-pane-col-diameter').getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, P);
+		await a.page.mouse.click(box.x, box.y);
+		const walk = [];
+		await a.page.keyboard.press('Tab'); await a.settle(80); walk.push(await snap());
+		await a.page.keyboard.press('Shift+Tab'); await a.settle(80); walk.push(await snap());
+		report.ok(walk[0].key === 'length' && walk[1].key === 'diameter', 'Tab walks into Length, Shift+Tab back into Diameter', JSON.stringify(walk.map((w) => w.key)));
+		report.ok(walk.every((t) => t.val !== '' && quiet(t)), '...editable cells, and neither shows selected text on arrival', JSON.stringify(walk));
+		// Now type over Diameter and commit with Tab: the cell arrived at is quiet, and so is
+		// Diameter when Shift+Tab returns to it.
+		const orig = (await snap()).val;
+		await a.page.keyboard.type('10');
+		const typing = await snap();
+		report.ok(typing.key === 'diameter' && !typing.ro, 'typing into Diameter puts it in Entry mode (writable)', JSON.stringify(typing));
+		await a.page.keyboard.press('Tab');
+		await a.settle(150);
+		const afterCommit = await snap();
+		report.ok(afterCommit.key === 'length' && quiet(afterCommit), 'after Tab commits the edit, the next cell shows the outline and no selected text', JSON.stringify(afterCommit));
+		await a.page.keyboard.press('Shift+Tab');
+		await a.settle(80);
+		const back = await snap();
+		report.ok(back.key === 'diameter' && back.val === '10' && quiet(back), '...and the edited cell, Tabbed back into, holds its new value with no selected text', JSON.stringify(back));
+		await a.page.keyboard.press('Tab');
+		await a.page.keyboard.press('Tab');
+		await a.settle(80);
+		const onward = await snap();
+		report.ok(quiet(onward), '...and on past Length, still no selected text', JSON.stringify(onward));
+		report.ok(orig !== '10', '(the edit really changed the value)', orig);
+		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
+		await a.close();
+	}
 };
