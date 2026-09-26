@@ -2309,3 +2309,23 @@ appears in its remaining-gaps list, and the matrix's #7/#8 entries are marked CL
 quotes attached correctly.
 
 SPECULATION: none needed; this branch matched its own claims on every point checked.
+
+## 2026-09-26 -- feat/placement-wizard (fd3f5506, head a7917752)
+
+OBSERVED: `dev/lpn-spike/convert-as-browser-harness.js` sections 7-10 (added in fd3f5506) render
+the real page and measure real DOM/opacity/CRS-list state; ran ALL PASS (95 checks) on the branch.
+Confirmed genuine (not decoration) by copying the same harness into a throwaway detached worktree
+at 483da66b (pre-fix, the SHA Tom actually tested) and re-running: it FAILED exactly where expected
+-- opacity stayed 0.9 instead of capping at 0.5, both wizard bars did not move under a title drag,
+and the CRS chooser at Prescott Valley listed the full 5347 rows including EPSG:32610 (10N) rather
+than the 40-row filtered list with 32612 (12N) selected. Screenshots (`/tmp/convert-as-shots/`)
+visually confirm the filtered CRS list (`9-crsbox-filtered.png`, 12N highlighted, 10N/Arizona
+correctly in/out) and the wizard bar dragged fully over the menu row (`8 Convert as-over-menus.png`).
+
+CITED: dev/session-handoff.md's "a stub harness can pass over the very defect it names" warning
+(2026-09-23 zoom-control incident) is what made the mutation check (run harness on pre-fix SHA)
+necessary here rather than trusting a green run on the branch alone.
+
+SPECULATION: the mid-session orchestrator correction said Tom himself settled item 5 ("Step 1
+already opened on your location: I think that is right") -- not independently verified with Tom,
+relayed as given.
