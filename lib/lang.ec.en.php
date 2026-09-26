@@ -3236,7 +3236,7 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, and the EPANET solver report.';
+$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, and, after an extended period simulation, the status report and the full report.';
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
@@ -3291,6 +3291,39 @@ $ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
 $ec_lang['lpn_energy_peak_kw']='Peak power usage';
 $ec_lang['lpn_energy_total_demand_charge']='Cost of peak demand';
 $ec_lang['lpn_energy_total_cost']='Total cost';
+
+// ---- The Status report (ROADMAP Task 716) and the Full report (ROADMAP Task 715) --------------
+// EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
+// simulation, in time order; Full lists every node and every link at every reporting time step.
+// Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
+$ec_lang['lpn_reports_status']='Status report';
+$ec_lang['lpn_reports_status_tip']='What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.';
+$ec_lang['lpn_status_title']='Status report';
+$ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
+$ec_lang['lpn_status_empty']='Nothing changed status during this run.';
+$ec_lang['lpn_status_col_time']='Time';
+$ec_lang['lpn_status_col_event']='Event';
+$ec_lang['lpn_status_opened']='{type} {id} opened';
+$ec_lang['lpn_status_closed']='{type} {id} closed';
+$ec_lang['lpn_status_filling']='{type} {id} is filling';
+$ec_lang['lpn_status_emptying']='{type} {id} is emptying';
+$ec_lang['lpn_status_full']='{type} {id} is full';
+$ec_lang['lpn_status_dry']='{type} {id} is empty';
+$ec_lang['lpn_status_no_converge']='The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.';
+$ec_lang['lpn_status_note']='Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.';
+
+$ec_lang['lpn_reports_full']='Full report';
+$ec_lang['lpn_reports_full_tip']='Every node and every link at every reporting time step of the last run, as one table you can download or print.';
+$ec_lang['lpn_full_title']='Full report';
+$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.';
+$ec_lang['lpn_full_download_csv']='Download CSV';
+$ec_lang['lpn_full_print']='Print report';
+$ec_lang['lpn_full_building']='Building the report…';
+$ec_lang['lpn_full_col_time']='Time';
+$ec_lang['lpn_full_col_type']='Type';
+$ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_full_row_count']='{n} rows.';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
 // The sibling of the line above, and the difference between them is the whole of Task 581: a file
 // that states a price of zero is not a file that states no price, and the report must not say the

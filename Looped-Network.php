@@ -1313,6 +1313,33 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
+<?php // THE STATUS REPORT (ROADMAP Task 716). EPANET's Report > Status: what changed, in time
+      // order, over the last extended period simulation -- pumps and valves opening or closing,
+      // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
+      // borrows the same box shell as the reports above it; the list is built in JS
+      // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_statusbox_title">
+	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
+	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_status_report" class="lpn-ff-report"></div>
+	</div>
+</div>
+<?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
+      // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
+      // frames the Status report and the Tables pane read, so the three cannot disagree. Download
+      // and Print sit beside the close button, the same placement the run report's Copy button
+      // uses, because this table can run to thousands of rows and a button that scrolls away with
+      // it is a button nobody finds. ?>
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_fullbox_title">
+	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
+	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
+	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
+	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_full_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">

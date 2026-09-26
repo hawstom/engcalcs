@@ -252,6 +252,12 @@ input.ec-spin[type=number] {
 	font-size: 11px;
 	padding: 1px 6px;
 }
+/* THE FULL REPORT BOX CARRIES TWO OF THESE, NOT ONE (ROADMAP Task 715), so each needs its own
+   offset from the close button rather than sharing lpn-rptbox-copy's single `right`. Print sits
+   immediately left of the X, as Copy does everywhere else; Download CSV sits left of Print, with
+   enough room for its own longer label. */
+#lpn_full_print { right: 34px; }
+#lpn_full_csv { right: 128px; }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-status-notes { transition: none; }
 }
