@@ -97,7 +97,7 @@ const L = loadLoopedNetwork(
 	"\t\tviewLonLat: viewLonLat,\n" +
 	"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
-	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced,\n" +
+	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced, crsLabel: crsLabel,\n" +
 	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
 	"\t\tsyncNewBoxCrsPick: syncNewBoxCrsPick,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
