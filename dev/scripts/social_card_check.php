@@ -144,7 +144,10 @@ $pages = array_filter(glob($root . '/*.php'), function ($p) {
     // visitor was, so it emits no <head> at all. It used to fall through the silent skip below
     // rather than being declared here, which is the difference between a decision and an accident.
     $skip = array('lpn-lock.php', 'log-calc-event.php', 'log-human-view.php', 'log-signal-event.php',
-                  'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php', 'manifest.php');
+                  'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php', 'manifest.php',
+                  // spock.php is the private usage report: it renders its own bare <head> rather than
+                  // calling echoHTMLHead(), on purpose, since it is never meant to be shared or linked.
+                  'spock.php');
     return !in_array(basename($p), $skip, true);
 });
 

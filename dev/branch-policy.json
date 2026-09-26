@@ -63,7 +63,12 @@
         "feat/table-editing",
         "feat/property-venue",
         "feat/label-limit",
-        "feat/offscreen-notice"
+        "feat/offscreen-notice",
+        "feat/usage-report",
+        "feat/select-on-focus",
+        "feat/first-project",
+        "feat/customer-node",
+        "feat/menu-button"
     ],
     "feature_freeze": {
         "active": false,

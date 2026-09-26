@@ -1358,3 +1358,89 @@ EngCalcs.wireColumnTabOrder = function () {
 };
 
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireColumnTabOrder(); });
+
+/**
+ * R-207 (Tom's friend, review queue; confirmed and specified by the interface designer,
+ * 2026-09-24 journal entry): a short, single-value field -- Properties, Settings, Find and
+ * replace, a search box, a calculator's own number field -- selects its whole contents when it
+ * gains focus, so typing immediately overwrites it. The browser address bar's own convention, and
+ * (per Tom) "his natural expectation."
+ *
+ * **ONE DELEGATED LISTENER ON DOCUMENT**, the same reason wireColumnTabOrder() above is delegated
+ * rather than wired per field: a field built at runtime (a popup's own inputs, a row the Tables
+ * pane or a wizard inserts later) is covered for free.
+ *
+ * **Tab and programmatic focus** (a dialog calling `.focus()` on its own first field) need no
+ * sequencing at all -- nothing else is moving the caret at that instant -- so a plain `focus`
+ * listener calling `.select()` is enough there.
+ *
+ * **Mouse and touch need sequencing, and NOT the naive `mousedown` + `preventDefault()`.** The
+ * design brief called for exactly that (stop the native caret placement on `mousedown`, then focus
+ * and select programmatically), and it reproduces the address-bar behaviour for a plain text
+ * field -- but measured against a real `<input type="number">`'s spin buttons
+ * (`dev/browser-pass/specs/selectall.js`), `preventDefault()` on `mousedown` also
+ * cancels the spinner's own increment: a first click on the up-arrow left the value unchanged
+ * instead of incrementing, because Chromium resolves the spin step against the same `mousedown`
+ * this code would have cancelled. Deferring the `preventDefault()`/`select()` pair to `mouseup`
+ * (marking the field "pending" on the `mousedown` that finds it not yet focused, then acting on the
+ * matching `mouseup`) produces the identical observable result Ida specified -- first arrival
+ * selects everything, a second click on an already-focused field just moves the caret -- while
+ * leaving the spinner's own `mousedown` behaviour alone, because nothing on that field was
+ * cancelled until the (separate) `mouseup`. Confirmed against both cases headlessly: a spin-button
+ * click still increments, and a first click into a text field selects all while a second places the
+ * caret (`dev/browser-pass/specs/selectall.js`).
+ *
+ * Touch takes the same pending/act split on `pointerdown`/`pointerup` for `pointerType === 'touch'`
+ * only, so a mouse dragging a selection handle on a HYBRID device is untouched -- and so a field
+ * that is already focused is left alone exactly as on desktop, which is what keeps the phone's own
+ * selection handles usable on a second tap rather than being reset on every tap.
+ *
+ * **Excluded, and why:** `<textarea>` (Notes/Description fields are edited incrementally -- an
+ * accidental Tab that erased a paragraph would be the opposite of this courtesy) and every input
+ * inside `#lpn_pane_body`, the Tables pane's spreadsheet grid, whose own arrival rule is the
+ * opposite one (Tom, 2026-09-19: arriving at a cell selects no characters). A field can opt out on
+ * its own with `data-no-select-all`; none needed it as of this writing.
+ */
+EngCalcs.selectAllCandidate = function (el) {
+	'use strict';
+	var t;
+	if (!el || el.tagName !== 'INPUT' || el.disabled || el.readOnly) { return false; }
+	t = (el.type || 'text').toLowerCase();
+	if (t !== 'text' && t !== 'number' && t !== 'search' && t !== 'tel' && t !== 'email' && t !== 'url') { return false; }
+	if (el.closest('#lpn_pane_body')) { return false; }
+	if (el.closest('[data-no-select-all]')) { return false; }
+	return true;
+};
+EngCalcs.wireSelectAllOnFocus = function () {
+	'use strict';
+	// focus() does not bubble, so this has to listen in the capture phase to reach document at all.
+	document.addEventListener('focus', function (e) {
+		if (!EngCalcs.selectAllCandidate(e.target)) { return; }
+		try { e.target.select(); } catch (err) { /* select() throws on some input types */ }
+	}, true);
+
+	function armPending(el) {
+		// Recorded every time, even false, so a stale flag from a cancelled drag never lingers.
+		el.__ecSelectAllPending = EngCalcs.selectAllCandidate(el) && document.activeElement !== el;
+	}
+	function actOnPending(el) {
+		if (!el || !el.__ecSelectAllPending) { return false; }
+		el.__ecSelectAllPending = false;
+		el.focus();
+		try { el.select(); } catch (err) { /* select() throws on some input types */ }
+		return true;
+	}
+	document.addEventListener('mousedown', function (e) {
+		if (e.target && e.target.tagName === 'INPUT') { armPending(e.target); }
+	});
+	document.addEventListener('mouseup', function (e) {
+		if (actOnPending(e.target)) { e.preventDefault(); }
+	});
+	document.addEventListener('pointerdown', function (e) {
+		if (e.pointerType === 'touch' && e.target && e.target.tagName === 'INPUT') { armPending(e.target); }
+	});
+	document.addEventListener('pointerup', function (e) {
+		if (e.pointerType === 'touch' && actOnPending(e.target)) { e.preventDefault(); }
+	});
+};
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireSelectAllOnFocus(); });

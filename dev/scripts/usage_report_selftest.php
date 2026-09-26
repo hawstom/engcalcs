@@ -1,7 +1,7 @@
 <?php
 /**
- * usage_report_selftest.php -- the usage report page reads the right field, and never sums the
- * two buckets. BLOCKING.
+ * usage_report_selftest.php -- spock.php, the usage report page, reads the right field, and never
+ * sums the two buckets. BLOCKING.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -193,7 +193,7 @@ $boot = "$dir/render.php";
 file_put_contents($boot,
     "<?php\n\$_GET['days'] = 0;\n"
   . "define('EC_USAGE_REPORT_DIRS', " . var_export(serialize(array($dir)), true) . ");\n"
-  . "require " . var_export($root . '/usage-report/index.php', true) . ";\n");
+  . "require " . var_export($root . '/spock.php', true) . ";\n");
 $html = (string) shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($boot) . ' 2>&1');
 
 ec_ur_expect('the page renders at all', strlen($html) > 1000 && strpos($html, '<!DOCTYPE html>') === 0,
@@ -201,6 +201,19 @@ ec_ur_expect('the page renders at all', strlen($html) > 1000 && strpos($html, '<
 ec_ur_expect('it emits no PHP warning, notice or fatal',
     stripos($html, 'Warning:') === false && stripos($html, 'Notice:') === false
     && stripos($html, 'Fatal error') === false && stripos($html, 'Deprecated:') === false);
+
+// header() is a no-op under the CLI SAPI (headers_list() stays empty there too), so the only way
+// to see the ACTUAL response header is a real HTTP request against PHP's built-in server -- the
+// same reason render_page.php exists for a page that must be rendered outside a web request.
+$port = 8000 + (getmypid() % 1000);
+$srvCmd = sprintf('%s -S 127.0.0.1:%d -t %s %s > %s/spock-server.log 2>&1 & echo $!',
+    escapeshellarg(PHP_BINARY), $port, escapeshellarg($root), escapeshellarg($boot), escapeshellarg($dir));
+$pid = (int) trim(shell_exec($srvCmd));
+usleep(300000);
+$curlHeaders = (string) shell_exec('curl -s -D - -o /dev/null ' . escapeshellarg("http://127.0.0.1:$port/") . ' 2>&1');
+if ($pid) { posix_kill($pid, SIGTERM); }
+ec_ur_expect('the live HTTP response carries X-Robots-Tag: noindex, nofollow',
+    stripos($curlHeaders, 'X-Robots-Tag: noindex, nofollow') !== false, $curlHeaders);
 
 $prev = libxml_use_internal_errors(true);
 $doc = new DOMDocument();
@@ -276,7 +289,7 @@ ec_ur_expect('the page names its own source files, so every number is re-derivab
 // COMMENTS ARE STRIPPED FIRST, because the page's own docblock explains at length what it does
 // not do -- and a scan that reads the prose forbidding a thing as the thing itself is the shape
 // that makes people delete the explanation to quiet the check.
-$src = ec_ur_code($root . '/usage-report/index.php');
+$src = ec_ur_code($root . '/spock.php');
 foreach (array('setcookie', 'session_start', 'session_id', 'localStorage', 'sessionStorage',
                'indexedDB', '<script') as $forbidden) {
     ec_ur_expect("the page contains no $forbidden", stripos($src, $forbidden) === false);
@@ -289,12 +302,15 @@ ec_ur_expect('the fixture door is a CONSTANT, never a request parameter',
     strpos($src, "defined('EC_USAGE_REPORT_DIRS')") !== false
     && strpos($src, "\$_GET['dir") === false && strpos($src, '$_REQUEST') === false);
 
-$ht = (string) @file_get_contents($root . '/usage-report/.htaccess');
-ec_ur_expect('the directory declares HTTP Basic auth and requires a valid user',
-    preg_match('/^\s*AuthType\s+Basic/mi', $ht) === 1
-    && preg_match('/^\s*Require\s+valid-user/mi', $ht) === 1
-    && preg_match('/^\s*AuthUserFile\s+\//mi', $ht) === 1,
-    'usage-report/.htaccess is the ONLY thing standing between these numbers and the open web.');
+// No HTTP Basic any more (R-212: "it doesn't have to be secret"). What stands in its place is
+// noindex both ways, since no .htaccess sits beside this root-level file the way
+// usage-report/.htaccess once did.
+ec_ur_expect('the source sends the X-Robots-Tag header itself, with no .htaccess to rely on',
+    strpos($src, "header('X-Robots-Tag: noindex, nofollow')") !== false);
+ec_ur_expect('the rendered page also carries a noindex robots meta tag',
+    strpos($html, '<meta name="robots" content="noindex, nofollow">') !== false);
+ec_ur_expect('it is not usage-report/index.php reborn: that directory and its .htaccess are gone',
+    !is_dir($root . '/usage-report'));
 
 // ---- cleanup -----------------------------------------------------------------------------------
 foreach (glob("$dir/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
