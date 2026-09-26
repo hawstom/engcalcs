@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**24 still to read on master**, of 288 untranslated keys, of 2119 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**28 still to read on master**, of 292 untranslated keys, of 2123 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (288, 24 to read @@ NEEDS RULING)
+## lpn_  (292, 28 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -591,6 +591,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_paste_no_position`**
   > Row {row}: a new node needs both {first} and {second}.
   @@ NEEDS RULING
+- **`lpn_pane_paste_overflow`**
+  > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_add`**
+  > Add {extra} rows
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_bad`**
+  > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_fit`**
+  > Paste only the {fit} that fit
+  @@ NEEDS RULING
 - **`lpn_pane_paste_refused`**
   > Nothing was pasted. {reasons}
   @@ NEEDS RULING
@@ -929,4 +941,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > {n} of {total} coordinate systems cover this network.
   @@ NEEDS RULING
 
-### feat/row-paste (`d21ecd9d`) — adds no English strings
+### feat/row-paste (`0cb5cf15`) — adds no English strings

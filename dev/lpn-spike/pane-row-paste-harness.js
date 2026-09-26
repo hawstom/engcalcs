@@ -106,6 +106,9 @@ function say(key, vals) {
 function has(text, key, vals) { return String(text || '').indexOf(say(key, vals)) >= 0; }
 const REFUSED = say('lpn_pane_paste_refused', { reasons: '' }).trim();
 function nodes() { return L.getDoc().nodes; }
+function dlgButtons() { return byId.lpn_dialog_buttons.children; }
+function dlgButton(label) { return dlgButtons().filter((c) => c.textContent === label)[0]; }
+function dlgText() { return byId.lpn_dialog_body.children.map((c) => c.textContent).join(' '); }
 function links() { return L.getDoc().links; }
 
 console.log('\n--- 1. 400 junction rows into an empty table: 400 junctions, one undo step ---');
@@ -180,12 +183,12 @@ console.log('\n--- 2. a duplicate ID refuses the WHOLE paste ---');
 	// An ORDINARY paste on the last row is a spreadsheet paste: that row is written (a DIFFERENT
 	// value, so the overwrite is visible) and what runs past the bottom is dropped and counted. It
 	// never creates an element and never deletes one.
-	const n5 = nodes().length;
+	const n5 = nodes().length, e0 = L.cellText('junctions', 'E', 'elev');
 	L.selectCell('junctions', 'E', 'id');
 	r = L.pasteAt('junctions', 'E\t45\t0\t\t\t1\t777\nF\t50\t0');
-	report(r && !r.created && r.dropped > 0 && nodes().length === n5 && !L.nodeById('F'),
-		'an ordinary paste on the last row creates nothing and deletes nothing', r && JSON.stringify(r));
-	report(L.cellText('junctions', 'E', 'elev') === '777', '...it writes the row it stands on, as a spreadsheet does');
+	report(r && r.asked === true && nodes().length === n5 && !L.nodeById('F') && L.cellText('junctions', 'E', 'elev') === e0,
+		'an ordinary paste running past the last row writes nothing and creates nothing until it is answered', r && JSON.stringify(r));
+	fire(dlgButton(PC.lpn_cancel), 'click');
 }
 
 console.log('\n--- 3. a new node with no position refuses the paste ---');
@@ -423,6 +426,59 @@ console.log('\n--- 9. Paste as new rows: the menu arms it, Ctrl+Shift+V does it,
 	// Tables that cannot create rows offer nothing.
 	L.openPane('text'); L.renderTable('text');
 	report(!L.spec('text').appendArmed, 'the Text table has no such action');
+}
+
+console.log('\n--- 10. 100 rows pasted on the first of 50: the paste asks ---');
+{
+	function setup() {
+		L.reset();
+		const l = [];
+		for (let i = 1; i <= 50; i++) { l.push(['R' + i, String(i), '0', '', '', '1', String(100 + i)].join('\t')); }
+		pasteIntoEmpty('junctions', l.join('\n'));
+		L.openPane('junctions'); L.renderTable('junctions');
+		L.selectCell('junctions', 'R1', 'id');
+		return JSON.stringify(nodes());
+	}
+	const hundred = [];
+	for (let i = 1; i <= 100; i++) { hundred.push(['R' + i, String(i), '0', '', '', '1', String(500 + i)].join('\t')); }
+	const text = hundred.join('\n');
+	const say3 = (k) => say(k, { n: 100, fit: 50, extra: 50 });
+
+	let orig = setup(), d0 = L.undoDepth();
+	let r = L.pasteAt('junctions', text);
+	report(r && r.asked === true && r.fit === 50 && r.extra === 50, 'it asks rather than dropping the other 50', r && JSON.stringify(r));
+	report(dlgText() === say3('lpn_pane_paste_overflow'), 'the question names 100, 50 and 50', dlgText());
+	report(dlgButtons().map((b) => b.textContent).join(' | ') === [say3('lpn_pane_paste_overflow_add'), say3('lpn_pane_paste_overflow_fit'), PC.lpn_cancel].join(' | '),
+		'three answers: add, fit only, cancel', dlgButtons().map((b) => b.textContent).join(' | '));
+	report(JSON.stringify(nodes()) === orig && L.undoDepth() === d0, 'nothing is written while it asks');
+	fire(dlgButton(say3('lpn_pane_paste_overflow_add')), 'click');
+	report(nodes().length === 100 && L.nodeById('R100') && L.nodeById('R1').elev === 501 && L.nodeById('R100').elev === 600,
+		'Add: 100 rows, the 50 overwritten and 50 added', String(nodes().length));
+	report(L.undoDepth() === d0 + 1, '...as ONE undo step', d0 + ' -> ' + L.undoDepth());
+	L.undo();
+	report(JSON.stringify(nodes()) === orig, 'one Ctrl+Z restores the original 50 exactly');
+
+	orig = setup(); d0 = L.undoDepth();
+	L.pasteAt('junctions', text);
+	fire(dlgButton(say3('lpn_pane_paste_overflow_fit')), 'click');
+	report(nodes().length === 50 && L.nodeById('R1').elev === 501 && L.nodeById('R50').elev === 550 && !L.nodeById('R51'),
+		'Fit only: the 50 are changed and none added', String(nodes().length));
+
+	orig = setup(); d0 = L.undoDepth();
+	L.pasteAt('junctions', text);
+	fire(dlgButton(PC.lpn_cancel), 'click');
+	report(JSON.stringify(nodes()) === orig && L.undoDepth() === d0, 'Cancel: nothing changed');
+
+	// A left-over row that would be refused: the dialog says why and withholds Add.
+	orig = setup();
+	const bad = hundred.slice(); bad[79] = 'R3\t80\t0';
+	r = L.pasteAt('junctions', bad.join('\n'));
+	report(r && r.errors.length === 1 && dlgText().indexOf(say('lpn_pane_paste_id_taken', { row: 80, id: 'R3' })) >= 0,
+		'a left-over row that fails is named in the question', dlgText());
+	report(!dlgButton(say3('lpn_pane_paste_overflow_add')) && !!dlgButton(say3('lpn_pane_paste_overflow_fit')) && !!dlgButton(PC.lpn_cancel),
+		'...and only Fit only and Cancel are offered');
+	fire(dlgButton(PC.lpn_cancel), 'click');
+	report(JSON.stringify(nodes()) === orig, '...and Cancel leaves the table as it was');
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

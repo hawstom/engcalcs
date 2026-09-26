@@ -879,6 +879,13 @@ $ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to
 $ec_lang['lpn_pane_paste_append']='Paste as new rows';
 // Shown after choosing Paste as new rows from a menu: the page waits for the paste keystroke.
 $ec_lang['lpn_pane_paste_armed']='Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.';
+// Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
+// pasted, {fit} how many land on rows that exist, {extra} how many are left over.
+$ec_lang['lpn_pane_paste_overflow']='This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?';
+$ec_lang['lpn_pane_paste_overflow_add']='Add {extra} rows';
+$ec_lang['lpn_pane_paste_overflow_fit']='Paste only the {fit} that fit';
+// The same question when the left-over rows could not be added; {reasons} names the rows and why.
+$ec_lang['lpn_pane_paste_overflow_bad']='This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';

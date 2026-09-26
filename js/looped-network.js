@@ -23997,27 +23997,75 @@ var EngCalcs = EngCalcs || {};
 		if (spec.appendArmed) { paneDisarmAppend(spec, false); }
 		return !!yes && paneCanCreate(spec);
 	}
+	/**
+	 * **A PASTE THAT RUNS PAST THE LAST ROW ASKS** (Tom, 2026-09-26: *"If a user pastes 100 at the
+	 * top of 50 rows, do we just prompt, 'Add 50 rows?'"*). Three answers: add the overflow as new
+	 * elements, paste only what fits, or paste nothing. The overflow is judged FIRST, by the same
+	 * rules as Paste as new rows (IDs, positions, From and To), so the question is never offered
+	 * when its answer would be refused: a failing overflow is named in the dialog, and only the
+	 * other two answers remain. Whichever runs, it is one paste and one undo step.
+	 */
+	function paneAskOverflow(spec, raw, n, extra) {
+		var pc = EngCalcs.pageConfig || {}, fit = n - extra,
+			check = panePasteAt(spec, raw, { overflow: 'check', raw: raw }), errs = (check && check.errors) || [],
+			say = function (t) {
+				return String(t).replace('{n}', String(n)).replace('{fit}', String(fit)).replace('{extra}', String(extra));
+			}, text, buttons;
+		if (errs.length) {
+			text = say(pc.lpn_pane_paste_overflow_bad ||
+				'This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}')
+				.replace('{reasons}', errs.slice(0, 5).join(' ') + (errs.length > 5
+					? ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.').replace('{n}', String(errs.length - 5)) : ''));
+		} else {
+			text = say(pc.lpn_pane_paste_overflow ||
+				'This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?');
+		}
+		buttons = [];
+		if (!errs.length) {
+			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add {extra} rows'),
+				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw }); } });
+		}
+		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the {fit} that fit'),
+			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw }); } });
+		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () {} });
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = text;
+			body.appendChild(p);
+		}, buttons);
+		return { asked: true, extra: extra, fit: fit, errors: errs };
+	}
 	function panePasteAt(spec, cells, opts) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
-			creates = [], plan, made, created = [], firstId, errs, shown, i;
+			creates = [], plan, made, created = [], firstId, errs, shown, i,
+			overflow = (opts && opts.overflow) || '', mayAsk = false, extra;
 		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
 		// begins past the last existing row so not one of them can be written.
 		if (opts && opts.append) {
 			if (!canCreate || !cols.length) { return null; }
 			box = { r0: rows.length, r1: rows.length, c0: 0, c1: 0 };
-		} else {
-			canCreate = false;   // an ordinary paste writes cells and never makes an element
+		} else if (overflow !== 'add' && overflow !== 'check') {
+			// An ordinary paste writes cells and never makes an element on its own. When it runs
+			// past the last row of a table that CAN make them, it asks first (paneAskOverflow());
+			// 'fit' is the answer that drops the overflow and counts it.
+			mayAsk = canCreate && !overflow;
+			canCreate = false;
 		}
 		if (!box || !cells.length) { return null; }
+		opts = opts || {};
+		if (!opts.raw) { opts.raw = cells; }
 		if (cells.length > 1 && paneIsHeadingLine(cells[0], cols, box.c0)) { cells = cells.slice(1); lineOffset = 1; }
 		srcRows = cells.length;
 		cells.forEach(function (line2) { srcCols = Math.max(srcCols, line2.length); });
 		if (!srcCols) { return null; }
 		nRows = Math.max(box.r1 - box.r0 + 1, srcRows);
 		nCols = Math.max(box.c1 - box.c0 + 1, srcCols);
+		extra = Math.max(0, box.r0 + nRows - rows.length);
+		if (mayAsk && extra) { return paneAskOverflow(spec, opts && opts.raw || cells, nRows, extra); }
 		// The new rows, read and judged before anything is written.
 		if (canCreate) {
 			for (r = 0; r < nRows; r++) {
@@ -24034,6 +24082,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			if (creates.length) {
 				plan = panePlanCreates(spec, creates);
+				if (overflow === 'check') { return { check: true, errors: plan.errors }; }
 				if (plan.errors.length) {
 					// **NOTHING WAS WRITTEN, AND IT SAYS WHICH ROWS AND WHY.** The first five, and a
 					// count of the rest: a notice line holding four hundred reasons helps nobody, and
@@ -24049,6 +24098,7 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		}
+		if (overflow === 'check') { return { check: true, errors: [] }; }
 		saveUndoSnapshot();
 		for (r = 0; r < nRows; r++) {
 			if (box.r0 + r >= rows.length) {
