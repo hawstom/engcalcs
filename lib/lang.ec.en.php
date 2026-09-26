@@ -1207,7 +1207,7 @@ $ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG regist
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
 $ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
 $ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
-$ec_lang['lpn_convas_units_tip']='The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.';
+$ec_lang['lpn_convas_units_tip']='The units the copy is converted to. The original keeps its own numbers and units.';
 $ec_lang['lpn_convas_round']='Round converted values';
 $ec_lang['lpn_convas_round_tip']='Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.';
 $ec_lang['lpn_convas_round_none']='No rounding';
@@ -1216,7 +1216,9 @@ $ec_lang['lpn_convas_label_col']='Suffix';
 $ec_lang['lpn_convas_label_tip']='Text added after this value on the copy\'s map labels, such as \' mm\' or \' gpm\'. Pre-filled from the unit chosen above; clear it for no suffix.';
 $ec_lang['lpn_convas_oneway']='Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.';
 $ec_lang['lpn_convas_ok']='Convert';
-$ec_lang['lpn_convas_no_transform']='This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.';
+// {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
+// 2026-09-25: "What, specifically, is 'that coordinate system'?").
+$ec_lang['lpn_convas_no_transform']='This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.';
 // {name} is the new project's name.
 $ec_lang['lpn_convas_done']='The converted copy is {name}. The original project is unchanged.';
 $ec_lang['lpn_convas_cancelled']='Nothing was converted. The copy is closed, and the original project is unchanged.';

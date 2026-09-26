@@ -42,6 +42,7 @@ const L = loadLoopedNetwork(
 	"\t\tlineCount: function (id) { return linkEls[id].lineCount; },\n" +
 	"\t\tserializeProject: serializeProject,\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
+	"\t\tlabelPrefixFor: labelPrefixFor,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -138,6 +139,9 @@ checkAffix('link', 'id', '', onlyLink('id')[0], pipes[0].id);
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
 });
 checkAffix('node', 'id', '', onlyNode('id')[0], junctions[0].id);
+// TANK WATER DEPTH DEFAULTS TO 'Y=' (Tom, 2026-09-25).
+ok("tank water depth's default label prefix is 'Y='", L.labelPrefixFor('node', 'level') === 'Y=',
+	L.labelPrefixFor('node', 'level'));
 
 console.log('\n=== the roughness prefix IS the friction method\'s own symbol ===');
 // The one dynamic default: a stored 'C=' could not follow the method selector, so this default is

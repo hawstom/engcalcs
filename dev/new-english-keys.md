@@ -52,7 +52,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
-  > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
+  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
   @@ NEEDS RULING
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
@@ -79,7 +79,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Convert as
   @@ NEEDS RULING
 - **`lpn_convas_units_tip`**
-  > The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.
+  > The units the copy is converted to. The original keeps its own numbers and units.
   @@ NEEDS RULING
 - **`lpn_convas_unnamed`**
   > Unnamed (local) georeference
@@ -665,7 +665,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**15 still to read**, of 32 new keys across 8 unmerged branch(es).
+**15 still to read**, of 32 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -676,7 +676,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`47649c32`) — adds no English strings
+### feat/convert-as (`019ffcd0`) — adds no English strings
 
 ### feat/customer-node (`6dd9fb71`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -686,8 +686,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_meter_node_tip`**
   > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
   @@ NEEDS RULING
-
-### feat/first-project (`8aa04872`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 

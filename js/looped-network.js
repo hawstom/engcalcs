@@ -29290,6 +29290,20 @@ var EngCalcs = EngCalcs || {};
 		if (convasFor !== library.openId) { convertAs(); return; }
 		runConvertAs(a);
 	}
+	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
+	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
+	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
+	// the visitor is missing a transform for.
+	function convasForeignCrs(from, to) {
+		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
+		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
+		return '';
+	}
+	function convasNoTransformMessage(pc, code) {
+		return String(pc.lpn_convas_no_transform
+			|| 'This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.')
+			.replace('{crs}', crsLabel(code) || String(code || ''));
+	}
 	// An EPSG system other than lat/lon needs js/lpn-crs.js and its definitions, which are fetched
 	// only when a project needs them. Both ends are checked before anything is copied, so a system
 	// this page cannot transform refuses up front rather than half way through.
@@ -29302,13 +29316,14 @@ var EngCalcs = EngCalcs || {};
 			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
 		}
 		if (!need.length) { convasProceed(a, from, to, changed); return; }
-		var refuse = function () {
-			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+		var refuse = function (code) {
+			setNotice(convasNoTransformMessage(pc, code));
 		};
-		if (!EngCalcs.lpnCrsLoad) { refuse(); return; }
+		if (!EngCalcs.lpnCrsLoad) { refuse(need[0]); return; }
 		EngCalcs.lpnCrsLoad(function () {
 			if (library.openId !== bornAs) { return; }
-			if (need.some(function (c) { return !EngCalcs.lpnCrsHas(c); })) { refuse(); return; }
+			var missing = need.filter(function (c) { return !EngCalcs.lpnCrsHas(c); });
+			if (missing.length) { refuse(missing[0]); return; }
 			convasProceed(a, from, to, changed);
 		});
 	}
@@ -29628,7 +29643,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		if (!ok) {
-			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+			setNotice(convasNoTransformMessage(pc, convasForeignCrs(from, to)));
 			return;
 		}
 		id = importProject(saved);
@@ -29672,7 +29687,7 @@ var EngCalcs = EngCalcs || {};
 			if (ok) { savedSetKind(saved, c.to.kind, '', t2); }
 		}
 		if (!ok) {
-			setNotice(pc.lpn_convas_no_transform || 'This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.');
+			setNotice(convasNoTransformMessage(pc, c.to.kind === 'epsg' ? c.to.crs : ''));
 			return;
 		}
 		writeJSON(projectKey(library.openId), saved);
@@ -48644,11 +48659,11 @@ var EngCalcs = EngCalcs || {};
 		// and a user who wants a prefix can type their own.
 		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
 		// quality row's own input, and neither half of that pair has a symbol a reader would know.
-		// **TANK WATER DEPTH GETS NONE EITHER** (Task 696): 'd' is ambiguous with a pipe's own
-		// diameter on the same label set, and no single letter for depth is standard the way Q, H,
-		// P and Z are. A user who wants one types it into the prefix box, same as quality.
+		// **TANK WATER DEPTH DEFAULTS TO 'Y='** (Tom, 2026-09-25: "For Water depth, initial default
+		// prefix can be 'Y='"). 'd' was ruled out as ambiguous with a pipe's own diameter on the
+		// same label set (Task 696); Y is the standard hydraulics symbol for depth.
 		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=',
-			level: '', quality: '', initQuality: '' },
+			level: 'Y=', quality: '', initQuality: '' },
 		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
 		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
 		// are. A status prints a WORD and would read as an equation with one; an average quality
