@@ -587,7 +587,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**28 still to read**, of 58 new keys across 8 unmerged branch(es).
+**28 still to read**, of 58 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -598,7 +598,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`47649c32`) — 28 new, 15 to read @@ NEEDS RULING
+### feat/convert-as (`b2c2a802`) — 28 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -625,7 +625,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
   @@ NEEDS RULING
 - **`lpn_convas_no_transform`**
-  > This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.
+  > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
   @@ NEEDS RULING
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
@@ -652,7 +652,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Convert as
   @@ NEEDS RULING
 - **`lpn_convas_units_tip`**
-  > The units the copy is converted to. Every number these units decide is rewritten once, into the copy. The original keeps its own numbers and units.
+  > The units the copy is converted to. The original keeps its own numbers and units.
   @@ NEEDS RULING
 - **`lpn_convas_unnamed`**
   > Unnamed (local) georeference
@@ -685,9 +685,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > US survey ft
   _Ruled OK 2026-09-25._
 
-### feat/customer-node (`6dd9fb71`) — adds no English strings
-
-### feat/first-project (`f775f0a6`) — adds no English strings
+### feat/customer-node (`ebdbba34`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -703,7 +701,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/menu-button (`a82d32f5`) — adds no English strings
 
-### feat/property-venue (`b8733c5d`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/property-venue (`c02dcc59`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_find_filter_none`**
   > No table has a property this query names.
@@ -715,7 +713,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Filtered by {q}. {rows}.
   @@ NEEDS RULING
 
-### feat/table-editing (`34b757b8`) — 17 new, 10 to read @@ NEEDS RULING
+### feat/table-editing (`b7398d0b`) — 17 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
@@ -769,7 +767,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sort descending
   @@ NEEDS RULING
 
-### feat/zoom-control (`dc1fa5a9`) — 7 new, all ruled
+### feat/zoom-control (`3200afa9`) — 7 new, all ruled
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
