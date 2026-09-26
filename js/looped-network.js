@@ -16,7 +16,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
+	var svg, world, modelLayer, backdropLayer, gridLayer, customersLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
@@ -8831,6 +8831,51 @@ var EngCalcs = EngCalcs || {};
 		return (c.x || 0) * n.x + (c.y || 0) * n.y;
 	}
 	/**
+	 * **A SERVICE OUTSIDE A BEND CONNECTS AT THE BEND** (Tom, 2026-09-25: *"We didn't account for
+	 * vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex.
+	 * And we need to allow dragging a customer to this region while intelligently tracking onto the
+	 * vertex while appropriate."*).
+	 *
+	 * Outside a convex bend there is a wedge where no perpendicular from the meter lands on either
+	 * leg. The nearest point on the pipe there IS the vertex -- nearestFractionOnPolyline() already
+	 * answers exactly that station -- but the offset used to be squared to the leg the station
+	 * happened to fall in, which dragged the meter out of the wedge onto that leg's perpendicular:
+	 * the region was, in effect, banned. **A station exactly on an interior vertex is now read the
+	 * way a station on a node is: the offset whole**, because a bend, like a junction, has no one
+	 * leg to be square to. Leave the wedge and the nearest point is a perpendicular foot again, so
+	 * the drag moves continuously on and off the vertex with no rule of its own.
+	 *
+	 * The fractions are summed in the same order nearestFractionOnPolyline() sums them, so its
+	 * answer at a vertex compares equal; the tolerance only absorbs a hand-edited file.
+	 */
+	var LPN_BEND_T_EPS = 1e-9;
+	function linkBendAt(l, t) {
+		var pts, segs = [], total = 0, run = 0, i, d;
+		if (!l || typeof t !== 'number' || !isFinite(t) || t <= 0 || t >= 1) { return null; }
+		pts = linkPointList(l);
+		if (pts.length < 3) { return null; }
+		for (i = 0; i + 1 < pts.length; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+		}
+		if (!(total > 0)) { return null; }
+		for (i = 0; i + 1 < segs.length; i++) {
+			run += segs[i];
+			if (Math.abs(run / total - t) <= LPN_BEND_T_EPS) { return { index: i + 1, f: run / total }; }
+		}
+		return null;
+	}
+	function customerAtBend(c) {
+		return !!linkBendAt(customerLink(c), c ? c.t : undefined);
+	}
+	// Which side of the pipe a meter at a bend stands on, for the SIGN of its offset: the sum of the
+	// two legs' normals, so the sign agrees with the one a meter on either leg beside it reads.
+	function linkBendNormal(l, idx) {
+		var pts = linkPointList(l), a = pts[idx - 1], v = pts[idx], b = pts[idx + 1],
+			l1 = Math.hypot(v.x - a.x, v.y - a.y) || 1, l2 = Math.hypot(b.x - v.x, b.y - v.y) || 1;
+		return { x: -(v.y - a.y) / l1 - (b.y - v.y) / l2, y: (v.x - a.x) / l1 + (b.x - v.x) / l2 };
+	}
+	/**
 	 * **A SERVICE THAT COMES OFF THE MAIN RIGHT AT A NODE SNAPS TO THE NODE** (Tom, 2026-09-17:
 	 * *"I don't see a way to connect directly to a node. I think that a very close connection
 	 * should snap to the nearest node."*).
@@ -8993,11 +9038,13 @@ var EngCalcs = EngCalcs || {};
 	 * is where several mains meet and there is no one of them to be square to.
 	 */
 	function setCustomerOffsetTo(c, l, t, x, y) {
-		var an, n;
+		var an, n, bend;
 		if (!l) { return false; }
 		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		bend = linkBendAt(l, c.t);
+		if (bend) { c.t = bend.f; }
 		an = Geom.pointAlongPolyline(linkPointList(l), c.t);
-		if (c.t === 0 || c.t === 1) { c.x = x - an.x; c.y = y - an.y; return true; }
+		if (c.t === 0 || c.t === 1 || bend) { c.x = x - an.x; c.y = y - an.y; return true; }
 		n = linkNormalAt(l, c.t);
 		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
 	}
@@ -9025,7 +9072,8 @@ var EngCalcs = EngCalcs || {};
 		// offset there, so a service that arrived at a node by sliding along its pipe draws exactly
 		// where it always did; what this allows is the one Tom asked for, a meter left standing
 		// where the hand put it when the press named a node.
-		if (customerAtNodeEnd(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
+		// **AND ON A BEND, FOR THE SAME REASON** -- see linkBendAt().
+		if (customerAtNodeEnd(c) || customerAtBend(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
 		l = customerLink(c);
 		n = linkNormalAt(l, customerT(c));
 		d = customerPerpDistance(c, l);
@@ -9424,8 +9472,11 @@ var EngCalcs = EngCalcs || {};
 		// The connector names its customer too, though it is not pickable: an element that says
 		// whose it is can be found and read -- by a probe driving a real browser, and by anybody
 		// reading the drawing in the inspector -- and "which service is this" has no other answer.
-		var stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, labelsLayer),
-			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
+		// customersLayer is below every pipe (see init()); the spike harnesses that hand-roll their
+		// layer stack have none, and fall back to labelsLayer, which buildDom() empties anyway.
+		var layer = customersLayer || labelsLayer,
+			stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, layer),
+			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, layer);
 		custEls[c.id] = { stub: stub, box: box };
 		buildCustomerLabelEls(c);
 		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
@@ -9799,7 +9850,9 @@ var EngCalcs = EngCalcs || {};
 	function setCustomerStation(c, t) {
 		var l = customerLink(c);
 		if (!l) { return false; }
-		return setCustomerPerp(c, t, customerPerpDistance(c, l));
+		// Off a bend the whole signed distance carries over, so sliding away keeps the house as far
+		// out as it stood rather than as far as one leg's normal happened to measure it.
+		return setCustomerPerp(c, t, customerAtBend(c) ? customerOffsetDrawn(c) : customerPerpDistance(c, l));
 	}
 
 	// ---- STATION AND OFFSET: the pair a position is read from ------------------------------------
@@ -9822,8 +9875,14 @@ var EngCalcs = EngCalcs || {};
 	// wrote it through setCustomerPerp() from the first day, which is why nothing below is a new
 	// way of storing anything.
 	function customerOffsetDrawn(c) {
-		var l = customerLink(c), n;
+		var l = customerLink(c), n, bend;
 		if (!l) { return 0; }
+		bend = linkBendAt(l, c.t);
+		if (bend) {
+			n = linkBendNormal(l, bend.index);
+			return ((c.x || 0) * n.x + (c.y || 0) * n.y) < 0 ?
+				-Math.hypot(c.x || 0, c.y || 0) : Math.hypot(c.x || 0, c.y || 0);
+		}
 		// **ON A NODE THE WHOLE DISTANCE IS THE ANSWER, NOT ITS SQUARE COMPONENT.** A service that
 		// lands on a junction keeps the offset it was given whole (customerPoint()), because a
 		// junction is where several mains meet and there is no one of them to be square to. Reading
@@ -9848,6 +9907,10 @@ var EngCalcs = EngCalcs || {};
 		if (!l || !isLatLonProject()) { return 1; }
 		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		n = linkNormalAt(l, customerT(c));
+		// On a bend the offset runs wherever the meter stands, not along one leg's normal.
+		if (customerAtBend(c) && Math.hypot(c.x || 0, c.y || 0) > 0) {
+			n = { x: (c.x || 0) / Math.hypot(c.x, c.y), y: (c.y || 0) / Math.hypot(c.x, c.y) };
+		}
 		return Geom.geodesicPolylineMeters([
 			{ x: outwardX(an.x), y: outwardY(an.y) },
 			{ x: outwardX(an.x + n.x * OFFSET_PROBE), y: outwardY(an.y + n.y * OFFSET_PROBE) }
@@ -9862,7 +9925,14 @@ var EngCalcs = EngCalcs || {};
 	// squares the service to its main, which is the only angle this page offers at all.
 	function setCustomerOffset(c, v) {
 		var per = customerOffsetUnitsPerDrawn(c);
+		var mag;
 		if (!customerLink(c) || typeof v !== 'number' || !isFinite(v) || !(per > 0)) { return false; }
+		// On a bend a typed offset keeps the service's direction and changes only its length;
+		// squaring it to one leg would throw the meter out of the wedge it was put in.
+		if (customerAtBend(c) && (mag = customerOffsetDrawn(c)) !== 0) {
+			c.x = (c.x || 0) * (v / per) / mag; c.y = (c.y || 0) * (v / per) / mag;
+			return true;
+		}
 		return setCustomerPerp(c, customerT(c), v / per);
 	}
 
@@ -9894,6 +9964,7 @@ var EngCalcs = EngCalcs || {};
 		// broken. Guarded because the spike harnesses that hand-roll their layer stack have no
 		// such layer; those fall back to nodesLayer, which IS emptied above.
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
+		if (customersLayer) { customersLayer.innerHTML = ''; }
 		// A wholesale rebuild is a new drawing as far as the symbol cap knows (Task 705).
 		invalidateLinkLengths();
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
@@ -33469,6 +33540,12 @@ var EngCalcs = EngCalcs || {};
 		modelLayer = el('g', {}, world);
 		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
 		// the .lpn-symbols rule in css/engcalcs.css.
+		// **CUSTOMERS PAINT UNDER EVERY PIPE AND EVERY NODE** (Tom, 2026-09-25: *"Customer zindex is
+		// higher than Junction. Fix that. Make it just less than link?"*). A service and its dot are
+		// the least of the things on the map, so where one overlaps a main or a junction the main or
+		// the junction shows and takes the press -- a mouse's precedence is nothing but paint order.
+		// The selection grip stays in labelsLayer, on top, because it is the thing in the hand.
+		customersLayer = el('g', { 'class': 'lpn-customers' }, modelLayer);
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		// **A PUMP OR VALVE SYMBOL PAINTS OVER EVERY PIPE AND UNDER EVERY NODE, AND IT NEEDS ITS OWN
 		// LAYER TO DO BOTH** (Tom, 2026-09-10: *"Somebody has to win. There's no compelling reason to
@@ -37992,7 +38069,7 @@ var EngCalcs = EngCalcs || {};
 			if (+lwInput.value >= 1) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		row(mapBody, pc.lpn_settings_link_width || 'Link line thickness (pixels)', lwInput);
+		row(mapBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput);
 		// **FLOW-DIRECTION ARROWS** (Tom, 2026-09-01). Built exactly like maskLabels and
 		// alignPipeLabels two rows below -- a bare checkbox through row(), reading `settings`,
 		// writing `settings`, then one apply function and saveToStorage(). It sits with the link
