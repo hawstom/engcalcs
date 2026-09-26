@@ -1,8 +1,14 @@
-// feat/menu-button preview (R-202/R-203, Tom 2026-09-25): the menu bar (.lpn-menubar-item, File
-// through Help/Language) is now painted as blue rounded-rectangle buttons; the toolbar below it is
-// untouched. This is a REAL headless-Chrome check, not a static-source one, because the defect
-// class here -- a colour that looks right in the CSS and wrong once white text sits on it, or a
-// height that grew because a border did -- only shows up in a rendered page.
+// feat/menu-button (R-202/R-203, Tom 2026-09-25): the menu bar (.lpn-menubar-item, File through
+// Help/Language) is painted as OUTLINED rounded-rectangle buttons -- white fill, blue text and
+// border ("I love the outlined version, and they are reminiscent of diazo prints (blueprints). I
+// agree with leaving the toolbar black."); the toolbar below it is untouched. This is a REAL
+// headless-Chrome check, not a static-source one, because the defect class here -- a colour that
+// looks right in the CSS and wrong once it is actually rendered, or a height that grew because a
+// border did -- only shows up in a rendered page.
+//
+// **ONLY ONE STYLE SHIPS.** The earlier solid-blue variant and the `?menustyle=outline` preview
+// switch this harness used to compare are both gone (Tom chose outline over solid, 2026-09-25);
+// this harness now checks the one style at the one URL every visitor gets.
 //
 // Run with:
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/menu-button-harness.js
@@ -71,77 +77,86 @@ async function main() {
 	try {
 		const masterToolbar = toolbarRulesOnMaster();
 
-		for (const variant of ['solid', 'outline']) {
-			for (const size of [{ w: 1440, h: 900, tag: 'desktop' }, { w: 390, h: 844, tag: 'phone' }]) {
-				const context = await browser.newContext({ viewport: { width: size.w, height: size.h } });
-				const page = await context.newPage();
-				const qs = variant === 'outline' ? '&menustyle=outline' : '';
-				await page.goto(env.pageUrl('Looped-Network.php?ec_nolog=1' + qs), { waitUntil: 'load' });
-				await page.waitForSelector('#lpn_menubar .lpn-menubar-item');
-				// The menu cue and any first-visit chrome settle a beat after load.
-				await page.waitForTimeout(300);
+		for (const size of [{ w: 1440, h: 900, tag: 'desktop' }, { w: 390, h: 844, tag: 'phone' }]) {
+			const context = await browser.newContext({ viewport: { width: size.w, height: size.h } });
+			const page = await context.newPage();
+			await page.goto(env.pageUrl('Looped-Network.php?ec_nolog=1'), { waitUntil: 'load' });
+			await page.waitForSelector('#lpn_menubar .lpn-menubar-item');
+			// Any first-visit chrome settles a beat after load.
+			await page.waitForTimeout(300);
 
-				console.log(`\n--- ${variant} @ ${size.w}x${size.h} ---`);
+			console.log(`\n--- outline @ ${size.w}x${size.h} ---`);
 
-				const items = await page.$$eval('#lpn_menubar .lpn-menubar-item', (els) => els.map((el) => {
-					const cs = getComputedStyle(el);
-					const r = el.getBoundingClientRect();
-					return {
-						id: el.id, bg: cs.backgroundColor, color: cs.color,
-						borderRadius: cs.borderTopLeftRadius, height: r.height
-					};
-				}));
-				ok('every menu-bar item found', items.length >= 6, `found ${items.length}`);
+			const items = await page.$$eval('#lpn_menubar .lpn-menubar-item', (els) => els.map((el) => {
+				const cs = getComputedStyle(el);
+				const r = el.getBoundingClientRect();
+				return {
+					id: el.id, bg: cs.backgroundColor, color: cs.color,
+					borderRadius: cs.borderTopLeftRadius, height: r.height
+				};
+			}));
+			ok('every menu-bar item found', items.length >= 6, `found ${items.length}`);
 
-				const expectBg = variant === 'solid' ? 'rgb(6, 69, 173)' : 'rgb(255, 255, 255)';
-				const expectFg = variant === 'solid' ? 'rgb(255, 255, 255)' : 'rgb(6, 69, 173)';
-				items.forEach((it) => {
-					ok(`${it.id}: background is the accent blue (${variant})`, it.bg === expectBg, it.bg);
-					ok(`${it.id}: text colour is ${expectFg}`, it.color === expectFg, it.color);
-					const ratio = contrast(it.bg === 'rgb(255, 255, 255)' ? it.bg : it.bg, it.color);
-					ok(`${it.id}: text/background contrast >= 4.5:1`, ratio >= 4.5, ratio.toFixed(2) + ':1');
-					ok(`${it.id}: rounded rectangle, not a pill or a square`,
-						parseFloat(it.borderRadius) > 0 && parseFloat(it.borderRadius) < it.height / 2,
-						it.borderRadius + ' on a ' + it.height + 'px-tall button');
-				});
+			const expectBg = 'rgb(255, 255, 255)';
+			const expectFg = 'rgb(6, 69, 173)';
+			items.forEach((it) => {
+				ok(`${it.id}: background is white (outlined)`, it.bg === expectBg, it.bg);
+				ok(`${it.id}: text colour is the accent blue ${expectFg}`, it.color === expectFg, it.color);
+				const ratio = contrast(it.bg, it.color);
+				ok(`${it.id}: text/background contrast >= 4.5:1`, ratio >= 4.5, ratio.toFixed(2) + ':1');
+				ok(`${it.id}: rounded rectangle, not a pill or a square`,
+					parseFloat(it.borderRadius) > 0 && parseFloat(it.borderRadius) < it.height / 2,
+					it.borderRadius + ' on a ' + it.height + 'px-tall button');
+			});
 
-				// The bar's own height must equal master's -- captured on THIS run (padding/border/
-				// font are unchanged from master, so this is a same-page regression guard: it would
-				// catch this branch itself growing the bar on a later edit).
-				const barHeight = await page.$eval('#lpn_menubar', (el) => el.getBoundingClientRect().height);
-				ok('menu bar height is unchanged (30-34px band, matches master\'s padding/font)',
-					barHeight >= 26 && barHeight <= 36, barHeight + 'px');
+			// The bar's own height must equal master's -- captured on THIS run (padding/border/
+			// font are unchanged from master, so this is a same-page regression guard: it would
+			// catch this branch itself growing the bar on a later edit).
+			const barHeight = await page.$eval('#lpn_menubar', (el) => el.getBoundingClientRect().height);
+			ok('menu bar height is unchanged (30-34px band, matches master\'s padding/font)',
+				barHeight >= 26 && barHeight <= 36, barHeight + 'px');
 
-				// Open one menu and confirm the open item looks pressed (darker), not just hovered.
-				await page.click('#lpn_menu_file');
-				await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-				const openState = await page.$eval('#lpn_menu_file', (el) => ({
-					expanded: el.getAttribute('aria-expanded'), bg: getComputedStyle(el).backgroundColor
-				}));
-				ok('the open item is aria-expanded="true"', openState.expanded === 'true', openState.expanded);
-				const pressedExpect = variant === 'solid' ? 'rgb(5, 55, 138)' : 'rgb(215, 230, 251)';
-				ok('the open item is visually distinct (pressed) from the closed default',
-					openState.bg === pressedExpect, openState.bg);
-				await page.keyboard.press('Escape');
+			// Open one menu and confirm the open item looks pressed (darker), not just hovered.
+			await page.click('#lpn_menu_file');
+			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			const openState = await page.$eval('#lpn_menu_file', (el) => ({
+				expanded: el.getAttribute('aria-expanded'), bg: getComputedStyle(el).backgroundColor
+			}));
+			ok('the open item is aria-expanded="true"', openState.expanded === 'true', openState.expanded);
+			const pressedExpect = 'rgb(215, 230, 251)';
+			ok('the open item is visually distinct (pressed) from the closed default',
+				openState.bg === pressedExpect, openState.bg);
+			await page.keyboard.press('Escape');
 
-				// Toolbar buttons must be untouched by this branch.
-				const toolbarSample = await page.$eval('#lpn_toolbar button:not(.lpn-transport-btn)', (el) => {
-					const cs = getComputedStyle(el);
-					return { bg: cs.backgroundColor, border: cs.borderColor, radius: cs.borderTopLeftRadius, padding: cs.padding };
-				});
-				ok('toolbar button background is still "none" (transparent)',
-					toolbarSample.bg === 'rgba(0, 0, 0, 0)', toolbarSample.bg);
-				ok('toolbar button border-radius is still master\'s 4px',
-					/4px/.test(masterToolbar.base) && toolbarSample.radius === '4px', toolbarSample.radius);
-				ok('toolbar button padding is still master\'s "3px 5px"',
-					/padding: 3px 5px/.test(masterToolbar.base) && toolbarSample.padding === '3px 5px', toolbarSample.padding);
+			// Toolbar buttons must be untouched by this branch.
+			const toolbarSample = await page.$eval('#lpn_toolbar button:not(.lpn-transport-btn)', (el) => {
+				const cs = getComputedStyle(el);
+				return { bg: cs.backgroundColor, border: cs.borderColor, radius: cs.borderTopLeftRadius, padding: cs.padding };
+			});
+			ok('toolbar button background is still "none" (transparent)',
+				toolbarSample.bg === 'rgba(0, 0, 0, 0)', toolbarSample.bg);
+			ok('toolbar button border-radius is still master\'s 4px',
+				/4px/.test(masterToolbar.base) && toolbarSample.radius === '4px', toolbarSample.radius);
+			ok('toolbar button padding is still master\'s "3px 5px"',
+				/padding: 3px 5px/.test(masterToolbar.base) && toolbarSample.padding === '3px 5px', toolbarSample.padding);
 
-				const shot = path.join(SCREEN_DIR, `menu-${variant}-${size.tag}.png`);
-				await page.screenshot({ path: shot });
-				console.log('  screenshot: ' + shot);
-
-				await context.close();
+			// **PHONE WIDTH STILL READS WELL** (job brief, 2026-09-25): the same 640px collapse
+			// master already ships (.lpn-menubar-word hidden, icon-only) still applies under the
+			// new paint, so a narrow menu-bar item is not just a blue/white square with no name.
+			if (size.tag === 'phone') {
+				const wordVisible = await page.$eval('#lpn_menubar .lpn-menubar-word',
+					(el) => getComputedStyle(el).display !== 'none');
+				ok('phone width: the word collapses to icon-only, same as master', !wordVisible);
+				const iconVisible = await page.$eval('#lpn_menubar .lpn-menubar-item .ec-icon',
+					(el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+				ok('phone width: the icon is still visible and non-zero size', iconVisible);
 			}
+
+			const shot = path.join(SCREEN_DIR, `menu-outline-${size.tag}.png`);
+			await page.screenshot({ path: shot });
+			console.log('  screenshot: ' + shot);
+
+			await context.close();
 		}
 	} finally {
 		await browser.close();

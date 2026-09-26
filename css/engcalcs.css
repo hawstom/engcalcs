@@ -1455,42 +1455,36 @@ html[lang="zh"] .ec-welcome {
    own -- the same trap recorded above for #lpn_menubar. It changes no layout. */
 nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
-/* **PREVIEW, feat/menu-button (R-202/R-203): the menu-bar items read as buttons, in the suite's
-   own accent blue** (#0645ad, already this page's one accent colour -- the profile HGL trace, the
-   georeference tack, the current-cell outline in Tables all use it; nothing new is invented here).
-   Tom, 2026-09-25, closing R-202/R-203: testers were slow to find the MENUS, never the toolbar;
-   "promoting the menus and toolbar equally is counterproductive," and he asked for colour only --
-   no new icon, no size change, no layout change. So padding, gap and font are UNCHANGED from the
-   flat-text rule above; only background, border and text colour move. `color: #fff` also repaints
-   the icon, which draws with `stroke: currentColor` (see .ec-icon above) -- so the icon-only phone
-   row (640px breakpoint, below) stays legible without a rule of its own.
+/* **THE MENU-BAR ITEMS READ AS OUTLINED BUTTONS, in the suite's own accent blue** (#0645ad,
+   already this page's one accent colour -- the profile HGL trace, the georeference tack, the
+   current-cell outline in Tables all use it; nothing new is invented here). Tom, 2026-09-25,
+   closing R-202/R-203: testers were slow to find the MENUS, never the toolbar; "promoting the
+   menus and toolbar equally is counterproductive," and he asked for colour only -- no new icon,
+   no size change, no layout change. So padding, gap and font are UNCHANGED from the flat-text
+   rule above; only background, border and text colour move.
 
-   White-on-#0645ad measures 8.5:1 (WCAG AA needs 4.5:1 for text), so the three states below only
-   need to stay clearly distinct from each other, not fight for contrast:
-     default   #0645ad  the accent blue as everywhere else on the page
-     hover     #1f58b5  lighter -- "the pointer is here"
-     open      #05378a  darker  -- aria-expanded="true", set by openMenu()/closeMenu() already,
-                         so no new JS wiring; the pressed/open item reads as pushed IN, not lit up
+   **OUTLINED, NOT SOLID** (Tom, 2026-09-25, choosing between two previews: "I love the outlined
+   version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the
+   toolbar black."). White fill, blue text and border -- the toolbar above stays black and gets no
+   button paint of its own. `color: #0645ad` also repaints the icon, which draws with
+   `stroke: currentColor` (see .ec-icon above) -- so the icon-only phone row (640px breakpoint,
+   below) stays legible without a rule of its own. The three states only need to stay clearly
+   distinct from each other, not fight for contrast against the white bar:
+     default   #0645ad text/border on #fff  the accent blue as everywhere else on the page
+     hover     #eaf1fc fill, #1f58b5 border/text -- "the pointer is here"
+     open      #d7e6fb fill, #05378a border/text -- aria-expanded="true", set by
+                         openMenu()/closeMenu() already, so no new JS wiring; the pressed/open
+                         item reads as pushed IN, not lit up
    `border-radius` makes the rounded-rectangle Tom leaned toward; the border is the same colour as
-   the fill in the default and hover states (so the rule reads as one filled shape, not a filled
-   box with a ring) and lightens with the fill on hover so the two states move together. */
+   the text in every state (so the rule reads as one outlined shape, not a box with a stray ring),
+   and both move together on hover and open. */
 .lpn-menubar-item {
-	background: #0645ad; color: #fff; border: 1px solid #0645ad; border-radius: 5px;
+	background: #fff; color: #0645ad; border: 1px solid #0645ad; border-radius: 5px;
 	font: inherit; padding: 3px 10px; cursor: pointer;
 }
-.lpn-menubar-item:hover { background: #1f58b5; border-color: #1f58b5; }
-.lpn-menubar-item[aria-expanded="true"] { background: #05378a; border-color: #05378a; }
+.lpn-menubar-item:hover { background: #eaf1fc; border-color: #1f58b5; color: #1f58b5; }
+.lpn-menubar-item[aria-expanded="true"] { background: #d7e6fb; border-color: #05378a; color: #05378a; }
 .lpn-menubar-item:focus-visible { outline: 2px solid #0645ad; outline-offset: 2px; }
-/* **THE OUTLINED VARIANT, for Tom to compare against the solid default above -- PREVIEW ONLY.**
-   One class on the bar swaps every item's paint; nothing else in this file or in buildMenuBar()
-   changes. `?menustyle=outline` (this branch's URL query, read once in js/looped-network.js and
-   never written to storage -- see the note where it is read) is the only way to reach it, so it
-   costs the shipped page nothing if this branch does not go further. */
-#lpn_menubar.lpn-menubar-outline .lpn-menubar-item {
-	background: #fff; color: #0645ad; border-color: #0645ad;
-}
-#lpn_menubar.lpn-menubar-outline .lpn-menubar-item:hover { background: #eaf1fc; border-color: #1f58b5; color: #1f58b5; }
-#lpn_menubar.lpn-menubar-outline .lpn-menubar-item[aria-expanded="true"] { background: #d7e6fb; border-color: #05378a; color: #05378a; }
 /* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
    pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
    it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
