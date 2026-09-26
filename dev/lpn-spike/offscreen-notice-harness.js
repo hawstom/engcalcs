@@ -148,6 +148,8 @@ console.log('--- 4. one corner node barely inside the window: still no overlay -
 	ok(!shown(), 'NO OVERLAY -- one node in view is enough, whatever the coverage fraction');
 }
 
+const loneNode = JSON.parse(JSON.stringify(doc.nodes[0]));
+
 // ---- 5. AN EMPTY PROJECT NEVER SHOWS IT, DRAGGED OR NOT ------------------------------------------
 console.log('--- 5. an empty project: never shown ---');
 {
@@ -164,6 +166,29 @@ console.log('--- 5. an empty project: never shown ---');
 	ok(!shown(), 'no overlay for a bare canvas -- Task 314\'s shop window owns that state, not this one');
 	press(600, 350); move(700, 400); move(60000, 60000); lift(60000, 60000);
 	ok(!shown(), 'and panning an empty canvas around does not conjure one either');
+}
+
+// ---- 5b. ONE JUNCTION AND NO PIPES (Tom, 2026-09-25) ---------------------------------------------
+// Escape the gallery, add one junction, Zoom to fit: "Your network is intact" appeared and would
+// not go away, because a zero-extent model always failed the too-small-to-see test.
+console.log('--- 5b. one junction, no pipes: Zoom to fit shows it and no overlay ---');
+{
+	doc.nodes.push(loneNode);
+	L.buildDom();
+	L.zoomExtent();
+	await settle();
+	L.updateOffscreenNotice();
+	ok(L.modelExtent() !== null && L.modelExtent().w === 0, 'the model is one point', JSON.stringify(L.modelExtent()));
+	ok(L.viewShowsModel(L.currentView()), 'the fit view shows the lone junction');
+	ok(!shown(), 'NO OVERLAY after Zoom to fit on a one-junction network');
+	const v = L.currentView();
+	L.applyView({ cx: v.cx + 100000, cy: v.cy + 100000, s: v.s });
+	L.updateOffscreenNotice();
+	ok(shown(), 'panned far away, the overlay does appear for it');
+	L.zoomExtent();
+	await settle();
+	L.updateOffscreenNotice();
+	ok(!shown(), 'and Zoom to fit clears it again');
 }
 
 // ---- 6. IT WEARS AN EXISTING STYLE, NOT ONE OF ITS OWN (R-227) ----------------------------------
