@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 270 untranslated keys, of 2108 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 272 untranslated keys, of 2103 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (270, 5 to read @@ NEEDS RULING)
+## lpn_  (272, 8 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -208,8 +208,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Convert as…
   _Ruled OK 2026-09-25._
 - **`lpn_file_convert_as_tip`**
-  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.
-  _Ruled OK 2026-09-25._
+  > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.
+  @@ NEEDS RULING
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
@@ -255,6 +255,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_full_title`**
   > Full report
   _Ruled OK 2026-09-26._
+- **`lpn_geomap`**
+  > georeferenced
+  @@ NEEDS RULING
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
@@ -825,6 +828,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_units_usft`**
   > US survey ft
   _Ruled OK 2026-09-25._
+- **`lpn_xymap`**
+  > local
+  @@ NEEDS RULING
 - **`lpn_zoom_in`**
   > Zoom in
   _Ruled OK 2026-09-25._
@@ -867,4 +873,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### fix/table-help (`830eb63a`) — adds no English strings
+### fix/table-help (`84bfdc5f`) — adds no English strings

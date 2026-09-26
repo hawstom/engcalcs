@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2101,
-        "delta_key_count": 270,
+        "expected_key_count": 2103,
+        "delta_key_count": 272,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -651,8 +651,10 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
-        "lpn_notes_6_term": "Table keyboard shortcuts",
-        "lpn_notes_6_def": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys<\/strong> Move the selection.<\/li><li><strong>Tab, Enter<\/strong> Move the selection after you type.<\/li><li><strong>Shift+Tab, Shift+Enter<\/strong> Move it backward.<\/li><li><strong>Shift+arrow keys<\/strong> Extend the selection.<\/li><li><strong>Ctrl+C<\/strong> Copy the selection.<\/li><li><strong>Ctrl+D<\/strong> Fill the selection down from its top row.<\/li><li><strong>Ctrl+A<\/strong> Select the whole table.<\/li><li><strong>Delete<\/strong> Clear a cell.<\/li><li><strong>F2<\/strong> Open a cell to edit it.<\/li><li><strong>Esc<\/strong> Cancel an edit.<\/li><li><strong>Click a column heading<\/strong> Select that column.<\/li><li><strong>Ctrl+click, Shift+click a heading<\/strong> Add a column to the selection, or extend it.<\/li><li><strong>Drag a column heading<\/strong> Move that column, or the whole selection if it is part of one.<\/li><li><strong>Right-click a heading, or long-press it<\/strong> Hide the selected columns.<\/li><li><strong>Hover a heading's top corner, or Tab into it<\/strong> Shows its ⋮ menu and its sort arrow.<\/li><li><strong>The ⋮<\/strong> Hide, show all, or manage columns.<\/li><li><strong>The arrow<\/strong> Sort by that column. Click again to reverse it.<\/li><\/ul>",
+        "lpn_notes_6_term": "Table columns help",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_term": "Table keyboard shortcuts",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -923,8 +925,10 @@
         "lpn_msglog_empty": "No messages yet.",
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
-        "lpn_notes_6_term": "Table keyboard shortcuts",
-        "lpn_notes_6_def": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys<\/strong> Move the selection.<\/li><li><strong>Tab, Enter<\/strong> Move the selection after you type.<\/li><li><strong>Shift+Tab, Shift+Enter<\/strong> Move it backward.<\/li><li><strong>Shift+arrow keys<\/strong> Extend the selection.<\/li><li><strong>Ctrl+C<\/strong> Copy the selection.<\/li><li><strong>Ctrl+D<\/strong> Fill the selection down from its top row.<\/li><li><strong>Ctrl+A<\/strong> Select the whole table.<\/li><li><strong>Delete<\/strong> Clear a cell.<\/li><li><strong>F2<\/strong> Open a cell to edit it.<\/li><li><strong>Esc<\/strong> Cancel an edit.<\/li><li><strong>Click a column heading<\/strong> Select that column.<\/li><li><strong>Ctrl+click, Shift+click a heading<\/strong> Add a column to the selection, or extend it.<\/li><li><strong>Drag a column heading<\/strong> Move that column, or the whole selection if it is part of one.<\/li><li><strong>Right-click a heading, or long-press it<\/strong> Hide the selected columns.<\/li><li><strong>Hover a heading's top corner, or Tab into it<\/strong> Shows its ⋮ menu and its sort arrow.<\/li><li><strong>The ⋮<\/strong> Hide, show all, or manage columns.<\/li><li><strong>The arrow<\/strong> Sort by that column. Click again to reverse it.<\/li><\/ul>",
+        "lpn_notes_6_term": "Table columns help",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_term": "Table keyboard shortcuts",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -3177,6 +3181,38 @@
             }
         },
         "lpn_notes_6_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Проєкт може розташовуватися на реальній землі з картою вулиць позаду. Файли EPANET .inp можна зчитувати й записувати. Нижня панель малює профіль уздовж маршруту й перелічує вузли. Елементи можна фарбувати за їхніми результатами, а «Знайти й замінити» вибирає кожен елемент, що відповідає заданій вами умові.",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "Межі кольорових діапазонів лишаються незмінними",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_7_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Проєкт може розташовуватися на реальній землі з картою вулиць позаду. Файли EPANET .inp можна зчитувати й записувати. Нижня панель малює профіль уздовж маршруту й перелічує вузли. Елементи можна фарбувати за їхніми результатами, а «Знайти й замінити» вибирає кожен елемент, що відповідає заданій вами умові.",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_color_term",
+                    "value": "Межі кольорових діапазонів лишаються незмінними",
+                    "english": "Color band boundaries stay the same"
+                }
+            }
+        },
+        "lpn_notes_7_def": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
