@@ -167,48 +167,6 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 
-- 100|682| **Zoom on a PC with no wheel, and from the keyboard.**
-  Tom, 2026-09-17: *"How would a person zoom on a PC without a mouse wheel or, for that matter,
-  with a keyboard (if that's not too much to ask). Interesting question, nonetheless."*
-  - **THIS IS TASK 674's DEFECT IN ANOTHER CONSTRUCT and that is why it is at 75 rather than 25.**
-    674 exists because a coordinate could be entered by gesture and by nothing else. Zoom may be
-    the same shape: a trackpad, a trackball, a presentation remote and a keyboard-only user all
-    arrive at a drawing surface whose only documented zoom is a wheel. **Establish first whether
-    that is true** -- read `js/looped-network.js` rather than assuming, and say where you did not
-    look.
-  - **IT IS TRUE, AND IT WAS MEASURED RATHER THAN ASSUMED (Ida, 2026-09-17).** The zoom function has
-    exactly TWO callers in the whole of `js/looped-network.js`: the wheel (`:26699`) and the
-    two-finger pinch (`:27387`). The only non-gesture control is **Zoom to fit** (`:25343`), which is
-    a reset, not an increment -- press it twice and the second press does nothing. The page's only
-    keydown bindings outside a text field are Ctrl+Z and the 1-9 tool picker. **So a keyboard-only
-    visitor, or anyone with a wheel-less mouse, can reach "fit" and nothing else.**
-  - **EPANET ITSELF ANSWERS THIS WITH TWO ORDINARY BUTTONS, Zoom In and Zoom Out**, and documents no
-    wheel and no keyboard shortcut. That is the model: not a new idiom, the one our own reference
-    application already uses. Full citations in `dev/agents/interface-designer/journal.md`.
-  - **TOM'S OWN DESIGN FOR THE TOOLBAR HALF, 2026-09-17, and it is cheaper than either option he
-    was offered:** *"Make the Zoom to Fit toolbar button do double duty like the select area button.
-    Give it a little triangle indicator. The second time you click it, it changes to Zoom Window.
-    And/or we put + and - on the map in a way that Ida tells us to do it."* **So the toolbar does not
-    grow a button** -- an existing one gains a mode, through a disclosure idiom this page already
-    has. That is the answer to his own standing worry about four lines of chrome.
-  - **AND IDA ANSWERED THE HALF HE GAVE HER: + AND - STACKED VERTICALLY, TOP-RIGHT.** She read all
-    four map corners before placing it, and corrected an assumption that one was empty -- top-left is
-    a growing stack of status messages, bottom-left holds seven things already, and bottom-right
-    carries the tile attribution, which is a legal requirement and cannot be crowded. **Top-right is
-    the only calm corner**, and it is also where Mapbox puts its own zoom buttons. Styled like the
-    scale bar and the legend, so no new visual language; **hidden entirely at the 640px breakpoint**,
-    because fingers pinch.
-    - **IT IS NOT A FIFTH LINE OF CHROME, and she argued that rather than asserting it**: the four
-      bars Tom named are things a reader must get past before doing anything, while this is a small
-      tool found by somebody already looking at the map -- the same family as the scale bar, which
-      nobody has complained about.
-    - **THE TWO HALVES COMPLETE EACH OTHER RATHER THAN COMPETING.** Zoom to Fit resets; Zoom Window
-      drags a box to zoom IN. **Neither gives a one-click zoom OUT**, and the + / - pair is the only
-      thing that does.
-    - **THE KEYS ARE PLAIN `+` AND `-`, NEVER Ctrl.** Every browser has claimed Ctrl+plus for its own
-      page zoom and taking it would surprise people. The "not while somebody is typing" guard the
-      other shortcuts already use is there to reuse.
-
 - 50|683| **The wheel zoom increment, snapping having been ruled out.**
   Tom, 2026-09-17: *"There are a limited number of zoom levels. Even on a phone, zoom level
   snapping could be enforced, though that might be anti-idiomatic."* And: *"An argument could be
@@ -421,14 +379,6 @@ the block.
       DISPLAY of what the coordinate system already says, never an input that rewrites anything.
     - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
       Save-as side.
-- 100|715| **Full Report: every element at every time step, as one exportable document.**
-  Tom, 2026-09-25: *"Make the reports roadmap tasks before EPANET++."* EPANET's Report > Full, the
-  gap Mary ranked first (`dev/agents/market-researcher/epanet-gap-audit.md` §3.1). The per-step
-  results already exist in `js/lpn-time.js`; the work is layout and export. Before Task 697.
-- 100|716| **Status Report: what switched, when, in time order.**
-  EPANET's Report > Status: pump starts and stops, valve status changes, tanks filling or emptying,
-  warnings, per time step. Mary's second-ranked gap (same audit, §3.2). Read with the Net3 Pump 10
-  status defect (R-231), which is the same event stream. Before Task 697.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
