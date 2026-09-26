@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-248.
+**An ID is permanent and never reused.** Next free: R-275.
 
 ---
 
@@ -63,7 +63,6 @@ judgement and does not belong to a script.
 - [ ] R-135 feat/label-gang-search | I am incredulous. You made huge progress. Long strings now barely perturb the endless stacked gang of leaders. Before moving on, I want to pick at this.
 - [ ] R-136 feat/label-gang-search | While the results are very good, I still want to push on why additional string length makes any difference at all. The fact that it does leads me to suspect or at least ask for a good insight into our model since, again, there is free space all the way to Japan and beyond. I notice that with 1 character added, there is no significant additional vertical spacing in the gang. But when I add a second character, a noticeable amount of additional gaps appear in the vertical stack. As I add more characters, results oscillate, but the general trend is that the gang's leader trend longer and longer, meaning that the top label of this descending gang is eventually gratuitously 20 text heights away from its node. While I am tempted to rationalize that this is an artifact of keeping the leaders near parallel, that's wrong because with no characters or 1 character, the top label is only gratuitously about 8 text heights below (south of) its node. That said, to say this is partly to quibble since our placements are quite good now, and we really should be focusing on efficiency and performance.
 - [ ] R-137 feat/label-gang-search | Moving to a different test case than that notorious southwest area, let's look at the northwest area with three properties turned on and we are zoomed in closer. [his screenshot: labels for nodes 120 and 25x at A, well away from their nodes; empty ground at B, nearer them] A human would have slid the two labels at A toward B, shortening the leaders without any bad effects. Could our algorithm be smart enough not to be gratuitously distant like this?
-- [x] R-144 feat/notice-log | I like the down arrow glyph. -- the clock drawing reads to him as a down arrow / Expand glyph, and he likes it: KEEP IT, do not redraw the hands
 
 ### feat/label-gang-search
 
@@ -94,11 +93,6 @@ judgement and does not belong to a script.
 
 - [ ] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build
 
-### feat/property-venue (8106)
-
-- [ ] R-197 feat/property-venue | "Table to filter is confusing. (1) Is this offering two options or just one? In other words, is the button offering "Filter in selected table" or "Filter in active table"? (2) I think this would work better on the same line as the Find button like this: [Find][Filter in Table][tables_selector], and change/switch/push tables_selector when What to Search is changed/switched." -- feat/property-venue 1066860e: one row [Find][Filter in Table] Table [selector]; "Table to filter" shortened to "Table", which is OUR word and needs yours
-  - [TGH 2026-09-24: We lost the selector now.]
-
 ### feat/label-gang-search (8090)
 
 - [ ] R-200 feat/label-gang-search | "I edited the file. Still a lot is open."
@@ -109,14 +103,7 @@ judgement and does not belong to a script.
 
 - [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one
   - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
-- [x] R-203 -- | "Our hint above the toolbar didn't help him. He suggested maybe a colored light bulb glyph. But I think that is a feeble attempt to rescue an attempt that isn't working." -- Ida agrees: retire the hint, no light bulb; she would delete it when R-202's button style ships. Delete it now instead? -- deleted on master 61fa16f4 (fix/menu-cue)
-  - [TGH 2026-09-25: "Delete the toolbar hint. It failed."]
 - [ ] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached
-
-### Requests
-
-- [x] R-210 -- | EPANET++: "Ask Mary to do a deep pass through EPANET Help etc to find out if we are missing anything that EPANET has, other than graphs that are already on our roadmap. Before we release as EPANET++, I want to be sure we are not behind EPANET." -- dev/agents/market-researcher/epanet-gap-audit.md: 27 HAVE, 1 PARTIAL, 8 MISSING; top gaps Full Report and Status Report, not yet roadmap tasks -- your call
-  - [TGH 2026-09-24: Add. And list for me all the features we are missing.]
 
 ### feat/convert-as (8104)
 
@@ -128,12 +115,6 @@ judgement and does not belong to a script.
 ### Real-world use (IOD, senior civil engineer; `dev/real-world-reviews.md`)
 
 - [x] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25 -- Mary: dev/agents/market-researcher/watercad-migration.md; Sue: her journal. Both: no WaterCAD-expert seat; one WaterCAD-exported .inp from IOD is the next step
-
-### Fire flow and Net3 Pump 10
-
-- [x] R-231 -- | "Pump 10 is initially closed, making the pressure at node 10 -0.64 psi. But the pump opens at time step 1 ... I see that head and pressure jump at time 1. But the link still shows as closed, and Properties and Tables shows it as closed." -- fix/fireflow-eps -- merged, master f9ebf891
-- [x] R-232 -- | "Fire flow analysis says that it works on the current time step, and its results **do** vary. But the static pressure for Junction 10 never matches the map pressure, and it's always significantly lower ... it seems clear to me that the static pressure for all hydrants should match the map." (Elm Street Center matched.) -- fix/fireflow-eps -- merged, master f9ebf891
-- [x] R-233 -- | "I think that area selection and multi-selection succeeded fire flow analysis and fire flow analysis does not know how to handle multiple selected hydrants. Check and fix that." -- fix/fireflow-eps -- merged, master f9ebf891
 
 ### Workflow
 
@@ -170,8 +151,68 @@ judgement and does not belong to a script.
 - [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass
 - [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass
 
+## Round of 2026-09-25, second pass -- his pass over the preview ports
+
+### Workflow
+
+- [x] R-248 -- | "You told me 'After you pull, run: ... git worktree remove ../../worktrees/...' That is partly misinformed since there is no such path at the production server, and there are no worktrees there. This bad advice has happened before. What can I do to prevent it? Am I giving you too much? As for the worktrees, of course you can clean them up on local dev." -- worktrees removed on local dev 2026-09-25; the handoff now says local housekeeping is never handed to him
+
+### feat/first-project (8112)
+
+- [ ] R-249 feat/first-project | "On the gallery welcome, end it 'Or start here'. With that, we can close, merge, and delete the branch. Nice work." -- feat/first-project 8aa04872
+- [ ] R-250 -- | Decision: "Street map on at first load: Yes." -- landing pages and CLAUDE.md reworded to match
+
+### feat/convert-as (8104)
+
+- [ ] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!"
+- [ ] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space."
+- [ ] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?"
+
+### feat/table-editing (8105)
+
+- [ ] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice."
+- [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go."
+- [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu."
+- [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)."
+- [ ] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful."
+- [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf"
+
+### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
+
+- [ ] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap."
+- [ ] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work."
+- [ ] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?"
+
+### feat/zoom-control (8103)
+
+- [ ] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side]
+- [ ] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant."
+- [ ] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'."
+- [x] R-266 feat/zoom-control | "The zoom window can be very nice for some users. ... 'Don't zoom again after results' seems to work fine." -- nothing to build
+
+### feat/customer-node (8113)
+
+- [ ] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?"
+- [ ] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)"
+- [ ] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers."
+- [ ] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'."
+
+### feat/menu-button (8114)
+
+- [ ] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'."
+
+### Fire flow
+
+- [x] R-272 -- | "Remember that I am testing locally almost always. I am not pulling to test. ... We can close, merge, and delete the branch." -- fix/fireflow-eps was already merged (f9ebf891); branch and worktree deleted 2026-09-25
+
+### WaterCAD and EPANET, his notes
+
+- [ ] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool."
+- [ ] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!"
+
 ### Rulings recorded, nothing to build
 
 - File menu: "Convert as..." stays where it is ("The problem with putting it near open is that implies we are going to go get a file").
 - EPANET audit: "Make the reports roadmap tasks before EPANET++. I'd like to know the full list of what we are missing."
 - feat/label-limit, feat/offscreen-notice, feat/usage-report, feat/select-on-focus: "Close, merge, and delete branch."
+- Strings: "The selected junctions"; "{n} selected elements are not junctions, so they were not tested." -- "OK."

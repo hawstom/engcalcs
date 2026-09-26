@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read on master**, of 211 untranslated keys, of 2051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 211 untranslated keys, of 2051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (211, 20 to read @@ NEEDS RULING)
+## lpn_  (211, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -44,49 +44,49 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-25._
 - **`lpn_convas_from`**
   > Current: {crs}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_label_col`**
   > Suffix
   _Ruled OK 2026-09-25._
 - **`lpn_convas_label_tip`**
   > Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.
-  @@ NEEDS RULING
+  _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
 - **`lpn_convas_no_transform`**
   > This page has no coordinate transform for {crs}, so it cannot convert to or from it. Nothing was converted. Choose a different coordinate system, or leave this project as it is.
   @@ NEEDS RULING
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_ok`**
   > Convert
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_oneway`**
   > Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_round`**
   > Round converted values
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_round_flow`**
   > Demand and flow
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_round_none`**
   > No rounding
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_round_tip`**
   > Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_title`**
   > Convert as
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_units_tip`**
   > The units the copy is converted to. The original keeps its own numbers and units.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_unnamed`**
   > Unnamed (local) georeference
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_convas_unnamed_tip`**
   > Local coordinates in the length unit, with the world map attached.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
@@ -104,7 +104,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled 2026-09-23: Please explain to me what this is in response to. What's the case for this label?_
 - **`lpn_crsbox_title`**
   > Coordinate system
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
   _Ruled OK 2026-09-23._
@@ -134,7 +134,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_ff_skipped`**
   > {n} selected elements are not junctions, so they were not tested.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -226,8 +226,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
-  > Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
-  @@ NEEDS RULING
+  > Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
+  _Ruled OK 2026-09-26._
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -458,13 +458,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_settings_label_always`**
   > Always show
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_max_width`**
   > Show labels when zoomed to this map width or less
   _Ruled OK 2026-09-23._
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
-  @@ NEEDS RULING
+  > Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.
+  _Ruled OK 2026-09-26._
 - **`lpn_settings_label_use_view`**
   > Use current view
   _Ruled OK 2026-09-23._
@@ -665,7 +665,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**15 still to read**, of 32 new keys across 7 unmerged branch(es).
+**27 still to read**, of 58 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -676,16 +676,18 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/convert-as (`019ffcd0`) — adds no English strings
+### chore/roadmap-0925c (`905667fe`) — adds no English strings
 
-### feat/customer-node (`6dd9fb71`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/convert-as (`b2c2a802`) — adds no English strings
+
+### feat/customer-node (`da75608c`) — 2 new, all ruled
 
 - **`lpn_field_meter_node`**
   > Connected to
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_field_meter_node_tip`**
   > The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -699,21 +701,102 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/menu-button (`a82d32f5`) — adds no English strings
+### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/property-venue (`b8733c5d`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/property-venue (`f76a98e1`) — 3 new, all ruled
 
 - **`lpn_find_filter_none`**
-  > No table has a property this query names.
-  @@ NEEDS RULING
+  > This query doesn't apply to any table.
+  _Ruled 2026-09-26: Edited. Is this even possible?_
 - **`lpn_find_filter_row`**
   > {table}: {n} of {all}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_find_filter_summary`**
   > Filtered by {q}. {rows}.
+  _Ruled OK 2026-09-26._
+
+### feat/report (`7bca1397`) — 26 new, 26 to read @@ NEEDS RULING
+
+- **`lpn_full_col_id`**
+  > ID
+  @@ NEEDS RULING
+- **`lpn_full_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_full_col_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_full_download_csv`**
+  > Download CSV
+  @@ NEEDS RULING
+- **`lpn_full_needs_run`**
+  > The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.
+  @@ NEEDS RULING
+- **`lpn_full_note`**
+  > One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have.
+  @@ NEEDS RULING
+- **`lpn_full_print`**
+  > Print report
+  @@ NEEDS RULING
+- **`lpn_full_row_count`**
+  > {n} rows.
+  @@ NEEDS RULING
+- **`lpn_full_title`**
+  > Full report
+  @@ NEEDS RULING
+- **`lpn_reports_full`**
+  > Full report
+  @@ NEEDS RULING
+- **`lpn_reports_full_tip`**
+  > Every node and every link at every reporting time step of the last run, as one table you can download or print.
+  @@ NEEDS RULING
+- **`lpn_reports_status`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_reports_status_tip`**
+  > What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.
+  @@ NEEDS RULING
+- **`lpn_status_closed`**
+  > {type} {id} closed
+  @@ NEEDS RULING
+- **`lpn_status_col_event`**
+  > Event
+  @@ NEEDS RULING
+- **`lpn_status_col_time`**
+  > Time
+  @@ NEEDS RULING
+- **`lpn_status_dry`**
+  > {type} {id} is empty
+  @@ NEEDS RULING
+- **`lpn_status_empty`**
+  > Nothing changed status during this run.
+  @@ NEEDS RULING
+- **`lpn_status_emptying`**
+  > {type} {id} is emptying
+  @@ NEEDS RULING
+- **`lpn_status_filling`**
+  > {type} {id} is filling
+  @@ NEEDS RULING
+- **`lpn_status_full`**
+  > {type} {id} is full
+  @@ NEEDS RULING
+- **`lpn_status_needs_run`**
+  > The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.
+  @@ NEEDS RULING
+- **`lpn_status_no_converge`**
+  > The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.
+  @@ NEEDS RULING
+- **`lpn_status_note`**
+  > Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.
+  @@ NEEDS RULING
+- **`lpn_status_opened`**
+  > {type} {id} opened
+  @@ NEEDS RULING
+- **`lpn_status_title`**
+  > Status report
   @@ NEEDS RULING
 
-### feat/table-editing (`b7398d0b`) — 17 new, 10 to read @@ NEEDS RULING
+### feat/table-editing (`b7398d0b`) — 17 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_notes_6_def`**
   > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>
@@ -723,7 +806,7 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-25._
 - **`lpn_pane_colmenu_tip`**
   > Sort, hide, or manage columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
   _Ruled OK 2026-09-25._
@@ -741,31 +824,31 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-25._
 - **`lpn_pane_manage_cols`**
   > Manage columns…
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_down`**
   > Move down
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_show`**
   > Show
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_title`**
   > Manage columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_manage_cols_up`**
   > Move up
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_show_all_cols`**
   > Show all columns
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_show_col`**
   > Show {col}
   _Ruled OK 2026-09-25._
 - **`lpn_pane_sort_asc`**
   > Sort ascending
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_sort_desc`**
   > Sort descending
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-26._
 
 ### feat/zoom-control (`3200afa9`) — 7 new, all ruled
 

@@ -146,6 +146,81 @@
             "ruled": "2026-09-25",
             "answer": "Edited."
         },
+        "lpn_convas_from": {
+            "on": "Current: {crs}",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_label_col": {
+            "on": "Suffix",
+            "ruled": "2026-09-25",
+            "answer": "OK"
+        },
+        "lpn_convas_label_tip": {
+            "on": "Text added after this value on the copy's map labels, such as ' mm' or ' gpm'. Pre-filled from the unit chosen above; clear it for no suffix.",
+            "ruled": "2026-09-26",
+            "answer": "OK. Did we prefill with a space? I believe that SI uses no space and US uses a space."
+        },
+        "lpn_convas_no_transform": {
+            "on": "This page has no transform for that coordinate system, so it cannot convert to or from it. Nothing was converted.",
+            "ruled": "2026-09-26",
+            "answer": "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is \"that coordinate system\"?"
+        },
+        "lpn_convas_none_tip": {
+            "on": "Local coordinates in the length unit, with no world map for now.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_ok": {
+            "on": "Convert",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_oneway": {
+            "on": "Converting back is a second conversion, not an undo. A number converted and converted back may not return exactly as it was typed.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_round": {
+            "on": "Round converted values",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_round_flow": {
+            "on": "Demand and flow",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_round_none": {
+            "on": "No rounding",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_round_tip": {
+            "on": "Rounds only the numbers this conversion rewrites, to the nearest step you choose. Values whose unit does not change are left as they are.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_title": {
+            "on": "Convert as",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_units_tip": {
+            "on": "The units the copy is converted to. The original keeps its own numbers and units.",
+            "ruled": "2026-09-26",
+            "answer": "Edited."
+        },
+        "lpn_convas_unnamed": {
+            "on": "Unnamed (local) georeference",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_convas_unnamed_tip": {
+            "on": "Local coordinates in the length unit, with the world map attached.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_coord_off_world": {
             "on": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
             "ruled": "2026-09-17",
@@ -510,6 +585,11 @@
             "on": "Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_crsbox_title": {
+            "on": "Coordinate system",
+            "ruled": "2026-09-26",
+            "answer": "OK."
         },
         "lpn_curve_kind_effic": {
             "on": "Pump efficiency",
@@ -1061,6 +1141,11 @@
             "on": "Choose the set before you run. Testing every junction in a large system can take minutes.",
             "ruled": "2026-09-01"
         },
+        "lpn_ff_skipped": {
+            "on": "{n} selected elements are not junctions, so they were not tested.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_ff_stale": {
             "on": "The drawing changed, so the fire flow results were cleared. Run it again.",
             "ruled": "2026-09-01"
@@ -1210,6 +1295,16 @@
             "ruled": "2026-09-23",
             "answer": "Edited"
         },
+        "lpn_field_meter_node": {
+            "on": "Connected to",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_field_meter_node_tip": {
+            "on": "The junction this customer is connected to. Drag the connection point onto a pipe to serve it from a station along that pipe instead.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_field_meter_offset": {
             "on": "Offset from the pipe",
             "ruled": "2026-09-23",
@@ -1356,6 +1451,21 @@
             "on": "Filter in current table",
             "ruled": "2026-09-07",
             "answer": "Edited."
+        },
+        "lpn_find_filter_none": {
+            "on": "This query doesn't apply to any table.",
+            "ruled": "2026-09-26",
+            "answer": "Edited. Is this even possible?"
+        },
+        "lpn_find_filter_row": {
+            "on": "{table}: {n} of {all}",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_find_filter_summary": {
+            "on": "Filtered by {q}. {rows}.",
+            "ruled": "2026-09-26",
+            "answer": "OK."
         },
         "lpn_find_filter_table": {
             "on": "Table to filter",
@@ -1734,9 +1844,9 @@
             "answer": "OK."
         },
         "lpn_labels_customer_width_tip": {
-            "on": "How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
+            "ruled": "2026-09-26",
+            "answer": "Edited."
         },
         "lpn_labels_restore": {
             "on": "Restore label defaults",
@@ -2435,8 +2545,8 @@
             "answer": "Edited."
         },
         "lpn_notes_6_def": {
-            "on": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li></ul>",
-            "ruled": "2026-09-25",
+            "on": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Sort by that column. Click again to reverse it.</li><li><strong>Drag across column headings</strong> Select those whole columns.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a selected heading</strong> Move that column.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋯ at the edge of a heading</strong> Open the same menu: sort, hide, show all, or manage columns.</li></ul>",
+            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_notes_6_term": {
@@ -2447,6 +2557,11 @@
         "lpn_offscreen_intact": {
             "on": "Your network is intact.",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_pane_colmenu_tip": {
+            "on": "Sort, hide, or manage columns",
+            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_pane_fill_none": {
@@ -2494,6 +2609,31 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_pane_manage_cols": {
+            "on": "Manage columns…",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_down": {
+            "on": "Move down",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_show": {
+            "on": "Show",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_title": {
+            "on": "Manage columns",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_up": {
+            "on": "Move up",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_pane_not_used": {
             "on": "Not used",
             "ruled": "2026-09-23",
@@ -2509,9 +2649,24 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_pane_show_all_cols": {
+            "on": "Show all columns",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
         "lpn_pane_show_col": {
             "on": "Show {col}",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_pane_sort_asc": {
+            "on": "Sort ascending",
+            "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_sort_desc": {
+            "on": "Sort descending",
+            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_pane_tab_customers": {
@@ -2974,8 +3129,8 @@
             "ruled": "2026-09-02"
         },
         "lpn_settings_label_always": {
-            "on": "Always show labels",
-            "ruled": "2026-09-23",
+            "on": "Always show",
+            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_settings_label_auto": {
@@ -2989,9 +3144,9 @@
             "answer": "OK."
         },
         "lpn_settings_label_max_width_tip": {
-            "on": "Labels are drawn only while the map is this wide or narrower. Leave the box blank to draw them at every zoom.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a label, at any zoom.",
+            "ruled": "2026-09-26",
+            "answer": "Edited."
         },
         "lpn_settings_label_use_view": {
             "on": "Use current view",
@@ -3759,6 +3914,11 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_zoom_out_tip": {
+            "on": "Zoom out one step. Shortcut: -",
+            "ruled": "2026-09-25",
+            "answer": "His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's."
+        },
         "mhp_annual_kwh": {
             "on": "P as annual energy",
             "ruled": "2026-09-06"
@@ -3770,16 +3930,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_convas_label_col": {
-            "on": "Suffix",
-            "ruled": "2026-09-25",
-            "answer": "OK"
-        },
-        "lpn_zoom_out_tip": {
-            "on": "Zoom out one step. Shortcut: -",
-            "ruled": "2026-09-25",
-            "answer": "His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's."
         }
     }
 }

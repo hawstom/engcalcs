@@ -3882,6 +3882,26 @@ var EngCalcs = EngCalcs || {};
 		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat),
 			s: Math.max(minScale(), Math.min(w, h) / degLat) };
 	}
+	// **PROJECT1's OWN HOME VIEW, KEPT SEPARATE FROM `LPN_GEO_HOME`** (R-208,
+	// dev/tom-review-queue.md: *"we start the Project1 on WGS84 zoomed to our favorite place ...
+	// possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center,
+	// Novato, CA."*). Repointing `LPN_GEO_HOME` itself would move every wizard-made blank
+	// geographic project to Novato too, surprising someone who explicitly chose "start blank,
+	// geographic" -- this constant and function exist only for the ONE tab nobody chose to make.
+	//
+	// Centre and span are the real Nominatim `jsonv2` result for "Downtown Novato Center, Novato,
+	// CA" (2026-09-24: centre from the result's lat/lon, span from its own `boundingbox`, the
+	// larger of the two sides) -- the same search a visitor's own place-name lookup would return,
+	// not a hand-picked point.
+	var LPN_FIRST_VISIT_HOME = { lon: -122.579669, lat: 38.108195 };
+	var LPN_FIRST_VISIT_SPAN = 0.0024; // degrees -- the geocoder's own bounding box, padded a hair
+	function firstVisitHomeView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return null; }
+		return { cx: inwardX(LPN_FIRST_VISIT_HOME.lon), cy: inwardY(LPN_FIRST_VISIT_HOME.lat),
+			s: Math.max(minScale(), Math.min(w, h) / LPN_FIRST_VISIT_SPAN) };
+	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
 	function coordText(v) { return isLatLonProject() ? v.toFixed(6) : v.toFixed(2); }
@@ -5482,6 +5502,9 @@ var EngCalcs = EngCalcs || {};
 		// through here again, so a measurement that recovers is picked up with nothing to reset.
 		if (!viewNumbersUsable()) { noteMapUnmeasurable(true); return; }
 		noteMapUnmeasurable(false);
+		// An empty geographic document re-origins under the camera first; the rebase ends in its
+		// own setTransform(), which has then done everything below.
+		if (followViewWhileEmpty()) { return; }
 		// **THE STROKE SIZES RIDE THE TRANSFORM, and that is the whole of the 2026-09-09 repair.**
 		// See publishScaleSizes(): a scale that reaches the world layer without them following it
 		// paints the map as one solid colour and makes every pipe's invisible grab band cover the
@@ -10462,6 +10485,9 @@ var EngCalcs = EngCalcs || {};
 	// (Tasks 669 and 705) and the per-pipe one that hides a label longer than its own pipe -- and
 	// both must be answered for the scale being TESTED, or the fit reserves room for labels that
 	// will not be there.
+	// What a Zoom to fit shows round a drawing that is a single point: 250 m in a geographic
+	// project, a few streets either way; 250 drawing units (feet or metres) in a grid one.
+	var LPN_POINT_FIT_M = 250;
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
@@ -10544,7 +10570,23 @@ var EngCalcs = EngCalcs || {};
 		});
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
 		// returns maxScale() on a blank canvas.
-		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
+		if (!out.length) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); return out; }
+		// **A DRAWING WITH NO EXTENT IS ONE PLACE, AND IT IS FRAMED AT STREET SCALE THERE** (Tom,
+		// 2026-09-25, a single junction on Project1). The pair above used to be added whenever
+		// there were fewer than two items, so one bare junction was fitted together with the points
+		// (0, 0) and (10, 10) -- ten DEGREES in a geographic project, so the fit showed a continent
+		// with the junction somewhere in it -- and a junction plus its own label (two items at one
+		// anchor) fitted at maxScale(). Every anchor at one point means there is no extent to fit,
+		// so the frame is LPN_POINT_FIT_M centred on it.
+		var i0, same = true;
+		for (i0 = 1; i0 < out.length && same; i0++) {
+			same = out[i0].x === out[0].x && out[i0].y === out[0].y;
+		}
+		if (same) {
+			var half = LPN_POINT_FIT_M / 2 * (isLatLonProject() ? DEG_PER_M : 1);
+			fitItem(out, out[0].x - half, out[0].y - half, 0, 0, 0, 0);
+			fitItem(out, out[0].x + half, out[0].y + half, 0, 0, 0, 0);
+		}
 		return out;
 	}
 	// The translation window for one axis at one scale. `need > room` means this scale does not fit;
@@ -10797,6 +10839,11 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
+	// **R-208's OWN DEFERRAL, SEPARATE FROM `pendingView`/`pendingViewFor`.** Set once, in init(),
+	// for the ONE project a first visit is born with; consumed and cleared by `noteMapSized()`,
+	// which is the first moment the canvas has a real height to compute Novato's home view against.
+	// See the note where it is set for why it cannot be an ordinary `pendingView`.
+	var firstVisitPendingId = null;
 	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
@@ -11738,7 +11785,10 @@ var EngCalcs = EngCalcs || {};
 		// kind and, for a projected project, the CRS code. Changing either used to be safe because
 		// nothing survived the repaint; now something does.
 		var proj = projectedBasemapOk();
-		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
+		// ...and the ORIGIN, since a tile is placed in local units: followViewWhileEmpty() can move
+		// it under a tile that is still cached.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '') + '|' + (xg
 			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
 				'|' + xg.metersPerUnit + '|' + xg.rotDeg
 			: '');
@@ -25554,9 +25604,14 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
-	function rebaseLiveGeoDoc() {
+	//
+	// `at`, when given, is a WORLD point (longitude, Mercator y) to put the origin's cell under
+	// instead of the model's own extent -- the one caller is followViewWhileEmpty(), for a document
+	// that has no model to choose from.
+	function rebaseLiveGeoDoc(at) {
 		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
+		if (at && isFinite(at.x) && isFinite(at.y)) { minX = at.x; minY = at.y; }
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
 		// cartesianY()'s call sites for exactly this reason -- a fifth site added later without the
@@ -25568,13 +25623,15 @@ var EngCalcs = EngCalcs || {};
 		// a departure of 1e-13 could only change the answer at an exact cell boundary, and both
 		// answers there are equally valid origins. NO COORDINATE IS MOVED BY THIS ROUND TRIP; the
 		// shift below is a subtraction of the chosen origin and nothing else.
-		eachStoredPoint(doc, function (pt, get) {
-			if (get) { return; }
-			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
-			var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
-			if (X < minX) { minX = X; }
-			if (Y < minY) { minY = Y; }
-		});
+		if (!at) {
+			eachStoredPoint(doc, function (pt, get) {
+				if (get) { return; }
+				if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+				var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
+				if (X < minX) { minX = X; }
+				if (Y < minY) { minY = Y; }
+			});
+		}
 		if (!isFinite(minX) || !isFinite(minY)) { return null; }
 		org = {
 			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
@@ -25606,6 +25663,41 @@ var EngCalcs = EngCalcs || {};
 		tv = tabViews[library.openId];
 		if (tv && isFinite(tv.cx) && isFinite(tv.cy)) { tv.cx += dx; tv.cy += dy; }
 		return { dx: dx, dy: dy };
+	}
+	// **AN EMPTY GEOGRAPHIC DOCUMENT'S ORIGIN FOLLOWS THE CAMERA** (Tom, 2026-09-25, on Project1:
+	// *"There are nodes, but they are not visible, even when I zoom to fit."*). Task 439 derives a
+	// geographic origin from the MODEL, so a document with no model keeps {0, 0} -- and a camera
+	// over Novato at street zoom is then `translate(-5e7, ...)`: past Chrome's layout range, so
+	// every junction drawn there and every tile under it is laid out millions of pixels off the
+	// canvas. Nothing was wrong with the symbols or the zoom limit; the drawn numbers were too big.
+	// Project1 is born exactly there, and a wizard-made blank project or a place-name search on an
+	// empty one reaches the same state by hand.
+	//
+	// So while the document holds no model at all, a view whose centre sits more than
+	// LPN_GEO_FOLLOW_PX from the origin re-origins onto the 1/128-degree cell under that centre,
+	// with the camera compensated inside rebaseLiveGeoDoc() so nothing on screen moves. With no
+	// model there is no user number to shift, and the first junction placed is then born small.
+	// Once a model exists, Task 439's own rule (origin from the model) is left alone.
+	//
+	// The bound: after a follow the centre is within one cell (1/128 degree) of the origin, which is
+	// 434,000 px at maxScale() -- under this, so a follow can never trigger another. Chrome's layout
+	// range is about 3.3e7 px, so this keeps every drawn number more than ten times inside it.
+	// Never mid-gesture: a pan holds `tx0` from before the shift and would jump by the whole origin.
+	var LPN_GEO_FOLLOW_PX = 2e6, followingView = false;
+	function geoDocHasModel() {
+		if (doc.nodes.length) { return true; }
+		var any = false;
+		eachStoredPoint(doc, function (pt, get) { if (!get) { any = true; } });
+		return any;
+	}
+	function followViewWhileEmpty() {
+		if (followingView || drag || georef || !doc || !isLatLonProject() || geoDocHasModel()) { return false; }
+		var v = currentView();
+		if (!v || Math.max(Math.abs(v.cx), Math.abs(v.cy)) * v.s < LPN_GEO_FOLLOW_PX) { return false; }
+		followingView = true;
+		try {
+			return !!rebaseLiveGeoDoc({ x: outwardX(v.cx), y: Geom.mercY(outwardY(v.cy)) });
+		} finally { followingView = false; }
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
@@ -34120,6 +34212,30 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
+			// GRID.** The reported defect was specific: attaching the world map to the default tab
+			// errored, because a schematic project has no coordinate system to place tiles with.
+			// Making Project1 geographic from birth removes the error at its source instead of
+			// routing the visitor around it -- see `firstVisitHomeView()` above for where the
+			// numbers come from and why `LPN_GEO_HOME` itself is untouched.
+			project.coords = LPN_COORDS_GEO;
+			// **AND THE STREET MAP IS ON, BEHIND THE GALLERY, FROM THE FIRST FRAME** (Tom,
+			// 2026-09-25: *"we need to have this visible on first load behind the gallery. I think
+			// we can suppress any disclosure at this time because it is a standard app request
+			// instead of a user request"*). A geographic project defaults its basemap on
+			// (`basemapOn()` is `project.basemap !== 'off'`), and this one is no longer the
+			// exception: a map application drawing its street map is the service the visitor came
+			// for. It fetches OpenStreetMap tiles with no gesture behind it, which is why
+			// privacy.php says the street map is shown on this first, empty project and can be
+			// hidden (Map, World map, Detach), while the other three outside requests still ask.
+			// It stores nothing new: `project.basemap` stays unset, as on every geographic project.
+			// **NOT `pendingView`/`pendingViewFor` HERE** -- `firstVisitHomeView()`, like
+			// `geoHomeView()`, needs the canvas's real height to compute a scale, and at this point
+			// in boot the canvas is still behind the curtain (height 0 until `applyMapHeight()` runs
+			// on `window load` -- see the Task 418 note above "AND IT IS BORN CLEAN"). Computed now,
+			// it would come back null and the camera would never move. `firstVisitPendingId` asks
+			// `noteMapSized()` to compute and apply it once the canvas actually has a size.
+			firstVisitPendingId = firstId;
 			// **AND IT IS BORN CLEAN.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
@@ -36916,7 +37032,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
@@ -37376,6 +37492,15 @@ var EngCalcs = EngCalcs || {};
 			fitWhenSized = false;
 			if (!(validView(v) && applyView(v))) { zoomExtent(wasAuto); }
 		}
+		// **R-208: PROJECT1's HOME VIEW, NOW THAT THE CANVAS CAN ANSWER `clientWidth`/`clientHeight`
+		// HONESTLY.** Guarded on the SAME project still being open and still empty -- a visitor who
+		// switched tabs or started drawing before the canvas ever sized must not have their camera
+		// moved out from under them, which is the same discipline `pendingViewFor` observes for the
+		// ordinary case.
+		if (firstVisitPendingId && firstVisitPendingId === library.openId && !doc.nodes.length) {
+			applyView(firstVisitHomeView());
+		}
+		firstVisitPendingId = null;
 		// **NOTHING THAT HAPPENED BEFORE THE CANVAS HAD A SIZE WAS A USER EDIT** (Task 418), so this
 		// re-baselines once, here, and never again -- the mapSized guard above makes this function
 		// run exactly once per page load, and rebaseSignatureIfClean() still refuses a project that

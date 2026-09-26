@@ -386,8 +386,11 @@ console.log('\n--- one home for the concept ---');
 	// **THE INWARD PAIR GAINS NOTHING**, and that asymmetry is the design rather than an oversight:
 	// a typed offset is converted to drawing units by DIVIDING by that same measured scale, so it
 	// never states a longitude or a latitude of its own for anything to convert.
-	ok('outwardX has one definition and 34 call sites', count(/outwardX\(/g) === 35, count(/outwardX\(/g));
-	ok('outwardY has one definition and 34 call sites', count(/outwardY\(/g) === 35, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR followViewWhileEmpty()** (Tom, 2026-09-25): an empty geographic
+	// document re-origins under the camera, and the camera's centre crosses OUTWARD to name the
+	// world cell the new origin sits in, exactly as rebaseLiveGeoDoc() reads its model's corner.
+	ok('outwardX has one definition and 35 call sites', count(/outwardX\(/g) === 36, count(/outwardX\(/g));
+	ok('outwardY has one definition and 35 call sites', count(/outwardY\(/g) === 36, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -451,8 +454,13 @@ console.log('\n--- one home for the concept ---');
 	// only to draw that overlay; the two sliders that replace it edit the transform and draw
 	// nothing in the drawing frame at all, so the boundary got SMALLER. Worth saying out loud
 	// because every other movement of these numbers in this file has been upward.
-	ok('inwardX has one definition and 30 call sites', count(/inwardX\(/g) === 31, count(/inwardX\(/g));
-	ok('inwardY has one definition and 31 call sites', count(/inwardY\(/g) === 32, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR PROJECT1's OWN HOME VIEW** (R-208). `firstVisitHomeView()` states
+	// Downtown Novato Center in WORLD terms, exactly as `geoHomeView()` already does for
+	// LPN_GEO_HOME -- a longitude and a latitude the code writes have to come through this door
+	// like any other outside number, or a first visit with a local origin would open over the
+	// wrong continent.
+	ok('inwardX has one definition and 31 call sites', count(/inwardX\(/g) === 32, count(/inwardX\(/g));
+	ok('inwardY has one definition and 32 call sites', count(/inwardY\(/g) === 33, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

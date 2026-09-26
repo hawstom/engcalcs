@@ -35,6 +35,9 @@ lines rather than appending corrections.
 - Run `git status` at the start of a session and before acting on each of his messages. His own
   edits arrive uncommitted.
 - Make his wording changes, not yours. Don't ship something he has questioned.
+- **Never hand him local-dev housekeeping** (worktrees, branches, ports, leaked servers). He has no
+  worktrees on production; his commands are `git pull` there and the Apache reload here. If the
+  classifier refuses a local cleanup, say so and ask him to allow it, never phrase it as his step.
 
 ## TRAPS
 
@@ -96,14 +99,6 @@ Report) at 100 ahead of 697; R-230..R-247 queued; `dev/real-world-reviews.md`; M
 merely inherited. The merge commit was first pushed with `--no-verify` on the argument that its tree
 was identical to a verified tree; the classifier then blocked worktree removal as a CI bypass, and
 the suite was run on 61fa16f4 itself afterwards (green, stamped). Do not repeat the `--no-verify`.
-
-### Awaiting cleanup (the classifier refused `git worktree remove` after that push)
-
-Worktrees of merged branches still exist: feat-label-limit (holds a real `dev/browser-pass/node_modules`
-other worktrees symlink to), feat-offscreen-notice, feat-usage-report, feat-select-on-focus,
-chore-queue-0925, fix-menu-cue, merge-0925, bisect. Their branches are merged. Remove with plain
-`git worktree remove` (symlinked node_modules first), then `git branch -d`. Retire panel ports
-8108-8111 in `ports.conf`.
 
 ### In flight
 
