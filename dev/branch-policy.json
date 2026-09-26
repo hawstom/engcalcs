@@ -37,6 +37,8 @@
         "name that comes back meaning something else must not walk through an open door."
     ],
     "protected": [
+        "feat/property-venue",
+        "feat/convert-as",
         "customer",
         "graph",
         "projection",

@@ -355,10 +355,17 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 			preventDefault: function () {} });
 		return menuEl();
 	}
+	// **THE LABEL, NOT THE WHOLE ROW.** Copy and Fill down now carry a keyboard accelerator beside
+	// their own word (Ctrl+C, Ctrl+D -- Tom: "I did not know about Ctrl+D"), in its own child
+	// rather than appended to the label's text, so the borrowed word is still exactly what it was.
+	function labelText(b) {
+		const first = b.children && b.children[0];
+		return (first && first.textContent !== undefined) ? first.textContent : b.textContent;
+	}
 	click(ids[1], 'elev');
 	let menu = openMenuOn(ids[1], 'elev');
 	report(!!menu, 'a right press on a cell opens a menu');
-	const labels = (menu.children || []).map((b) => b.textContent);
+	const labels = (menu.children || []).map((b) => labelText(b));
 	report(labels.length === 4, 'exactly four rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
