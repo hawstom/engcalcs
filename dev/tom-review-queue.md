@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-291. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-300. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -218,19 +218,20 @@ judgement and does not belong to a script.
 
 - [x] R-275 -- | "8103 zoom-control: Merge", "8113 customer-node: Merge. Nice!", "8114 menu-button: Merge.", "8115 reports: Merge. Very nice. And the file name was good." -- merged; production 83bf02d5
 - [x] R-276 -- | "Can you copy the 'Zoom in to see labels' text from the ungeoreferenced Net3 to the lat/lon Net3? Remove the 'Zoom to see labels' text from the Net2 example." -- master 3a4bb054, fccaaa67
-- [ ] R-277 feat/table-editing | "(1) The headings text is still acting like text ... (a) No hover shading, (b) No cursor change. (2) Sorting still feels schizophrenic. Either the dots or the arrow, not both ... Possibly the arrow and the menu can take up zero space and appear with 100% opacity over any heading text on hover. (3) ... remove the sort rows from the column menu. (4) Remove the itemized Show {column} rows ... Leave only Hide this, Show all, and Manage." -- feat/table-editing acdbe7f8, awaiting your pass
-- [ ] R-278 feat/table-editing | "I still see special highlighting on the text." [his screenshot: a box round 'Longitude'] -- 410ddadc: the ring is on the whole cell
-- [ ] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc
-- [ ] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback
+- [x] R-277 feat/table-editing | "(1) The headings text is still acting like text ... (a) No hover shading, (b) No cursor change. (2) Sorting still feels schizophrenic. Either the dots or the arrow, not both ... Possibly the arrow and the menu can take up zero space and appear with 100% opacity over any heading text on hover. (3) ... remove the sort rows from the column menu. (4) Remove the itemized Show {column} rows ... Leave only Hide this, Show all, and Manage." -- feat/table-editing acdbe7f8, awaiting your pass -- master 893b7a3f
+- [x] R-278 feat/table-editing | "I still see special highlighting on the text." [his screenshot: a box round 'Longitude'] -- 410ddadc: the ring is on the whole cell -- master 893b7a3f
+- [x] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc -- master 893b7a3f
+- [x] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback -- master 893b7a3f
 - [x] R-281 feat/table-editing | "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click selects, drag moves. -- recorded in the handoff
-- [ ] R-283 feat/table-editing | "Put a little vertical space between the ellipsis menu and the sort arrow. You or Ida should know how to make it more pleasing." -- c28c6f3c: about 5 px of clear space, softer grey marks that turn blue on hover
-- [ ] R-284 feat/table-editing | "Dragging: I like it! (1) Suppress the menu and sort arrow during dragging. (2) Sometimes mere clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a "long click" for a drag or a move of at least 1/2 column width." -- c28c6f3c: every mark hidden mid-drag; a drag starts after half the column's width or a 450 ms hold
-- [?] R-285 feat/table-editing | (same comment, the threshold) -- Perry measured half-width at 288 px of silent travel on a widened Description column, 87-109 px on Net3's wider pipe columns. Keep half-width, or cap it (for example at 40 px)?
-- [ ] R-286 feat/table-editing | "I think that the menu and arrow are too eager to show. Can we make them show only when the cursor is directly over their area of the cell?" -- c28c6f3c: they show only over their own top-right corner; Perry notes nothing now hints that the corner does anything
-- [ ] R-287 feat/table-editing | "(1) The heavy blue line is not meaningful at the left and right edge of the selection ... you can't drag a column to its own left or right edge; that is a do-nothing case. (2) If and only if you drag beyond the middle of the adjacent column, a blue line appears at the new insertion place." -- c28c6f3c, with R-289's dark line as the marker
-- [ ] R-288 feat/table-editing | "Spreadsheets don't highlight cell contents in Navigation (Ready) mode. When I tab from cell to cell, the only indicator I should see is cell outline." -- c28c6f3c, checked on read-only and editable cells
-- [ ] R-289 feat/table-editing | "(1) Turn an entire heading solid blue on select. (2) Drag a column (not heading) shaded outline (see Google Sheets). (3) Make a wide black or dark gray destination line on entire column (not heading) divider when middle of drag rectangle (not cursor) is between middle of two columns." -- c28c6f3c: solid #0b57d0 heading, grey whole-column ghost, 4 px dark-grey full-height line decided by the ghost's middle
+- [x] R-283 feat/table-editing | "Put a little vertical space between the ellipsis menu and the sort arrow. You or Ida should know how to make it more pleasing." -- c28c6f3c: about 5 px of clear space, softer grey marks that turn blue on hover -- master 893b7a3f
+- [x] R-284 feat/table-editing | "Dragging: I like it! (1) Suppress the menu and sort arrow during dragging. (2) Sometimes mere clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a "long click" for a drag or a move of at least 1/2 column width." -- c28c6f3c: every mark hidden mid-drag; a drag starts after half the column's width or a 450 ms hold -- master 893b7a3f
+- [x] R-285 feat/table-editing | (same comment, the threshold) -- Perry measured half-width at 288 px of silent travel on a widened Description column, 87-109 px on Net3's wider pipe columns. Keep half-width, or cap it (for example at 40 px)? -- "Yes. It's perfect. We are gold now." Kept; master 893b7a3f
+- [x] R-286 feat/table-editing | "I think that the menu and arrow are too eager to show. Can we make them show only when the cursor is directly over their area of the cell?" -- c28c6f3c: they show only over their own top-right corner; Perry notes nothing now hints that the corner does anything -- master 893b7a3f
+- [x] R-287 feat/table-editing | "(1) The heavy blue line is not meaningful at the left and right edge of the selection ... you can't drag a column to its own left or right edge; that is a do-nothing case. (2) If and only if you drag beyond the middle of the adjacent column, a blue line appears at the new insertion place." -- c28c6f3c, with R-289's dark line as the marker -- master 893b7a3f
+- [x] R-288 feat/table-editing | "Spreadsheets don't highlight cell contents in Navigation (Ready) mode. When I tab from cell to cell, the only indicator I should see is cell outline." -- c28c6f3c, checked on read-only and editable cells -- master 893b7a3f
+- [x] R-289 feat/table-editing | "(1) Turn an entire heading solid blue on select. (2) Drag a column (not heading) shaded outline (see Google Sheets). (3) Make a wide black or dark gray destination line on entire column (not heading) divider when middle of drag rectangle (not cursor) is between middle of two columns." -- c28c6f3c: solid #0b57d0 heading, grey whole-column ghost, 4 px dark-grey full-height line decided by the ghost's middle -- master 893b7a3f
 - [?] R-290 feat/label-gang-search | (no new words; the master merge) -- c0104534: master's symbol-size rule and zoom-to-fit make this branch's own numbers worse (x2 Novato 72 labels give up a value, was 22; switching the crowding rule off gets 30 but a pass takes 8.3 s, not 0.8 s). Relax the crowding rule, accept slower passes, or rework?
+  - TGH 2026-09-26: "Merging master into it undid much of its gains: Is there anything we can do to figure out why this happened and fix it? What did master have that sabotaged us? Was the merge just inept? We can't proceed unmerged, so this must be dealt with." -- being diagnosed on the branch
 
 ### Rulings recorded, nothing to build
 
@@ -238,3 +239,22 @@ judgement and does not belong to a script.
 - EPANET audit: "Make the reports roadmap tasks before EPANET++. I'd like to know the full list of what we are missing."
 - feat/label-limit, feat/offscreen-notice, feat/usage-report, feat/select-on-focus: "Close, merge, and delete branch."
 - Strings: "The selected junctions"; "{n} selected elements are not junctions, so they were not tested." -- "OK."
+
+## Round of 2026-09-26 (evening) -- table-editing and convert-as merged
+
+### Rulings recorded
+
+- feat/table-editing, merged at master 893b7a3f: "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete."
+- feat/convert-as, merged at master 2a2ffb7a: "Step 1 zoom is good. Image stays with the model on pan. ... Step 2 is good. Satellite is good. Done! Merge and delete."
+
+### Open
+
+- [ ] R-291 feat/placement-wizard | "The background opacity of the background image happened to be 50%, and that made a huge difference in placing the project. This is a major quality of life enhancement. Can we force the opacity of any background image to no more than 50% during "World Map, Attach" and "File, Convert as"?"
+- [ ] R-292 feat/placement-wizard | "It would be really nice if the wizard were draggable including up to the top of the page over the menus in case it's in the way."
+- [ ] R-293 feat/placement-wizard | "File, Convert as should automatically filter EPSG CRSes for the displayed area or network extents. I am at Prescott Valley, AZ, but I see the full list of CRSes."
+- [ ] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona."
+- [ ] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?"
+- [ ] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim
+- [?] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
+- [ ] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users."
+- [ ] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)."
