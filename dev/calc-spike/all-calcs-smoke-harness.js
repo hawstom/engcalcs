@@ -50,7 +50,10 @@ const NOT_CALCULATORS = new Set([
 	'sw.php',
 	// Not a page either: it emits the web app manifest as JSON, one scope per mount (Task 609).
 	// dev/scripts/web_manifest_check.php reads what it generates.
-	'manifest.php'
+	'manifest.php',
+	// The private usage report (R-212): defines no pageCalculator and reads log files, not a
+	// design. dev/scripts/usage_report_selftest.php covers it instead.
+	'spock.php'
 ]);
 
 // A page whose results live in DYNAMIC ROWS writes nothing until those rows exist, and building

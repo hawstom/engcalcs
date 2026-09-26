@@ -5234,6 +5234,13 @@ var EngCalcs = EngCalcs || {};
 			// meaningful across networks 400 ft and 40 miles wide -- the Settings row captures it
 			// from the current view rather than asking anyone to guess one.
 			//
+			// **0 = NEVER draw a generated label, at any zoom** (2026-09-23, replacing
+			// "Thematic map (colors only)" -- Tom: *"Should we do the same for all labels and use
+			// that to replace the 'Thematic map, no labels' setting?"*). Mirrors the customer row's
+			// own 0 ("Type 0 to leave customers unlabelled."). null and 0 are DIFFERENT stored
+			// values read differently in labelWidthLimitSI() -- null is "no threshold", 0 is a real
+			// threshold nothing is ever narrower than.
+			//
 			// **NO LONGER FEEDS THE SYMBOL CAP** (Tom, 2026-09-22, removing the "piggyback" he had
 			// asked for the day before: *"I'd prefer not to have two rules."*). See
 			// `symbolCapMultiple`/`symbolCapPercentile` below for the one rule that replaced it.
@@ -5327,10 +5334,6 @@ var EngCalcs = EngCalcs || {};
 			colorClassesLink: 7,
 			colorReverseNode: false,
 			colorReverseLink: false,
-			// Task 327's thematic map: colour is the whole message, so the GENERATED labels come
-			// off. It never touches labelSettings, and it is one of three suppressors read by
-			// applyLabelVisibility() -- see there. It does NOT hide the user's own Text (Task 428).
-			colorThematic: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
 			//
@@ -7789,8 +7792,16 @@ var EngCalcs = EngCalcs || {};
 		var nf = colorFieldOf('node'), lf = colorFieldOf('link');
 		var nb = nf ? effectiveBreaks('node', nf) : [], lb = lf ? effectiveBreaks('link', lf) : [];
 		doc.nodes.forEach(function (n) { paintNodeColor(n.id, nb); });
-		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); });
+		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
 		renderColorLegend();
+	}
+	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
+	// starts with. buildLinkEls() draws it once; this keeps it true on every solve and every step
+	// of the transport, which is what reaches here without rebuilding a single element.
+	function paintLinkStatus(l) {
+		var le = linkEls[l.id];
+		if (!le || !le.line || !le.line.classList) { return; }
+		le.line.classList.toggle('lpn-link-closed', linkStatusOf(l) === 'closed');
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
 	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no generated
@@ -7980,11 +7991,13 @@ var EngCalcs = EngCalcs || {};
 		}, linksLayer);
 		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
 		// open one on the map while carrying no water, which turns a one-click state into an
-		// invisible cause of a network that will not solve. Read through effective(), so a future
-		// scenario override changes the drawing too, not only the arithmetic.
+		// invisible cause of a network that will not solve. Read through linkStatusOf(), so a
+		// scenario override changes the drawing too, and so does a run: at a time step where a
+		// control has opened a pump the file starts shut, the pump is drawn open (Tom, 2026-09-25,
+		// on Net3's pump 10). paintLinkStatus() keeps it current as the transport moves.
 		var line = el('polyline', {
 			points: linkPoints(l), fill: 'none',
-			'class': 'lpn-link lpn-link-' + l.type + (effective(l, 'status') === 'closed' ? ' lpn-link-closed' : ''),
+			'class': 'lpn-link lpn-link-' + l.type + (linkStatusOf(l) === 'closed' ? ' lpn-link-closed' : ''),
 			'data-link': l.id
 		}, linksLayer);
 		var handles = [], i;
@@ -9207,11 +9220,21 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return 0; }
 		return toSI(v, 'lpn_u_length');
 	}
-	function customerLabelWidthLimitSI() { return viewWidthLimitSI(labelSettings.customerMaxWidth); }
-	// **THE LABELING THRESHOLD IN METRES, or 0 for "no threshold".** The stored number is in the
-	// project's own length unit, so a project in feet keeps the number its reader typed and changing
-	// the unit REINTERPRETS it, exactly as every other typed number on this page.
-	function labelWidthLimitSI() { return viewWidthLimitSI(settings.labelMaxWidth); }
+	// **`null` FOR "NO THRESHOLD" (ALWAYS DRAW), OR 0 FOR A REAL THRESHOLD NOTHING IS EVER NARROWER
+	// THAN (NEVER DRAW).** `viewWidthLimitSI()` collapses both "blank" and "0" to the same 0, which
+	// is wrong here, where blank and 0 are two different answers -- so this reads the stored value
+	// directly rather than going through that shared converter. The stored number is in the
+	// project's own length unit, so a project in feet keeps the number its reader typed and
+	// changing the unit REINTERPRETS it, exactly as every other typed number on this page.
+	// **THE CUSTOMER ROW NOW FOLLOWS THE SAME RULE** (Tom, 2026-09-23 pre-review: "make the customer
+	// row accept exactly what the all-labels row accepts") -- both readers share this one shape.
+	function labelMaxWidthLimitSI(v) {
+		if (v === 0) { return 0; }
+		var lim = viewWidthLimitSI(v);
+		return lim > 0 ? lim : null;
+	}
+	function labelWidthLimitSI() { return labelMaxWidthLimitSI(settings.labelMaxWidth); }
+	function customerLabelWidthLimitSI() { return labelMaxWidthLimitSI(labelSettings.customerMaxWidth); }
 	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
 	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
 	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
@@ -9251,7 +9274,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function customerLabelsAttempted() {
 		var lim = customerLabelWidthLimitSI(), wide;
-		if (dataLabelsHidden || !lim) { return false; }
+		if (dataLabelsHidden) { return false; }
+		// **BLANK IS "ALWAYS", 0 IS "NEVER"** (Tom, 2026-09-23 pre-review), the same reading
+		// `labelsPastThreshold()` gives `labelWidthLimitSI()` -- `lim === null` means the customer
+		// row itself imposes no limit (the all-labels gate above still applies); `lim === 0` is the
+		// real "never label a customer" answer this row has always had.
+		if (lim === 0) { return false; }
+		if (lim === null) { return true; }
 		wide = visibleMapMetres();
 		// A view we cannot measure is not a view we refuse to label: the threshold is a courtesy,
 		// and failing closed on an unmeasurable canvas would blank every label in a harness.
@@ -10718,6 +10747,43 @@ var EngCalcs = EngCalcs || {};
 		halfW = (w / 2) / sc; halfH = (h / 2) / sc;
 		return v.cx + halfW >= ext.minx && v.cx - halfW <= ext.maxx &&
 			v.cy + halfH >= ext.miny && v.cy - halfH <= ext.maxy;
+	}
+	// **TASK 647: "the network is intact, just off screen" is a different failure from "the
+	// project is gone", and a visitor cannot tell them apart on a blank canvas** (Tom, 2026-09-13:
+	// "a blank map is equally fatal as a lost project. User doesn't know the difference."). This
+	// reuses viewShowsModel()'s own arithmetic rather than a second geometry -- the same boolean
+	// that decides whether a SAVED view is worth restoring at load, asked again after the user has
+	// panned or zoomed by hand. `modelExtent()` returning null (no elements at all) is answered by
+	// leaving the overlay off: there is nothing off screen to be intact, and Task 314's shop
+	// window already owns that canvas.
+	//
+	// **CALLED ONLY AT REST** -- from the pan-release path (endPointer's wasPan branch) and from
+	// scheduleReshed()'s own debounced settle, never per drag frame or per wheel notch -- matching
+	// the "at rest" discipline viewShowsModel() already keeps for the load-time case (Task 628).
+	function updateOffscreenNotice() {
+		var el = document.getElementById('lpn_offscreen_notice');
+		var v = currentView();
+		var show = !!el && !!v && !!modelExtent() && !viewShowsModel(v);
+		if (el) { el.style.display = show ? 'flex' : 'none'; }
+	}
+	// One-time fill and wiring, called from the same boot pass as wireMessageLogButton() etc.
+	// The button reuses `lpn_tool_zoom_extent` -- the toolbar's own "Zoom to fit" string -- rather
+	// than a second key for the same action, and is wired to `zoomExtent` the same DIRECT way the
+	// toolbar button is (`addEventListener('click', zoomExtent)`, not a wrapping closure): a
+	// wrapped `function () { zoomExtent(); }` is a second BARE call view-memory-harness.js counts
+	// as an automatic fit nobody asked for (Task 439's asterisk trap) -- see that harness's "every
+	// automatic fit says so" assertion. `zoomExtent` reads its `auto` argument off the click event
+	// it is handed here, exactly as the toolbar's own button already does, so this is not a new
+	// quirk.
+	function wireOffscreenNotice() {
+		var pc = EngCalcs.pageConfig || {};
+		var text = document.getElementById('lpn_offscreen_notice_text');
+		var btn = document.getElementById('lpn_offscreen_zoom_btn');
+		if (text) { text.textContent = pc.lpn_offscreen_intact || 'Your network is intact.'; }
+		if (btn) {
+			btn.textContent = pc.lpn_tool_zoom_extent || 'Zoom to fit';
+			btn.addEventListener('click', zoomExtent);
+		}
 	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
@@ -19617,27 +19683,14 @@ var EngCalcs = EngCalcs || {};
 
 		// ---- WHAT IS TRUE OF NODE LABELS AND LINK LABELS ALIKE ----------------------------------
 		//
-		// **THEMATIC MAP STANDS UNDER "Node and link"** (Tom, 2026-08-19: "Move Thematic map to the
-		// Node and link section"). It hides EVERY label so that only the colours are left, which is
-		// as true of a node's label as of a link's -- filed inside either colouring group it read as
-		// belonging to that one kind of element, which is the same misreading the high/low mark and
-		// the separator were moved out of.
-		//
-		// **STILL A MODE, NOT A DEFAULT** (Task 327): it suppresses the labels and does not touch
-		// labelSettings, so switching it off brings the user's own choices back untouched -- which is
-		// what the tip promises, and why the tip travels with the row rather than staying behind.
-		// Moving where a control is DRAWN changes nothing about what it does.
-		var them = document.createElement('input');
-		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
-		them.addEventListener('change', function () {
-			// renderLabelsLegend() too: the labels key is hidden in thematic mode (Tom, 2026-08-20),
-			// so the checkbox that turns the mode on is one of the two things that change whether it
-			// is on screen. Without this the key stays until the next solve repaints it.
-			settings.colorThematic = them.checked; refreshValueColors(); renderLabelsLegend();
-			saveToStorage(); syncColorControls();
-		});
-		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map (colors only)', them,
-			pc.lpn_settings_color_thematic_tip);
+		// **"Thematic map (colors only)" IS RETIRED** (Tom, 2026-09-23: *"I noticed that we have a
+		// tip saying that 0 is never for Customer labels. Should we do the same for all labels and
+		// use that to replace the 'Thematic map, no labels' setting?"*). Everything the checkbox did
+		// -- labels off, the user's own Text stays, label choices are kept, the legend hides --
+		// now follows from the labeling threshold (below, in Map display) being typed as 0. A row
+		// that only duplicated a state the threshold already reaches is one fewer thing to explain.
+		// See applyLabelVisibility() and renderLabelsLegend() for where the 0 case is read, and the
+		// migration in applySaved() for a project that still carries the old flag.
 
 		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
 		//
@@ -19867,6 +19920,14 @@ var EngCalcs = EngCalcs || {};
 	function paneColLinkResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (l) { return colorLinkValue(l, key); } };
+	}
+	// **A LINK'S STATUS AT THE TIME STEP ON SCREEN, AS A RESULT** (Tom, 2026-09-25: Net3's pump 10
+	// opens at 1:00 by its control, and the Tables kept calling it closed). The Shut column is the
+	// INPUT -- the status the run starts from -- and stays the user's; this one is EPANET's Status
+	// column, the word and not a number, blank until something has been solved.
+	function paneColLinkStatus() {
+		return { key: 'status', label: 'lpn_result_status', result: true, str: true,
+			get: function (l) { return lastSolveResult ? linkStatusText(l) : undefined; } };
 	}
 	function paneColNodeResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit,
@@ -20615,6 +20676,7 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus(),
 					paneColLinkReactionRate()
 				])
 			},
@@ -20638,7 +20700,8 @@ var EngCalcs = EngCalcs || {};
 					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkStatus()
 				])
 			},
 			{
@@ -20665,7 +20728,8 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
-					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient)
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
+					paneColLinkStatus()
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -21036,7 +21100,7 @@ var EngCalcs = EngCalcs || {};
 		// what a typed cell can be parsed back from; a choice and a text read verbatim.
 		if (c.bool) { return v ? '1' : '0'; }
 		if (!panePresent(v)) { return ''; }
-		if (c.result) { return String(plainRound(v, 2)); }
+		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
 	}
@@ -25692,7 +25756,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', AREA_HINT_KEY, MENU_CUE_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -26838,9 +26902,15 @@ var EngCalcs = EngCalcs || {};
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		// A number, and ZERO IS A REAL ANSWER here ("never label a customer"), so this is a type
 		// test and never a truthiness one -- `savedLS.customerMaxWidth || default` would silently
-		// turn the one setting that says NEVER back into the default.
-		if (typeof savedLS.customerMaxWidth === 'number' && isFinite(savedLS.customerMaxWidth) &&
-			savedLS.customerMaxWidth >= 0) { labelSettings.customerMaxWidth = savedLS.customerMaxWidth; }
+		// turn the one setting that says NEVER back into the default. **NULL IS ALSO A REAL ANSWER**
+		// (Tom, 2026-09-23 pre-review: blank means "always show", the same state the all-labels row
+		// already persists) -- accepted here the same way `savedSettings.labelMaxWidth`'s own reader
+		// treats it a few lines down, so a blanked customer row survives a save/reload round trip
+		// instead of silently reverting to whatever number the field held before.
+		if (savedLS.customerMaxWidth === null || (typeof savedLS.customerMaxWidth === 'number' &&
+			isFinite(savedLS.customerMaxWidth) && savedLS.customerMaxWidth >= 0)) {
+			labelSettings.customerMaxWidth = savedLS.customerMaxWidth;
+		}
 		backdrop = saved.backdrop || null;
 		// Same one-level-deeper merge the labelSettings block documents: `defaults` and
 		// `sectionsOpen` are nested, so a top-level Object.assign swaps the saved one in whole and
@@ -26916,6 +26986,14 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		delete settings.colorFrozenBreaks;
+		// **A PROJECT SAVED WITH "Thematic map (colors only)" ON OPENS WITH LABELS OFF** (2026-09-23,
+		// retiring that checkbox in favour of the labeling threshold read as 0). **0
+		// WINS over a saved positive threshold**: the last thing that project's reader saw was no
+		// labels at all, not labels past some particular width, so the state that reproduces the
+		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
+		// read a stale one and disagree with the map.
+		if (savedSettings.colorThematic) { settings.labelMaxWidth = 0; }
+		delete settings.colorThematic;
 		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
 		// count and the reverse flag were one each for the whole map until they split per element
 		// class; a document written then carries the single key, and both groups take its value,
@@ -32401,12 +32479,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
+				+ (pc.lpn_tool_key_hint_two || 'Shortcut: {key} or {key2}')
 					.replace('{key}', key).replace('{key2}', alt);
 		}
 		if (key || alt) {
 			return (tip ? tip + ' ' : '')
-				+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', key || alt);
+				+ (pc.lpn_tool_key_hint || 'Shortcut: {key}').replace('{key}', key || alt);
 		}
 		return tip;
 	}
@@ -32646,8 +32724,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
 	function wireNotesPopup() {
-		var cx = document.getElementById('lpn_menu_cue_x');
-		if (cx) { cx.addEventListener('click', retireMenuCue); }
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
 		var x = document.getElementById('lpn_notes_close');
@@ -33002,12 +33078,10 @@ var EngCalcs = EngCalcs || {};
 			if (m.tip) { b.title = m.tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function (e) {
 				e.stopPropagation();
-				retireMenuCue();   // they found the bar; the cue has done its job
 				m.open(e.currentTarget);
 			});
 			bar.appendChild(b);
 		});
-		showMenuCue();
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
 		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
 		initTipsIn(bar);
@@ -33550,6 +33624,7 @@ var EngCalcs = EngCalcs || {};
 		wireScenarioButton();
 		wireWrongButtons();
 		wireMessageLogButton();
+		wireOffscreenNotice();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -34376,7 +34451,9 @@ var EngCalcs = EngCalcs || {};
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
-			if (wasPan && !drag) { relayoutLabels(); }
+			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
+			// and its release is the "at rest" moment -- never mid-drag.
+			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
 		}
 		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
 		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
@@ -36155,12 +36232,60 @@ var EngCalcs = EngCalcs || {};
 	// row layout itself was already correct. rebuildLabelsFields() now calls columnHeadings() on this
 	// host before this function runs, with trailingCols trimmed to ['decimals'] because a customer
 	// label has no Drop column to head (see customerFieldDefs()'s own comment).
+	// **ONE CONTROL, BUILT ONCE, USED BY BOTH THE ALL-LABELS AND CUSTOMER ROWS** (Tom, 2026-09-23
+	// pre-review: "Best: build both rows through one shared function so they cannot drift."). The
+	// two rows differ only in WHERE the number lives and what else a change must also do --
+	// `spec.get`/`spec.set` are the whole of that difference. Everything else (the box, its width,
+	// the placeholder, the unit, the capture button, and the three-way blank/0/number read a typed
+	// entry gets) is written once.
+	//
+	// **BLANK IS null ("ALWAYS"), 0 IS A REAL NUMBER ("NEVER"), A REFUSED ENTRY PUTS BACK WHATEVER
+	// spec.get() ALREADY HELD** -- the same rule `setLabelMaxWidth()` used to enforce for the
+	// all-labels row alone; the customer row never had a door to null before this, so its own box
+	// could show "Always show" but never actually reach the state that placeholder promises.
+	function buildLabelWidthControl(spec) {
+		var pc = EngCalcs.pageConfig || {},
+			wrap = document.createElement('span'), input = document.createElement('input'),
+			unit = document.createElement('span'), btn = document.createElement('button');
+		wrap.className = 'lpn-set-ctlgroup';
+		input.type = 'number'; input.step = 'any'; input.min = '0';
+		// **THE SAME WIDTH ON BOTH ROWS** (Tom, 2026-09-23 pre-review: the customer box was 2.6rem,
+		// the all-labels box 7em -- visibly narrower for no reason tied to what either box holds).
+		input.style.width = '7em'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
+		if (spec.id) { input.id = spec.id; }
+		input.placeholder = pc.lpn_settings_label_always || 'Always show';
+		input.setAttribute('aria-label', spec.label || pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less');
+		function paint() {
+			var v = spec.get();
+			input.value = (typeof v === 'number' && isFinite(v) && v >= 0) ? String(v) : '';
+		}
+		paint();
+		function commit(v) { spec.set(v); paint(); }
+		input.addEventListener('change', function () {
+			var t = input.value.trim();
+			if (t === '') { commit(null); return; }
+			var v = +t;
+			if (isFinite(v) && v >= 0) { commit(v); } else { paint(); }
+		});
+		btn.type = 'button'; btn.className = 'lpn-btn';
+		btn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		btn.addEventListener('click', function (e) {
+			// Inside a <label>, so the press must not also be read as a click on the box.
+			if (e && e.preventDefault) { e.preventDefault(); }
+			var w = captureViewWidth();
+			if (w > 0) { commit(w); }
+		});
+		unit.className = 'lpn-set-note';
+		unit.textContent = unitLabel('lpn_u_length');
+		// **THE UNIT SITS BEFORE THE BUTTON** (Tom, 2026-09-22/23: "'ft' is in the wrong place. It
+		// should be before the button.") -- on both rows now.
+		wrap.appendChild(input); wrap.appendChild(unit); wrap.appendChild(btn);
+		return { wrap: wrap, input: input, paint: paint };
+	}
 	function buildCustomerLabelSection(host) {
-		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'),
-			name = document.createElement('span'), input = document.createElement('input'),
-			unit = document.createElement('span'), note = document.createElement('div'),
-			wrap = document.createElement('span'), useBtn = document.createElement('button'),
-			cur = labelSettings.customerMaxWidth;
+		var pc = EngCalcs.pageConfig || {}, line = document.createElement('label'),
+			text = document.createElement('span'), note = document.createElement('div');
 		customerFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
 				function (v) { labelSettings.customer[f[0]] = v; },
@@ -36186,52 +36311,31 @@ var EngCalcs = EngCalcs || {};
 		note.textContent = pc.lpn_labels_customer_note ||
 			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
-		name.className = 'lpn-set-name ec-help';
-		name.style.flex = '1 1 auto';
-		name.textContent = pc.lpn_labels_customer_width ||
-			'Widest view that attempts to display customer labels';
-		name.title = pc.lpn_labels_customer_width_tip ||
-			'How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
-		input.type = 'number'; input.step = 'any'; input.min = '0';
-		input.style.width = LPN_LABEL_AFFIX_W; input.style.flex = '0 0 auto';
-		input.style.boxSizing = 'border-box';
-		input.setAttribute('aria-label', name.textContent);
-		input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
-		// **A REFUSED ENTRY PUTS THE OLD NUMBER BACK RATHER THAN STANDING**, which is the energy
-		// rows' own rule: a box showing a value the document does not hold is the one state a
-		// reader cannot tell from a setting that took.
-		input.addEventListener('change', function () {
-			var v = parseFloat(input.value);
-			if (isFinite(v) && v >= 0) { labelSettings.customerMaxWidth = v; }
-			else { input.value = String(labelSettings.customerMaxWidth); return; }
-			saveToStorage();
-			requestLabelRefresh();
+		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
+		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
+		// interfaces identical"; pre-review, same day: "build both rows through one shared function
+		// so they cannot drift"). This function cannot reach rebuildSettingsFieldsNow()'s own nested
+		// row() helper -- a different top-level function -- so the `.lpn-set-row`/setFieldLabel()
+		// wrapper is built here by hand, but `buildLabelWidthControl()` above supplies everything
+		// inside it. Same wording, too: the row NAME is shared with lpn_settings_label_max_width
+		// (the all-labels row's own key) rather than a second key carrying an identical string, per
+		// CLAUDE.md's "reuse whole labels" rule -- these two rows now say exactly the same thing
+		// about what they gate.
+		line.className = 'lpn-set-row';
+		setFieldLabel(text, pc.lpn_settings_label_max_width ||
+			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
+			'Customer labels are drawn only while the map is this wide or narrower, measured across the window. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
+		// the box's own "Always show" placeholder was previously unreachable -- the old change
+		// handler refused an empty entry and put the last number back). saveToStorage() and
+		// requestLabelRefresh() are this row's own two side effects, exactly as they were before.
+		var lw = buildLabelWidthControl({
+			get: function () { return labelSettings.customerMaxWidth; },
+			set: function (v) { labelSettings.customerMaxWidth = v; saveToStorage(); requestLabelRefresh(); },
+			label: pc.lpn_settings_label_max_width
 		});
-		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
-		// view' button like the other one we restored in a different branch."*). Same words and the
-		// same rounding UP; the QUANTITY is captured by captureViewWidth(), which reads what
-		// this box is actually compared against rather than what the other branch's box is -- see
-		// the comment there for the two ways a verbatim copy was wrong.
-		//
-		// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps the pair
-		// inside the row's control column instead of pushing the whole group left.
-		useBtn.type = 'button';
-		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		useBtn.addEventListener('click', function () {
-			var w = captureViewWidth();
-			if (!(w > 0)) { return; }
-			labelSettings.customerMaxWidth = w;
-			input.value = String(labelSettings.customerMaxWidth);
-			saveToStorage();
-			requestLabelRefresh();
-		});
-		wrap.className = 'lpn-set-ctlgroup';
-		wrap.appendChild(input); wrap.appendChild(useBtn);
-		unit.className = 'lpn-set-note';
-		unit.textContent = unitLabel('lpn_u_length');
-		row.appendChild(name); row.appendChild(wrap); row.appendChild(unit);
-		host.appendChild(row);
+		line.appendChild(text); line.appendChild(lw.wrap);
+		host.appendChild(line);
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
@@ -36463,15 +36567,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
 		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
-		// **THEMATIC MODE HIDES THIS LEGEND** (Tom, 2026-08-20). Thematic is the mode that
-		// strips the drawing back to colour alone -- it already switches the data labels off
-		// -- so a key naming the label fields is a key to lettering nobody can see. The colour
-		// legend is the one that belongs on a thematic map and it is a different element
-		// (colorLegendBox), so this hides without touching that one.
+		// **THE LABELING THRESHOLD HIDES THIS LEGEND WHEN IT HIDES EVERY LABEL** (Tom, 2026-08-20,
+		// on the retired "Thematic map" checkbox; folded into the threshold on 2026-09-23). A
+		// threshold of 0, or any view wider than it, already switches the data labels off, so a key
+		// naming the label fields is a key to lettering nobody can see. The colour legend is the one
+		// that belongs on a map with no labels and it is a different element (colorLegendBox), so
+		// this hides without touching that one.
 		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
-		// chrome the placement never touches.
-		box.style.display = (any && !galleryIsUp() && !settings.colorThematic && !legendIsOff(settings.legendPosition))
-			? '' : 'none';
+		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
+		// the read that keeps that exclusion true.
+		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
+			!legendIsOff(settings.legendPosition)) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -37002,12 +37108,27 @@ var EngCalcs = EngCalcs || {};
 	// `atScale` is the scale being TESTED -- the zoom-to-fit search asks about scales that are not in
 	// force. The quantity is visibleMapMetres(), the one the customer-label gate and both capture
 	// buttons read, so a captured view cannot disagree with the gate it feeds (R-090).
+	// **A GENUINE POSITIVE THRESHOLD, EXCEEDED -- 0 IS DELIBERATELY NOT READ HERE.** This feeds the
+	// per-label "Show at all zoom levels" rule below, which is meant to go with a real width the
+	// reader typed and captured, exactly as before 2026-09-23. 0 is unconditional rather than a width
+	// to be "past", and Tom's ruling on it (*"Should we do the same for all labels and use that to
+	// replace the 'Thematic map, no labels' setting?"*) keeps the old thematic checkbox's own
+	// promise that a Text label survives -- see labelsFullyHidden() for the unconditional case.
 	function labelsPastThreshold(atScale) {
 		var lim = labelWidthLimitSI(), wide;
-		if (!(lim > 0)) { return false; }
+		if (!(lim > 0)) { return false; }   // null (no threshold) or 0 (unconditional, see below)
 		wide = visibleMapMetres(atScale);
 		// A view we cannot measure is not one we refuse to label -- customerLabelsAttempted()'s rule.
 		return wide > 0 && wide > lim;
+	}
+	// **UNCONDITIONAL: GENERATED ANNOTATION IS HIDDEN, at 0 or past a real threshold.** 2026-09-23
+	// folded "Thematic map (colors only)" into a labelMaxWidth of 0, which must reach
+	// `dataLabelsHidden` (so node and link labels come off) and the labels legend (so its key
+	// vanishes with them) -- but must NOT reach labelsPastThreshold() above, or a Text label with
+	// "Show at all zoom levels" off would disappear too, which is the one thing Tom's ruling did
+	// not ask for and the old checkbox never did either.
+	function labelsFullyHidden(atScale) {
+		return settings.labelMaxWidth === 0 || labelsPastThreshold(atScale);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -37044,10 +37165,11 @@ var EngCalcs = EngCalcs || {};
 	// a rule of its own. What the OR governs is `.lpn-annotation`, so no suppressor can ever reach
 	// authored content again by construction.
 	//
-	// Three suppressors:
+	// Two suppressors:
 	//   * generated annotation is off while the project is being placed on the map;
-	//   * thematic mode: colour is the message, so the lettering comes off;
-	//   * the view is wider than the labeling threshold.
+	//   * the view is wider than the labeling threshold -- and a threshold of 0 is past at every
+	//     zoom, which is how "Thematic map (colors only)" was retired (2026-09-23): colour the
+	//     message by typing 0 into the one threshold rather than a second switch.
 	// And two per-label rules:
 	//   * a Text label switched off in this scenario is not there at all (the MODEL, not the view);
 	//   * a Text label whose "Show at all zoom levels" is UNticked goes with the threshold.
@@ -37063,9 +37185,13 @@ var EngCalcs = EngCalcs || {};
 		// the rule for the georef case: "only elements including text". A Text object is a note
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
-		// **AND THE THIRD SUPPRESSOR IS THE LABELING THRESHOLD** (Tasks 669 and 705).
+		// **AND THE SECOND SUPPRESSOR IS THE LABELING THRESHOLD, 0 INCLUDED** (Tasks 669 and 705;
+		// 2026-09-23 folded thematic mode into it). `dataLabelsHidden` reads the UNCONDITIONAL
+		// labelsFullyHidden() (0 or a real threshold exceeded); the per-label loop below reads
+		// `past` -- labelsPastThreshold() alone, a real threshold only -- because a Text label's
+		// own "Show at all zoom levels" rule must not fire on 0 (see labelsFullyHidden()'s comment).
 		var past = labelsPastThreshold(state.s);
-		dataLabelsHidden = !!(georefActive() || settings.colorThematic || past);
+		dataLabelsHidden = !!(georefActive() || labelsFullyHidden(state.s));
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
 		// labels only, typically a handful, so the loop is cheap.
@@ -37094,10 +37220,17 @@ var EngCalcs = EngCalcs || {};
 	// cap** (Tom removed that piggyback 2026-09-22), so this no longer invalidates it -- only the
 	// label gate is re-decided and every symbol re-sized to match. Never on the zoom path: a zoom
 	// changes neither input.
+	//
+	// **AND THE LABELS LEGEND, SINCE 2026-09-23.** The retired "Thematic map" checkbox's own change
+	// handler called renderLabelsLegend() directly (the key had to vanish the moment the mode did);
+	// folding thematic mode into this threshold moved that same obligation here, and every path that
+	// can change dataLabelsHidden -- a typed 0, blank, a real number, "Use current view", or a
+	// resize crossing it -- goes through this one function, so one call covers all of them.
 	function labelThresholdChanged() {
 		if (!svg) { return; }
 		refreshSymbolSizes();
 		refreshLabelSuppression();
+		renderLabelsLegend();
 		if (!dataLabelsHidden) { relayoutLabels(); }
 	}
 	// **THE TRANSITION BACK COSTS A RELAYOUT, and that is why a suppressor calls this rather than
@@ -37202,6 +37335,11 @@ var EngCalcs = EngCalcs || {};
 	function reshedNow() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
 		reshedTimer = null;
+		// Task 647: this is the zoom gesture's own "settled" signal -- one notch or a whole wheel
+		// spin, never a mid-gesture frame -- so the off-screen overlay is decided here too, ahead of
+		// the dataLabelsHidden early return below (that return is about re-composing text, not about
+		// whether the model is on screen).
+		updateOffscreenNotice();
 		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
 		beginLinkGeomHold();
 		try {
@@ -37241,56 +37379,9 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **SHOWN IS THE DEFAULT AND A BLOCKED STORAGE IS SHOWN**, which is the safe direction for a
 	// help bubble exactly as it is for the page titles above.
-	// ---- The menu cue (Task 625; Ida's re-diagnosis, section F item 4) -------------------------
-	//
-	// **IT RETIRES ITSELF THE MOMENT IT WORKS.** Opening ANY menu is proof the reader has found the
-	// bar, so that is what dismisses it for good -- not a timer, and not only the close button.
-	// A cue that keeps appearing after it has done its job is the Hide-titles highlight again in
-	// another costume.
-	//
-	// FURNITURE, so localStorage and never the project: whether one reader has found the menus is
-	// a fact about that reader, and a colleague opening the file must not inherit it.
-	var MENU_CUE_KEY = 'lpn_menucue';
-	function menuCueDone() {
-		try { return localStorage.getItem(MENU_CUE_KEY) === '0'; } catch (e) { return true; }
-	}
-	function retireMenuCue() {
-		var el = document.getElementById('lpn_menu_cue');
-		if (el) { el.style.display = 'none'; }
-		try { localStorage.setItem(MENU_CUE_KEY, '0'); } catch (e) {}
-	}
-	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design.
-	//
-	// **THE ARROW LANDS ON File, NOT ON THE MARK AND NOT ON Water** (Tom, 2026-09-11, asking the
-	// right question). The mark is IDENTITY, not a command, and the sentence sends the reader to
-	// the menus -- pointing at the mark would aim it at the one item that holds none.
-	// Water is this page's own menu and the most interesting one, but singling it out contradicts
-	// "every", and a reader who follows the arrow to Water has been told the bar is one menu wide.
-	// File is the first COMMAND menu and the start of the reading order, so the arrow points at
-	// where the row begins and the eye continues along it.
-	function showMenuCue() {
-		var el = document.getElementById('lpn_menu_cue'), bar = document.getElementById('lpn_menubar'),
-			arrow = el && el.querySelector ? el.querySelector('.lpn-menu-cue-arrow') : null,
-			txt = document.getElementById('lpn_menu_cue_text'), pc = EngCalcs.pageConfig || {};
-		if (!el || !bar || menuCueDone()) { return; }
-		// Nothing to point at yet: the bar is built after this file loads.
-		if (!bar.children || !bar.children.length) { return; }
-		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Start with the menus above. Use the toolbar for quick access.'; }
-		el.style.display = '';
-		// Measured, not assumed: the mark's width depends on the icon and the bar's own gap, and a
-		// hardcoded offset would drift the first time either changes. Falls back to no indent if
-		// the bar has not been laid out yet, which is correct rather than wrong-by-a-guess.
-		// `fileMenuButton`, not getElementById: buildMenuBar() already holds the button, and the id
-		// is assigned computedly (`b.id = m.id`) so a lookup by name is invisible to
-		// dom_id_resolve_check.php -- which said so.
-		var file = fileMenuButton;
-		if (file && arrow && file.getBoundingClientRect && bar.getBoundingClientRect) {
-			var fr = file.getBoundingClientRect(), br = bar.getBoundingClientRect();
-			if (fr.width > 0) {
-				el.style.marginLeft = Math.max(0, fr.left - br.left + (fr.width / 2) - 10) + 'px';
-			}
-		}
-	}
+	// The menu cue (Task 625) is gone: Tom, 2026-09-25, "Delete the toolbar hint. It failed." Every
+	// tester was slow to find the MENUS, and a quiet strip of prose under them did not change that.
+	// Its localStorage key is still erased by literal in Erase everything, for browsers that hold it.
 	var AREA_HINT_KEY = 'lpn_areahint';
 	function areaHintShown() {
 		try { return localStorage.getItem(AREA_HINT_KEY) !== '0'; } catch (e) { return true; }
@@ -37981,47 +38072,30 @@ var EngCalcs = EngCalcs || {};
 		// worth, presses the button, and the view's width becomes the number. Blank is "always",
 		// which the placeholder says, because it is the one place the rule is written on screen.
 		//
+		// **0 IS "NEVER"** (2026-09-23), mirroring the customer row's own 0 -- the tip
+		// says so, in the customer tip's own wording. This is what replaced "Thematic map (colors
+		// only)": type 0 here for colour with no lettering, instead of a second switch that did the
+		// same thing a different way.
+		//
 		// **THE SAME BUTTON AND THE SAME ARITHMETIC AS THE CUSTOMER ROW** in the Labels box --
 		// captureViewWidth(), rounded UP. **No longer a second job as well** (Tom, 2026-09-22,
 		// removing the "piggyback": *"I'd prefer not to have two rules."*) -- this box hides
 		// generated labels and nothing else; the symbol-size cap is the separate row below.
-		var lmwWrap = document.createElement('span'), lmwInput = document.createElement('input'),
-			lmwBtn = document.createElement('button'), lmwUnit = document.createElement('span');
-		lmwWrap.className = 'lpn-set-ctlgroup';
-		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
-		lmwInput.id = 'lpn_set_label_max_width';
-		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
-		lmwInput.value = labelWidthLimitSI() > 0 ? String(settings.labelMaxWidth) : '';
-		// Blank, zero or anything unreadable is "no threshold", stored as null -- the value a
-		// project that has never been asked carries, so there is exactly one way to say it.
-		function setLabelMaxWidth(v) {
-			settings.labelMaxWidth = (typeof v === 'number' && isFinite(v) && v > 0) ? v : null;
-			lmwInput.value = settings.labelMaxWidth === null ? '' : String(settings.labelMaxWidth);
-			labelThresholdChanged();
-			saveToStorage();
-		}
-		lmwInput.addEventListener('change', function () {
-			var t = lmwInput.value.trim();
-			setLabelMaxWidth(t === '' ? null : +t);
+		// Blank or anything unreadable is "no threshold", stored as null -- the value a project that
+		// has never been asked carries, so there is exactly one way to say it. **0 IS A REAL ANSWER
+		// here ("never show a label"), so this is a type test and never a truthiness one** --
+		// `v || null` would silently turn the one setting that says NEVER back into "always",
+		// exactly the trap `labelSettings.customerMaxWidth`'s own comment names. Built through
+		// `buildLabelWidthControl()` (above `buildCustomerLabelSection()`), the same door the
+		// customer row's own box now goes through -- `labelThresholdChanged()` is this row's own
+		// extra side effect (the customer row's is `requestLabelRefresh()`).
+		var lmw = buildLabelWidthControl({
+			id: 'lpn_set_label_max_width',
+			get: function () { return settings.labelMaxWidth; },
+			set: function (v) { settings.labelMaxWidth = v; labelThresholdChanged(); saveToStorage(); }
 		});
-		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
-		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		lmwBtn.addEventListener('click', function (e) {
-			// Inside a <label>, so the press must not also be read as a click on the box.
-			if (e && e.preventDefault) { e.preventDefault(); }
-			var w = captureViewWidth();
-			if (w > 0) { setLabelMaxWidth(w); }
-		});
-		lmwUnit.className = 'lpn-set-note';
-		lmwUnit.textContent = unitLabel('lpn_u_length');
-		// **THE UNIT NAMES THE NUMBER, SO IT SITS RIGHT AFTER IT** (Tom, 2026-09-22, on a screenshot
-		// showing "ft" trailing the button: *"'ft' is in the wrong place. It should be before the
-		// button."*). It used to read "[box] [Use current view] ft", which reads as though the
-		// BUTTON took the unit.
-		lmwWrap.appendChild(lmwInput); lmwWrap.appendChild(lmwUnit); lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
-			lmwWrap, pc.lpn_settings_label_max_width_tip);
+			lmw.wrap, pc.lpn_settings_label_max_width_tip);
 		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
 		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
 		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
@@ -38924,17 +38998,26 @@ var EngCalcs = EngCalcs || {};
 		if (setboxTextCache) { setboxTextCache.set(el, text); }
 		return text;
 	}
+	// **AN AND OF WORDS, NOT ONE SUBSTRING** (Tom, 2026-09-23 (g): "can Settings filter work as an
+	// AND word search? I think it currently works as an entire string search."). `words` is already
+	// lower-cased and split on whitespace by the one caller that builds it (applySetboxFilter());
+	// every function below just threads the array through, so there is exactly one place that reads
+	// what the user typed.
+	function setboxWordsMatch(text, words) {
+		for (var i = 0; i < words.length; i++) { if (text.indexOf(words[i]) < 0) { return false; } }
+		return true;
+	}
 	// Hide/show the units of one container and report how many survived. A SUB-HEADING is decided
 	// by its body, except when the heading itself matches -- somebody searching "units" means the
 	// Units section, not the four rows inside it that happen to contain the word.
-	function filterSetboxContainer(container, q) {
+	function filterSetboxContainer(container, words) {
 		var shown = 0, pendingSub = null;
 		[].forEach.call(container.children, function (kid) {
 			var n, headMatch;
 			if (kid.classList.contains('lpn-set-sub')) { pendingSub = kid; return; }
 			if (kid.classList.contains('lpn-set-subbody')) {
-				headMatch = pendingSub && q && setboxUnitText(pendingSub).indexOf(q) >= 0;
-				n = filterSetboxContainer(kid, headMatch ? '' : q);
+				headMatch = pendingSub && words.length && setboxWordsMatch(setboxUnitText(pendingSub), words);
+				n = filterSetboxContainer(kid, headMatch ? [] : words);
 				if (headMatch) { n = Math.max(n, 1); }
 				kid.style.display = n ? '' : 'none';
 				if (pendingSub) { pendingSub.style.display = n ? '' : 'none'; }
@@ -38947,15 +39030,15 @@ var EngCalcs = EngCalcs || {};
 			// div. Recursing through it keeps the filter working ROW BY ROW; treating the host as
 			// one unit would make a search for "opacity" show everything either builder wrote.
 			if (kid.classList.contains('lpn-set-part')) {
-				n = filterSetboxContainer(kid, q);
+				n = filterSetboxContainer(kid, words);
 				kid.style.display = n ? '' : 'none';
 				shown += n;
 				return;
 			}
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
-			if (kid.classList.contains('lpn-set-group')) { kid.style.display = q ? 'none' : ''; return; }
-			var m = !q || setboxUnitText(kid).indexOf(q) >= 0;
+			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			kid.style.display = m ? '' : 'none';
 			if (m) { shown++; }
 		});
@@ -38964,14 +39047,18 @@ var EngCalcs = EngCalcs || {};
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
-			index = document.getElementById('lpn_setbox_index'), q, total = 0, live = {};
+			index = document.getElementById('lpn_setbox_index'), q, words, total = 0, live = {};
 		if (!box) { return; }
 		q = (input && input.value || '').trim().toLowerCase();
+		// Every whitespace-separated word must appear SOMEWHERE in a row's own text -- an AND, not
+		// the single substring this used to be -- so "zoom label" finds the row without either word
+		// sitting next to the other.
+		words = q ? q.split(/\s+/).filter(function (w) { return w !== ''; }) : [];
 		[].forEach.call(box.querySelectorAll('.lpn-set-sec'), function (sec) {
 			var body = sec.querySelector('.lpn-set-secbody'),
-				headMatch = q && sec.querySelector('.lpn-set-head') &&
-					setboxUnitText(sec.querySelector('.lpn-set-head')).indexOf(q) >= 0,
-				n = body ? filterSetboxContainer(body, headMatch ? '' : q) : 0;
+				headMatch = words.length && sec.querySelector('.lpn-set-head') &&
+					setboxWordsMatch(setboxUnitText(sec.querySelector('.lpn-set-head')), words),
+				n = body ? filterSetboxContainer(body, headMatch ? [] : words) : 0;
 			if (headMatch) { n = Math.max(n, 1); }
 			// **A SECTION MAY DECLARE ITSELF UNFILTERABLE, AND EXACTLY ONE DOES** (Task 591).
 			// Credits became a section of its own on 2026-09-06; as a bare footer it sat outside
@@ -45517,6 +45604,12 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
+			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
+			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
+			// the INPUT, the status the run starts from, and stays exactly what the user set; this
+			// row is what EPANET reports for the step on screen, the column its own link report
+			// ends on.
+			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -49368,6 +49461,52 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 
+	// **THE TIME STEP ON SCREEN IS THE CONDITION TESTED, AND ALL OF IT, NOT ONLY ITS DEMANDS**
+	// (Tom, 2026-09-25, on Net3: *"the static pressure for Junction 10 never matches the map
+	// pressure, and it's always significantly lower"*). assembleModel() already scales demands,
+	// reservoir heads and pump speeds to the transport's time, because those are patterns anyone can
+	// evaluate at an instant. Two parts of the state cannot be evaluated at an instant, because a run
+	// produced them: where each TANK stands, which is everything that flowed in or out since the run
+	// began, and which links a CONTROL or RULE has switched. Without them the sweep tested Net3 with
+	// every tank at its starting level and pump 10 still shut as the file starts it, although its
+	// control opens it at 1:00 -- a network nobody was looking at.
+	//
+	// So where a run is on screen, its frame at this moment is laid over the copy: each tank's water
+	// surface, and each link's status. Only on the COPY; the document's own starting levels and
+	// statuses are the user's input and are never touched.
+	//
+	// **WHICH STATUSES ARE LAID OVER, AND WHICH ARE LEFT TO THE SOLVE.** An open link is laid over
+	// always: whatever shut it in the file, the run says it was open at this moment. A closed one is
+	// laid over for a pipe or a pump, where only the file, a control or a rule shuts it, with one
+	// exception -- a link touching a tank that is sitting at its lowest or highest level, which the
+	// engine shuts on its own for that step and would open again the moment a fire drew on the tank.
+	// A valve that went shut is left to decide for itself, because a PRV, PSV or FCV closes on its
+	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
+	// feed.
+	function fireFlowAtFrame(model) {
+		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
+			atLimit = {}, TOL = 1e-3;
+		if (!f || !f.heads) { return false; }
+		model.nodes.forEach(function (n) {
+			var h = f.heads[n.id];
+			if (n.type !== 'tank' || typeof h !== 'number' || !isFinite(h)) { return; }
+			n.head = h;
+			n.level = h - (n.elev || 0);
+			if (n.level <= (n.minLevel || 0) + TOL ||
+				(n.maxLevel > 0 && n.level >= n.maxLevel - TOL)) { atLimit[n.id] = true; }
+		});
+		if (f.statuses) {
+			model.links.forEach(function (l) {
+				var st = f.statuses[l.id];
+				if (st === 'open') { l.status = 'open'; return; }
+				if (st !== 'closed' || l.type === 'valve') { return; }
+				if (atLimit[l.from] || atLimit[l.to]) { return; }
+				l.status = 'closed';
+			});
+		}
+		return true;
+	}
+
 	// ---- the marks on the map -------------------------------------------------------------------
 	//
 	// **A CLASS ON THE JUNCTION'S OWN CIRCLE, NOT A SECOND ELEMENT AND NOT THE COLOUR RAMP.** The
@@ -49475,7 +49614,7 @@ var EngCalcs = EngCalcs || {};
 
 		boxes.scope = ffSelect([
 			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junction only']
+			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -49991,6 +50130,7 @@ var EngCalcs = EngCalcs || {};
 			minPressure = ffValue(ask.minPressure, 'lpn_u_pressure'),
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
+			skipped = 0,
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -49998,14 +50138,29 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
 		}
+		// **EVERY SELECTED JUNCTION, ONE AT A TIME** (Tom, 2026-09-25: *"area selection and
+		// multi-selection succeeded fire flow analysis and fire flow analysis does not know how to
+		// handle multiple selected hydrants"*). This read `selection`, the singular, which is the LAST
+		// thing selected -- so a window drag over six hydrants tested one of them and said nothing
+		// about the other five. The list is the subject now, in the order it was picked, and each
+		// junction in it gets its own row exactly as a whole-system sweep gives it one. Whatever else
+		// the drag caught -- a pipe, a tank, a label -- is not a hydrant, and the count of those is
+		// said rather than swallowed.
 		if (ask.scope === 'selected') {
-			if (!selection || selection.kind !== 'node' ||
-				!junctions.some(function (n) { return n.id === selection.id; })) {
+			skipped = 0;
+			ids = [];
+			selections.forEach(function (s) {
+				if (s.kind === 'node' && junctions.some(function (n) { return n.id === s.id; })) {
+					ids.push(s.id);
+				} else {
+					skipped++;
+				}
+			});
+			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
 					'No junction is selected. Choose one on the map, or test every junction.');
 				return;
 			}
-			ids = [selection.id];
 		} else {
 			ids = junctions.map(function (n) { return n.id; });
 		}
@@ -50014,6 +50169,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		model = assembleModel();
+		fireFlowAtFrame(model);
 		engine = engineFor(model);
 		if (ask.design !== 'off') {
 			design = {
@@ -50039,6 +50195,10 @@ var EngCalcs = EngCalcs || {};
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
 		openFireFlowRunBox(ids.length);
+		if (skipped) {
+			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
+				.replace('{n}', String(skipped)));
+		}
 
 		return EngCalcs.lpnFireFlowSweep(model, {
 			solve: engine.solve,

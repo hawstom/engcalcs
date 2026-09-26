@@ -1464,27 +1464,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    deliberately has no dividers (see the note above #lpn_menubar). The anchor rules that used to be
    here went with the <a>. */
 .lpn-menubar-mark { margin-right: 6px; }
-/* THE MENU CUE (Task 625). Sits in the flow BETWEEN the two bars, hard against the toolbar's top
-   edge, with an arrow aimed at the bar above -- it starts where the eye lands and points up,
-   rather than trying to make the menu bar outshine 22 icons it cannot outshine. Deliberately quiet
-   (no shadow, no saturated fill): it must be noticed once, not compete forever. Removed from the
-   flow entirely when retired, so it costs no headroom on the page whose headroom is the point. */
-.lpn-menu-cue { display: flex; align-items: center; gap: .4em;
-	font-size: 12px; line-height: 1.3; margin: 0 0 3px; padding: 2px 6px;
-	border: 1px solid #9bd; border-radius: 3px; background: #eef6fd; color: #12211f;
-	width: fit-content; max-width: 100%; }
-.lpn-menu-cue-arrow { color: #0645ad; font-size: 10px; }
-.lpn-menu-cue-x { background: none; border: 0; font-size: 15px; line-height: 1;
-	padding: 0 0 0 .3em; cursor: pointer; color: inherit; opacity: .7; }
-.lpn-menu-cue-x:hover { opacity: 1; }
-/* **NOT ON A PHONE AT ALL** (Tom, 2026-09-11: *"Menus cue: Do not show on phone."*). It shipped
-   merely smaller here, which was the wrong instinct: below this breakpoint the menu bar is already
-   icon-only and the toolbar already keeps nothing but the transport, so the two rows the cue
-   mediates between are a handful of glyphs a thumb's width apart -- there is no attention contest
-   left to referee. What there IS is the scarcest headroom on any screen we serve, and a strip of
-   prose spending it to explain a bar the reader can see all of is the opposite of the trade this
-   cue exists to make. `display: none`, not a size tweak. */
-@media (max-width: 640px) { html:has(#lpn_canvas) .lpn-menu-cue { display: none; } }
 /* The About box leads with the same mark that opened it (Task 625). Sized to the heading rather
    than to .ec-icon's 1.05em base, so the glyph and the name read as one lockup. */
 .lpn-about-name { display: flex; align-items: center; gap: .45em; }
@@ -3356,6 +3335,15 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	background: rgba(255, 255, 255, .8);
 	border: 1px solid #bbb; border-radius: 3px;
 	padding: 2px 6px; font-size: 11px; color: #666;
+}
+/* "Your network is intact." (Task 647) wears the suite's NEUTRAL panel pair, the one above, not the
+   #fffbe6/#a80 warning pair: it is reassurance, not a warning (Ida, R-227). Theming phase 1
+   (Task 714) turns both into one token rather than two copies of the same two values. */
+.lpn-offscreen-card {
+	pointer-events: auto;
+	background: rgba(255, 255, 255, .8);
+	border: 1px solid #bbb; border-radius: 3px;
+	padding: 10px 16px;
 }
 /* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
    on why. No background of its own: it is a caption under the pills, not one more of them. */
