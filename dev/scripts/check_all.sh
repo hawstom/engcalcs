@@ -139,6 +139,11 @@ run_check "log format selftest"          blocking php dev/scripts/log_format_sel
 # looks fine -- plus the leg that matters most: the page must carry no total of the two consent
 # buckets, because one counts people and the other counts page loads.
 run_check "usage report selftest"        blocking php dev/scripts/usage_report_selftest.php
+# 2026-09-26: production error_log, four times in three minutes -- ecUsageReadAll() materialised
+# one array per log row, and engcalcs-lang.log (11+ MB, growing daily) exhausted the 128 MB host
+# limit. Builds a fixture that size, runs the pre-fix code from `master` to reproduce the crash,
+# then asserts the current code completes well under the limit with the same counts.
+run_check "usage report memory bound"    blocking php dev/scripts/usage_report_memory_selftest.php
 # 2026-09-22, R-121/122/123: the mailed rank-by-shopping table had no heading and Tom guessed wrong
 # about what "people" and "page loads" meant. A fixture through the real dev/scripts/daily_report.sh
 # extraction, because the failure is a good-looking table with the wrong or missing heading.
