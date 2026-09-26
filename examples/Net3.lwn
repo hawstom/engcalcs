@@ -2635,9 +2635,9 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 8,
-		"symbolSize": 8,
-		"linkWidth": 2,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
 		"labelMaxWidth": 30,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.5,

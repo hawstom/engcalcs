@@ -702,9 +702,9 @@
 			"thisCalculator": false,
 			"units": false
 		},
-		"textSize": 11,
-		"symbolSize": 10,
-		"linkWidth": 3,
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
