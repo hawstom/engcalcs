@@ -135,7 +135,7 @@ by design.
 | Bold | ✓ | ✓ | ✓ | — | — | n/a | n/a | n/a |
 | Rotation | ✓ | ✓ | ✓ | — | — | n/a | n/a | n/a |
 | Align / valign | ✓ | ✓ | ✓ | — | — | n/a | n/a | n/a *(position is exported; the alignment rule is not)* |
-| **Show at all zoom levels** | ✓ | **— (in flight on `feat/zoom-scale-rules`, R-174)** | **— (in flight on `feat/zoom-scale-rules`, R-174)** | **— (in flight, per the branch's own scope)** | — | n/a | n/a | n/a |
+| **Show at all zoom levels** | ✓ | ✓ *(R-174, closed)* | ✓ *(R-174, closed)* | ✓ *(R-174, closed; matched on the numeric 1/0 vocabulary `sizeMult` already used)* | ✓ *(R-174, closed, base-write like size)* | — | n/a | n/a |
 | Attached (leader) | ✓ | ✓ | ✓ *(the align/valign columns state the rule instead, per `EC_TABLE_PARITY_EXEMPT`)* | n/a | n/a | n/a | n/a | `[LABELS]` (anchor node/link) |
 
 ## Customer
@@ -159,10 +159,10 @@ format has no section for one at all, so the whole `.inp` column below is n/a by
 
 ## Ranked gaps: which a visitor would plausibly hit
 
-**1. Text: "Show at all zoom levels" absent from Multi-properties, Tables and Find (Tom's own
-report).** In flight on the unmerged `feat/zoom-scale-rules` branch (R-174), which
-`table_column_parity_check.php`'s `EC_TABLE_PARITY_EXEMPT` already names and refuses to let the
-check go green without. Once that branch merges this row disappears from the matrix.
+**1. CLOSED.** Text: "Show at all zoom levels" (Tom's own report) shipped with `feat/zoom-scale-rules`
+(R-174), which has merged. It rides `sizeMult`'s existing numeric vocabulary in Find (`equal to 1`
+finds a note kept on past the threshold) and has its own base-write spec in `labelReplaceSpecs()`
+for Replace.
 
 **2. CLOSED (Task 708).** A closed/inactive pipe, pump or valve is now findable and replaceable
 under a new Find/Replace property, internally `status` (`'open'`/`'closed'`, matched
