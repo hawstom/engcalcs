@@ -22757,7 +22757,7 @@ var EngCalcs = EngCalcs || {};
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
 				rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
-			table, thead, tr, tbody, note, filterNote, cg;
+			table, thead, tr, tbody, tfoot, note, filterNote, cg;
 		if (!host) { return; }
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
@@ -22775,7 +22775,10 @@ var EngCalcs = EngCalcs || {};
 		// should remove it since we are soon working on Declan's request to allow creation by
 		// pasting."*). The paste note went, and its language key with it: a paragraph that
 		// scrolls away above a sticky heading moves that heading the moment it has gone.
-		if (!rows.length) {
+		// **AN EMPTY TABLE THAT CAN TAKE NEW ROWS IS STILL A TABLE** (Task 610): its headings are
+		// the columns a paste must follow, and its new row, which says it is empty, is where the
+		// paste lands. Only a table that cannot create rows, or one a filter has emptied, is the note.
+		if (!rows.length && (filterNote || !paneCanCreate(spec))) {
 			note = document.createElement('p');
 			note.className = 'lpn-lib-note';
 			// One message for all six: "none of these yet" is true of every tab, and the tab the
@@ -22785,25 +22788,6 @@ var EngCalcs = EngCalcs || {};
 			note.textContent = filterNote
 				? (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.')
 				: (pc.lpn_pane_none || 'This network has none of these yet.');
-			// **THE EMPTY TABLE TAKES A PASTE** (Task 610). With no row there is no cell to stand
-			// on, so the note itself is the target: click it, paste, and the block lands as new
-			// rows from the first column. Not under a filter, where the rows it made would be
-			// hidden the moment they were made.
-			if (!filterNote && paneCanCreate(spec)) {
-				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
-				note.tabIndex = 0;
-				note.className += ' lpn-pane-paste-target';
-				note.addEventListener('paste', function (e) {
-					var text, cells;
-					try { text = e.clipboardData && e.clipboardData.getData('text/plain'); }
-					catch (err) { return; }
-					if (!text) { return; }
-					cells = libPasteCells(text);
-					if (!cells.length) { return; }
-					if (e.preventDefault) { e.preventDefault(); }
-					panePasteAt(spec, cells, { append: true });
-				});
-			}
 			host.appendChild(note);
 			return;
 		}
@@ -22979,6 +22963,15 @@ var EngCalcs = EngCalcs || {};
 		tbody = document.createElement('tbody');
 		rows.forEach(function (el) { tbody.appendChild(paneTableRow(spec, el)); });
 		table.appendChild(tbody);
+		// **IN A <tfoot>, NOT THE <tbody>**, because it is not a row of the data: everything that
+		// walks the body's rows (the stylesheet, the browser specs, a reader's own selector) keeps
+		// meaning "the elements", and the printed sheet drops it by one rule.
+		spec.newRowTd = null;
+		if (paneCanCreate(spec)) {
+			tfoot = document.createElement('tfoot');
+			tfoot.appendChild(paneNewRow(spec, !rows.length));
+			table.appendChild(tfoot);
+		}
 		host.appendChild(table);
 		// **THE FIRST DRAW FILLS THE RESULT CELLS TOO** (Tom, 2026-08-21: "Add current results to
 		// the bottom pane tables"). They were there and empty: paneTableRow() creates a result cell
@@ -23002,6 +22995,53 @@ var EngCalcs = EngCalcs || {};
 		}
 		paneHeadSelPaint(spec);
 		initTipsIn(host);
+	}
+	/**
+	 * **THE NEW ROW** (Task 610, after the pre-review found the first build's append destroyed
+	 * the row a paste started on). One empty row at the foot of every table that can create
+	 * elements, the spreadsheet and database convention: stand on it and paste, and every pasted
+	 * line becomes a new element while no existing row is touched. Reached by clicking it, by Down
+	 * or Enter from the last row, or by Tab past the last cell.
+	 *
+	 * **IT IS NOT A ROW OF THE TABLE'S DATA.** It is not an element, so it is not in
+	 * paneTableRowsInOrder(): Ctrl+A, copy, sort, fill-down, counts and the printed sheet never see
+	 * it, and the selection model (ids and keys) never holds it. Standing on it is `spec.onNewRow`,
+	 * with no selection. **Typing into it creates nothing yet**; it takes a paste only.
+	 */
+	function paneNewRow(spec, empty) {
+		var pc = EngCalcs.pageConfig || {}, tr = document.createElement('tr'), td = document.createElement('td'),
+			hint = pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.';
+		tr.className = 'lpn-pane-newrow';
+		td.colSpan = Math.max(1, paneCols(spec).length);
+		td.tabIndex = 0;
+		td._lpnNewRow = true;
+		td.textContent = empty ? (pc.lpn_pane_none || 'This network has none of these yet.') + ' ' + hint : hint;
+		if (spec.onNewRow) { td.classList.add('lpn-pane-cur'); }
+		tr.appendChild(td);
+		spec.newRowTd = td;
+		return tr;
+	}
+	function paneIsNewRowNode(node) {
+		while (node && node !== document) {
+			if (node._lpnNewRow) { return true; }
+			node = node.parentNode;
+		}
+		return false;
+	}
+	function paneEnterNewRow(spec, focus) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec);
+		spec.onNewRow = true;
+		spec.sel = null;
+		paneSelPaint(spec, rows, cols);
+		if (spec.newRowTd) {
+			spec.newRowTd.classList.add('lpn-pane-cur');
+			if (focus && spec.newRowTd.focus) { spec.newRowTd.focus({ preventScroll: true }); }
+			paneScrollCellIntoView(document.getElementById(spec.panel), spec.newRowTd);
+		}
+	}
+	function paneLeaveNewRow(spec) {
+		spec.onNewRow = false;
+		if (spec.newRowTd) { spec.newRowTd.classList.remove('lpn-pane-cur'); }
 	}
 	function sortPaneTable(spec, col) {
 		spec.sort.dir = (spec.sort.col === col) ? -spec.sort.dir : 1;
@@ -23821,8 +23861,9 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **IT GROWS THE TABLE, BY APPENDING, AND ONLY ON THE CLERK'S TERMS** (ROADMAP Task 610,
 	 * built to dev/paste-creates-rows-spec.md). A pasted row that runs past the last row is a NEW
-	 * junction, pipe, tank... There is no blank "new row" to click: the gesture is the one a
-	 * spreadsheet already has, a block pasted past the used range extends it. Tom's conditions are
+	 * junction, pipe, tank... Two ways in: stand on the NEW ROW at the foot (paneNewRow()) and
+	 * every line is new, or paste on an existing row, which is written as a spreadsheet writes it,
+	 * and the rest of the block extends the table. Tom's conditions are
 	 * the whole of the rule, and panePlanCreates() holds them: every new row carries an ID that
 	 * collides with nothing, in the network or in the same paste; a new node states where it is;
 	 * a new link names two nodes that already exist.
@@ -23964,10 +24005,10 @@ var EngCalcs = EngCalcs || {};
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
 			creates = [], plan, made, created = [], firstId, errs, shown, i;
-		// **AN EMPTY TABLE HAS NO CELL TO STAND ON**, so the note in its place takes the paste
-		// (renderPaneTable()) and it lands from the first column as a block of new rows.
-		if (!box && opts && opts.append && canCreate && !rows.length && cols.length) {
-			box = { r0: 0, r1: 0, c0: 0, c1: 0 };
+		// **ON THE NEW ROW, EVERY LINE IS A NEW ROW** (paneNewRow()), read from the first column,
+		// and the block begins past the last existing row so none of them can be written.
+		if (opts && opts.append && canCreate && cols.length) {
+			box = { r0: rows.length, r1: rows.length, c0: 0, c1: 0 };
 		}
 		if (!box || !cells.length) { return null; }
 		if (cells.length > 1 && paneIsHeadingLine(cells[0], cols, box.c0)) { cells = cells.slice(1); lineOffset = 1; }
@@ -24043,6 +24084,7 @@ var EngCalcs = EngCalcs || {};
 		// **THE NEW ROWS STAY SELECTED**, from where the paste began to the last one made, so the
 		// clerk is looking at what they just added rather than at the row above it.
 		if (created.length) {
+			paneLeaveNewRow(spec);
 			firstId = box.r0 < rows.length ? rows[box.r0].id : created[0];
 			spec.sel = { aId: firstId, aKey: cols[box.c0].key,
 				fId: created[created.length - 1], fKey: cols[Math.min(cols.length - 1, box.c0 + nCols - 1)].key };
@@ -24120,6 +24162,28 @@ var EngCalcs = EngCalcs || {};
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
 			pc = EngCalcs.pageConfig || {}, active = activeElementSafe(), r, c, at;
 		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
+		// **STANDING ON THE NEW ROW** (Task 610): Up goes back to the last row, Ctrl+A selects the
+		// table's own rows, and nothing else moves -- there is nothing below it and nothing beside it.
+		if (spec.onNewRow && key && active && active === spec.newRowTd) {
+			if (e.altKey) { return false; }
+			if ((key === 'ArrowUp' || key === 'Up') && rows.length && cols.length) {
+				paneLeaveNewRow(spec);
+				paneSelSet(spec, rows, cols, rows.length - 1, spec.newRowCol || 0, false);
+				paneSelPaint(spec, rows, cols);
+				box = paneSelBox(spec, rows, cols);
+				if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
+				return true;
+			}
+			if (jump && (key === 'a' || key === 'A') && rows.length && cols.length) {
+				paneLeaveNewRow(spec);
+				spec.sel = { aId: rows[0].id, aKey: cols[0].key,
+					fId: rows[rows.length - 1].id, fKey: cols[cols.length - 1].key };
+				paneSelPaint(spec, rows, cols);
+				return true;
+			}
+			if (jump && (key === 'd' || key === 'D')) { return true; }
+			return key.indexOf('Arrow') === 0 || key === 'Enter' || key === 'Home' || key === 'End';
+		}
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
@@ -24245,6 +24309,15 @@ var EngCalcs = EngCalcs || {};
 		// and the reason a column of forty numbers can be typed without touching the mouse.
 		else if (key === 'Enter') { at = { r: r + (ext ? -1 : 1), c: c }; ext = false; }
 		else { return false; }
+		// **DOWN OR ENTER OFF THE LAST ROW LANDS ON THE NEW ROW** (Task 610), where a table that
+		// cannot create rows simply stays put. The column is remembered so Up comes back to it.
+		if (!ext && !jump && at.r >= rows.length && spec.newRowTd &&
+				(key === 'ArrowDown' || key === 'Down' || key === 'Enter')) {
+			if (editing && active) { paneCommitCell(active); }
+			spec.newRowCol = c;
+			paneEnterNewRow(spec, true);
+			return true;
+		}
 		// **LEAVING A CELL COMMITS IT, BEFORE ANYTHING ELSE HAPPENS.** paneFocusCell() blurs and a
 		// blur fires `change`, so this is belt and braces for the one case where the focus does not
 		// move at all -- an arrow at the table's edge, which clamps to the same cell and would
@@ -24281,6 +24354,8 @@ var EngCalcs = EngCalcs || {};
 			if (t && t.tagName === 'INPUT' && t.type === 'text' && t.readOnly && t.setSelectionRange) {
 				try { t.setSelectionRange(0, 0); } catch (e2) { /* a detached input has no range */ }
 			}
+			if (paneIsNewRowNode(t)) { if (!spec.onNewRow) { paneEnterNewRow(spec, false); } return; }
+			if (td && spec.onNewRow) { paneLeaveNewRow(spec); }
 			if (!td || spec._selMoving) { return; }
 			// **A RIGHT PRESS INSIDE THE SELECTION HAS ALREADY SAID "LEAVE IT ALONE"** -- see the
 			// mousedown below. A right-click focuses the box under the pointer exactly as a left
@@ -24438,7 +24513,8 @@ var EngCalcs = EngCalcs || {};
 			cells = libPasteCells(text);
 			if (!cells.length) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
-			panePasteAt(spec, cells);
+			// On the new row every pasted line is a new element; nothing above it is touched.
+			panePasteAt(spec, cells, spec.onNewRow ? { append: true } : undefined);
 		});
 		table.addEventListener('copy', function (e) {
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),

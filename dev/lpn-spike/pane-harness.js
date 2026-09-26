@@ -387,12 +387,15 @@ console.log('\n--- no standing note above the table ---');
 	const panel = document.getElementById(L.paneTableById('junctions').panel);
 	const first = (panel.childNodes || [])[0];
 	report(!/lpn_pane_paste_note/.test(src + php), 'the paste note and its key are retired, not merely hidden');
-	// No junctions exist yet at this point, so the panel holds the empty message -- and ONLY that.
-	// Since Task 610 that one paragraph also says a paste lands there (it IS the paste target of an
-	// empty table), which costs no head room: there is no table under it to push down.
+	// No junctions exist yet at this point. Since Task 610 an empty table that can create rows is
+	// still a TABLE -- its headings are the columns a paste follows -- and its body is empty and its footer is the
+	// new row, which says the table is empty. Still nothing standing above it.
 	const kids = panel.childNodes || [];
-	report(kids.length === 1 && first._tag === 'p' && first.textContent.indexOf(PC.lpn_pane_none) === 0,
-		'an empty table says only that it is empty: no second paragraph above it', kids.map((k) => k._tag).join(','));
+	const part = (tag) => (first && first._tag === 'table' ? first.children.filter((k) => k._tag === tag)[0] : null);
+	const tbody = part('tbody'), tfoot = part('tfoot');
+	const only = tfoot && tfoot.children.length === 1 ? tfoot.children[0].children[0] : null;
+	report(kids.length === 1 && tbody && tbody.children.length === 0 && only && only._lpnNewRow && only.textContent.indexOf(PC.lpn_pane_none) === 0,
+		'an empty table says only that it is empty, on its new row: no paragraph above it', kids.map((k) => k._tag).join(','));
 	const langEn = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
 	report(/\$ec_lang\['lpn_pane_none'\]=/.test(langEn),
 		'lpn_pane_none is untouched -- it is shared with six Library sections that create rows by a button');

@@ -171,10 +171,18 @@ console.log('\n--- anchor and focus ---');
 	key('ArrowLeft');
 	report(spec.sel.fKey === colKeys[0], 'ArrowLeft in the first column does not leave the table');
 	clickCell(ids[3], colKeys[colKeys.length - 1]);
-	key('ArrowDown');
 	key('ArrowRight');
 	report(spec.sel.fId === ids[3] && spec.sel.fKey === colKeys[colKeys.length - 1],
-		'and the bottom-right corner is a corner in both directions');
+		'ArrowRight in the last column does not leave the table');
+	// ArrowDown off the last row lands on the NEW ROW (Task 610), which holds nothing to move
+	// sideways in, and Up comes back to the column it left.
+	key('ArrowDown');
+	report(spec.onNewRow === true && spec.sel === null, 'ArrowDown on the last row lands on the new row');
+	key('ArrowRight');
+	report(spec.onNewRow === true, '...which nothing moves sideways off');
+	key('ArrowUp');
+	report(!spec.onNewRow && spec.sel && spec.sel.fId === ids[3] && spec.sel.fKey === colKeys[colKeys.length - 1],
+		'and ArrowUp goes back to the last row, in the column it left');
 }
 
 // ---- 5. Home, End and their Ctrl pair ---------------------------------------------------------

@@ -2306,6 +2306,12 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 	outline: 2px solid #0645ad; outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
+/* The new row at the foot of a table that can create rows (Task 610): a place to paste, not a
+   row of data, so it reads as a quiet hint and takes the current-cell outline when stood on. */
+.lpn-pane-table tfoot tr.lpn-pane-newrow td { font-style: italic; opacity: .75; cursor: pointer; text-align: left; }
+.lpn-pane-table tfoot tr.lpn-pane-newrow td:focus { outline: 0; }
+.lpn-pane-table tfoot tr.lpn-pane-newrow td.lpn-pane-cur { opacity: 1; outline: 2px solid #0645ad; outline-offset: -2px; }
+@media print { .lpn-pane-table tfoot tr.lpn-pane-newrow { display: none; } }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
