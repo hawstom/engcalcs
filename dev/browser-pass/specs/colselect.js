@@ -16,6 +16,12 @@
 // if the pressed heading is part of one) -- one gesture, one job. Whole-column SELECTION is
 // Ctrl+click, Shift+click and Ctrl+Space only; there is no drag-to-select any more.
 //
+// Tom, 2026-09-25, second pass: sorting by clicking a heading is gone entirely -- "(1)(a) No
+// selectable text; there is only one selection possible and one cursor for a heading... A click
+// anywhere on the cell selects the column." A plain click now selects that column alone rather
+// than sorting; sorting moved behind the "..." menu and the arrow it puts under itself once a
+// column IS sorted (see colmanage.js).
+//
 // Driven with REAL mouse events (page.mouse) throughout, because every earlier check of the drag
 // gesture called the handlers directly and passed while Tom could not make it work with his own
 // hand. What this file holds:
@@ -23,9 +29,10 @@
 //       column there, in one motion -- and leaves no native text selection behind;
 //   (2) pressing on a heading that IS part of a standing multi-column selection and dragging it
 //       moves the whole selection together, as a block, in its original relative order;
-//   (3) Ctrl+click and Shift+click build a selection (never a drag); a plain click still sorts
-//       and selects nothing; Shift+click after a plain click extends from where the click landed
-//       (the cause of R-221's "only one column hides" -- a plain click used to leave no anchor);
+//   (3) Ctrl+click and Shift+click build a selection (never a drag); a plain click selects the
+//       column alone and never sorts; Shift+click after a plain click extends from where the
+//       click landed (the cause of R-221's "only one column hides" -- a plain click used to leave
+//       no anchor);
 //   (4) right-click a selection offers "Hide these columns", and hides all of it;
 //   (5) Ctrl+click toggles columns that need not be side by side, and they hide together;
 //   (6) one selection, not two: a click on a cell ends a column selection, and Ctrl+C on a column
@@ -155,7 +162,9 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// ---- (3): a plain click sorts and selects nothing; Shift+click after it extends from there --
+	// ---- (3): a plain click SELECTS the column alone and never sorts (Tom, 2026-09-25, second
+	// pass: "there is only one selection possible and one cursor for a heading... A click anywhere
+	// on the cell selects the column"); Shift+click after it extends the range from there ---------
 	{
 		const a = await openJunctions(browser, 'C');
 		const hideCols = await a.lang('lpn_pane_hide_cols');
@@ -165,8 +174,8 @@ exports.run = async function ({ browser, report }) {
 		await a.page.mouse.click(p0.x, p0.y);
 		await a.settle(300);
 		let s = await state(a);
-		report.ok(s.sorted === k0, 'a plain click on a heading still sorts by it', s.sorted);
-		report.ok(s.headSel.length === 0 && !s.anyWash, '...and selects nothing', JSON.stringify(s.headSel));
+		report.ok(s.sorted === before.sorted && s.sortDir === before.sortDir, 'a plain click on a heading no longer sorts', s.sorted);
+		report.ok(JSON.stringify(s.headSel) === JSON.stringify([k0]), '...it selects that column alone', JSON.stringify(s.headSel));
 		const p1 = await headCentre(a, k1);
 		await a.page.keyboard.down('Shift');
 		await a.page.mouse.click(p1.x, p1.y);
@@ -177,7 +186,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(JSON.stringify(s.headSel) === JSON.stringify(want),
 			'Shift+click after that click selects the whole range, not only the Shift-clicked column (why only one column hid, R-221)',
 			JSON.stringify(s.headSel));
-		report.ok(s.sorted === k0, '...and does not sort', s.sorted);
+		report.ok(s.sorted === before.sorted && s.sortDir === before.sortDir, '...and still does not sort', s.sorted);
 		// ---- (4): right-click that selection offers "Hide these columns", and hides it -----------
 		await a.page.mouse.click(p1.x, p1.y, { button: 'right' });
 		await a.settle(150);
@@ -239,20 +248,26 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!!copied && lines.every((l) => l.split('\t').length === 2) && lines.length >= nRows,
 			'Ctrl+C on a two-column selection (built with Ctrl+click) copies two columns of every row',
 			(copied ? lines.length + ' lines, first ' + JSON.stringify(lines[0]) : 'nothing copied'));
-		// Re-select the two apart (kA, kB) and hide them together. A plain click on an unrelated
-		// heading, not a body cell, ends the standing selection this time -- the sort button's own
-		// click handler always clears `headSel` before sorting (see "(3)" above), which is the most
-		// direct way to get there and does not depend on a body cell's own focus plumbing.
-		const kOther = before.keys.find((k) => k !== kA && k !== kB && k !== kX && k !== kY);
-		const po = await headCentre(a, kOther);
-		await a.page.mouse.click(po.x, po.y);
-		await a.settle(150);
-		for (const k of [kA, kB]) {
+		// Re-select the two apart (kA, kB) and hide them together. A plain click on another heading
+		// no longer clears the selection to nothing since 2026-09-25's second pass -- it REPLACES
+		// the selection with that one column instead -- so the deterministic way to land on exactly
+		// [kA, kB] is: plain-click a third heading (selects it alone), Ctrl+click kA and kB onto it
+		// (three selected), then Ctrl+click the third heading again to toggle it back out.
+		const kThird = before.keys.find((k) => k !== kA && k !== kB && k !== kX && k !== kY);
+		const pt = await headCentre(a, kThird);
+		await a.page.mouse.click(pt.x, pt.y);
+		await a.settle(100);
+		for (const k of [kA, kB, kThird]) {
 			const p = await headCentre(a, k);
 			await a.page.keyboard.down('Control');
 			await a.page.mouse.click(p.x, p.y);
 			await a.page.keyboard.up('Control');
 		}
+		await a.settle(150);
+		s = await state(a);
+		report.ok(JSON.stringify(s.headSel.slice().sort()) === JSON.stringify([kA, kB].sort()),
+			'plain-click one heading then Ctrl+click two more and toggle the first back out leaves exactly those two selected',
+			JSON.stringify(s.headSel));
 		const pb = await headCentre(a, kB);
 		await a.page.mouse.click(pb.x, pb.y, { button: 'right' });
 		await a.settle(150);

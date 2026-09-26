@@ -66,7 +66,13 @@ global.window.print = function () {
 	printed = {
 		onBody: area.length,
 		flagged: global.document.body.classList.contains('lpn-printing-table'),
-		area: area[0] || null
+		area: area[0] || null,
+		// **THE TITLE AT THE MOMENT OF PRINTING**, not after: this stub's `window.print()` is
+		// synchronous and printPaneTable() restores the real title in the SAME call (there is no
+		// `afterprint` event here), so a check made after the click has already returned would only
+		// ever see the restored title. Only a snapshot taken from inside this stub, the way `area`
+		// already is, can see what a real browser's Save-as-PDF dialog would have read.
+		title: global.document.title
 	};
 };
 
@@ -380,6 +386,39 @@ console.log('\n--- pressing Print ---');
 	report(!/window\.open/.test(src.slice(src.indexOf('function paneBuildPrintable('),
 		src.indexOf('function activePaneTableSpec('))),
 		'nothing here opens a window — a blocked popup is a silent failure');
+}
+
+// **THE PDF'S SUGGESTED FILE NAME** (Tom, 2026-08-21, 2026-09-25: "make the Print table PDF name
+// more useful, like {project}-{table}.pdf") -- every browser's "Save as PDF" picker takes its
+// default name from `document.title`, so `printPaneTable()` borrows it for the moment it prints and
+// puts the real one back afterwards. Characters a file name cannot carry are replaced first.
+console.log('\n--- the print title, {project}-{table}, restored afterward ---');
+{
+	const btn = byId.lpn_pane_print;
+	const origTitle = global.document.title;
+	L.setProjectName(PROJECT_NAME);
+	L.setPaneTab('junctions');
+	printed = null;
+	btn._listeners.click[0]();
+	report(printed.title === PROJECT_NAME + '-Junctions',
+		'while printing, the title reads {project}-{table}', printed.title);
+	report(!!printed, 'and the sheet did print with that title showing');
+	// afterprint is not a real browser event in this stub, so the synchronous fallback branch runs
+	// here (see printPaneTable()) and restores the title itself, in the same call.
+	report(global.document.title === origTitle, 'afterward the tab’s own title is back', global.document.title);
+
+	// **CHARACTERS A FILE NAME CANNOT CARRY, REPLACED.**
+	L.setProjectName('Elm/Street: "Center" <2>|*?');
+	btn._listeners.click[0]();
+	report(!/[\\/:*?"<>|]/.test(printed.title),
+		'a project name with characters no file system allows prints a title without them',
+		printed.title);
+	report(printed.title.indexOf('Elm_Street') === 0,
+		'...replaced one for one rather than dropped, so the name still reads', printed.title);
+	// restore afterward for section 8's own assertions, which do not care about the title but should
+	// not depend on what this section left behind.
+	L.setProjectName(PROJECT_NAME);
+	global.document.title = origTitle;
 }
 
 // ---- 8. the stylesheet, which is the other half of the mechanism ------------------------------

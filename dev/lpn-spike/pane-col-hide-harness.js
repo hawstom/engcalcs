@@ -254,13 +254,20 @@ console.log('\n--- ID inside a multi-selection is dropped, not a reason to refus
 	L.setColHidden('junctions', 'elev', false);
 }
 
-console.log('\n--- a plain click on a heading clears any standing selection and sorts, as before ---');
+// **A PLAIN CLICK NO LONGER CLEARS TO NOTHING; IT SELECTS** (2026-09-25, second pass: Tom's "a
+// click anywhere on the cell selects the column" -- sorting moved to the "..." menu and its
+// arrow). A plain click on a DIFFERENT heading REPLACES the standing selection with that column
+// alone, which is the new way a reader gets back to "just one heading marked" -- see
+// pane-heading-menu-harness.js for the click/sort split in full.
+console.log('\n--- a plain click on a heading replaces any standing selection with itself ---');
 {
 	function click(key, mod) { fire(L.sortBtn('junctions', key), 'click', Object.assign({}, mod)); }
 	click('elev', { ctrlKey: true });
 	report(L.headSel('junctions').length === 1, 'a heading is marked going in');
-	click('elev', {});
-	report(L.headSel('junctions').length === 0, 'a plain click drops the selection');
+	click('demand', {});
+	report(JSON.stringify(L.headSel('junctions')) === JSON.stringify(['demand']),
+		'a plain click on another heading replaces the selection with that column alone',
+		JSON.stringify(L.headSel('junctions')));
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

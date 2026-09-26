@@ -3,16 +3,24 @@
 //    columns command/box that has checkboxes for Show." ... "Maybe a three dots menu for sorting
 //    and hiding."
 //
+// Tom, 2026-09-25, SECOND pass, on that first build: (1) the heading should be one selectable
+// target, no sort arrow inside its text; (2) the "..." glyph should not need a hover to be found;
+// (3) the sort arrow, when there is one, belongs under the "..." glyph, not in the heading; (4) the
+// Manage columns dialog should apply only on OK, and reorder by moving a SELECTION with buttons
+// outside the list rather than one row's own up/down arrows.
+//
 // colselect.js already covers, with real page.mouse events: dragging across headings to select,
 // Ctrl/Shift+click, Hide (this)/(these) column(s), and a SELECTED heading dragged onto another
-// moving the column (the missing preventDefault() fix). This spec covers what is NEW: the "..."
-// menu glyph opening the same menu, Sort ascending/descending on it, "Show all columns", the
-// "Manage columns..." dialog (Show checkboxes and reorder, applying live and surviving a table
-// rebuild), and Ctrl+Space toggling the current column into the selection.
+// moving the column (the missing preventDefault() fix). This spec covers: the "..." glyph (always
+// visible, not hover-only) opening the same menu, Sort ascending/descending on it, the arrow that
+// then appears under the glyph ONLY on the sorted column (and reverses it on click), "Show all
+// columns", the "Manage columns..." dialog (Show checkboxes and a selection moved by buttons,
+// applying only on OK and surviving a table rebuild), and Ctrl+Space toggling the current column
+// into the selection.
 
 const { Session } = require('../lib/session');
 
-exports.title = 'Tables: the "..." column menu, Manage columns, Ctrl+Space';
+exports.title = 'Tables: the "..." column menu, the sort arrow, Manage columns, Ctrl+Space';
 
 async function openJunctions(browser, name) {
 	const a = await Session.open(browser, name);
@@ -56,11 +64,41 @@ async function clickColMenuGlyph(a, key) {
 	}, key);
 }
 
+// Fires a real MouseEvent with the modifier flags the ROW's own click handler reads
+// (`ev.ctrlKey`/`ev.metaKey`/`ev.shiftKey`) -- calling `.click()` on the element after a
+// `page.keyboard.down('Control')` does NOT do this: a JS-level `.click()` synthesizes an event with
+// every modifier false regardless of what real keys are physically held, so that combination
+// silently behaves as an unmodified click. This is what a real Ctrl+click and Shift+click on the
+// row need instead of coordinate-based `page.mouse.click()`, which the list's own scrolling makes
+// awkward to aim reliably.
+function clickRow(a, i, mods) {
+	return a.page.evaluate(({ i, mods }) => {
+		document.querySelectorAll('.lpn-managecols-row')[i]
+			.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: !!mods.ctrl, shiftKey: !!mods.shift }));
+	}, { i, mods: mods || {} });
+}
+
+async function arrowState(a, key) {
+	return a.page.evaluate((key) => {
+		const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
+		const arrow = th && th.querySelector('.lpn-pane-sortarrow');
+		return arrow ? { present: true, desc: arrow.classList.contains('lpn-pane-sortarrow-desc') } : { present: false };
+	}, key);
+}
+
 exports.run = async function ({ browser, report }) {
-	// ---- the "..." glyph opens the same menu, with Sort ascending/descending on it --------------
+	// ---- the "..." glyph is ALWAYS visible (Tom, second pass: no longer a hover reveal), opens the
+	// same menu, with Sort ascending/descending on it; the arrow appears ONLY on the sorted column,
+	// directly under the glyph, and reverses the sort on click -----------------------------------
 	{
 		const a = await openJunctions(browser, 'A');
 		const before = await keys(a);
+		const opacity = await a.page.evaluate((key) => {
+			const th = document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key);
+			return getComputedStyle(th.querySelector('.lpn-pane-colmenu')).opacity;
+		}, before[1]);
+		report.ok(opacity === '1', 'the "..." glyph is visible with no hover or focus', opacity);
+		report.ok(!(await arrowState(a, before[1])).present, 'no arrow yet: this column is not sorted', JSON.stringify(await arrowState(a, before[1])));
 		const opened = await clickColMenuGlyph(a, before[1]);
 		await a.settle(150);
 		report.ok(opened, 'the "..." button exists on a heading and is clickable');
@@ -78,6 +116,24 @@ exports.run = async function ({ browser, report }) {
 			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
 		}, T);
 		report.ok(s && s.col === before[1] && s.dir === 'ascending', 'Sort ascending sorts that column ascending', JSON.stringify(s));
+		let arrow = await arrowState(a, before[1]);
+		report.ok(arrow.present && !arrow.desc, 'the sorted column now carries an ascending arrow under the "..." glyph', JSON.stringify(arrow));
+		const others = before.filter((k) => k !== before[1]);
+		const anyOtherArrow = await a.page.evaluate((keys) => keys.some((k) =>
+			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + k + ' .lpn-pane-sortarrow')), others);
+		report.ok(!anyOtherArrow, 'no other column carries an arrow', anyOtherArrow);
+		// Clicking the arrow itself reverses the sort, without reopening the menu.
+		await a.page.evaluate((key) => {
+			document.querySelector('#lpn_pane_junctions table thead th.lpn-pane-col-' + key + ' .lpn-pane-sortarrow').click();
+		}, before[1]);
+		await a.settle(200);
+		s = await a.page.evaluate((T) => {
+			const th = document.querySelector(T + ' thead th[aria-sort]');
+			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
+		}, T);
+		report.ok(s && s.col === before[1] && s.dir === 'descending', 'clicking the arrow reverses the sort', JSON.stringify(s));
+		arrow = await arrowState(a, before[1]);
+		report.ok(arrow.present && arrow.desc, '...and the arrow itself now points the other way', JSON.stringify(arrow));
 		await clickColMenuGlyph(a, before[1]);
 		await a.settle(150);
 		await clickMenu(a, sortDesc);
@@ -86,7 +142,7 @@ exports.run = async function ({ browser, report }) {
 			const th = document.querySelector(T + ' thead th[aria-sort]');
 			return th ? { col: (th.className.match(/lpn-pane-col-(\S+)/) || [])[1], dir: th.getAttribute('aria-sort') } : null;
 		}, T);
-		report.ok(s && s.col === before[1] && s.dir === 'descending', '...and Sort descending reverses it', JSON.stringify(s));
+		report.ok(s && s.col === before[1] && s.dir === 'descending', '...and Sort descending from the menu still works too', JSON.stringify(s));
 		report.ok(a.errors.length === 0, 'no page error', a.errors.slice(0, 1).join(''));
 		await a.close();
 	}
@@ -120,7 +176,10 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// ---- Manage columns…: Show checkboxes and reorder, live, and it survives a table rebuild ----
+	// ---- Manage columns…: a selectable list, buttons outside it move the block, and NOTHING
+	// applies until OK (Tom, second pass, point (4)(a): "it could (should?) do nothing until OK";
+	// point (4)(b)(i): "Highlight a group of columns honoring Ctrl and Shift, then use move up,
+	// move down, move to beginning, and move to end buttons") ------------------------------------
 	{
 		const a = await openJunctions(browser, 'C');
 		const manage = await a.lang('lpn_pane_manage_cols');
@@ -131,35 +190,87 @@ exports.run = async function ({ browser, report }) {
 		const d = await a.waitDialog(2000);
 		report.ok(!!d, 'the dialog opens', JSON.stringify(d));
 		// One row per column of the CURRENT table, in its current order -- checkbox first.
-		const rows = await a.page.evaluate(() => [...document.querySelectorAll('.lpn-managecols-table tbody tr')].map((tr) => ({
-			label: tr.children[1].textContent,
-			checked: tr.children[0].querySelector('input').checked,
-			disabled: tr.children[0].querySelector('input').disabled
+		const rows = () => a.page.evaluate(() => [...document.querySelectorAll('.lpn-managecols-row')].map((row) => ({
+			label: row.querySelector('span').textContent,
+			checked: row.querySelector('input').checked,
+			disabled: row.querySelector('input').disabled,
+			selected: row.classList.contains('lpn-managecols-row-sel')
 		})));
-		report.ok(rows.length === before.length, 'one dialog row per column', rows.length + ' vs ' + before.length);
-		report.ok(rows.every((r) => r.checked), 'every column starts checked (Show)', JSON.stringify(rows));
-		report.ok(rows[0].disabled, 'ID cannot be unchecked', JSON.stringify(rows[0]));
-		// Uncheck the third row -- applies live, to the table BEHIND the dialog.
-		await a.page.evaluate(() => document.querySelectorAll('.lpn-managecols-table tbody tr')[2].querySelector('input').click());
-		await a.settle(250);
+		let rowsNow = await rows();
+		report.ok(rowsNow.length === before.length, 'one dialog row per column', rowsNow.length + ' vs ' + before.length);
+		report.ok(rowsNow.every((r) => r.checked), 'every column starts checked (Show)', JSON.stringify(rowsNow));
+		report.ok(rowsNow[0].disabled, 'ID cannot be unchecked', JSON.stringify(rowsNow[0]));
+		// Uncheck the third row -- and confirm it does NOT touch the live table behind the dialog.
+		await a.page.evaluate(() => document.querySelectorAll('.lpn-managecols-row')[2].querySelector('input').click());
+		await a.settle(150);
 		let live = await keys(a);
-		report.ok(live.length === before.length - 1 && live.indexOf(before[2]) === -1,
-			'unchecking Show in the dialog hides that column in the live table right away', JSON.stringify(live));
-		// The dialog redrew itself too: the row for that column is now unchecked, in place.
-		let rowsNow = await a.page.evaluate(() => [...document.querySelectorAll('.lpn-managecols-table tbody tr')].map((tr) => tr.children[0].querySelector('input').checked));
-		report.ok(rowsNow[2] === false, '...and the dialog itself shows it unchecked', JSON.stringify(rowsNow));
-		// Move the second row down one with the ▼ button.
-		const movedLabel = await a.page.evaluate(() => document.querySelectorAll('.lpn-managecols-table tbody tr')[1].children[1].textContent);
-		await a.page.evaluate(() => {
-			const tr = document.querySelectorAll('.lpn-managecols-table tbody tr')[1];
-			[...tr.children[2].querySelectorAll('button')].find((b) => b.textContent === '▼').click();
-		});
-		await a.settle(250);
-		let liveOrder = await keys(a);
-		const movedKey = before.filter((k) => k !== before[2])[1];
-		report.ok(liveOrder[2] === movedKey, 'moving a row down in the dialog reorders the live table', JSON.stringify(liveOrder));
+		report.ok(JSON.stringify(live) === JSON.stringify(before), 'unchecking Show in the dialog does NOT touch the live table yet', JSON.stringify(live));
+		// Select rows 1 and 3 with Ctrl+click (not side by side), and move them to the beginning.
+		const moveTop = await a.lang('lpn_pane_manage_cols_top');
+		const moveBottom = await a.lang('lpn_pane_manage_cols_bottom');
+		const moveDown = await a.lang('lpn_pane_manage_cols_down');
+		const moveUp = await a.lang('lpn_pane_manage_cols_up');
+		const rowLabels = (await rows()).map((r) => r.label);
+		await clickRow(a, 1, {});
+		await clickRow(a, 3, { ctrl: true });
+		await a.settle(100);
+		rowsNow = await rows();
+		report.ok(rowsNow[1].selected && rowsNow[3].selected && rowsNow.filter((r) => r.selected).length === 2,
+			'click then Ctrl+click selects two rows that are not side by side', JSON.stringify(rowsNow.map((r) => r.selected)));
+		await a.page.evaluate((text) => {
+			[...document.querySelectorAll('.lpn-managecols-btns button')].find((b) => b.textContent === text).click();
+		}, moveTop);
+		await a.settle(100);
+		let labelsNow = (await rows()).map((r) => r.label);
+		report.ok(labelsNow[0] === rowLabels[1] && labelsNow[1] === rowLabels[3],
+			'"' + moveTop + '" moves the whole (non-contiguous) selection to the top, in its own relative order',
+			JSON.stringify(labelsNow));
+		report.ok(JSON.stringify(await keys(a)) === JSON.stringify(before), '...and STILL nothing has applied to the live table', JSON.stringify(await keys(a)));
+		// Move that same selection (still selected, now rows 0 and 1) to the bottom, then back up
+		// one with Move up, then down one with Move down -- exercising all four buttons.
+		await a.page.evaluate((text) => {
+			[...document.querySelectorAll('.lpn-managecols-btns button')].find((b) => b.textContent === text).click();
+		}, moveBottom);
+		await a.settle(100);
+		labelsNow = (await rows()).map((r) => r.label);
+		report.ok(labelsNow[labelsNow.length - 2] === rowLabels[1] && labelsNow[labelsNow.length - 1] === rowLabels[3],
+			'"' + moveBottom + '" moves the selection to the end, in the same relative order', JSON.stringify(labelsNow));
+		await a.page.evaluate((text) => {
+			[...document.querySelectorAll('.lpn-managecols-btns button')].find((b) => b.textContent === text).click();
+		}, moveUp);
+		await a.settle(100);
+		labelsNow = (await rows()).map((r) => r.label);
+		report.ok(labelsNow[labelsNow.length - 3] === rowLabels[1], '"' + moveUp + '" moves the block up one step', JSON.stringify(labelsNow));
+		await a.page.evaluate((text) => {
+			[...document.querySelectorAll('.lpn-managecols-btns button')].find((b) => b.textContent === text).click();
+		}, moveDown);
+		await a.settle(100);
+		labelsNow = (await rows()).map((r) => r.label);
+		report.ok(labelsNow[labelsNow.length - 2] === rowLabels[1], '"' + moveDown + '" moves it back down one step', JSON.stringify(labelsNow));
+		// **CANCEL DISCARDS EVERYTHING** -- close this dialog without OK and reopen: the live table
+		// (and a fresh dialog) must show the ORIGINAL order and every column still checked.
+		await a.dialogClick(await a.lang('lpn_dialog_cancel') || 'Cancel');
+		await a.settle(150);
+		report.ok(JSON.stringify(await keys(a)) === JSON.stringify(before), 'Cancel discards every change made in the dialog', JSON.stringify(await keys(a)));
+		// Reopen and this time press OK: the move-to-top and the unchecked third row both land.
+		await clickColMenuGlyph(a, before[0]);
+		await a.settle(150);
+		await clickMenu(a, manage);
+		await a.waitDialog(2000);
+		await a.page.evaluate(() => document.querySelectorAll('.lpn-managecols-row')[2].querySelector('input').click());
+		await clickRow(a, 1, {});
+		await clickRow(a, 3, { ctrl: true });
+		const finalLabels = (await rows()).map((r) => r.label);
+		await a.page.evaluate((text) => {
+			[...document.querySelectorAll('.lpn-managecols-btns button')].find((b) => b.textContent === text).click();
+		}, moveTop);
 		await a.dialogClick(await a.lang('lpn_dialog_ok') || 'OK');
-		await a.settle(200);
+		await a.settle(250);
+		const liveOrder = await keys(a);
+		report.ok(liveOrder.length === before.length - 1, 'OK applies the hide', JSON.stringify(liveOrder));
+		const liveNames = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead .lpn-pane-sort')].map((b) => b.textContent), T);
+		report.ok(liveNames[0] === finalLabels[1] && liveNames[1] === finalLabels[3],
+			'...and OK applies the reorder to the live table, the pair in its own relative order', JSON.stringify({ liveNames, finalLabels }));
 		// **PERSISTS ACROSS A REBUILD**: switch tabs away and back, which throws the table's DOM away
 		// and rebuilds it from lpn_panecols (paneColPrefs) -- the same key the drag-reorder and the
 		// old hide-menu already wrote to, so this dialog adds no storage of its own.

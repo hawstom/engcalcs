@@ -21010,11 +21010,13 @@ var EngCalcs = EngCalcs || {};
 	// **DRAG-ACROSS-HEADINGS-TO-SELECT IS GONE** (pre-review, 2026-09-25: it is what made a plain
 	// drag of an unselected heading select instead of move, which is the gesture Tom actually
 	// reached for and master already gave him). Whole-column selection is Ctrl+click, Shift+click
-	// (paneHeadSelClick(), just below) and Ctrl+Space (paneHandleKey()) only now -- the same three
-	// idioms a spreadsheet answers to for its own column headers, none of which compete with drag.
-	function paneHeadSelClick(spec, key, ev) {
-		if (ev && ev.shiftKey) { paneHeadSelRange(spec, key); } else { paneHeadSelToggle(spec, key); }
-	}
+	// and Ctrl+Space (`paneHandleKey()`) only now -- the same three idioms a spreadsheet answers to
+	// for its own column headers, none of which compete with drag. **A PLAIN CLICK IS ONE OF THEM
+	// TOO, SINCE 2026-09-25 (SECOND PASS)** -- it used to sort; now it replaces the selection with
+	// this column alone (the heading `click` listener in `renderPaneTable()` calls
+	// `paneHeadSelToggle()`/`paneHeadSelRange()` directly for the modified cases and sets
+	// `spec.headSel` itself for the plain case, so there is no longer a single shared entry point
+	// worth a wrapper function here).
 	// **THE FULL, ORDERED LIST, HIDDEN COLUMNS INCLUDED.** Everything that reads the table --
 	// tabbing, arrow-jump, Home/End, paste, fill-down, copy, print -- goes through `paneCols()`
 	// below instead, which is the ordered list with a hidden column simply ABSENT rather than
@@ -21527,34 +21529,31 @@ var EngCalcs = EngCalcs || {};
 			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
-			// **THE ARROW IS ALWAYS THERE ON THE SORTED COLUMN** -- inline TEXT, exactly as it
-			// always was (`dev/lpn-spike/pane-harness.js` reads it off `th.textContent`, the trap
-			// it guards being the stale-refill branch that repaints cells by id and never touches a
-			// heading at all -- see that harness's own comment). **AND HOVER-REVEALED ON EVERY OTHER
-			// ONE** (Tom, 2026-09-25: *"Is there a conventional glyph and gesture for sort, maybe
-			// including a hover revelation?"*), where it is a CSS `::after` rather than a second real
-			// node: a hint span holding "▲" is a TEXT NODE too, and `dev/browser-pass/specs/print.js`
-			// walks every text node of a heading to compare screen and print line counts -- an
-			// invisible span still has a client rect and was silently double-counted as an extra line
-			// on EVERY column once, before the hint (only) moved to `content:` (2026-09-25
-			// pre-review). The active column needs no hint glyph -- its real arrow already shows --
-			// so the two never stack.
-			b.textContent = paneHeadingText(c) +
-				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
-			b.className += (spec.sort.col === c.key) ? ' lpn-pane-sort-active' : '';
+			// **THE HEADING NO LONGER CARRIES THE SORT ARROW** (Tom, 2026-09-25, second pass: *"We
+			// currently have a problem with a sort arrow in the middle of the cell conflicting with
+			// the heading text. I suppose that should go."*). The whole cell is now ONE target, like a
+			// spreadsheet's own A/B/C column head -- its label and nothing else, so there is nothing
+			// in the button's own text for a sort mark to collide with. The sorted column's arrow
+			// lives in the trailing gutter instead, under the "..." menu glyph (paneSortArrow below).
+			b.textContent = paneHeadingText(c);
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
-			// **CTRL/CMD OR SHIFT ON THE HEADING SELECTS IT INSTEAD OF SORTING** -- the same modifier
-			// convention a spreadsheet uses for its own column headers, so several can be marked
-			// before a right-click hides all of them at once (Tom: *"can we select multiple heading
-			// cells to hide multiple columns at once?"*). A plain click still sorts, and drops
-			// whatever was selected, exactly as a plain click on an unmodified cell would.
+			// **A PLAIN CLICK SELECTS THE COLUMN; IT NEVER SORTS** (Tom, 2026-09-25, second pass:
+			// *"No selectable text; there is only one selection possible and one cursor for a
+			// heading... A click anywhere on the cell selects the column."*). Sorting moved to the
+			// "..." menu (Sort ascending/descending) and to the arrow that appears on the sorted
+			// column once it exists (click reverses it) -- a heading click is now exactly the
+			// spreadsheet gesture of clicking a column letter: Ctrl/Cmd+click toggles it into a
+			// standing multi-column selection, Shift+click extends one from the last heading touched,
+			// and a plain click replaces the selection with this column alone.
 			b.addEventListener('click', function (ev) {
-				// The release that ends a drag-select is not a click on the heading it ended over.
+				// The release that ends a drag is not a click on the heading it ended over.
 				if (spec.headDragged) { spec.headDragged = false; return; }
-				if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey)) { paneHeadSelClick(spec, c.key, ev); return; }
-				if (paneHeadSel(spec).length) { paneHeadSelClear(spec); }
+				if (ev && (ev.ctrlKey || ev.metaKey)) { paneHeadSelToggle(spec, c.key); return; }
+				if (ev && ev.shiftKey) { paneHeadSelRange(spec, c.key); return; }
+				spec.headSel = [c.key];
 				spec.headSelAnchor = c.key;   // where a following Shift+click extends from
-				sortPaneTable(spec, c.key);
+				paneHeadSelApply(spec);
+				paneHeadSelPaint(spec);
 			});
 			// **ONE GESTURE, ONE JOB** (pre-review, 2026-09-25, after Tom tried the one-motion drag
 			// master already had and could not move a column: R-221's "drag an unselected heading to
@@ -21609,21 +21608,19 @@ var EngCalcs = EngCalcs || {};
 				if (ev.stopPropagation) { ev.stopPropagation(); }
 				paneHeadMenuTrigger(spec, c.key, ev.clientX || 0, ev.clientY || 0);
 			});
-			// **A HOVER-REVEALED "..." AT THE TRAILING EDGE OF EVERY HEADING** (Tom, 2026-09-25: *"I
-			// honestly don't know [about] a grab cursor somewhere... Maybe a three dots menu for
-			// sorting and hiding."*). The right-click/long-press menu was already the whole of this
-			// affordance; a desktop mouse user who does not already know to right-click had no way to
-			// find it, and a KEYBOARD user had no way at all -- this is a real, focusable button, not
-			// a decoration, so Tab reaches it and `:focus-within` (CSS) reveals it same as hover does.
-			// It opens the exact same menu, positioned under itself rather than the pointer --
-			// `position: absolute` in CSS, so like the sort glyph it costs no heading width. Shown
-			// unconditionally on a touch screen too, where "hover" never happens at all.
-			// **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- the sort glyph beside it
-			// learned this the hard way (see its own comment): a real "⋯" character in the button
-			// would be one more text node under the heading for `print.js`'s screen/print line-count
-			// walk to trip over on every column, not only the sorted one. The accessible name comes
-			// from `title` instead (picked up by `ec-help` for the styled tip, same as every other
-			// icon-only button on this page).
+			// **AN ALWAYS-VISIBLE, QUIET "..." AT THE TRAILING EDGE OF EVERY HEADING** (Tom,
+			// 2026-09-25, second pass: *"A menu glyph, likely three vertical dots."*, named as a
+			// standing control rather than a hover reveal now that a plain click no longer sorts --
+			// with sorting moved entirely behind this menu and the arrow below it, a reader must be
+			// able to find it without hovering or already knowing to right-click). Muted ink rather
+			// than hidden: `opacity` no longer gates it, only `:hover`/`:focus-visible` darken it. It
+			// opens the exact same menu the right-click/long-press does, positioned under itself
+			// rather than the pointer -- `position: absolute` in CSS, so it costs no heading width.
+			// **THE GLYPH ITSELF IS A CSS `::after`, NOT A TEXT NODE** -- a real "⋮" character in the
+			// button would be one more text node under the heading for `print.js`'s screen/print
+			// line-count walk to trip over on every column, not only the sorted one. The accessible
+			// name comes from `title` instead (picked up by `ec-help` for the styled tip, same as
+			// every other icon-only button on this page).
 			menuBtn.type = 'button';
 			menuBtn.className = 'lpn-pane-colmenu ec-help';
 			menuBtn.setAttribute('aria-haspopup', 'menu');
@@ -21635,6 +21632,29 @@ var EngCalcs = EngCalcs || {};
 				paneHeadMenuTrigger(spec, c.key, r.left, r.bottom);
 			});
 			th.appendChild(menuBtn);
+			// **THE SORT ARROW, ONLY ON THE COLUMN THAT IS ACTUALLY SORTED, DIRECTLY BELOW THE "..."
+			// GLYPH** (Tom, 2026-09-25, second pass: *"I think that an arrow could be fine if we
+			// fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the
+			// menu."*). Built only when this IS the sorted column, so an unsorted heading carries no
+			// extra node at all -- the table is already rebuilt in full on every sort (the sort
+			// column/direction is part of paneTableSignature()), so there is no live-refill path that
+			// would need this element to already exist. A click reverses the direction; it never
+			// changes which column is sorted, that is the menu's job. Same `::after`-glyph trick as
+			// the menu button just above, for the same reason (print.js's per-text-node line count).
+			if (spec.sort.col === c.key) {
+				(function () {
+					var arrow = document.createElement('button');
+					arrow.type = 'button';
+					arrow.className = 'lpn-pane-sortarrow ec-help' + (spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+					arrow.title = pc.lpn_pane_sortarrow_tip || 'Reverse the sort';
+					arrow.setAttribute('aria-label', pc.lpn_pane_sortarrow_tip || 'Reverse the sort');
+					arrow.addEventListener('click', function (ev) {
+						if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+						sortPaneTable(spec, c.key);
+					});
+					th.appendChild(arrow);
+				}());
+			}
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -23191,65 +23211,152 @@ var EngCalcs = EngCalcs || {};
 	// for a few seconds and has nothing worth remembering between visits. Column order and hidden
 	// state are already `lpn_panecols` (paneColPrefs); this dialog reads and writes exactly that and
 	// adds no key of its own.
-	// **EVERY CHANGE APPLIES LIVE AND THE DIALOG REDRAWS ITSELF**, so a reader watching the table
-	// through the gap the dialog leaves (it is not full-screen) sees each checkbox and each reorder
-	// land immediately, the same promise Recalculate-off makes for the table's own edits.
+	// **NOTHING APPLIES UNTIL OK; CANCEL DISCARDS EVERYTHING** (Tom, 2026-09-25, second pass: *"It's
+	// sluggish, possibly because it waits for the table to respond in real time, where it could
+	// (should?) do nothing until OK."*). The table behind the dialog is untouched while it is open --
+	// this works on a LOCAL COPY (`work`, an array of `{key, label, show, fixed}` in the order the
+	// dialog shows them) and writes `pref.order`/`pref.hidden` in one shot on OK. Cancel's `fn` is a
+	// no-op: the local copy is simply thrown away with the dialog.
+	// **A LIST WITH A SPREADSHEET-STYLE SELECTION, NOT PER-ROW ARROWS** (Tom, 2026-09-25, second
+	// pass: *"Highlight a group of columns honoring Ctrl and Shift, then use move up, move down,
+	// move to beginning, and move to end buttons outside the list to move the entire selection.
+	// This is solid and efficient."*). Click/Ctrl+click/Shift+click select rows in `work`; the four
+	// buttons move the WHOLE selection as a block, keeping the selected rows' own relative order.
 	function paneOpenManageColsDialog(spec) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {},
+			work = paneColsAll(spec).map(function (c) {
+				return { key: c.key, label: paneHeadingText(c), show: !paneColHidden(spec.id, c.key), fixed: c.key === 'id' };
+			}),
+			sel = [], anchor = 0, focusIdx = 0;
+		// **THE BLOCK MOVE, ONE STEP AT A TIME** -- moving the selection past its nearest unselected
+		// neighbour, ascending for a move down and descending for a move up, so a non-contiguous
+		// selection (Ctrl+click can make one) still moves as a coherent block instead of each row
+		// leapfrogging its selected neighbours. `top`/`bottom` extract the selection in its own
+		// relative order and reinsert it whole, which a one-step-at-a-time loop cannot do cheaply
+		// for a selection scattered across a long list.
+		function moveSel(where) {
+			var idxs = sel.slice().sort(function (a, b) { return a - b; }), i, moved, rest;
+			if (!idxs.length) { return; }
+			if (where === 'top' || where === 'bottom') {
+				moved = idxs.map(function (i2) { return work[i2]; });
+				rest = work.filter(function (c, i2) { return idxs.indexOf(i2) === -1; });
+				work = (where === 'top') ? moved.concat(rest) : rest.concat(moved);
+				sel = (where === 'top') ? moved.map(function (c, i2) { return i2; })
+					: moved.map(function (c, i2) { return rest.length + i2; });
+			} else if (where < 0) {
+				for (i = 0; i < idxs.length; i++) {
+					if (idxs[i] > 0 && sel.indexOf(idxs[i] - 1) === -1) {
+						moved = work[idxs[i] - 1]; work[idxs[i] - 1] = work[idxs[i]]; work[idxs[i]] = moved;
+						sel[sel.indexOf(idxs[i])] = idxs[i] - 1;
+					}
+				}
+			} else {
+				for (i = idxs.length - 1; i >= 0; i--) {
+					if (idxs[i] < work.length - 1 && sel.indexOf(idxs[i] + 1) === -1) {
+						moved = work[idxs[i] + 1]; work[idxs[i] + 1] = work[idxs[i]]; work[idxs[i]] = moved;
+						sel[sel.indexOf(idxs[i])] = idxs[i] + 1;
+					}
+				}
+			}
+			focusIdx = sel.length ? sel[sel.length - 1] : focusIdx;
+		}
 		openDialog(function (body) {
-			var h = document.createElement('p'), table, thead, htr,
-				tbody, mkTh, redraw;
+			var h = document.createElement('p'), wrap, list, btnCol, redraw,
+				mkBtn, btnUp, btnDown, btnTop, btnBottom, rowClick;
 			h.style.margin = '0 0 8px';
 			h.style.fontWeight = 'bold';
 			h.textContent = pc.lpn_pane_manage_cols_title || 'Manage columns';
 			body.appendChild(h);
-			table = document.createElement('table');
-			table.className = 'lpn-managecols-table';
-			thead = document.createElement('thead');
-			htr = document.createElement('tr');
-			mkTh = function (text) { var th = document.createElement('th'); th.textContent = text; htr.appendChild(th); return th; };
-			mkTh(pc.lpn_pane_manage_cols_show || 'Show');
-			mkTh('');
-			mkTh('');
-			thead.appendChild(htr);
-			table.appendChild(thead);
-			tbody = document.createElement('tbody');
-			table.appendChild(tbody);
-			body.appendChild(table);
-			// A column hidden or reordered from HERE rebuilds the live table (paneSetColHidden and
-			// paneMoveCol both do), and this dialog redraws itself from the same paneColsAll(spec)
-			// the table now reflects -- one read, so the two can never say something different.
+			wrap = document.createElement('div');
+			wrap.className = 'lpn-managecols-wrap';
+			list = document.createElement('div');
+			list.className = 'lpn-managecols-list';
+			list.setAttribute('role', 'listbox');
+			list.setAttribute('aria-multiselectable', 'true');
+			list.tabIndex = 0;
+			btnCol = document.createElement('div');
+			btnCol.className = 'lpn-managecols-btns';
+			mkBtn = function (text, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.textContent = text;
+				b.addEventListener('click', function () { fn(); redraw(); list.focus(); });
+				btnCol.appendChild(b);
+				return b;
+			};
+			btnUp = mkBtn(pc.lpn_pane_manage_cols_up || 'Move up', function () { moveSel(-1); });
+			btnDown = mkBtn(pc.lpn_pane_manage_cols_down || 'Move down', function () { moveSel(1); });
+			btnTop = mkBtn(pc.lpn_pane_manage_cols_top || 'Move to beginning', function () { moveSel('top'); });
+			btnBottom = mkBtn(pc.lpn_pane_manage_cols_bottom || 'Move to end', function () { moveSel('bottom'); });
+			wrap.appendChild(list);
+			wrap.appendChild(btnCol);
+			body.appendChild(wrap);
+			rowClick = function (i, ev) {
+				if (ev && ev.shiftKey) {
+					sel = []; (function () { var lo = Math.min(anchor, i), hi = Math.max(anchor, i), k;
+						for (k = lo; k <= hi; k++) { sel.push(k); } }());
+				} else if (ev && (ev.ctrlKey || ev.metaKey)) {
+					var p = sel.indexOf(i);
+					if (p === -1) { sel.push(i); } else { sel.splice(p, 1); }
+					anchor = i;
+				} else {
+					sel = [i]; anchor = i;
+				}
+				focusIdx = i;
+				redraw();
+				list.focus();
+			};
+			// **EVERY CHANGE STAYS LOCAL UNTIL OK** -- no call here writes `paneColPrefs` or touches
+			// the live table; `redraw()` only repaints this dialog's own list from `work`/`sel`.
 			redraw = function () {
-				var cols = paneColsAll(spec);
-				tbody.innerHTML = '';
-				cols.forEach(function (c, i) {
-					var tr = document.createElement('tr'), tdShow = document.createElement('td'),
-						tdName = document.createElement('td'), tdOrder = document.createElement('td'),
-						cb = document.createElement('input'), up = document.createElement('button'),
-						down = document.createElement('button');
+				list.innerHTML = '';
+				btnUp.disabled = btnDown.disabled = btnTop.disabled = btnBottom.disabled = !sel.length;
+				work.forEach(function (c, i) {
+					var row = document.createElement('div'), cb = document.createElement('input'),
+						lab = document.createElement('span');
+					row.className = 'lpn-managecols-row' +
+						(sel.indexOf(i) !== -1 ? ' lpn-managecols-row-sel' : '') +
+						(i === focusIdx ? ' lpn-managecols-row-focus' : '');
+					row.setAttribute('role', 'option');
+					row.setAttribute('aria-selected', sel.indexOf(i) !== -1 ? 'true' : 'false');
 					cb.type = 'checkbox';
-					cb.checked = !paneColHidden(spec.id, c.key);
+					cb.checked = c.show;
+					cb.setAttribute('aria-label', (pc.lpn_pane_manage_cols_show || 'Show') + ' ' + c.label);
 					// ID can never be hidden (paneSetColsHidden already refuses it) -- shown checked
 					// and disabled rather than left off the list, so the list is every column this
 					// table has, not a subset the reader has to guess is missing one.
-					if (c.key === 'id') { cb.disabled = true; }
-					cb.addEventListener('change', function () { paneSetColHidden(spec, c.key, !cb.checked); redraw(); });
-					tdShow.appendChild(cb);
-					tdName.textContent = paneHeadingText(c);
-					up.type = 'button'; up.textContent = '▲'; up.disabled = (i === 0);
-					up.title = pc.lpn_pane_manage_cols_up || 'Move up';
-					up.addEventListener('click', function () { if (paneMoveCol(spec, c.key, i - 1)) { renderPaneTable(spec); redraw(); } });
-					down.type = 'button'; down.textContent = '▼'; down.disabled = (i === cols.length - 1);
-					down.title = pc.lpn_pane_manage_cols_down || 'Move down';
-					down.addEventListener('click', function () { if (paneMoveCol(spec, c.key, i + 1)) { renderPaneTable(spec); redraw(); } });
-					tdOrder.appendChild(up);
-					tdOrder.appendChild(down);
-					tr.appendChild(tdShow); tr.appendChild(tdName); tr.appendChild(tdOrder);
-					tbody.appendChild(tr);
+					if (c.fixed) { cb.disabled = true; }
+					cb.addEventListener('click', function (ev) { if (ev && ev.stopPropagation) { ev.stopPropagation(); } c.show = cb.checked; });
+					lab.textContent = c.label;
+					row.appendChild(cb);
+					row.appendChild(lab);
+					row.addEventListener('click', function (ev) { rowClick(i, ev); });
+					list.appendChild(row);
 				});
 			};
+			// Arrow keys move focus (extending the selection with it, the ordinary listbox idiom);
+			// Space toggles Show on the focused row without disturbing the selection.
+			list.addEventListener('keydown', function (ev) {
+				if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+					focusIdx = Math.max(0, Math.min(work.length - 1, focusIdx + (ev.key === 'ArrowDown' ? 1 : -1)));
+					if (ev.shiftKey) { rowClick(focusIdx, { shiftKey: true }); } else { rowClick(focusIdx, {}); }
+					if (ev.preventDefault) { ev.preventDefault(); }
+				} else if (ev.key === ' ' || ev.key === 'Spacebar') {
+					if (!work[focusIdx].fixed) { work[focusIdx].show = !work[focusIdx].show; redraw(); }
+					if (ev.preventDefault) { ev.preventDefault(); }
+				}
+			});
 			redraw();
-		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+		}, [
+			{ label: pc.lpn_dialog_ok || 'OK', fn: function () {
+				var pref = paneColPrefFor(spec.id);
+				pref.order = work.map(function (c) { return c.key; });
+				pref.hidden = work.filter(function (c) { return !c.show; }).map(function (c) { return c.key; });
+				savePaneColPrefs();
+				paneTableReset(spec);
+				renderPaneTable(spec);
+			} },
+			{ label: pc.lpn_dialog_cancel || 'Cancel', fn: function () { }, gapBefore: true }
+		]);
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
@@ -23375,19 +23482,39 @@ var EngCalcs = EngCalcs || {};
 	// engine is still reading the page -- and again at the head of the next print, so a browser
 	// that never fires it cannot leave this sheet standing in for the map on the next Ctrl+P.
 	var panePrintArea = null;
+	// **THE SUGGESTED PDF NAME, RESTORED THE MOMENT PRINTING IS DONE.** `document.title` is the one
+	// thing a browser's own "Save as PDF" picker reads for its default file name -- nothing a page
+	// hands to `window.print()` can set it directly -- so this holds the tab's real title only long
+	// enough to print, exactly the way `document.title` is already borrowed elsewhere on this page
+	// for a moment and put back.
+	var panePrintPrevTitle = null;
+	// **CHARACTERS A FILE NAME CANNOT CARRY, ON WINDOWS OR ANY OTHER PLATFORM'S BROWSER** (Tom,
+	// 2026-08-21, 2026-09-25: *"make the Print table PDF name more useful, like
+	// {project}-{table}.pdf"*). A project or table name is free text and may hold any of these; the
+	// browser would silently mangle them itself, so this does it once, predictably, before either
+	// name reaches `document.title`.
+	function paneSanitizeFileName(s) {
+		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
 		if (panePrintArea && panePrintArea.parentNode) {
 			panePrintArea.parentNode.removeChild(panePrintArea);
 		}
 		panePrintArea = null;
+		if (panePrintPrevTitle !== null) { document.title = panePrintPrevTitle; panePrintPrevTitle = null; }
 	}
 	function printPaneTable(spec) {
+		var pc = EngCalcs.pageConfig || {}, projectName, tableName;
 		if (!spec || !document.body) { return; }
 		paneEndPrint();
 		panePrintArea = paneBuildPrintable(spec);
 		document.body.appendChild(panePrintArea);
 		document.body.classList.add('lpn-printing-table');
+		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
+		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
+		panePrintPrevTitle = document.title;
+		document.title = (projectName ? projectName + '-' : '') + tableName;
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
 			window.addEventListener('afterprint', paneEndPrint);
 			window.print();
