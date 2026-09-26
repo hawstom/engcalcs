@@ -113,6 +113,7 @@ run_check "form keyboard stops"          blocking php dev/scripts/focus_order_ch
 # unfiltered lines pasted into five writers -- so this checks the helper's behaviour AND that nobody
 # has pasted the raw read back in.
 run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_tag_check.php
+run_check "no Accept-Language header answers 500" blocking php dev/scripts/accept_language_check.php
 # Task 318, third of the same kind and the worst of the three while it was missing: the service
 # worker precached bare paths while every page requested '?v=<filemtime>', so 22 of 25 precache
 # entries were unreachable and the offline promise on About.php was simply false. Nothing rendered

@@ -181,9 +181,13 @@ function chooseLanguage($all_language_settings) {
               // Get the name, quality, and prefix (prefix is a hack
               // for non-compliance) of the browser language preference.
               // Split language and quality
-              $browserLang = explode(";", strtolower($browserLang));
-              // Get the numeric part of the quality
-              $browserLang[1] = (isset($browserLang[1])) ? substr($browserLang[1],2) : '';
+              $browserLang = array_map('trim', explode(";", strtolower($browserLang)));
+              // Get the numeric part of the quality. RFC 9110 allows whitespace around the ";" and
+              // the "=", so "en; q=0.8" is valid, and substr($x, 2) of " q=0.8" was "=0.8", which PHP 8
+              // refuses to multiply (production, 2026-09-22, eight fatals). A q-value that is not a
+              // number at all is ignored, as if absent.
+              $browserLang[1] = (isset($browserLang[1]) && preg_match('/^q\s*=\s*([0-9]*\.?[0-9]+)/', $browserLang[1], $qm))
+                  ? (string)min(1.0, (float)$qm[1]) : '';
               // Split the language parts
               $browserLang[2] = explode("-", $browserLang[0]);
               // Put the sub language into element 2 of the array
@@ -213,7 +217,7 @@ function chooseLanguage($all_language_settings) {
     foreach ($all_language_settings as $tag => $language) {
       $tagarray = explode("-", $tag);
       $tagPrefix = isset($language['BROWSER_TAG']) ? $language['BROWSER_TAG'] : $tagarray[0];
-      $tagQuality = $language['QUALITY'];
+      $tagQuality = (float)$language['QUALITY'];
       $longestMatch = 0;
       // Assign the default quality.
       $language['QUALITY'] = $browserDefaultQuality * $tagQuality;
@@ -227,7 +231,7 @@ function chooseLanguage($all_language_settings) {
             if (strlen($browserLang[0]) > $longestMatch) {
               $longestMatch = strlen($browserLang[0]);
               // Assign it in case this is the longest match.
-              $language['QUALITY'] = $browserLang[1] * $tagQuality;
+              $language['QUALITY'] = (float)$browserLang[1] * $tagQuality;
             }
           /**
            * NON-COMPLIANT hack for disinterested users that prefer
@@ -250,7 +254,7 @@ function chooseLanguage($all_language_settings) {
             // Call it a one character long match (a pseudo-match).
             $longestMatch = 1;
             // Assign it in case this is the longest match.
-            $language['QUALITY'] = $browserLang[1]  * $tagQuality;
+            $language['QUALITY'] = (float)$browserLang[1] * $tagQuality;
           }
           // echo "\n<br />For tag $tag, quality $tagQuality, browser range $browserLang[0], quality $browserLang[1], put tag quality at $language[QUALITY].";
         }

@@ -31,6 +31,8 @@
  * under a rewrite those two genuinely differ, and SCRIPT_NAME staying the real script is the whole
  * reason a pretty URL cannot be recovered from the environment (ROADMAP Task 479.01).
  *
+ * `--accept=` seeds the Accept-Language header, verbatim, for dev/scripts/accept_language_check.php.
+ *
  * `--lang` seeds the ec_language COOKIE, which is how a returning visitor's language actually
  * arrives. It matters for more than translated labels: EC_DEFAULT_UNIT_SET is derived from the
  * language, so `en` renders the US defaults and every other language renders the SI ones. That is
@@ -57,6 +59,7 @@ foreach (array_slice($argv, 1) as $__rp_arg) {
     elseif (substr($__rp_arg, 0, 6) === '--get=') { $__rp_query = substr($__rp_arg, 6); }
     elseif (substr($__rp_arg, 0, 7) === '--host=') { $__rp_host = substr($__rp_arg, 7); }
     elseif (substr($__rp_arg, 0, 6) === '--uri=') { $__rp_uri = substr($__rp_arg, 6); }
+    elseif (substr($__rp_arg, 0, 9) === '--accept=') { $_SERVER['HTTP_ACCEPT_LANGUAGE'] = substr($__rp_arg, 9); }
     elseif (substr($__rp_arg, 0, 1) !== '-' && $__rp_page === '') { $__rp_page = basename($__rp_arg); }
 }
 $__rp_path = $__rp_root . '/' . $__rp_page;
