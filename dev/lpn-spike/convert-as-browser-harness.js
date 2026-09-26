@@ -284,6 +284,23 @@ async function main() {
 		ok('...saying it starts from the whole world', await a.notice() === await S('lpn_georef_intro'));
 		await shot('2-step1');
 		await dragStep1('2');
+		// Then to the site, at street zoom, the way a person does it: Go to, a latitude and
+		// longitude, and about how wide the site is. Far from 0 N 0 E at this zoom the drawing used
+		// to leave Chrome's layout range; it has to still be a drawing on the screen.
+		answers.push('38.1074,-122.5697', '300');
+		await page.click('#lpn_georef_goto');
+		await a.settle(1500);
+		await shot('2-step1-goto');
+		const onScreen = async (label) => {
+			const c = await canvasBox(), m = (await rects()).model;
+			ok(label, !!m && m.w > 150 && m.x > c.x - 50 && m.x + m.w < c.x + c.w + 50,
+				m ? JSON.stringify({ x: Math.round(m.x), w: Math.round(m.w) }) : 'no model');
+		};
+		await onScreen('2: after Go to at street zoom, the model is a drawing on the screen, not a clamped point');
+		await page.click('#lpn_georef_drop');
+		await a.settle(800);
+		await shot('2-step2');
+		await onScreen('2: ...and still is at step 2');
 		await page.click('#lpn_georef_cancel');
 		await a.settle(800);
 		ok('Cancel closes the copy and says nothing was converted', await a.notice() === await S('lpn_convas_cancelled'), await a.notice());
