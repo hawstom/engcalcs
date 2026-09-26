@@ -62,6 +62,7 @@ const L = loadLoopedNetwork(
 	"\t\teffective: effective, baseValue: baseValue, hasOverride: hasOverride,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, inBase: inBaseScenario,\n" +
 	"\t\tnotice: function () { return document.getElementById('lpn_map_notice').textContent || ''; },\n" +
+	"\t\tvalidateNewId: validateNewId,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, outwardX: outwardX, outwardY: outwardY,\n" +
 	"\t\tserialize: serializeProject, GEO: LPN_COORDS_GEO,\n" +
 	"\t\tsetCoords: function (k) { project.coords = k; },\n" +
@@ -230,10 +231,23 @@ console.log('\n--- 4. pipe rows join existing nodes; a missing node refuses the 
 	r = L.pasteAppend('pipes', pipeRow({ id: 'P3', from: 'N3', to: 'N3' }));
 	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_same_ends', { row: 1 }),
 		'a pipe from a node to itself refuses the paste', r && r.errors[0]);
-	r = L.pasteAppend('pipes', pipeRow({ id: 'N1', from: 'N3', to: 'N1' }));
-	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_id_taken', { row: 1, id: 'N1' }),
-		'a pipe ID that a NODE already answers to is taken (one ID pool, as allIds() has it)', r && r.errors[0]);
+	r = L.pasteAppend('pipes', pipeRow({ id: 'P1', from: 'N3', to: 'N1' }));
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_id_taken', { row: 1, id: 'P1' }),
+		'a pipe ID another PIPE already has is taken', r && r.errors[0]);
 	report(links().length === 2, 'none of those created anything', String(links().length));
+	// **NODES AND LINKS ARE SEPARATE NAMESPACES** (Tom, 2026-09-26: "Junctions and pipes can use
+	// same ID."). A pipe may be called N1 while junction N1 exists.
+	r = L.pasteAppend('pipes', pipeRow({ id: 'N1', from: 'N3', to: 'N1' }));
+	report(r && r.created === 1 && L.linkById('N1') && L.nodeById('N1') && L.linkById('N1').from === 'N3',
+		'a pipe may share its ID with a junction, by paste', r && JSON.stringify(r));
+	// ...and by rename, through the same rule the Properties box and the ID cell use.
+	report(L.validateNewId('N2', 'P2', 'link') === true, 'renaming pipe P2 to N2 (a junction\'s ID) is allowed');
+	report(L.validateNewId('P1', 'P2', 'link') !== true, 'renaming it to P1 (another pipe\'s) is not');
+	report(L.validateNewId('N3', 'N2', 'node') !== true && L.validateNewId('P1', 'N2', 'node') === true,
+		'and for a node: another node\'s ID is taken, a pipe\'s is free');
+	L.setCell('pipes', 'P2', 'id', 'N2');
+	report(L.linkById('N2') && L.nodeById('N2') && L.linkById('N2').from === 'N2' && L.linkById('N2').to === 'N3',
+		'the ID cell renames pipe P2 to N2, and its ends still name junctions N2 and N3');
 }
 
 console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
@@ -346,16 +360,11 @@ console.log('\n--- 8. a real exported network: Net1, tab-separated, with a headi
 	pasteIntoEmpty('junctions', sheet('junctions', sec.JUNCTIONS.map((r) => ({ id: r[0], axis1: xy[r[0]][0], axis2: xy[r[0]][1], elev: r[1], demand: r[2] }))));
 	pasteIntoEmpty('reservoirs', sheet('reservoirs', sec.RESERVOIRS.map((r) => ({ id: r[0], axis1: xy[r[0]][0], axis2: xy[r[0]][1], head: r[1] }))));
 	pasteIntoEmpty('tanks', sheet('tanks', sec.TANKS.map((r) => ({ id: r[0], axis1: xy[r[0]][0], axis2: xy[r[0]][1], elev: r[1], level: r[2], minLevel: r[3], maxLevel: r[4], tankDiameter: r[5] }))));
-	// **EPANET KEEPS NODE AND LINK IDS IN SEPARATE NAMESPACES AND THIS PAGE'S NEW-ID RULE DOES NOT**
-	// (validateNewId() pools them, and the spec reuses it verbatim). Net1 has junction 10 AND pipe
-	// 10, so its pipe sheet as EPANET wrote it is refused, whole, naming the rows. That is the
-	// finding this section exists to record; the sheet with its pipe IDs made unique then lands.
+	// Net1 has junction 10 AND pipe 10, and with nodes and links in separate namespaces (Tom,
+	// 2026-09-26) its pipe sheet pastes verbatim, exactly as EPANET wrote it.
 	pasteIntoEmpty('pipes', sheet('pipes', sec.PIPES.map((r) => ({ id: r[0], from: r[1], to: r[2], length: r[3], diameter: r[4], roughness: r[5] }))));
-	report(links().length === 0 && L.notice().indexOf(REFUSED + ' ' + say('lpn_pane_paste_id_taken', { row: 2, id: '10' })) === 0,
-		'Net1\'s pipe sheet as EPANET wrote it is refused: pipe 10 shares an ID with junction 10', L.notice());
-	pasteIntoEmpty('pipes', sheet('pipes', sec.PIPES.map((r) => ({ id: 'P' + r[0], from: r[1], to: r[2], length: r[3], diameter: r[4], roughness: r[5] }))));
 	const pipesSaid = L.notice();
-	pasteIntoEmpty('pumps', sheet('pumps', sec.PUMPS.map((r) => ({ id: 'PU' + r[0], from: r[1], to: r[2] }))));
+	pasteIntoEmpty('pumps', sheet('pumps', sec.PUMPS.map((r) => ({ id: r[0], from: r[1], to: r[2] }))));
 	report(nodes().filter((n) => n.type === 'junction').length === sec.JUNCTIONS.length &&
 		nodes().filter((n) => n.type === 'reservoir').length === 1 && nodes().filter((n) => n.type === 'tank').length === 1,
 		'every junction, the reservoir and the tank were created, and no heading row became a node',
@@ -363,7 +372,9 @@ console.log('\n--- 8. a real exported network: Net1, tab-separated, with a headi
 	report(!L.nodeById('ID'), 'the heading row was recognized and skipped');
 	report(links().filter((l) => l.type === 'pipe').length === sec.PIPES.length && links().filter((l) => l.type === 'pump').length === 1,
 		'every pipe and the pump were created', String(links().length) + ' / ' + pipesSaid);
-	const bad = sec.PIPES.filter((r) => { const l = L.linkById('P' + r[0]); return !l || l.from !== r[1] || l.to !== r[2] ||
+	report(!!L.linkById('10') && !!L.nodeById('10') && L.linkById('10').from === '10' && L.linkById('10').to === '11',
+		'pipe 10 and junction 10 both exist, and pipe 10 joins junctions 10 and 11');
+	const bad = sec.PIPES.filter((r) => { const l = L.linkById(r[0]); return !l || l.from !== r[1] || l.to !== r[2] ||
 		l._diameter !== +r[4] || l._length !== +r[3] || l._roughness !== +r[5] || l.lenAuto !== false; });
 	report(bad.length === 0, 'each pipe has its ends, length, diameter and roughness from the sheet, and a typed length turns Auto off',
 		bad.map((r) => r[0]).join(','));

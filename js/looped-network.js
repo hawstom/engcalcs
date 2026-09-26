@@ -20849,7 +20849,7 @@ var EngCalcs = EngCalcs || {};
 				// **REFUSED OUT LOUD, IN THE POPUP'S OWN WORDS.** validateNewId() is the popup's
 				// rule and its message; `reread` above then puts the old id back in the box, so a
 				// refused rename leaves the document and the cell saying the same thing.
-				ok = validateNewId(newId, el.id);
+				ok = validateNewId(newId, el.id, group);
 				if (ok !== true) { alert(ok); return; }
 				if (group === 'node') { applyNodeRename(el.id, newId); }
 				else { applyLinkRename(el.id, newId); }
@@ -23875,7 +23875,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function panePlanCreates(spec, lines) {
 		var used = {}, seen = {}, errors = [], plans = [];
-		allIds().forEach(function (x) { used[x] = 1; });
+		allIds(spec.group).forEach(function (x) { used[x] = 1; });   // this table's namespace: see allIds()
 		lines.forEach(function (ln) {
 			var cells = ln.cells, row = ln.no, err = null, plan = { no: row, writes: [], ignored: 0 },
 				id = cells.id ? cells.id.t : '', a, b, f, to, vp;
@@ -31294,7 +31294,7 @@ var EngCalcs = EngCalcs || {};
 			// as every other one, which is why a point carries both.
 			if (want) {
 				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', line: p.line, raw: p.raw, detail: want }); }
-				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
+				else if (allIds('node').indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
 				else { applyNodeRename(n.id, want); }
 			}
 			created++;
@@ -47177,26 +47177,39 @@ var EngCalcs = EngCalcs || {};
 		initTipsIn(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
-	function allIds() {
-		return doc.nodes.map(function (x) { return x.id; })
-			.concat(doc.links.map(function (x) { return x.id; }))
-			.concat(doc.labels.map(function (x) { return x.id; }))
-			// A meter joins the one id pool the rest of the drawing shares (Task 247). This page
-			// has always pooled nodes, links and Texts -- EPANET namespaces nodes and links
-			// separately and we do not -- so a meter is pooled on the same terms, and mintId()
-			// cannot hand a new meter an id a junction already answers to.
+	/**
+	 * **NODES AND LINKS ARE TWO ID NAMESPACES, AS IN EPANET** (Tom, 2026-09-26: *"Junctions and
+	 * pipes can use same ID. Yes. J1 & P1 or 1 and 1."*). A node's ID must be unique among nodes
+	 * and a link's among links; junction 10 and pipe 10 are both legal, as they always were in a
+	 * file this page imported (Task 324 keyed every override, index and lookup by group for exactly
+	 * that). `group` says which pool a new or renamed ID must be free in:
+	 *
+	 *   'node'  the nodes, plus Texts and customers
+	 *   'link'  the links, plus Texts and customers
+	 *   none    everything -- what mintId() and a Text's or a customer's own new ID still use
+	 *
+	 * **TEXTS AND CUSTOMERS KEEP THEIR OLD RULE**, unique against everything (Task 247 pooled a
+	 * meter on those terms), and they stay in both pools so no node or link can be renamed onto one.
+	 * mintId() still avoids every ID, so the page never MAKES a shared ID of its own accord; it only
+	 * stops refusing one a person chose.
+	 */
+	function allIds(group) {
+		var out = [];
+		if (group !== 'link') { out = out.concat(doc.nodes.map(function (x) { return x.id; })); }
+		if (group !== 'node') { out = out.concat(doc.links.map(function (x) { return x.id; })); }
+		return out.concat(doc.labels.map(function (x) { return x.id; }))
 			.concat((doc.customers || []).map(function (x) { return x.id; }));
 	}
-	function validateNewId(newId, oldId) {
+	function validateNewId(newId, oldId, group) {
 		var pc = EngCalcs.pageConfig || {};
 		if (newId === oldId) { return true; }
 		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'; }
-		if (allIds().indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
+		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
 	// A text input in place of the static title -- shared by both popups since the validation/
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
-	function idField(currentId, onRename) {
+	function idField(currentId, onRename, group) {
 		var pc = EngCalcs.pageConfig || {},
 			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
 		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
@@ -47206,7 +47219,7 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'text'; input.value = currentId;
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
-			var newId = input.value, result = validateNewId(newId, currentId);
+			var newId = input.value, result = validateNewId(newId, currentId, group);
 			if (result !== true) { alert(result); input.value = currentId; return; }
 			if (newId !== currentId) { saveUndoSnapshot(); onRename(newId); }
 		});
@@ -47394,17 +47407,19 @@ var EngCalcs = EngCalcs || {};
 		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
 			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
 	}
-	function isNodeId(id) { return !!nodeById(id); }
 	function applyIdPrefixToAll(key) {
 		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,
 			batch = elementsForIdKey(key), moving = [], skipped = 0, taken = {}, highest = 0;
-		allIds().forEach(function (id) { taken[id] = true; });
+		// One key is one element type, so one namespace (allIds()); taken is that pool.
+		allIds(batch.length ? elGroup(batch[0]) : undefined).forEach(function (id) { taken[id] = true; });
 		batch.forEach(function (x) {
 			var m = /^(.*?)(\d+)$/.exec(String(x.id));
 			if (m && +m[2] > highest) { highest = +m[2]; }
 			if (!m) { skipped++; return; }               // no trailing number: nothing to keep
 			var want = prefix + m[2];
-			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: isNodeId(x.id) }); }
+			// **ITS GROUP, NOT A LOOKUP BY ID**: junction 10 and pipe 10 may both exist, so "is there
+			// a node called 10" does not say which one this is.
+			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: elGroup(x) === 'node' }); }
 		});
 		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a FIXED POINT rather than in one
 		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away
@@ -47549,7 +47564,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		idField(n.id, function (newId) { renameNode(nodeId, newId); });
+		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
 		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
@@ -48612,7 +48627,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		idField(l.id, function (newId) { renameLink(linkId, newId); });
+		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
 		clearFields(fields);
 		// **THE IDENTITY BAND, AND A LINK HAS NO COORDINATES TO PUT BETWEEN** (Task 674) -- so it is
 		// ID, Description, Tag, then everything the link is. The same two rows a node gets, at the
