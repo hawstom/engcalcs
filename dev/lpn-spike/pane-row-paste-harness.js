@@ -87,6 +87,16 @@ function pasteIntoEmpty(tableId, text) {
 	fire(note, 'paste', { clipboardData: { getData: () => text }, preventDefault: () => { prevented = true; } });
 	return { prevented, note };
 }
+// Every expected sentence is built from the language file, never restated: a reworded string must
+// not break this harness (harness_wording_pins).
+const PC = global.EngCalcs.pageConfig;
+function say(key, vals) {
+	let t = String(PC[key]);
+	Object.keys(vals || {}).forEach((k) => { t = t.replace('{' + k + '}', String(vals[k])); });
+	return t;
+}
+function has(text, key, vals) { return String(text || '').indexOf(say(key, vals)) >= 0; }
+const REFUSED = say('lpn_pane_paste_refused', { reasons: '' }).trim();
 function nodes() { return L.getDoc().nodes; }
 function links() { return L.getDoc().links; }
 
@@ -99,7 +109,7 @@ console.log('\n--- 1. 400 junction rows into an empty table: 400 junctions, one 
 	const res = pasteIntoEmpty('junctions', lines.join('\r\n'));
 	const ms = Date.now() - t0;
 	report(!!res, 'an empty Junctions table offers a paste target');
-	report(res && /paste rows/i.test(res.note.textContent), '...and says so on the note', res && res.note.textContent);
+	report(res && has(res.note.textContent, 'lpn_pane_paste_here'), '...and says so on the note', res && res.note.textContent);
 	report(res && res.prevented, 'the paste is claimed, not left to the browser');
 	report(nodes().length === 400, '400 junctions were created', String(nodes().length));
 	report(nodes().every((n) => n.type === 'junction'), '...all of them junctions');
@@ -109,7 +119,7 @@ console.log('\n--- 1. 400 junction rows into an empty table: 400 junctions, one 
 	report(j7 && j7.elev === 0 && j7._demand === 0, 'a blank elevation and demand take the new-asset defaults',
 		j7 && JSON.stringify({ elev: j7.elev, demand: j7._demand }));
 	report(L.undoDepth() === d0 + 1, 'the whole paste is ONE undo snapshot', d0 + ' -> ' + L.undoDepth());
-	report(/Pasted 400 rows and added 400/.test(L.notice()), 'the notice counts rows added, not cells', L.notice());
+	report(has(L.notice(), 'lpn_pane_pasted_rows', { n: 400, created: 400 }), 'the notice counts rows added, not cells', L.notice());
 	report(ms < 5000, '400 rows paste in reasonable time headlessly', ms + ' ms');
 	const s = L.sel('junctions');
 	report(s && s.aId === 'J-1' && s.fId === 'J-400', 'the new rows are left selected, first to last', JSON.stringify(s));
@@ -128,29 +138,29 @@ console.log('\n--- 2. a duplicate ID refuses the WHOLE paste ---');
 	L.selectCell('junctions', 'C', 'id');
 	let r = L.pasteAt('junctions', 'C\t20\t0\t\t\t1\t555\nD\t30\t0\nA\t40\t0');
 	report(r && r.refused === true, 'an ID already in the network refuses the paste', r && JSON.stringify(r.errors));
-	report(r && r.errors.length === 1 && /Row 3/.test(r.errors[0]) && /A is already in use/.test(r.errors[0]),
+	report(r && r.errors.length === 1 && r.errors[0] === say('lpn_pane_paste_id_taken', { row: 3, id: 'A' }),
 		'...naming the row of the pasted block and the reason', r && r.errors[0]);
 	report(nodes().length === 3 && !L.nodeById('D'), 'nothing was created, not even the good row D');
 	report(L.cellText('junctions', 'C', 'elev') === '100', 'and the existing row the block covered was not written either',
 		L.cellText('junctions', 'C', 'elev'));
 	report(L.undoDepth() === d0, 'a refused paste takes no undo snapshot');
-	report(/^Nothing was pasted\./.test(L.notice()), 'the notice says nothing was pasted', L.notice());
+	report(L.notice().indexOf(REFUSED) === 0, 'the notice says nothing was pasted', L.notice());
 
 	L.selectCell('junctions', 'C', 'id');
 	r = L.pasteAt('junctions', 'C\t20\t0\nD\t30\t0\nE\t40\t0\nD\t50\t0');
-	report(r && r.refused === true && r.errors.length === 1 && /Row 4/.test(r.errors[0]) && /used twice in this paste/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors.length === 1 && r.errors[0] === say('lpn_pane_paste_id_twice', { row: 4, id: 'D' }),
 		'an ID used twice WITHIN the pasted block refuses it too', r && r.errors[0]);
 	report(nodes().length === 3, '...and creates nothing', String(nodes().length));
 
 	r = L.pasteAt('junctions', 'C\t20\t0\n\t30\t0\nE F\t40\t0');
-	report(r && r.errors.length === 2 && /Row 2: a new row needs an ID/.test(r.errors[0]) && /Row 3.*space or a quotation mark/.test(r.errors[1]),
+	report(r && r.errors.length === 2 && r.errors[0] === say('lpn_pane_paste_no_id', { row: 2 }) && r.errors[1] === say('lpn_pane_paste_bad_id', { row: 3, id: 'E F' }),
 		'a blank ID and an ID with a space are each named', r && JSON.stringify(r.errors));
 
 	// Many bad rows: five named, the rest counted.
 	const many = ['C\t20\t0'];
 	for (let i = 0; i < 12; i++) { many.push('A\t' + i + '\t0'); }
 	r = L.pasteAt('junctions', many.join('\n'));
-	report(/Nothing was pasted\./.test(L.notice()) && /Rows with problems not shown here: 7\./.test(L.notice()),
+	report(L.notice().indexOf(REFUSED) === 0 && has(L.notice(), 'lpn_pane_paste_more', { n: 7 }),
 		'twelve failing rows: five are named and seven counted', L.notice());
 
 	// A good paste over the same place now lands: C edited, D and E created.
@@ -160,7 +170,7 @@ console.log('\n--- 2. a duplicate ID refuses the WHOLE paste ---');
 		r && JSON.stringify(r));
 	report(L.cellText('junctions', 'C', 'elev') === '555' && L.cellText('junctions', 'D', 'elev') === '560',
 		'...with the cells of both kinds of row written', L.cellText('junctions', 'C', 'elev') + ',' + L.cellText('junctions', 'D', 'elev'));
-	report(/Pasted 3 rows and added 2 of them/.test(L.notice()), 'the notice says 3 rows, 2 added', L.notice());
+	report(has(L.notice(), 'lpn_pane_pasted_rows', { n: 3, created: 2 }), 'the notice says 3 rows, 2 added', L.notice());
 }
 
 console.log('\n--- 3. a new node with no position refuses the paste ---');
@@ -168,13 +178,13 @@ console.log('\n--- 3. a new node with no position refuses the paste ---');
 	L.selectCell('junctions', 'E', 'id');
 	const n0 = nodes().length;
 	let r = L.pasteAt('junctions', 'E\t40\t0\nF\t\t7');
-	report(r && r.refused === true && /Row 2: a new node needs both X and Y/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_no_position', { row: 2, first: PC.lpn_field_x, second: PC.lpn_field_y }),
 		'a blank coordinate is refused, naming both axes the project uses', r && r.errors[0]);
 	r = L.pasteAt('junctions', 'E\t40\t0\nF\tabc\t7');
-	report(r && r.refused === true && /Row 2: abc is not a valid X/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_bad_cell', { row: 2, text: 'abc', col: PC.lpn_field_x }),
 		'a coordinate that is not a number is refused, naming the column', r && r.errors[0]);
 	r = L.pasteAt('junctions', 'E\t40\t0\nF\t50\t0\t\t\t1\tlots');
-	report(r && r.refused === true && /Row 2: lots is not a valid Elevation/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_bad_cell', { row: 2, text: 'lots', col: L.headings('junctions').filter((c) => c.key === 'elev')[0].h }),
 		'any other cell of a new row that cannot be read refuses it too', r && r.errors[0]);
 	report(nodes().length === n0, 'nothing was created by any of them');
 }
@@ -197,16 +207,16 @@ console.log('\n--- 4. pipe rows join existing nodes; a missing node refuses the 
 	L.openPane('pipes'); L.renderTable('pipes');
 	L.selectCell('pipes', 'P2', 'id');
 	let r = L.pasteAt('pipes', [pipeRow({ id: 'P2', from: 'N2', to: 'N3' }), pipeRow({ id: 'P3', from: 'N3', to: 'N9' })].join('\n'));
-	report(r && r.refused === true && /Row 2: node N9 does not exist yet/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_no_node', { row: 2, id: 'N9' }),
 		'a pipe naming a node that does not exist refuses the paste', r && r.errors[0]);
 	r = L.pasteAt('pipes', [pipeRow({ id: 'P2', from: 'N2', to: 'N3' }), pipeRow({ id: 'P3', from: 'N3' })].join('\n'));
-	report(r && r.refused === true && /Row 2: a new link needs a From node and a To node/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_no_ends', { row: 2 }),
 		'a pipe with a blank To refuses the paste', r && r.errors[0]);
 	r = L.pasteAt('pipes', [pipeRow({ id: 'P2', from: 'N2', to: 'N3' }), pipeRow({ id: 'P3', from: 'N3', to: 'N3' })].join('\n'));
-	report(r && r.refused === true && /From and To are the same node/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_same_ends', { row: 2 }),
 		'a pipe from a node to itself refuses the paste', r && r.errors[0]);
 	r = L.pasteAt('pipes', [pipeRow({ id: 'P2', from: 'N2', to: 'N3' }), pipeRow({ id: 'N1', from: 'N3', to: 'N1' })].join('\n'));
-	report(r && r.refused === true && /the ID N1 is already in use/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_id_taken', { row: 2, id: 'N1' }),
 		'a pipe ID that a NODE already answers to is taken (one ID pool, as allIds() has it)', r && r.errors[0]);
 	report(links().length === 2, 'none of those created anything', String(links().length));
 }
@@ -231,7 +241,7 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 		'the auto length follows the bends', p4 && String(p4._length));
 	L.selectCell('pipes', 'P4', 'id');
 	r = L.pasteAt('pipes', [pipeRow({ id: 'P4', from: 'N1', to: 'N3', verts: '0/100/50/120' }), pipeRow({ id: 'P5', from: 'N1', to: 'N3', verts: '0/100/50' })].join('\n'));
-	report(r && r.refused === true && /Row 2: 0\/100\/50 is not a valid Vertices/.test(r.errors[0]),
+	report(r && r.refused === true && r.errors[0] === say('lpn_pane_paste_bad_cell', { row: 2, text: '0/100/50', col: vh.h }),
 		'an odd count refuses the whole paste', r && r.errors[0]);
 	r = L.pasteAt('pipes', [pipeRow({ id: 'P4', from: 'N1', to: 'N3', verts: '0/100/50/120' }), pipeRow({ id: 'P5', from: 'N1', to: 'N3', verts: '0,100,50,120' })].join('\n'));
 	report(r && r.refused === true, 'commas are not the separator, and a cell using them is refused, not half-read', r && r.errors[0]);
@@ -265,7 +275,7 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 	report(sn.y === 40.7128 && sn.x === -74.006, 'and a pasted node\'s position too', JSON.stringify({ x: sn.x, y: sn.y }));
 	L.selectCell('junctions', 'G2', 'id');
 	const r2 = L.pasteAt('junctions', 'G2\t40.7306\t-73.9866\nG3\t95\t0');
-	report(r2 && r2.refused === true && /95 is not a valid Latitude/.test(r2.errors[0]), 'a latitude off the map is refused', r2 && r2.errors[0]);
+	report(r2 && r2.refused === true && r2.errors[0] === say('lpn_pane_paste_bad_cell', { row: 2, text: '95', col: PC.lpn_field_lat }), 'a latitude off the map is refused', r2 && r2.errors[0]);
 	L.setCoords(undefined);
 }
 
@@ -334,7 +344,7 @@ console.log('\n--- 8. a real exported network: Net1, tab-separated, with a headi
 	// 10, so its pipe sheet as EPANET wrote it is refused, whole, naming the rows. That is the
 	// finding this section exists to record; the sheet with its pipe IDs made unique then lands.
 	pasteIntoEmpty('pipes', sheet('pipes', sec.PIPES.map((r) => ({ id: r[0], from: r[1], to: r[2], length: r[3], diameter: r[4], roughness: r[5] }))));
-	report(links().length === 0 && /^Nothing was pasted\. Row 2: the ID 10 is already in use\./.test(L.notice()),
+	report(links().length === 0 && L.notice().indexOf(REFUSED + ' ' + say('lpn_pane_paste_id_taken', { row: 2, id: '10' })) === 0,
 		'Net1\'s pipe sheet as EPANET wrote it is refused: pipe 10 shares an ID with junction 10', L.notice());
 	pasteIntoEmpty('pipes', sheet('pipes', sec.PIPES.map((r) => ({ id: 'P' + r[0], from: r[1], to: r[2], length: r[3], diameter: r[4], roughness: r[5] }))));
 	const pipesSaid = L.notice();
