@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-275.
+**An ID is permanent and never reused.** Next free: R-282.
 
 ---
 
@@ -213,6 +213,16 @@ judgement and does not belong to a script.
 
 - [x] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool." -- Tasks 718-723
 - [x] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!" -- 146.09 retitled "An inset overview map"; Task 717 at 50
+
+## Round of 2026-09-26 -- merges, and feat/table-editing's third and fourth passes
+
+- [x] R-275 -- | "8103 zoom-control: Merge", "8113 customer-node: Merge. Nice!", "8114 menu-button: Merge.", "8115 reports: Merge. Very nice. And the file name was good." -- merged; production 83bf02d5
+- [x] R-276 -- | "Can you copy the 'Zoom in to see labels' text from the ungeoreferenced Net3 to the lat/lon Net3? Remove the 'Zoom to see labels' text from the Net2 example." -- master 3a4bb054, fccaaa67
+- [ ] R-277 feat/table-editing | "(1) The headings text is still acting like text ... (a) No hover shading, (b) No cursor change. (2) Sorting still feels schizophrenic. Either the dots or the arrow, not both ... Possibly the arrow and the menu can take up zero space and appear with 100% opacity over any heading text on hover. (3) ... remove the sort rows from the column menu. (4) Remove the itemized Show {column} rows ... Leave only Hide this, Show all, and Manage." -- feat/table-editing acdbe7f8, awaiting your pass
+- [ ] R-278 feat/table-editing | "I still see special highlighting on the text." [his screenshot: a box round 'Longitude'] -- 410ddadc: the ring is on the whole cell
+- [ ] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc
+- [ ] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback
+- [x] R-281 feat/table-editing | "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click selects, drag moves. -- recorded in the handoff
 
 ### Rulings recorded, nothing to build
 
