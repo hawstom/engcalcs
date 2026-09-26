@@ -2223,7 +2223,6 @@
         "lpn_crs_none": "9dde375cc04d679ae6b060691faeb027da079685",
         "lpn_crs_noview": "33031c9ce657f6540388a1f6afd8d40ef035dc6b",
         "lpn_crs_place": "2e7a0e7314a2f757a63be4cc925888af14f35c6c",
-        "lpn_crs_place_projected": "5590a538edd8a9521ce8191d7468ea50707ed7d3",
         "lpn_crs_place_tip": "f87d92f97a54b6e78b0e0273ae9ea8a61805b824",
         "lpn_crs_search": "bce06414177f72ab70e6387b6af9f8ceef0d6049",
         "lpn_crs_view": "dc1bac0d38317f34e3253544be338c1e7c5ee88d",
@@ -2596,7 +2595,6 @@
         "lpn_fittings_none": "b615dcfdcf8645f7f5c7054fb0e9e6f21d8d9e21",
         "lpn_geomap": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
         "lpn_georef_adjust": "e5af13bcbd04eebd8e96cb6deded72be4bd6c1ad",
-        "lpn_georef_asdegrees": "c13ac3f8f725066e5adf32eb4ea0155b08a845e9",
         "lpn_georef_backdrop_unrotated": "044e4077a7af86a4d7da986c8225d3fe47f02980",
         "lpn_georef_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_georef_confirm": "2726726201f9f019478618ff8b60df99b3dcdad9",
@@ -2607,8 +2605,6 @@
         "lpn_georef_finish": "a17a8468e04228d05cdbc42542d7f3ab737c5c6b",
         "lpn_georef_goto": "b7d99183c72849085ea09d98cc205c06cd6e0ff6",
         "lpn_georef_intro": "89a437b550014e989e6f3e32c8d0814e07df4bc9",
-        "lpn_georef_on_map": "7843df7be37e3e7d47b4d1e866c797dd8c64328a",
-        "lpn_georef_projected": "aacb8741f37cc229fb1d9615c685c5b580b78cbc",
         "lpn_georef_rotation": "7b27d08bdb07249454acd7424d742c40e608fd0c",
         "lpn_georef_rotation_tip": "7a24c3c413288fa6fc73255bda96c60f3cd3a73e",
         "lpn_georef_save_locked": "821c84cf73567c0352f73ab63aed35b6d9cc60ec",
@@ -5254,10 +5250,6 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_crs_place_projected": {
-            "words": 32,
-            "ends_sentence": true
-        },
         "lpn_crs_place_tip": {
             "words": 42,
             "ends_sentence": true
@@ -6746,10 +6738,6 @@
             "words": 45,
             "ends_sentence": true
         },
-        "lpn_georef_asdegrees": {
-            "words": 43,
-            "ends_sentence": true
-        },
         "lpn_georef_backdrop_unrotated": {
             "words": 24,
             "ends_sentence": true
@@ -6788,14 +6776,6 @@
         },
         "lpn_georef_intro": {
             "words": 80,
-            "ends_sentence": true
-        },
-        "lpn_georef_on_map": {
-            "words": 6,
-            "ends_sentence": true
-        },
-        "lpn_georef_projected": {
-            "words": 19,
             "ends_sentence": true
         },
         "lpn_georef_rotation": {

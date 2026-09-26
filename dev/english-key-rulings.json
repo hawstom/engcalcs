@@ -546,11 +546,6 @@
             "ruled": "2026-09-14",
             "answer": "OK. And this seems like a duplicate string maybe."
         },
-        "lpn_crs_place_projected": {
-            "on": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.",
-            "ruled": "2026-09-14",
-            "answer": "This is a problem. The projected project needs to open at the place you searched for. We know the lat/lon and zoom level they searched for. That needs to be the initial view of their project."
-        },
         "lpn_crs_place_tip": {
             "on": "Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.",
             "ruled": "2026-09-14",
@@ -1746,11 +1741,6 @@
         "lpn_georef_backdrop_unrotated": {
             "on": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
             "ruled": "2026-08-29"
-        },
-        "lpn_georef_projected": {
-            "on": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
         },
         "lpn_georef_save_locked": {
             "on": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",

@@ -47,11 +47,14 @@ if (!isset($en['lpn_geomap'], $en['lpn_xymap'])) {
 }
 
 /* THE KEY LIST IS DERIVED, NEVER TYPED. Any English string containing the mode's English name is a
- * string that names the mode. `XY` is matched on a word boundary so it cannot hit a stray pair of
- * letters inside another word. The two anchor keys are excluded: they ARE the rendering. */
+ * string that names the mode. The local noun is matched on a word boundary so it cannot hit a stray
+ * longer word. The two anchor keys are excluded: they ARE the rendering. */
 $modes = array(
     'geo' => array('anchor' => 'lpn_geomap', 'needle' => $en['lpn_geomap'], 'regex' => null),
-    'xy'  => array('anchor' => 'lpn_xymap',  'needle' => $en['lpn_xymap'],  'regex' => '/\bXY\b/'),
+    // On a word boundary, case-insensitive, so the short noun ('local') cannot hit 'locally' or
+    // 'location'. Derived from the anchor, like the needle, so a new noun needs no edit here.
+    'xy'  => array('anchor' => 'lpn_xymap',  'needle' => $en['lpn_xymap'],
+                   'regex' => '/\b' . preg_quote($en['lpn_xymap'], '/') . '\b/i'),
 );
 foreach ($modes as $id => &$m) {
     $m['keys'] = array();

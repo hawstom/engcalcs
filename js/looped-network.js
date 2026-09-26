@@ -13973,7 +13973,9 @@ var EngCalcs = EngCalcs || {};
 			var p = projectLocatable()
 				? EngCalcs.lpnCrsForward(projectCrsCode(), { lon: ll.lon, lat: ll.lat }) : null;
 			if (!p) {
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// One of the few systems this page lists without a transform: Tom's own sentence,
+				// naming it (the retired "which this page does not have yet" sentence said otherwise).
+				setNotice(String((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || '{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.').replace('{crs}', crsLabel(projectCrsCode()) || String(projectCrsCode() || '')));
 				return;
 			}
 			applyView({
@@ -14581,14 +14583,14 @@ var EngCalcs = EngCalcs || {};
 		// somebody may convert to another. It says where the network already is, so the wizard opens
 		// with that answer in place rather than asking the question again from the whole world.
 		var fromGeo = isLatLonProject();
-		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
-		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
-		// project that states its own coordinate system. The xy grid it was built for states none.
-		if (isProjectedProject()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// **A DECLARED COORDINATE SYSTEM IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites
+		// every coordinate in the document, which is exactly what ruling P2 says no door may do to a
+		// project that states its own coordinate system in place. Its one door, File, Convert as,
+		// lays an EPSG copy out in lat/lon BEFORE calling this (convasProceed()), so the guard is a
+		// net and says nothing: its old "already states a map projection" sentence was deleted (Task 696; Tom:
+		// *"Obsolete. A project that is already georeferenced is easier (more precise) to convert,
+		// not harder."*).
+		if (isProjectedProject()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -14768,7 +14770,10 @@ var EngCalcs = EngCalcs || {};
 		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_asdegrees || 'The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.');
+		// No notice of its own: the one caller, georefOpenAnswered(), says what is true of the
+		// project it is reading, and the "x and y in this file were read as a longitude and a
+		// latitude" sentence this used to say, only for that caller to overwrite it at once, was
+		// deleted with its key.
 	}
 	// Whole-world framing puts a little more land on the screen than the equator does, and the
 	// clamp in applyView() takes care of the rest.
@@ -15267,17 +15272,14 @@ var EngCalcs = EngCalcs || {};
 	function mapgeoStart() {
 		var pc = EngCalcs.pageConfig || {}, ext;
 		if (mapgeo || georefActive()) { return; }
-		if (isLatLonProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
-			return;
-		}
-		// A project that STATES a coordinate system already says where it is, and a second answer
-		// to that question is the drift ruling P2 exists to stop.
-		if (!xyMapAttachable()) {
-			setNotice(pc.lpn_georef_projected ||
-				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
-			return;
-		}
+		// A project that STATES a coordinate system (lat/lon, EPSG:4326, is one) already says where
+		// it is, and a second answer to that question is the drift ruling P2 exists to stop. **NO
+		// SENTENCE, BECAUSE NO DOOR REACHES THIS** (Task 696): World map, Attach calls this only for
+		// a grid (xyMapAttachable()), and File, Convert as only from "not georeferenced". The two
+		// refusals that stood here ("This project is already on lat/lon." and "...already states a
+		// map projection...") were deleted with their keys; the first is the sentence Tom ruled wrong
+		// on 2026-09-23.
+		if (!xyMapAttachable()) { return; }
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -30381,9 +30383,9 @@ var EngCalcs = EngCalcs || {};
 		runConvertAs(a);
 	}
 	// **THE NAMED SYSTEM IN THE REFUSAL** (Tom, 2026-09-25: "What, specifically, is 'that coordinate
-	// system'?"). `from`/`to` never both name a non-lat/lon EPSG system at once -- one side of a
-	// Convert as is always lat/lon or a local grid -- so the other one is unambiguously the system
-	// the visitor is missing a transform for.
+	// system'?"). Both sides can be EPSG planes (UTM zone 10N to State Plane, say), and then the
+	// FROM side is named: its caller, convasProceed(), fails only while reading the project's own
+	// coordinates. runConvertAs() names the missing side itself, before anything is copied.
 	function convasForeignCrs(from, to) {
 		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
 		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
@@ -32675,7 +32677,7 @@ var EngCalcs = EngCalcs || {};
 			return true;
 		}
 		if (!georefActive()) { return false; }
-		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the conversion with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
 	}
 	function switchToTab(id) {
@@ -33505,7 +33507,10 @@ var EngCalcs = EngCalcs || {};
 				// js/lpn-crs.js: the first draft skipped the whole branch and the user got
 				// neither the arrival nor the explanation -- a project silently on its own plane
 				// with nothing said about it, which is the state this notice exists to prevent.
-				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				// A module that did not load is a page that did not load, so it says what every such
+				// failure here says (Task 696 retired the "does not have yet" sentence, which Tom asked "Isn't
+				// this obsolete?" of: the page does have the transforms, when it has loaded).
+				setNotice((EngCalcs.pageConfig || {}).lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			} else {
 				EngCalcs.lpnCrsLoad(function () {
 					if (library.openId !== bornAs) { return; }
@@ -33516,7 +33521,7 @@ var EngCalcs = EngCalcs || {};
 						return;
 					}
 					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
-					// to reach for lpn_crs_place_projected, which says the transform is something
+					// to reach for the retired "does not have yet" sentence, which said the transform is something
 					// "this page does not have yet" -- true of the module being absent and false
 					// here, where the page has 5,240 transforms and not this one. A reader who
 					// has just watched a blank plane arrive at 0,0 concludes the feature is
