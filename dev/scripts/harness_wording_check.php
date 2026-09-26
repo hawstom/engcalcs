@@ -125,10 +125,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
             '(a) asserted against PC.lpn_labels_customer_width_tip: the assertion IS that Tom\'s own '
             . 'qualifier sentence, verbatim, is present in the customer row\'s shipped tip -- the '
             . 'sentence going missing or getting paraphrased is the defect this line exists to catch.',
-        'drawn only while the map is this wide or narrower' =>
-            '(a) asserted against PC.lpn_labels_customer_width_tip: the customer tip must read as the '
-            . 'parallel sentence to lpn_settings_label_max_width_tip\'s own wording, not a different '
-            . 'shape -- this is that comparison, not a rewording pin.',
     ],
     'dev/lpn-spike/pane-print-harness.js' => [
         'Elm Street Center' =>
