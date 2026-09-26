@@ -1056,7 +1056,6 @@ $ec_lang['lpn_pane_resize']='Buruta ili kufanya kidirisha kirefu zaidi au kifupi
 $ec_lang['lpn_pane_tab_junctions']='Miunganiko';
 $ec_lang['lpn_pane_tab_tip']='Kichupo hiki kinaonyesha vipengele vya aina hii kama jedwali unaloweza kupanga na kuhariri. Safu za matokeo haziwezi kuhaririwa.';
 $ec_lang['lpn_pane_none']='Mtandao huu bado hauna hivi.';
-$ec_lang['lpn_pane_sort_tip']='Panga kwa safu hii. Bofya tena ili kugeuza mpangilio.';
 
 $ec_lang['lpn_find_menu']='Tafuta na ubadilishe';
 $ec_lang['lpn_find_title']='Tafuta na ubadilishe';

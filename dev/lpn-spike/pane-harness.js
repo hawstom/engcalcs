@@ -513,11 +513,18 @@ console.log('\n--- the FIRST click on Tag / Active / Shut sorts, even when every
 	function tieBrokenIds(ids) {
 		return ids.slice().sort(function (a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); });
 	}
-	// The heading <th> carries a sort <button> and a resize <span> grip; textContent walks both,
-	// and only the button ever carries the ▲/▼.
-	function headingText(id, col) {
+	// **THE ARROW MOVED OUT OF THE HEADING'S OWN TEXT** (2026-09-25, second pass: Tom's "a sort
+	// arrow in the middle of the cell conflicting with the heading text... should go"). It is now
+	// its own `.lpn-pane-sortarrow` element in the trailing gutter, under the "..." menu, and its
+	// glyph is a CSS `content:` string rather than a text node at all (the same reasoning the "..."
+	// glyph itself uses) -- so a stale refill branch that repaints cells by id and never touches a
+	// header <th> would leave this element MISSING entirely rather than merely un-arrowed, which is
+	// exactly as loud a signal as the old textContent check and cannot be satisfied by accident.
+	function sortArrowPresent(id, col) {
 		var th = L.paneTableById(id).headCells[col];
-		return th ? th.textContent : '';
+		return !!(th && th.children.some(function (c) {
+			return (' ' + (c.className || '') + ' ').indexOf(' lpn-pane-sortarrow ') !== -1;
+		}));
 	}
 	[['pipes', 'tag'], ['pumps', 'active'], ['valves', 'closed'], ['junctions', 'active']].forEach(function (t) {
 		var id = t[0], col = t[1], before, expected;
@@ -532,9 +539,8 @@ console.log('\n--- the FIRST click on Tag / Active / Shut sorts, even when every
 		report(L.tableOrder(id).join(',') === expected.join(','),
 			'...and the row order is the tie-broken sort, not whatever it happened to be before',
 			L.tableOrder(id).join(','));
-		report(headingText(id, col).indexOf('▲') >= 0,
-			'...and the heading shows the ascending arrow — this is the one a stale refill branch drops',
-			JSON.stringify(headingText(id, col)));
+		report(sortArrowPresent(id, col),
+			'...and the heading shows the sort arrow — this is the one a stale refill branch drops');
 	});
 	// Pipes and Junctions are reused below by tests that assume they still open at the default
 	// id sort -- put them back exactly where this block found them.

@@ -1054,7 +1054,6 @@ $ec_lang['lpn_pane_resize']='اسحب لجعل اللوحة أطول أو أقص
 $ec_lang['lpn_pane_tab_junctions']='الملتقيات';
 $ec_lang['lpn_pane_tab_tip']='يعرض هذا التبويب عناصر هذا النوع كجدول يمكنك فرزه وتحريره. لا يمكن تحرير أعمدة النتائج.';
 $ec_lang['lpn_pane_none']='لا تحتوي هذه الشبكة على أي منها بعد.';
-$ec_lang['lpn_pane_sort_tip']='فرز حسب هذا العمود. انقر مرة أخرى لعكس الترتيب.';
 
 $ec_lang['lpn_find_menu']='بحث واستبدال';
 $ec_lang['lpn_find_title']='البحث والاستبدال';

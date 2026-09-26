@@ -1057,7 +1057,6 @@ $ec_lang['lpn_pane_resize']='Paneli daha uzun ya da daha kısa yapmak için sür
 $ec_lang['lpn_pane_tab_junctions']='Düğümler';
 $ec_lang['lpn_pane_tab_tip']='Bu sekme, bu türdeki öğeleri sıralayabileceğiniz ve düzenleyebileceğiniz bir tablo olarak gösterir. Sonuç sütunları düzenlenemez.';
 $ec_lang['lpn_pane_none']='Bu şebekede henüz bunlardan yok.';
-$ec_lang['lpn_pane_sort_tip']='Bu sütuna göre sıralayın. Ters çevirmek için tekrar tıklayın.';
 $ec_lang['lpn_find_menu']='Bul ve değiştir';
 $ec_lang['lpn_find_title']='Bul ve değiştir';
 $ec_lang['lpn_find_scope']='Nerede aransın';

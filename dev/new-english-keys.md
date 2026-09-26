@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 250 untranslated keys, of 2089 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 268 untranslated keys, of 2106 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (250, all ruled)
+## lpn_  (268, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -492,15 +492,69 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_node_customers_tip`**
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
+- **`lpn_notes_6_def`**
+  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading's top corner, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
+  @@ NEEDS RULING
+- **`lpn_notes_6_term`**
+  > Table keyboard shortcuts
+  _Ruled OK 2026-09-25._
 - **`lpn_offscreen_intact`**
   > Your network is intact.
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_colmenu_tip`**
+  > Hide or manage columns
+  @@ NEEDS RULING
+- **`lpn_pane_fill_none`**
+  > Nothing in this selection can be filled down.
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_filldown`**
+  > Fill down
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_filled`**
+  > Filled down {n} cells. {skipped} were not changed.
   _Ruled OK 2026-09-25._
 - **`lpn_pane_goto_tip`**
   > Zoom & select
   _Ruled OK 2026-09-23._
+- **`lpn_pane_hide_col`**
+  > Hide this column
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_hide_cols`**
+  > Hide these columns
+  _Ruled OK 2026-09-25._
+- **`lpn_pane_manage_cols`**
+  > Manage columns…
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_bottom`**
+  > Move to end
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_down`**
+  > Move down
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_show`**
+  > Show
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_title`**
+  > Manage columns
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_top`**
+  > Move to beginning
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_manage_cols_up`**
+  > Move up
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_not_used`**
   > Not used
   _Ruled OK 2026-09-23._
+- **`lpn_pane_show_all_cols`**
+  > Show all columns
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_sort_asc`**
+  > Sort ascending
+  _Ruled OK 2026-09-26._
+- **`lpn_pane_sortarrow_tip`**
+  > Reverse the sort
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
@@ -782,7 +836,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**2 still to read**, of 21 new keys across 3 unmerged branch(es).
+**0 still to read**, of 3 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -793,7 +847,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/queue-0926 (`06b7976e`) — adds no English strings
+### feat/convert-as (`6f14fcdc`) — adds no English strings
 
 ### feat/label-gang-search (`0346dc5d`) — 3 new, all ruled
 
@@ -807,59 +861,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/table-editing (`acdbe7f8`) — 18 new, 2 to read @@ NEEDS RULING
+### feat/property-venue (`fd490dd0`) — adds no English strings
 
-- **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
-  @@ NEEDS RULING
-- **`lpn_notes_6_term`**
-  > Table keyboard shortcuts
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_colmenu_tip`**
-  > Hide or manage columns
-  @@ NEEDS RULING
-- **`lpn_pane_fill_none`**
-  > Nothing in this selection can be filled down.
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_filldown`**
-  > Fill down
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_filled`**
-  > Filled down {n} cells. {skipped} were not changed.
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_hide_col`**
-  > Hide this column
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_hide_cols`**
-  > Hide these columns
-  _Ruled OK 2026-09-25._
-- **`lpn_pane_manage_cols`**
-  > Manage columns…
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_bottom`**
-  > Move to end
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_down`**
-  > Move down
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_show`**
-  > Show
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_title`**
-  > Manage columns
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_top`**
-  > Move to beginning
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_manage_cols_up`**
-  > Move up
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_show_all_cols`**
-  > Show all columns
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_sort_asc`**
-  > Sort ascending
-  _Ruled OK 2026-09-26._
-- **`lpn_pane_sortarrow_tip`**
-  > Reverse the sort
-  _Ruled OK 2026-09-26._
+### feat/table-editing (`b7bfdc95`) — adds no English strings
+
+### fix/usage-report-memory (`bbdac569`) — adds no English strings

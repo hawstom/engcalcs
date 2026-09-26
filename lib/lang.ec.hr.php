@@ -1050,7 +1050,6 @@ $ec_lang['lpn_pane_resize']='Povucite da ploču učinite višom ili nižom';
 $ec_lang['lpn_pane_tab_junctions']='Čvorovi';
 $ec_lang['lpn_pane_tab_tip']='Ova kartica prikazuje elemente ove vrste kao tablicu koju možete razvrstati i urediti. Stupci rezultata ne mogu se uređivati.';
 $ec_lang['lpn_pane_none']='Ova mreža još nema nijedan od njih.';
-$ec_lang['lpn_pane_sort_tip']='Razvrstaj prema ovom stupcu. Kliknite ponovno da obrnete redoslijed.';
 $ec_lang['lpn_find_menu']='Pronađi i zamijeni';
 $ec_lang['lpn_find_title']='Pronađi i zamijeni';
 $ec_lang['lpn_find_scope']='Što pretražiti';

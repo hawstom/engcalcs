@@ -750,7 +750,6 @@ $ec_lang['lpn_pane_resize']='Плъзнете, за да направите па
 $ec_lang['lpn_pane_tab_junctions']='Възли';
 $ec_lang['lpn_pane_tab_tip']='Този раздел показва елементите от този вид като таблица, която можете да сортирате и редактирате. Колоните с резултати не могат да се редактират.';
 $ec_lang['lpn_pane_none']='Тази мрежа все още няма нито един такъв.';
-$ec_lang['lpn_pane_sort_tip']='Сортирай по тази колона. Щракнете отново, за да обърнете реда.';
 $ec_lang['lpn_menu_settings']='Настройки';
 $ec_lang['lpn_menu_help']='Помощ';
 $ec_lang['lpn_help_walkthroughs']='Ръководства';

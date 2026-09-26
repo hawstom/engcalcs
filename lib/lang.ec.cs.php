@@ -1048,7 +1048,6 @@ $ec_lang['lpn_pane_resize']='Tažením panel zvětšíte nebo zmenšíte';
 $ec_lang['lpn_pane_tab_junctions']='Uzly';
 $ec_lang['lpn_pane_tab_tip']='Tato karta zobrazuje prvky tohoto druhu jako tabulku, kterou lze třídit a upravovat. Sloupce s výsledky nelze upravovat.';
 $ec_lang['lpn_pane_none']='Tato síť zatím nemá nic z tohoto druhu.';
-$ec_lang['lpn_pane_sort_tip']='Seřadí podle tohoto sloupce. Dalším kliknutím pořadí obrátíte.';
 $ec_lang['lpn_find_menu']='Najít a nahradit';
 $ec_lang['lpn_find_title']='Najít a nahradit';
 $ec_lang['lpn_find_scope']='Kde hledat';

@@ -1049,7 +1049,6 @@ $ec_lang['lpn_pane_resize']='Trascina per rendere il pannello più alto o più b
 $ec_lang['lpn_pane_tab_junctions']='Nodi';
 $ec_lang['lpn_pane_tab_tip']='Questa scheda mostra gli elementi di questo tipo come una tabella che puoi ordinare e modificare. Le colonne dei risultati non possono essere modificate.';
 $ec_lang['lpn_pane_none']='Questa rete non ha ancora nessuno di questi elementi.';
-$ec_lang['lpn_pane_sort_tip']='Ordina in base a questa colonna. Fai clic di nuovo per invertire l\'ordine.';
 $ec_lang['lpn_find_menu']='Trova e sostituisci';
 $ec_lang['lpn_find_title']='Trova e sostituisci';
 $ec_lang['lpn_find_scope']='Cosa cercare';

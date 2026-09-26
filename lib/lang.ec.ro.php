@@ -1050,7 +1050,6 @@ $ec_lang['lpn_pane_resize']='Trageți pentru a face panoul mai înalt sau mai sc
 $ec_lang['lpn_pane_tab_junctions']='Joncțiuni';
 $ec_lang['lpn_pane_tab_tip']='Acest tab arată elementele de acest tip ca un tabel pe care îl puteți sorta și edita. Coloanele de rezultate nu pot fi editate.';
 $ec_lang['lpn_pane_none']='Această rețea nu are încă niciunul dintre acestea.';
-$ec_lang['lpn_pane_sort_tip']='Sortează după această coloană. Faceți clic din nou pentru a inversa ordinea.';
 $ec_lang['lpn_find_menu']='Găsire și înlocuire';
 $ec_lang['lpn_find_title']='Găsire și înlocuire';
 $ec_lang['lpn_find_scope']='Ce se caută';

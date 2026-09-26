@@ -2852,7 +2852,6 @@
         "lpn_pane_resize": "ec7886a3bab174ee59d4ffc0b0bbb1272abafee3",
         "lpn_pane_right_toggle": "7d9ff4f0de398581c4640bcbb6e536c355a391be",
         "lpn_pane_right_toggle_tip": "a87afa19af1816cefc826dd45cad9a60ebee0ff2",
-        "lpn_pane_sort_tip": "8f0d327910845105c937a478aa1143486f3d33c9",
         "lpn_pane_tab_junctions": "b836e8bcdde86c43aeb171e94a0bb2a815027fef",
         "lpn_pane_tab_pipes": "785af2a4ad3c4ee912623c6e0b6d4299ea305bf6",
         "lpn_pane_tab_pumps": "95f9186df66ab0f38fde70f069906889c1dcbdbd",
@@ -7768,10 +7767,6 @@
         },
         "lpn_pane_right_toggle_tip": {
             "words": 18,
-            "ends_sentence": true
-        },
-        "lpn_pane_sort_tip": {
-            "words": 9,
             "ends_sentence": true
         },
         "lpn_pane_tab_junctions": {

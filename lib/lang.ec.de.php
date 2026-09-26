@@ -1050,7 +1050,6 @@ $ec_lang['lpn_pane_resize']='Ziehen, um das Panel höher oder niedriger zu mache
 $ec_lang['lpn_pane_tab_junctions']='Entnahmeknoten';
 $ec_lang['lpn_pane_tab_tip']='Dieser Tab zeigt die Elemente dieser Art als Tabelle, die Sie sortieren und bearbeiten können. Ergebnisspalten können nicht bearbeitet werden.';
 $ec_lang['lpn_pane_none']='Dieses Netz hat davon noch keine.';
-$ec_lang['lpn_pane_sort_tip']='Nach dieser Spalte sortieren. Erneut klicken, um die Reihenfolge umzukehren.';
 $ec_lang['lpn_find_menu']='Suchen und ersetzen';
 $ec_lang['lpn_find_title']='Suchen und ersetzen';
 $ec_lang['lpn_find_scope']='Wonach gesucht wird';

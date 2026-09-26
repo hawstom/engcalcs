@@ -738,7 +738,6 @@ $ec_lang['lpn_pane_resize']='Faites glisser pour agrandir ou réduire le panneau
 $ec_lang['lpn_pane_tab_junctions']='Jonctions';
 $ec_lang['lpn_pane_tab_tip']='Cet onglet affiche les éléments de ce type sous forme de tableau que vous pouvez trier et modifier. Les colonnes de résultats ne peuvent pas être modifiées.';
 $ec_lang['lpn_pane_none']='Ce réseau n\'en a encore aucun.';
-$ec_lang['lpn_pane_sort_tip']='Trier selon cette colonne. Cliquez à nouveau pour inverser le tri.';
 $ec_lang['lpn_menu_settings']='Paramètres';
 $ec_lang['lpn_menu_help']='Aide';
 $ec_lang['lpn_help_walkthroughs']='Tutoriels';
