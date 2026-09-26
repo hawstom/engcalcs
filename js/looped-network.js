@@ -2671,6 +2671,13 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
+		// The one data label the pointer is carrying right now, if any. It is placed exactly where
+		// the pointer puts it (js/lpn-collide.js candidatesFor()), never pushed along its leader.
+		function labelHeldByDrag(key) {
+			if (!drag || drag.id === undefined) { return false; }
+			return (drag.type === 'nodelbl' && key === nodeLabelKey(drag.id)) ||
+				(drag.type === 'linklbl' && key === linkLabelKey(drag.id));
+		}
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -2681,7 +2688,7 @@ var EngCalcs = EngCalcs || {};
 			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
 			labels.push({
-				id: key, anchor: anchor, home: home, dragged: !!dragged,
+				id: key, anchor: anchor, home: home, dragged: !!dragged, held: labelHeldByDrag(key),
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
