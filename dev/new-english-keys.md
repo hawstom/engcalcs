@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 272 untranslated keys, of 2103 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 286 untranslated keys, of 2117 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (272, 8 to read @@ NEEDS RULING)
+## lpn_  (286, 22 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -555,6 +555,48 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_not_used`**
   > Not used
   _Ruled OK 2026-09-23._
+- **`lpn_pane_paste_bad_cell`**
+  > Row {row}: {text} is not a valid {col}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_id`**
+  > Row {row}: the ID {id} has a space or a quotation mark in it.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_here`**
+  > Click here and paste rows from a spreadsheet to add them.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_taken`**
+  > Row {row}: the ID {id} is already in use.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_twice`**
+  > Row {row}: the ID {id} is used twice in this paste.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_more`**
+  > Rows with problems not shown here: {n}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_ends`**
+  > Row {row}: a new link needs a From node and a To node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_id`**
+  > Row {row}: a new row needs an ID.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_node`**
+  > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_position`**
+  > Row {row}: a new node needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_refused`**
+  > Nothing was pasted. {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_same_ends`**
+  > Row {row}: From and To are the same node.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows`**
+  > Pasted {n} rows and added {created} of them to the network.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows_skipped`**
+  > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
+  @@ NEEDS RULING
 - **`lpn_pane_show_all_cols`**
   > Show all columns
   _Ruled OK 2026-09-26._
@@ -848,7 +890,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 3 unmerged branch(es).
+**1 still to read**, of 4 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -859,7 +901,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0926c (`588e5257`) — adds no English strings
+### chore/handoff-0926c (`d40d1327`) — adds no English strings
+
+### feat/find-coordinate (`a75480e0`) — adds no English strings
 
 ### feat/label-gang-search (`c0104534`) — 3 new, all ruled
 
@@ -873,4 +917,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### fix/table-help (`84bfdc5f`) — adds no English strings
+### feat/placement-wizard (`a7917752`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_crs_count_network`**
+  > {n} of {total} coordinate systems cover this network.
+  @@ NEEDS RULING
+
+### feat/row-paste (`a9a78bcd`) — adds no English strings
