@@ -14748,6 +14748,12 @@ var EngCalcs = EngCalcs || {};
 			// `mpd` is already at t.origin.lat, which is the latitude georefWriteBackdrop() reads.
 			georef.bd.s = georef.bd.s * mpd.lon / t.metersPerUnit;
 		}
+		// **AND THE PICTURE IS DRAWN THROUGH IT NOW, not at the first settle** (R-172 (1), found by
+		// dev/lpn-spike/convert-as-browser-harness.js section 5). georefStart() had already written it
+		// through its whole-world opening transform, so without this the site plan sat there --
+		// enormous and off the network -- until the first drag's settle wrote it here, which is the
+		// jump on release Tom saw. The round trip through `bd.s` above returns the scale it arrived at.
+		georefWriteBackdrop(t);
 		// ATTACHED from the first frame: the model is already on the ground, which is what step 2
 		// means. Step 1 exists to aim a drawing that is nowhere in particular.
 		georef.step = GEOREF_STEP_ATTACHED;
