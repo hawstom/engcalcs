@@ -755,7 +755,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**5 still to read**, of 33 new keys across 6 unmerged branch(es).
+**7 still to read**, of 33 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -766,7 +766,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-node (`d29a2c2c`) — 2 new, all ruled
+### feat/customer-node (`105d9f68`) — 2 new, all ruled
 
 - **`lpn_field_meter_node`**
   > Connected to
@@ -789,7 +789,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/menu-button (`eceab3ab`) — adds no English strings
 
-### feat/report (`d3be5817`) — adds no English strings
+### feat/report (`15490bd3`) — adds no English strings
 
 ### feat/table-editing (`39d3b3f8`) — 21 new, 5 to read @@ NEEDS RULING
 
@@ -857,7 +857,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reverse the sort
   @@ NEEDS RULING
 
-### feat/zoom-control (`d95c0b27`) — 7 new, all ruled
+### feat/zoom-control (`43902998`) — 7 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_mode_zoom_window`**
   > Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.
@@ -872,11 +872,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Zoom in
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_in_tip`**
-  > Zoom in one step. Shortcut: +
-  _Ruled OK 2026-09-25._
+  > Zoom in. Shortcut: +
+  @@ NEEDS RULING
 - **`lpn_zoom_out`**
   > Zoom out
   _Ruled OK 2026-09-25._
 - **`lpn_zoom_out_tip`**
-  > Zoom out one step. Shortcut: -
-  _Ruled 2026-09-25: His own wording, written on the list 2026-09-25 beside lpn_zoom_in_tip's._
+  > Zoom out. Shortcut: -
+  @@ NEEDS RULING
