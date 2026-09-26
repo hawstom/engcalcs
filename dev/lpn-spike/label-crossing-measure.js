@@ -33,6 +33,15 @@
 // next. It does not any more: predictNodeLabelBoxes() derives that seed from the drawing, and
 // label-stability-harness.js holds it.)
 
+// **THE SHIPPED FILE'S LABELING THRESHOLD IS CLEARED ON LOAD.** Master's examples carry one (Net3
+// 30 ft, Net3-World 65000 ft), and at the fit view it hides every label outright, so a placement
+// measured there would compare nothing. A caller measuring placement, not the threshold, passes
+// `opts.allWidths`.
+function labelsAtAllWidths(saved) {
+	if (saved && saved.settings) { saved.settings.labelMaxWidth = null; }
+	return saved;
+}
+
 'use strict';
 
 const fs = require('fs');
@@ -168,7 +177,10 @@ async function measure(file, mode, opts) {
 	);
 	L.buildLayers();
 	L.setCanvas(1400, 900);
-	L.applySaved(JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8')));
+	const saved = JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8'));
+	// opts.allWidths: see labelsAtAllWidths(). Off by default, so a harness that reports the drawing
+	// AS IT SHIPS still sees the shipped threshold.
+	L.applySaved(opts.allWidths ? labelsAtAllWidths(saved) : saved);
 	L.buildDom();
 	L.noteMapSized();
 	// EVERY FIELD ON, which is the crowded end of what a user can ask for and the state Tom's own

@@ -166,7 +166,7 @@ async function measure(prefix) {
 	};
 	const { measure: pageMeasure } = require('./label-crossing-measure.js');
 	await pageMeasure(HEADLINE, 'all+shed',
-		{ passes: 1, fields: { node: ['id'], link: [] }, prefix: { node: { id: prefix } } });
+		{ passes: 1, allWidths: true, fields: { node: ['id'], link: [] }, prefix: { node: { id: prefix } } });
 	return views;
 }
 

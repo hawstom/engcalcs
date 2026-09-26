@@ -55,6 +55,14 @@ const HIS_CEILING = { 2: { '251': 3.7 } };
 const ZOOMS = (process.env.LPN_ZOOMS || '2,3').split(',').map(Number);
 
 let checks = 0, failures = 0;
+// **THE SHIPPED FILE'S LABELING THRESHOLD IS CLEARED ON LOAD.** Master's examples carry one (Net3
+// 30 ft, Net3-World 65000 ft), and at the fit view it hides every label outright, so a placement
+// measured there would compare nothing. This harness measures placement, not the threshold.
+function labelsAtAllWidths(saved) {
+	if (saved && saved.settings) { saved.settings.labelMaxWidth = null; }
+	return saved;
+}
+
 function report(ok, label, detail) {
 	checks++;
 	if (!ok) { failures++; }
@@ -100,7 +108,7 @@ async function runChild(noSlide) {
 		null, noSlide ? NO_SLIDE : undefined);
 	L.buildLayers();
 	L.setCanvas(1400, 900);
-	L.applySaved(JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples', FILE), 'utf8')));
+	L.applySaved(labelsAtAllWidths(JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples', FILE), 'utf8'))));
 	L.buildDom();
 	L.noteMapSized();
 	const ls = L.labelSettings();

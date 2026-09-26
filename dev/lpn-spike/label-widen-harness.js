@@ -42,6 +42,14 @@ const FILES = ['Net3-Novato-CA-World.lwn', 'Net3.lwn', 'Net2.lwn', 'Net1.lwn', '
 const AFFIXES = [{ tag: 'node ID alone', affix: '' }, { tag: 'ID + 12345678', affix: '12345678' }];
 
 let checks = 0, failures = 0;
+// **THE SHIPPED FILE'S LABELING THRESHOLD IS CLEARED ON LOAD.** Master's examples carry one (Net3
+// 30 ft, Net3-World 65000 ft), and at the fit view it hides every label outright, so a placement
+// measured there would compare nothing. This harness measures placement, not the threshold.
+function labelsAtAllWidths(saved) {
+	if (saved && saved.settings) { saved.settings.labelMaxWidth = null; }
+	return saved;
+}
+
 function report(ok, label, detail) {
 	checks++;
 	if (!ok) { failures++; }
@@ -90,7 +98,7 @@ function runChild(file, widenFlag, affix, mutation) {
 		null, mutation && MUTATIONS[mutation] ? MUTATIONS[mutation] : undefined);
 	L.buildLayers();
 	L.setCanvas(1400, 900);
-	L.applySaved(JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8')));
+	L.applySaved(labelsAtAllWidths(JSON.parse(fs.readFileSync(path.join(EXAMPLES, file), 'utf8'))));
 	L.buildDom();
 	L.noteMapSized();
 	const ls = L.labelSettings();
