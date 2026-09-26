@@ -11360,6 +11360,18 @@ var EngCalcs = EngCalcs || {};
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
 		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
 		var modelFit = s;
+		// **WHILE A MODEL IS BEING PLACED, THE FIT IS THE MODEL'S ALONE.** The labels are off for the
+		// duration (georefSuspend(); Tom, 2026-08-18: *"hide labels temporarily during conversion"*),
+		// so the lettering steps 2 and 3 would measure is left over from an earlier frame -- on the
+		// answered steps of File, Convert as, from the whole-world opening -- and the settle stepped
+		// the zoom down to meet it until Elm Street Center was a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5).
+		if (georefActive()) {
+			apply(modelFit, place(modelFit, modelItems));
+			lastFit = null;
+			if (auto) { rebaseSignatureIfClean(); }
+			return;
+		}
 		items = fitItems(s);
 		s = solve();
 		if (labelsPastThreshold(s)) {
@@ -13745,10 +13757,30 @@ var EngCalcs = EngCalcs || {};
 	// The one write seam for "the placement changed". buildDom() rather than
 	// refreshAllFromDocument(): the elements have moved, and nothing about the project, the units,
 	// the view or the solve has. A full refresh here would re-fit the view on every frame of a drag.
+	// **KEEP THE DRAWN NUMBERS INSIDE CHROME'S LAYOUT RANGE WHILE PLACING** (Task 696, found by
+	// dev/lpn-spike/convert-as-browser-harness.js). georefStart() zeroes the origin, because degrees
+	// start from zero, and georefFinish() re-origins only at the end -- so a model placed at street
+	// zoom anywhere far from 0 N 0 E was drawn at `translate(6.5e7, ...)`, past Chrome's ~3.3e7 px
+	// layout range, and every pipe collapsed into one clamped point (Elm Street Center at Novato:
+	// a 13 px dot). followViewWhileEmpty() already guards the empty document against exactly this;
+	// this is the same rule for a model in mid-placement, through the same rebaseLiveGeoDoc(), which
+	// compensates the view itself. The step 1 freeze is a view too, so it moves by the same amount
+	// and the held model does not jump. Never mid-gesture: a pan holds a translation from before.
+	function georefKeepDrawable() {
+		if (!georef || drag || !isLatLonProject()) { return; }
+		var f = georef.frozen, big = Math.max(Math.abs(state.tx), Math.abs(state.ty),
+			f ? Math.abs(f.tx) : 0, f ? Math.abs(f.ty) : 0);
+		if (big < LPN_GEO_FOLLOW_PX) { return; }
+		var shift = rebaseLiveGeoDoc();
+		if (!shift) { return; }
+		if (f) { f.tx -= f.s * shift.dx; f.ty -= f.s * shift.dy; }
+		georefApplyCompensation();
+	}
 	function georefSetTransform(t) {
 		georef.t = t;
 		georef.rotDeg = t.rotDeg;
 		perfDebugTime('write', function () { georefWrite(t); });
+		georefKeepDrawable();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		// Anything sized in screen pixels was left at the scale of the LAST redraw while the model
 		// was being held still (onZoomChanged does no work at all while detached), so the settle
@@ -13805,8 +13837,11 @@ var EngCalcs = EngCalcs || {};
 			// The scale is shown as WHAT ONE DRAWING UNIT IS ON THE GROUND, in the project's own
 			// length unit -- the sentence a person can check against the drawing they made, unlike
 			// "metres per unit" which is our internal term.
+			// `unitK` is 1 except on the answered steps, where the drawing was re-expressed in
+			// degree-sized units and this says what one of the FILE's own units is on the ground
+			// (georefArmAsDegrees()), so R-219's "type 1" still means the file's numbers unchanged.
 			georefBarEl('lpn_georef_scale_in').value =
-				toDisplay(georef.t.metersPerUnit, 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
+				toDisplay(georef.t.metersPerUnit * (georef.unitK || 1), 'lpn_u_length').toPrecision(6).replace(/\.?0+$/, '');
 			georefBarEl('lpn_georef_rot_in').value = (Math.round(georef.t.rotDeg * 100) / 100);
 		}
 		georefBarEl('lpn_georef_unit').textContent = unitLabel('lpn_u_length');
@@ -13819,7 +13854,7 @@ var EngCalcs = EngCalcs || {};
 		// model where the user has already put it.
 		scale.addEventListener('change', function () {
 			if (!georef || !georef.t) { return; }
-			var m = toSI(+scale.value, 'lpn_u_length');
+			var m = toSI(+scale.value, 'lpn_u_length') / (georef.unitK || 1);
 			if (!(m > 0)) { georefRefreshBar(); return; }
 			var c = georefSrcCentre(), ll = EngCalcs.lpnGeorefToLonLat(georef.t, c.x, c.y);
 			georefSetTransform(EngCalcs.lpnGeorefWithScale(georef.t, m / georef.t.metersPerUnit, ll));
@@ -14736,6 +14771,24 @@ var EngCalcs = EngCalcs || {};
 		// or the user's first drag would move them by exactly the ratio this corrects (Task 674).
 		(georef.ovs || []).forEach(function (o) {
 			o.src = EngCalcs.lpnGeorefFromLonLat(t, o.src.x, o.src.y);
+			// ...and they go back to the numbers they arrived with, which georefStart() had already
+			// rewritten through its whole-world opening transform.
+			if (o.hasX) { o.ov.x = o.was.x; }
+			if (o.hasY) { o.ov.y = o.was.y; }
+		});
+		// **THE OFFSETS COME BACK TOO** (label offsets, anchored Text, attached customers). The same
+		// opening transform had scaled them to the size of a continent, which left every label that
+		// far from its node until the first settle -- and, with the labels drawn, made the fit below
+		// back off to the minimum zoom: Elm Street Center opened as a 13 px dot on a 500,000 ft scale
+		// (dev/lpn-spike/convert-as-browser-harness.js section 5). doc.origin is zero now, so the
+		// arrival offset is the plain difference of the captured tip and base; then both are
+		// re-expressed in this transform's frame, like `src`, for every settle after this one.
+		(georef.offs || []).forEach(function (o) {
+			var bx = inwardX(o.base.x), by = inwardY(o.base.y), px = inwardX(o.tip.x), py = inwardY(o.tip.y);
+			if (o.keys.x) { o.el[o.keys.x] = px - bx; }
+			if (o.keys.y) { o.el[o.keys.y] = py - by; }
+			o.base = EngCalcs.lpnGeorefFromLonLat(t, o.base.x, o.base.y);
+			o.tip = EngCalcs.lpnGeorefFromLonLat(t, o.tip.x, o.tip.y);
 		});
 		// The backdrop is re-expressed in the same frame for the same reason, and its SCALE with it:
 		// reinterpret's promise is that nothing moves, so the picture has to come out the size it
@@ -14760,6 +14813,12 @@ var EngCalcs = EngCalcs || {};
 		georef.frozen = null;
 		georef.t = t;
 		georef.rotDeg = 0;
+		// **THE GROUND DISTANCE IS SHOWN PER UNIT OF THE FILE THE COPY CAME FROM.** One unit of `t`
+		// is a degree of latitude's worth of metres, so step 2 read "364168 ft per drawing unit" on
+		// Elm Street Center; File, Convert as knows what one of the original's own units was (a
+		// foot, a UTM metre), and the bar shows and takes the ground distance in those.
+		georef.unitK = (convas && convas.copyId === library.openId && convas.srcUnitM > 0)
+			? convas.srcUnitM / t.metersPerUnit : 1;
 		georefSuspend(true);
 		// **AND THE VIEW GOES TO THE MODEL.** Refusing to fit -- on the argument that the view is
 		// still the one fitted to these very coordinates when the project opened -- holds only while
@@ -14767,9 +14826,18 @@ var EngCalcs = EngCalcs || {};
 		// bar, by which time step 1 has carried them out to the whole Earth. Fitting re-baselines
 		// nothing: not one coordinate moves here, the camera merely points at where the numbers say
 		// the network already is.
+		// The origin goes under the model first, since the fit below goes to street zoom on it --
+		// see georefKeepDrawable(). A shift of the frame, not of any coordinate; the view follows.
+		rebaseLiveGeoDoc();
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
+		// **THE COMPENSATION GOES FIRST, AND THE FIT SECOND.** georefStart() drew the model through
+		// its whole-world step 1 compensation, and the fit's last step measures the labels AS DRAWN:
+		// under that stale transform every label reads as sitting far from its node, and the fit
+		// backed off to the minimum zoom, leaving Elm Street Center a 13 px dot on a 500,000 ft
+		// scale (dev/lpn-spike/convert-as-browser-harness.js section 5). Attached, it is identity.
+		georefApplyCompensation();
 		// AUTOMATIC, because the user asked to reinterpret the coordinates and not to change the
 		// view: a bare fit here would set the asterisk for a camera move nobody made.
 		zoomExtent(true);
@@ -14838,7 +14906,11 @@ var EngCalcs = EngCalcs || {};
 		// and that is Tom's.
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		var unrotated = georefBackdropRotated(georef.t);
+		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
+		// before the steps began, so the steps see 0 degrees while the picture was left unturned
+		// all the same; convas.bdTurn carries that turn here so the sentence is still said.
+		var unrotated = georefBackdropRotated(georef.t) ||
+			!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
@@ -14874,7 +14946,7 @@ var EngCalcs = EngCalcs || {};
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
 				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
-		convasPlaced();
+		convasPlaced(unrotated);
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -30701,6 +30773,12 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
+		// Metres in one of THIS project's own coordinate units, for the answered steps' Ground
+		// distance box (georefArmAsDegrees()): the attached map's own scale, or the plane's unit.
+		// Null for lat/lon, whose unit is a degree and has no one ground length.
+		var bdTurn = saved.project.georef && isFinite(saved.project.georef.rotDeg) ? saved.project.georef.rotDeg : 0;
+		var srcUnitM = from.kind === 'unnamed' && saved.project.georef ? saved.project.georef.metersPerUnit
+			: (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC ? planeUnitMetres(from.crs) : null);
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
@@ -30757,7 +30835,8 @@ var EngCalcs = EngCalcs || {};
 				.replace('{name}', name));
 			return;
 		}
-		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step };
+		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
+			bdTurn: (from.kind === 'unnamed' && saved.backdrop && bdTurn) ? bdTurn : 0 };
 		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
 		georefStart();
 		if (!georefActive()) { convasAbandon(); }
@@ -30765,7 +30844,7 @@ var EngCalcs = EngCalcs || {};
 	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
 	// this lays it onto the system the box asked for, on the saved document, and installs it in the
 	// same tab. A conversion to lat/lon itself is already finished.
-	function convasPlaced() {
+	function convasPlaced(unrotated) {
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
 		if (!c || c.copyId !== library.openId) { return; }
@@ -30797,7 +30876,10 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		refreshAllFromDocument();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.');
+		// The same two sentences georefFinish() said a moment ago, which this would otherwise erase.
+		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
+			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 	}
 	// **CANCEL IN THE PLACEMENT STEPS CLOSES THE COPY.** It never became what the box asked for, and
 	// a half-converted duplicate left open is a second document nobody asked to keep.
@@ -37723,6 +37805,15 @@ var EngCalcs = EngCalcs || {};
 		if (u.units === 'us-ft') { return pc.lpn_units_usft || 'US survey ft'; }
 		if (isFinite(u.toMeter)) { return u.toMeter + ' ' + (pc.u_m || 'm'); }
 		return String(u.units);
+	}
+	// Metres in one of a plane's DECLARED units (a UTM metre, a US survey foot), from its own
+	// definition rather than measured on the ground, so it carries no zone scale factor. Null when
+	// the definition is not loaded or states a unit this does not know.
+	function planeUnitMetres(code) {
+		var u = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null;
+		if (!u) { return null; }
+		if (isFinite(u.toMeter) && u.toMeter > 0) { return u.toMeter; }
+		return { m: 1, ft: 0.3048, 'us-ft': 1200 / 3937 }[u.units] || null;
 	}
 	function refreshMapCoordsUnit() {
 		var el = document.getElementById('lpn_u_mapcoords');

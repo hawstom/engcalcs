@@ -459,8 +459,12 @@ console.log('\n--- one home for the concept ---');
 	// LPN_GEO_HOME -- a longitude and a latitude the code writes have to come through this door
 	// like any other outside number, or a first visit with a local origin would open over the
 	// wrong continent.
-	ok('inwardX has one definition and 31 call sites', count(/inwardX\(/g) === 32, count(/inwardX\(/g));
-	ok('inwardY has one definition and 32 call sites', count(/inwardY\(/g) === 33, count(/inwardY\(/g));
+	// **AND TWO MORE EACH FOR THE ANSWERED PLACEMENT STEPS' OFFSETS** (Task 696). georefArmAsDegrees()
+	// puts every label offset back to the number it arrived with, as the difference of its captured
+	// tip and base -- two WORLD points in lon/lat, so both come through this door. Before it, the
+	// whole-world opening transform had left them the size of a continent.
+	ok('inwardX has one definition and 33 call sites', count(/inwardX\(/g) === 34, count(/inwardX\(/g));
+	ok('inwardY has one definition and 34 call sites', count(/inwardY\(/g) === 35, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

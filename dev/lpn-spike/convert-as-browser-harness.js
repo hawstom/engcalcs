@@ -192,6 +192,17 @@ async function main() {
 			};
 		});
 		const moved = (p, q) => Math.hypot(p.x - q.x, p.y - q.y);
+		// **THE ANSWERED STEP 1 OPENS ON THE NETWORK, FITTED.** It once opened Elm Street Center as a
+		// 13 px dot on a 500,000 ft scale: the fit backed off to meet stale labels, and at street
+		// zoom the drawing was past Chrome's layout range. Both are asserted as what a person sees.
+		async function fitted(prefix) {
+			const c = await canvasBox(), m = (await rects()).model;
+			ok(prefix + ': step 1 opens fitted to the network (it spans over a third of the canvas, all on it)',
+				!!m && Math.max(m.w / c.w, m.h / c.h) > 0.33 && m.x >= c.x - 1 && m.y >= c.y - 1 &&
+				m.x + m.w <= c.x + c.w + 1 && m.y + m.h <= c.y + c.h + 1,
+				m ? JSON.stringify({ x: Math.round(m.x), y: Math.round(m.y), w: Math.round(m.w), h: Math.round(m.h) }) : 'no model');
+		}
+		const groundBox = () => page.$eval('#lpn_georef_scale_in', (e) => +e.value).catch(() => NaN);
 		// **TOM'S DEFECT (1), MEASURED MID-DRAG.** The pointer is held down while the positions are
 		// read, which is the moment he saw the picture go with the map; a check after release would
 		// pass over the very snap-back he described.
@@ -293,6 +304,7 @@ async function main() {
 		ok('...at step 1, already answered', await stepText() === await S('lpn_georef_step1') && await a.notice() === await S('lpn_georef_answered'),
 			await a.notice());
 		await shot('3-step1');
+		await fitted('3');
 		await dropAndKeep('3');
 		const utm = await stored((await index()).openId), pu = positions(utm);
 		ok('the copy states EPSG:32610', utm.project.crs === UTM10 && utm.project.coords === undefined, JSON.stringify(utm.project.crs));
@@ -312,6 +324,14 @@ async function main() {
 		await pickCrs('EPSG:4326');
 		await convert();
 		ok('an EPSG plane opens the steps answered too', await barVisible() && await a.notice() === await S('lpn_georef_answered'), await a.notice());
+		await fitted('4');
+		await page.click('#lpn_georef_drop');
+		await a.settle(600);
+		// Net3 at Novato is in US units, so one UTM metre reads as 3.28084 ft.
+		ok('step 2\'s Ground distance reads per unit of the file it came from: one UTM metre, 3.28084 ft',
+			Math.abs(await groundBox() - 3.28084) < 1e-4, await groundBox());
+		await page.click('#lpn_georef_detach');
+		await a.settle(600);
 		await dropAndKeep('4');
 		const back = await stored((await index()).openId), pb = positions(back);
 		ok('the round-trip copy is lat/lon again', back.project.coords === 'geo');
@@ -351,6 +371,7 @@ async function main() {
 		ok('the steps open at step 1, already answered from the attachment',
 			await barVisible() && await stepText() === await S('lpn_georef_step1') && await a.notice() === await S('lpn_georef_answered'), await a.notice());
 		await shot('5-step1');
+		await fitted('5');
 		await dragStep1('5');
 		// The drag above moved the ground under the held model, so put it back where the attachment
 		// said by cancelling and running the answered steps again untouched.
@@ -361,7 +382,16 @@ async function main() {
 		await openConvertAs();
 		await pickCrs(UTM10);
 		await convert();
+		await page.click('#lpn_georef_drop');
+		await a.settle(600);
+		ok('step 2\'s Ground distance reads 1 ft per drawing unit, the attachment\'s own scale (R-219: type 1 to keep the numbers)',
+			Math.abs(await groundBox() - 1) < 1e-6, await groundBox());
+		await page.click('#lpn_georef_detach');
+		await a.settle(600);
 		await dropAndKeep('5');
+		// The attachment turns 12 degrees and a background image cannot turn, so the page says so.
+		ok('the finish says the site plan could not be turned with the 12 degree attachment',
+			(await a.notice()).indexOf(await S('lpn_georef_backdrop_unrotated')) > 0, await a.notice());
 		const out5 = await stored((await index()).openId), p5 = positions(out5);
 		let worst5 = 0;
 		Object.keys(want).forEach((id) => {
