@@ -918,3 +918,32 @@ value for the submittal-review workflow I actually care about. Do not build this
 for on its own.
 
 — Sue
+
+### 2026-09-26 — not a want, a ruling request: symbology default decimals, answered
+
+Not a row I found — Tom's own `dev/settings-symbology-defaults.csv`, asked to review. Full
+reasoning and citations: journal, 2026-09-26 entry. Short form: **most of the table is fine; the
+real defect the review surfaced is architectural, not a wrong number** — `labelSettings.decimals`
+is one flat number per FIELD (`js/looped-network.js:5144-5175`), not keyed to the UNIT a reader
+picks, and the shipped code's own comment on gradient (5117-5119, "2 decimals is useless as a
+ratio... 4 covers both") is the suite's own proof this already bites: gradient ships at 4 decimals
+today ONLY to survive a reader switching to the rare 'grade' unit, over-displaying its own default
+gradePercent reading in the process. **Recommend: key decimals to the unit NAME, same as every
+other unit-facing table already does** (`unitFactor()`/`resultUnit()` already carry it everywhere
+needed) — this removes the gradient compromise entirely and answers Tom's "should decimals derive
+from the chosen unit" question with the suite's own code as the evidence, not my opinion alone.
+**Two flags, not corrections:** "Number of services" has no decimals control to set at all
+(OBSERVED, printed as a bare `String()`) — likely copy-pasted from the row above; and Bulk/Wall
+coefficient rows describe map-label fields that do not exist yet (Properties-popup only today), so
+ruling on their decimals is really a small new-feature decision, not a reconciliation. **One
+correction I'd stand behind:** Elevation/Total head/Pressure at 3 decimals in SI (metres) contradicts
+this suite's own DEM-ingestion comment ("more digits [are] false precision" past the raster's 0.1 m
+quantum) and SI pressure's actual default unit is metres of water, not kPa — Tom's own "kPa at 3
+decimals would be absurd" already names the failure mode, it is just arriving via a different unit
+than he pictured. **Size: small** — a decimals-per-unit lookup table and a rendering-site change,
+no new solve, no new field (apart from the two coefficient rows, which are genuinely new). **Rank:
+low-medium** — real and cheap, but it is a display-precision polish, not a capability a master plan
+or CIP decision would ever turn on; I would not push it ahead of anything already ranked above it in
+this file.
+
+— Sue

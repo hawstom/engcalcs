@@ -99,8 +99,10 @@ console.log('\n-- the wiring rules that keep a drag out of the controls --');
 	const drag = extract('makePanelDraggable'), wire = extract('wirePopup');
 	// A control is always a CHILD of the popup, so testing identity is what makes this safe to add
 	// to a panel of inputs without re-wiring any of them.
-	report(/if \(e\.target !== popup\) \{ return; \}/.test(drag),
-		'a drag starts only on the chrome, never on a child control');
+	// A caller may declare HANDLES -- named children that drag too (the placement wizard bars'
+	// step titles, 2026-09-26) -- and nothing else inside the box ever does.
+	report(/if \(e\.target !== popup && !\(handles && handles\.indexOf\(e\.target\) >= 0\)\) \{ return; \}/.test(drag),
+		'a drag starts only on the chrome (or a declared handle), never on a child control');
 	report(/setPointerCapture/.test(drag) && /releasePointerCapture/.test(drag),
 		'the pointer is captured and released, so a fast drag does not escape the box');
 	report(/pointercancel/.test(drag), 'and a cancelled pointer ends the drag rather than sticking it');

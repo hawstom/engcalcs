@@ -1211,8 +1211,8 @@ $ec_lang['lpn_basemap_satellite_show']='Show satellite images';
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
 $ec_lang['lpn_geomap']='georeferenced';
 $ec_lang['lpn_xymap']='local';
-$ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
-$ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
+$ec_lang_syn['lpn_geomap']='coordinate system referenced to the world map';
+$ec_lang_syn['lpn_xymap']='local, arbitrary, or schematic coordinate system';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
 $ec_lang['lpn_file_convert_as']='Convert as…';
@@ -1803,6 +1803,10 @@ $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
+// The same count when the list is filtered by the whole network's extent (File, Convert as, Tom
+// 2026-09-26: "should automatically filter EPSG CRSes for the displayed area or network extents"),
+// so the reader knows why the list is short. The Filter by map view box above still shows them all.
+$ec_lang['lpn_crs_count_network']='{n} of {total} coordinate systems cover this network.';
 // Shown beside a coordinate system in the chooser, and beside the chosen one in the New project box,
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.

@@ -389,8 +389,11 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR followViewWhileEmpty()** (Tom, 2026-09-25): an empty geographic
 	// document re-origins under the camera, and the camera's centre crosses OUTWARD to name the
 	// world cell the new origin sits in, exactly as rebaseLiveGeoDoc() reads its model's corner.
-	ok('outwardX has one definition and 35 call sites', count(/outwardX\(/g) === 36, count(/outwardX\(/g));
-	ok('outwardY has one definition and 35 call sites', count(/outwardY\(/g) === 36, count(/outwardY\(/g));
+	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
+	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
+	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
+	ok('outwardX has one definition and 34 call sites', count(/outwardX\(/g) === 35, count(/outwardX\(/g));
+	ok('outwardY has one definition and 34 call sites', count(/outwardY\(/g) === 35, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

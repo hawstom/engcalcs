@@ -3575,10 +3575,37 @@ var EngCalcs = EngCalcs || {};
 		return { w: w, e: e, s: f.s, n: f.n };
 	}
 	// `ll` is { lon, lat } -- SYSTEM order, x then y, which is what every caller here holds.
+	//
+	// **A PLACE MAY CARRY `bounds` {w, s, e, n}: THE NETWORK'S OWN EXTENT, and then the whole of it
+	// must lie inside the area of use** (Tom, 2026-09-26: *"File, Convert as should automatically
+	// filter EPSG CRSes for the displayed area or network extents."*). A network that straddles two
+	// UTM zones is honestly covered by neither, and saying so is the filter doing its job. A register
+	// box whose west is greater than its east crosses the antimeridian (36 rows, Alaska's among them)
+	// and is read that way rather than as empty.
+	function crsLonIn(lon, w, e) { return w <= e ? (lon >= w && lon <= e) : (lon >= w || lon <= e); }
 	function crsCoversPoint(code, ll) {
-		var ex = crsExtent(code);
+		var ex = crsExtent(code), b;
 		if (!ex || !ll) { return true; }
-		return ll.lon >= ex.w && ll.lon <= ex.e && ll.lat >= ex.s && ll.lat <= ex.n;
+		b = ll.bounds;
+		if (b && isFinite(b.w) && isFinite(b.e) && isFinite(b.s) && isFinite(b.n)) {
+			if (b.s < ex.s || b.n > ex.n) { return false; }
+			if (ex.w <= ex.e) { return b.w >= ex.w && b.e <= ex.e; }
+			// Across the antimeridian: both ends inside, and the network not reaching over the gap.
+			return crsLonIn(b.w, ex.w, ex.e) && crsLonIn(b.e, ex.w, ex.e) && !(b.w <= ex.e && b.e >= ex.w);
+		}
+		return crsLonIn(ll.lon, ex.w, ex.e) && ll.lat >= ex.s && ll.lat <= ex.n;
+	}
+	// **THE UTM ZONE THAT CONTAINS A PLACE** (Tom, 2026-09-26: *"UTM, I am choosing 12N, not 10N, for
+	// Arizona."*): zone = floor((lon + 180) / 6) + 1, north or south by the latitude, as the WGS 84
+	// code (EPSG:326zz or 327zz). The chooser is opened on it where UTM is the likely answer --
+	// File, Convert as from latitude and longitude or from an unnamed georeference. Null where the
+	// place is unknown or outside UTM's own latitudes.
+	function crsUtmCodeFor(ll) {
+		var z, lon;
+		if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat) || ll.lat < -80 || ll.lat > 84) { return null; }
+		lon = (ll.lon < -180 || ll.lon > 180) ? (((ll.lon + 180) % 360 + 360) % 360) - 180 : ll.lon;
+		z = Math.min(60, Math.floor((lon + 180) / 6) + 1);
+		return 'EPSG:' + ((ll.lat >= 0 ? 32600 : 32700) + z);
 	}
 	// The two filters of the box, as ONE function of a plain value, so a harness can ask what the
 	// list would be without driving a select. `text` matches the NAME or the CODE, because somebody
@@ -6989,6 +7016,28 @@ var EngCalcs = EngCalcs || {};
 		// 0.49px, which the browser renders as a grey smudge, and at Symbol size 2 it was 0.14px.
 		svg.style.setProperty('--lpn-hair', 1 / s);
 	}
+	// **THE BACKGROUND IMAGE IS HELD AT HALF STRENGTH OR LESS WHILE A PLACEMENT WIZARD IS OPEN** (Tom,
+	// 2026-09-26: *"The background opacity of the background image happened to be 50%, and that made
+	// a huge difference in placing the project. ... Can we force the opacity of any background image
+	// to no more than 50% during 'World Map, Attach' and 'File, Convert as'?"*). A site plan at full
+	// strength hides the streets it is being lined up with. min(the user's own setting, 50%), so a
+	// fainter setting is left alone, and ONLY THE PICTURE READS IT: settings.backdropOpacity is the
+	// project's and is never written here, so closing the wizard (Finish or Cancel) is simply this
+	// function answering again. The street and satellite tiles keep the user's own fade -- they are
+	// the thing being lined up against. Called by both wizard bars' refreshers, which run on every
+	// open, step change and close. dev/lpn-spike/convert-as-browser-harness.js section 7.
+	var LPN_WIZARD_BACKDROP_MAX = 0.5;
+	function backdropImageOpacity() {
+		var bop = settings.backdropOpacity;
+		bop = (bop === undefined || bop === null || !isFinite(bop)) ? 1 : bop;
+		return (georefActive() || mapgeoActive()) ? Math.min(bop, LPN_WIZARD_BACKDROP_MAX) : bop;
+	}
+	function refreshBackdropOpacity() {
+		if (!svg) { return; }
+		var bop = settings.backdropOpacity;
+		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
+		svg.style.setProperty('--lpn-backdrop-img-opacity', backdropImageOpacity());
+	}
 	function refreshSymbolSizes() {
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		publishScaleSizes(true);
@@ -7001,8 +7050,7 @@ var EngCalcs = EngCalcs || {};
 		// heavier stroke it changes nothing about the network -- so a drawing tuned against a busy
 		// aerial still prints and reads correctly on white.
 
-		var bop = settings.backdropOpacity;
-		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
+		refreshBackdropOpacity();
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
@@ -13847,8 +13895,10 @@ var EngCalcs = EngCalcs || {};
 	function georefBarEl(id) { return document.getElementById(id); }
 	function georefRefreshBar() {
 		var pc = EngCalcs.pageConfig || {}, bar = georefBarEl('lpn_georef_bar');
+		refreshBackdropOpacity();
 		if (!bar) { return; }
 		bar.style.display = georef ? 'block' : 'none';
+		if (!georef) { wizardBarDock(bar); }
 		// **AND THE TAB STRIP SAYS IT IS LOCKED** (Tom's 2026-09-08 worklist). The refusal is a sentence in the
 		// notice box, which is the part that teaches; this is the part that stops a reader reaching
 		// for the tab in the first place. A class on the strip, so nothing is created, destroyed or
@@ -14335,11 +14385,46 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function viewLonLat(v) {
 		var ll;
-		if (!v || !projectLocatable()) { return null; }
-		if (isLatLonProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
-		if (!EngCalcs.lpnCrsInverse) { return null; }
-		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
+		if (!v) { return null; }
+		ll = placeLonLatAt(outwardX(v.cx), outwardY(v.cy));
 		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
+	}
+	/**
+	 * **AN OUTWARD POSITION AS A PLACE ON THE EARTH, FOR CHOOSING A COORDINATE SYSTEM -- or null.**
+	 * nodeLonLat()'s arithmetic, widened by one case on purpose: a grid project with the world map
+	 * attached (xyGeoref()) knows perfectly well what town it is in, and the coordinate-system
+	 * chooser only READS the answer to narrow a list. nodeLonLat() stays narrow because the DEM
+	 * writes numbers from it (see the note beside placeFindable()); nothing here writes anything.
+	 * Tom, 2026-09-26, at Prescott Valley with the world map attached: *"I see the full list of CRSes."*
+	 */
+	function placeLonLatAt(x, y) {
+		var xg;
+		if (isLatLonProject()) { return { lon: x, lat: y }; }
+		if (isProjectedProject()) {
+			return (projectLocatable() && EngCalcs.lpnCrsInverse) ? EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y }) : null;
+		}
+		xg = xyGeoref();
+		return (xg && EngCalcs.lpnGeorefToLonLat) ? EngCalcs.lpnGeorefToLonLat(xg, x, y) : null;
+	}
+	/**
+	 * **WHERE THIS NETWORK IS, AS THE CHOOSER'S PLACE: its centre, and its extent as `bounds`**, so
+	 * the list is filtered to the coordinate systems whose area of use holds the whole network
+	 * (crsCoversPoint()). With no network, the middle of the map view; with no location at all, null,
+	 * and the chooser says the whole list is offered.
+	 */
+	function networkPlace() {
+		var w = Infinity, e = -Infinity, s = Infinity, n = -Infinity, v;
+		doc.nodes.forEach(function (nd) {
+			var ll = placeLonLatAt(effective(nd, 'x'), effective(nd, 'y'));
+			if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return; }
+			w = Math.min(w, ll.lon); e = Math.max(e, ll.lon);
+			s = Math.min(s, ll.lat); n = Math.max(n, ll.lat);
+		});
+		if (!isFinite(w)) {
+			v = currentView();
+			return v ? viewLonLat(v) : null;
+		}
+		return { lat: (s + n) / 2, lon: (w + e) / 2, extent: null, bounds: { w: w, s: s, e: e, n: n } };
 	}
 	function terrainPointsForIds(ids) {
 		if (!projectLocatable()) { return []; }
@@ -15765,8 +15850,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function mapgeoRefreshBar() {
 		var pc = EngCalcs.pageConfig || {}, bar = mapgeoBarEl('lpn_mapgeo_bar'), world1;
+		refreshBackdropOpacity();
 		if (!bar) { return; }
 		bar.style.display = mapgeo ? 'block' : 'none';
+		if (!mapgeo) { wizardBarDock(bar); }
 		if (!mapgeo) { mapgeoShow('lpn_mapgeo_dial', false); return; }
 		world1 = mapgeo.step === MAPGEO_STEP_WORLD;
 		mapgeoBarEl('lpn_mapgeo_step').textContent = world1
@@ -16391,6 +16478,60 @@ var EngCalcs = EngCalcs || {};
 			box.style.top = at.top + 'px';
 		}
 	}
+	// **THE TWO PLACEMENT BARS DRAG BY THEIR STEP TITLE, ANYWHERE ON THE PAGE** (Tom, 2026-09-26:
+	// *"It would be really nice if the wizard were draggable including up to the top of the page
+	// over the menus in case it's in the way."*). File, Convert as's bar and World map, Attach's bar
+	// sit at the top centre of the MAP, positioned inside it, which is the one place they cannot be
+	// moved out of. The first press on the step title (or the bar's own padding) lifts the bar out
+	// into the page -- fixed, at exactly the place it was drawn, and into the panel band above the
+	// menus -- and from there it is the same drag every other box has: makePanelDraggable(), whose
+	// dragBounds() keeps the top edge on the screen and a sliver of the title on every other edge.
+	//
+	// **NOT REMEMBERED, AND NOTHING IS STORED.** Closing the wizard (Finish or Cancel) puts the bar
+	// back where it opens, so the next placement starts where the instructions say it is; a place
+	// kept in the browser would be a new entry in what this page stores on a visitor's device, which
+	// is a conversation with Tom and not a side effect of a drag.
+	// dev/lpn-spike/convert-as-browser-harness.js section 8.
+	function wizardBarFloat(bar) {
+		var r;
+		if (!bar || bar.__lpnFloating) { return; }
+		r = bar.getBoundingClientRect();
+		bar.__lpnFloating = true;
+		bar.style.position = 'fixed';
+		bar.style.left = Math.round(r.left) + 'px';
+		bar.style.top = Math.round(r.top) + 'px';
+		bar.style.width = Math.ceil(r.width) + 'px';
+		bar.style.maxWidth = 'none';
+		bar.style.transform = 'none';
+		raisePanel(bar);
+	}
+	function wizardBarDock(bar) {
+		var h = bar && bar.__lpnHome, i;
+		if (!h || !bar.__lpnFloating) { return; }
+		bar.__lpnFloating = false;
+		['position', 'left', 'top', 'width', 'maxWidth', 'transform', 'zIndex'].forEach(function (k) {
+			bar.style[k] = h[k];
+		});
+		i = lpnPanels.indexOf(bar);
+		if (i >= 0) { lpnPanels.splice(i, 1); }
+	}
+	function wireWizardBars() {
+		[['lpn_georef_bar', 'lpn_georef_step'], ['lpn_mapgeo_bar', 'lpn_mapgeo_step']].forEach(function (ids) {
+			var bar = document.getElementById(ids[0]), grip = document.getElementById(ids[1]);
+			if (!bar || !grip || bar.__lpnHome) { return; }
+			bar.__lpnHome = { position: bar.style.position, left: bar.style.left, top: bar.style.top,
+				width: bar.style.width, maxWidth: bar.style.maxWidth, transform: bar.style.transform,
+				zIndex: bar.style.zIndex };
+			grip.classList.add('lpn-wizbar-grip');
+			bar.classList.add('lpn-wizbar');
+			// Registered BEFORE makePanelDraggable()'s own listeners, so the bar is already in the
+			// page's frame when that drag reads its rectangle.
+			bar.addEventListener('pointerdown', function (e) {
+				if (e.target === bar || e.target === grip) { wizardBarFloat(bar); }
+			}, true);
+			makePanelDraggable(bar, null, [grip]);
+		});
+	}
 	// Wired once, from init(): the drag callback remembers the corner for the session.
 	function wireAreaHint() {
 		var box = document.getElementById('lpn_area_hint');
@@ -16951,6 +17092,27 @@ var EngCalcs = EngCalcs || {};
 		// spelling for the parser is its own label, because a custom property has no English name
 		// but the one the reader gave it.
 		findOfferCustom(out, d);
+		// **A NODE'S POSITION (Task 708, ranked gap #7).** Tom, 2026-09-19, of the parallel Customer
+		// gap: *"Should coordinates be in Find? I say yes. This is a freedom we need to give power
+		// users."* Band 4, beside Connection, because a coordinate is a question about the drawing
+		// rather than about the asset's own design -- and, LIKE Connection but not offered under
+		// "Everything": that exception is Connection's own (see the comment above it), and a
+		// coordinate does not share its reason, so it stays gated to a real node scope.
+		//
+		// **THE KEY IS THE SLOT, NOT THE DOCUMENT AXIS** (`axis1`/`axis2`, coordSlotIsY()'s own
+		// vocabulary) -- the same identity paneColCoord() already gives the Tables column for
+		// exactly the reason stated there: a query written on a lat/lon project must keep naming the
+		// same property if the project is ever reprojected, and "x"/"y" is the document's frame, not
+		// the public one. The label is axisNames()'s own pair, so the pull-down calls an axis
+		// whatever the popup's coordinate rows already call it -- Latitude/Longitude,
+		// Northing/Easting or X/Y -- never the bare "coordinates" CLAUDE.md's naming rule refuses.
+		// No English alt spelling (the third slot): unlike "Diameter" or "Roughness" there is no one
+		// stable English word for an axis that is Latitude on one project and Northing on the next.
+		if (d.group === 'node') {
+			var axn = axisNames();
+			out.push(['axis1', axn.first, null]);
+			out.push(['axis2', axn.second, null]);
+		}
 		if (d.key === 'all' || d.group === 'node') {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connectivity', 'Connection']);
 		}
@@ -17499,6 +17661,12 @@ var EngCalcs = EngCalcs || {};
 				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
 				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
 				? cand.el.mixingFraction : undefined;
+		}
+		// **A NODE'S POSITION** (Task 708, gap #7), read through nodeCoordAxis() -- the same
+		// resolver the popup's typed boxes and the Tables column (paneColCoord()) read, so a search
+		// and the number shown beside it can never disagree about what this axis holds right now.
+		if (prop === 'axis1' || prop === 'axis2') {
+			return cand.group === 'node' ? nodeCoordAxis(cand.el, prop === 'axis1' ? 1 : 2) : undefined;
 		}
 		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
 		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
@@ -19021,6 +19189,22 @@ var EngCalcs = EngCalcs || {};
 	function labelReplaceSpecs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
+			// **A TEXT'S WORDS (Task 708, ranked gap #8; Tom: *"Should a Text's words be
+			// replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field
+			// replace. No string replace within texts (partial replace)."*).** Whole-field only, the
+			// same rule every other Replace property here obeys -- the matched Texts' content
+			// BECOMES the new value, never a substring substitution. `str: true`, like a description,
+			// so the exact bytes typed survive (no one-word truncation, and Find's own `contains`
+			// still answers the partial-match question this box does not). Overridable (`text` is in
+			// LPN_OVERRIDABLE's `label` group), so a plain `prop` routes the write through setProp()
+			// -- the one seam -- exactly as the popup's own textarea and the Tables column's `text`
+			// cell do; `refreshLabelContent()` afterwards is that column's own redraw call, since
+			// replaceRedraw() has no branch for the `label` group (only node and link get one).
+			{ key: 'text', group: 'label', field: 'text', str: true,
+				label: pc.lpn_tool_add_text || 'Text',
+				applies: function () { return true; },
+				get: function (lb) { return effective(lb, 'text') || ''; },
+				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
 			{ key: 'allZoom', group: 'label', field: 'allZoom',
 				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
 				applies: function () { return true; },
@@ -19029,6 +19213,40 @@ var EngCalcs = EngCalcs || {};
 					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 					applyLabelVisibility();
 				} }
+		];
+	}
+	/**
+	 * **A NODE'S POSITION (Task 708, ranked gap #7).** Kept out of pushSpecList() on purpose, for
+	 * the same reason a customer's station and offset are kept out of it (customerReplaceSpecs()'s
+	 * own note): neither Settings' "apply starting values to every element" nor a scenario push has
+	 * ever offered a position, because writing the SAME coordinate onto every matched node in one
+	 * push is not a starting value, it is erasing the drawing.
+	 *
+	 * **THE WRITE GOES THROUGH setNodeCoordAxis(), THE SAME FUNCTION THE POPUP'S TYPED BOXES AND
+	 * THE TABLES COLUMN (paneColCoord()) ALREADY USE** -- not a second custom `set` reimplementing
+	 * it. That single function is what makes a Replace move a node exactly the way Properties does:
+	 * it refuses an off-world value out loud (coordValueOk()) rather than writing Infinity, records
+	 * the override in a scenario or writes Base directly (writeNodeCoord(), the one place a node's
+	 * position is written), and calls updateNode() -- which walks every incident link's geometry
+	 * (updateLinkGeometry()) and moves its endpoint with the node, because a pipe holds no vertex of
+	 * its own at an endpoint; the endpoint IS the node's position, read fresh on every redraw. No
+	 * separate vertex write is needed for exactly that reason.
+	 *
+	 * `field`/`key` are `axis1`/`axis2`, findPropDefs()'s own slot identity, not `x`/`y`: the same
+	 * property must keep naming itself after a document is reprojected. The label is axisNames()'s
+	 * pair, so the pull-down calls an axis whatever the popup's own coordinate rows call it.
+	 */
+	function nodeCoordReplaceSpecs() {
+		var axn = axisNames();
+		return [
+			{ key: 'axis1', group: 'node', field: 'axis1', label: axn.first,
+				applies: function () { return true; },
+				get: function (n) { return nodeCoordAxis(n, 1); },
+				set: function (n, v) { setNodeCoordAxis(n, 1, v); } },
+			{ key: 'axis2', group: 'node', field: 'axis2', label: axn.second,
+				applies: function () { return true; },
+				get: function (n) { return nodeCoordAxis(n, 2); },
+				set: function (n, v) { setNodeCoordAxis(n, 2, v); } }
 		];
 	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
@@ -19076,7 +19294,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!cands.length) { return []; }
 		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
-			.concat(labelReplaceSpecs()).filter(function (s) {
+			.concat(labelReplaceSpecs()).concat(nodeCoordReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
@@ -31117,7 +31335,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (pick) {
 			pick.addEventListener('click', function () {
-				openCrsBox(convasPick.crs, convasPick.place, function (code, ll) {
+				// **THE CHOOSER OPENS WHERE THIS NETWORK IS, ON ITS UTM ZONE** (Tom, 2026-09-26, items
+				// 3 and 4). The list is filtered to what covers the whole network, and where the pick
+				// is still latitude and longitude -- nothing chosen yet, or a lat/lon project -- the
+				// row selected is the UTM zone the network sits in. The pick itself does not change
+				// until Select, so Cancel still leaves a plain copy.
+				var place = convasPick.place || networkPlace(),
+					start = convasPick.crs === LPN_CRS_WEBMERC ? (crsUtmCodeFor(place) || convasPick.crs) : convasPick.crs;
+				openCrsBox(start, place, function (code, ll) {
 					convasPick.crs = code;
 					convasPick.place = ll || convasPick.place;
 					convasSetKind('epsg');
@@ -34582,7 +34807,9 @@ var EngCalcs = EngCalcs || {};
 			// A filter that is on and filtering nothing looks broken, so it says which it is.
 			note.textContent = (crsBoxViewOn() && !crsBox.place)
 				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
-				: (pc.lpn_crs_count || '{n} of {total} coordinate systems listed.')
+				: ((crsBoxViewOn() && crsBox.place.bounds)
+					? (pc.lpn_crs_count_network || '{n} of {total} coordinate systems cover this network.')
+					: (pc.lpn_crs_count || '{n} of {total} coordinate systems listed.'))
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
 			// **THE ACKNOWLEDGEMENT THE IOGP TERMS REQUIRE, AND IT IS NOT A LANGUAGE KEY** -- the
 			// same rule as the OpenStreetMap and Nominatim credits: it names an owner rather than
@@ -36177,6 +36404,7 @@ var EngCalcs = EngCalcs || {};
 		wireSettingsBox();
 		wireLibraryBox();
 		wireAreaHint();
+		wireWizardBars();
 		wireFireFlowBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
@@ -45610,7 +45838,10 @@ var EngCalcs = EngCalcs || {};
 		el.style.zIndex = String(lpnPanelZ);
 	}
 
-	function makePanelDraggable(popup, onMove) {
+	// `handles` (optional): elements INSIDE the box that also start a drag when pressed -- a title
+	// line that is a child element rather than the box's own padding. The placement bars need it
+	// (wireWizardBars()); every other box drags by its chrome alone and passes nothing.
+	function makePanelDraggable(popup, onMove, handles) {
 		var drag = null;
 		// **EVERY PRESS RAISES, INCLUDING ONE ON A CONTROL INSIDE THE BOX.** Registered in the
 		// capture phase and separately from the drag handler below, which returns early unless the
@@ -45630,7 +45861,8 @@ var EngCalcs = EngCalcs || {};
 		// impossible to half-wire.
 		popup.classList.add('lpn-dragpanel');
 		popup.addEventListener('pointerdown', function (e) {
-			if (e.target !== popup) { return; }   // a child is a control; only the chrome drags
+			// A child is a control; only the chrome (and a declared handle) drags.
+			if (e.target !== popup && !(handles && handles.indexOf(e.target) >= 0)) { return; }
 			var r = popup.getBoundingClientRect();
 			// **THE RESIZE GRABBER IS CHROME TOO, AND IT IS NOT A DRAG HANDLE.** On a panel carrying
 			// `resize`, the browser paints its widget in the bottom-right corner of the padding --

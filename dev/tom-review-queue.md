@@ -27,8 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-325. (R-282 is taken on `feat/label-gang-search`;
-R-305-320 may be taken on other branches concurrent with this one -- reconcile at merge.)
+**An ID is permanent and never reused.** Next free: R-338. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -256,7 +255,7 @@ R-305-320 may be taken on other branches concurrent with this one -- reconcile a
 - [ ] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona."
 - [ ] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?"
 - [x] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim -- master f038eba5
-- [?] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
+- [x] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
 - [ ] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users."
 - [ ] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)."
 - [ ] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V)
@@ -264,9 +263,62 @@ R-305-320 may be taken on other branches concurrent with this one -- reconcile a
 - [ ] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b
 - [ ] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording
 
-## Round of 2026-09-26 (night) -- WaterCAD/EPANET audit, the Quality panel
+## Round of 2026-09-26 (night) -- his pass over 8117-8119 and 8090, EPANET likeness, Symbology
 
-- [x] R-321 feat/quality-settings | "Quality parameter order must be: None, Chemical, Trace, Age (as he sees in EPANET)." -- reordered
-- [x] R-322 feat/quality-settings | "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative diffusivity: I don't see this in our interface. Is it missing?" -- both added to Settings, Quality, Chemical, EPANET's own names and defaults (0.01, 1.0); already carried and handed to the engine, now with a box. Along the way: `lpnQualityText()` never composed an edited chemical name/mass unit, only carried or dropped one, so an edit on an imported Net1/Net2/Net3 never reached the exported file -- fixed on the same terms a retargeted trace already had
-- [x] R-323 feat/quality-settings | "(1) We should say 'Mass units' if EPANET says that. (2) ... they have a dropdown for Mass Units ... and they don't 'require' the chemical name. (3) ... we could put it in Properties, Find, and Tables as '{chemical} concentration', and that would be very cool." -- split into a Chemical name box (optional) and a Mass units dropdown (mg/L, µg/L); qualityLabel() now composes "{chemical} concentration" everywhere it is read, "Concentration" when nothing is named
-- [x] R-324 feat/quality-settings | "(1) Wall reaction coefficient units vary according to Wall reaction order; when order is 0, coefficient is mass/area/time and when order is 1, coefficient is length/time. I guess we can dynamically change the label. (2) Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.'" -- wallCoeffUnitText() now switches the unit (mg or µg per unit-length² per day at order 0, length per day at order 1) everywhere it is shown (Settings, pipe type Library, Tables); tip wording his exact words
+### fix/label-columns
+
+- [ ] R-304 fix/label-columns | "I'll have to trust your judgement on what to test. I don't hate longer runs at this time." "Merge this fix into the branches."
+
+### feat/placement-wizard (8117)
+
+- [x] R-305 feat/placement-wizard | "Step 1 happily fades my image to 50%." "2. OK. 3. OK. 4. OK. Done. Close, merge, and delete branch."
+- [ ] R-306 feat/placement-wizard | "The initial map view at Step 1 (i) is only a width sliver of the world map that shows most of Africa and Europe, but cuts of extreme east and west Africa. (ii) The n-s extent occupies only about half my screen map height."
+
+### feat/find-coordinate (8118)
+
+- [x] R-307 feat/find-coordinate | "All good. Close, merge, and delete branch."
+
+### feat/row-paste (8119)
+
+- [ ] R-308 feat/row-paste | "Text table needs its location coordinates."
+- [ ] R-309 feat/row-paste | "'Paste as new rows' is not quite descriptive of 'Paste append'. How about 'Paste below table' or 'Paste as new rows after last' or 'Paste as new rows at end'? I really like the dashed line clarifying indicator."
+- [ ] R-310 feat/row-paste | "When I copy an entire table, the headings are included even though I didn't select the headings. Fix that."
+- [ ] R-311 feat/row-paste | "Add 'Ctrl+Shift+V | Paste as new rows at end of table' to Help, Notes."
+- [ ] R-312 feat/row-paste | "Add 'Paste as new rows at end of table | Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V', to Help, Notes."
+
+### feat/label-gang-search (8090)
+
+- [ ] R-313 feat/label-gang-search | "It sounds like this was a good test, and that we were optimizing to a particular case with blinders. This is a very long project."
+- [ ] R-314 feat/label-gang-search | "All examples need appropriate Link and Node Before, After, Decimals, and Drop."
+- [ ] R-315 feat/label-gang-search | "It's very sluggish. My browser froze while advancing through EPS time steps. It eventually caught up. But we may want to delay/debounce label placement unless we succeed in making it a lot faster. On the bright side, when labels stop showing, everything speeds up, indicating that, 'Yes, Virginia, maybe off really does mean off'."
+- [x] R-316 feat/label-gang-search | "There is no UI way I know of to zoom to 2x or 3x or to know what x I am zoomed to. Users don't really care about that in an app like this." -- report in his terms (what he sees), never zoom multiples
+- [x] R-317 feat/label-gang-search | "There is no way for me to know what used to be missing. Sorry."
+- [ ] R-318 feat/label-gang-search | **"For the permanent record, a label on a leader always reads as belonging to its node.** You have repeated the misconception about this many times, and it's important that you dispel it so that we are not working to false priorities. Long leaders are only unfavored because they are inefficient and extra ink, which generally is clutter in a weak way. But a stack of labels with long and parallel leaders can be very effective."
+- [ ] R-319 feat/label-gang-search | "It occurs to me that where there is infinite space east or west, we might want to recognize that infinity and leverage it by using single-line concatenation of properties."
+
+### EPANET likeness
+
+- [ ] R-320 -- | MSX: "This is an extension, not base EPANET. We can provide this, but it's not a blocker for EPANET++." "I may be overly naive, but I don't see this as a big deal. The chemistry is solved, and the UI need be no more scary than Custom Properties. I think that in Settings, Quality we can have maybe a short list of Quality parameters with toggles plus an infinitely expandable list of parameters (Reactive chemicals?). But I don't know what I am talking about."
+- [ ] R-321 -- | "I don't think we should change things in the EPANET UI without a reason (Mary's findings, for example)." "Quality parameter order: None, Chemical, Trace, Age" -- feat/quality-settings d75a944c: None, Chemical, Trace, Age; awaiting your pass
+- [ ] R-322 -- | "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative diffusivity: I don't see this in our interface. Is it missing?" -- feat/quality-settings d75a944c: both were read and written but had no box; both added under Chemical, blank means EPANET's defaults (0.01, 1.0); awaiting your pass
+- [ ] R-323 -- | "Chemical and Mass units: (1) We should say 'Mass units' if EPANET says that. (2) Our interface is very clear that these don't matter to the calculations. But explanation aside, our interface is arguably less friendly than EPANET because they have dropdown for Mass Units (however restrictive that is), and they don't 'require' the chemical name. (3) If EPANET doesn't offer a UI for the chemical name, what are we doing with it, if anything? We could put it in Properties, Find, and Tables as '{chemical} concentration', and that would be very cool. And maybe some agent planned to do that. But we are not doing it." -- feat/quality-settings d75a944c: "Mass units" dropdown (mg/L, µg/L); Chemical name optional; "{chemical} concentration" in Properties, Find, Tables and the legend; an edited name now reaches the exported file (it silently did not before); awaiting your pass
+- [ ] R-324 -- | "I believe we have a mistake in our Wall reaction coefficient and Wall reaction order UI. (1) Wall reaction coefficient units vary according to Wall reaction order; when order is 0, coefficient is mass/area/time and when order is 1, coefficient is length/time. I guess we can dynamically change the label. (2) Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.'" -- feat/quality-settings d75a944c: unit follows the order (length/day at 1, mass/area/day at 0) in Settings, Library and Tables; your tip verbatim; awaiting your pass
+- [ ] R-325 -- | Solver: "I think it would be fun and maybe wise, maybe Roadmap priority 50, for us to gradually, in phases, build out our native solver to do everything that the EPANET solver does. This way the math is less of a black box for us so that we have more fundamental understanding of the values we are handling."
+
+### Symbology
+
+- [ ] R-326 -- | "Drop order is missing for Node ID and several Customer properties."
+- [ ] R-327 -- | "We may need a branch to work on intentionality and completeness for our symbology labels." "Initial defaults and all examples need to be consistent."
+- [ ] R-328 -- | "For initial values and examples, we need an internal way to guess decimals based on the units factor. And/or we need our table of initial decimals to include at least the main US and SI units. We probably should ask Sue and Mary to review the initial decimals I am suggesting below."
+- [ ] R-329 -- | "I don't like that ID needs to display first, but also may need to drop first. We have been using drop first as display last, which is efficient, but lazy. I suppose there is room for it even on my phone."
+- [ ] R-330 -- | "Scroll/spin decimals and orders integers: I notice that on my phone space is economized by showing decimals and order as text inputs. But when tapped, these should (a) highlight entirely like other inputs (I think they were skipped over because they are scroll/spin on the PC) and (b) they should open the scroll/spin interface if there is one. Use your judgement; I am only observing the deficiencies."
+- [ ] R-331 -- | "We need a code or a toggle to 'Use units' for the After string. It should put space and units in the After field and disable it."
+- [ ] R-332 -- | "Does Mary find whether we need to include quality results (inherited directly from their node with disclaimer) for Customer Properties, Table, Find, and Symbology?"
+- [ ] R-333 -- | "Our lists are getting long. I think the Settings index pane Symbology section can be reworked to Node labels, Node colors, Link labels, Link colors, Customer."
+- [ ] R-334 -- | "See dev/settings-symbology-defaults.csv. Rename if needed. I see that there is already a symbology-property-audit.md. Harmonize as needed."
+
+### Discussion
+
+- [x] R-335 -- | R-297 answered: "$ec_lang_syn: Yes. Write it." -- the 09-16 wording written
+- [ ] R-336 -- | Task 697: "Which domain does Mary vote as canonical? I have been leaning toward -plus-plus since pp isn't immediately obvious, but can be a nice shortcut maybe."
+- [x] R-337 -- | Orchestration: work from 100 down, Sonnet where appropriate, translation sprint when prudent, handoff for a /clear at the end.

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 2103,
-        "delta_key_count": 274,
+        "expected_key_count": 2104,
+        "delta_key_count": 275,
         "exempt_key_count": 28,
         "exempt_keys": [
             "calc_units_us",
@@ -627,6 +627,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -903,6 +904,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -2796,6 +2798,22 @@
                     "key": "lpn_crs_view",
                     "value": "Филтриране по изглед на картата",
                     "english": "Filter by map view"
+                }
+            }
+        },
+        "lpn_crs_count_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_count",
+                    "value": "{n} от {total} проекции в списъка.",
+                    "english": "{n} of {total} coordinate systems listed."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Без географска привръзка",
+                    "english": "Not georeferenced"
                 }
             }
         },
@@ -5313,8 +5331,8 @@
         }
     },
     "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
-        "lpn_xymap": "Cartesian map or plane map",
+        "lpn_geomap": "coordinate system referenced to the world map",
+        "lpn_xymap": "local, arbitrary, or schematic coordinate system",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

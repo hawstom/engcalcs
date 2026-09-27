@@ -465,3 +465,25 @@ write access) — flagging for whoever next touches that file.
 extension, not a claim of being more free) and finds nothing against it. The one thing that must
 travel with any of this is §2's own rule: never write a completeness claim against EPANET. A gap
 list from one session is a sample of the gap, not its boundary.
+
+## 0c. Fix "Number of services" Dec. SI in settings-symbology-defaults.csv
+
+2026-09-26. `## Customer` block, "Number of services" row has Dec. US=0, Dec. SI=1; it is a
+dimensionless count and should be 0/0 in both columns — the one row in that file with no unit-
+magnitude reason for its US/SI split. One-cell CSV edit, Tom's or Sue's call on the file itself
+since I do not edit it. Full context: journal entry 2026-09-26 (night), Q3.
+
+## 0d. Do not add per-Customer water quality results by default; if ever added, pass-through only with a disclaimer
+
+2026-09-26, answering Tom's question on Customer Properties/Table/Find/Symbology. Bentley's own
+WaterCAD/WaterGEMS Customer Meter element — the closest real-world analogue, checked directly —
+reports pressure/HGL only, optionally, and has no quality result field at all (CITED, Bentley
+WaterCAD CONNECT Help, fetched 2026-09-26). No other tool was found to name this as a feature in
+three targeted searches (absence result). Lead & Copper Rule / disinfectant-residual practice
+argues the opposite direction from "convenient copy of the node's number": the entire compliance
+apparatus around tap sampling exists because a model node's quality and the tap's quality are two
+different things, so a copied number that looks like a tap-specific answer is a real
+misunderstanding risk for a small UI convenience. Rank this low — not a build item, a "don't build
+this as currently framed" finding. If Tom still wants it, it should be a read-only pass-through of
+the node's own value (no new solve) with the disclaimer text drafted in the journal entry. Full
+reasoning and citations: journal entry 2026-09-26 (night), Q2.

@@ -1808,6 +1808,9 @@ the block.
 - 50|717| **EPANET-MSX, multi-species water quality.**
   Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
   Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
+  Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
+  not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
+  with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
 - 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
   Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
   Junction, Pipe, etc until escape."*
@@ -1853,6 +1856,14 @@ the block.
 - 25|731| **At whole-world zoom the map drags past the 180th meridian and a continent-sized model tears
   across it.** Found 2026-09-26 building Convert as (`feat/convert-as`); an edge case, since the
   mission scope is a 300 km span, but the wizard's world-wide first screen reaches it.
+- 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
+  (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
+  to do everything that the EPANET solver does. This way the math is less of a black box for us."*
+  Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
+  line that the built-in solver is not getting a time dimension only when a phase ships.
+- 50|734| **Where space is open east or west, one label on one line.** Tom, 2026-09-26 (R-319):
+  *"where there is infinite space east or west, we might want to recognize that infinity and
+  leverage it by using single-line concatenation of properties."* After Task 539's current round.
 - 50|732| **Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.** Ten checks fail
   identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
   catches it; bring them current or retire the checks.

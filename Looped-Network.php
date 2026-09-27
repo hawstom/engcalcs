@@ -1875,6 +1875,7 @@ EngCalcs.pageConfig = {
 	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
+	lpn_crs_count_network: <?=json_encode($ec_lang['lpn_crs_count_network'])?>,
 	lpn_crs_unplaceable_mark: <?=json_encode($ec_lang['lpn_crs_unplaceable_mark'])?>,
 	lpn_crs_unplaceable: <?=json_encode($ec_lang['lpn_crs_unplaceable'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
