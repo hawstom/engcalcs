@@ -76,7 +76,8 @@
         "feat/find-coordinate",
         "feat/row-paste",
         "feat/symbology-label",
-        "feat/quality-settings"
+        "feat/quality-settings",
+        "feat/ctrl-enter"
     ],
     "feature_freeze": {
         "active": false,
