@@ -2312,6 +2312,8 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 	outline: 2px solid #0645ad; outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
+/* A table waiting for Paste as new rows (Task 610): visibly armed until Ctrl+V or Esc. */
+.lpn-pane-appending .lpn-pane-table { outline: 2px dashed #0645ad; outline-offset: 2px; }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**17 still to read on master**, of 281 untranslated keys, of 2112 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**38 still to read on master**, of 302 untranslated keys, of 2133 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (281, 17 to read @@ NEEDS RULING)
+## lpn_  (302, 38 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -499,13 +499,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table columns help
   @@ NEEDS RULING
 - **`lpn_notes_7_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_7_term`**
   > Table keyboard shortcuts
@@ -558,6 +558,69 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_not_used`**
   > Not used
   _Ruled OK 2026-09-23._
+- **`lpn_pane_paste_append`**
+  > Paste as new rows at end of table
+  @@ NEEDS RULING
+- **`lpn_pane_paste_armed`**
+  > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_cell`**
+  > Row {row}: {text} is not a valid {col}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_id`**
+  > Row {row}: the ID {id} has a space or a quotation mark in it.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_here`**
+  > Click here and paste rows from a spreadsheet to add them.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_taken`**
+  > Row {row}: the ID {id} is already in use.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_twice`**
+  > Row {row}: the ID {id} is used twice in this paste.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_ids_differ`**
+  > {n} IDs don't match. Paste anyway?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_more`**
+  > Rows with problems not shown here: {n}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_ends`**
+  > Row {row}: a new link needs a From node and a To node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_id`**
+  > Row {row}: a new row needs an ID.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_node`**
+  > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_position`**
+  > Row {row}: a new node needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow`**
+  > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_add`**
+  > Add {extra} rows
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_bad`**
+  > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_fit`**
+  > Paste only the {fit} that fit
+  @@ NEEDS RULING
+- **`lpn_pane_paste_refused`**
+  > Nothing was pasted. {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_same_ends`**
+  > Row {row}: From and To are the same node.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows`**
+  > Pasted {n} rows and added {created} of them to the network.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows_skipped`**
+  > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
+  @@ NEEDS RULING
 - **`lpn_pane_show_all_cols`**
   > Show all columns
   _Ruled OK 2026-09-26._
@@ -875,7 +938,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**21 still to read**, of 24 new keys across 3 unmerged branch(es).
+**8 still to read**, of 11 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -886,7 +949,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/label-gang-search (`bff4af96`) — 3 new, all ruled
+### chore/handoff-0927b (`ed19d9d0`) — adds no English strings
+
+### feat/label-gang-search (`d8afdd5f`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -898,70 +963,31 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/quality-settings (`d75a944c`) — adds no English strings
+### feat/quality-settings (`43d22a0f`) — adds no English strings
 
-### feat/row-paste (`33e7ca1b`) — 21 new, 21 to read @@ NEEDS RULING
+### feat/symbology-label (`aef7185e`) — 8 new, 8 to read @@ NEEDS RULING
 
-- **`lpn_pane_paste_append`**
-  > Paste as new rows
+- **`lpn_labels_col_show`**
+  > Show
   @@ NEEDS RULING
-- **`lpn_pane_paste_armed`**
-  > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
+- **`lpn_labels_init_status`**
+  > Initial status
   @@ NEEDS RULING
-- **`lpn_pane_paste_bad_cell`**
-  > Row {row}: {text} is not a valid {col}.
+- **`lpn_labels_priority_customer_tip`**
+  > The order in which values are dropped from a customer label. The value numbered 1 is dropped first.
   @@ NEEDS RULING
-- **`lpn_pane_paste_bad_id`**
-  > Row {row}: the ID {id} has a space or a quotation mark in it.
+- **`lpn_labels_show_tip`**
+  > The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.
   @@ NEEDS RULING
-- **`lpn_pane_paste_here`**
-  > Click here and paste rows from a spreadsheet to add them.
+- **`lpn_labels_use_units`**
+  > Use units
   @@ NEEDS RULING
-- **`lpn_pane_paste_id_taken`**
-  > Row {row}: the ID {id} is already in use.
+- **`lpn_labels_use_units_tip`**
+  > Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.
   @@ NEEDS RULING
-- **`lpn_pane_paste_id_twice`**
-  > Row {row}: the ID {id} is used twice in this paste.
+- **`lpn_settings_sym_link_colors`**
+  > Link colors
   @@ NEEDS RULING
-- **`lpn_pane_paste_ids_differ`**
-  > {n} IDs don't match. Paste anyway?
-  @@ NEEDS RULING
-- **`lpn_pane_paste_more`**
-  > Rows with problems not shown here: {n}.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_ends`**
-  > Row {row}: a new link needs a From node and a To node.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_id`**
-  > Row {row}: a new row needs an ID.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_node`**
-  > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_position`**
-  > Row {row}: a new node needs both {first} and {second}.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_overflow`**
-  > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
-  @@ NEEDS RULING
-- **`lpn_pane_paste_overflow_add`**
-  > Add {extra} rows
-  @@ NEEDS RULING
-- **`lpn_pane_paste_overflow_bad`**
-  > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
-  @@ NEEDS RULING
-- **`lpn_pane_paste_overflow_fit`**
-  > Paste only the {fit} that fit
-  @@ NEEDS RULING
-- **`lpn_pane_paste_refused`**
-  > Nothing was pasted. {reasons}
-  @@ NEEDS RULING
-- **`lpn_pane_paste_same_ends`**
-  > Row {row}: From and To are the same node.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_rows`**
-  > Pasted {n} rows and added {created} of them to the network.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_rows_skipped`**
-  > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
+- **`lpn_settings_sym_node_colors`**
+  > Node colors
   @@ NEEDS RULING

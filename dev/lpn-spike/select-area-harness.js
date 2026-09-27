@@ -666,10 +666,12 @@ console.log('\n--- the Text table ---');
 	const spec = L.paneTableById('text');
 	report(!!spec && spec.group === 'label', 'there is a Text table, on the label group');
 	const keys = spec.cols.map((c) => c.key);
-	// `allZoom` ("Show at all zoom levels", R-174) rides in right after Bold, the same column
-	// order paneTextCols() declares it in.
-	report(keys.join(',') === 'id,active,text,sizeMult,align,valign,bold,allZoom,rot',
-		'with the id, Active, the words, size, the two alignments, Bold, all-zoom and the angle', keys.join(','));
+	// **R-308, Tom: "Text table needs its location coordinates."** axis1/axis2 ride right after
+	// id, the same slot the Junctions and Customers tables give a position. `allZoom` ("Show at
+	// all zoom levels", R-174) still rides in right after Bold.
+	report(keys.join(',') === 'id,axis1,axis2,active,text,sizeMult,align,valign,bold,allZoom,rot',
+		'with the id, the location, Active, the words, size, the two alignments, Bold, all-zoom and the angle',
+		keys.join(','));
 	L.renderPaneTable(spec);
 	const host = byId.lpn_pane_text;
 	const table = host.children.filter((c) => c._tag === 'table')[0];
@@ -678,9 +680,11 @@ console.log('\n--- the Text table ---');
 	report(!!body && body.children.length === doc.labels.length, 'one row per Text object', body && body.children.length);
 	const firstRow = body.children[0];
 	const cellTags = firstRow.children.map((td) => (td.children[0] ? td.children[0]._tag + (td.children[0].type ? ':' + td.children[0].type : '') : 'plain'));
-	report(cellTags[1] === 'input:checkbox', 'the Active cell is a checkbox', cellTags.join(','));
-	report(cellTags[4] === 'select' || cellTags[4] === 'plain', 'the alignment cell is a select (or plain on a Text with a leader)', cellTags.join(','));
-	report(cellTags[6] === 'input:checkbox', 'the Bold cell is a checkbox', cellTags.join(','));
+	report(cellTags[1] === 'input:text' && cellTags[2] === 'input:text',
+		'the location cells are ordinary editable text cells for a free-floating Text', cellTags.join(','));
+	report(cellTags[3] === 'input:checkbox', 'the Active cell is a checkbox', cellTags.join(','));
+	report(cellTags[6] === 'select' || cellTags[6] === 'plain', 'the alignment cell is a select (or plain on a Text with a leader)', cellTags.join(','));
+	report(cellTags[8] === 'input:checkbox', 'the Bold cell is a checkbox', cellTags.join(','));
 	// The parser the table, the paste and the multi box share.
 	const boldCol = spec.cols.filter((c) => c.key === 'bold')[0], lb0 = doc.labels[0];
 	report(L.paneWriteCellText(spec, boldCol, lb0, 'yes') === true && lb0.bold === true, 'a pasted "yes" is a tick');
@@ -689,6 +693,25 @@ console.log('\n--- the Text table ---');
 	const alignCol = spec.cols.filter((c) => c.key === 'align')[0];
 	report(L.paneWriteCellText(spec, alignCol, lb0, 'diagonal') === false, 'a choice outside the list is refused');
 	report(L.paneCellText(spec.cols.filter((c) => c.key === 'active')[0], lb0) === '1', 'an Active cell reads as 1');
+	// **THE LOCATION ITSELF, ON A FREE-FLOATING TEXT.** lb0 (tx[0]) sits at (40, 0), and this
+	// project is a bare XY grid, so outward and drawn agree.
+	const axis1Col = spec.cols.filter((c) => c.key === 'axis1')[0], axis2Col = spec.cols.filter((c) => c.key === 'axis2')[0];
+	report(L.paneCellText(axis1Col, lb0) === '40' && L.paneCellText(axis2Col, lb0) === '0',
+		'a free-floating Text reads its own X and Y', L.paneCellText(axis1Col, lb0) + ',' + L.paneCellText(axis2Col, lb0));
+	report(L.paneWriteCellText(spec, axis1Col, lb0, '75') === true && L.paneCellText(axis1Col, lb0) === '75',
+		'and typing a new X moves it, through the one seam a node and a customer position also write through',
+		L.paneCellText(axis1Col, lb0));
+	report(L.paneWriteCellText(spec, axis2Col, lb0, '12') === true && L.paneCellText(axis2Col, lb0) === '12',
+		'...and so does Y, read back through the same outward/inward crossing a node uses',
+		L.paneCellText(axis2Col, lb0));
+	// **AN ANCHORED TEXT'S LOCATION IS "Attached", NOT A NUMBER TO TYPE OVER** -- the same rule the
+	// alignment cells beside it already follow, because a leader follows its asset and there is
+	// nowhere else on this page a Text's position moves independently of it.
+	const anchored = L.addText(0, 0, ids[0]);
+	report(L.paneCellText(axis1Col, anchored) === (PC.lpn_pane_text_attached || 'Attached'),
+		'an anchored Text\'s location cell reads "Attached"', L.paneCellText(axis1Col, anchored));
+	report(L.paneWriteCellText(spec, axis1Col, anchored, '99') === false,
+		'...and refuses a typed coordinate rather than detaching it');
 }
 
 // ---- 9. what the source has to keep saying ------------------------------------------------------
