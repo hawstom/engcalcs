@@ -9,8 +9,8 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Four branches may not merge without Tom's all-clear** (in `protected` in
-  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/placement-wizard`,
-  `feat/find-coordinate`, `feat/row-paste`.
+  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/symbology-label`, `feat/quality-settings`,
+  `feat/label-gang-search`, `feat/ctrl-enter`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -95,49 +95,61 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-27
+## STATE — 2026-09-27 (evening)
 
-### Production is 83bf02d5 (Tom pulled 2026-09-26). Master 58934db3 is ahead of it
+### Production is 83bf02d5 (Tom pulled 2026-09-26). Master 3bc9c4a8 is ahead of it
 
-Unpulled on master: feat/table-editing, feat/convert-as, fix/table-help, the two error_log fatal
-fixes, and now feat/placement-wizard + feat/find-coordinate (his all-clears 2026-09-26 night) and
-fix/placement-world-view (R-306). The permission guard refuses an AI write to
-`dev/branch-all-clears.json` until he has confirmed in the conversation (AskUserQuestion worked).
+Unpulled on master: table-editing, convert-as, table-help, the two error_log fixes,
+placement-wizard, find-coordinate, R-306 world view, and today row-paste (his all-clear) and the
+R-171 harness extension. R-348: remind him to test symbology on dev once it merges and he pulls.
 
-### Awaiting his browser pass (all green but payload freshness; all Perry-reviewed; pushed)
+### Awaiting his browser pass (each green but payload freshness; each Perry-reviewed; pushed)
 
-- **8119 `feat/row-paste`** 56ab0925 -- R-308..R-312: Text coordinates, "Paste as new rows at end
-  of table", copy without headings, both Help rows. Perry could not drive Ctrl+Z after typing a
-  Text coordinate in headless Chrome; ask Tom to try it.
-- **8120 `feat/symbology-label`** 2bb37987 (NEW, needs the Apache reload) -- R-326..R-334.
-  Questions open: R-328 Sue's decimals, R-331 Use units default for blank-After rows, whether a
-  new project should stop inheriting the open project's label settings (`newProject()`), an "All"
-  index entry kept beyond his five. Deleted keys: lpn_settings_sym_node, lpn_settings_sym_link.
-  Seams: it rewrote label-order functions in js/looped-network.js that feat/label-gang-search also
-  touches, and its concentration row must read the quality branch's `qualityLabel()` -- merge the
-  first of the two, then merge master into the other and run its harnesses.
-- **8121 `feat/quality-settings`** 43d22a0f (NEW, needs the Apache reload) -- R-321..R-324. Its
-  last check_all was queued when handed back; rerun on the merge before asking for the all-clear.
-- **8090 `feat/label-gang-search`** d8afdd5f -- R-315 stepping fixed; R-315 and R-318 carry his
-  decisions (repair budget; two leader rules). Perry: the harness no longer checks the settle pass
-  after Play stops.
+- **8120 `feat/symbology-label`** 78b7ef98 -- R-346 Bef./Aft./Use units order, R-347 US Length
+  and Diameter `'` `"` unticked (SI ticked), R-342 new project inherits. OPEN QUESTION: the build read
+  "otherwise built-in defaults" narrowly -- a changed unit resets only what is calibrated to it
+  (Use units ticks, typed defaults, customer label width); prefixes, colouring, Show/Drop still carry.
+  CLAUDE.md and dev/unit-rulings.md already say so; revert both if he rules the literal reading.
+- **8121 `feat/quality-settings`** 24aa4bfa -- R-349 link concentration in Tables, Find,
+  Properties; R-350 Source type None and disabled while Source quality is blank. Perry could not open
+  a pump's Properties box (his Find for pump IDs came back empty; probably scope). Keys:
+  lpn_quality_named_avg_concentration, lpn_source_type_none.
+- **8090 `feat/label-gang-search`** 8b31a907 -- R-338/R-351: gang repair cost (6.9 s of 9.3 s)
+  and the slide step (a quarter of the LABEL height, not a text row) found and fixed; 3-7x faster,
+  no gaps at his zoom, still 3-5x master at crowded views. R-339 done. OPEN: three gaps at 1.75x are
+  the R-075 ID reserve (R-075 vs R-351, his ruling). Full account: dev/label-placement-algorithms.md 22.
+- **8123 `feat/ctrl-enter`** d6558eb4 (NEW PORT, needs the Apache reload) -- Task 690: Ctrl+Enter
+  fills a selection with the active cell's value, one undo. Declan's spec
+  dev/task-690-ctrl-enter-spec.md. Key: lpn_pane_ctrlenter_filled, and a Help, Notes row.
+
+**Merge order, for the seams:** symbology-label first (label-order functions shared with
+label-gang; its concentration row reads quality's `qualityLabel()`), then merge master into
+quality-settings and label-gang and run their harnesses before each goes.
 
 ### Open with him
 
-- R-336 / Task 697: Mary votes epanet-plus-plus.org canonical.
+- Task 697 plan: dev/epanet-plus-plus-plan.md, five questions (Option A landing page recommended).
 - R-235 (WaterCAD sample .inp from IOD).
+- The hardware box for more agents: nothing was saved in any transcript here; answered from scratch.
 
 ### Translation sprint
 
-Not launched. Wait until row-paste, symbology-label and quality-settings merge, then one sprint
-covers them with table-editing and placement-wizard (already on master).
+Not launched. Wait until the four branches merge (all change English), then one sprint covers
+them with table-editing, placement-wizard and row-paste (already on master).
 
-### Traps met 2026-09-26/27
+### Traps met 2026-09-27
 
-- **A fresh worktree has no `dev/browser-pass/node_modules`**, so four browser harnesses fail with
-  "playwright-core is not installed". Symlink it from the main checkout when creating a worktree.
-- **Give each agent a unique scratchpad log name**; one agent's check_all log overwrote another's.
-- `example-open-guard-harness.js` fails 2 of 18 under load and passes alone.
+- **The chime marker is `~/.claude/hooks/chime.busy`, not the repo's `hooks/`.** Touch it before
+  any background work; a marker older than 12 hours is ignored.
+- **Build agents hand back while their check_all is still queued.** Read the log yourself before
+  calling a branch green.
+- **Load flakes, green alone:** `label-drag-fit-harness.js` (the fit lands on the label threshold),
+  `time-harness.js` ("frames come back without pressing Run").
+- **Never let a consulting agent write into the main checkout while its suite runs**; brief it to
+  write to the scratchpad.
+- **A fresh worktree has no `dev/browser-pass/node_modules`**; symlink it from the main checkout.
+  Give each agent a unique scratchpad log name. `example-open-guard-harness.js` fails 2 of 18
+  under load and passes alone.
 
 ## Commands to hand Tom with any panel change
 

@@ -327,13 +327,13 @@ judgement and does not belong to a script.
 
 ### Decisions
 
-- [ ] R-338 feat/label-gang-search | R-315: "There appears to be serious breakage afoot with no other explanation than 'Text and symbol sizes got bigger'. Can you do a deeper inquiry into what broke label placement, and why it now takes 5 times as long as before with apparently worse results?"
-- [ ] R-339 feat/label-gang-search | R-318: the longest leader hidden first on a crowding tie: "No." A leader may not pass through another node's symbol: "Yes."
+- [ ] R-338 feat/label-gang-search | R-315: "There appears to be serious breakage afoot with no other explanation than 'Text and symbol sizes got bigger'. Can you do a deeper inquiry into what broke label placement, and why it now takes 5 times as long as before with apparently worse results?" -- feat/label-gang-search bff8a35a: causes found and fixed (see handoff); awaiting your pass
+- [ ] R-339 feat/label-gang-search | R-318: the longest leader hidden first on a crowding tie: "No." A leader may not pass through another node's symbol: "Yes." -- feat/label-gang-search 8ce9ce7c: tie rule removed (ties broken by element ID only), symbol rule kept; dev/lpn-rulings.md
 - [x] R-340 feat/symbology-label | R-328: "1 is ludicrous when US is 2. 3 is roughly analogous to 2 for US. I guess Sue is just guessing with no experience or intuition to draw on." ... "Keep all as is. They didn't show anything worth heeding." -- nothing to change
 - [x] R-341 feat/symbology-label | R-331: "No. Let's conserve space for users by leaving them unticked." -- nothing to change
-- [ ] R-342 feat/symbology-label | New project inheritance: "Things are more complicated now. A new project copies the open project where units are the same (not changed in the New Project wizard). Otherwise a new project gets built-in defaults. The party line is that new projects follow current project as much as they can."
+- [ ] R-342 feat/symbology-label | New project inheritance: "Things are more complicated now. A new project copies the open project where units are the same (not changed in the New Project wizard). Otherwise a new project gets built-in defaults. The party line is that new projects follow current project as much as they can." -- feat/symbology-label 1701e62b: same units copies all; a changed unit resets only what is calibrated to it -- confirm that reading
 - [x] R-343 feat/symbology-label | The "All" index entry: "Yes." -- kept
-- [ ] R-344 -- | R-336: epanet-plus-plus.org canonical, the other a redirect: "OK."
+- [x] R-344 -- | R-336: epanet-plus-plus.org canonical, the other a redirect: "OK." -- recorded on Task 697; plan in dev/epanet-plus-plus-plan.md
 
 ### feat/row-paste (8119)
 
@@ -341,15 +341,15 @@ judgement and does not belong to a script.
 
 ### feat/symbology-label (8120)
 
-- [ ] R-346 feat/symbology-label | "(1) OK. (2) OK. But (a) change Before to 'Bef.' (b) Move Use units to after 'After'. (c) Change After to 'Aft.'"
-- [ ] R-347 feat/symbology-label | "(3) Length and Diameter for US projects should have ' and \", not 'Use units' ticked. You may have intended to tick it for SI, since for US, I provided suffixes."
+- [ ] R-346 feat/symbology-label | "(1) OK. (2) OK. But (a) change Before to 'Bef.' (b) Move Use units to after 'After'. (c) Change After to 'Aft.'" -- feat/symbology-label 1701e62b; awaiting your pass
+- [ ] R-347 feat/symbology-label | "(3) Length and Diameter for US projects should have ' and \", not 'Use units' ticked. You may have intended to tick it for SI, since for US, I provided suffixes." -- feat/symbology-label 1701e62b: US unticked with ' and ", SI ticked; awaiting your pass
 - [ ] R-348 feat/symbology-label | "(6) Remind me to test on dev once this is merged and pushed. (7) It's a lot, and it's messy, but let's see if we can make it work."
 
 ### feat/quality-settings (8121)
 
-- [ ] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task."
-- [ ] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank."
+- [ ] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task." -- feat/quality-settings 016576a4; awaiting your pass
+- [ ] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank." -- feat/quality-settings 016576a4; awaiting your pass
 
 ### feat/label-gang-search (8090)
 
-- [ ] R-351 feat/label-gang-search | "(1) Good. (2) Good. (3) It's instantaneous, unmeasurable for a human. (4) But we know that zooming and placement are broken beyond this. [his screenshot: Novato southwest, a descending gang of labels 185/183/181/179/177 with empty gaps circled between them and leaders running far from their nodes] shows gratuitous spacing, and you know that the delay is far worse than before."
+- [ ] R-351 feat/label-gang-search | "(1) Good. (2) Good. (3) It's instantaneous, unmeasurable for a human. (4) But we know that zooming and placement are broken beyond this. [his screenshot: Novato southwest, a descending gang of labels 185/183/181/179/177 with empty gaps circled between them and leaders running far from their nodes] shows gratuitous spacing, and you know that the delay is far worse than before." -- feat/label-gang-search bff8a35a: gaps closed at your zoom, 3 remain at 1.75x held by the R-075 ID reserve; awaiting your pass
