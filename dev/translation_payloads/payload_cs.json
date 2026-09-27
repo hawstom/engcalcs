@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2125,
-        "delta_key_count": 296,
+        "expected_key_count": 2141,
+        "delta_key_count": 314,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -694,6 +694,14 @@
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.",
+        "lpn_labels_col_show": "Show",
+        "lpn_labels_show_tip": "The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.",
+        "lpn_labels_priority_customer_tip": "The order in which values are dropped from a customer label. The value numbered 1 is dropped first.",
+        "lpn_labels_use_units": "Use units",
+        "lpn_labels_use_units_tip": "Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.",
+        "lpn_labels_init_status": "Initial status",
+        "lpn_settings_sym_node_colors": "Node colors",
+        "lpn_settings_sym_link_colors": "Link colors",
         "lpn_map_attach_menu": "World map…",
         "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
         "lpn_map_attach_add": "Attach",
@@ -736,6 +744,16 @@
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_quality_mass_units": "Mass units",
+        "lpn_quality_mass_units_tip": "The mass half of the concentration unit, EPANET's own two choices.",
+        "lpn_quality_unit_ug": "µg\/L",
+        "lpn_quality_tolerance": "Quality tolerance",
+        "lpn_quality_tolerance_tip": "How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.",
+        "lpn_quality_diffusivity": "Relative diffusivity",
+        "lpn_quality_diffusivity_tip": "How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.",
+        "lpn_quality_named_concentration": "{chemical} concentration",
+        "lpn_quality_named_avg_concentration": "Average {chemical} concentration",
+        "lpn_source_type_none": "None",
         "lpn_reports_status": "Status",
         "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
         "lpn_status_title": "Status report",
@@ -992,6 +1010,14 @@
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.",
+        "lpn_labels_col_show": "Show",
+        "lpn_labels_show_tip": "The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.",
+        "lpn_labels_priority_customer_tip": "The order in which values are dropped from a customer label. The value numbered 1 is dropped first.",
+        "lpn_labels_use_units": "Use units",
+        "lpn_labels_use_units_tip": "Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.",
+        "lpn_labels_init_status": "Initial status",
+        "lpn_settings_sym_node_colors": "Node colors",
+        "lpn_settings_sym_link_colors": "Link colors",
         "lpn_map_attach_menu": "World map…",
         "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
         "lpn_map_attach_add": "Attach",
@@ -1034,6 +1060,16 @@
         "lpn_labels_customer_note": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
+        "lpn_quality_mass_units": "Mass units",
+        "lpn_quality_mass_units_tip": "The mass half of the concentration unit, EPANET's own two choices.",
+        "lpn_quality_unit_ug": "µg\/L",
+        "lpn_quality_tolerance": "Quality tolerance",
+        "lpn_quality_tolerance_tip": "How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.",
+        "lpn_quality_diffusivity": "Relative diffusivity",
+        "lpn_quality_diffusivity_tip": "How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.",
+        "lpn_quality_named_concentration": "{chemical} concentration",
+        "lpn_quality_named_avg_concentration": "Average {chemical} concentration",
+        "lpn_source_type_none": "None",
         "lpn_reports_status": "Status",
         "lpn_reports_status_tip": "What changed over the last extended period simulation, in time order: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.",
         "lpn_status_title": "Status report",
@@ -3840,6 +3876,134 @@
                 }
             }
         },
+        "lpn_labels_col_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_show_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_priority_customer_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_use_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_use_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_init_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_settings_sym_node_colors": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_settings_sym_link_colors": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_decimals",
+                    "value": "Desetinná místa",
+                    "english": "Decimals"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Podkladový obrázek…",
+                    "english": "Background image…"
+                }
+            }
+        },
         "lpn_map_attach_menu": {
             "reason": "missing",
             "current_value": null,
@@ -4453,9 +4617,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Symbolika spojů",
-                    "english": "Link"
+                    "key": "lpn_settings_sec_calculation",
+                    "value": "Výpočet",
+                    "english": "Calculation"
                 },
                 "next_translated": {
                     "key": "lpn_settings_page",
@@ -4469,9 +4633,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Symbolika spojů",
-                    "english": "Link"
+                    "key": "lpn_settings_sec_calculation",
+                    "value": "Výpočet",
+                    "english": "Calculation"
                 },
                 "next_translated": {
                     "key": "lpn_settings_page",
@@ -4485,9 +4649,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Symbolika spojů",
-                    "english": "Link"
+                    "key": "lpn_settings_sec_calculation",
+                    "value": "Výpočet",
+                    "english": "Calculation"
                 },
                 "next_translated": {
                     "key": "lpn_settings_page",
@@ -4501,14 +4665,174 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_sym_link",
-                    "value": "Symbolika spojů",
-                    "english": "Link"
+                    "key": "lpn_settings_sec_calculation",
+                    "value": "Výpočet",
+                    "english": "Calculation"
                 },
                 "next_translated": {
                     "key": "lpn_settings_page",
                     "value": "Stránka",
                     "english": "Page"
+                }
+            }
+        },
+        "lpn_quality_mass_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_mass_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_unit_ug": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_tolerance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_tolerance_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_diffusivity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_diffusivity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_named_concentration": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_quality_named_avg_concentration": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_chemical_name_tip",
+                    "value": "Název chemické látky a jednotky, ve kterých jsou zapsány její koncentrace: napište například Chlór mg\/l jako jeden údaj. Je to popisek. EPANET koncentraci nepřevádí, takže každá koncentrace a každý koeficient v projektu už musí být zapsány v těchto jednotkách.",
+                    "english": "The chemical you are tracking, for example Chlorine. Leave it blank for EPANET's own default label, Chemical. Shown on your reports, but not used in the calculations."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_initial",
+                    "value": "Počáteční kvalita",
+                    "english": "Initial quality"
+                }
+            }
+        },
+        "lpn_source_type_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_source_type_tip",
+                    "value": "Jaký druh dávky tento uzel přidává do vody, která jím prochází. Koncentrace bere vodu vstupující zde do sítě, jako by měla hodnotu Kvalita zdroje. Hmotnostní dávkovač přidává hmotnost chemické látky každou minutu, ať je průtok jakýkoli. Dávkovač na mezní hodnotu zvýší koncentraci opouštějící tento uzel na hodnotu Kvalita zdroje, a ne výš. Dávkovač úměrný průtoku přidá hodnotu Kvalita zdroje k tomu, co už ve vodě je.",
+                    "english": "What kind of chemical source dosing is applied here based on the Source Quality value? Concentration source uses the value as a concentration applied to the external inflow (reservoir or negative demand). Mass booster adds a fixed mass flow per minute to that entering the node from other points in the network. Setpoint booster ensures that the concentration leaving the node is no lower than the value. Flow-paced booster source adds a fixed concentration to that resulting from the mixing of all inflow to the node from other points in the network"
+                },
+                "next_translated": {
+                    "key": "lpn_source_type_concen",
+                    "value": "Koncentrace",
+                    "english": "Concentration"
                 }
             }
         },
