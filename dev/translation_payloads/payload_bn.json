@@ -5336,8 +5336,8 @@
         }
     },
     "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
-        "lpn_xymap": "Cartesian map or plane map",
+        "lpn_geomap": "coordinate system referenced to the world map",
+        "lpn_xymap": "local, arbitrary, or schematic coordinate system",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

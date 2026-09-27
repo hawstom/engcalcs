@@ -1211,8 +1211,8 @@ $ec_lang['lpn_basemap_satellite_show']='Show satellite images';
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
 $ec_lang['lpn_geomap']='georeferenced';
 $ec_lang['lpn_xymap']='local';
-$ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
-$ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
+$ec_lang_syn['lpn_geomap']='coordinate system referenced to the world map';
+$ec_lang_syn['lpn_xymap']='local, arbitrary, or schematic coordinate system';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
 $ec_lang['lpn_file_convert_as']='Convert as…';
