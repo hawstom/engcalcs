@@ -382,22 +382,13 @@ the block.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
-  - **BOTH DOMAINS ALREADY EXIST ON THE ACCOUNT** -- `~/addon_html/epanet-plus-plus.org` and
-    `~/addon_html/epanetpp.org` were both seen there on 2026-09-17.
-  - **"CANONICAL TO THEMSELVES" IS THE WHOLE TECHNICAL REQUIREMENT AND IT IS NOW CHEAP.** As of
-    2026-09-18 the canonical origin is a PER-PAGE declaration in `lib/Canonical.lib.php` rather than
-    one global constant, so a third and fourth front door is a declaration rather than a rewrite.
-    **But read the Search Console lesson first:** every calculator page had been nominating
-    librewaternet.org, a three-week-old domain at position 34, while hawsedc.com earned 7,575 clicks
-    a quarter at position 9.7. **A page can nominate only ONE canonical address**, so a genuine A/B
-    test of two front doors is not two canonicals over one page -- decide what each site actually
-    serves before writing a line.
-  - **AND THE NAME IS A PUBLIC CLAIM, WHICH IS THE PART THAT NEEDS CARE.** `dev/positioning.md` is the
-    authority for every public claim, `public_claim_check.php` holds four sentences Tom has already
-    struck, and `dev/not-epanet.org` exists as a sibling site with its own claim rules. **"EPANET++"
-    asserts a relationship to EPANET** -- read `dev/positioning.md` and the `not-epanet.org` CLAIMS
-    file before drafting a word of it, and expect the completeness question (never a completeness
-    claim against EPANET) to be the first one asked.
+  **Ruled 2026-09-27 (R-336/R-344): epanet-plus-plus.org is canonical; epanetpp.org 301-redirects
+  to it** (Mary's reasoning: Notepad++ chose notepad-plus-plus.org; "pp" needs decoding).
+  Both domains already exist on the account (`~/addon_html/epanet-plus-plus.org`,
+  `~/addon_html/epanetpp.org`, seen 2026-09-17). The name is a public claim -- `dev/positioning.md`
+  §6 and `public_claim_check.php` govern it, and expect the completeness question first.
+  **Plan: `dev/epanet-plus-plus-plan.md`** -- what each domain serves, the hero copy as a proposal,
+  build steps, and questions only Tom can answer.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
   - **Tasks 715 and 716 (Full and Status Report) come first** (Tom, 2026-09-25).
 
@@ -1766,20 +1757,6 @@ the block.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 
-- 100|708| **Every property in every venue: an audit, then a check.**
-  Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
-  multi-properties. Should we do an audit to ensure that all properties are represented in all
-  venues?"* Yes. Venues: the Properties box (single and multi-select), the Tables pane, Find and
-  replace, Settings symbology, labels, `.inp` export. Produce the element-by-venue matrix first, then
-  hold it with a check so a new property cannot ship in one venue only. Task 690 already asks the
-  popup-vs-table half.
-  - **AUDIT SHIPPED 2026-09-23:** `dev/property-venue-matrix.md` (8 element types x 8 venues) and
-    `property_venue_check.php` (advisory, 42 table columns with no Find row). Top gaps a user would
-    hit: Active/Closed not findable on any link; emitter coefficient; a tank's levels, diameter and
-    mixing; pump speed and energy price; pipe length findable but not replaceable.
-  - **ALL SIX FILLED AND MERGED**, Text's allZoom included; `property_venue_check.php` now FAILS if
-    any reopens. **Left for Tom:** matrix gaps 7 (coordinates are not in Find, while a Customer's
-    Station and Offset are) and 8 (no Replace row for a Text's words). Close on his word.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**

@@ -636,3 +636,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|682| CLOSED 2026-09-26 with the feat/zoom-control merge on Tom's all-clear: + and - buttons top-right, plain + and - keys, and Zoom to fit doubling as Zoom Window.
 - 0|715| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Full, every element at every time step.
 - 0|716| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Status, what switched and when.
+- 0|708| CLOSED 2026-09-27: every property in every venue; audit, six fills, gaps 7 and 8 (coordinates and Text words in Find) merged with feat/find-coordinate on Tom's all-clear; `property_venue_check.php` holds it.
