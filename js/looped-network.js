@@ -17041,6 +17041,27 @@ var EngCalcs = EngCalcs || {};
 		// spelling for the parser is its own label, because a custom property has no English name
 		// but the one the reader gave it.
 		findOfferCustom(out, d);
+		// **A NODE'S POSITION (Task 708, ranked gap #7).** Tom, 2026-09-19, of the parallel Customer
+		// gap: *"Should coordinates be in Find? I say yes. This is a freedom we need to give power
+		// users."* Band 4, beside Connection, because a coordinate is a question about the drawing
+		// rather than about the asset's own design -- and, LIKE Connection but not offered under
+		// "Everything": that exception is Connection's own (see the comment above it), and a
+		// coordinate does not share its reason, so it stays gated to a real node scope.
+		//
+		// **THE KEY IS THE SLOT, NOT THE DOCUMENT AXIS** (`axis1`/`axis2`, coordSlotIsY()'s own
+		// vocabulary) -- the same identity paneColCoord() already gives the Tables column for
+		// exactly the reason stated there: a query written on a lat/lon project must keep naming the
+		// same property if the project is ever reprojected, and "x"/"y" is the document's frame, not
+		// the public one. The label is axisNames()'s own pair, so the pull-down calls an axis
+		// whatever the popup's coordinate rows already call it -- Latitude/Longitude,
+		// Northing/Easting or X/Y -- never the bare "coordinates" CLAUDE.md's naming rule refuses.
+		// No English alt spelling (the third slot): unlike "Diameter" or "Roughness" there is no one
+		// stable English word for an axis that is Latitude on one project and Northing on the next.
+		if (d.group === 'node') {
+			var axn = axisNames();
+			out.push(['axis1', axn.first, null]);
+			out.push(['axis2', axn.second, null]);
+		}
 		if (d.key === 'all' || d.group === 'node') {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connectivity', 'Connection']);
 		}
@@ -17589,6 +17610,12 @@ var EngCalcs = EngCalcs || {};
 				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
 				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
 				? cand.el.mixingFraction : undefined;
+		}
+		// **A NODE'S POSITION** (Task 708, gap #7), read through nodeCoordAxis() -- the same
+		// resolver the popup's typed boxes and the Tables column (paneColCoord()) read, so a search
+		// and the number shown beside it can never disagree about what this axis holds right now.
+		if (prop === 'axis1' || prop === 'axis2') {
+			return cand.group === 'node' ? nodeCoordAxis(cand.el, prop === 'axis1' ? 1 : 2) : undefined;
 		}
 		// **A LINK'S OPEN/CLOSED STATUS, READ AS THE STORED INPUT** (Task 708, gap #2) -- not
 		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
@@ -19111,6 +19138,22 @@ var EngCalcs = EngCalcs || {};
 	function labelReplaceSpecs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
+			// **A TEXT'S WORDS (Task 708, ranked gap #8; Tom: *"Should a Text's words be
+			// replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field
+			// replace. No string replace within texts (partial replace)."*).** Whole-field only, the
+			// same rule every other Replace property here obeys -- the matched Texts' content
+			// BECOMES the new value, never a substring substitution. `str: true`, like a description,
+			// so the exact bytes typed survive (no one-word truncation, and Find's own `contains`
+			// still answers the partial-match question this box does not). Overridable (`text` is in
+			// LPN_OVERRIDABLE's `label` group), so a plain `prop` routes the write through setProp()
+			// -- the one seam -- exactly as the popup's own textarea and the Tables column's `text`
+			// cell do; `refreshLabelContent()` afterwards is that column's own redraw call, since
+			// replaceRedraw() has no branch for the `label` group (only node and link get one).
+			{ key: 'text', group: 'label', field: 'text', str: true,
+				label: pc.lpn_tool_add_text || 'Text',
+				applies: function () { return true; },
+				get: function (lb) { return effective(lb, 'text') || ''; },
+				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
 			{ key: 'allZoom', group: 'label', field: 'allZoom',
 				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
 				applies: function () { return true; },
@@ -19119,6 +19162,40 @@ var EngCalcs = EngCalcs || {};
 					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
 					applyLabelVisibility();
 				} }
+		];
+	}
+	/**
+	 * **A NODE'S POSITION (Task 708, ranked gap #7).** Kept out of pushSpecList() on purpose, for
+	 * the same reason a customer's station and offset are kept out of it (customerReplaceSpecs()'s
+	 * own note): neither Settings' "apply starting values to every element" nor a scenario push has
+	 * ever offered a position, because writing the SAME coordinate onto every matched node in one
+	 * push is not a starting value, it is erasing the drawing.
+	 *
+	 * **THE WRITE GOES THROUGH setNodeCoordAxis(), THE SAME FUNCTION THE POPUP'S TYPED BOXES AND
+	 * THE TABLES COLUMN (paneColCoord()) ALREADY USE** -- not a second custom `set` reimplementing
+	 * it. That single function is what makes a Replace move a node exactly the way Properties does:
+	 * it refuses an off-world value out loud (coordValueOk()) rather than writing Infinity, records
+	 * the override in a scenario or writes Base directly (writeNodeCoord(), the one place a node's
+	 * position is written), and calls updateNode() -- which walks every incident link's geometry
+	 * (updateLinkGeometry()) and moves its endpoint with the node, because a pipe holds no vertex of
+	 * its own at an endpoint; the endpoint IS the node's position, read fresh on every redraw. No
+	 * separate vertex write is needed for exactly that reason.
+	 *
+	 * `field`/`key` are `axis1`/`axis2`, findPropDefs()'s own slot identity, not `x`/`y`: the same
+	 * property must keep naming itself after a document is reprojected. The label is axisNames()'s
+	 * pair, so the pull-down calls an axis whatever the popup's own coordinate rows call it.
+	 */
+	function nodeCoordReplaceSpecs() {
+		var axn = axisNames();
+		return [
+			{ key: 'axis1', group: 'node', field: 'axis1', label: axn.first,
+				applies: function () { return true; },
+				get: function (n) { return nodeCoordAxis(n, 1); },
+				set: function (n, v) { setNodeCoordAxis(n, 1, v); } },
+			{ key: 'axis2', group: 'node', field: 'axis2', label: axn.second,
+				applies: function () { return true; },
+				get: function (n) { return nodeCoordAxis(n, 2); },
+				set: function (n, v) { setNodeCoordAxis(n, 2, v); } }
 		];
 	}
 	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
@@ -19166,7 +19243,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!cands.length) { return []; }
 		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
-			.concat(labelReplaceSpecs()).filter(function (s) {
+			.concat(labelReplaceSpecs()).concat(nodeCoordReplaceSpecs()).filter(function (s) {
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}

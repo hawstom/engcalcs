@@ -851,7 +851,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**21 still to read**, of 24 new keys across 5 unmerged branch(es).
+**21 still to read**, of 24 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -861,8 +861,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/tom-0926d (`86bc2a96`) — adds no English strings
 
 ### feat/find-coordinate (`a3688c0e`) — adds no English strings
 
@@ -877,8 +875,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_labels_restore_tip`**
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
-
-### feat/placement-wizard (`a7917752`) — adds no English strings
 
 ### feat/row-paste (`33e7ca1b`) — 21 new, 21 to read @@ NEEDS RULING
 

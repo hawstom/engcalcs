@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2103,
-        "delta_key_count": 274,
+        "expected_key_count": 2104,
+        "delta_key_count": 275,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -632,6 +632,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -908,6 +909,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -2801,6 +2803,22 @@
                     "key": "lpn_crs_view",
                     "value": "Filtrovat podle pohledu mapy",
                     "english": "Filter by map view"
+                }
+            }
+        },
+        "lpn_crs_count_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_count",
+                    "value": "Zobrazeno {n} z {total} projekcí.",
+                    "english": "{n} of {total} coordinate systems listed."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Bez georeferencování",
+                    "english": "Not georeferenced"
                 }
             }
         },

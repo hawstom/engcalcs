@@ -1064,6 +1064,7 @@
         "lpn_crs_choose": "Select",
         "lpn_crs_noview": "No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.",
         "lpn_crs_count": "{n} of {total} coordinate systems listed.",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -2105,7 +2106,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2103,
+    "count": 2104,
     "active_prefixes": [
         "about",
         "bpn",
