@@ -69,7 +69,7 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
   // an enabled debugger costs time, and the timings are the point of the default run.
   if (process.env.COUNT) {
     const src = fs.readFileSync('js/looped-network.js', 'utf8').split('\n');
-    const ln = src.findIndex(l => /^\s*function refreshLabelTextPass\(\) \{/.test(l));
+    const ln = src.findIndex(l => /^\s*function refreshLabelTextPass\([^)]*\) \{/.test(l));
     await send('Debugger.enable');
     const bp = await send('Debugger.setBreakpointByUrl', { urlRegex: 'looped-network\\.js', lineNumber: ln + 1,
       condition: '(window.__lp = (window.__lp || 0) + 1, ' +

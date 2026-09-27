@@ -94,8 +94,9 @@ function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 // full collision pass moves nothing looks identical to tunnel vision having run. This counts calls
 // to refreshLabelTextPass() itself -- the network-wide content+collision pass -- by splicing a
 // counter increment into its own first line, the same technique the GATE mutations below use.
-const FULL_PASS_MARK = "\tfunction refreshLabelTextPass() {\n";
-const FULL_PASS_COUNTED = "\tfunction refreshLabelTextPass() {\n\t\tglobal.__fullPassCount = (global.__fullPassCount || 0) + 1;\n";
+// A time step's text-only call (R-315, `textOnly` true) is not a full pass and is not counted.
+const FULL_PASS_MARK = "\tfunction refreshLabelTextPass(textOnly) {\n";
+const FULL_PASS_COUNTED = "\tfunction refreshLabelTextPass(textOnly) {\n\t\tif (!textOnly) { global.__fullPassCount = (global.__fullPassCount || 0) + 1; }\n";
 function withFullPassCounter(mutate) {
 	return function (src) {
 		if (src.indexOf(FULL_PASS_MARK) < 0) { throw new Error('refreshLabelTextPass() has moved; update FULL_PASS_MARK'); }
