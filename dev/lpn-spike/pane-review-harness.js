@@ -366,11 +366,11 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	let menu = openMenuOn(ids[1], 'elev');
 	report(!!menu, 'a right press on a cell opens a menu');
 	const labels = (menu.children || []).map((b) => labelText(b));
-	// Paste as new rows (Task 610) sits after Paste on a table that can create rows.
+	// Paste as new rows at end of table (Task 610) sits after Paste on a table that can create rows.
 	report(labels.length === 5, 'exactly five rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
-	report(labels[2] === PC.lpn_pane_paste_append, 'Paste as new rows follows Paste', labels[2]);
+	report(labels[2] === PC.lpn_pane_paste_append, 'Paste as new rows at end of table follows Paste', labels[2]);
 	report(labels[3] === PC.lpn_pane_goto_tip,
 		'Select in map reuses the pin’s own tip, not a new string', labels[3]);
 	report(labels[4] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[4]);

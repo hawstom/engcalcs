@@ -496,13 +496,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
   > Table columns help
   @@ NEEDS RULING
 - **`lpn_notes_7_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_7_term`**
   > Table keyboard shortcuts
@@ -556,7 +556,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Not used
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_append`**
-  > Paste as new rows
+  > Paste as new rows at end of table
   @@ NEEDS RULING
 - **`lpn_pane_paste_armed`**
   > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
@@ -911,7 +911,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**1 still to read**, of 4 new keys across 5 unmerged branch(es).
+**0 still to read**, of 3 new keys across 2 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -922,11 +922,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0926c (`b17d0c70`) — adds no English strings
-
-### feat/find-coordinate (`a75480e0`) — adds no English strings
-
-### feat/label-gang-search (`3a1cba26`) — 3 new, all ruled
+### feat/label-gang-search (`828ed06e`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -938,10 +934,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/placement-wizard (`a7917752`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_crs_count_network`**
-  > {n} of {total} coordinate systems cover this network.
-  @@ NEEDS RULING
-
-### feat/row-paste (`c011eb5b`) — adds no English strings
+### feat/row-paste (`33e7ca1b`) — adds no English strings

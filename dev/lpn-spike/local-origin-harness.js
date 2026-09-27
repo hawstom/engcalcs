@@ -391,8 +391,12 @@ console.log('\n--- one home for the concept ---');
 	// world cell the new origin sits in, exactly as rebaseLiveGeoDoc() reads its model's corner.
 	// **TASK 610 ADDED ONE OUTWARD SITE PER AXIS**: the Vertices cell reads each bend outward, in the
 	// same public order the node coordinate columns show.
-	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
-	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR R-308's TEXT LOCATION COLUMNS.** labelCoordAxis() reads a Text's own
+	// drawn point outward for the Text table's two coordinate columns, exactly as nodeCoordAxis()
+	// and customerCoordAxis() already do for a junction and a meter -- one reader, shared by both
+	// axes through the same slot argument, not two.
+	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 38, count(/outwardX\(/g));
+	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 38, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -468,8 +472,11 @@ console.log('\n--- one home for the concept ---');
 	// **AND TASK 610 THREE INWARD ONES PER AXIS** (paste that creates rows): a pasted node's
 	// position and a pasted bend come in from the outside like any typed number, and the Vertices
 	// cell compares a typed latitude's source record against the drawn bend.
-	ok('inwardX has one definition and 36 call sites', count(/inwardX\(/g) === 37, count(/inwardX\(/g));
-	ok('inwardY has one definition and 37 call sites', count(/inwardY\(/g) === 38, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR R-308's TEXT LOCATION COLUMNS.** setLabelCoordAxis() is the one seam a
+	// typed X/Y in the Text table comes through, on setNodeCoordAxis()'s own pattern -- a typed
+	// number is an outside one until it crosses this door.
+	ok('inwardX has one definition and 36 call sites', count(/inwardX\(/g) === 38, count(/inwardX\(/g));
+	ok('inwardY has one definition and 37 call sites', count(/inwardY\(/g) === 39, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

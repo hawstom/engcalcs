@@ -344,7 +344,7 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 			preventDefault: function () {} });
 		return menuEl();
 	}
-	// Zoom & select, found by its own word rather than its position: Paste as new rows (Task 610)
+	// Zoom & select, found by its own word rather than its position: Paste as new rows at end of table (Task 610)
 	// sits above it on a table that can create rows.
 	function gotoItem(m) { return m.children.filter((b) => (b.textContent || '').indexOf(global.EngCalcs.pageConfig.lpn_pane_goto_tip) === 0)[0]; }
 	// The ID column: the row's own element, which is what it has always done.

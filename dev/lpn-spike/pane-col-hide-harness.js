@@ -136,7 +136,7 @@ console.log('\n--- a hidden column is absent from a copy, not merely invisible -
 {
 	L.selectAll('junctions');
 	const tsv = L.copyTsv('junctions');
-	report(tsv.indexOf(demandLabel) < 0, 'the heading row of a copy carries no ' + demandLabel + ' column',
+	report(tsv.indexOf(demandLabel) < 0, 'a copy carries no ' + demandLabel + ' heading (it has none) or column',
 		tsv.split('\n')[0]);
 	report(L.colKeys('junctions').indexOf('demand') < 0,
 		'...the same absence a filtered-out row already gets, by construction');

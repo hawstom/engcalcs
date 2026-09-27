@@ -16,7 +16,7 @@
 //      kept exactly through a save on a geographic project.
 //   6. A scenario: a pasted element is born as a drawn one is (inactive in Base, active here), its
 //      position is its construction, and its property cells are this scenario's overrides.
-//   9. Paste as new rows is its own action (cell and heading menus arm it, Ctrl+Shift+V does it),
+//   9. Paste as new rows at end of table is its own action (cell and heading menus arm it, Ctrl+Shift+V does it),
 //      it leaves existing rows byte-identical, and an ordinary paste never creates an element.
 //   7. A real exported network, tab-separated with a heading row (EPANET's Net1, in this page's own
 //      column order), pasted table by table into an empty project.
@@ -174,7 +174,7 @@ console.log('\n--- 2. a duplicate ID refuses the WHOLE paste ---');
 
 	// A clean block on the new row appends, and the rows above it are byte-identical after.
 	r = L.pasteAppend('junctions', 'D\t30\t0\t\t\t1\t560\nE\t40\t0');
-	report(r && r.created === 2 && L.nodeById('D') && L.nodeById('E'), 'Paste as new rows adds every line',
+	report(r && r.created === 2 && L.nodeById('D') && L.nodeById('E'), 'Paste as new rows at end of table adds every line',
 		r && JSON.stringify(r));
 	report(JSON.stringify(nodes().slice(0, 3)) === before, 'APPEND TOUCHES NO EXISTING ROW: A, B and C are byte-identical after');
 	report(L.tableOrder('junctions').join(',') === 'A,B,C,D,E', 'the table reads A, B, C, D, E', L.tableOrder('junctions').join(','));
@@ -351,8 +351,9 @@ console.log('\n--- 8. a real exported network: Net1, tab-separated, with a headi
 	});
 	const xy = {};
 	sec.COORDINATES.forEach((r) => { xy[r[0]] = [r[1], r[2]]; });
-	// The sheet a clerk would keep: this page's own headings (exactly what a whole-table copy puts
-	// on the clipboard), one row per element, blanks where the sheet has nothing to say.
+	// The sheet a clerk would keep: this page's own headings (a copy never puts these on the
+	// clipboard itself, R-310, but an external spreadsheet's export legitimately has them), one
+	// row per element, blanks where the sheet has nothing to say.
 	function sheet(tableId, rows) {
 		const hs = L.headings(tableId);
 		return [hs.map((c) => c.h).join('\t')].concat(rows.map((o) => hs.map((c) => (o[c.key] === undefined ? '' : String(o[c.key]))).join('\t'))).join('\r\n');
@@ -384,7 +385,7 @@ console.log('\n--- 8. a real exported network: Net1, tab-separated, with a headi
 	report(t2 && t2.minLevel === 100 && t2.maxLevel === 150 && t2.tankDiameter === 50.5, 'the tank carries its levels and diameter');
 }
 
-console.log('\n--- 9. Paste as new rows: the menu arms it, Ctrl+Shift+V does it, an ordinary paste never does ---');
+console.log('\n--- 9. Paste as new rows at end of table: the menu arms it, Ctrl+Shift+V does it, an ordinary paste never does ---');
 {
 	L.reset();
 	pasteIntoEmpty('junctions', 'K1\t0\t0\nK2\t10\t0\nK3\t20\t0');
@@ -402,7 +403,7 @@ console.log('\n--- 9. Paste as new rows: the menu arms it, Ctrl+Shift+V does it,
 	L.selectCell('junctions', 'K3', 'elev');
 	L.ctxMenu('junctions', 'K3', 'elev');
 	const it = item(menuEl());
-	report(!!it && (it.textContent || '').indexOf('Ctrl+Shift+V') > 0, 'the cell menu offers Paste as new rows, with its shortcut', it && it.textContent);
+	report(!!it && (it.textContent || '').indexOf('Ctrl+Shift+V') > 0, 'the cell menu offers Paste as new rows at end of table, with its shortcut', it && it.textContent);
 	fire(it, 'click');
 	report(L.armed('junctions') && byId.lpn_pane_junctions.classList.contains('lpn-pane-appending'),
 		'choosing it arms the table, visibly');

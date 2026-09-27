@@ -875,9 +875,11 @@ $ec_lang['lpn_pane_pasted_rows_skipped']='Pasted {n} rows and added {created} of
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to add them.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
-// paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu.
-$ec_lang['lpn_pane_paste_append']='Paste as new rows';
-// Shown after choosing Paste as new rows from a menu: the page waits for the paste keystroke.
+// paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
+// wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
+$ec_lang['lpn_pane_paste_append']='Paste as new rows at end of table';
+// Shown after choosing Paste as new rows at end of table from a menu: the page waits for the paste
+// keystroke.
 $ec_lang['lpn_pane_paste_armed']='Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.';
 // Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
 // pasted, {fit} how many land on rows that exist, {extra} how many are left over.
@@ -2240,9 +2242,14 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 $ec_lang['lpn_notes_4_term']='Also on this page';
 $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
-$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr></tbody></table>';
+// R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
+// heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
+// because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
+// every row here already has -- the Hide/Show row beside it names the identical menu.
+$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+// R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

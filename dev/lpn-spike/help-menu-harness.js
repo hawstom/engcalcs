@@ -55,10 +55,24 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 		'lpn_notes_7 is the keyboard-shortcuts table');
 	const colsDefMatch = en.match(/\$ec_lang\['lpn_notes_6_def'\]='([^\n]*)';/);
 	const keysDefMatch = en.match(/\$ec_lang\['lpn_notes_7_def'\]='([^\n]*)';/);
-	report(!!colsDefMatch && (colsDefMatch[1].match(/<tr>/g) || []).length === 6,
-		'the columns table has all six rows Tom wrote');
-	report(!!keysDefMatch && (keysDefMatch[1].match(/<tr>/g) || []).length === 10,
-		'the keyboard-shortcuts table has all ten rows Tom wrote');
+	// **R-311/R-312: Paste as new rows at end of table joined both tables.** Ctrl+Shift+V in the
+	// shortcuts table (R-311) and the same command paired with its menu gestures in the columns
+	// table (R-312, Tom's verbatim row) -- one row apiece, seven and eleven. The wording itself is
+	// read out of `en`, never spelled out here (harness_wording_check.php), so a reword of either
+	// row is not a red build in this file.
+	const pasteAppendMatch = en.match(/\$ec_lang\['lpn_pane_paste_append'\]='([^\n]*)';/);
+	report(!!colsDefMatch && (colsDefMatch[1].match(/<tr>/g) || []).length === 7,
+		'the columns table has all seven rows, Paste as new rows at end of table included');
+	report(!!keysDefMatch && (keysDefMatch[1].match(/<tr>/g) || []).length === 11,
+		'the keyboard-shortcuts table has all eleven rows, Ctrl+Shift+V included');
+	report(!!colsDefMatch && !!pasteAppendMatch &&
+		colsDefMatch[1].indexOf(pasteAppendMatch[1]) > 0 &&
+		colsDefMatch[1].indexOf('Ctrl+Shift+V') > 0,
+		'R-312: the columns table carries Tom\'s own row, verbatim');
+	report(!!keysDefMatch && !!pasteAppendMatch &&
+		keysDefMatch[1].indexOf('Ctrl+Shift+V') > 0 &&
+		keysDefMatch[1].indexOf(pasteAppendMatch[1]) > 0,
+		'R-311: the shortcuts table carries Ctrl+Shift+V | Paste as new rows at end of table');
 	report(!!colsDefMatch && colsDefMatch[1].indexOf('lpn-notes-table') > 0 &&
 		!!keysDefMatch && keysDefMatch[1].indexOf('lpn-notes-table') > 0,
 		'both are real <table class="lpn-notes-table">, not a styled list');

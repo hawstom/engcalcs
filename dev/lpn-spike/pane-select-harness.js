@@ -239,7 +239,11 @@ console.log('\n--- the clipboard ---');
 		'and every cell is paneCellText(), so the clipboard cannot disagree with the screen or the print sheet');
 }
 
-// ---- 8. headers come with the WHOLE table and with nothing else --------------------------------
+// ---- 8. no copy ever prepends a heading nobody selected (R-310) --------------------------------
+// Tom, R-310: "When I copy an entire table, the headings are included even though I didn't select
+// the headings. Fix that." Neither Excel nor Google Sheets puts a heading row on the clipboard for
+// a whole-column or whole-table selection, and there is no gesture on this page that puts a
+// heading CELL into the selection for a copy to find there -- so there is none, ever.
 {
 	clickCell(ids[0], 'demand');
 	key('ArrowDown', { shiftKey: true });
@@ -248,11 +252,9 @@ console.log('\n--- the clipboard ---');
 	key('a', { ctrlKey: true });
 	const all = L.copyTsv('junctions');
 	const lines = all.split('\n');
-	report(lines.length === 5, 'Ctrl+A selects every cell, so the copy is four rows and a heading', String(lines.length));
-	report(lines[0].split('\t').length === colKeys.length, '...the heading row being one cell per column');
-	// paneHeadingText() already appends the unit in parentheses, so the units on the clipboard are
-	// the units on the strip with no second formatter to disagree with it.
-	report(/\(/.test(lines[0]), '...and the headings carry their units, as the screen does', lines[0]);
+	report(lines.length === 4, 'Ctrl+A selects every cell, so the copy is the four rows and NO heading', String(lines.length));
+	report(lines.every((l) => l.split('\t').length === colKeys.length), '...every line has one cell per column');
+	report(!/\(/.test(lines[0]), '...and the first line is data, not a heading carrying a unit', lines[0]);
 }
 
 // ---- 9. the selection survives a rebuild, because it is not made of DOM nodes ------------------

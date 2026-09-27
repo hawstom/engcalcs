@@ -10010,6 +10010,40 @@ var EngCalcs = EngCalcs || {};
 		var pt = customerPoint(c);
 		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
 	}
+	/**
+	 * **A TEXT'S LOCATION AS TWO COLUMNS** (R-308, Tom: *"Text table needs its location
+	 * coordinates."*), in whatever the project calls its axes, on the same two functions the
+	 * Junctions and Customers tables already read and write a position with.
+	 *
+	 * **AN ANCHORED TEXT HAS NO POSITION OF ITS OWN TO STATE** -- textLabelPoint() still answers one
+	 * (the anchor plus the offset), so the cell READS it, but a leader follows its asset and
+	 * relocating the words independently of it is not a thing this page offers anywhere else, so the
+	 * column is `plainFor` there, on the exact pattern the align/valign columns beside it already
+	 * use (paneTextAttachedWord/paneTextAttachedTip).
+	 */
+	function labelCoordAxis(lb, slot) {
+		var pt = textLabelPoint(lb);
+		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
+	}
+	// Writing a FREE-FLOATING Text's position only -- an anchored one is read-only here (see the
+	// column's plainFor). Base-owned, exactly as size and justification are (Task 407): a Text's
+	// place on the drawing does not change with the scenario.
+	function setLabelCoordAxis(lb, slot, v) {
+		var pc = EngCalcs.pageConfig || {}, isY;
+		if (!lb || !labelEls[lb.id] || textIsAnchored(lb)) { return false; }
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		if (!coordValueOk(coordSlotIsY(slot), v)) {
+			setNotice(pc.lpn_coord_off_world ||
+				'That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.');
+			return false;
+		}
+		isY = coordSlotIsY(slot);
+		if (isY) { lb.y = inwardY(v); } else { lb.x = inwardX(v); }   // base-write: position is Base-owned, exactly as size is
+		updateLabelGeometry(lb.id);
+		relayoutLabels();
+		saveToStorage();
+		return true;
+	}
 	// Writing a customer's own field: no setProp(), no effective(), no override marker -- see the
 	// section note on why a customer carries nothing overridable. One seam all the same, so the
 	// solve, the drawing, the table and the popup are always refreshed together.
@@ -21570,10 +21604,25 @@ var EngCalcs = EngCalcs || {};
 				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
 	}
+	/**
+	 * **A TEXT'S LOCATION AS TWO COLUMNS** (R-308), on `labelCoordAxis()`/`setLabelCoordAxis()` --
+	 * the same seam a Junction's and a Customer's own coordinate columns write through, so all three
+	 * tables mean the same thing by "editing a position". `reread`, because an anchored Text or an
+	 * off-map value refuses the write and the cell must show what actually landed.
+	 */
+	function paneColTextCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5, reread: true,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (lb) { return labelCoordAxis(lb, slot); },
+			plainFor: textIsAnchored, plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
+			set: function (lb, v) { setLabelCoordAxis(lb, slot, v); }
+		};
+	}
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			paneColId(), paneColActive(),
+			paneColId(), paneColTextCoord(1), paneColTextCoord(2), paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
 			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
@@ -23584,11 +23633,13 @@ var EngCalcs = EngCalcs || {};
 	// struck that rule on 2026-09-18 -- an arrow cannot leave EDIT mode at all now -- so the
 	// question no longer has a caller. Reinstating it would be reinstating the behaviour.)
 	/**
-	 * **THE HEADERS COME WITH A WHOLE-TABLE COPY AND WITH NOTHING ELSE.** Selecting B5:D40 in a
-	 * spreadsheet does not silently prepend a heading nobody selected; selecting the whole table
-	 * is a different gesture and means "give me this table", which is the one Task 186's out
-	 * direction is about. paneHeadingText() already carries the unit in parentheses, so the units
-	 * on the clipboard are the units on the strip with no second formatter.
+	 * **A COPY NEVER PREPENDS A HEADING NOBODY SELECTED** (Tom, R-310: *"When I copy an entire
+	 * table, the headings are included even though I didn't select the headings. Fix that."*). A
+	 * whole-table selection (all rows, all columns; Ctrl+A included) used to earn a heading line
+	 * on the theory that "give me this table" meant "with its labels" -- but neither Excel nor
+	 * Google Sheets does that, whole-column or whole-table, and there is no gesture on this page
+	 * that puts a heading CELL into the selection for a copy to find there. So there is none to
+	 * find, ever, and the heading strip stays off the clipboard.
 	 *
 	 * **A FILTERED TABLE COPIES WHAT IT SHOWS, FOR FREE.** Task 597 removes non-matching rows from
 	 * the DOM rather than hiding them, so a rectangle can only ever be built out of rows that are
@@ -23596,14 +23647,7 @@ var EngCalcs = EngCalcs || {};
 	 * if you forget; here it is true by construction.
 	 */
 	function paneCopyTsv(spec, rows, cols, box) {
-		var whole = box.r0 === 0 && box.r1 === rows.length - 1 &&
-				box.c0 === 0 && box.c1 === cols.length - 1,
-			out = [], r, c, line;
-		if (whole) {
-			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneHeadingText(cols[c])); }
-			out.push(line.join('\t'));
-		}
+		var out = [], r, c, line;
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
 			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
@@ -23833,7 +23877,7 @@ var EngCalcs = EngCalcs || {};
 	 * row' or 'Paste append' action."*
 	 *
 	 * **ADDING ROWS IS ITS OWN, NAMED ACTION** (ROADMAP Task 610, dev/paste-creates-rows-spec.md):
-	 * Paste as new rows, on the cell and heading menus and on Ctrl+Shift+V, or a paste into an
+	 * Paste as new rows at end of table, on the cell and heading menus and on Ctrl+Shift+V, or a paste into an
 	 * empty table's note. Every pasted line is then a NEW junction, pipe, tank... appended below
 	 * the last row, and no existing row is touched (`opts.append`). Tom's conditions are
 	 * the whole of the rule, and panePlanCreates() holds them: every new row carries an ID that
@@ -24009,7 +24053,7 @@ var EngCalcs = EngCalcs || {};
 	 * **A PASTE THAT RUNS PAST THE LAST ROW ASKS** (Tom, 2026-09-26: *"If a user pastes 100 at the
 	 * top of 50 rows, do we just prompt, 'Add 50 rows?'"*). Three answers: add the overflow as new
 	 * elements, paste only what fits, or paste nothing. The overflow is judged FIRST, by the same
-	 * rules as Paste as new rows (IDs, positions, From and To), so the question is never offered
+	 * rules as Paste as new rows at end of table (IDs, positions, From and To), so the question is never offered
 	 * when its answer would be refused: a failing overflow is named in the dialog, and only the
 	 * other two answers remain. Whichever runs, it is one paste and one undo step.
 	 */
@@ -24288,7 +24332,7 @@ var EngCalcs = EngCalcs || {};
 			spec._appendKeyAt = Date.now();
 			return false;
 		}
-		// Escape first disarms a waiting Paste as new rows, which is the thing on screen to cancel.
+		// Escape first disarms a waiting Paste as new rows at end of table, which is the thing on screen to cancel.
 		if ((key === 'Escape' || key === 'Esc') && spec.appendArmed) { paneDisarmAppend(spec, true); return true; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
 		// it must work whatever else the key handler would have made of the moment.
@@ -24380,7 +24424,7 @@ var EngCalcs = EngCalcs || {};
 		// character. Tom is adding the parked roadmap row himself, on master.
 		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
-			// The whole table, which is the gesture that earns the headings on the clipboard.
+			// The whole table. A copy of it carries no heading line (paneCopyTsv()).
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
 				fId: rows[rows.length - 1].id, fKey: cols[cols.length - 1].key };
 			paneSelPaint(spec, rows, cols);
@@ -24808,7 +24852,7 @@ var EngCalcs = EngCalcs || {};
 			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
 		});
 		if (paneCanCreate(spec)) {
-			mk(pc.lpn_pane_paste_append || 'Paste as new rows', function () { paneArmAppend(spec); }, 'Ctrl+Shift+V');
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); }, 'Ctrl+Shift+V');
 		}
 		aim = paneCtxTarget(spec, td, rows, box);
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
@@ -24893,7 +24937,7 @@ var EngCalcs = EngCalcs || {};
 		// The table's own action, offered from its headings too, so it is findable without first
 		// standing on a cell.
 		if (paneCanCreate(spec)) {
-			mk(pc.lpn_pane_paste_append || 'Paste as new rows', function () { paneArmAppend(spec); });
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); });
 		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
