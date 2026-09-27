@@ -24562,6 +24562,63 @@ var EngCalcs = EngCalcs || {};
 			.replace('{skipped}', String(refused)));
 		return true;
 	}
+	/**
+	 * **CTRL+ENTER FILLS A STANDING SELECTION WITH THE ACTIVE (ANCHOR) CELL'S VALUE, AND LEAVES THE
+	 * SELECTION STANDING** (Task 690), the binding Excel and Sheets both give the gesture. Unlike
+	 * Ctrl+D, which always reads the TOP row, this reads the ANCHOR cell (`box.ar`, `box.ac`) -- the
+	 * cell the selection was started from and the one just typed into -- so beginning a selection
+	 * anywhere still does the obvious thing.
+	 *
+	 * Every write goes through paneWriteCellText(), the same validated door paste and Ctrl+D use, so
+	 * a scenario override, a result/read-only refusal and the count of what was skipped are all
+	 * handled exactly as they are for those. **THE ID COLUMN IS SKIPPED BY NAME**, the same
+	 * precedent paneFillDown() and paneDeleteSelection() already set: broadcasting an id would ask
+	 * validateNewId() to refuse the same collision once per cell, an alert-storm already ruled out.
+	 *
+	 * **ONE saveUndoSnapshot() FOR THE WHOLE OPERATION**, taken only once something in the box is
+	 * actually settable -- an all-read-only box never reaches here (paneHandleKey() only calls this
+	 * once the box is more than one cell; a box with nothing settable still must not push a no-op).
+	 *
+	 * **THE SELECTION IS NOT COLLAPSED.** `spec.sel` is never touched here, and paneSelPaint() is
+	 * called again once the render settles, so the box the person had stays exactly as it was --
+	 * the one behavioral difference from ordinary Enter that makes this worth having.
+	 */
+	function paneCtrlEnterFill(spec, box) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), pc = EngCalcs.pageConfig || {},
+			anchorEl = rows[box.ar], text, r, c, col, el, wrote = 0, refused = 0, any = false;
+		if (!anchorEl || !cols[box.ac]) { return false; }
+		text = paneCellText(cols[box.ac], anchorEl);
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				if (r === box.ar && c === box.ac) { continue; }
+				col = cols[c];
+				if (col.key === 'id' || paneCellIsPlain(col, rows[r]) || !col.set) { continue; }
+				any = true;
+			}
+		}
+		if (!any) { return false; }
+		saveUndoSnapshot();
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				if (r === box.ar && c === box.ac) { continue; }
+				col = cols[c];
+				el = rows[r];
+				// **THE ID COLUMN IS COUNTED, NOT SILENTLY DROPPED**, unlike Ctrl+D: a broadcast that
+				// spans the id column still touched N cells the person selected, and {skipped} is
+				// where every one of those "not changed" cells is accounted for, id or read-only alike.
+				if (col.key === 'id') { refused++; continue; }
+				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		paneSelPaint(spec, paneTableRowsInOrder(spec), paneCols(spec));
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused)));
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -24630,6 +24687,23 @@ var EngCalcs = EngCalcs || {};
 				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
 			}
 			return true;
+		}
+		// **CTRL+ENTER FILLS THE STANDING SELECTION** (Task 690), checked before the plain `Enter`
+		// case below and, unlike Ctrl+D, whether or not the active cell is still mid-edit --
+		// committing the in-progress value into the model is the first thing it has to do, so the
+		// text just typed into the anchor is what gets broadcast. A box that is empty or a single
+		// cell has nothing to broadcast and falls through to ordinary Enter, unchanged, below.
+		if (jump && key === 'Enter' && box && (box.r1 > box.r0 || box.c1 > box.c0)) {
+			if (editing && active) { paneCommitCell(active); }
+			rows = paneTableRowsInOrder(spec);
+			cols = paneCols(spec);
+			box = paneSelBox(spec, rows, cols);
+			if (box && (box.r1 > box.r0 || box.c1 > box.c0)) {
+				if (!paneCtrlEnterFill(spec, box)) {
+					setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
+				}
+				return true;
+			}
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
