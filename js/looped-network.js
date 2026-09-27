@@ -38440,8 +38440,10 @@ var EngCalcs = EngCalcs || {};
 		if (fromUnits) {
 			Object.keys(fromUnits).forEach(function (sel) { followUnitDecimals(sel, fromUnits[sel]); });
 		}
-		// A ticked "Use units" After box names the unit, so it follows the change (R-331).
+		// A ticked "Use units" After box names the unit, so it follows the change (R-331), and a
+		// decimals count that just followed the unit shows its new number in an open panel.
 		refreshUseUnitsBoxes();
+		refreshLabelNumberBoxes();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -38881,8 +38883,20 @@ var EngCalcs = EngCalcs || {};
 	// One small bounded-integer box in a Labels row. `spec` is {value, max, title, onChange}.
 	// Shared by the Decimals, Show and Drop columns: the same control with a different bound and tip.
 	// Zero is the floor in all three; a limit low enough to argue about is one someone will resent.
+	// Every Labels number box whose spec can re-read its own value, so a change made somewhere else
+	// -- a unit switch moving a default decimals count (followUnitDecimals()) -- shows at once in a
+	// panel that is already open, rather than only after the panel is rebuilt.
+	var labelNumberBoxes = [];
+	function refreshLabelNumberBoxes() {
+		labelNumberBoxes = labelNumberBoxes.filter(function (u) { return u.box.isConnected !== false; });
+		labelNumberBoxes.forEach(function (u) {
+			var v = u.spec.read();
+			if (typeof v === 'number' && String(v) !== String(u.box.value)) { u.box.value = v; u.spec.value = v; }
+		});
+	}
 	function labelNumberBox(spec) {
 		var box = document.createElement('input');
+		if (spec.read) { labelNumberBoxes.push({ box: box, spec: spec }); }
 		if (labelTouchScreen()) {
 			box.type = 'text';
 			box.setAttribute('inputmode', 'numeric');
@@ -39181,6 +39195,10 @@ var EngCalcs = EngCalcs || {};
 			k = (key === 'quality') ? qualityDecimalsKey() : key;
 			out.decimals = {
 				value: (typeof dec[k] === 'number') ? dec[k] : dec[key], max: 32,
+				read: function () {
+					var d = labelSettings.decimals[group] || {};
+					return (typeof d[k] === 'number') ? d[k] : d[key];
+				},
 				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
 				onChange: function (v) { dec[k] = v; }
 			};
@@ -39232,6 +39250,7 @@ var EngCalcs = EngCalcs || {};
 			optBox = document.getElementById('lpn_labels_options');
 		nodeBox.innerHTML = ''; linkBox.innerHTML = '';
 		useUnitsBoxes = [];
+		labelNumberBoxes = [];
 		// **THE COLUMNS NEED NAMING.** Six unlabelled boxes are not inferable from their contents:
 		// three integers look alike and mean entirely different things. Built from the same widths
 		// the boxes use, so a heading cannot drift off its column. The name column is a flex spacer.

@@ -246,9 +246,17 @@ console.log('== 5. decimals by unit (R-328) ==');
 	setUnitSet('us');
 	L.resetLS();
 	ok('gpm opens at 0 places', L.ls().decimals.link.flow === 0);
+	// WITH THE PANEL OPEN (pre-review, 2026-09-27: the stored count moved to 3 while the box on
+	// screen still read 0). afterUnitChange() is the seam both the plain switch and the
+	// reinterpretation dialog's Non-destructive and Destructive buttons end in.
+	L.rebuildLabels();
+	const flowBox = () => byId['lpn_labels_link_fields'].children
+		.find((r) => (r.children[0].textContent || '').indexOf('Flow') >= 0).children[4];
+	ok('the open panel shows Flow at 0 places', String(flowBox().value) === '0', flowBox().value);
 	L.applyOneUnit('lpn_u_flow', 'mgd');
 	L.afterUnitChange({ lpn_u_flow: 'gpm' });
 	ok('switching to MGD moves an untouched flow to 3 places', L.ls().decimals.link.flow === 3, L.ls().decimals.link.flow);
+	ok('...and the Decimals box already open on screen says 3 too', String(flowBox().value) === '3', flowBox().value);
 	ok('...and the demands with it', L.ls().decimals.node.demand === 3 && L.ls().decimals.customer.demand === 3);
 	L.ls().decimals.link.flow = 1;
 	L.applyOneUnit('lpn_u_flow', 'lps');
