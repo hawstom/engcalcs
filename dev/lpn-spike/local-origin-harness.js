@@ -395,8 +395,11 @@ console.log('\n--- one home for the concept ---');
 	// drawn point outward for the Text table's two coordinate columns, exactly as nodeCoordAxis()
 	// and customerCoordAxis() already do for a junction and a meter -- one reader, shared by both
 	// axes through the same slot argument, not two.
-	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 38, count(/outwardX\(/g));
-	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 38, count(/outwardY\(/g));
+	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
+	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
+	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
+	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
+	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
