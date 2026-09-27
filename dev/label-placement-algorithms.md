@@ -581,14 +581,12 @@ each redraw and the map flickers as you pan. Worst goes first:
    approximation to the minimum vertex cover this problem really is. **It sits below rank on
    purpose**: clearing a cluster of junction labels is worth more than clearing it by hiding the one
    tank in it.
-4. **Leader length, longest first** — of two hides that buy the same, the one that takes more ink
-   off the map. **Not because a far label is weakly attached to its node: it is not.** Tom,
-   2026-09-26 (R-318): *"a label on a leader **always** reads as belonging to its node ... Long
-   leaders are only unfavored because they are inefficient and extra ink."* This term was first
-   argued from attachment; ink is the only reason left for it, and whether ink alone earns it a
-   rank is his call, not settled here.
-5. **The id**, so the order is total. Nothing should reach here; without it, two identical labels
-   would be chosen by array order, which is the flicker term 1 exists to avoid.
+4. **The id**, so the order is total. A stability term, not a preference: without it two tied
+   labels would be chosen by array order, which is the flicker term 1 exists to avoid.
+
+**Leader length is not a term** (Tom, 2026-09-27, R-339, on "the longest leader is hidden first on
+a crowding tie": *"No."*). Its first argument was attachment, which R-318 struck; ink was all that
+was left, and ink does not earn a hide. A tie on rank and degree is broken by the id alone.
 
 The rejected ordering, so it is not re-proposed: **degree first.** It hides fewer labels — that is
 the whole of its case — and it pays for them by hiding the tank label in a cluster of junctions,

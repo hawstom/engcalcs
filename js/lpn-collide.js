@@ -656,9 +656,12 @@ EngCalcs.lpnCollide = (function () {
 	// on that, and none of them moved.
 	var SIDE_STRATEGIES = ['corners', 'sector', 'ring'];
 	// How many half-row steps a gang column may be slid toward its nodes (repairCrossingGangs() (b')).
-	// Measured on Net3-World with the ID prefix swept 0 to 10 characters: the worst top-of-column
-	// leader fell from 5.7 to 3.5 text heights at 16 steps, and 40 bought nothing more.
-	var COLUMN_SLIDE_STEPS = 16;
+	// A "row" here is a whole LABEL, so 16 steps reached eight label heights -- 32 text rows for a
+	// four-row label -- and each step is a new trial for every member of the gang: at Tom's R-351
+	// view those trials were most of the repair. Since the leader slide after the repair finds the
+	// exact edge of the clear ground (R-351), the column no longer has to get there on its own: at 4
+	// steps every measured Novato view drew the identical layout as at 16, for 30% fewer tests.
+	var COLUMN_SLIDE_STEPS = 4;
 	// How many times slideTowardAnchors() goes round (its own note says why more than once).
 	var SLIDE_PASSES = 3;
 	// When a label may leave its own leader line after the slide (slideTowardAnchors()): a leader
@@ -1345,6 +1348,23 @@ EngCalcs.lpnCollide = (function () {
 		return { id: sp.id, anchor: sp.anchor, home: sp.home, sides: sp.sides, dragged: sp.dragged,
 			w: r.room, h: sp.h, yOff: sp.yOff, lines: null, text: sp };
 	}
+	// **THE SLIDE RESERVES ROOM WHERE THE TEXT WILL GROW, AND NOWHERE ELSE** (R-351). A longer ID
+	// (R-075's `12345678`) lengthens the ID row, which is the label's first; the value rows below it
+	// do not change. roomSpec() reserves the extra width on EVERY row, so a label in a stack slid as
+	// a block twice as wide as its values and stopped where that invisible block met a neighbour --
+	// the empty slot a text row or more tall between members of the Novato gang Tom circled (node 40
+	// stood 1.5 rows off node 183 for that alone). Here the first row is as wide as the room and the
+	// others are the rows as they are, so the reserve still holds the ID's growth and the rows that
+	// cannot grow stack as close as their own text allows. None of these widths depends on the ID's
+	// length while it fits its room, so a longer ID still moves nothing the slide placed.
+	function slideRoomSpec(sp, r) {
+		var lines;
+		if (!sp || !r || !(r.room > sp.w) || !(sp.lines && sp.lines.length > 1)) { return roomSpec(sp, r); }
+		lines = sp.lines.slice();
+		lines[0] = r.room;
+		return { id: sp.id, anchor: sp.anchor, home: sp.home, sides: sp.sides, dragged: sp.dragged,
+			w: r.room, h: sp.h, yOff: sp.yOff, lines: lines, text: sp };
+	}
 	// ---- SLIDE TOWARD THE NODE (Task 539, Tom 2026-09-22) ------------------------------------------
 	//
 	// **Tom, on two labels parked well out from their nodes with empty ground between:** *"A human
@@ -1368,6 +1388,13 @@ EngCalcs.lpnCollide = (function () {
 	//   opts     { pad, leaderMin, step, leaders }  -- `step` in world units, default a quarter text
 	//            height; `leaders` the drawn leaders of labels this pass does not move (link labels,
 	//            Text callouts), which a moved box must not land on either
+	// ONE TEXT ROW of a label spec: its box height over its row count. The slide's comments speak of
+	// "text heights" and its code used the whole box height, which on a four-row label is four of
+	// them (R-351) -- the placement lattice blind to label size that R-108 named, back in the slide.
+	function textRow(sp) {
+		var t = sp.text || sp, n = (t.lines && t.lines.length) || 1;
+		return sp.h / n;
+	}
 	function slideTowardAnchors(labels, placed, obstacles, opts) {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
@@ -1389,7 +1416,7 @@ EngCalcs.lpnCollide = (function () {
 		out.forEach(function (r, i) {
 			var sp0 = specs[r.id], sp;
 			if (r.dropped || !sp0 || sp0.dragged) { return; }
-			sp = roomSpec(sp0, r);
+			sp = slideRoomSpec(sp0, r);
 			live.push({ i: i, sp: sp, boxes: labelLineBoxes(sp, { x: r.x, y: r.y }),
 				leader: segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
 		});
@@ -1411,11 +1438,41 @@ EngCalcs.lpnCollide = (function () {
 			for (j = 0; j < fixedLeaders.length; j++) {
 				if (bbMeet(fixedLeaders[j].bb, region)) { near.fixed.push(fixedLeaders[j].g); }
 			}
+			// **A WIDE REGION GETS A BUCKET GRID** (R-338): the leave-the-line search below asks
+			// hundreds of spots against everything within a long leader's reach, and nearly all of
+			// it is nowhere near the spot being asked. rectGrid() hands a test only what lies beside
+			// it, a superset of what can answer, so every verdict is the one the list gave.
+			if (near.hard.length + near.live.length + near.fixed.length > 32) {
+				var cell = Math.max(me.sp.w, me.sp.h) || 1, grid = rectGrid(cell);
+				near.hard.forEach(function (o) { grid.add({ h: o }, boxBB(o, 0)); });
+				near.live.forEach(function (m) {
+					m.boxes.forEach(function (b) { grid.add({ lb: b }, boxBB(b, 0)); });
+					if (m.leader) { grid.add({ lg: m.leader, m: m }, segBB(m.leader)); }
+				});
+				near.fixed.forEach(function (g) { grid.add({ f: g }, segBB(g)); });
+				near.grid = grid; near.buf = [];
+			}
 			return near;
+		}
+		function clearAtGrid(near, bs) {
+			var j, k, g, q, it;
+			for (k = 0; k < bs.length; k++) {
+				g = pad > 0 ? box(bs[k].cx, bs[k].cy, bs[k].w + 2 * pad, bs[k].h + 2 * pad, bs[k].a) : bs[k];
+				q = near.grid.query(padBB(boxBB(bs[k], pad * 1.5)), near.buf);
+				for (j = 0; j < q.length; j++) {
+					it = q[j];
+					if (it.h) { if (boxOverlapDepth(g, it.h) > 0) { return false; } }
+					else if (it.lb) { if (boxOverlapDepth(g, it.lb) > 0) { return false; } }
+					else if (it.lg) { if (segmentInBoxFraction(it.lg, bs[k]) > 0) { return false; } }
+					else if (segmentInBoxFraction(it.f, bs[k]) > 0) { return false; }
+				}
+			}
+			return true;
 		}
 		function clearAt(near, bs) {
 			var j, k, m, o, g;
 			work++;
+			if (near.grid) { return clearAtGrid(near, bs); }
 			for (k = 0; k < bs.length; k++) {
 				g = pad > 0 ? box(bs[k].cx, bs[k].cy, bs[k].w + 2 * pad, bs[k].h + 2 * pad, bs[k].a) : bs[k];
 				for (j = 0; j < near.hard.length; j++) {
@@ -1439,7 +1496,21 @@ EngCalcs.lpnCollide = (function () {
 		// shed would simply hide one of the two afterwards. The own symbol is where it starts, so a
 		// box holding the anchor is not asked.
 		function leaderClear(me, near, seg) {
-			var j, k, m, o, ax = me.sp.anchor.x, ay = me.sp.anchor.y;
+			var j, k, m, o, ax = me.sp.anchor.x, ay = me.sp.anchor.y, q, it;
+			if (near.grid) {
+				q = near.grid.query(padBB(segBB(seg)), near.buf);
+				for (j = 0; j < q.length; j++) {
+					it = q[j];
+					if (it.h) {
+						o = it.h;
+						if (Math.abs(ax - o.cx) <= o.w / 2 && Math.abs(ay - o.cy) <= o.h / 2) { continue; }
+						if (segmentInBoxFraction(seg, o) > 0) { return false; }
+					} else if (it.lb) { if (segmentInBoxFraction(seg, it.lb) > 0) { return false; } }
+					else if (it.lg) { if (segmentsCross(seg, it.lg)) { return false; } }
+					else if (segmentsCross(seg, it.f)) { return false; }
+				}
+				return true;
+			}
 			for (j = 0; j < near.hard.length; j++) {
 				o = near.hard[j];
 				if (Math.abs(ax - o.cx) <= o.w / 2 && Math.abs(ay - o.cy) <= o.h / 2) { continue; }
@@ -1509,8 +1580,46 @@ EngCalcs.lpnCollide = (function () {
 			for (d = floor; d <= len - step; d += step) {
 				c = { x: ax + ux * d, y: ay + uy * d };
 				bs = labelLineBoxes(me.sp, c);
-				if (clearAt(near, bs)) { movedThisPass++; moveTo(me, c, bs); return; }
+				if (clearAt(near, bs)) {
+					// **THEN THE EXACT EDGE OF THAT CLEAR GROUND, not the lattice point past it**
+					// (R-351). The step is a quarter of the LABEL's height, so on a four-row label it
+					// is a whole text row, and a label standing below another one in a stack stopped
+					// up to that far short of it: the empty one-row slots Tom circled in the Novato
+					// gang. Halving between the last blocked step and the first clear one finds where
+					// the clear ground begins to within an eighth of a text row, for a few tests.
+					refineAlong(me, near, ux, uy, d > floor ? d - step : d, d, c, bs);
+					movedThisPass++;
+					return;
+				}
 			}
+			// **AND THE GROUND BETWEEN THE LAST STEP AND WHERE IT STANDS.** The lattice above stops a
+			// whole step short of the label, so clear ground less than one step deep -- up to a text
+			// row on a four-row label -- was never looked at, and a label that could close most of
+			// a row onto its neighbour stayed put (R-351). Halving from the last blocked step toward
+			// the label finds that edge too; the label moves only if it gains more than the tolerance.
+			if (d - step >= floor && len - (d - step) > textRow(me.sp) / 8) {
+				var lo = d - step, hi = len, cBest = null, bBest = null, mid, cm, bm;
+				while (hi - lo > textRow(me.sp) / 8) {
+					mid = (lo + hi) / 2;
+					cm = { x: ax + ux * mid, y: ay + uy * mid };
+					bm = labelLineBoxes(me.sp, cm);
+					if (clearAt(near, bm)) { hi = mid; cBest = cm; bBest = bm; } else { lo = mid; }
+				}
+				if (cBest) { movedThisPass++; moveTo(me, cBest, bBest); }
+			}
+		}
+		// Halves [lo, hi] along the leader, lo blocked (or the floor) and hi clear, down to an eighth
+		// of a text row, and moves the label to the nearest clear point found. Every point tried lies
+		// on the old leader, so the shorter leader still crosses nothing new.
+		function refineAlong(me, near, ux, uy, lo, hi, c, bs) {
+			var ax = me.sp.anchor.x, ay = me.sp.anchor.y, tol = textRow(me.sp) / 8, mid, cm, bm;
+			while (hi - lo > tol) {
+				mid = (lo + hi) / 2;
+				cm = { x: ax + ux * mid, y: ay + uy * mid };
+				bm = labelLineBoxes(me.sp, cm);
+				if (clearAt(near, bm)) { hi = mid; c = cm; bs = bm; } else { lo = mid; }
+			}
+			moveTo(me, c, bs);
 		}
 		for (pass = 0; pass < SLIDE_PASSES; pass++) {
 			movedThisPass = 0;
@@ -1546,7 +1655,12 @@ EngCalcs.lpnCollide = (function () {
 					if (!clearAt(near, bs)) { continue; }
 					if (!leaderClear(me, near, segment(ax, ay, c.x, c.y, 'leader', r.id))) { continue; }
 					left++;
-					moveTo(me, c, bs);
+					// The rings are half a LABEL apart, so the same halving as the slide above finds
+					// the nearest clear radius on this angle; a shorter leader on the same line is a
+					// piece of the one just cleared, so it crosses nothing that one did not.
+					if (rad - h / 2 >= floor) {
+						refineAlong(me, near, Math.cos(angles[k].a), Math.sin(angles[k].a), rad - h / 2, rad, c, bs);
+					} else { moveTo(me, c, bs); }
 					return;
 				}
 			}
@@ -1572,6 +1686,11 @@ EngCalcs.lpnCollide = (function () {
 		var u = null, i;
 		for (i = 0; i < bs.length; i++) { u = bbUnion(u, boxBB(bs[i], pad)); }
 		return u;
+	}
+	// Grown by a hair, so an exact touch still reaches the full test.
+	function padBB(r) {
+		var e = 1e-9 * (Math.abs(r.x0) + Math.abs(r.x1) + Math.abs(r.y0) + Math.abs(r.y1) + 1);
+		return { x0: r.x0 - e, y0: r.y0 - e, x1: r.x1 + e, y1: r.y1 + e };
 	}
 	function bbMeet(p, q) {
 		return !!p && !!q && p.x0 <= q.x1 && q.x0 <= p.x1 && p.y0 <= q.y1 && q.y0 <= p.y1;
@@ -2537,6 +2656,56 @@ EngCalcs.lpnCollide = (function () {
 		}
 		return false;
 	}
+	// **A BUCKET GRID OF RECTANGLES, FOR THE GANG REPAIR'S TWO "WHAT IS BESIDE THIS?" QUESTIONS**
+	// (R-338). Every test the repair asks -- a box on a box, a leader through a box, a leader across
+	// a leader or a pipe -- can answer yes only where the two bounding rectangles meet, so a query
+	// that returns every item whose rectangle meets the asked one returns a superset of every item
+	// that can answer, and every verdict is the one the whole list gave. It changes no layout; it
+	// only stops a trial from asking a label a screen away. Measured before it existed, on Novato
+	// zoomed in to Tom's R-351 view: the repair was 6.9 s of a 9.3 s pass, most of it those
+	// questions asked of a neighbourhood as wide as a whole column of the gang.
+	function rectGrid(cell) {
+		var cells = new Map(), big = [], stamp = 0, items = [];
+		// Cells are keyed by one number, not a string: the key is built on every query.
+		function key(i, j) { return i * 4194304 + j; }
+		return {
+			add: function (item, r) {
+				var i, j, k, c, i0, i1, j0, j1;
+				if (!r) { return; }
+				items.push(item); item._gs = 0;
+				i0 = Math.floor(r.x0 / cell); i1 = Math.floor(r.x1 / cell);
+				j0 = Math.floor(r.y0 / cell); j1 = Math.floor(r.y1 / cell);
+				if ((i1 - i0 + 1) * (j1 - j0 + 1) > 4096) { big.push(item); return; }
+				for (i = i0; i <= i1; i++) {
+					for (j = j0; j <= j1; j++) {
+						k = key(i, j); c = cells.get(k);
+						if (c) { c.push(item); } else { cells.set(k, [item]); }
+					}
+				}
+			},
+			query: function (r, out) {
+				var i, j, k, c, n, i0, i1, j0, j1, q = out || [];
+				q.length = 0;
+				stamp++;
+				i0 = Math.floor(r.x0 / cell); i1 = Math.floor(r.x1 / cell);
+				j0 = Math.floor(r.y0 / cell); j1 = Math.floor(r.y1 / cell);
+				if ((i1 - i0 + 1) * (j1 - j0 + 1) > 4096) {
+					for (n = 0; n < items.length; n++) { q.push(items[n]); }
+					return q;
+				}
+				c = big;
+				for (n = 0; n < c.length; n++) { if (c[n]._gs !== stamp) { c[n]._gs = stamp; q.push(c[n]); } }
+				for (i = i0; i <= i1; i++) {
+					for (j = j0; j <= j1; j++) {
+						c = cells.get(key(i, j));
+						if (!c) { continue; }
+						for (n = 0; n < c.length; n++) { if (c[n]._gs !== stamp) { c[n]._gs = stamp; q.push(c[n]); } }
+					}
+				}
+				return q;
+			}
+		};
+	}
 	function repairCrossingGangs(labels, placed, obstacles, opts) {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0,
@@ -2615,6 +2784,25 @@ EngCalcs.lpnCollide = (function () {
 		// and the leader the drawing would really have. **CACHED PER MEMBER PER ENDPOINT**, because
 		// a gang of three at six candidates each is 216 arrangements over 18 distinct pieces, and
 		// labelLineBoxes() is not free -- it was 40% of the pass before the cache.
+		var localGrid = null, nearGrid = null, sliceBuf = [];
+		// A cell about a label across: small enough that a query returns the few things beside a
+		// piece, large enough that a label spans a handful of cells.
+		function gridCell(members) {
+			var c = 0;
+			members.forEach(function (m) { c = Math.max(c, m.spec.w, m.spec.h); });
+			return c > 0 ? c : 1;
+		}
+		// The obstacles of this gang's neighbourhood whose rectangles meet `r`, in list form, grown
+		// by a hair so an exact touch still reaches the full test.
+		function localNear(r) {
+			var e = 1e-9 * (Math.abs(r.x0) + Math.abs(r.x1) + Math.abs(r.y0) + Math.abs(r.y1) + 1),
+				q = localGrid.query({ x0: r.x0 - e, y0: r.y0 - e, x1: r.x1 + e, y1: r.y1 + e }, sliceBuf),
+				out = { boxes: [], segments: [] }, i;
+			for (i = 0; i < q.length; i++) {
+				if (q[i].b) { out.boxes.push(q[i].b); } else { out.segments.push(q[i].g); }
+			}
+			return out;
+		}
 		function pieceFor(m, c, local) {
 			var k = c.x + ',' + c.y, g, bs;
 			if (!m.pieces) { m.pieces = {}; }
@@ -2625,9 +2813,10 @@ EngCalcs.lpnCollide = (function () {
 					// **THE OBSTACLE VERDICT AND THE LEADER LENGTH BELONG TO THE PIECE, not to the
 					// trial.** Nothing in the obstacle list moves during a search, so asking
 					// boxesClearOf() per trial asked the same question of the same neighborhood a
-					// thousand times over -- and it was most of the pass.
-					clear: boxesClearOf(bs, local, pad, m.id),
-					linkX: leaderLinkCrossings(g, local, m.id),
+					// thousand times over -- and it was most of the pass. Asked of the slice of
+					// the neighbourhood beside the piece (rectGrid()), which answers identically.
+					clear: boxesClearOf(bs, localNear(bbOfBoxes(bs, pad * 1.5)), pad, m.id),
+					linkX: g ? leaderLinkCrossings(g, localNear(segBB(g)), m.id) : 0,
 					len: g ? Math.hypot(g.bx - g.ax, g.by - g.ay) : 0 };
 			}
 			return m.pieces[k];
@@ -2671,9 +2860,14 @@ EngCalcs.lpnCollide = (function () {
 			}
 			for (i = 0; i < members.length; i++) {
 				mine = slotOf[members[i].id];
-				for (j = 0; j < near.length; j++) {
-					o = near[j];
-					if (o === mine || (isMem[o] && o < mine)) { continue; }
+				// The other members, each pair once, then the fixed neighbours beside this piece
+				// (rectGrid(): only a neighbour whose rectangle meets the piece's can be in a pair
+				// with it, so the count is the one the whole neighbourhood gave).
+				var cand = ctx.memSlots.filter(function (o) { return o > mine; });
+				ctx.nearGrid.query(pairExtent(arr[i]), ctx.buf).forEach(function (it) { cand.push(it.o); });
+				for (j = 0; j < cand.length; j++) {
+					o = cand[j];
+					if (o === mine) { continue; }
 					if (live[o].yields && !ctx.shown[o]) { continue; }   // covered: not on the map
 					if (repairPairFlagged(live[mine], live[o])) { c++; }
 					// A node label is never in the obstacle list -- placeLabelsFirstFit() commits
@@ -2869,6 +3063,9 @@ EngCalcs.lpnCollide = (function () {
 			// the grid: near() is only sound out to its own cell size, and this radius is the
 			// gang's, not the one placeLabelsFirstFit() built its index for.
 			local = obstaclesInReach({ anchor: center, w: 0, h: 0 }, obs, searchReach);
+			localGrid = rectGrid(gridCell(members));
+			local.boxes.forEach(function (o) { localGrid.add({ b: o }, boxBB(o, 0)); });
+			local.segments.forEach(function (o) { localGrid.add({ g: o }, segBB(o)); });
 			// The PLACEMENTS in reach, by the same definition: a box whose centre is within the
 			// radius plus its own half-diagonal, or a leader that passes inside it. Members are
 			// always in, whatever their own geometry says.
@@ -2898,6 +3095,12 @@ EngCalcs.lpnCollide = (function () {
 					return !ctx.isMem[p] && live[p].movable
 						&& anyBoxOverlapAny(live[p].boxes, live[o].boxes);
 				});
+			});
+			ctx.memSlots = members.map(function (m) { return slotOf[m.id]; });
+			ctx.buf = [];
+			ctx.nearGrid = rectGrid(gridCell(members));
+			ctx.near.forEach(function (o) {
+				if (!ctx.isMem[o]) { ctx.nearGrid.add({ o: o }, pairExtent(live[o])); }
 			});
 			bestArr = arrange(members, members.map(function (m) { return m.at; }), local);
 			base = score(members, bestArr, ctx);
@@ -3059,12 +3262,15 @@ EngCalcs.lpnCollide = (function () {
 	//      choice by degree is the standard approximation to the minimum vertex cover this problem
 	//      really is. It sits BELOW rank on purpose: clearing a cluster of junction labels is worth
 	//      more than clearing it by hiding the one tank in it.
-	//   4. LEADER LENGTH, longest first -- of two hides that buy the same, the one that takes more
-	//      ink off the map. NOT because a far label is weakly attached: Tom, 2026-09-26 (R-318),
-	//      *"a label on a leader always reads as belonging to its node."* It was first argued from
-	//      attachment; ink is the only reason left, and whether that earns it a rank is his call.
-	//   5. The id, so the order is total. Nothing should reach here; without it, two identical
-	//      labels would be chosen by array order, which is the flicker term 1 exists to avoid.
+	//   4. The id, so the order is total -- and it is a STABILITY term, not a preference: nothing
+	//      about which label is worth more is argued from it. Without it two tied labels would be
+	//      chosen by array order, which is the flicker term 1 exists to avoid.
+	//
+	// **LEADER LENGTH IS NOT A TERM, BY RULING** (Tom, 2026-09-27, R-339, asked whether the longer
+	// leader should be hidden first on a tie: *"No."*). It was first argued from attachment, which
+	// his R-318 struck (*"a label on a leader always reads as belonging to its node"*), and ink was
+	// the only reason left; ink does not earn a hide. So a tie on rank and degree is broken by
+	// nothing but the id. `dev/lpn-spike/label-gang-gap-harness.js` asserts it.
 	//
 	// **THE YIELD RULE IS PART OF THE MODEL, because otherwise this counts labels nobody sees.** A
 	// stationed pipe label is drawn only while no node label stands on it, so the ones already
@@ -3104,13 +3310,9 @@ EngCalcs.lpnCollide = (function () {
 				return !hidden[e.id] && (!e.yields || !coveredNow(e));
 			});
 		}
-		function leaderLen(e) {
-			return e.leader ? Math.hypot(e.leader.bx - e.leader.ax, e.leader.by - e.leader.ay) : 0;
-		}
 		function worse(a, b) {
 			if (a.rank !== b.rank) { return a.rank > b.rank; }
 			if (a.deg !== b.deg) { return a.deg > b.deg; }
-			if (a.len !== b.len) { return a.len > b.len; }
 			return a.id > b.id;
 		}
 		for (rounds = 0; rounds <= maxRounds; rounds++) {
@@ -3129,7 +3331,7 @@ EngCalcs.lpnCollide = (function () {
 			// one exit that does not reach zero and it is the correct one: two hand-placed labels
 			// crossing is a drawing somebody made on purpose.
 			if (!pool.length) { break; }
-			pool.forEach(function (e) { e.deg = deg[e.id]; e.len = leaderLen(e); });
+			pool.forEach(function (e) { e.deg = deg[e.id]; });
 			victim = pool[0];
 			pool.forEach(function (e) { if (worse(e, victim)) { victim = e; } });
 			hidden[victim.id] = true;

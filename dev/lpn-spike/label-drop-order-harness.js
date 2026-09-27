@@ -42,7 +42,12 @@ const ZOOMS = [2, 3];
 // 3/1 were measured on the old drawing and are unreachable on this one). The merge as it landed
 // scored 72/7 and 18/0; the graded rescue scores 49/7 and 16/1. The 3x hide is the rescue's gather
 // now covering a room claim's full width, which the old per-ring disc could miss.
-const CEILING = { 2: { shed: 49, hidden: 7 }, 3: { shed: 16, hidden: 1 } };
+// **RAISED ONE HIDE AT EACH ZOOM 2026-09-27, BY TOM'S R-339 RULING AND NOTHING ELSE.** Asked whether
+// the label with the longer leader should be the one hidden on a crowding tie, he said *"No."*; with
+// that term gone the crossing shed breaks the tie by the id, a different label goes, and the re-laid
+// drawing ends one hide worse here: 7 -> 8 at 2x, 1 -> 2 at 3x. Measured with the old term put back
+// and every other R-338 change in place, both read 7 and 1 again. Values given up 47 and 15.
+const CEILING = { 2: { shed: 49, hidden: 8 }, 3: { shed: 16, hidden: 2 } };
 
 let checks = 0, failures = 0;
 // **THE SHIPPED FILE'S LABELING THRESHOLD IS CLEARED ON LOAD.** Master's examples carry one (Net3

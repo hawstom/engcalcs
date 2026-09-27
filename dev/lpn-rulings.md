@@ -39,7 +39,17 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   answer, not a failure to be minimised. Three places argued from attachment and were rewritten
   that day (`lpn-collide.js`: `SPOT.reachFactor`, `spotPrime()`'s nearest-first order, and rank 4 of
   `shedCrossingSurvivors()`; `dev/label-placement-algorithms.md` §11a and §12a). Their numbers did not
-  change; whether ink alone still earns rank 4 in the crossing shed is a separate decision.
+  change.
+- **WHEN CROWDING FORCES A HIDE, LEADER LENGTH DOES NOT CHOOSE WHICH LABEL GOES** (Tom, 2026-09-27,
+  R-339, asked whether the label with the longest leader should be hidden first on a tie: *"No."*).
+  With attachment struck by R-318, ink was the rule's only reason, and ink does not earn a hide. The
+  crossing shed (`shedCrossingSurvivors()`) ranks by what the label names, then by how many crossings
+  hiding it clears, then by the id, which is there only so the same label goes on every redraw.
+  `dev/lpn-spike/label-gang-gap-harness.js` asserts the rule is gone.
+- **A LEADER MAY NOT PASS THROUGH ANOTHER NODE'S SYMBOL** (Tom, 2026-09-27, R-339: *"Yes."*). It is a
+  gate, not a cost: a placement whose leader runs through a symbol other than its own node's is not
+  offered (`leaderClearOfSymbols()` in the gang repair's spot route; the slide's leave-the-line step
+  asks the same of every hard obstacle). A leader across a PIPE stays a cost, not a gate.
 - **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
   EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
   EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
