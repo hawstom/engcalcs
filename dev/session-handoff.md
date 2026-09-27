@@ -139,7 +139,7 @@ them with table-editing, placement-wizard and row-paste (already on master).
 
 ### Traps met 2026-09-27
 
-- **The chime marker is `~/.claude/hooks/chime.busy`, not the repo's `hooks/`.** Touch it before
+- **The chime marker is `~/.claude/hooks/chime.busy`, not a folder inside the repo.** Touch it before
   any background work; a marker older than 12 hours is ignored.
 - **Build agents hand back while their check_all is still queued.** Read the log yourself before
   calling a branch green.
