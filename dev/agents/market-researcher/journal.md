@@ -1817,3 +1817,128 @@ verifying `js/lpn-inp.js` against a real WaterCAD `.inp` export. Full sizing in
 `dev/agents/market-researcher/wishlist.md`.
 
 — Mary
+
+## 2026-09-26 — Task 697: naming and SEO evidence before building epanet-plus-plus.org / epanetpp.org
+
+Question from the orchestrator, Mary's seat, on Task 697 (priority 100): outside evidence on the
+"EPANET++" name and on what a searcher finds today, before anyone writes copy for the two domains.
+
+### 1. Naming: what already uses an EPANET-derived name, and is "EPANET++" already taken
+
+**Named derivatives, all real and independently verifiable, none of them called "X++":**
+EPANET-MSX (USEPA/epanetmsx, multi-species extension), EPANET-RTX (real-time extension), OWA-EPANET
+(OpenWaterAnalytics/EPANET, the MIT community fork this suite vendors — already OBSERVED in
+`js/vendor/README.md`), EPyT / "EPANET-Python Toolkit" (KIOS-Research and OpenWaterAnalytics, PyPI
+`epyt`), `epanettools` and `owa-epanet` (both PyPI), epanet-js (Iterating Inc., epanetjs.com, the
+one this repo already tracks closely), and — new to this journal — **a second, older, unrelated
+"epanet.js"** at `epanet.de/developer/epanetjs.html.en` (I could not fetch the page directly this
+session, TLS handshake failure; the search-result synopsis describes it as a JavaScript port
+requiring no install, distinct from Iterating's product of the same descriptive name). CITED: search
+results for `github.com/USEPA/epanetmsx`, `github.com/OpenWaterAnalytics/EPyT`, `pypi.org/project/
+epyt`, `pypi.org/project/owa-epanet`, `pypi.org/project/EPANETTOOLS`, `epanet.de/developer/
+epanetjs.html.en` (title/description only, fetch failed). Also surfaced: **CityWater** and
+**Qatium**, both browser-based EPANET-model management products distinct from epanet-js — recorded
+here as more competitive landscape, not investigated further; out of scope for this question.
+
+**No stated EPA or Open Water Analytics policy on derivative naming was found, searched
+specifically.** EPA's own page (`epa.gov/water-research/epanet`, fetched directly 2026-09-08 per the
+2026-09-08 entry above, re-cited not re-fetched) states EPANET is public domain and carries EPA's
+standard non-endorsement boilerplate ("any mention of trade names... does not imply endorsement by
+EPA"), which is a disclaimer of endorsement, not a naming policy. The OWA-EPANET repo README
+(OBSERVED via the 2026-09-08 entry) says nothing about naming derivatives at all. **This is an
+absence result, not a gap in my search**: three targeted queries (EPA trademark/branding guidance,
+OWA repo policy, a general "EPANET naming guidelines" search) all came back with disclaimer language
+only, never a naming rule. Nobody has to ask permission to use "EPANET" in a name, and nobody has
+told anyone not to.
+
+**"EPANET++" itself: not found anywhere I could search — GitHub, PyPI, npm, or scholarly
+literature.** Four separate queries (GitHub/PyPI/npm-scoped search, a derivative-name roundup
+search, a Google Scholar-flavored search for "EPANET++"/"EPANET plus plus", and the general web
+search above) turned up zero hits for a project, package, or paper using that exact name. The
+closest near-miss is a paper title using "an interface for coupling optimization algorithms with...
+[EPANET]" (IEEE, not the same name) and an unrelated "Extending EPANET hydraulic solver capacity"
+paper (ScienceDirect) that extends EPANET's solver but is not named EPANET++. **Result: the name is
+clean, as far as four searches can establish; a later invocation should not upgrade this to
+"registered/confirmed unused everywhere" without re-searching nearer the actual launch date**, since
+names get claimed quickly once discussed publicly.
+
+**What "++" implies to an engineer reader, and why this matters against our own rule.** SPECULATION,
+but grounded in the one precedent every engineer already knows: C++'s own name was chosen because
+"++" is the increment operator — the language IS C, plus more, and every valid C program is (in
+intent, if imperfectly in practice) a valid C++ program. That is the convention "++" carries into
+engineering usage generally: **a strict superset claim** — everything the base does, plus
+additional capability, nothing lost. Read against `dev/positioning.md` §2's own standing rule —
+*"never write a completeness claim against EPANET... name what we do and what we know we lack; do
+not imply the second list is finished"* — **the name itself asserts the thing that rule forbids
+saying in prose.** Tom's own 2026-09-11 reasoning for choosing EPANET++ over LibreEPANET
+(`dev/positioning.md` §6, "EPANET++ ASSERTS SOMETHING WE CAN SHOW: an extension of EPANET") already
+anticipated the demonstrable-extension half of this; what it does not address is the SUPERSET half
+— "++" does not just claim "we add things," it claims "we are EPANET and then some," which is a
+stronger and less checkable claim than "we extend EPANET with scenarios, fire flow, and libraries."
+The 2026-09-24 EPANET gap audit (this journal, above) found real, uncontested gaps (multi-species
+water quality, full report export, status report, calibration) that a strict "EPANET plus more"
+reading would have to explain away. **I am not recommending against the name — that is not my
+call and Tom has already ruled on it twice — I am flagging that the specific evidence "++ means
+superset" is new, external, and sits in tension with an existing internal rule, which is exactly the
+kind of finding this seat exists to surface rather than resolve.**
+
+### 2. What a searcher finds today, and whether two self-canonical domains split reach
+
+**epanet-js/epanetjs.com dominates every query shape tested.** Three separate searches — "epanet
+online", "epanet web", and "epanet browser" (plus a fourth, "epanet online browser tool water
+network model") — each returned epanetjs.com and/or its GitHub repos in the first page of results,
+frequently as the top or near-top organic result, alongside EPA's own page, Wikipedia, and a handful
+of GIS-vendor product pages (Aquaveo/WMS, CESDB, pcswmm). **Neither `librewaternet.org` nor
+`hawsedc.com`/`engcalcs` nor any `lpn_`-related term appeared in any of the four result sets.**
+CITED: WebSearch results for "epanet online" / "epanet web" / "epanet browser" / "epanet online
+browser tool water network model 2026", run 2026-09-26.
+
+**This confirms, with fresh external evidence, the exact risk the Task 697 roadmap block already
+names from internal Search Console data** (OBSERVED, `dev/ROADMAP.md` Task 697: librewaternet.org
+at position 34 after three weeks, against hawsedc.com's 7,575 clicks/quarter at position 9.7) —
+**a brand-new domain starts from zero search authority in a niche where a well-resourced,
+better-funded competitor already occupies page one of exactly the query shapes a curious engineer
+would type.** Two new domains do not solve that; they compound it. `lib/Canonical.lib.php`'s
+per-page canonical can point at only one address per page (OBSERVED, matches the Task 697 block's
+own framing), so `epanet-plus-plus.org` and `epanetpp.org` being simultaneously "canonical to
+themselves" is not two front doors reaching two audiences — it is the SAME page's SEO signal split
+across two brand-new, zero-authority domains, each of which must independently out-rank epanet-js
+for the identical search intent, while also competing with each other and with librewaternet.org
+and hawsedc.com for the same backlinks and the same visitor. **I found no case for two domains
+helping more than one would; every piece of evidence found this session and already on file argues
+the opposite.**
+
+### 3. Recommendation, ranked
+
+1. **Resolve the "++"-as-completeness-claim tension with Tom directly, in words, before any copy is
+   written.** This is new external evidence bearing on a name he has already ruled on twice
+   (2026-09-11, 2026-09-18); per this journal's own SPECULATION discipline, I am not asserting the
+   name is wrong, only that "an increment is something we can demonstrate" (his own words, §6) does
+   not by itself answer the superset half of what "++" claims, and `dev/positioning.md` §2 is a rule
+   this seat is not permitted to contradict silently.
+2. **Do not build both domains as independently canonical front doors for the same content.** Pick
+   one canonical destination and 301-redirect the other to it — the same resolution the Task 697
+   roadmap block's own Search Console evidence already points to for librewaternet.org vs.
+   hawsedc.com, applied a second time rather than repeated. Of the two names, `epanetpp.org` is
+   shorter to type and share; `epanet-plus-plus.org` reads better as an exact-match string a search
+   engine can parse from a spoken or fully-spelled query ("epanet plus plus"). I do not have SEO
+   evidence strong enough to rank one over the other with confidence — this is a coin Tom or the
+   interface seat should call, not a finding.
+3. **Whichever domain is chosen, its copy must lead with the demonstrable-extension claim already
+   written (scenarios, fire flow, libraries, multi-scenario compare — `dev/positioning.md` §6, the
+   2026-09-24 gap audit) and explicitly disclaim the superset reading** — the same discipline §2
+   already requires everywhere else, applied to a name that, for the first time, asserts it in the
+   name itself rather than in a sentence that can be qualified.
+4. **A courtesy note to Open Water Analytics before launch remains cheap insurance and is still
+   unsent**, per `dev/positioning.md` §6's own standing note; it is the more relevant "community" to
+   clear this with than epanet-js, since OWA is EPA's own successor project and the "++" claim is
+   made against EPANET the program, not against any one commercial competitor.
+
+**What I could not find, stated plainly:** no primary EPA or OWA naming policy (searched, absent,
+not merely unread); no confirmation of what epanetjs.com's own web app does or does not rank for
+beyond the four searches run today (a rank-tracking tool would give a harder number than a search
+snapshot); and no second engineer's read on what "++" implies beyond the C++ precedent — this is
+one seat's inference from one analogy, and a future invocation should re-derive it before quoting it
+as settled.
+
+— Mary

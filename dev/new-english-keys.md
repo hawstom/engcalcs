@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**6 still to read on master**, of 271 untranslated keys, of 2102 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 273 untranslated keys, of 2104 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (271, 6 to read @@ NEEDS RULING)
+## lpn_  (273, 9 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -499,11 +499,17 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
-  > <ul class="lpn-notes-keys"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns.</li><li><strong>Hover a heading's top corner, or Tab into it</strong> Shows its ⋮ menu and its sort arrow.</li><li><strong>The ⋮</strong> Hide, show all, or manage columns.</li><li><strong>The arrow</strong> Sort by that column. Click again to reverse it.</li></ul>
+  > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_6_term`**
+  > Table columns help
+  @@ NEEDS RULING
+- **`lpn_notes_7_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_notes_7_term`**
   > Table keyboard shortcuts
-  _Ruled OK 2026-09-25._
+  @@ NEEDS RULING
 - **`lpn_offscreen_intact`**
   > Your network is intact.
   _Ruled OK 2026-09-25._
@@ -845,7 +851,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**2 still to read**, of 5 new keys across 4 unmerged branch(es).
+**21 still to read**, of 24 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -856,9 +862,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0926c (`588e5257`) — adds no English strings
+### chore/tom-0926d (`86bc2a96`) — adds no English strings
 
-### feat/label-gang-search (`c0104534`) — 3 new, all ruled
+### feat/find-coordinate (`a3688c0e`) — adds no English strings
+
+### feat/label-gang-search (`828ed06e`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -870,13 +878,70 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/placement-wizard (`a71841ad`) — adds no English strings
+### feat/placement-wizard (`a7917752`) — adds no English strings
 
-### fix/table-help (`ae43f013`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/row-paste (`33e7ca1b`) — 21 new, 21 to read @@ NEEDS RULING
 
-- **`lpn_notes_7_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+- **`lpn_pane_paste_append`**
+  > Paste as new rows
   @@ NEEDS RULING
-- **`lpn_notes_7_term`**
-  > Table keyboard shortcuts
+- **`lpn_pane_paste_armed`**
+  > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_cell`**
+  > Row {row}: {text} is not a valid {col}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_id`**
+  > Row {row}: the ID {id} has a space or a quotation mark in it.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_here`**
+  > Click here and paste rows from a spreadsheet to add them.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_taken`**
+  > Row {row}: the ID {id} is already in use.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_twice`**
+  > Row {row}: the ID {id} is used twice in this paste.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_ids_differ`**
+  > {n} IDs don't match. Paste anyway?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_more`**
+  > Rows with problems not shown here: {n}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_ends`**
+  > Row {row}: a new link needs a From node and a To node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_id`**
+  > Row {row}: a new row needs an ID.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_node`**
+  > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_position`**
+  > Row {row}: a new node needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow`**
+  > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_add`**
+  > Add {extra} rows
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_bad`**
+  > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_fit`**
+  > Paste only the {fit} that fit
+  @@ NEEDS RULING
+- **`lpn_pane_paste_refused`**
+  > Nothing was pasted. {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_same_ends`**
+  > Row {row}: From and To are the same node.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows`**
+  > Pasted {n} rows and added {created} of them to the network.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows_skipped`**
+  > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
   @@ NEEDS RULING

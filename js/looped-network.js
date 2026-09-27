@@ -41821,6 +41821,16 @@ var EngCalcs = EngCalcs || {};
 	// Hide/show the units of one container and report how many survived. A SUB-HEADING is decided
 	// by its body, except when the heading itself matches -- somebody searching "units" means the
 	// Units section, not the four rows inside it that happen to contain the word.
+	// **SHOWING A ROW PUTS BACK ITS OWN DISPLAY, NEVER ''.** A labels row is laid out by an inline
+	// `display: flex` (labelCheckbox()), and writing '' to show it erased that, so every row in the
+	// three label lists stacked its columns the moment the box opened -- the filter runs with an
+	// empty query too. It went unseen until R-226 made those lists `lpn-set-part` and the filter
+	// began walking into them row by row. dev/browser-pass/specs/labelcols.js is what caught it.
+	function setboxShow(el, show) {
+		var own = el.style.display || '';
+		if (own !== 'none') { el._setboxDisplay = own; }
+		el.style.display = show ? (el._setboxDisplay || '') : 'none';
+	}
 	function filterSetboxContainer(container, words) {
 		var shown = 0, pendingSub = null;
 		[].forEach.call(container.children, function (kid) {
@@ -41850,7 +41860,7 @@ var EngCalcs = EngCalcs || {};
 			// a filter is on rather than standing over a gap.
 			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
 			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
-			kid.style.display = m ? '' : 'none';
+			setboxShow(kid, m);
 			if (m) { shown++; }
 		});
 		return shown;
