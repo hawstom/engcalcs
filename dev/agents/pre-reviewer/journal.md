@@ -2602,3 +2602,84 @@ Verdict, ranked by cost to Tom if wrong:
    unguarded by the automated suite.
 5. Drag/selection during Play -- CONFIRMED no crash on one drag; did not verify the dragged label's
    final resting position was sensible, only that nothing threw.
+
+---
+
+## 2026-09-27 -- R-338/R-351 gang-gap and performance round (feat/label-gang-search, bff8a35a)
+
+CITED: R-338 ("serious breakage ... Text and symbol sizes got bigger ... 5 times as long as
+before"), R-351 (the Novato southwest screenshot of a descending gang with empty gaps), R-339
+(longest-leader tie: "No." / leader-through-symbol: "Yes."), R-075 (12345678 prefix must not move
+or hide a shown label), dev/tom-review-queue.md.
+
+OBSERVED: `node dev/lpn-spike/label-gang-gap-harness.js` -- 10/10 checks pass on this tree. At x1.5
+of fit on Net3-Novato-CA-World (id+elev+demand+pressure, node 179): 0 empty gang slots, longest
+leader 12.6 rows (ceiling 14), 1.40M placement tests (ceiling 1.68M; was 3.49M before R-338). At
+x1.75: 3 gaps remain (183/40, 189/185, 251/247, 1.1-1.6 rows), each attributed by the harness itself
+to the ID's reserved room -- this is the R-075-vs-R-351 tension the build agent's report names, not
+a new defect. The tie-fixture check confirms a tie on rank/degree is now broken by id, not by
+leader length -- matches R-339's "No."
+
+OBSERVED, source: `js/lpn-collide.js` around `shedCrossingSurvivors` carries a comment dated
+2026-09-27 quoting R-339 directly ("asked whether the longer leader should be hidden first on a
+tie: *No.*") and states leader length is not a term in the tie order; grepped the file for any
+other still-live leader-length comparison in the shed and found none. The kept half of R-339 (a
+leader may not pass through another node's symbol) is untouched by this branch's diff -- still
+argued at line ~2197/2556/2895, not touched by 8ce9ce7c/14955580/bff8a35a.
+
+OBSERVED: `node dev/lpn-spike/label-prefix-acceptance-harness.js` -- 7/7 pass. Net3-Novato-CA-World
+and Net3 both show 0 moved / 0 hidden at 4x and 8x after adding `12345678`; at 1x and 2x some
+labels still move (2-11 depending on view), which is the SAME state R-282 already ruled acceptable
+(a label with no property to give has nothing to trade for a longer leader) -- not a new leak.
+
+OBSERVED, real Chrome (playwright-core from dev/browser-pass/node_modules, branch on its running
+preview at :8090, master at hawsedc.local/3bc9c4a8): opened the gallery's "EPANET Net3, lat/lon",
+set node labels to ID + Base demand + Pressure + Elevation only (Project > Settings), used View >
+Go to a latitude and longitude to 38.08596, -122.56123 (node 179), then zoomed in by mouse wheel to
+reach the 177/179/181/183/185/187/189/204/35 cluster. Screenshots saved:
+`/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/f64d0617-4ce8-4891-9895-1b26faec6024/scratchpad/branch16-canvas.png`
+and `master16-canvas.png` (same view, same fields, same zoom path, both builds). At this zoom the
+cluster's labels are dense but I did not find an obvious multi-row blank gap in either build's
+screenshot; I could NOT reproduce Tom's exact screenshot state (his labels had degraded to bare ID
+numbers stacked in a column -- mine still carry full P=/Qb=/Z= text at this zoom/pan), so this is
+NOT a pixel-for-pixel replication of R-351's view and I cannot say his precise complaint is now
+absent on screen, only that the harness's own version of that same gang (measured, not screenshotted)
+passes its no-gap assertion at the zooms it defines.
+
+OBSERVED, real Chrome timing (same script, same zoom path, one wheel-notch step timed by wall clock
+from dispatch to three consecutive stable text-node counts, 50 ms poll): branch settle 868-1482 ms
+across 4 runs at two zoom depths (median ~1200 ms); master 487-2043 ms across the same runs (the one
+2043 ms sample was the very first page load of the run and looks like cold-start noise; the other
+three master samples are 487-597 ms). Branch is consistently slower than master here, roughly
+1.5-2.5x by this measure -- confirms the DIRECTION of the claim (branch slower) but I did NOT
+reproduce the specific "3-5x" ratio the build agent measured, because my zoom path (wheel notches
+from a Go-to point) is not the same view as their instrumented x1.25-x2-of-fit centred exactly on
+node 179, and my measurement is a coarse DOM-stability poll rather than a CPU-profiled placement-test
+count. Read this as "not contradicted, not independently reproduced at the claimed magnitude."
+
+UNVERIFIABLE FROM HERE: whether the exact visual Tom will see on his own saved view -- his own pan,
+zoom and possibly a saved label-column layout -- still shows a gratuitous one-row gap. The harness
+covers the same node cluster at defined zooms and passes; only a browser pass on his own project
+state (or the exact zoom/pan his screenshot was taken at) can close that last gap.
+
+Verdict, ranked by cost to Tom if wrong:
+1. R-351 gaps -- CONFIRMED by the project's own harness (0 gaps at 1.5x, 3 named and attributed at
+   1.75x); NOT independently re-created pixel-for-pixel in a live browser because his exact
+   screenshot state (bare-ID stacked labels) was not reproduced by my zoom path. Tom should re-check
+   his own saved view before calling this closed.
+2. R-338 slowness -- CONFIRMED in direction on a live Chrome (branch slower than master at the same
+   view); the specific "3-5x" figure comes from the build agent's own instrumented run and the
+   harness's placement-test ceilings, both of which I re-ran and both passed -- I did not
+   independently measure the same 3-5x on a different view, so treat the number as their own
+   measurement, verified self-consistent, not independently reproduced by me at that exact ratio.
+3. R-339 (remove longest-leader tie, keep symbol-crossing ban) -- CONFIRMED on both halves: the tie
+   is gone from the code and asserted gone by a harness fixture; the symbol-crossing rule is
+   untouched by this branch's diff.
+4. R-075 (12345678 prefix) -- CONFIRMED unchanged and passing; the branch's own harness shows the
+   same non-zero-at-1x/2x, zero-at-4x/8x split that R-282 already ruled acceptable.
+
+Click-list for Tom (2 minutes): open your own saved Novato southwest view at the zoom your R-351
+screenshot was taken at (not a fresh Go-to), confirm the descending 185/183/181/179/177 gang now
+touches with no blank row between members, and note whether the overall zoom/pan feel noticeably
+snappier than before -- the harness says the pass costs less, but "instantaneous" is not promised at
+this crowded a view (3-5x master's time is still claimed).
