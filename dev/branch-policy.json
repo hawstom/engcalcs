@@ -71,7 +71,10 @@
         "feat/first-project",
         "feat/customer-node",
         "feat/menu-button",
-        "feat/report"
+        "feat/report",
+        "feat/placement-wizard",
+        "feat/find-coordinate",
+        "feat/row-paste"
     ],
     "feature_freeze": {
         "active": false,
