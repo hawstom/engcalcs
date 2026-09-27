@@ -117,6 +117,10 @@ $ec_canonical_origins = Array(
     'hawsedc.com'                    => 'https://hawsedc.com',
     'librewaternet.org'              => 'https://hawsedc.com',
     'constructionnotesmanager.com'   => 'https://hawsedc.com',
+    // Task 697 (B1): the EPANET++ front door. Its calculators, if anybody reaches them through the
+    // /engcalcs/ symlink, stay hawsedc.com's like everywhere else; the map application's own
+    // answer on this host is ecCanonicalHostOrigins()'s, in lib/Canonical.lib.php.
+    'epanet-plus-plus.org'           => 'https://hawsedc.com',
 );
 define('CANONICAL_ORIGIN_DEFAULT', 'https://hawsedc.com');
 
@@ -141,6 +145,23 @@ define('EC_LWN_APP_URL', EC_LWN_ORIGIN . '/app/');
 // application who wants to know what this project is has nowhere to go without it -- Tom:
 // *"No way to get back to LibreWaterNet.org from the map."*
 define('EC_LWN_SITE_URL', EC_LWN_ORIGIN . '/');
+
+/**
+ * The name the page being served presents itself under, and where that name links (Task 697).
+ *
+ * Both answer from ecAppBrand() in lib/Canonical.lib.php, which keys the brand on the origin the
+ * page NOMINATES -- so the name and the canonical come from one declared whitelist and cannot
+ * disagree. LibreWaterNet is the fallback for anything with no brand of its own, which is what
+ * these two strings were before Task 697 on every host. Called at render time, after
+ * base.inc.php has loaded Canonical.lib.php.
+ */
+function ecAppBrandCurrent() {
+    $script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+    $brand = function_exists('ecAppBrand') ? ecAppBrand($script, CANONICAL_ORIGIN, EC_CANONICAL_HOST) : null;
+    return $brand !== null ? $brand : array('name' => 'LibreWaterNet.org', 'site' => EC_LWN_SITE_URL);
+}
+function ecAppBrandName() { $b = ecAppBrandCurrent(); return $b['name']; }
+function ecAppSiteUrl()   { $b = ecAppBrandCurrent(); return $b['site']; }
 
 /**
  * Which code is actually running on this host: the deploy time and the commit.
@@ -269,6 +290,11 @@ define('CANONICAL_ORIGIN', isset($ec_canonical_origins[$ec_canonical_host])
 // not in the array above, and a redirect that could not tell them apart from hawsedc.com would
 // send every developer to production. ecCanonicalRedirectTarget() is gated on this.
 define('EC_CANONICAL_HOST_DECLARED', isset($ec_canonical_origins[$ec_canonical_host]));
+// **THE SERVING HOST, BUT ONLY ONE WE DECLARED** (Task 697). ecCanonicalHostOrigins() lets one
+// page nominate a different origin on one named host, and this is the key it is looked up by. It
+// is '' for every host not in the array above, so a forged Host header never reaches that lookup
+// at all -- it can select one of our declared answers or none, never introduce one.
+define('EC_CANONICAL_HOST', EC_CANONICAL_HOST_DECLARED ? $ec_canonical_host : '');
 unset($ec_canonical_host, $ec_colon);
 
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.

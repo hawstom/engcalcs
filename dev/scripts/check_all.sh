@@ -199,6 +199,10 @@ run_check "canonical path override"      blocking php dev/scripts/canonical_path
 run_check "sitemap canonical agree"      blocking php dev/scripts/sitemap_canonical_check.php
 run_check "sitemap canonical selftest"   blocking php dev/scripts/sitemap_canonical_selftest.php
 run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
+# Task 697 (B1): the map application is two front doors, librewaternet.org/app/ and
+# epanet-plus-plus.org/app/. Renders it per Host and reads canonical, hreflang, og:url, og:image and
+# the brand; a spoofed Host must get the librewaternet.org answer.
+run_check "canonical per host"           blocking php dev/scripts/canonical_host_check.php
 # The suite nav rides onto every page including the one served at the /app/ rewrite, where a
 # RELATIVE href resolves against /app/ and 404s. The markup is identical on both hosts, so nothing
 # in this repository could see it and Tom found it by clicking. Born at zero, guarded by a live
