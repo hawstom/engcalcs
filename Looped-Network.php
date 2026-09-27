@@ -1834,6 +1834,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_filled: <?=json_encode($ec_lang['lpn_pane_filled'])?>,
 	lpn_pane_filldown: <?=json_encode($ec_lang['lpn_pane_filldown'])?>,
 	lpn_pane_fill_none: <?=json_encode($ec_lang['lpn_pane_fill_none'])?>,
+	lpn_pane_ctrlenter_filled: <?=json_encode($ec_lang['lpn_pane_ctrlenter_filled'])?>,
 	lpn_pane_hide_col: <?=json_encode($ec_lang['lpn_pane_hide_col'])?>,
 	lpn_pane_hide_cols: <?=json_encode($ec_lang['lpn_pane_hide_cols'])?>,
 	lpn_pane_show_all_cols: <?=json_encode($ec_lang['lpn_pane_show_all_cols'])?>,
