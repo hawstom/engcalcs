@@ -2435,3 +2435,36 @@ SPECULATION: the Find defect above is a pre-existing `findResultRow()` behavior,
 this branch — but this branch is what makes shared IDs a normal, encouraged outcome (Tom: "Junctions
 and pipes can use same ID. Yes."), so the branch is what turns a previously rare cosmetic gap into
 a routine one. Worth naming to Tom as a one-line follow-up regardless of whose branch owns the fix.
+
+# Perry review, feat/label-gang-search R-290, 2026-09-26
+
+OBSERVED: node dev/lpn-spike/label-merge-attribution-measure.js on current tree (091e58b9) gives
+"drawing new, fit new, cap new: x2 49/7/199, x3 16/1/259" -- matches build agent's claim
+72->49 giving up a value, hidden 7, 3x hidden 0->1.
+
+OBSERVED: all 7 re-baselined harnesses (label-drop-order, label-prefix-acceptance, label-slide,
+label-widen, label-width-cause, label-width-stability, node-shed) pass on current tree, 128
+checks total, no failures.
+
+OBSERVED: node-shed-harness.js lines 385-388, the build agent's own comment: floor lowered
+9->6 "AND THE MUTATION NO LONGER FAILS IT ... This floor holds the count; it no longer tells
+the two cascades apart on this view." Self-disclosed loss of discriminating power in that
+harness, not hidden.
+
+OBSERVED: js/lpn-collide.js line ~1838-1843: rescue budget explicitly "COUNTED IN OBSTACLE
+TESTS, NOT MILLISECONDS ... Counted rather than timed so the same drawing always gets the same
+answer." When exhausted, "the labels still waiting are dropped exactly as they were before the
+rescue existed" -- clean fallback, not half-placed state, per code comment (not independently
+fuzz-tested for determinism across repeated runs in this session -- ran out of time budget).
+
+OBSERVED: commit 091e58b9 gates labelRescueWork() to 0 while fitMeasuring, then reshedNow()
+once after settleLoop -- self-consistent with "no rescue during zoom-to-fit" claim.
+
+UNVERIFIED: did not independently time a real browser Novato 2x pass / Net3 fit branch vs
+master (budget ran out); only the node-harness "content pass" ms printout (2258 ms x2, current
+code) was checked, which is same order of magnitude as the claimed ~2.5 s but is not a browser
+wall-clock measurement.
+
+UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom to fit lands on
+the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
+no browser session was opened this pass, only Node DOM-stub harnesses.
