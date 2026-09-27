@@ -208,6 +208,13 @@
             "words": "All good. Close, merge, and delete branch.",
             "context": "Said 2026-09-26 night after his browser pass on port 8118, and confirmed when asked whether to record it ('Yes, write both').",
             "pin_note": "HE CLEARED IT AT a75480e0 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message. Nothing of the branch's own."
+        },
+        "feat/row-paste": {
+            "head": "2db90b59",
+            "date": "2026-09-27",
+            "words": "8119 row-paste: OK. Done. Close, merge and delete branch.",
+            "context": "Said 2026-09-27 after his browser pass on port 8119, in the message that also carried his R-315/R-318 decisions.",
+            "pin_note": "HE CLEARED IT AT 56ab0925 AND THE PIN IS LATER: the merge of master (placement-wizard, find-coordinate, R-306), one harness count conflict resolved. Nothing of the branch's own."
         }
     }
 }

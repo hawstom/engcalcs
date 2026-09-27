@@ -388,8 +388,10 @@ console.log('\n--- no standing note above the table ---');
 	const first = (panel.childNodes || [])[0];
 	report(!/lpn_pane_paste_note/.test(src + php), 'the paste note and its key are retired, not merely hidden');
 	// No junctions exist yet at this point, so the panel holds the empty message -- and ONLY that.
+	// Since Task 610 that one paragraph also says a paste lands there (it IS the paste target of an
+	// empty table), which costs no head room: there is no table under it to push down.
 	const kids = panel.childNodes || [];
-	report(kids.length === 1 && first._tag === 'p' && first.textContent === PC.lpn_pane_none,
+	report(kids.length === 1 && first._tag === 'p' && first.textContent.indexOf(PC.lpn_pane_none) === 0,
 		'an empty table says only that it is empty: no second paragraph above it', kids.map((k) => k._tag).join(','));
 	const langEn = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
 	report(/\$ec_lang\['lpn_pane_none'\]=/.test(langEn),

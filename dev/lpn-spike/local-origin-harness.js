@@ -389,11 +389,17 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR followViewWhileEmpty()** (Tom, 2026-09-25): an empty geographic
 	// document re-origins under the camera, and the camera's centre crosses OUTWARD to name the
 	// world cell the new origin sits in, exactly as rebaseLiveGeoDoc() reads its model's corner.
+	// **TASK 610 ADDED ONE OUTWARD SITE PER AXIS**: the Vertices cell reads each bend outward, in the
+	// same public order the node coordinate columns show.
+	// **AND ONE MORE EACH FOR R-308's TEXT LOCATION COLUMNS.** labelCoordAxis() reads a Text's own
+	// drawn point outward for the Text table's two coordinate columns, exactly as nodeCoordAxis()
+	// and customerCoordAxis() already do for a junction and a meter -- one reader, shared by both
+	// axes through the same slot argument, not two.
 	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
 	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
-	ok('outwardX has one definition and 34 call sites', count(/outwardX\(/g) === 35, count(/outwardX\(/g));
-	ok('outwardY has one definition and 34 call sites', count(/outwardY\(/g) === 35, count(/outwardY\(/g));
+	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
+	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -466,11 +472,17 @@ console.log('\n--- one home for the concept ---');
 	// puts every label offset back to the number it arrived with, as the difference of its captured
 	// tip and base -- two WORLD points in lon/lat, so both come through this door. Before it, the
 	// whole-world opening transform had left them the size of a continent.
+	// **AND TASK 610 THREE INWARD ONES PER AXIS** (paste that creates rows): a pasted node's
+	// position and a pasted bend come in from the outside like any typed number, and the Vertices
+	// cell compares a typed latitude's source record against the drawn bend.
+	// **AND ONE MORE EACH FOR R-308's TEXT LOCATION COLUMNS.** setLabelCoordAxis() is the one seam a
+	// typed X/Y in the Text table comes through, on setNodeCoordAxis()'s own pattern -- a typed
+	// number is an outside one until it crosses this door.
 	// **AND ONE MORE EACH FOR THE WORLD-VIEW FIT AT STEP 1** (R-306). `mapgeoWorldFit()` centres the
 	// camera on the anchor -- 0 N 0 E -- and that anchor is a DOC point, so it comes through this
 	// door exactly as `zoomExtent()`'s own centring would have.
-	ok('inwardX has one definition and 34 call sites', count(/inwardX\(/g) === 35, count(/inwardX\(/g));
-	ok('inwardY has one definition and 35 call sites', count(/inwardY\(/g) === 36, count(/inwardY\(/g));
+	ok('inwardX has one definition and 38 call sites', count(/inwardX\(/g) === 39, count(/inwardX\(/g));
+	ok('inwardY has one definition and 39 call sites', count(/inwardY\(/g) === 40, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

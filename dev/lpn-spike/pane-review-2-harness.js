@@ -344,24 +344,27 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 			preventDefault: function () {} });
 		return menuEl();
 	}
+	// Zoom & select, found by its own word rather than its position: Paste as new rows at end of table (Task 610)
+	// sits above it on a table that can create rows.
+	function gotoItem(m) { return m.children.filter((b) => (b.textContent || '').indexOf(global.EngCalcs.pageConfig.lpn_pane_goto_tip) === 0)[0]; }
 	// The ID column: the row's own element, which is what it has always done.
 	let menu = rightClick('id');
 	report(!!menu, 'the menu opens on the pipes table');
-	fire(menu.children[2], 'click', {});
+	fire(gotoItem(menu), 'click', {});
 	let refs = L.selectedRefs();
 	report(refs.length === 1 && refs[0].kind === 'link' && refs[0].id === pipe.id,
 		'Select in map on the ID column still selects the row’s own asset', JSON.stringify(refs));
 
 	// The From column: the node that end lands on.
 	menu = rightClick('from');
-	fire(menu.children[2], 'click', {});
+	fire(gotoItem(menu), 'click', {});
 	refs = L.selectedRefs();
 	report(refs.length === 1 && refs[0].kind === 'node' && refs[0].id === ids[0],
 		'Select in map on From selects the node at that end', JSON.stringify(refs));
 
 	// The To column: the other one.
 	menu = rightClick('to');
-	fire(menu.children[2], 'click', {});
+	fire(gotoItem(menu), 'click', {});
 	refs = L.selectedRefs();
 	report(refs.length === 1 && refs[0].kind === 'node' && refs[0].id === ids[1],
 		'Select in map on To selects the node at the other end', JSON.stringify(refs));
@@ -369,7 +372,7 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 	// A support column whose value is a NUMBER, not an asset, falls back to the row.
 	menu = rightClick('length');
 	if (menu) {
-		fire(menu.children[2], 'click', {});
+		fire(gotoItem(menu), 'click', {});
 		refs = L.selectedRefs();
 		report(refs.length === 1 && refs[0].kind === 'link' && refs[0].id === pipe.id,
 			'an ordinary column still means the row’s own asset', JSON.stringify(refs));

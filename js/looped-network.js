@@ -10058,6 +10058,40 @@ var EngCalcs = EngCalcs || {};
 		var pt = customerPoint(c);
 		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
 	}
+	/**
+	 * **A TEXT'S LOCATION AS TWO COLUMNS** (R-308, Tom: *"Text table needs its location
+	 * coordinates."*), in whatever the project calls its axes, on the same two functions the
+	 * Junctions and Customers tables already read and write a position with.
+	 *
+	 * **AN ANCHORED TEXT HAS NO POSITION OF ITS OWN TO STATE** -- textLabelPoint() still answers one
+	 * (the anchor plus the offset), so the cell READS it, but a leader follows its asset and
+	 * relocating the words independently of it is not a thing this page offers anywhere else, so the
+	 * column is `plainFor` there, on the exact pattern the align/valign columns beside it already
+	 * use (paneTextAttachedWord/paneTextAttachedTip).
+	 */
+	function labelCoordAxis(lb, slot) {
+		var pt = textLabelPoint(lb);
+		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
+	}
+	// Writing a FREE-FLOATING Text's position only -- an anchored one is read-only here (see the
+	// column's plainFor). Base-owned, exactly as size and justification are (Task 407): a Text's
+	// place on the drawing does not change with the scenario.
+	function setLabelCoordAxis(lb, slot, v) {
+		var pc = EngCalcs.pageConfig || {}, isY;
+		if (!lb || !labelEls[lb.id] || textIsAnchored(lb)) { return false; }
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		if (!coordValueOk(coordSlotIsY(slot), v)) {
+			setNotice(pc.lpn_coord_off_world ||
+				'That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.');
+			return false;
+		}
+		isY = coordSlotIsY(slot);
+		if (isY) { lb.y = inwardY(v); } else { lb.x = inwardX(v); }   // base-write: position is Base-owned, exactly as size is
+		updateLabelGeometry(lb.id);
+		relayoutLabels();
+		saveToStorage();
+		return true;
+	}
 	// Writing a customer's own field: no setProp(), no effective(), no override marker -- see the
 	// section note on why a customer carries nothing overridable. One seam all the same, so the
 	// solve, the drawing, the table and the popup are always refreshed together.
@@ -18811,6 +18845,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One result, as a row you can click. Extracted so the top of the range and the bottom of it are
 	// built by the same code -- two copies would be two chances for one end to stop being clickable.
+	// **AN ID SHARED BY A NODE AND A LINK SAYS WHICH ONE IT IS** (Tom, 2026-09-26: junctions and
+	// pipes may share an ID, as in EPANET). Junction 10 and pipe 10 would otherwise be two rows
+	// reading "10"; each gets the element's own noun, the one the run report already uses. An ID
+	// only one element answers to stays bare, as it always was.
+	function findRowId(c) {
+		var other = c.group === 'node' ? linkById(c.el.id) : c.group === 'link' ? nodeById(c.el.id) : null;
+		return other ? reportTypeNoun(c.group, c.el.type) + ' ' + c.el.id : c.el.id;
+	}
 	function findResultRow(c) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('button'),
 			val = findValueOf(c, findState.prop);
@@ -18824,7 +18866,7 @@ var EngCalcs = EngCalcs || {};
 		// question the user did not ask. The id alone is the honest row.
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
-			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
+			: findRowId(c) + (findResultsCompound || findState.prop === 'id' ? ''
 				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
 					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
 					// fix, Task 708), not the stored English code -- the second half of the same
@@ -21098,7 +21140,7 @@ var EngCalcs = EngCalcs || {};
 				// **REFUSED OUT LOUD, IN THE POPUP'S OWN WORDS.** validateNewId() is the popup's
 				// rule and its message; `reread` above then puts the old id back in the box, so a
 				// refused rename leaves the document and the cell saying the same thing.
-				ok = validateNewId(newId, el.id);
+				ok = validateNewId(newId, el.id, group);
 				if (ok !== true) { alert(ok); return; }
 				if (group === 'node') { applyNodeRename(el.id, newId); }
 				else { applyLinkRename(el.id, newId); }
@@ -21197,6 +21239,74 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
 				refTo: function (l) { return { group: 'node', id: l.to }; } }
 		];
+	}
+	/**
+	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
+	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
+	 * `n1/n2/n3/n4/...`, read two at a time from the From end toward the To end, in the SAME slot
+	 * order the two coordinate columns of the node tables use (latitude first on a geographic
+	 * project, northing first on a projected one, x first on a grid). An empty cell is a straight
+	 * link.
+	 *
+	 * **`/` AND NOTHING ELSE**, because libPasteCells() splits a line with no tab on whitespace,
+	 * commas and semicolons: a vertices-only paste arrives with no tab at all, and any of those
+	 * separators would shred it into false columns. A hyphen is out because it is a minus sign.
+	 *
+	 * **THE WHOLE CELL OR NOTHING.** An odd count, or one token that is not a number or is off the
+	 * map, refuses the cell and leaves the link's vertices as they were: a polyline half-read still
+	 * draws and solves, wrong, quietly.
+	 *
+	 * **A TYPED LATITUDE KEEPS ITS OWN CHARACTERS** through the same `_xsrc`/`_ysrc` channel a
+	 * typed node coordinate and an `.inp` vertex use, so 40.7128 is saved as 40.7128 and not as a
+	 * projection residual. Vertices are geometry and not overridable, so this writes the element in
+	 * any scenario, exactly as the Vertices tool does.
+	 */
+	function paneVertText(v, slot) {
+		var isY = coordSlotIsY(slot), src = v[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC];
+		if (isLatLonProject() && typeof src === 'number' &&
+				(isY ? inwardY(src) === v.y : inwardX(src) === v.x)) { return String(src); }
+		return paneNumText(isY ? outwardY(v.y) : outwardX(v.x));
+	}
+	function paneParseVerts(t) {
+		var parts, i, pts = [], a, b, xv, yv, pt;
+		if (t === '') { return { ok: true, v: [] }; }
+		parts = t.split('/').map(function (x) { return x.trim(); });
+		if (parts.length % 2) { return { ok: false }; }
+		for (i = 0; i < parts.length; i += 2) {
+			if (parts[i] === '' || parts[i + 1] === '' || !isFinite(+parts[i]) || !isFinite(+parts[i + 1])) {
+				return { ok: false };
+			}
+			a = +parts[i]; b = +parts[i + 1];
+			if (!coordValueOk(coordSlotIsY(1), a) || !coordValueOk(coordSlotIsY(2), b)) { return { ok: false }; }
+			yv = coordSlotIsY(1) ? a : b;
+			xv = coordSlotIsY(1) ? b : a;
+			pt = { x: inwardX(xv), y: inwardY(yv) };
+			if (isLatLonProject()) { pt[LPN_GEO_XSRC] = xv; pt[LPN_GEO_YSRC] = yv; }
+			pts.push(pt);
+		}
+		return { ok: true, v: pts };
+	}
+	function paneColVerts() {
+		return { key: 'verts', str: true, em: 8, noMulti: true, parse: paneParseVerts,
+			label: function () { return (EngCalcs.pageConfig || {}).lpn_tool_vertices || 'Vertices'; },
+			// The heading says which number comes first, as the clerk's spec requires: a reader
+			// should never have to open a popup to learn the order of a cell.
+			unitText: function () {
+				var n = axisNames();
+				return (n.firstShort || n.first) + '/' + (n.secondShort || n.second) + '/…';
+			},
+			get: function (l) {
+				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('/');
+			},
+			set: function (l, pts) {
+				l.verts = (pts || []).map(function (p) {
+					var q = { x: p.x, y: p.y };
+					if (typeof p[LPN_GEO_XSRC] === 'number') { q[LPN_GEO_XSRC] = p[LPN_GEO_XSRC]; q[LPN_GEO_YSRC] = p[LPN_GEO_YSRC]; }
+					return q;
+				});
+				rebuildLink(l);
+				updateLinkGeometry(l.id);
+			} };
 	}
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
 	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
@@ -21743,10 +21853,25 @@ var EngCalcs = EngCalcs || {};
 				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
 	}
+	/**
+	 * **A TEXT'S LOCATION AS TWO COLUMNS** (R-308), on `labelCoordAxis()`/`setLabelCoordAxis()` --
+	 * the same seam a Junction's and a Customer's own coordinate columns write through, so all three
+	 * tables mean the same thing by "editing a position". `reread`, because an anchored Text or an
+	 * off-map value refuses the write and the cell must show what actually landed.
+	 */
+	function paneColTextCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5, reread: true,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (lb) { return labelCoordAxis(lb, slot); },
+			plainFor: textIsAnchored, plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
+			set: function (lb, v) { setLabelCoordAxis(lb, slot, v); }
+		};
+	}
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			paneColId(), paneColActive(),
+			paneColId(), paneColTextCoord(1), paneColTextCoord(2), paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
 			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
@@ -21969,6 +22094,7 @@ var EngCalcs = EngCalcs || {};
 					paneColFittings(),
 					paneColReaction('bulkCoeff', 'lpn_reaction_bulk_short', paneReactionPerDay),
 					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
+					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
@@ -21996,6 +22122,7 @@ var EngCalcs = EngCalcs || {};
 					paneColPumpSpeed(), paneColSpeedPattern(),
 					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
 					paneColEnergyPrice(), paneColEnergyPattern(),
+					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkStatus()
@@ -22022,6 +22149,7 @@ var EngCalcs = EngCalcs || {};
 					// so the reference is blank on those rows and the chooser offers the same
 					// headloss curves the popup's does.
 					paneColCurveRef('curveId', 'headloss', 'lpn_gpv_curve_source'),
+					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
@@ -22548,6 +22676,9 @@ var EngCalcs = EngCalcs || {};
 	// of the column's own; a text column takes anything.
 	function paneParseCellText(c, text) {
 		var t = String(text === null || text === undefined ? '' : text).trim();
+		// A column whose cell is a small language of its own (the Vertices list, Task 610) brings
+		// its own reader, so a typed cell, a pasted one and a created row all refuse it alike.
+		if (c.parse) { return c.parse(t); }
 		if (c.bool) {
 			if (/^(1|true|yes|on|y|x|✓)$/i.test(t)) { return { ok: true, v: true }; }
 			if (t === '' || /^(0|false|no|off|n)$/i.test(t)) { return { ok: true, v: false }; }
@@ -22960,6 +23091,25 @@ var EngCalcs = EngCalcs || {};
 			note.textContent = filterNote
 				? (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.')
 				: (pc.lpn_pane_none || 'This network has none of these yet.');
+			// **THE EMPTY TABLE TAKES A PASTE** (Task 610). With no row there is no cell to stand
+			// on, so the note itself is the target: click it, paste, and the block lands as new
+			// rows from the first column. Not under a filter, where the rows it made would be
+			// hidden the moment they were made.
+			if (!filterNote && paneCanCreate(spec)) {
+				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
+				note.tabIndex = 0;
+				note.className += ' lpn-pane-paste-target';
+				note.addEventListener('paste', function (e) {
+					var text, cells;
+					try { text = e.clipboardData && e.clipboardData.getData('text/plain'); }
+					catch (err) { return; }
+					if (!text) { return; }
+					cells = libPasteCells(text);
+					if (!cells.length) { return; }
+					if (e.preventDefault) { e.preventDefault(); }
+					panePasteAt(spec, cells, { append: true });
+				});
+			}
 			host.appendChild(note);
 			return;
 		}
@@ -23732,11 +23882,13 @@ var EngCalcs = EngCalcs || {};
 	// struck that rule on 2026-09-18 -- an arrow cannot leave EDIT mode at all now -- so the
 	// question no longer has a caller. Reinstating it would be reinstating the behaviour.)
 	/**
-	 * **THE HEADERS COME WITH A WHOLE-TABLE COPY AND WITH NOTHING ELSE.** Selecting B5:D40 in a
-	 * spreadsheet does not silently prepend a heading nobody selected; selecting the whole table
-	 * is a different gesture and means "give me this table", which is the one Task 186's out
-	 * direction is about. paneHeadingText() already carries the unit in parentheses, so the units
-	 * on the clipboard are the units on the strip with no second formatter.
+	 * **A COPY NEVER PREPENDS A HEADING NOBODY SELECTED** (Tom, R-310: *"When I copy an entire
+	 * table, the headings are included even though I didn't select the headings. Fix that."*). A
+	 * whole-table selection (all rows, all columns; Ctrl+A included) used to earn a heading line
+	 * on the theory that "give me this table" meant "with its labels" -- but neither Excel nor
+	 * Google Sheets does that, whole-column or whole-table, and there is no gesture on this page
+	 * that puts a heading CELL into the selection for a copy to find there. So there is none to
+	 * find, ever, and the heading strip stays off the clipboard.
 	 *
 	 * **A FILTERED TABLE COPIES WHAT IT SHOWS, FOR FREE.** Task 597 removes non-matching rows from
 	 * the DOM rather than hiding them, so a rectangle can only ever be built out of rows that are
@@ -23744,14 +23896,7 @@ var EngCalcs = EngCalcs || {};
 	 * if you forget; here it is true by construction.
 	 */
 	function paneCopyTsv(spec, rows, cols, box) {
-		var whole = box.r0 === 0 && box.r1 === rows.length - 1 &&
-				box.c0 === 0 && box.c1 === cols.length - 1,
-			out = [], r, c, line;
-		if (whole) {
-			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneHeadingText(cols[c])); }
-			out.push(line.join('\t'));
-		}
+		var out = [], r, c, line;
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
 			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
@@ -23975,26 +24120,353 @@ var EngCalcs = EngCalcs || {};
 	 * is a custom application we would be justified to restrict copying among columns. But I don't
 	 * know that we need to do that."* We do not, so we do not.
 	 *
-	 * **IT CANNOT GROW THE TABLE.** A row is an element on the map and a column is a property; a
-	 * paste that ran off the bottom would have to invent junctions, which is Task 186's paste-IN
-	 * phase and a different question with an ID-collision story of its own. Anything past the last
-	 * row or the last column is dropped and COUNTED.
+	 * **AN ORDINARY PASTE NEVER CREATES AN ELEMENT.** Standing on a cell, a paste writes cells, and
+	 * what runs past the last row or column is dropped and COUNTED. Tom, 2026-09-26: *"we can't let
+	 * user sit on an existing cell and expect it not to be overwritten. So we need some sort of 'Add
+	 * row' or 'Paste append' action."*
+	 *
+	 * **ADDING ROWS IS ITS OWN, NAMED ACTION** (ROADMAP Task 610, dev/paste-creates-rows-spec.md):
+	 * Paste as new rows at end of table, on the cell and heading menus and on Ctrl+Shift+V, or a paste into an
+	 * empty table's note. Every pasted line is then a NEW junction, pipe, tank... appended below
+	 * the last row, and no existing row is touched (`opts.append`). Tom's conditions are
+	 * the whole of the rule, and panePlanCreates() holds them: every new row carries an ID that
+	 * collides with nothing, in the network or in the same paste; a new node states where it is;
+	 * a new link names two nodes that already exist.
+	 *
+	 * **THE WHOLE PASTE OR NOTHING.** Every new row is checked before anything is written, the
+	 * cells over existing rows included, and one bad row refuses the lot with a notice naming the
+	 * rows and why. A partial create at 400 rows leaves the clerk no way to tell which rows landed.
+	 *
+	 * Text and Customer rows are not created this way (a Text is placed and a customer is served
+	 * from a pipe, neither by typing an ID), so those two tables offer no such action.
 	 */
-	function panePasteAt(spec, cells) {
+	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link'; }
+	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
+	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
+	// whose every filled cell is the heading of the column it lands on, with or without its unit,
+	// is skipped instead of being read as an element called "ID".
+	function paneIsHeadingLine(line, cols, c0) {
+		var pc = EngCalcs.pageConfig || {}, any = false, i, t, c, bare;
+		for (i = 0; i < line.length; i++) {
+			t = String(line[i] === undefined ? '' : line[i]).trim().toLowerCase();
+			if (!t) { continue; }
+			c = cols[c0 + i];
+			if (!c) { return false; }
+			bare = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key);
+			if (t !== paneHeadingText(c).toLowerCase() && t !== String(bare).toLowerCase()) { return false; }
+			any = true;
+		}
+		return any;
+	}
+	function panePasteSay(key, fallback, row, extra) {
+		var pc = EngCalcs.pageConfig || {}, s = String(pc[key] || fallback).replace('{row}', String(row)), k;
+		for (k in (extra || {})) { if (Object.prototype.hasOwnProperty.call(extra, k)) { s = s.replace('{' + k + '}', String(extra[k])); } }
+		return s;
+	}
+	/**
+	 * **THE DRY PASS.** Reads every new row and returns what to create and, per failing row, the
+	 * FIRST reason it fails -- nothing is written here. `lines` are the pasted rows destined for
+	 * new elements, each `{no, cells}` where `no` is the line's number in the paste (the row the
+	 * clerk sees in their own spreadsheet) and `cells` maps a column key to `{c, t}`.
+	 *
+	 * The ID rule is validateNewId()'s own (no blank, no space, no quotation mark, not already in
+	 * use) plus the one thing that function cannot see: two rows of the SAME paste sharing an ID,
+	 * neither of which exists yet. From and To must name nodes that exist BEFORE this paste; one
+	 * paste fills one table, so nodes come first and links second.
+	 */
+	function panePlanCreates(spec, lines) {
+		var used = {}, seen = {}, errors = [], plans = [];
+		allIds(spec.group).forEach(function (x) { used[x] = 1; });   // this table's namespace: see allIds()
+		lines.forEach(function (ln) {
+			var cells = ln.cells, row = ln.no, err = null, plan = { no: row, writes: [], ignored: 0 },
+				id = cells.id ? cells.id.t : '', a, b, f, to, vp;
+			function txt(key) { return cells[key] ? cells[key].t : ''; }
+			function bad(key) {
+				return panePasteSay('lpn_pane_paste_bad_cell', 'Row {row}: {text} is not a valid {col}.', row,
+					{ text: txt(key), col: paneHeadingText(cells[key].c) });
+			}
+			if (!id) { err = panePasteSay('lpn_pane_paste_no_id', 'Row {row}: a new row needs an ID.', row); }
+			else if (/[\s'"]/.test(id)) { err = panePasteSay('lpn_pane_paste_bad_id', 'Row {row}: the ID {id} has a space or a quotation mark in it.', row, { id: id }); }
+			else if (used[id]) { err = panePasteSay('lpn_pane_paste_id_taken', 'Row {row}: the ID {id} is already in use.', row, { id: id }); }
+			else if (seen[id]) { err = panePasteSay('lpn_pane_paste_id_twice', 'Row {row}: the ID {id} is used twice in this paste.', row, { id: id }); }
+			if (id) { seen[id] = 1; }
+			plan.id = id;
+			if (!err && spec.group === 'node') {
+				a = txt('axis1'); b = txt('axis2');
+				if (a === '' || b === '') {
+					err = panePasteSay('lpn_pane_paste_no_position', 'Row {row}: a new node needs both {first} and {second}.', row,
+						{ first: axisNames().first, second: axisNames().second });
+				} else if (!isFinite(+a) || !coordValueOk(coordSlotIsY(1), +a)) { err = bad('axis1'); }
+				else if (!isFinite(+b) || !coordValueOk(coordSlotIsY(2), +b)) { err = bad('axis2'); }
+				else {
+					plan.yv = coordSlotIsY(1) ? +a : +b;
+					plan.xv = coordSlotIsY(1) ? +b : +a;
+				}
+			}
+			if (!err && spec.group === 'link') {
+				f = txt('from'); to = txt('to');
+				if (f === '' || to === '') { err = panePasteSay('lpn_pane_paste_no_ends', 'Row {row}: a new link needs a From node and a To node.', row); }
+				else if (!nodeById(f)) { err = panePasteSay('lpn_pane_paste_no_node', 'Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.', row, { id: f }); }
+				else if (!nodeById(to)) { err = panePasteSay('lpn_pane_paste_no_node', 'Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.', row, { id: to }); }
+				else if (f === to) { err = panePasteSay('lpn_pane_paste_same_ends', 'Row {row}: From and To are the same node.', row); }
+				else if (cells.verts) {
+					vp = paneParseVerts(txt('verts'));
+					if (!vp.ok) { err = bad('verts'); } else { plan.verts = vp.v; }
+				}
+				plan.from = f; plan.to = to;
+			}
+			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
+			// result or identity cell is left to the solve and counted, and anything else must read
+			// as its column reads a typed value.
+			if (!err) {
+				Object.keys(cells).forEach(function (key) {
+					var c = cells[key].c, t = cells[key].t, p;
+					if (err || key === 'id' || key === 'axis1' || key === 'axis2' ||
+						key === 'from' || key === 'to' || key === 'verts' || t === '') { return; }
+					if (c.result || !c.set) { plan.ignored++; return; }
+					p = paneParseCellText(c, t);
+					if (!p.ok) { err = bad(key); return; }
+					plan.writes.push({ c: c, v: p.v });
+				});
+			}
+			if (err) { errors.push(err); } else { plans.push(plan); }
+		});
+		return { errors: errors, plans: plans };
+	}
+	// Writes one planned row through the same doors a drawn element and a typed cell go through:
+	// addNode()/addLink() for the birth (defaults, the DEM elevation queue, and membership of the
+	// scenario that is showing), then each cell's own c.set(), which is setProp() where the
+	// property is overridable. The position is the element's CONSTRUCTION, as a click is, so in a
+	// scenario the node is born where the row says rather than as an override on a node at 0, 0.
+	function paneCreateFromPlan(spec, plan) {
+		var el, skipped = 0;
+		if (spec.group === 'node') {
+			el = addNode(spec.type, inwardX(plan.xv), inwardY(plan.yv), plan.id);
+			if (isLatLonProject()) {
+				el[LPN_GEO_XSRC] = plan.xv;   // the typed characters, exactly as setNodeCoordAxis() keeps them
+				el[LPN_GEO_YSRC] = plan.yv;
+			}
+		} else {
+			el = addLink(spec.type, plan.from, plan.to, plan.verts || [], plan.id);
+			(plan.verts || []).forEach(function (p, i) {
+				if (typeof p[LPN_GEO_XSRC] === 'number') {
+					el.verts[i][LPN_GEO_XSRC] = p[LPN_GEO_XSRC];
+					el.verts[i][LPN_GEO_YSRC] = p[LPN_GEO_YSRC];
+				}
+			});
+		}
+		plan.writes.forEach(function (w) {
+			// Asked at write time, per element, as a typed cell asks it: a pipe type written by an
+			// earlier cell of the same row may now own this row's diameter.
+			if (paneCellIsPlain(w.c, el)) { skipped++; return; }
+			w.c.set(el, w.v);
+		});
+		return { el: el, skipped: skipped + plan.ignored };
+	}
+	/**
+	 * **PASTE AS NEW ROWS, FROM A MENU, WAITS FOR CTRL+V** rather than reading the clipboard
+	 * itself. A menu click can only read it through navigator.clipboard.readText(), which Chrome
+	 * puts behind a permission prompt (measured in headless Chromium: refused outright without the
+	 * permission), so the item ARMS the table instead: the table shows it is waiting, the notice
+	 * says to press Ctrl+V, and Escape cancels. The ordinary `paste` event then carries the text,
+	 * which needs no permission at all. Ctrl+Shift+V skips the arming (see paneHandleKey()).
+	 */
+	function paneArmAppend(spec) {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById(spec.panel),
+			rows = paneTableRowsInOrder(spec), cols = paneCols(spec), box = paneSelBox(spec, rows, cols);
+		if (!paneCanCreate(spec)) { return false; }
+		spec.appendArmed = true;
+		if (host) { host.classList.add('lpn-pane-appending'); }
+		// The keystroke has to reach this table, so the caret goes back to its current cell.
+		if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
+		else if (rows.length && cols.length) { paneFocusCell(spec, rows[0].id, cols[0].key); }
+		setNotice(pc.lpn_pane_paste_armed ||
+			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.');
+		return true;
+	}
+	function paneDisarmAppend(spec, said) {
+		var host = document.getElementById(spec.panel);
+		spec.appendArmed = false;
+		if (host) { host.classList.remove('lpn-pane-appending'); }
+		if (said) { setNotice(''); }
+	}
+	// Whether THIS paste appends: an armed table, or a Ctrl+Shift+V pressed a moment ago. Asking
+	// consumes both, so the next ordinary Ctrl+V is ordinary again.
+	function paneTakeAppend(spec) {
+		var yes = !!spec.appendArmed || (spec._appendKeyAt && Date.now() - spec._appendKeyAt < 2000);
+		spec._appendKeyAt = 0;
+		if (spec.appendArmed) { paneDisarmAppend(spec, false); }
+		return !!yes && paneCanCreate(spec);
+	}
+	/**
+	 * **A PASTE THAT RUNS PAST THE LAST ROW ASKS** (Tom, 2026-09-26: *"If a user pastes 100 at the
+	 * top of 50 rows, do we just prompt, 'Add 50 rows?'"*). Three answers: add the overflow as new
+	 * elements, paste only what fits, or paste nothing. The overflow is judged FIRST, by the same
+	 * rules as Paste as new rows at end of table (IDs, positions, From and To), so the question is never offered
+	 * when its answer would be refused: a failing overflow is named in the dialog, and only the
+	 * other two answers remain. Whichever runs, it is one paste and one undo step.
+	 */
+	// The EXISTING rows this paste would give a different ID: the rows it lands on, where the ID
+	// column is inside the pasted block and the pasted text is not the row's own ID.
+	function paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols) {
+		var r, cIdx, out = [], t, el;
+		for (cIdx = 0; cIdx < nCols; cIdx++) {
+			if (cols[box.c0 + cIdx] && cols[box.c0 + cIdx].key === 'id') { break; }
+		}
+		if (cIdx >= nCols) { return out; }
+		for (r = 0; r < nRows && box.r0 + r < rows.length; r++) {
+			el = rows[box.r0 + r];
+			t = cells[r % srcRows][cIdx % srcCols];
+			if (t === undefined || paneCellIsPlain(cols[box.c0 + cIdx], el)) { continue; }
+			t = String(t).trim();
+			if (t !== el.id) { out.push({ r: r, el: el, id: t }); }
+		}
+		return out;
+	}
+	// validateNewId()'s rule for each rename, plus two renames in the block onto the same ID.
+	function paneRenameErrors(spec, renames, lineOffset) {
+		var seen = {}, errs = [];
+		renames.forEach(function (x) {
+			var row = x.r + 1 + lineOffset, ok;
+			if (!x.id) { errs.push(panePasteSay('lpn_pane_paste_no_id', 'Row {row}: a new row needs an ID.', row)); return; }
+			if (/[\s'"]/.test(x.id)) { errs.push(panePasteSay('lpn_pane_paste_bad_id', 'Row {row}: the ID {id} has a space or a quotation mark in it.', row, { id: x.id })); return; }
+			ok = validateNewId(x.id, x.el.id, spec.group);
+			if (ok !== true) { errs.push(panePasteSay('lpn_pane_paste_id_taken', 'Row {row}: the ID {id} is already in use.', row, { id: x.id })); return; }
+			if (seen[x.id]) { errs.push(panePasteSay('lpn_pane_paste_id_twice', 'Row {row}: the ID {id} is used twice in this paste.', row, { id: x.id })); return; }
+			seen[x.id] = 1;
+		});
+		return errs;
+	}
+	// ONE notice for a refused paste: up to five reasons, and a count of the rest.
+	function paneRefuse(errors) {
+		var pc = EngCalcs.pageConfig || {}, shown = errors.slice(0, 5), errs = shown.join(' ');
+		if (errors.length > shown.length) {
+			errs += ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.')
+				.replace('{n}', String(errors.length - shown.length));
+		}
+		setNotice(String(pc.lpn_pane_paste_refused || 'Nothing was pasted. {reasons}').replace('{reasons}', errs));
+		return { refused: true, errors: errors, wrote: 0, created: 0 };
+	}
+	function paneAskIdChanges(spec, raw, n) {
+		var pc = EngCalcs.pageConfig || {},
+			text = String(pc.lpn_pane_paste_ids_differ || '{n} IDs don\'t match. Paste anyway?').replace('{n}', String(n));
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = text;
+			body.appendChild(p);
+		}, [
+			{ label: pc.points_data_paste || 'Paste', fn: function () { panePasteAt(spec, raw, { raw: raw, idsOk: true }); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () {} }
+		]);
+		return { asked: true, idChanges: n };
+	}
+	function paneAskOverflow(spec, raw, n, extra) {
+		var pc = EngCalcs.pageConfig || {}, fit = n - extra,
+			check = panePasteAt(spec, raw, { overflow: 'check', raw: raw }), errs = (check && check.errors) || [],
+			say = function (t) {
+				return String(t).replace('{n}', String(n)).replace('{fit}', String(fit)).replace('{extra}', String(extra));
+			}, text, buttons;
+		if (errs.length) {
+			text = say(pc.lpn_pane_paste_overflow_bad ||
+				'This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}')
+				.replace('{reasons}', errs.slice(0, 5).join(' ') + (errs.length > 5
+					? ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.').replace('{n}', String(errs.length - 5)) : ''));
+		} else {
+			text = say(pc.lpn_pane_paste_overflow ||
+				'This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?');
+		}
+		buttons = [];
+		if (!errs.length) {
+			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add {extra} rows'),
+				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw, idsOk: true }); } });
+		}
+		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the {fit} that fit'),
+			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw, idsOk: true }); } });
+		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () {} });
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = text;
+			body.appendChild(p);
+		}, buttons);
+		return { asked: true, extra: extra, fit: fit, errors: errs };
+	}
+	function panePasteAt(spec, cells, opts) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
-			srcRows = cells.length, srcCols = 0, nRows, nCols, r, cIdx, line, txt,
-			wrote = 0, refused = 0, dropped = 0, col, el;
-		if (!box || !srcRows) { return null; }
+			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
+			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
+			creates = [], plan, made, created = [], firstId, i,
+			overflow = (opts && opts.overflow) || '', mayAsk = false, extra;
+		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
+		// begins past the last existing row so not one of them can be written.
+		if (opts && opts.append) {
+			if (!canCreate || !cols.length) { return null; }
+			box = { r0: rows.length, r1: rows.length, c0: 0, c1: 0 };
+		} else if (overflow !== 'add' && overflow !== 'check') {
+			// An ordinary paste writes cells and never makes an element on its own. When it runs
+			// past the last row of a table that CAN make them, it asks first (paneAskOverflow());
+			// 'fit' is the answer that drops the overflow and counts it.
+			mayAsk = canCreate && !overflow;
+			canCreate = false;
+		}
+		if (!box || !cells.length) { return null; }
+		opts = opts || {};
+		if (!opts.raw) { opts.raw = cells; }
+		if (cells.length > 1 && paneIsHeadingLine(cells[0], cols, box.c0)) { cells = cells.slice(1); lineOffset = 1; }
+		srcRows = cells.length;
 		cells.forEach(function (line2) { srcCols = Math.max(srcCols, line2.length); });
 		if (!srcCols) { return null; }
 		nRows = Math.max(box.r1 - box.r0 + 1, srcRows);
 		nCols = Math.max(box.c1 - box.c0 + 1, srcCols);
+		extra = Math.max(0, box.r0 + nRows - rows.length);
+		// **A PASTE THAT WOULD RENAME ROWS ASKS FIRST, IN TOM'S WORDS** (2026-09-26: *"Yes, it is a
+		// big change to make silently. I think we should alert, '{n} IDs don't match. Paste
+		// anyway?'"*). Asked before the overflow question: the two are separate decisions, and the
+		// rename one is about rows that already exist, so it comes first.
+		// **EVERY RENAME IN THE BLOCK IS JUDGED BEFORE ANY IS MADE**, so a paste of forty bad IDs
+		// is one notice rather than forty alerts from the ID cell's own refusal (paneColId()). Same
+		// rule as that cell, same shape as the add refusals: nothing written, up to five rows named.
+		if (!opts.append && overflow !== 'check') {
+			var renames = paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols),
+				renameErrs = paneRenameErrors(spec, renames, lineOffset);
+			if (renameErrs.length) { return paneRefuse(renameErrs); }
+			if (!overflow && !opts.idsOk && renames.length) { return paneAskIdChanges(spec, opts.raw, renames.length); }
+		}
+		if (mayAsk && extra) { return paneAskOverflow(spec, opts.raw, nRows, extra); }
+		// The new rows, read and judged before anything is written.
+		if (canCreate) {
+			for (r = 0; r < nRows; r++) {
+				if (box.r0 + r < rows.length) { continue; }
+				line = cells[r % srcRows];
+				var rowCells = {};
+				for (cIdx = 0; cIdx < nCols; cIdx++) {
+					if (box.c0 + cIdx >= cols.length) { dropped++; continue; }
+					txt = line[cIdx % srcCols];
+					if (txt === undefined) { continue; }
+					rowCells[cols[box.c0 + cIdx].key] = { c: cols[box.c0 + cIdx], t: String(txt).trim() };
+				}
+				creates.push({ no: r + 1 + lineOffset, cells: rowCells });
+			}
+			if (creates.length) {
+				plan = panePlanCreates(spec, creates);
+				if (overflow === 'check') { return { check: true, errors: plan.errors }; }
+				// **NOTHING WAS WRITTEN, AND IT SAYS WHICH ROWS AND WHY.** The first five, and a count
+				// of the rest: a notice line holding four hundred reasons helps nobody.
+				if (plan.errors.length) { return paneRefuse(plan.errors); }
+			}
+		}
+		if (overflow === 'check') { return { check: true, errors: [] }; }
 		saveUndoSnapshot();
 		for (r = 0; r < nRows; r++) {
+			if (box.r0 + r >= rows.length) {
+				if (!canCreate) { dropped += nCols; }
+				continue;
+			}
 			line = cells[r % srcRows];
 			for (cIdx = 0; cIdx < nCols; cIdx++) {
-				if (box.r0 + r >= rows.length || box.c0 + cIdx >= cols.length) { dropped++; continue; }
+				if (box.c0 + cIdx >= cols.length) { dropped++; continue; }
 				el = rows[box.r0 + r];
 				col = cols[box.c0 + cIdx];
 				txt = line[cIdx % srcCols];
@@ -24005,15 +24477,45 @@ var EngCalcs = EngCalcs || {};
 				if (paneWriteCellText(spec, col, el, txt)) { wrote++; } else { refused++; }
 			}
 		}
+		if (plan) {
+			// Kept as one hold, as paneCommitCell() does, so four hundred births share the canvas
+			// measurements their redraws need rather than asking for them four hundred times.
+			beginMapBoxHold();
+			try {
+				plan.plans.forEach(function (p) {
+					made = paneCreateFromPlan(spec, p);
+					created.push(made.el.id);
+					refused += made.skipped;
+				});
+			} finally { endMapBoxHold(); }
+		}
 		completeEdit(null);
 		refreshPopupIfOpen();
+		// **THE NEW ROWS STAY SELECTED**, from where the paste began to the last one made, so the
+		// clerk is looking at what they just added rather than at the row above it.
+		if (created.length) {
+			firstId = box.r0 < rows.length ? rows[box.r0].id : created[0];
+			spec.sel = { aId: firstId, aKey: cols[box.c0].key,
+				fId: created[created.length - 1], fKey: cols[Math.min(cols.length - 1, box.c0 + nCols - 1)].key };
+		}
 		renderPaneTable(spec);
 		// **IT SAYS WHAT IT DID, INCLUDING WHAT IT DID NOT DO.** A paste that silently skipped
-		// eleven read-only cells is a paste the user believes landed.
-		setNotice(String(pc.lpn_pane_pasted || 'Pasted {n} cells. {skipped} were not changed.')
-			.replace('{n}', String(wrote))
-			.replace('{skipped}', String(refused + dropped)));
-		return { wrote: wrote, refused: refused, dropped: dropped };
+		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
+		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
+		// cells changed.
+		if (created.length) {
+			setNotice(String(refused + dropped
+				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.')
+				: (pc.lpn_pane_pasted_rows || 'Pasted {n} rows and added {created} of them to the network.'))
+				.replace('{n}', String(nRows))
+				.replace('{created}', String(created.length))
+				.replace('{skipped}', String(refused + dropped)));
+		} else {
+			setNotice(String(pc.lpn_pane_pasted || 'Pasted {n} cells. {skipped} were not changed.')
+				.replace('{n}', String(wrote))
+				.replace('{skipped}', String(refused + dropped)));
+		}
+		return { wrote: wrote, refused: refused, dropped: dropped, created: created.length };
 	}
 	/**
 	 * **CTRL+D FILLS DOWN THE TOP ROW OF A MULTI-ROW SELECTION**, the spreadsheet convention Excel
@@ -24071,6 +24573,16 @@ var EngCalcs = EngCalcs || {};
 		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
+		// **CTRL+SHIFT+V IS PASTE AS NEW ROWS** (Task 610). The keydown only marks the paste that
+		// follows; the key is left to the browser, which then raises an ordinary `paste` event with
+		// the clipboard's text -- measured in headless Chromium on a read-only cell, with no
+		// clipboard permission needed. Inside a cell being typed in it stays the browser's own.
+		if (jump && e.shiftKey && (key === 'V' || key === 'v') && !editing && paneCanCreate(spec)) {
+			spec._appendKeyAt = Date.now();
+			return false;
+		}
+		// Escape first disarms a waiting Paste as new rows at end of table, which is the thing on screen to cancel.
+		if ((key === 'Escape' || key === 'Esc') && spec.appendArmed) { paneDisarmAppend(spec, true); return true; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
 		// it must work whatever else the key handler would have made of the moment.
 		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
@@ -24161,7 +24673,7 @@ var EngCalcs = EngCalcs || {};
 		// character. Tom is adding the parked roadmap row himself, on master.
 		// Ctrl+D is handled above, before `box` is guaranteed to exist -- see the comment there.
 		if (jump && (key === 'a' || key === 'A')) {
-			// The whole table, which is the gesture that earns the headings on the clipboard.
+			// The whole table. A copy of it carries no heading line (paneCopyTsv()).
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
 				fId: rows[rows.length - 1].id, fKey: cols[cols.length - 1].key };
 			paneSelPaint(spec, rows, cols);
@@ -24387,7 +24899,7 @@ var EngCalcs = EngCalcs || {};
 			cells = libPasteCells(text);
 			if (!cells.length) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
-			panePasteAt(spec, cells);
+			panePasteAt(spec, cells, paneTakeAppend(spec) ? { append: true } : undefined);
 		});
 		table.addEventListener('copy', function (e) {
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
@@ -24588,6 +25100,9 @@ var EngCalcs = EngCalcs || {};
 				}
 			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
 		});
+		if (paneCanCreate(spec)) {
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); }, 'Ctrl+Shift+V');
+		}
 		aim = paneCtxTarget(spec, td, rows, box);
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
 			findGoTo(aim.group, aim.id);
@@ -24668,6 +25183,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		mk(pc.lpn_pane_manage_cols || 'Manage columns…', function () { paneOpenManageColsDialog(spec); });
+		// The table's own action, offered from its headings too, so it is findable without first
+		// standing on a cell.
+		if (paneCanCreate(spec)) {
+			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); });
+		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
@@ -26815,10 +27335,13 @@ var EngCalcs = EngCalcs || {};
 		updateAreaHint();
 	}
 
-	function addNode(type, x, y) {
+	// `wantId`, when given, is an ID the CALLER has already validated -- a pasted row's own (Task
+	// 610, panePlanCreates()). Everything else a new node is born with is the same either way, which
+	// is the point: a pasted junction and a clicked one cannot come to differ.
+	function addNode(type, x, y, wantId) {
 		// key is the structural nextId/settings.idPrefixes lookup letter; the ID's actual leading text
 		// is settings.idPrefixes[key], customizable in the settings panel and defaulting to the key.
-		var id = mintId(LPN_ID_KEY[type] || 'J');
+		var id = wantId || mintId(LPN_ID_KEY[type] || 'J');
 		// Both node types carry an elevation and take the same settings.defaults.nodeElev. A
 		// reservoir ALSO carries a head, left blank by default meaning "same as the elevation" -- it
 		// gets no `head` key at all, which is what keeps it following its elevation.
@@ -26910,8 +27433,9 @@ var EngCalcs = EngCalcs || {};
 	// world coordinates and in the order they were picked. COPIED rather than adopted: the caller's
 	// array is view state that is emptied on the next drawing, and a link holding a reference to it
 	// would lose its own bends. A link born any other way still gets a fresh empty array.
-	function addLink(type, fromId, toId, verts) {
-		var id = mintId(LPN_ID_KEY[type] || 'L');
+	// `wantId` as for addNode(): a pasted row's own, already validated (Task 610).
+	function addLink(type, fromId, toId, verts, wantId) {
+		var id = wantId || mintId(LPN_ID_KEY[type] || 'L');
 		var l = {
 			id: id, type: type, from: fromId, to: toId,
 			verts: (verts || []).map(function (p) { return { x: p.x, y: p.y }; }),
@@ -31091,7 +31615,7 @@ var EngCalcs = EngCalcs || {};
 			// as every other one, which is why a point carries both.
 			if (want) {
 				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', line: p.line, raw: p.raw, detail: want }); }
-				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
+				else if (allIds('node').indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
 				else { applyNodeRename(n.id, want); }
 			}
 			created++;
@@ -46998,26 +47522,39 @@ var EngCalcs = EngCalcs || {};
 		initTipsIn(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
-	function allIds() {
-		return doc.nodes.map(function (x) { return x.id; })
-			.concat(doc.links.map(function (x) { return x.id; }))
-			.concat(doc.labels.map(function (x) { return x.id; }))
-			// A meter joins the one id pool the rest of the drawing shares (Task 247). This page
-			// has always pooled nodes, links and Texts -- EPANET namespaces nodes and links
-			// separately and we do not -- so a meter is pooled on the same terms, and mintId()
-			// cannot hand a new meter an id a junction already answers to.
+	/**
+	 * **NODES AND LINKS ARE TWO ID NAMESPACES, AS IN EPANET** (Tom, 2026-09-26: *"Junctions and
+	 * pipes can use same ID. Yes. J1 & P1 or 1 and 1."*). A node's ID must be unique among nodes
+	 * and a link's among links; junction 10 and pipe 10 are both legal, as they always were in a
+	 * file this page imported (Task 324 keyed every override, index and lookup by group for exactly
+	 * that). `group` says which pool a new or renamed ID must be free in:
+	 *
+	 *   'node'  the nodes, plus Texts and customers
+	 *   'link'  the links, plus Texts and customers
+	 *   none    everything -- what mintId() and a Text's or a customer's own new ID still use
+	 *
+	 * **TEXTS AND CUSTOMERS KEEP THEIR OLD RULE**, unique against everything (Task 247 pooled a
+	 * meter on those terms), and they stay in both pools so no node or link can be renamed onto one.
+	 * mintId() still avoids every ID, so the page never MAKES a shared ID of its own accord; it only
+	 * stops refusing one a person chose.
+	 */
+	function allIds(group) {
+		var out = [];
+		if (group !== 'link') { out = out.concat(doc.nodes.map(function (x) { return x.id; })); }
+		if (group !== 'node') { out = out.concat(doc.links.map(function (x) { return x.id; })); }
+		return out.concat(doc.labels.map(function (x) { return x.id; }))
 			.concat((doc.customers || []).map(function (x) { return x.id; }));
 	}
-	function validateNewId(newId, oldId) {
+	function validateNewId(newId, oldId, group) {
 		var pc = EngCalcs.pageConfig || {};
 		if (newId === oldId) { return true; }
 		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'; }
-		if (allIds().indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
+		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
 	// A text input in place of the static title -- shared by both popups since the validation/
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
-	function idField(currentId, onRename) {
+	function idField(currentId, onRename, group) {
 		var pc = EngCalcs.pageConfig || {},
 			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
 		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
@@ -47027,7 +47564,7 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'text'; input.value = currentId;
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
-			var newId = input.value, result = validateNewId(newId, currentId);
+			var newId = input.value, result = validateNewId(newId, currentId, group);
 			if (result !== true) { alert(result); input.value = currentId; return; }
 			if (newId !== currentId) { saveUndoSnapshot(); onRename(newId); }
 		});
@@ -47215,17 +47752,19 @@ var EngCalcs = EngCalcs || {};
 		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
 			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
 	}
-	function isNodeId(id) { return !!nodeById(id); }
 	function applyIdPrefixToAll(key) {
 		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,
 			batch = elementsForIdKey(key), moving = [], skipped = 0, taken = {}, highest = 0;
-		allIds().forEach(function (id) { taken[id] = true; });
+		// One key is one element type, so one namespace (allIds()); taken is that pool.
+		allIds(batch.length ? elGroup(batch[0]) : undefined).forEach(function (id) { taken[id] = true; });
 		batch.forEach(function (x) {
 			var m = /^(.*?)(\d+)$/.exec(String(x.id));
 			if (m && +m[2] > highest) { highest = +m[2]; }
 			if (!m) { skipped++; return; }               // no trailing number: nothing to keep
 			var want = prefix + m[2];
-			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: isNodeId(x.id) }); }
+			// **ITS GROUP, NOT A LOOKUP BY ID**: junction 10 and pipe 10 may both exist, so "is there
+			// a node called 10" does not say which one this is.
+			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: elGroup(x) === 'node' }); }
 		});
 		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a FIXED POINT rather than in one
 		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away
@@ -47370,7 +47909,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		idField(n.id, function (newId) { renameNode(nodeId, newId); });
+		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
 		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
@@ -48433,7 +48972,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		idField(l.id, function (newId) { renameLink(linkId, newId); });
+		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
 		clearFields(fields);
 		// **THE IDENTITY BAND, AND A LINK HAS NO COORDINATES TO PUT BETWEEN** (Task 674) -- so it is
 		// ID, Description, Tag, then everything the link is. The same two rows a node gets, at the
@@ -48810,7 +49349,7 @@ var EngCalcs = EngCalcs || {};
 			// a time either. `plainFor` is asked PER ELEMENT, so a property that is read-only on any
 			// one of the selection is read-only for the whole group -- the safe direction, and the
 			// only one that cannot write a number where a type or a fittings list owns it.
-			if (c.result || !c.set) { return; }
+			if (c.result || !c.set || c.noMulti) { return; }
 			if (group.els.some(function (el) { return paneCellIsPlain(c, el); })) { return; }
 			multiRow(box, c, group.els);
 		});

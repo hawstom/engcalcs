@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-338. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-352. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -258,10 +258,10 @@ judgement and does not belong to a script.
 - [x] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
 - [ ] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users."
 - [ ] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)."
-- [ ] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V)
-- [ ] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared
-- [ ] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b
-- [ ] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording
+- [x] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V) -- merged 2026-09-27
+- [x] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared -- merged 2026-09-27
+- [x] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b -- merged 2026-09-27
+- [x] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording -- merged 2026-09-27
 
 ## Round of 2026-09-26 (night) -- his pass over 8117-8119 and 8090, EPANET likeness, Symbology
 
@@ -280,11 +280,11 @@ judgement and does not belong to a script.
 
 ### feat/row-paste (8119)
 
-- [ ] R-308 feat/row-paste | "Text table needs its location coordinates." -- feat/row-paste 1631a562: Latitude/Longitude (or X/Y) after ID; an attached Text reads "Attached"; awaiting your pass
-- [ ] R-309 feat/row-paste | "'Paste as new rows' is not quite descriptive of 'Paste append'. How about 'Paste below table' or 'Paste as new rows after last' or 'Paste as new rows at end'? I really like the dashed line clarifying indicator." -- feat/row-paste 1631a562: "Paste as new rows at end of table" (your Help wording), dashed line untouched; awaiting your pass
-- [ ] R-310 feat/row-paste | "When I copy an entire table, the headings are included even though I didn't select the headings. Fix that." -- feat/row-paste 1631a562: a copy never carries the heading row now; awaiting your pass
-- [ ] R-311 feat/row-paste | "Add 'Ctrl+Shift+V | Paste as new rows at end of table' to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass
-- [ ] R-312 feat/row-paste | "Add 'Paste as new rows at end of table | Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V', to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass
+- [x] R-308 feat/row-paste | "Text table needs its location coordinates." -- feat/row-paste 1631a562: Latitude/Longitude (or X/Y) after ID; an attached Text reads "Attached"; awaiting your pass -- merged 2026-09-27
+- [x] R-309 feat/row-paste | "'Paste as new rows' is not quite descriptive of 'Paste append'. How about 'Paste below table' or 'Paste as new rows after last' or 'Paste as new rows at end'? I really like the dashed line clarifying indicator." -- feat/row-paste 1631a562: "Paste as new rows at end of table" (your Help wording), dashed line untouched; awaiting your pass -- merged 2026-09-27
+- [x] R-310 feat/row-paste | "When I copy an entire table, the headings are included even though I didn't select the headings. Fix that." -- feat/row-paste 1631a562: a copy never carries the heading row now; awaiting your pass -- merged 2026-09-27
+- [x] R-311 feat/row-paste | "Add 'Ctrl+Shift+V | Paste as new rows at end of table' to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass -- merged 2026-09-27
+- [x] R-312 feat/row-paste | "Add 'Paste as new rows at end of table | Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V', to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass -- merged 2026-09-27
 
 ### feat/label-gang-search (8090)
 
@@ -293,7 +293,7 @@ judgement and does not belong to a script.
 - [?] R-315 feat/label-gang-search | "It's very sluggish. My browser froze while advancing through EPS time steps. It eventually caught up. But we may want to delay/debounce label placement unless we succeed in making it a lot faster. On the bright side, when labels stop showing, everything speeds up, indicating that, 'Yes, Virginia, maybe off really does mean off'." -- feat/label-gang-search e4bb4f3b: a step rewrites the numbers in place; placement waits 0.6 s after the clock stops and never runs during Play (24 h at 4x: 8-17 s before, ~2.6 s now). The one placement after you stop is ~2.3 s here vs ~0.5 s on master; capping the crossing repair would cut it but changes layouts. Your call
 - [x] R-316 feat/label-gang-search | "There is no UI way I know of to zoom to 2x or 3x or to know what x I am zoomed to. Users don't really care about that in an app like this." -- report in his terms (what he sees), never zoom multiples
 - [x] R-317 feat/label-gang-search | "There is no way for me to know what used to be missing. Sorry."
-- [?] R-318 feat/label-gang-search | **"For the permanent record, a label on a leader always reads as belonging to its node.** You have repeated the misconception about this many times, and it's important that you dispel it so that we are not working to false priorities. Long leaders are only unfavored because they are inefficient and extra ink, which generally is clutter in a weak way. But a stack of labels with long and parallel leaders can be very effective." -- feat/label-gang-search 0d45f03a: your ruling is in dev/lpn-rulings.md and CLAUDE.md; three comments corrected. Two rules to rule on: a crowding tie hides the LONGEST leader first (ink is now its only reason), and a leader may not pass through another node's symbol
+- [x] R-318 feat/label-gang-search | **"For the permanent record, a label on a leader always reads as belonging to its node.** You have repeated the misconception about this many times, and it's important that you dispel it so that we are not working to false priorities. Long leaders are only unfavored because they are inefficient and extra ink, which generally is clutter in a weak way. But a stack of labels with long and parallel leaders can be very effective." -- feat/label-gang-search 0d45f03a: your ruling is in dev/lpn-rulings.md and CLAUDE.md; three comments corrected. Two rules to rule on: a crowding tie hides the LONGEST leader first (ink is now its only reason), and a leader may not pass through another node's symbol
 - [x] R-319 feat/label-gang-search | "It occurs to me that where there is infinite space east or west, we might want to recognize that infinity and leverage it by using single-line concatenation of properties." -- Task 734 at 50
 
 ### EPANET likeness
@@ -309,10 +309,10 @@ judgement and does not belong to a script.
 
 - [ ] R-326 -- | "Drop order is missing for Node ID and several Customer properties." -- feat/symbology-label 060abb3c: every row has Show and Drop, node ID and Customer included; awaiting your pass
 - [ ] R-327 -- | "We may need a branch to work on intentionality and completeness for our symbology labels." "Initial defaults and all examples need to be consistent." -- feat/symbology-label 060abb3c: defaults and examples come from one table; a check fails if they drift; awaiting your pass
-- [?] R-328 -- | "For initial values and examples, we need an internal way to guess decimals based on the units factor. And/or we need our table of initial decimals to include at least the main US and SI units. We probably should ask Sue and Mary to review the initial decimals I am suggesting below." -- feat/symbology-label 060abb3c: decimals by displayed unit (your values, plus a 3-significant-figure guess for any other unit). Sue and Mary: SI elevation/head/pressure/depth at 3 decimals is too fine in metres of water (Sue: 1); Number of services should be 0/0 (applied, it is a count); head loss should not share elevation's decimals; reaction coefficients 2-3, not 1. Your ruling
+- [x] R-328 -- | "For initial values and examples, we need an internal way to guess decimals based on the units factor. And/or we need our table of initial decimals to include at least the main US and SI units. We probably should ask Sue and Mary to review the initial decimals I am suggesting below." -- feat/symbology-label 060abb3c: decimals by displayed unit (your values, plus a 3-significant-figure guess for any other unit). Sue and Mary: SI elevation/head/pressure/depth at 3 decimals is too fine in metres of water (Sue: 1); Number of services should be 0/0 (applied, it is a count); head loss should not share elevation's decimals; reaction coefficients 2-3, not 1. Your ruling
 - [ ] R-329 -- | "I don't like that ID needs to display first, but also may need to drop first. We have been using drop first as display last, which is efficient, but lazy. I suppose there is room for it even on my phone." -- feat/symbology-label 060abb3c: Show and Drop are separate columns on every row; ID is Show 1, Drop 2; awaiting your pass
 - [ ] R-330 -- | "Scroll/spin decimals and orders integers: I notice that on my phone space is economized by showing decimals and order as text inputs. But when tapped, these should (a) highlight entirely like other inputs (I think they were skipped over because they are scroll/spin on the PC) and (b) they should open the scroll/spin interface if there is one. Use your judgement; I am only observing the deficiencies." -- feat/symbology-label 060abb3c: on a touch screen a tap selects the whole number and opens the digit keypad; phones have no spinner for a number box; awaiting your pass
-- [?] R-331 -- | "We need a code or a toggle to 'Use units' for the After string. It should put space and units in the After field and disable it." -- feat/symbology-label 060abb3c: a Use units tick box before After. Your table leaves After blank for Demand, Elevation, Pressure, Flow, Velocity, Head loss and others, so those start unticked. Should they start ticked?
+- [x] R-331 -- | "We need a code or a toggle to 'Use units' for the After string. It should put space and units in the After field and disable it." -- feat/symbology-label 060abb3c: a Use units tick box before After. Your table leaves After blank for Demand, Elevation, Pressure, Flow, Velocity, Head loss and others, so those start unticked. Should they start ticked?
 - [x] R-332 -- | "Does Mary find whether we need to include quality results (inherited directly from their node with disclaimer) for Customer Properties, Table, Find, and Symbology?" -- Mary: no. WaterGEMS' customer element carries no quality; a node's number copied to a customer reads like a tap sample and is not one. Not built
 - [ ] R-333 -- | "Our lists are getting long. I think the Settings index pane Symbology section can be reworked to Node labels, Node colors, Link labels, Link colors, Customer." -- feat/symbology-label 060abb3c: Node labels, Node colors, Link labels, Link colors, Customer, and All kept last for Mark highest/lowest and Thematic map; awaiting your pass
 - [ ] R-334 -- | "See dev/settings-symbology-defaults.csv. Rename if needed. I see that there is already a symbology-property-audit.md. Harmonize as needed." -- feat/symbology-label: committed as dev/symbology-defaults.csv, the audit doc points at it; Show? all 0 would show no labels, so the shipped ticks were kept; Net inflow has no property yet
@@ -320,5 +320,36 @@ judgement and does not belong to a script.
 ### Discussion
 
 - [x] R-335 -- | R-297 answered: "$ec_lang_syn: Yes. Write it." -- the 09-16 wording written
-- [?] R-336 -- | Task 697: "Which domain does Mary vote as canonical? I have been leaning toward -plus-plus since pp isn't immediately obvious, but can be a nice shortcut maybe." -- Mary votes epanet-plus-plus.org canonical (Notepad++ chose notepad-plus-plus.org; "pp" needs decoding), the other a 301
+- [x] R-336 -- | Task 697: "Which domain does Mary vote as canonical? I have been leaning toward -plus-plus since pp isn't immediately obvious, but can be a nice shortcut maybe." -- Mary votes epanet-plus-plus.org canonical (Notepad++ chose notepad-plus-plus.org; "pp" needs decoding), the other a 301
 - [x] R-337 -- | Orchestration: work from 100 down, Sonnet where appropriate, translation sprint when prudent, handoff for a /clear at the end.
+
+## Round of 2026-09-27 -- his pass over 8119-8121 and 8090, and the open decisions
+
+### Decisions
+
+- [ ] R-338 feat/label-gang-search | R-315: "There appears to be serious breakage afoot with no other explanation than 'Text and symbol sizes got bigger'. Can you do a deeper inquiry into what broke label placement, and why it now takes 5 times as long as before with apparently worse results?"
+- [ ] R-339 feat/label-gang-search | R-318: the longest leader hidden first on a crowding tie: "No." A leader may not pass through another node's symbol: "Yes."
+- [x] R-340 feat/symbology-label | R-328: "1 is ludicrous when US is 2. 3 is roughly analogous to 2 for US. I guess Sue is just guessing with no experience or intuition to draw on." ... "Keep all as is. They didn't show anything worth heeding." -- nothing to change
+- [x] R-341 feat/symbology-label | R-331: "No. Let's conserve space for users by leaving them unticked." -- nothing to change
+- [ ] R-342 feat/symbology-label | New project inheritance: "Things are more complicated now. A new project copies the open project where units are the same (not changed in the New Project wizard). Otherwise a new project gets built-in defaults. The party line is that new projects follow current project as much as they can."
+- [x] R-343 feat/symbology-label | The "All" index entry: "Yes." -- kept
+- [ ] R-344 -- | R-336: epanet-plus-plus.org canonical, the other a redirect: "OK."
+
+### feat/row-paste (8119)
+
+- [x] R-345 feat/row-paste | "OK. Done. Close, merge and delete branch." -- merged 2026-09-27
+
+### feat/symbology-label (8120)
+
+- [ ] R-346 feat/symbology-label | "(1) OK. (2) OK. But (a) change Before to 'Bef.' (b) Move Use units to after 'After'. (c) Change After to 'Aft.'"
+- [ ] R-347 feat/symbology-label | "(3) Length and Diameter for US projects should have ' and \", not 'Use units' ticked. You may have intended to tick it for SI, since for US, I provided suffixes."
+- [ ] R-348 feat/symbology-label | "(6) Remind me to test on dev once this is merged and pushed. (7) It's a lot, and it's messy, but let's see if we can make it work."
+
+### feat/quality-settings (8121)
+
+- [ ] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task."
+- [ ] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank."
+
+### feat/label-gang-search (8090)
+
+- [ ] R-351 feat/label-gang-search | "(1) Good. (2) Good. (3) It's instantaneous, unmeasurable for a human. (4) But we know that zooming and placement are broken beyond this. [his screenshot: Novato southwest, a descending gang of labels 185/183/181/179/177 with empty gaps circled between them and leaders running far from their nodes] shows gratuitous spacing, and you know that the delay is far worse than before."

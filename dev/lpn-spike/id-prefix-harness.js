@@ -115,17 +115,19 @@ ok('...while the numbered ones moved on', doc.nodes.filter(n => n.type === 'junc
 	.some(n => n.id.indexOf('W') === 0));
 ok('...and the notice says how many were left alone', /left alone/.test(L.notice()), L.notice());
 
-console.log('\n=== a target held by something OUTSIDE the batch is skipped, not invented ===');
+console.log('\n=== a link may take an id a node has: two namespaces, as in EPANET ===');
 // Point the LINK prefix at the junctions' own prefix. Every L-something wants an id a junction
-// already answers to, and no junction is moving, so every one of them must be refused.
-const linkIdsBefore = doc.links.map(l => l.id);
+// already answers to -- which is allowed since Tom's ruling of 2026-09-26 ("Junctions and pipes can
+// use same ID."): nodes and links are separate namespaces, so every link moves, and none takes
+// another LINK's id.
 L.settings().idPrefixes.L = 'W';
 L.applyToAll('L');
 const pipeIds = doc.links.map(l => l.id);
-const collided = doc.nodes.map(n => n.id).filter(id => pipeIds.includes(id));
-ok('no link took an id a node already had', collided.length === 0, collided.join(','));
-ok('...and the ones that could not move kept their old ids',
-	pipeIds.filter((id, i) => id === linkIdsBefore[i]).length > 0, pipeIds.join(','));
+const shared = doc.nodes.map(n => n.id).filter(id => pipeIds.includes(id));
+ok('links took the ids junctions also have, as EPANET allows', shared.length > 0, shared.join(','));
+ok('...and no two LINKS share an id', new Set(pipeIds).size === pipeIds.length, pipeIds.join(','));
+ok('...and each link still joins the junctions it joined (its ends are node ids, untouched)',
+	doc.links.every(l => doc.nodes.some(n => n.id === l.from) && doc.nodes.some(n => n.id === l.to)));
 
 console.log('\n=== a target held by a batch member that is NOT moving is skipped too ===');
 // The subtle half of the collision rule, and the one a "they are all in this batch, so it is fine"
@@ -142,9 +144,9 @@ ok('the stationary Y5 keeps its id', doc.nodes.filter(n => n.id === 'Y5').length
 	doc.nodes.map(n => n.id).join(','));
 ok('...Q5 is left where it was rather than taking it', doc.nodes.some(n => n.id === 'Q5'),
 	doc.nodes.map(n => n.id).join(','));
-ok('...and no two elements anywhere share an id',
-	new Set(doc.nodes.map(n => n.id).concat(doc.links.map(l => l.id))).size ===
-		doc.nodes.length + doc.links.length,
+ok('...and no two elements of the same kind share an id',
+	new Set(doc.nodes.map(n => n.id)).size === doc.nodes.length &&
+		new Set(doc.links.map(l => l.id)).size === doc.links.length,
 	doc.nodes.map(n => n.id).join(','));
 
 console.log('\n=== answering NO to the confirm changes nothing ===');

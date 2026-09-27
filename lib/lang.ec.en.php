@@ -867,6 +867,45 @@ $ec_lang['lpn_multi_varies']='Various';
 $ec_lang['lpn_multi_applied']='Set {prop} on {n}.';
 $ec_lang['lpn_multi_no_fields']='These have nothing that can be set together here.';
 $ec_lang['lpn_pane_pasted']='Pasted {n} cells. {skipped} were not changed.';
+// PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
+// junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
+// {skipped} how many cells were left as they were.
+$ec_lang['lpn_pane_pasted_rows']='Pasted {n} rows and added {created} of them to the network.';
+$ec_lang['lpn_pane_pasted_rows_skipped']='Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.';
+// Added after "This network has none of these yet." on an empty table, which is where a paste lands.
+$ec_lang['lpn_pane_paste_here']='Click here and paste rows from a spreadsheet to add them.';
+// The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
+// paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
+// wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
+$ec_lang['lpn_pane_paste_append']='Paste as new rows at end of table';
+// Shown after choosing Paste as new rows at end of table from a menu: the page waits for the paste
+// keystroke.
+$ec_lang['lpn_pane_paste_armed']='Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.';
+// Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
+// pasted, {fit} how many land on rows that exist, {extra} how many are left over.
+$ec_lang['lpn_pane_paste_overflow']='This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?';
+$ec_lang['lpn_pane_paste_overflow_add']='Add {extra} rows';
+$ec_lang['lpn_pane_paste_overflow_fit']='Paste only the {fit} that fit';
+// The same question when the left-over rows could not be added; {reasons} names the rows and why.
+$ec_lang['lpn_pane_paste_overflow_bad']='This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}';
+// Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
+// that already exist; the buttons are Paste and Cancel.
+$ec_lang['lpn_pane_paste_ids_differ']='{n} IDs don\'t match. Paste anyway?';
+// A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
+// Row sentences below, each naming the row of the pasted block, counted from 1.
+$ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';
+$ec_lang['lpn_pane_paste_more']='Rows with problems not shown here: {n}.';
+$ec_lang['lpn_pane_paste_no_id']='Row {row}: a new row needs an ID.';
+$ec_lang['lpn_pane_paste_bad_id']='Row {row}: the ID {id} has a space or a quotation mark in it.';
+$ec_lang['lpn_pane_paste_id_taken']='Row {row}: the ID {id} is already in use.';
+$ec_lang['lpn_pane_paste_id_twice']='Row {row}: the ID {id} is used twice in this paste.';
+// {first} and {second} are the project's two coordinate names, such as Latitude and Longitude.
+$ec_lang['lpn_pane_paste_no_position']='Row {row}: a new node needs both {first} and {second}.';
+$ec_lang['lpn_pane_paste_no_ends']='Row {row}: a new link needs a From node and a To node.';
+$ec_lang['lpn_pane_paste_no_node']='Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.';
+$ec_lang['lpn_pane_paste_same_ends']='Row {row}: From and To are the same node.';
+// {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
+$ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
@@ -2207,9 +2246,14 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 $ec_lang['lpn_notes_4_term']='Also on this page';
 $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
-$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr></tbody></table>';
+// R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
+// heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
+// because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
+// every row here already has -- the Hide/Show row beside it names the identical menu.
+$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+// R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
