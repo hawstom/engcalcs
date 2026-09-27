@@ -91,7 +91,7 @@ judgement and does not belong to a script.
 
 ### feat/table-editing (8105)
 
-- [ ] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build
+- [x] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build -- feat/table-editing merged 2026-09-26
 
 ### feat/label-gang-search (8090)
 
@@ -101,7 +101,7 @@ judgement and does not belong to a script.
 
 ### MOD's first-use test (2026-09-23)
 
-- [ ] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one
+- [x] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one -- feat/menu-button merged 2026-09-26
   - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
 - [x] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached -- merged, master 017ee4de
 
@@ -123,7 +123,7 @@ judgement and does not belong to a script.
 ### feat/zoom-control (8103)
 
 - [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
-- [ ] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass
+- [x] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass -- feat/zoom-control merged 2026-09-26
 
 ### feat/convert-as (8104)
 
@@ -132,9 +132,9 @@ judgement and does not belong to a script.
 
 ### feat/table-editing (8105)
 
-- [ ] R-239 feat/table-editing | "There is a troublesome conflict between clicking on a column heading text to sort and clicking on a column heading to select. Is there a better way we can do this? ... Is there a conventional glyph and gesture for sort, maybe including a hover revelation?" -- Ida asked
-- [ ] R-240 feat/table-editing | "Add "Show all" to the heading right-click menu. Or maybe what we really need is a Manage columns command/box that has checkboxes for Show."
-- [ ] R-241 feat/table-editing | "Sorry I can't get a column to drag. I think it's the right thing to have. What I think is wrong is the ability to select the heading text ... Maybe a three dots menu for sorting and hiding. Maybe a grab cursor somewhere for dragging. I honestly don't know."
+- [x] R-239 feat/table-editing | "There is a troublesome conflict between clicking on a column heading text to sort and clicking on a column heading to select. Is there a better way we can do this? ... Is there a conventional glyph and gesture for sort, maybe including a hover revelation?" -- Ida asked -- feat/table-editing merged 2026-09-26
+- [x] R-240 feat/table-editing | "Add "Show all" to the heading right-click menu. Or maybe what we really need is a Manage columns command/box that has checkboxes for Show." -- feat/table-editing merged 2026-09-26
+- [x] R-241 feat/table-editing | "Sorry I can't get a column to drag. I think it's the right thing to have. What I think is wrong is the ability to select the heading text ... Maybe a three dots menu for sorting and hiding. Maybe a grab cursor somewhere for dragging. I honestly don't know." -- feat/table-editing merged 2026-09-26
 
 ### feat/property-venue (8106)
 
@@ -147,9 +147,9 @@ judgement and does not belong to a script.
 
 ### Customer
 
-- [ ] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black." -- feat/customer-node cd7640b1, awaiting your pass
-- [ ] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass
-- [ ] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass
+- [x] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
+- [x] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
+- [x] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
 
 ## Round of 2026-09-25, second pass -- his pass over the preview ports
 
@@ -171,13 +171,13 @@ judgement and does not belong to a script.
 
 ### feat/table-editing (8105)
 
-- [ ] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice." -- feat/table-editing: whole cell is one target, click selects the column, ⋮ glyph opens the menu; awaiting your pass
-- [ ] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed
-- [ ] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it
-- [ ] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list
+- [x] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice." -- feat/table-editing: whole cell is one target, click selects the column, ⋮ glyph opens the menu; awaiting your pass -- feat/table-editing merged 2026-09-26
+- [x] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed -- feat/table-editing merged 2026-09-26
+- [x] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it -- feat/table-editing merged 2026-09-26
+- [x] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list -- feat/table-editing merged 2026-09-26
 - [x] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
   - [TGH 2026-09-26: "Let's remove it and park it in our roadmap. 'More trouble to debug than the feature is worth.'" -- removed on feat/table-editing; parked as Task 730]
-- [ ] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf
+- [x] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf -- feat/table-editing merged 2026-09-26
 
 ### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
 
@@ -189,21 +189,21 @@ judgement and does not belong to a script.
 
 ### feat/zoom-control (8103)
 
-- [ ] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side] -- feat/zoom-control 43902998: one cause fixed (a fit that hid labels kept room for them); your exact screenshot not reproduced, see the report
-- [ ] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant." -- feat/zoom-control 43902998: the dragged label leapt to 2.2x its leader; fixed
-- [ ] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'." -- feat/zoom-control 43902998: exactly your words
+- [x] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side] -- feat/zoom-control 43902998: one cause fixed (a fit that hid labels kept room for them); your exact screenshot not reproduced, see the report -- feat/zoom-control merged 2026-09-26
+- [x] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant." -- feat/zoom-control 43902998: the dragged label leapt to 2.2x its leader; fixed -- feat/zoom-control merged 2026-09-26
+- [x] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'." -- feat/zoom-control 43902998: exactly your words -- feat/zoom-control merged 2026-09-26
 - [x] R-266 feat/zoom-control | "The zoom window can be very nice for some users. ... 'Don't zoom again after results' seems to work fine." -- nothing to build
 
 ### feat/customer-node (8113)
 
-- [ ] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?" -- feat/customer-node 105d9f68: customers draw under links and junctions; a click on the junction under a selected customer's grip opens the junction
-- [ ] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)" -- feat/customer-node 105d9f68: outside a bend the customer connects at the bend, and a drag tracks onto it and off again
-- [ ] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers." -- feat/customer-node 105d9f68: all 7 examples
-- [ ] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'." -- feat/customer-node 105d9f68
+- [x] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?" -- feat/customer-node 105d9f68: customers draw under links and junctions; a click on the junction under a selected customer's grip opens the junction -- feat/customer-node merged 2026-09-26
+- [x] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)" -- feat/customer-node 105d9f68: outside a bend the customer connects at the bend, and a drag tracks onto it and off again -- feat/customer-node merged 2026-09-26
+- [x] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers." -- feat/customer-node 105d9f68: all 7 examples -- feat/customer-node merged 2026-09-26
+- [x] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'." -- feat/customer-node 105d9f68 -- feat/customer-node merged 2026-09-26
 
 ### feat/menu-button (8114)
 
-- [ ] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'." -- feat/menu-button eceab3ab: outlined only; the cue was already deleted on master and is gone from the branch after merging master
+- [x] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'." -- feat/menu-button eceab3ab: outlined only; the cue was already deleted on master and is gone from the branch after merging master -- feat/menu-button merged 2026-09-26
 
 ### Fire flow
 
@@ -249,15 +249,15 @@ judgement and does not belong to a script.
 
 ### Open
 
-- [ ] R-291 feat/placement-wizard | "The background opacity of the background image happened to be 50%, and that made a huge difference in placing the project. This is a major quality of life enhancement. Can we force the opacity of any background image to no more than 50% during "World Map, Attach" and "File, Convert as"?"
-- [ ] R-292 feat/placement-wizard | "It would be really nice if the wizard were draggable including up to the top of the page over the menus in case it's in the way."
-- [ ] R-293 feat/placement-wizard | "File, Convert as should automatically filter EPSG CRSes for the displayed area or network extents. I am at Prescott Valley, AZ, but I see the full list of CRSes."
-- [ ] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona."
-- [ ] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?"
+- [x] R-291 feat/placement-wizard | "The background opacity of the background image happened to be 50%, and that made a huge difference in placing the project. This is a major quality of life enhancement. Can we force the opacity of any background image to no more than 50% during "World Map, Attach" and "File, Convert as"?" -- feat/placement-wizard merged 2026-09-26
+- [x] R-292 feat/placement-wizard | "It would be really nice if the wizard were draggable including up to the top of the page over the menus in case it's in the way." -- feat/placement-wizard merged 2026-09-26
+- [x] R-293 feat/placement-wizard | "File, Convert as should automatically filter EPSG CRSes for the displayed area or network extents. I am at Prescott Valley, AZ, but I see the full list of CRSes." -- feat/placement-wizard merged 2026-09-26
+- [x] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona." -- feat/placement-wizard merged 2026-09-26
+- [x] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?" -- feat/placement-wizard merged 2026-09-26
 - [x] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim -- master f038eba5
 - [x] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
-- [ ] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users."
-- [ ] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)."
+- [x] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users." -- feat/find-coordinate merged 2026-09-26
+- [x] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)." -- feat/find-coordinate merged 2026-09-26
 - [x] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V) -- merged 2026-09-27
 - [x] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared -- merged 2026-09-27
 - [x] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b -- merged 2026-09-27
