@@ -620,8 +620,8 @@ console.log('\n--- a node label is stacked in its Show order, and the Drop colum
 		// A shed keeps what survives in Show order: keptLines() preserves relative order.
 		report(ascends(shownFields(nodeEls[n.id])), 'the DRAWN lines keep Show order too',
 			shownFields(nodeEls[n.id]).join(' '));
+		// Put back, without a further layout pass: nothing after this section reads the drawing.
 		sk.forEach(function (k, i) { show[k] = sBefore[i]; });
-		zoomTo(80000);
 	}
 }
 
