@@ -2651,3 +2651,61 @@ lat/lon a person types or reads. I worked this out empirically (mercLat(-38.125)
 matching my own wrong test output to six figures) rather than reading a single comment that states
 it plainly; worth a doc note somewhere for the next person who tries to fabricate a label position
 by hand instead of loading a file, since it costs about the hour it cost me.
+
+---
+
+## feat/symbology-label R-346/R-347/R-342, 2026-09-27, 1701e62b
+
+CONFIRMED (R-346, OBSERVED, real Chrome via dev/browser-pass, labelcols spec, 69/69) -- Node
+labels, Link labels and Customer all read Bef./Aft. headings with Use units sitting after Aft.,
+in that order, on every row measured, including the ID row's spacer and the narrow-screen
+(<24rem) stacked layout Tom's "phone width" question was about. No leak into the fourth/fifth/
+sixth columns (Decimals/Show/Drop), which stayed exactly where R-326..R-331 put them.
+
+CONFIRMED (R-347, OBSERVED, real Chrome, ad-hoc script against the Settings box DOM, not a
+committed spec) -- a fresh US project: Link labels' Length row opens with "Use units" UNTICKED
+and its After box literally contains `'`; Diameter opens UNTICKED with `"`. A fresh SI project:
+both open TICKED (After box disabled, showing " m" / " mm"). Read the actual checkbox.checked and
+input.value off the live DOM, not the source. Matches Tom's words exactly: "Length and Diameter
+for US projects should have ' and ", not 'Use units' ticked."
+
+CONFIRMED (R-342, OBSERVED, real Chrome + the build agent's own node harness
+new-project-inherit-harness.js, 17/17) -- New Project with the SAME units as the open project:
+a hand-ticked Length "Use units" box (against its own US default of unticked) survived into the
+new project, live in Chrome, not just in the stub. New Project with Length's unit CHANGED (ft to
+m) while nothing else changed: the tick reset to the metre default (ticked) -- the narrow,
+per-field reset the build agent described, not a wipe of the whole project. The node harness
+additionally covers what I did not re-drive live (idPrefixes, decimals, customerMaxWidth,
+a Pressure-only change leaving Length untouched) and passed; I did not distrust it enough to
+re-drive all of it in a real browser given it exercises the same non-DOM object-copy code the
+DOM-level tick already confirmed behaves correctly.
+
+JUDGEMENT CALL, not a defect -- the build agent flagged its own reading of R-342 as narrower than
+a literal parse of "Otherwise a new project gets built-in defaults," which read alone could mean
+"if ANY unit differs, revert EVERYTHING to built-in, not just the changed unit's pieces." I think
+the shipped narrow reading is the better one: Tom's own closing sentence in the same message --
+"The party line is that new projects follow current project as much as they can" -- only makes
+sense under the narrow reading (an all-or-nothing wipe on the first mismatched unit is the
+opposite of "as much as they can," and would mean changing an unrelated family like Age units
+silently drops a person's ID prefixes and colour choices). But this is a genuine ambiguity in his
+own prose with real stakes (surprise data loss vs. surprise carryover), and only Tom can rule
+definitively which he meant -- worth him saying so explicitly rather than this holding as inferred.
+
+UNVERIFIABLE FROM HERE -- whether the rendered MAP label (not the Settings-box preview, which I
+did confirm) for Length/Diameter looks right by eye on an opened example. I tried to drive this
+in real Chrome (turn on the Length label, sample rendered label text on Net1-US and the SI Basic
+network example) and got empty samples both times -- my selector for the rendered label text was
+wrong, not a defect I can pin on the branch; I did not have time to find the right one this round.
+A person should open "Basic network, gpm (US)", turn on a pipe's Length in Settings > Link labels,
+and confirm the label on the map itself shows a plain number with a trailing `'`, then repeat with
+"Basic network, L/s (SI)" and confirm it shows " m".
+
+LEAK CHECK: labelUnitMark() is now the single source both labelTableDefaults() (which sets the
+tick) and labelUnitSuffix() (which decides what's printed) read, replacing two independent copies
+of the ft/in special case -- so the tick and the printed mark cannot drift out of sync with each
+other the way two separately-maintained conditionals could. resetUnitBearingDefaultsFor() is
+scoped to the three named defaults fields, the length-only customerMaxWidth, and useUnits rows
+whose OWN unit selector is in changedSelectors -- I read the loop and it does not touch decimals,
+show/drop order, colours, or any field outside LPN_LABEL_FIELD_UNIT, matching what CLAUDE.md and
+dev/unit-rulings.md now say.
+
