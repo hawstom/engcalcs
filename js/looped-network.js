@@ -15466,6 +15466,37 @@ var EngCalcs = EngCalcs || {};
 		return f >= 1 ? Math.log(f) / Math.log(MAPGEO_DIAL_MAX)
 			: -Math.log(f) / Math.log(MAPGEO_DIAL_MIN);
 	}
+	// **STEP 1 OPENS ON THE WHOLE WORLD, NOT ON THE DRAWING'S OWN SHAPE** (R-306, Tom: *"The initial
+	// map view at Step 1 (i) is only a width sliver of the world map that shows most of Africa and
+	// Europe, but cuts of extreme east and west Africa. (ii) The n-s extent occupies only about half
+	// my screen map height."*). `zoomExtent(true)` used to stand here, fitting the DRAWING's own
+	// bounding box (padded, at the DRAWING's own aspect ratio) to the canvas. `metersPerUnit` makes
+	// the drawing's LONGER axis exactly the equator's length, but the drawing's aspect ratio is
+	// whatever the user drew -- almost never square -- so its SHORTER axis, in real metres, is
+	// almost never the world's other side. Fitting that rectangle to the canvas shows the drawing's
+	// own shape, not the world's: a wide, short drawing let the world's height fill only a fraction
+	// of the canvas (his (ii)), and a tall, narrow one let the world's width do the same (his (i), on
+	// his own drawing).
+	//
+	// **THE WORLD ITSELF IS SQUARE** (`geoHomeView()`'s own finding), a side of `ext.span` DRAWING
+	// UNITS by construction (`metersPerUnit = MAPGEO_EARTH_M / ext.span` makes exactly `ext.span` doc
+	// units equal one equator's length). So the view that shows the whole world, filling the canvas
+	// as far as its shape allows, is `min(canvasWidth, canvasHeight) / ext.span` -- the shorter
+	// canvas axis binds and is completely filled, and the longer axis shows the whole world plus
+	// room to spare rather than cropping it. Centred on the anchor, which IS 0 N 0 E.
+	// dev/lpn-spike/mapgeo-world-view-harness.js measures the visible longitude and latitude span
+	// this leaves on screen, for a wide drawing, a tall one and a square one.
+	function mapgeoWorldFit(ext) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		// **THE SAME `mapSized` GUARD `zoomExtent()` OBSERVES, and for the same reason.** Before the
+		// canvas has been through a real measured layout its `clientWidth`/`clientHeight` are not to
+		// be trusted -- a hidden tab, a still-collapsing pane. Menu rows do not reach here before the
+		// canvas is sized, so this is the same untaken branch `zoomExtent(true)` already had; kept so
+		// this never writes a view off an unmeasured canvas where the old code never did either.
+		if (!mapSized || !w || !h) { zoomExtent(true); return; }
+		applyView({ cx: inwardX(ext.cx), cy: inwardY(ext.cy), s: Math.min(w, h) / ext.span });
+	}
 	function mapgeoStart() {
 		var pc = EngCalcs.pageConfig || {}, ext;
 		if (mapgeo || georefActive()) { return; }
@@ -15506,7 +15537,7 @@ var EngCalcs = EngCalcs || {};
 		// sits, and the whole equator wide so that the fit below shows the whole world.
 		project.georef = { anchor: { x: ext.cx, y: ext.cy }, origin: { lon: 0, lat: 0 },
 			metersPerUnit: MAPGEO_EARTH_M / ext.span, rotDeg: 0 };
-		zoomExtent(true);
+		mapgeoWorldFit(ext);
 		mapgeoSet(project.georef);
 		refreshMapStatus();
 		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');

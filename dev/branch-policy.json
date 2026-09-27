@@ -74,7 +74,9 @@
         "feat/report",
         "feat/placement-wizard",
         "feat/find-coordinate",
-        "feat/row-paste"
+        "feat/row-paste",
+        "feat/symbology-label",
+        "feat/quality-settings"
     ],
     "feature_freeze": {
         "active": false,
