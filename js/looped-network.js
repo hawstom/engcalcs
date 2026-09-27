@@ -7480,12 +7480,19 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **THREE WHOLE NAMES, NOT A WORD PLUS A HEADING.** Composing "Average" + qualityLabel() at
 	 * render time is the fragment composition CLAUDE.md forbids: it breaks in a gendered language,
-	 * in a word-order language and in the five right-to-left ones.
+	 * in a word-order language and in the five right-to-left ones. The named-chemical case (R-349,
+	 * the link half of R-323) follows the same rule: `lpn_quality_named_avg_concentration` is one
+	 * WHOLE template ("Average {chemical} concentration"), never "Average" glued to
+	 * qualityLabel()'s own named string.
 	 */
 	function linkQualityLabel() {
-		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
+		var pc = EngCalcs.pageConfig || {}, mode = qualityMode(), nm;
 		if (mode === 'trace') { return pc.lpn_result_avg_source_share || 'Average source share'; }
-		if (mode === 'chemical') { return pc.lpn_result_avg_concentration || 'Average concentration'; }
+		if (mode === 'chemical') {
+			nm = chemicalName();
+			return nm ? (pc.lpn_quality_named_avg_concentration || 'Average {chemical} concentration').replace('{chemical}', nm)
+				: (pc.lpn_result_avg_concentration || 'Average concentration');
+		}
 		return pc.lpn_result_avg_water_age || 'Average water age';
 	}
 	/**
@@ -17101,7 +17108,10 @@ var EngCalcs = EngCalcs || {};
 			['flow', 'lpn_result_flow', 'Flow'],
 			['velocity', 'lpn_result_velocity', 'Velocity'],
 			['headloss', 'lpn_result_headloss', 'Head loss'],
-			['gradient', 'lpn_result_gradient', 'Head loss gradient']
+			['gradient', 'lpn_result_gradient', 'Head loss gradient'],
+			// **THE LINK'S OWN AVERAGE** (R-349, Task 638 completed): the same result as the node's
+			// `quality` row, one band down, but never the node's word for it -- see linkQualityLabel().
+			['quality', null, 'Average water age']
 		];
 		// A row is offered only where it can match, which is the standing honesty rule: a property
 		// that silently matches nothing does not go in the menu.
@@ -17136,7 +17146,10 @@ var EngCalcs = EngCalcs || {};
 				}
 				// The heading follows the quality mode and the friction method, so those two are
 				// asked for rather than stored -- the same reason nodeFieldDefs() calls them.
-				var label = key === 'quality' ? qualityLabel()
+				// **A LINK'S QUALITY READS linkQualityLabel(), NEVER qualityLabel()** (R-349): the two
+				// are different quantities (a node's own value vs. a link's average) and must never
+				// share one word, the same split linkFieldDefs()/nodeFieldDefs() already keep.
+				var label = key === 'quality' ? (d.group === 'link' ? linkQualityLabel() : qualityLabel())
 					: key === 'roughness' ? roughnessLabel()
 					: (f[1] && pc[f[1]]) || f[2];
 				out.push([key, label, f[2]]);
@@ -21406,6 +21419,15 @@ var EngCalcs = EngCalcs || {};
 		c.unitText = qualityUnitText;
 		return c;
 	}
+	// **THE LINK'S OWN AVERAGE, IN EVERY VENUE A NODE'S HAS IT** (R-349, Task 638 completed): the
+	// same dynamic-heading arrangement as paneColNodeQuality(), reading linkQualityLabel() instead
+	// of qualityLabel() -- EPANET reports a link's quality as the average standing in it, a
+	// different quantity from a node's own value, so the two never share one word.
+	function paneColLinkQuality() {
+		var c = paneColLinkResult('quality', linkQualityLabel, null);
+		c.unitText = qualityUnitText;
+		return c;
+	}
 	/**
 	 * **THE STARTING CONCENTRATION AS A COLUMN** (Tom, 2026-09-14: *"Initial quality is in no Table
 	 * and no multi-properties. Embarrassing, and we are committed to finishing it."*).
@@ -21537,21 +21559,36 @@ var EngCalcs = EngCalcs || {};
 		if (overridable) { c.prop = key; }
 		return c;
 	}
+	// **HAS A NODE BEEN GIVEN A SOURCE QUALITY?** (R-350). The one question the type column, the
+	// type's own cell in the popup and its disabled state must all answer alike.
+	function hasSourceQuality(n) {
+		var sq = effective(n, 'sourceQuality');
+		return sq !== undefined && sq !== null && sq !== '';
+	}
 	// **WHERE A CHEMICAL ENTERS THE NETWORK** (Task 566): on every kind of node, and only while one
 	// is being tracked, which is the popup's own gate asked rather than stored.
+	//
+	// **DISABLED AND READING NONE WHILE SOURCE QUALITY IS BLANK** (R-350, Tom: *"Source type should
+	// default to none. Maybe just disable if Source quality is blank... it's ignored if Source
+	// Quality is blank."*) -- the same rule and the same `hasSourceQuality()` question sourceFields()
+	// asks in the popup, so the two surfaces can never show two different states for one node.
 	function paneColSourceType() {
 		return { key: 'sourceType', label: 'lpn_source_type', em: 5,
 			when: function () { return qualityMode() === 'chemical'; },
 			prop: 'sourceType',
-			choices: function () {
-				var pc = EngCalcs.pageConfig || {};
-				return [['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+			choices: function (n) {
+				var pc = EngCalcs.pageConfig || {},
+					out = (n && !hasSourceQuality(n)) ? [['', pc.lpn_source_type_none || 'None']] : [];
+				return out.concat([['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
 					['MASS', pc.lpn_source_type_mass || 'Mass booster'],
 					['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
-					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']];
+					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']]);
 			},
-			get: function (n) { return effective(n, 'sourceType') || 'CONCEN'; },
-			set: function (n, v) { setProp(n, 'sourceType', v); } };
+			disabledFor: function (n) { return !hasSourceQuality(n); },
+			get: function (n) { return hasSourceQuality(n) ? (effective(n, 'sourceType') || 'CONCEN') : ''; },
+			// '' is the disabled state's own value, never a type to store -- writing it would be a
+			// stated "no type" where EPANET's own vocabulary has none.
+			set: function (n, v) { setProp(n, 'sourceType', v || undefined); } };
 	}
 	function paneColSourceQuality() {
 		return { key: 'sourceQuality', label: 'lpn_source_quality', unitText: concentrationUnitText,
@@ -22151,6 +22188,7 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
 					paneColLinkStatus(),
+					paneColLinkQuality(),
 					paneColLinkReactionRate()
 				])
 			},
@@ -22176,7 +22214,8 @@ var EngCalcs = EngCalcs || {};
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
-					paneColLinkStatus()
+					paneColLinkStatus(),
+					paneColLinkQuality()
 				])
 			},
 			{
@@ -22205,7 +22244,8 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
-					paneColLinkStatus()
+					paneColLinkStatus(),
+					paneColLinkQuality()
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -23406,12 +23446,16 @@ var EngCalcs = EngCalcs || {};
 				input = document.createElement(c.bool ? 'input' : 'select');
 				if (c.bool) { input.type = 'checkbox'; input.checked = !!c.get(el); input.readOnly = true; }
 				else {
-					c.choices().forEach(function (o) {
+					c.choices(el).forEach(function (o) {
 						var opt = document.createElement('option');
 						opt.value = o[0]; opt.textContent = o[1];
 						input.appendChild(opt);
 					});
 					input.value = paneCellText(c, el);
+					// **THE SAME GREYED-OUT DOOR THE POPUP HAS** (R-350): a column can declare
+					// `disabledFor(el)` for a per-row reason a choice is not live right now -- the
+					// Source type column's own reason, while Source quality is blank.
+					if (c.disabledFor && c.disabledFor(el)) { input.disabled = true; }
 				}
 				paneApplyColWidth(input, c, spec);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
@@ -47951,17 +47995,29 @@ var EngCalcs = EngCalcs || {};
 	 * a zero would be a booster that is switched on and dosing nothing, and EPANET writes those two
 	 * as a line and as no line. All three go through setProp(), being overridable -- see
 	 * LPN_OVERRIDABLE, where the reason is that a dose is an operating question.
+	 *
+	 * **THE TYPE IS DISABLED, AND READS AS NONE, WHILE THE QUALITY IS BLANK** (R-350, Tom: *"Source
+	 * type should default to none. Maybe just disable if Source quality is blank, since that's
+	 * what's really happening; it's ignored if Source Quality is blank."*). `CONCEN` sat there as a
+	 * live-looking choice on a node that was not a source at all, which is EPANET's own default and
+	 * not this suite's -- so an untyped node showed a type that implied dosing nobody asked for.
+	 * `sourceType` is unwritten in that state and stays that way: choosing "None" here writes
+	 * nothing to `.inp` where an unedited import wrote nothing before, and TYPING a quality is what
+	 * turns the control on, defaulting to `CONCEN` -- EPANET's own rule -- unless the user then
+	 * picks something else.
 	 */
 	function sourceFields(fields, n, unitText) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, sq = effective(n, 'sourceQuality'),
+			hasQuality = (sq !== undefined && sq !== null && sq !== '');
 		selectFieldPlain(fields, pc.lpn_source_type || 'Source type',
-			[['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+			(hasQuality ? [] : [['', pc.lpn_source_type_none || 'None']]).concat([
+				['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
 				['MASS', pc.lpn_source_type_mass || 'Mass booster'],
 				['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
-				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']],
-			effective(n, 'sourceType') || 'CONCEN',
-			function (v) { setProp(n, 'sourceType', v); refreshPopupIfOpen(); },
-			pc.lpn_source_type_tip);
+				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']]),
+			hasQuality ? (effective(n, 'sourceType') || 'CONCEN') : '',
+			function (v) { setProp(n, 'sourceType', v || undefined); refreshPopupIfOpen(); },
+			pc.lpn_source_type_tip, !hasQuality);
 		numberFieldBlank(fields,
 			(pc.lpn_source_quality || 'Source quality') + (unitText ? ' (' + unitText + ')' : ''),
 			effective(n, 'sourceQuality'),
@@ -48014,6 +48070,23 @@ var EngCalcs = EngCalcs || {};
 		// which is the ONE place that question is answered -- this row, the Tables heading and the
 		// colour legend printed three different answers to it until they shared one.
 		readonlyField(fields, qualityLabel() + (u ? ' (' + u + ')' : ''), v,
+			mode === 'age' ? pc.lpn_result_water_age_tip
+				: mode === 'chemical' ? pc.lpn_result_concentration_tip
+					: pc.lpn_result_source_share_tip);
+	}
+	/**
+	 * **THE LINK'S OWN TAIL, ON THE SAME TERMS AS A NODE'S** (R-349, closing the gap Task 638 left:
+	 * a pipe, pump and valve had `linkQualityValue()` and `linkQualityLabel()` since Task 638, but
+	 * no popup row ever read them -- the Properties box was the one venue Find, the Tables pane and
+	 * the Labels legend all got and this one did not). Absent where there is no answer, exactly as
+	 * qualityResultRow() is; the tips are the node row's own, because the sentence explaining what
+	 * the number means does not change when it is an average rather than one node's value.
+	 */
+	function linkQualityResultRow(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, v = linkQualityValue(l),
+			mode = qualityMode(), u = qualityUnitText();
+		if (v === undefined) { return; }
+		readonlyField(fields, linkQualityLabel() + (u ? ' (' + u + ')' : ''), v,
 			mode === 'age' ? pc.lpn_result_water_age_tip
 				: mode === 'chemical' ? pc.lpn_result_concentration_tip
 					: pc.lpn_result_source_share_tip);
@@ -49193,6 +49266,9 @@ var EngCalcs = EngCalcs || {};
 			// row is what EPANET reports for the step on screen, the column its own link report
 			// ends on.
 			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
+			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
+			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
+			linkQualityResultRow(fields, l);
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -50048,7 +50124,12 @@ var EngCalcs = EngCalcs || {};
 	// A dropdown field. `options` is [[value, label], ...]. The only popup control that is not a
 	// number or a checkbox, added for the valve type (Task 248 phase 2) -- a valve's type decides
 	// what its other fields MEAN, so it cannot be a free-text or numeric input.
-	function selectFieldPlain(fields, labelText, options, current, onChange, tip) {
+	//
+	// **`disabled` IS THE SOURCE TYPE'S OWN DOOR** (R-350, Tom: *"Source type should default to
+	// none. Maybe just disable if Source quality is blank, since that's what's really
+	// happening."*) -- greyed out rather than removed, so the row stays in its place and a reader
+	// still sees the four choices a quality would put in play.
+	function selectFieldPlain(fields, labelText, options, current, onChange, tip, disabled) {
 		var label = document.createElement('label'), sel = document.createElement('select'), i, o;
 		for (i = 0; i < options.length; i++) {
 			o = document.createElement('option');
@@ -50057,6 +50138,7 @@ var EngCalcs = EngCalcs || {};
 			if (options[i][0] === current) { o.selected = true; }
 			sel.appendChild(o);
 		}
+		sel.disabled = !!disabled;
 		sel.addEventListener('change', function () { saveUndoSnapshot(); onChange(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);

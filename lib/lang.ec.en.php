@@ -3267,6 +3267,9 @@ $ec_lang['lpn_quality_diffusivity_tip']='How readily the chemical spreads throug
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} concentration';
+// R-349, the link half of R-323: linkQualityLabel()'s named-chemical case. A whole template
+// ("Average" is never glued to lpn_quality_named_concentration's own string at render time).
+$ec_lang['lpn_quality_named_avg_concentration']='Average {chemical} concentration';
 $ec_lang['lpn_quality_initial']='Initial quality';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Blank means 0.';
@@ -3281,6 +3284,9 @@ $ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at th
 $ec_lang['lpn_source_type']='Source type';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_source_type_tip']='What kind of chemical source dosing is applied here based on the Source Quality value? Concentration source uses the value as a concentration applied to the external inflow (reservoir or negative demand). Mass booster adds a fixed mass flow per minute to that entering the node from other points in the network. Setpoint booster ensures that the concentration leaving the node is no lower than the value. Flow-paced booster source adds a fixed concentration to that resulting from the mixing of all inflow to the node from other points in the network';
+// R-350: "Source type should default to none... it's ignored if Source Quality is blank." The
+// disabled state's own word, shown only while the box beside it carries no quality.
+$ec_lang['lpn_source_type_none']='None';
 $ec_lang['lpn_source_type_concen']='Concentration';
 $ec_lang['lpn_source_type_mass']='Mass booster';
 $ec_lang['lpn_source_type_setpoint']='Setpoint booster';

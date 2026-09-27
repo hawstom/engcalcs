@@ -44,7 +44,7 @@ by design.
 | Head (result) | ✓ | ✓ | n/a *(result)* | ✓ | ✓ | n/a *(computed)* |
 | Pressure (result) | ✓ | ✓ | n/a *(result)* | ✓ | ✓ | n/a *(computed)* |
 | Initial quality | ✓ | ✓ *(chemical mode)* | n/a *(not in `pushSpecList`)* | ✓ | ✓ *(chemical mode)* | `[QUALITY]` |
-| Source type / quality / pattern | ✓ | — | — | n/a *(categorical / not a colour quantity)* | n/a | `[SOURCES]` |
+| Source type / quality / pattern | ✓ *(R-350, closed: Source type disables and reads None while Source quality is blank, in Properties and the Tables column alike)* | — | — | n/a *(categorical / not a colour quantity)* | n/a | `[SOURCES]` |
 | Water age / quality (result) | ✓ | ✓ | n/a *(result)* | ✓ | ✓ | n/a *(computed)* |
 
 ## Reservoir
@@ -59,7 +59,7 @@ by design.
 | Head pattern | ✓ | — | — | n/a *(a pattern reference, not a number)* | n/a | `[RESERVOIRS]` |
 | Pressure (result) | ✓ | ✓ | n/a | ✓ | ✓ | n/a |
 | Initial quality | ✓ | ✓ *(chemical mode)* | — | ✓ | ✓ | `[QUALITY]` |
-| Source type / quality / pattern | ✓ | — | — | n/a | n/a | `[SOURCES]` |
+| Source type / quality / pattern | ✓ *(R-350, closed: same disable-while-blank rule as the junction's row)* | — | — | n/a | n/a | `[SOURCES]` |
 | Water age / quality (result) | ✓ | ✓ | n/a | ✓ | ✓ | n/a |
 
 ## Tank
@@ -77,7 +77,7 @@ by design.
 | Reaction coefficient (tank) | ✓ | n/a *(no per-type Find row; see pipe's pair for the pattern)* | — | n/a | n/a | `[REACTIONS]` |
 | Water surface (result) | ✓ | n/a | n/a | n/a | ✓ | n/a *(computed; `[TANKS]`'s `InitLvl` is the input)* |
 | Initial quality | ✓ | ✓ *(chemical mode)* | — | ✓ | ✓ | `[QUALITY]` |
-| Source type / quality / pattern | ✓ | — | — | n/a | n/a | `[SOURCES]` |
+| Source type / quality / pattern | ✓ *(R-350, closed: same disable-while-blank rule as the junction's row)* | — | — | n/a | n/a | `[SOURCES]` |
 | Water age / quality (result) | ✓ | ✓ | n/a | ✓ | ✓ | n/a |
 
 ## Pipe
@@ -95,7 +95,8 @@ by design.
 | Fittings list | ✓ | n/a *(a list; its total is the k column above)* | n/a | n/a | n/a | n/a *(this suite's own concept; exports the resolved k)* |
 | Bulk / wall reaction coefficient | ✓ | ✓ *(`FIND_EXTRA_LINK_FIELDS`, chemical mode)* | ✓ | n/a *(declared not colourable)* | n/a *(no map label carries it; Task 566's own note)* | `[REACTIONS]` |
 | Flow, velocity, head loss, gradient (results) | ✓ | ✓ | n/a | ✓ | ✓ | n/a *(computed)* |
-| Friction factor, status, quality, reaction rate (results) | ✓ | n/a *(no Find row for these four)* | n/a | ✓ *(friction, status, rate)* | ✓ | n/a *(computed)* |
+| Friction factor, status, reaction rate (results) | ✓ | n/a *(no Find row for these three)* | n/a | ✓ | ✓ | n/a *(computed)* |
+| Average water age / quality (result) | ✓ *(R-349, closed; Properties and the Tables column had none until this branch)* | ✓ *(R-349, closed)* | n/a *(result)* | ✓ *(Task 638)* | ✓ *(Task 638)* | n/a *(computed)* |
 
 ## Pump
 
@@ -110,6 +111,7 @@ by design.
 | Efficiency curve reference | ✓ | n/a *(curve object)* | n/a | n/a | n/a | `[ENERGY]`/`[CURVES]` |
 | Energy price / pattern | ✓ | ✓ *(Task 708)* | ✓ *(Task 708; the pattern is an id, `str`-flagged and validated against the pattern library, the same shape as a customer's demand pattern)* | — | n/a | `[ENERGY]` |
 | Flow, head loss (results) | ✓ | ✓ | n/a | ✓ | ✓ | n/a *(computed)* |
+| Average water age / quality (result) | ✓ *(R-349, closed)* | ✓ *(R-349, closed)* | n/a *(result)* | ✓ *(Task 638)* | ✓ *(Task 638)* | n/a *(computed)* |
 
 ## Valve
 
@@ -124,6 +126,7 @@ by design.
 | Minor loss, k | ✓ | ✓ *(TCV only, `lpn_field_km` states the rule)* | ✓ | n/a | ✓ | `[VALVES]`/`[STATUS]` |
 | Head-loss curve reference (GPV) | ✓ | n/a *(curve object)* | n/a | n/a | n/a | `[VALVES]`/`[CURVES]` |
 | Flow, velocity, head loss, gradient (results) | ✓ | ✓ | n/a | ✓ | ✓ | n/a *(computed)* |
+| Average water age / quality (result) | ✓ *(R-349, closed)* | ✓ *(R-349, closed)* | n/a *(result)* | ✓ *(Task 638)* | ✓ *(Task 638)* | n/a *(computed)* |
 
 ## Text
 
