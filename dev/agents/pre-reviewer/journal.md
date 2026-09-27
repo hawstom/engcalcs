@@ -2640,3 +2640,85 @@ lat/lon a person types or reads. I worked this out empirically (mercLat(-38.125)
 matching my own wrong test output to six figures) rather than reading a single comment that states
 it plainly; worth a doc note somewhere for the next person who tries to fabricate a label position
 by hand instead of loading a file, since it costs about the hour it cost me.
+
+---
+
+# Perry review, feat/quality-settings R-349/R-350, 2026-09-27 (commit 97a36cef)
+
+Reviewed 016576a4 ("R-349/R-350: link concentration everywhere a node has it; Source type
+disables blank") against R-349 ("Node labels settings, Find, and Table has it, but I don't see
+Concentration for Link or in Properties... incomplete execution") and R-350 ("Source type
+should default to none... disable if Source quality is blank").
+
+METHOD: ran dev/lpn-spike/quality-settings-harness.js (production functions via
+dev/lpn-spike/lpn-dom-stub.js, not stubs of the claim itself) -- CITED all-pass, then copied the
+same harness file to a worktree checked out at the immediate parent of the fix (d75a944c, one
+commit before 016576a4) and re-ran it there: it throws (`Cannot read properties of undefined
+(reading 'replace')`) partway through the R-349 section, proving the harness genuinely
+discriminates old from new code rather than passing on both. Ran dev/lpn-spike/inp-roundtrip-net3-
+harness.js and dev/lpn-spike/quality-net3-harness.js: Net3 unedited import->export is still 1229
+tokens, 1229 byte-identical, 0 different.
+
+Then drove REAL headless Chrome (dev/lpn-spike/browser-drive.js under flock
+/tmp/engcalcs-browser.lock, several throwaway scripts, not committed) through the actual production
+UI end to end on the shipped EPANET Net3 example: opened it from the real gallery card, opened
+Water > Settings > Quality, selected "A reactive chemical" in the real <select>, typed "Chlorine"
+in the real Chemical name <input>, pressed the real Calculate button
+(`#lpn_toolbar_run`), then:
+
+CONFIRMED live -- the Node AND Link Symbology "Color by" lists both read "Chlorine concentration"
+/ "Average Chlorine concentration" the instant the name was typed (this was already true for the
+node half; the link half is new and confirmed here too, since Tom's (3)(a) mentioned "Table" but
+this shows the coloring legend followed too).
+
+CONFIRMED live -- the real Pipes table (`#lpn_pane_pipes`, opened via the real `#lpn_pane_btn` and
+`#lpn_pane_tab_pipes` buttons) has a column headed exactly "Average Chlorine concentration (mg/L)",
+sitting beside "Reaction rate (mg/L/day)" as the build report claimed.
+
+CONFIRMED live -- real Find (`#lpn_find_popup`), scope set to "Pipe" via the actual <select>, "What
+to search" > Property lists "Average Chlorine concentration" as a choosable property -- the exact
+row R-349 said was missing.
+
+CONFIRMED live, and the sharpest check of the round -- used a real Find lookup (scope Pipe, ID
+contains "10") to select "Pipe 101", clicked its result row (a real `.click()` on the actual
+production row, not a synthetic hit-test guess), then dispatched a real PointerEvent
+pointerdown+pointerup at the map canvas's own screen centre (`#lpn_canvas`, centred there because
+Find's own `findGoTo()` recentres the view on the found element) to open the REAL Properties popup
+through the page's own click-handling code, not a function called directly. The popup's own
+`#lpn_popup_fields` now contains a `<label>` reading "Average Chlorine concentration (mg/L) ? 0.00"
+between "Status" and "Reaction rate" -- exactly the missing row. (Flow/velocity/quality all read
+0.00 because Net3's default has no Total run time set, which the box's own note says quality needs;
+that is a property of the network settings, not of this fix, and orthogonal to the venue question
+being checked.)
+
+CONFIRMED live -- R-350, on a real junction (Find scope Junction, "Junction 10", opened
+synchronously the same way a real node click does): BEFORE typing anything, the real Source type
+`<select>` in the popup is `.disabled === true` and reads value `""` (options list starts with
+"None"), while Source quality is blank -- exactly Tom's "disable if Source quality is blank... it's
+ignored if Source Quality is blank." Typed "1" into the real Source quality `<input>` and dispatched
+its own `change` event: the Source type select became enabled and read "CONCEN" (EPANET's own
+default), live. Cleared the Source quality input again: Source type went back to disabled/blank.
+Three real state transitions, all through the popup's own DOM and its own event listeners, none of
+it called directly.
+
+CONFIRMED at the harness level only, not independently reproduced live -- the SAME claim for a pump
+and a valve (Tables column, Find row, Properties popup row). The harness drives the identical
+`paneColLinkQuality()`/`linkQualityResultRow()`/`linkQualityLabel()` functions Chrome uses for a
+pipe, with no type-specific branch in that code path, so the risk of a pump/valve-only defect is
+low, but I did not click a pump or valve popup open in a live browser this round: my Find query for
+Net3's two real pump IDs ("10", "335", confirmed against the shipped .lwn's own JSON) returned
+"Nothing matched" for a query that should have matched "10" the same way the junction and pipe
+queries did, and I could not diagnose why inside this round's budget -- most likely my own test
+script rather than the product (the identical scope+property+condition+value recipe worked for
+Junction and Pipe moments earlier in the same session), but I did not prove that either way.
+UNVERIFIABLE FROM HERE: open a pump's Properties box in Net3 under a chemical run and read for an
+"Average {chemical} concentration" row between Status and the bottom of the box.
+
+LEAK CHECK: `paneColSourceType()`'s `choices(n)` only prepends the "None" option `when (n &&
+!hasSourceQuality(n))` -- so the same column definition never grows an extra option on a NODE that
+already has a stated source quality, and the harness's own check 6 confirms the Tables column and
+the popup select agree on both the disabled state and the option list for both cases. No other
+column reads `hasSourceQuality()`, so this is contained to the one control R-350 named.
+
+No further findings this round -- both R-349 and R-350 are what Tom asked for, measured rather than
+argued, in the harness, in Net3's byte-identical export, and in a real running Chrome.
