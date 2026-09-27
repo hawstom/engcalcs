@@ -22,8 +22,12 @@
 //     every label in a neighbourhood as wide as a whole column of the gang, four times a pass (the
 //     crossing shed's rungs re-run the layout). Two bucket grids now hand each test only what lies
 //     beside it; the layouts are byte-identical and the repair is 3-4x cheaper.
-//   * Text 11 -> 12 and master's symbol cap explained little of either: the branch before its merge
-//     already took 3 s at the tightest of these views.
+//   * What the slide still leaves open is the room a label reserves for a longer ID (R-075). It now
+//     reserves that room on the ID row only, which is the row that grows; the gaps it still holds
+//     are counted separately from empty slots, by a second run that slides by the text alone.
+//   * Text 11 -> 12 and master's symbol cap explained part of the time, not most: the branch before
+//     its merge already asked 10-25x master's placement tests at these views, and the bigger sizes
+//     multiplied the most crowded ones by a further 3-7x (more rescues, bigger gangs).
 //
 // It asserts, on the gallery's Net3-Novato-CA-World with ID, elevation, base demand and pressure on,
 // centred on node 179 at the zooms of his screenshot (1.5x and 1.75x of the fit):
