@@ -2081,3 +2081,69 @@ one number on the branch that went the wrong way and he may not want it.
   grow switched on and off (9.2 and 6.9 text heights). That is a real defect and is not fixed.
 - The twenty-text-height leader was a real defect and is bounded: at 2x the worst top-of-column
   leader is 1.7 to 3.5 text heights across all eleven prefix lengths.
+
+## 22. R-338 AND R-351: WHAT MADE THE PASS FIVE TIMES SLOWER AND LEFT GAPS IN THE GANG (2026-09-27)
+
+Tom, R-338: *"There appears to be serious breakage afoot with no other explanation than 'Text and
+symbol sizes got bigger'."* R-351, of the Novato southwest with P, Qb and Z on: a descending gang,
+185 down to 177, with an empty slot about a text row tall between members, circled four times.
+
+### 22a. Measured, in headless Chrome, before anything was changed
+
+The gallery's Net3-Novato-CA-World, ID + elevation + base demand + pressure, centred on node 179 (his
+gang), at 1.25x to 3x of zoom to fit. The cost column is the number of placement tests (box on box,
+segment through box, segments crossing) one pass asks, counted in an instrumented copy: it does not
+move with machine load, where the milliseconds swing 2-3x. Milliseconds are the best of four.
+
+| build | x1.25 tests / ms | x1.5 tests / ms | x1.75 tests / ms | x2 tests / ms |
+|---|---|---|---|---|
+| master 70c27218 | 0.27 M / 182 | 0.21 M / 134 | 0.12 M / 119 | 0.11 M / 121 |
+| branch before its merge, 0346dc5d (text 11) | 7.0 M / 1602 | 2.4 M / 643 | 0.75 M / 239 | 0.53 M / 172 |
+| branch after the merge, c0104534 | 3.0 M / 1043 | 4.4 M / 944 | 3.4 M / 802 | 1.6 M / 394 |
+| branch head d8afdd5f | 13.5 M / 4132 | 12.6 M / 3308 | 1.7 M / 688 | 0.69 M / 270 |
+| head with the old text/symbol sizes put back | 4.4 M / 1303 | 1.8 M / 1168 | 0.51 M / 219 | 0.44 M / 265 |
+| **after R-338** | **1.7 M / 711** | **1.0 M / 621** | **0.61 M / 414** | **0.48 M / 348** |
+
+- **The time was the gang repair**: 6.9 s of a 9.3 s pass at x1.25 (CPU profile), run four times a
+  pass because the crossing shed's rungs re-lay the drawing. Each trial asked every one of its
+  members about every label in a neighbourhood as wide as a whole column of the gang, and the
+  column slide (b') made every trial a new place for every member. Gangs of 10-16 labels (the
+  rescue's long leaders cross a lot) made it grow with the square of the gang.
+- **"Sizes got bigger" explains part of it, not most.** The branch was already 10-25x master's work
+  at these views before the merge. The bigger lettering and master's symbol cap then multiplied the
+  crowded views by a further 3-7x (head against head-with-old-sizes: 13.5 M against 4.4 M at x1.25),
+  because more labels fail, more are rescued far out, and the repair's gangs grow.
+- **The gaps were the leader slide's lattice.** Its step was documented as "a quarter text height"
+  and computed as a quarter of the LABEL's height: on a four-row label, one whole text row. A label
+  could stop a row short of its neighbour, and could not move at all into clear ground less than a
+  step deep. R-108's defect, a lattice blind to the size of what it places, back in a later pass.
+  The room a label reserves for a longer ID (R-075) held open the rest, because the slide reserved
+  that width on every row, not on the ID row, which is the only one that grows.
+
+### 22b. What changed (`js/lpn-collide.js`)
+
+1. `slideTowardAnchors()` finds the exact edge of clear ground on the leader by halving, to an
+   eighth of a text row (`refineAlong()`), both beyond the first clear step and between the last step
+   and the label itself; the leave-the-line rings are refined the same way. Every point tried lies on
+   the old leader, so nothing new is crossed.
+2. The slide reserves room only on the ID row (`slideRoomSpec()`), still as wide as the claimed room,
+   so a longer ID moves nothing (R-075 holds at 4x and 8x) while the value rows stack as close as
+   their text allows.
+3. The gang repair and the slide ask their tests through bucket grids (`rectGrid()`), which hand a
+   test only what lies beside it. Layouts are byte-identical (checked in Chrome at five zooms).
+4. `COLUMN_SLIDE_STEPS` 16 -> 4: the per-label slide now closes the rest, and every measured view
+   drew the identical layout.
+5. R-339: leader length is no longer a term in the crossing shed; the id breaks a tie.
+
+### 22c. What is left, stated plainly
+
+- At Tom's views the pass is still 3-5x master's wall time (4-6x its tests). That is the branch's
+  own work -- the rescue, the repair on far more labels than master draws, and the crossing shed's
+  up-to-four re-layouts -- and it buys what master does not have: at x1.5, 255 of 282 values shown
+  against master's 204 of 278.
+- At x1.75 three gaps of 1.1-1.6 rows stay open (183/40, 189/185, 251/247), and each is the ID's
+  reserve: sliding by the text alone closes them, and then adding `12345678` moves a label at 4x.
+  R-075 against R-351 is his call; `label-gang-gap-harness.js` names them and holds the count.
+- R-339 costs one hide at 2x and 3x in `label-drop-order-harness.js` (7 -> 8, 1 -> 2).
+- Every "text heights" in this file's earlier leader numbers was divided by the label's box height
+  (four rows for a four-row label), not by a text row. `label-gang-gap-harness.js` uses text rows.
