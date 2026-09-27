@@ -41676,12 +41676,9 @@ var EngCalcs = EngCalcs || {};
 	// empty query too. It went unseen until R-226 made those lists `lpn-set-part` and the filter
 	// began walking into them row by row. dev/browser-pass/specs/labelcols.js is what caught it.
 	function setboxShow(el, show) {
-		if (!show) {
-			if (el.style.display !== 'none') { el.setAttribute('data-set-display', el.style.display); }
-			el.style.display = 'none';
-		} else if (el.style.display === 'none') {
-			el.style.display = el.getAttribute('data-set-display') || '';
-		}
+		var own = el.style.display || '';
+		if (own !== 'none') { el._setboxDisplay = own; }
+		el.style.display = show ? (el._setboxDisplay || '') : 'none';
 	}
 	function filterSetboxContainer(container, words) {
 		var shown = 0, pendingSub = null;
