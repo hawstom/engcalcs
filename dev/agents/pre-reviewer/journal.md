@@ -2346,3 +2346,191 @@ would survive (git merge is additive here), so the all-clear gate is not actuall
 still tell the orchestrator to merge master in first, on the standing rule.
 
 CITED: dev/tom-review-queue.md R-172 (2026-09-19), Tom's own three complaints, folded into Task 696.
+
+## 2026-09-26 — feat/find-coordinate (a75480e0)
+
+
+OBSERVED: dev/lpn-spike/replace-harness.js sections 8-9 (node position, Text words) ran ALL PASS
+at a75480e0 (js/looped-network.js). Re-ran with js/looped-network.js reverted to 155fc0f9^ (same
+harness kept) via a throwaway `git worktree add --detach` scratch checkout (removed after): 13
+FAILED, all in the coordinate/Text sections. Mutation coverage is real, not decorative.
+
+OBSERVED: axisNames() (js/looped-network.js:3663) is the single resolver read by the property
+popup (line 3851), the Tables column (20962, 21434), the status strip (45980/46003), and now
+Find/Replace (16920, 19048) -- so the dropdown label cannot drift from Properties' own wording.
+
+OBSERVED: setNodeCoordAxis()->writeNodeCoord() writes only the one axis (n.x or n.y) named by
+`isY`; the untouched axis is structurally never touched by a Replace on the other axis. Confirmed
+by reading, not by a dedicated harness assertion (harness section 8 checks the moved axis and the
+incident pipes, not explicitly that axis2 survives a same-write).
+
+OBSERVED: Customer (group 'customer') is NOT covered by nodeCoordReplaceSpecs() (gated to
+`d.group === 'node'`); its own position analogue is Station/Offset along a pipe, added earlier
+(Tom, 2026-09-19, per dev/property-venue-matrix.md gap notes) and unaffected by this branch.
+Text (group 'label') has no x/y Find/Replace row either -- only its words -- and CLAUDE.md/Tom's
+quotes for this branch never asked for a Text's own position, only its words.
+
+OBSERVED: property_venue_check.php exits 0 (advisory) on this branch; no 'axis'/'coord' line
+appears in its remaining-gaps list, and the matrix's #7/#8 entries are marked CLOSED with Tom's
+quotes attached correctly.
+
+SPECULATION: none needed; this branch matched its own claims on every point checked.
+
+## 2026-09-26 -- feat/placement-wizard (fd3f5506, head a7917752)
+
+OBSERVED: `dev/lpn-spike/convert-as-browser-harness.js` sections 7-10 (added in fd3f5506) render
+the real page and measure real DOM/opacity/CRS-list state; ran ALL PASS (95 checks) on the branch.
+Confirmed genuine (not decoration) by copying the same harness into a throwaway detached worktree
+at 483da66b (pre-fix, the SHA Tom actually tested) and re-running: it FAILED exactly where expected
+-- opacity stayed 0.9 instead of capping at 0.5, both wizard bars did not move under a title drag,
+and the CRS chooser at Prescott Valley listed the full 5347 rows including EPSG:32610 (10N) rather
+than the 40-row filtered list with 32612 (12N) selected. Screenshots (`/tmp/convert-as-shots/`)
+visually confirm the filtered CRS list (`9-crsbox-filtered.png`, 12N highlighted, 10N/Arizona
+correctly in/out) and the wizard bar dragged fully over the menu row (`8 Convert as-over-menus.png`).
+
+CITED: dev/session-handoff.md's "a stub harness can pass over the very defect it names" warning
+(2026-09-23 zoom-control incident) is what made the mutation check (run harness on pre-fix SHA)
+necessary here rather than trusting a green run on the branch alone.
+
+SPECULATION: the mid-session orchestrator correction said Tom himself settled item 5 ("Step 1
+already opened on your location: I think that is right") -- not independently verified with Tom,
+relayed as given.
+
+# Perry journal — feat/row-paste, 2026-09-26
+
+OBSERVED (verified live against branch a7e9a246, will decay): `paneSelSet()` (js/looped-network.js:23262)
+clamps r to `Math.min(rows.length-1, r)`; `paneSelBox()` resolves aId/fId against existing row IDs
+only (paneIndexOfId). So on a non-empty table, box.r0 is always an EXISTING row's index — there is
+no selection state representing "one past the last row". Confirmed by a direct node repro
+(script at scratchpad/perry-append-check.js): 3 existing junctions A,B,C; select C; paste 3 new
+rows D/E/F (no repeat of C's own data) -> result: junction C is GONE, replaced in place by D
+(id renamed, position overwritten to D's pasted x); only E,F are net-new. created:2, but the
+table lost C's identity entirely. This is exactly the builder's own confession in the task
+handoff, and it is NOT exercised by dev/lpn-spike/pane-row-paste-harness.js — every harness case
+that "covers" an existing row deliberately RE-TYPES that row's own current values as the first
+pasted line (see harness lines ~137-139, comment "so the block covers C and runs past the last
+row"), which papers over the destructive gesture rather than testing the ordinary case of a clerk
+who just wants to add 3 rows to a full table.
+
+OBSERVED: allIds() pools nodes+links+labels+customers in one namespace (js/looped-network.js:47032),
+pre-existing app-wide rule, not new to this branch. Net1.inp genuinely has junction "10" and pipe
+"10" (dev/water-network-examples/Net1.inp). Harness §8 confirms and documents this: pasting Net1's
+own pipe sheet verbatim is refused whole, naming rows 2-6 as ID collisions with the junctions
+already pasted. Harness explicitly frames this as "the finding this section exists to record",
+so the builder disclosed it deliberately, not by omission.
+
+OBSERVED: ran dev/lpn-spike/pane-row-paste-harness.js under flock — 69/69 pass, no failures. Vertex
+cell format matches dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md exactly (n/n/n/n
+pairs, whole-cell refuse-or-commit, comma rejected, lat/lon public order on geo project, x/y on
+grid, header states the order). One-paste-one-undo confirmed (400 rows -> one snapshot, one
+Ctrl+Z removes all 400). 400-row paste into an empty table measured 2663 ms in the Node/jsdom-style
+stub — real Chrome timing not measured here (UNVERIFIABLE FROM HERE).
+
+No keyboard path (Enter/Tab/Arrow at the last row) creates a row either — paneHandleKey navigation
+uses the same clamped paneSelSet, confirming paste is the ONLY door and the append-destroys-a-row
+finding is not sidesteppable by any other gesture.
+
+# Perry journal, second pass — feat/row-paste, head f312278b, 2026-09-26
+
+OBSERVED (real Chrome, headless, driven via CDP through dev/lpn-spike/browser-drive.js against a
+plain `php -S 127.0.0.1:8119` instance serving the worktree, since the Apache vhost for 8119 in
+ports.conf was never reloaded into the live Apache config): loaded Net1.lwn (junction 10 + pipe 10
+already present), Junctions pane.
+
+CONFIRMED — original repro (A,B,C append D,E,F, existing rows byte-identical): armed the table via
+the cell context menu's "Paste as new rows", fired a real DOM `paste` ClipboardEvent (real
+listener, real code path — see the Ctrl+Shift+V finding below for why this substitutes for OS
+keystrokes) with 3 new junction rows. Before: 9 rows ids 10,11,12,13,21,22,23,31,32. After: same 9
+first, then NEW1,NEW2,NEW3 appended. `appendArmed` class was present before the paste and gone
+after — the table disarms itself once used.
+
+CONFIRMED — ordinary paste never overwrites silently: standing on an existing row (id "10") and
+firing a plain paste with a different ID produces the dialog "1 IDs don't match. Paste anyway?"
+rather than a silent overwrite — this is the R-side of the very defect my first review found.
+
+CONFIRMED — rename-then-overflow order and wording, in a real rendered dialog, not the jsdom
+harness: pasted 11 differently-IDed rows onto a 9-row table. Dialog 1: "9 IDs don't match. Paste
+anyway?" [Paste/Cancel]. Clicking Paste raised dialog 2: "This paste has 11 rows, and 9 of them fit
+in the table. Add the other 2 as new rows at the bottom?" [Add 2 rows / Paste only the 9 that fit /
+Cancel] — exact wording Tom asked for, exact order (rows judged first, is-it-an-overflow second).
+Add 2 rows landed all 11 renamed IDs; one Ctrl+Z (dispatched as a JS KeyboardEvent against the
+app's own document-level `ctrlKey && key==='z'` listener — legitimate, since that is app code
+reading the event, not a native browser command) restored the original 9 rows and IDs exactly.
+
+MISSED — a node and a link both "10": Find does not tell them apart. Searched
+`Everything.ID equal to 10` on Net1 (its own junction 10 and pipe 10). Real rendered results box:
+"2 found. Click one to go to it." with both result rows' visible text being the bare string `"10"`
+— nothing on screen says one is the junction and one is the pipe. Traced to
+`js/looped-network.js` `findResultRow()`: `row.textContent = ... c.el.id + (... findState.prop ===
+'id' ? '' : ...)` — when the search property is literally ID (the exact case a shared-ID collision
+produces), the group-distinguishing half of the label is suppressed, leaving two identical rows. A
+person who pastes J1/P1-style same-ID data (which Tom explicitly ruled in) and then goes looking
+for "10" cannot tell which result is which without clicking through both. This sits squarely on
+Tom's own named risk ("a node and a link both '10' then Find ... tell them apart") and is not
+covered by dev/lpn-spike/pane-row-paste-harness.js, which never drives the Find UI at all.
+UNVERIFIABLE FROM HERE past this: whether the two rows land on visually distinguishable map
+symbols/labels once clicked, and whether the .inp export keeps them apart on the page (the .inp
+format itself keeps [JUNCTIONS] and [PIPES] in separate sections by construction, so export is very
+likely fine, but I did not get a clean read on the Properties popup selector to confirm click-through
+selection targets the right element each time — a person should click both "10" rows and check the
+status/property box names the right element type each).
+
+UNVERIFIABLE FROM HERE, and worth Tom's own attention rather than mine: whether Ctrl+Shift+V
+"really works" as a physical keystroke in a real (non-headless) Chrome. I could not settle this
+from here at all: CDP's `Input.dispatchKeyEvent`, sent with real modifier bits against a real
+focused `<input>`, does NOT deliver a native `paste` DOM event in this headless Chrome even for a
+PLAIN Ctrl+V on a bare `<textarea>` with real clipboard content (control test: 0 characters landed).
+That is a ceiling of the measurement tool, not evidence the feature is broken — but it is also not
+evidence it works. The armed-Ctrl+V path (arm via menu, then the ordinary browser paste event) is
+the one Tom is more likely to actually use day to day and is unaffected by this gap, since it needs
+no native key interception at all, only the same `paste` event the mouse-menu route needs. Ctrl+Shift+V
+specifically still needs a real keyboard on a real desktop Chrome window to settle.
+
+CONFIRMED — armed-state visibility: right-clicking a cell shows "Paste as new rows  Ctrl+Shift+V"
+in the menu; choosing it adds a real, visible notice text ("Press Ctrl+V to add the copied rows at
+the bottom of this table. Press Esc to cancel.") measured non-empty and laid out (offsetWidth/
+offsetHeight > 0) in the rendered page, plus a CSS class on the pane host. Escape clears the class.
+
+CONFIRMED — 69/69 and 116/116 of dev/lpn-spike/pane-row-paste-harness.js pass against this exact
+commit (re-ran it myself, not trusting the builder's own report of green). It covers the vertex
+cell format, Net1 verbatim, the twenty-bad-IDs-one-notice case, node/link ID-sharing at the data
+level, and one-paste-one-undo — none of that needed re-verifying by hand once I'd re-run it and
+independently confirmed its overflow/rename/append findings against real DOM dialogs above.
+
+SPECULATION: the Find defect above is a pre-existing `findResultRow()` behavior, not new code in
+this branch — but this branch is what makes shared IDs a normal, encouraged outcome (Tom: "Junctions
+and pipes can use same ID. Yes."), so the branch is what turns a previously rare cosmetic gap into
+a routine one. Worth naming to Tom as a one-line follow-up regardless of whose branch owns the fix.
+
+# Perry review, feat/label-gang-search R-290, 2026-09-26
+
+OBSERVED: node dev/lpn-spike/label-merge-attribution-measure.js on current tree (091e58b9) gives
+"drawing new, fit new, cap new: x2 49/7/199, x3 16/1/259" -- matches build agent's claim
+72->49 giving up a value, hidden 7, 3x hidden 0->1.
+
+OBSERVED: all 7 re-baselined harnesses (label-drop-order, label-prefix-acceptance, label-slide,
+label-widen, label-width-cause, label-width-stability, node-shed) pass on current tree, 128
+checks total, no failures.
+
+OBSERVED: node-shed-harness.js lines 385-388, the build agent's own comment: floor lowered
+9->6 "AND THE MUTATION NO LONGER FAILS IT ... This floor holds the count; it no longer tells
+the two cascades apart on this view." Self-disclosed loss of discriminating power in that
+harness, not hidden.
+
+OBSERVED: js/lpn-collide.js line ~1838-1843: rescue budget explicitly "COUNTED IN OBSTACLE
+TESTS, NOT MILLISECONDS ... Counted rather than timed so the same drawing always gets the same
+answer." When exhausted, "the labels still waiting are dropped exactly as they were before the
+rescue existed" -- clean fallback, not half-placed state, per code comment (not independently
+fuzz-tested for determinism across repeated runs in this session -- ran out of time budget).
+
+OBSERVED: commit 091e58b9 gates labelRescueWork() to 0 while fitMeasuring, then reshedNow()
+once after settleLoop -- self-consistent with "no rescue during zoom-to-fit" claim.
+
+UNVERIFIED: did not independently time a real browser Novato 2x pass / Net3 fit branch vs
+master (budget ran out); only the node-harness "content pass" ms printout (2258 ms x2, current
+code) was checked, which is same order of magnitude as the claimed ~2.5 s but is not a browser
+wall-clock measurement.
+
+UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom to fit lands on
+the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
+no browser session was opened this pass, only Node DOM-stub harnesses.

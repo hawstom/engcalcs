@@ -1557,3 +1557,32 @@ speed question is about typing INTO a network that already exists, and the creat
 the network not existing yet. Fixing the first without the second is fixing the smaller number.
 
 — Declan
+
+## Thirteenth invocation, 2026-09-26 — the full Task 610 spec, assembled
+
+**OBSERVED**: the vertex-cell format and the whole-block-refuse recommendation were already fully
+specified in `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` (2026-09-09, re-verified
+2026-09-19). This invocation was asked for the REST of Task 610 — where the paste-to-add fires,
+required columns/defaults per element type, the exact ID-collision wording (including a gap the
+prior spec's cited `validateNewId()` does not close: it never checks two pasted rows against EACH
+OTHER, only against elements that already exist), From/To ordering, undo, and the post-paste
+notice. I wrote that up as `declan-610-spec.md` in this session's scratchpad, destined for
+`dev/paste-creates-rows-spec.md`.
+
+**OBSERVED** `js/looped-network.js:23734-23768`, `panePasteAt()`: the row-append point I recommend
+is the existing `if (box.r0 + r >= rows.length ...) { dropped++ }` line at `:23748` — turning that
+branch into a validated CREATE path rather than a discard is the whole mechanical change §1 of the
+new spec asks for; nothing else in the paste pipeline (tiling, undo, notice plumbing) needs to
+change shape, only grow a new case.
+
+**SPECULATION**: I recommended no "new row" UI affordance at all — a paste appending past the last
+row should just grow the table, the way Excel/Sheets already do, with no dialog. I have not tested
+this against a real 400-row EPANET-exported table; a future invocation with a sample `.inp`-derived
+CSV should paste it through whatever gets built and confirm the append boundary actually lands where
+a clerk expects it (immediately below the last row, not requiring an exact-match selection size).
+
+**Where each file goes:** `declan-610-spec.md` → `dev/paste-creates-rows-spec.md` (new file, not yet
+written into the repo — I was told not to write into the live tree this session). This journal entry
+→ append to `dev/agents/data-entry-clerk/journal.md`.
+
+— Declan

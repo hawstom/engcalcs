@@ -8,9 +8,9 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Two branches may not merge without Tom's all-clear** (in `protected` in
-  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/table-editing`,
-  `feat/convert-as`.
+- **Four branches may not merge without Tom's all-clear** (in `protected` in
+  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/label-gang-search`, `feat/placement-wizard`,
+  `feat/find-coordinate`, `feat/row-paste`.
 - **Every one of them fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -95,37 +95,44 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-26 (evening)
+## STATE — 2026-09-26 (late evening)
 
-### Production is 83bf02d5 (Tom pulled 2026-09-26; checked over ssh)
+### Production is 83bf02d5 (Tom pulled 2026-09-26). Master f038eba5 is ahead of it
 
-Master d6132d0c is ahead of it and fixes both production error_log fatals: an Accept-Language
-q-value with a space ("en; q=0.8") answered 500 (`accept_language_check.php`), and `spock.php` ran
-out of memory on the 11 MB lang log (now streams; `usage_report_memory_selftest.php`). Also: Task
-708's guard now fails on a reopened gap; Tasks 682, 715, 716 closed. He deploys at his pleasure.
+Master now carries feat/table-editing and feat/convert-as (both on his all-clear) and fix/table-help
+(his two Help tables, verbatim). Also still unpulled: the two error_log fatal fixes from d6132d0c.
+The permission guard refuses an AI write to `dev/branch-all-clears.json` from Bash; the Edit tool
+raises a prompt he can approve, which is how both all-clears were recorded.
 
-### Awaiting his browser pass
+### Awaiting his browser pass (all green but for payload freshness, all Perry-reviewed)
 
-- **8105 `feat/table-editing`** c28c6f3c, green but for payloads, Perry-reviewed: his fifth round,
-  R-283..R-289. Open question R-285: the half-column drag threshold is 288 px on a widened
-  Description column. Leftovers: the sorted arrow covers the heading's last letter; no dark theme.
-- **8116 `feat/convert-as`** 483da66b, green but for payloads: four defects fixed on the answered
-  path (R-172(1) image lag, a 13 px Step 1, Step 2's unit, the turn sentence); R-172(2) satellite
-  not reproduced. His 09-16 wording implemented; five keys deleted; a `$ec_lang_syn` diff for
-  lpn_geomap / lpn_xymap proposed, NOT applied. Perry confirmed all four against the pre-fix code.
-  Port 8116 needs his Apache reload. Merge master in before merging it up.
-- **8090 `feat/label-gang-search`** c0104534: master merged in, and six of its own harnesses now
-  fail on its limits, because master's symbol-size rule (d039bb13) and zoom-to-fit (9ba0d25e) undo
-  part of its gains (x2 Novato: 72 labels give up a value, was 22). Limits NOT relaxed. Needs a
-  design decision before any pass. R-075 still holds at 4x and 8x.
+- **8117 `feat/placement-wizard`** a7917752 -- R-291..R-295: backdrop capped at 50% in both
+  wizards, draggable bars, coordinate-system list filtered to the location (40 of 5,347 at Prescott
+  Valley), UTM zone preselected. New string: '{n} of {total} coordinate systems cover this network.'
+- **8118 `feat/find-coordinate`** a75480e0 -- Task 708 gaps 7 and 8: node coordinates in Find and
+  Replace; a Text's words replaceable whole. No new strings.
+- **8119 `feat/row-paste`** 79689882 -- Task 610, Declan's spec (`dev/paste-creates-rows-spec.md`)
+  reshaped by his rulings: an explicit "Paste as new rows" (menu arms, then Ctrl+V; or
+  Ctrl+Shift+V), overflow prompt, his "{n} IDs don't match. Paste anyway?", separate node and link
+  ID namespaces (his ruling). Open: does Ctrl+Shift+V reach the page in real Chrome (Perry could
+  not test a native paste); the status-bar line with a shared ID is unchecked; Ctrl+Shift+V is not
+  in his Help table (his text).
+- **8090 `feat/label-gang-search`** 091e58b9 -- R-290 answered: the merge was clean; master's
+  Novato example changed and its symbol cap shrank the search. Reworked rescue: Novato 2x 72 -> 49,
+  but a pass is ~2.5 s vs ~2.0 s; seven limits re-baselined on master's drawing.
+- Ports 8117-8119 need his Apache reload (commands below).
 
 ### Open with him
 
-- R-235, the WaterCAD sample .inp from IOD. R-285 above. Task 708 gaps 7 and 8.
+- R-297: the `$ec_lang_syn` for lpn_geomap / lpn_xymap, context given in the report.
+- Task 697 (EPANET++): Mary says "++" reads as a superset claim and two self-canonical domains split
+  a weak signal; recommends one canonical domain and a 301. His call before any copy.
+- R-235 (WaterCAD sample .inp from IOD).
 
 ### Translation sprint
 
-Not launched. Launch after table-editing merges, so one sprint covers it.
+Not launched. Table-editing's keys are on master; placement-wizard and row-paste add ~20 more.
+Launch once those two merge, so one sprint covers all three.
 
 ## Commands to hand Tom with any panel change
 
