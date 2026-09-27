@@ -24038,7 +24038,7 @@ var EngCalcs = EngCalcs || {};
 	// the old input type refused silently now has to be refused out loud. The cell goes back to
 	// what the document holds rather than writing NaN into a field of the user's, which nothing
 	// downstream could tell from a value they meant.
-	function paneCommitCell(input) {
+	function paneCommitCell(input, opts) {
 		var ctx = input && input._lpnCell, c, el, p, was;
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
@@ -24076,7 +24076,12 @@ var EngCalcs = EngCalcs || {};
 		// inside afterPropertyEdit() and updateNode() nest into it for free.
 		beginMapBoxHold();
 		try {
-		if (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
+		// **A CALLER THAT ALREADY TOOK THE ONE SNAPSHOT FOR A LARGER OPERATION SAYS SO** (Task 690,
+		// Ctrl+Enter): committing the anchor's in-progress edit is one write inside a broadcast that
+		// needs exactly one undo step for the whole thing, anchor included -- so `opts.noSnapshot`
+		// lets the caller take that single snapshot itself, before this write, rather than getting
+		// a second one here that would split Ctrl+Z into two presses.
+		if (!(opts && opts.noSnapshot) && !(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
 		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
@@ -24575,19 +24580,26 @@ var EngCalcs = EngCalcs || {};
 	 * precedent paneFillDown() and paneDeleteSelection() already set: broadcasting an id would ask
 	 * validateNewId() to refuse the same collision once per cell, an alert-storm already ruled out.
 	 *
-	 * **ONE saveUndoSnapshot() FOR THE WHOLE OPERATION**, taken only once something in the box is
-	 * actually settable -- an all-read-only box never reaches here (paneHandleKey() only calls this
-	 * once the box is more than one cell; a box with nothing settable still must not push a no-op).
+	 * **ONE saveUndoSnapshot() FOR THE WHOLE OPERATION, THE ANCHOR'S OWN COMMIT INCLUDED** (pre-review
+	 * finding on d0858ea8, real Chrome: typing into the anchor and pressing Ctrl+Enter took TWO
+	 * undo steps -- one Ctrl+Z restored only the broadcast cells and left the anchor's freshly typed
+	 * value standing until a second press). `pendingCommit` is the anchor's own `<input>` when it is
+	 * still mid-edit; committing it is one of the writes this single snapshot has to cover, so it is
+	 * taken FIRST, before that commit, and `paneCommitCell(pendingCommit, { noSnapshot: true })`
+	 * is told not to take its own -- the one place in this file that asks it not to. Taken only once
+	 * something in the box is actually settable -- an all-read-only box never broadcasts anything,
+	 * so the anchor's own edit (if any) still commits normally, with its own ordinary snapshot,
+	 * exactly as leaving the cell any other way would (a box with nothing settable must not push a
+	 * second, no-op snapshot on top of that).
 	 *
 	 * **THE SELECTION IS NOT COLLAPSED.** `spec.sel` is never touched here, and paneSelPaint() is
 	 * called again once the render settles, so the box the person had stays exactly as it was --
 	 * the one behavioral difference from ordinary Enter that makes this worth having.
 	 */
-	function paneCtrlEnterFill(spec, box) {
+	function paneCtrlEnterFill(spec, box, pendingCommit) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), pc = EngCalcs.pageConfig || {},
 			anchorEl = rows[box.ar], text, r, c, col, el, wrote = 0, refused = 0, any = false;
 		if (!anchorEl || !cols[box.ac]) { return false; }
-		text = paneCellText(cols[box.ac], anchorEl);
 		for (r = box.r0; r <= box.r1; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				if (r === box.ar && c === box.ac) { continue; }
@@ -24596,8 +24608,15 @@ var EngCalcs = EngCalcs || {};
 				any = true;
 			}
 		}
-		if (!any) { return false; }
+		if (!any) {
+			// Nothing to broadcast, but a pending edit on the anchor is still a real, ordinary
+			// commit -- it takes its own snapshot exactly as leaving the cell any other way would.
+			if (pendingCommit) { paneCommitCell(pendingCommit); }
+			return false;
+		}
 		saveUndoSnapshot();
+		if (pendingCommit) { paneCommitCell(pendingCommit, { noSnapshot: true }); }
+		text = paneCellText(cols[box.ac], anchorEl);
 		for (r = box.r0; r <= box.r1; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				if (r === box.ar && c === box.ac) { continue; }
@@ -24689,21 +24708,17 @@ var EngCalcs = EngCalcs || {};
 			return true;
 		}
 		// **CTRL+ENTER FILLS THE STANDING SELECTION** (Task 690), checked before the plain `Enter`
-		// case below and, unlike Ctrl+D, whether or not the active cell is still mid-edit --
-		// committing the in-progress value into the model is the first thing it has to do, so the
-		// text just typed into the anchor is what gets broadcast. A box that is empty or a single
-		// cell has nothing to broadcast and falls through to ordinary Enter, unchanged, below.
+		// case below and, unlike Ctrl+D, whether or not the active cell is still mid-edit -- the
+		// in-progress value is passed to paneCtrlEnterFill() as `pendingCommit`, which commits it as
+		// PART OF the fill's own single undo snapshot, rather than committed here first under its
+		// own separate one (that split a single Ctrl+Enter into two undo steps -- pre-review finding
+		// on d0858ea8). A box that is empty or a single cell has nothing to broadcast and falls
+		// through to ordinary Enter, unchanged, below.
 		if (jump && key === 'Enter' && box && (box.r1 > box.r0 || box.c1 > box.c0)) {
-			if (editing && active) { paneCommitCell(active); }
-			rows = paneTableRowsInOrder(spec);
-			cols = paneCols(spec);
-			box = paneSelBox(spec, rows, cols);
-			if (box && (box.r1 > box.r0 || box.c1 > box.c0)) {
-				if (!paneCtrlEnterFill(spec, box)) {
-					setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
-				}
-				return true;
+			if (!paneCtrlEnterFill(spec, box, editing ? active : null)) {
+				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
 			}
+			return true;
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is

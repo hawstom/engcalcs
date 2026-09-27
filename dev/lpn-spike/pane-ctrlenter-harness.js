@@ -232,5 +232,35 @@ console.log('\n--- 9. Ctrl+Enter commits an in-progress edit first, then broadca
 	});
 }
 
+console.log('\n--- 10. ONE Ctrl+Z undoes the WHOLE Ctrl+Enter, the anchor\'s own typed commit included ---');
+{
+	// Pre-review finding on d0858ea8: typing into the anchor through the REAL edit path (unlike
+	// every test above, which pre-loads it with L.setCell() and never touches paneCommitCell()) and
+	// pressing Ctrl+Enter took TWO undo steps in real Chrome -- the anchor's commit pushed its own
+	// snapshot before the broadcast pushed a second one, so one Ctrl+Z restored only the two
+	// non-anchor rows and left the anchor's freshly typed value standing until a second press.
+	ids.slice(0, 3).forEach((id, i) => L.setCell('junctions', id, 'demand', 200 + i));
+	const before = ids.slice(0, 3).map((id) => L.cellText('junctions', id, 'demand'));
+	L.selectBox('junctions', 'demand', 'demand', 0, 2);
+	const anchorInput = L.focusable('junctions', ids[0], 'demand');
+	anchorInput.focus();
+	L.enterEdit(anchorInput, true);
+	anchorInput.value = '999';   // typed, not yet committed -- the real edit path, not L.setCell()
+	const d0 = L.undoDepth();
+	ctrlEnter('junctions');
+	ids.slice(0, 3).forEach((id, i) => {
+		report(L.cellText('junctions', id, 'demand') === '999', 'row ' + i + ' reads the anchor\'s typed value (999)',
+			L.cellText('junctions', id, 'demand'));
+	});
+	report(L.undoDepth() === d0 + 1, 'the anchor\'s own commit and the broadcast are ONE undo step, not two',
+		d0 + ' -> ' + L.undoDepth());
+	L.undo();
+	ids.slice(0, 3).forEach((id, i) => {
+		report(L.cellText('junctions', id, 'demand') === before[i],
+			'ONE Ctrl+Z restores row ' + i + ' -- the anchor included, not left at 999',
+			L.cellText('junctions', id, 'demand'));
+	});
+}
+
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);
 process.exit(failures ? 1 : 0);
