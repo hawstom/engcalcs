@@ -466,8 +466,11 @@ console.log('\n--- one home for the concept ---');
 	// puts every label offset back to the number it arrived with, as the difference of its captured
 	// tip and base -- two WORLD points in lon/lat, so both come through this door. Before it, the
 	// whole-world opening transform had left them the size of a continent.
-	ok('inwardX has one definition and 33 call sites', count(/inwardX\(/g) === 34, count(/inwardX\(/g));
-	ok('inwardY has one definition and 34 call sites', count(/inwardY\(/g) === 35, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR THE WORLD-VIEW FIT AT STEP 1** (R-306). `mapgeoWorldFit()` centres the
+	// camera on the anchor -- 0 N 0 E -- and that anchor is a DOC point, so it comes through this
+	// door exactly as `zoomExtent()`'s own centring would have.
+	ok('inwardX has one definition and 34 call sites', count(/inwardX\(/g) === 35, count(/inwardX\(/g));
+	ok('inwardY has one definition and 35 call sites', count(/inwardY\(/g) === 36, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
