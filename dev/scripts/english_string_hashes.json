@@ -3114,13 +3114,11 @@
         "lpn_settings_legend_position": "8a7a163396239afaf5ce1518846ded3a69a992ae",
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
-        "lpn_settings_sym_link": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
         "lpn_settings_link_width": "3bc2bdae2e870971298fbd0f0485edc1967526c9",
         "lpn_settings_map_display": "986ff567ff2c4fc5523453c2180dd843d731c11a",
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
         "lpn_settings_no_match": "f323e88618d328cf97d644f8e7e27c817528dd4d",
         "lpn_settings_sym_all": "1d9001337c8660d173b9d7081a44d11a88b6237a",
-        "lpn_settings_sym_node": "ebb5a7f654357f1637ce907072a9645a896cf42d",
         "lpn_settings_option_unset": "c092c44522aa2bd88c0787297ca60e385c3db155",
         "lpn_settings_page": "fb06270f7c212baabc8749ffc36e49dc8f321548",
         "lpn_settings_page_note": "ecb671010d8f9b8085e93c9cb220790442f768c9",
@@ -8812,10 +8810,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_settings_sym_link": {
-            "words": 2,
-            "ends_sentence": false
-        },
         "lpn_settings_link_width": {
             "words": 4,
             "ends_sentence": false
@@ -8834,10 +8828,6 @@
         },
         "lpn_settings_sym_all": {
             "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_settings_sym_node": {
-            "words": 2,
             "ends_sentence": false
         },
         "lpn_settings_option_unset": {

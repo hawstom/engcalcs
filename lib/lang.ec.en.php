@@ -2570,19 +2570,36 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priority';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first and is also the rightmost (last in English) on the label.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first, and the ID is never dropped. When only the ID and one value are left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
-$ec_lang['lpn_labels_col_before']='Before';
+$ec_lang['lpn_labels_col_before']='Bef.';
 $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time';
-$ec_lang['lpn_labels_col_after']='After';
+$ec_lang['lpn_labels_col_after']='Aft.';
 $ec_lang_syn['lpn_labels_col_after']='After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time';
 $ec_lang['lpn_labels_col_decimals']='Decimals';
+// ---- R-326..R-334 (2026-09-26): Show order, Use units, the customer Drop column, the new rows ----
+// "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
+// display first, but also may need to drop first."). As short as "Drop" and for the same reason:
+// it heads a box about three characters wide, and its tip carries the whole meaning.
+$ec_lang['lpn_labels_col_show']='Show';
+$ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.';
+$ec_lang['lpn_labels_priority_customer_tip']='The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
+// Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
+// It heads a narrow column and names each row's tick box.
+$ec_lang['lpn_labels_use_units']='Use units';
+$ec_lang['lpn_labels_use_units_tip']='Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.';
+// EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
+$ec_lang['lpn_labels_init_status']='Initial status';
+// The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
+// Customer"). The two label entries reuse lpn_labels_heading_node/_link.
+$ec_lang['lpn_settings_sym_node_colors']='Node colors';
+$ec_lang['lpn_settings_sym_link_colors']='Link colors';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';
 $ec_lang['lpn_backdrop_add']='Add';
@@ -3209,8 +3226,6 @@ $ec_lang['lpn_settings_sec_symbology']='Symbology';
 $ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
-$ec_lang['lpn_settings_sym_node']='Node';
-$ec_lang['lpn_settings_sym_link']='Link';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.

@@ -8,8 +8,25 @@ give some attention to adding all missing properties to Settings Node and Link s
 the obvious two, and every property a popup or a table offers is accounted for -- either as a gap
 with a recommendation, or as a deliberate absence with the reason.
 
-**NOTHING IN THIS DOCUMENT IS BUILT.** It is a list, a reason per row, and a ranked
-recommendation. Promoting a row is Tom's call.
+**THE LABEL HALF IS NOW TOM'S TABLE, `dev/symbology-defaults.csv`** (R-334, 2026-09-26: *"See
+dev/settings-symbology-defaults.csv. Rename if needed. I see that there is already a
+symbology-property-audit.md. Harmonize as needed."*). That file is the one authority for which
+properties a map LABEL offers and what each opens with -- Show?, Before, After, decimals per unit
+system, Show order and Drop order. `LPN_LABEL_TABLE` in `js/looped-network.js` transcribes it, and
+`dev/lpn-spike/symbology-table-harness.js` fails if the page, the CSV or any gallery example
+disagree. Where this document and the CSV disagree, the CSV wins. What his table settled here:
+
+* **3f (the two reaction coefficients) and 3g (tag and description) are built as LABELS**: node and
+  link Description and Tag, and a pipe's Bulk and Wall reaction coefficients (printed only while a
+  chemical is tracked). Link **Initial status** is new, beside the run's Status. Their COLOUR half
+  is still open, as below.
+* **Every label row has a Drop order, the node ID included** (R-326), and a separate **Show order**
+  (R-329); the Customer list has both columns.
+* **Net inflow** is a row in his table that no property on this page answers. It is recorded in the
+  CSV with key `-` and is his to define.
+
+The colour half of this audit is unchanged: **nothing below about "Colourable" is built**, and
+promoting a row is Tom's call.
 
 ---
 
@@ -19,7 +36,7 @@ Two structures decide what the Settings box offers:
 
 | What | Where | Read by |
 |---|---|---|
-| Which properties get a map LABEL | `defaultLabelSettings().node` / `.link` in `js/looped-network.js` | the Labels checkboxes, the legend, both pushes, the audit halos |
+| Which properties get a map LABEL | `dev/symbology-defaults.csv`, transcribed as `LPN_LABEL_TABLE` in `js/looped-network.js` | the Labels checkboxes, the legend, both pushes, the audit halos |
 | Which properties a map may be COLOURED by | `COLOR_NODE_FIELDS` / `COLOR_LINK_FIELDS`, ordered by `COLOR_FIELD_ORDER` | the two "Color ... by" selectors, the ramp, the colour legend |
 
 They are deliberately not the same list. A label prints a value; a ramp needs one that can be
@@ -31,6 +48,9 @@ name. Three already are: the required fire flow, the two reaction coefficients, 
 through `FIND_EXTRA_LINK_FIELDS`.
 
 ## 2. The state today, measured
+
+*As measured 2026-09-18; the label lists have since grown to Tom's table (see the top of this
+file).*
 
 **NODE labels and NODE colour agree exactly.** Labels offer `id, elev, demand, demandActual, head,
 pressure, quality, initQuality`; colour offers the same seven minus `id`, which is correct because

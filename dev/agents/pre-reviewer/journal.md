@@ -2469,6 +2469,111 @@ UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom 
 the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
 no browser session was opened this pass, only Node DOM-stub harnesses.
 
+# Perry review, feat/symbology-label R-326..R-334, 2026-09-27
+
+Served the worktree myself: `php -S` docroot = worktree's PARENT (not a symlink), `flock
+/tmp/engcalcs-browser.lock` held for every Chromium run, via dev/browser-pass's own
+lib/env.js+lib/session.js reused directly from ad hoc scripts (not through run.js). Killed the
+server after each script exited; confirmed no leftover `php -S` process at the end.
+
+OBSERVED (MISSED) -- the Decimals box in an OPEN Settings panel does not live-update on a unit
+change, though the underlying data does. Real Chrome: opened Settings > Link labels, Flow row
+read decimals "0" (gpm). Switched the Flow unit to MGD via the units strip, confirmed
+"Non-destructive" on the real reinterpretation dialog. The Decimals input for Flow, still on
+screen, stayed "0". Closing Settings and reopening it showed "3" -- the correct value per R-328's
+own worked example (gpm->MGD, 0->3) -- proving `followUnitDecimals()` ran correctly but
+`afterUnitChange()` (js/looped-network.js ~38439) never repaints the currently-open Labels list's
+decimals spinners, unlike the "Use units" After boxes, which DO live-refresh via the tracked
+`useUnitsBoxes` array in the same commit. A person testing R-328 by watching the panel while
+switching units -- the natural way to test it -- sees a stale, wrong-looking number.
+
+OBSERVED (MEDIUM, harness bug the branch introduced) -- dev/browser-pass/specs/labelcols.js
+throws when run against this branch: `git diff master...HEAD -- dev/browser-pass/specs/labelcols.js`
+shows the build agent added `lpn_labels_customer_fields` to `LISTS` and wrote an `isField` filter
+meant to skip the Customer list's trailing note/zoom-limit rows -- but the filter runs only
+*after* `rows.map()` has already dereferenced `row.children[0].textContent` on every row,
+including the note div (0 element children, text-node only), which throws
+`Cannot read properties of undefined`. Ran it myself: `flock /tmp/engcalcs-browser.lock node
+dev/browser-pass/run.js labelcols` -- 40/41 checks pass (Node and Link lists both get full
+pixel-alignment coverage), then the section throws and is counted as 0/1 sections completed. So
+the claim "six columns, pixel-aligned, on every list, in real Chrome" is verified for Node and
+Link but NOT for Customer -- nobody's automation actually finished checking Customer's heading
+alignment. I independently confirmed Customer's STRUCTURE by hand (6 rows: ID, Description, Tag,
+Base demand, Number of services, Demand; each row holds the right input count, e.g. 7 for a
+numeric row with a decimals spinner, 5 without) but did not re-derive the crashed spec's own
+sub-pixel alignment check for that list.
+
+OBSERVED (MEDIUM, leak, mostly pre-existing but now covers new fields) -- a new project inherits
+the PREVIOUS project's label customizations rather than Tom's table defaults, which CLAUDE.md's
+lpn_ settings section states as a rule ("A new project gets hard-coded defaults"). Real Chrome:
+unticked "Use units" for Length in one project (leaving its own After text), then called
+`a.newProject('us')` (File > New project > Blank project, the real menu path) -- the fresh
+project's own Length row opened with Use units UNTICKED, inheriting the previous project's
+choice rather than the CSV's US default (ticked). `git blame` traces `labelSettings =
+inheritedLabels` in `newProject()` to e4fc5c5ce, 2026-07-31 -- predates this branch, so the
+inheritance mechanism itself is not new. What this branch changes is scope: Use units and Show
+order are new fields inside the same `labelSettings` object that mechanism copies wholesale, so
+both now leak into every new project exactly like every older label setting already did. Worth a
+sentence to Tom either way: the rule in CLAUDE.md and the shipped behaviour disagree, and this
+branch is the one that just added two more things riding the disagreement.
+
+OBSERVED -- the Settings index keeps a sixth "All" entry (`lpn_set_sub_nodeLink`) beside Tom's
+five (R-333: "Node labels, Node colors, Link labels, Link colors, Customer"). Read via
+`page.evaluate` on the real rendered `#lpn_setbox_index` nav: entries are Node labels, Node
+colors, Link labels, Link colors, Customer, All, then Map and page's own group. Tom named five;
+this is a sixth. It holds the "both kinds at once" controls (from the code's own comment above
+the section), so it may be a deliberate, defensible carry-over rather than an oversight -- but he
+did not ask for it and should say whether it stays.
+
+CONFIRMED -- real touch tap (Playwright `hasTouch:true, isMobile:true`, 390x844, `.tap()` on a
+real element handle) on a Decimals box selects the ENTIRE value and is `type=text
+inputmode=numeric`: measured `selectionStart:0, selectionEnd:1` on a one-character "0" (R-330).
+Also confirmed `matchMedia('(pointer: coarse)').matches === true` under this emulation, so the
+touch code path is the one actually exercised.
+
+CONFIRMED -- "Use units" toggle, real Chrome, Link labels: Length row opens ticked, After box
+disabled, showing "'" (US) — matches dev/symbology-defaults.csv exactly (Before empty, After
+US=`'`). Switching the length unit ft->m (through the real reinterpretation dialog, Non-
+destructive) updates the still-ticked After box live to " m", disabled stays true. Diameter
+row same, in->mm live-updates to " mm". Unticking Length's Use units box makes the After box
+editable, keeps "'" as ordinary text, and a later unit change on a DIFFERENT untied row's own
+unit leaves that typed text alone.
+
+CONFIRMED -- Settings index has all five of Tom's named entries in his order (Node labels, Node
+colors, Link labels, Link colors, Customer) and each button's `data-sub`/`data-sec` jump lands
+within 60px of the pane's own top after a real click (measured `getBoundingClientRect()` before
+and after).
+
+CONFIRMED -- no em dash in any English string this branch's diff touches: `git diff
+master...HEAD -- lib/lang.ec.en.php | grep '—'` returns nothing.
+
+CONFIRMED -- re-ran dev/lpn-spike/symbology-table-harness.js myself (not trusting the build
+agent's own report): every section passes, including "every gallery example opens on the same
+table" for all 7 .lwn examples against dev/symbology-defaults.csv, "every showable property has a
+Show order and a Drop order" for node/link/customer under all three quality modes, and the touch
+number-box behaviour (6b) -- though 6b's jsdom version only checks the `inputmode`/class
+attributes exist, not an actual focus-then-select measurement, which is why I re-verified that
+part by hand in real Chrome above rather than trusting the jsdom pass alone.
+
+UNVERIFIABLE FROM HERE -- whether the 7 gallery examples LOOK sane once opened (label overlap,
+crowding, anything a person's eye catches that a position number would not) -- I did not open
+each example and look, only confirmed via the harness that the CSV's Show?/Before/After/decimals
+values are transcribed correctly into each file's effective label set.
+
+UNVERIFIABLE FROM HERE -- Tom's R-075 acceptance test (adding "12345678" to a node's ID must not
+move or hide any label) against this branch's node-ID-drops-early change (R-326 gives node ID its
+own Drop order of 2, very early — previously it likely could not be dropped by value at all,
+only a whole label could vanish). I did not have time this pass to reproduce the original R-075
+repro on Net3 and diff it against master's label positions/hidden count. This is the one item
+here closest in shape to the two 2026-09-19 failures this seat exists to catch (a change that
+explains itself as safe rather than being measured), and I did not get to measure it -- flag it
+to Tom directly rather than pass it through unverified.
+
+SPECULATION -- the labelcols.js crash and the Customer-list note-row's "0 element children, text
+node only" shape both predate this branch (the note div was built the same way before); what's
+new is only that this branch is the first to point the automated pixel-alignment spec AT the
+Customer list at all, so the pre-existing DOM shape and the new coverage collided for the first
+time here.
 # Perry review, feat/row-paste R-308..R-312, 2026-09-27
 
 Reviewed commit 1631a562 (round head, on branch head d7e6084b) against dev/tom-review-queue.md
@@ -2546,3 +2651,61 @@ lat/lon a person types or reads. I worked this out empirically (mercLat(-38.125)
 matching my own wrong test output to six figures) rather than reading a single comment that states
 it plainly; worth a doc note somewhere for the next person who tries to fabricate a label position
 by hand instead of loading a file, since it costs about the hour it cost me.
+
+---
+
+## feat/symbology-label R-346/R-347/R-342, 2026-09-27, 1701e62b
+
+CONFIRMED (R-346, OBSERVED, real Chrome via dev/browser-pass, labelcols spec, 69/69) -- Node
+labels, Link labels and Customer all read Bef./Aft. headings with Use units sitting after Aft.,
+in that order, on every row measured, including the ID row's spacer and the narrow-screen
+(<24rem) stacked layout Tom's "phone width" question was about. No leak into the fourth/fifth/
+sixth columns (Decimals/Show/Drop), which stayed exactly where R-326..R-331 put them.
+
+CONFIRMED (R-347, OBSERVED, real Chrome, ad-hoc script against the Settings box DOM, not a
+committed spec) -- a fresh US project: Link labels' Length row opens with "Use units" UNTICKED
+and its After box literally contains `'`; Diameter opens UNTICKED with `"`. A fresh SI project:
+both open TICKED (After box disabled, showing " m" / " mm"). Read the actual checkbox.checked and
+input.value off the live DOM, not the source. Matches Tom's words exactly: "Length and Diameter
+for US projects should have ' and ", not 'Use units' ticked."
+
+CONFIRMED (R-342, OBSERVED, real Chrome + the build agent's own node harness
+new-project-inherit-harness.js, 17/17) -- New Project with the SAME units as the open project:
+a hand-ticked Length "Use units" box (against its own US default of unticked) survived into the
+new project, live in Chrome, not just in the stub. New Project with Length's unit CHANGED (ft to
+m) while nothing else changed: the tick reset to the metre default (ticked) -- the narrow,
+per-field reset the build agent described, not a wipe of the whole project. The node harness
+additionally covers what I did not re-drive live (idPrefixes, decimals, customerMaxWidth,
+a Pressure-only change leaving Length untouched) and passed; I did not distrust it enough to
+re-drive all of it in a real browser given it exercises the same non-DOM object-copy code the
+DOM-level tick already confirmed behaves correctly.
+
+JUDGEMENT CALL, not a defect -- the build agent flagged its own reading of R-342 as narrower than
+a literal parse of "Otherwise a new project gets built-in defaults," which read alone could mean
+"if ANY unit differs, revert EVERYTHING to built-in, not just the changed unit's pieces." I think
+the shipped narrow reading is the better one: Tom's own closing sentence in the same message --
+"The party line is that new projects follow current project as much as they can" -- only makes
+sense under the narrow reading (an all-or-nothing wipe on the first mismatched unit is the
+opposite of "as much as they can," and would mean changing an unrelated family like Age units
+silently drops a person's ID prefixes and colour choices). But this is a genuine ambiguity in his
+own prose with real stakes (surprise data loss vs. surprise carryover), and only Tom can rule
+definitively which he meant -- worth him saying so explicitly rather than this holding as inferred.
+
+UNVERIFIABLE FROM HERE -- whether the rendered MAP label (not the Settings-box preview, which I
+did confirm) for Length/Diameter looks right by eye on an opened example. I tried to drive this
+in real Chrome (turn on the Length label, sample rendered label text on Net1-US and the SI Basic
+network example) and got empty samples both times -- my selector for the rendered label text was
+wrong, not a defect I can pin on the branch; I did not have time to find the right one this round.
+A person should open "Basic network, gpm (US)", turn on a pipe's Length in Settings > Link labels,
+and confirm the label on the map itself shows a plain number with a trailing `'`, then repeat with
+"Basic network, L/s (SI)" and confirm it shows " m".
+
+LEAK CHECK: labelUnitMark() is now the single source both labelTableDefaults() (which sets the
+tick) and labelUnitSuffix() (which decides what's printed) read, replacing two independent copies
+of the ft/in special case -- so the tick and the printed mark cannot drift out of sync with each
+other the way two separately-maintained conditionals could. resetUnitBearingDefaultsFor() is
+scoped to the three named defaults fields, the length-only customerMaxWidth, and useUnits rows
+whose OWN unit selector is in changedSelectors -- I read the loop and it does not touch decimals,
+show/drop order, colours, or any field outside LPN_LABEL_FIELD_UNIT, matching what CLAUDE.md and
+dev/unit-rulings.md now say.
+

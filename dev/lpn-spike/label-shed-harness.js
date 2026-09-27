@@ -95,7 +95,11 @@ L.refreshLabelText();
 // the toggles rather than listing them. `friction` and `status` are both answerable from a plain
 // hydraulic solve; the average `quality` is NOT on this list because this harness runs no quality
 // analysis, and a field with no value prints nothing rather than a zero.
-const READING_ORDER = ['id', 'diameter', 'length', 'roughness', 'km',
+// **THE READING ORDER IS THE SHOW COLUMN SINCE R-329** (Tom's table, dev/symbology-defaults.csv),
+// which added Initial status and put Length before Diameter. A description and a tag print only
+// where one is stated, and the reaction coefficients only while a chemical is tracked, so neither
+// appears on this network.
+const READING_ORDER = ['id', 'length', 'diameter', 'roughness', 'km', 'initStatus',
 	'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status'];
 
 function fieldsOn(id) {

@@ -626,34 +626,6 @@
 			"headloss": false,
 			"gradient": false
 		},
-		"decimals": {
-			"node": {
-				"demand": 2,
-				"head": 2,
-				"pressure": 2,
-				"elev": 2
-			},
-			"link": {
-				"diameter": 0,
-				"length": 2,
-				"roughness": 0,
-				"km": 2,
-				"flow": 0,
-				"velocity": 2,
-				"headloss": 2,
-				"gradient": 1
-			}
-		},
-		"prefix": {
-			"node": {},
-			"link": {}
-		},
-		"suffix": {
-			"node": {},
-			"link": {
-				"diameter": "\""
-			}
-		},
 		"separator": " ",
 		"markExtrema": true
 	},

@@ -654,7 +654,8 @@ const TOUCH = true;
 	// **THE ASSERTION IS THE COMPARISON, not either number**, because either one alone can be
 	// right while the reading is wrong: 6px below and 6px above groups nothing, and that is the
 	// state a later tidy-up would most plausibly drift back to.
-	const inlineGap = /row\.style\.gap = '(\d+)px'/.exec(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'));
+	// The gap is written through one constant since R-329 added the Show column (LPN_LABEL_ROW_GAP).
+	const inlineGap = /LPN_LABEL_ROW_GAP = '(\d+)px'/.exec(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'));
 	ok(group + ': labelCheckbox() still writes one inline gap, which a wrapped row spends BOTH ways',
 		!!inlineGap, inlineGap ? inlineGap[1] + 'px' : 'no inline gap found -- this check is vacuous');
 	if (inlineGap) {
@@ -697,8 +698,10 @@ const TOUCH = true;
 	ok(group + ': a heading that overflows its column breaks rather than spilling',
 		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
 		'got ' + winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap'));
-	ok('...on the phone only, where the columns are narrow enough to need it',
-		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === null);
+	// **AND ON THE DESKTOP TOO SINCE R-329**: six columns at 15.3rem leave "Before" and "Use units"
+	// little spare ink there as well, and a longer translation must break inside its own column.
+	ok('...and on the desktop too, where six columns leave little spare ink',
+		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
 	ok('...and never on the boxes beneath it, which are sized and not text',
 		winning(RULES, field.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
 	// The heading row's lead cell goes, so the headings start where the wrapped group starts.
@@ -706,13 +709,14 @@ const TOUCH = true;
 		!!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
 	ok('...and stays on the desktop', !hiddenAt(RULES, heading.children[0], WIDE, DOC_IDS));
 
-	// (8) THE FOUR COLUMNS, HEADING AND BOX ALIKE. A heading that is not the same width as the box
-	// under it is the defect this list has already been fixed for twice, so the assertion is that
-	// the two agree -- at every width, and with and without a spinner.
-	const want = { 2: '2.08rem', 3: '1.6rem', 4: '2.56rem', 5: '2.56rem' };
-	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem' };
-	const wantWide = { 2: '2.6rem', 3: '2.6rem', 4: '3.2rem', 5: '3.2rem' };
-	[2, 3, 4, 5].forEach((i) => {
+	// (8) THE SIX COLUMNS, HEADING AND BOX ALIKE -- Before, Use units, After, Decimals, Show, Drop
+	// since R-326..R-331. A heading that is not the same width as the box under it is the defect this
+	// list has already been fixed for twice, so the assertion is that the two agree -- at every
+	// width, and with and without a spinner.
+	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '2.3rem', 6: '2.3rem', 7: '2.3rem' };
+	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem', 6: '1.6rem', 7: '1.6rem' };
+	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.6rem', 6: '2.6rem', 7: '2.6rem' };
+	[2, 3, 4, 5, 6, 7].forEach((i) => {
 		const h = heading.children[i - 1], b = field.children[i - 1];
 		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',
 			winning(RULES, h, SMALL, DOC_IDS, false, 'width') === want[i],
@@ -756,13 +760,13 @@ const TOUCH = true;
 			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'appearance') === null);
 	});
 	// And the list's own floor comes down, or the box still refuses to narrow.
-	ok(group + ' list floor is 11rem on a small screen',
-		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '11rem');
-	ok('...9rem when the spinners have gone too',
-		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '9rem');
-	ok('...and 13rem on the desktop, untouched',
-		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '13rem' &&
-		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '13rem');
+	ok(group + ' list floor is 13.5rem on a small screen',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '13.5rem');
+	ok('...11.4rem when the spinners have gone too',
+		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '11.4rem');
+	ok('...and 15.3rem on the desktop, whatever the pointer',
+		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '15.3rem' &&
+		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '15.3rem');
 });
 
 console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---');

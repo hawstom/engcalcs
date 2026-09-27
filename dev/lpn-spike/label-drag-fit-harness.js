@@ -172,8 +172,22 @@ async function sectionFit(Session, browser) {
 	try {
 		const page = a.page;
 		await zoomToFit(a);
-		const s0 = await scaleOf(page), shown0 = (await visibleNodeLabels(page)).length;
-		ok('the plain fit shows the labels', shown0 > 10, shown0 + ' drawn at scale ' + s0.toFixed(0));
+		let s0 = await scaleOf(page), shown0 = (await visibleNodeLabels(page)).length;
+		// **THE PLAIN FIT MAY ITSELF LAND ON THE LABELING THRESHOLD** since Tom's symbology table
+		// (2026-09-26, R-326): a crowded node label now gives up its ID first and keeps its longer
+		// numbers, so the room the fit leaves for lettering is wider and on Net3-Novato at this size
+		// the fit stops just past the threshold. That is the same rule the refit below is held to --
+		// one + step shows them -- so it is asserted the same way, and the drags then start from there.
+		if (shown0 <= 10) {
+			await page.keyboard.press('+');
+			await a.settle(900);
+			const sPlus = await scaleOf(page), shownPlus = (await visibleNodeLabels(page)).length;
+			ok('the plain fit stops at the labeling threshold: one + step shows the labels',
+				shownPlus > 10, shownPlus + ' drawn at scale ' + sPlus.toFixed(0) + ' (fit was ' + s0.toFixed(0) + ')');
+			s0 = sPlus; shown0 = shownPlus;
+		} else {
+			ok('the plain fit shows the labels', shown0 > 10, shown0 + ' drawn at scale ' + s0.toFixed(0));
+		}
 		for (const [pick, dy] of [['top', -150], ['bottom', 150]]) {
 			const labs = await visibleNodeLabels(page);
 			labs.sort((p, q) => pick === 'top' ? p.y - q.y : q.y - p.y);

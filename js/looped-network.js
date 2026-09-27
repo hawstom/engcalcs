@@ -548,7 +548,7 @@ var EngCalcs = EngCalcs || {};
 	// lowest, so it goes first -- -Infinity rather than a small number, because 0 is a rank someone
 	// could type.
 	function linkFieldRank(field) {
-		var r = field && labelSettings.priority.link[field];
+		var r = labelRank('priority', 'link', field);
 		return typeof r === 'number' ? r : -Infinity;
 	}
 	// **THE ONE PLACE A LINK LABEL'S GLYPHS ARE BUILT** (Task 399). The full label and every shed
@@ -1153,55 +1153,32 @@ var EngCalcs = EngCalcs || {};
 	// A node field's shed rank, out of the user's own Drop column -- linkFieldRank()'s counterpart,
 	// and the SECOND consumer of labelSettings.priority.node, which until Task 469 had only one.
 	//
-	// **THE ID IS NOT IN THE COLUMN AND IS THEREFORE NEVER SHED.** labelSettings.priority.node holds
-	// demand, pressure, elev and head and nothing else, which is also exactly what
-	// LPN_NODE_DROP_RULE ranks: the four values a reader could weigh against each other. A node's ID
-	// is not one of them -- it is what the other four are ABOUT -- so a label sheds down to its ID
-	// plus one ranked value and then, if it still will not fit, goes whole.
+	// **THE ID IS IN THE COLUMN NOW, SO IT CAN BE SHED** (Tom, 2026-09-26, R-326: *"Drop order is
+	// missing for Node ID"*). It used to be left out, which made it the one value a crowded node
+	// label could never give up; his table ranks it 2, among the first to go. A label still keeps
+	// one value -- nodeShedRec() stops there -- and then goes whole, which is the drop key's job.
 	function nodeFieldRank(field) {
-		var r = field && labelSettings.priority.node[field];
+		var r = labelRank('priority', 'node', field);
 		return typeof r === 'number' ? r : -Infinity;
 	}
 	// The shed order over the RANKED lines only, lowest rank first: the user's column is a drop order
-	// and 1 is the first value to go (Task 445). Unranked lines (the ID) are not in the order at all,
-	// so shedKeepSet() never reaches them.
+	// and 1 is the first value to go (Task 445). An unranked line (the empty placeholder) is not in
+	// the order at all, so shedKeepSet() never reaches it.
 	function nodeShedOrder(lines) {
 		var order = [], i;
 		for (i = 0; i < lines.length; i++) {
-			if (typeof labelSettings.priority.node[lines[i].field] === 'number') { order.push(i); }
+			if (typeof labelRank('priority', 'node', lines[i].field) === 'number') { order.push(i); }
 		}
 		order.sort(function (a, b) { return nodeFieldRank(lines[a].field) - nodeFieldRank(lines[b].field); });
 		return order;
 	}
-	// **THE DROP COLUMN ORDERS WHAT YOU SEE, NOT ONLY WHAT YOU LOSE** (Tom, 2026-09-08: *"For links,
-	// but not nodes, drop order is also used to order display: 5 4 3 2 1. This is very cool and
-	// intuitive and should be done for nodes."*).
-	//
-	// **A LINK LABEL GOT THIS BY ACCIDENT AND A NODE LABEL DID NOT.** Both build their lines in a
-	// hard-coded semantic order; the link defaults happen to run 5 4 3 2 1 down the inputs and
-	// 9 8 7 6 down the results, so the column and the label already agreed, while the node order
-	// (ID, Demand, Base demand, Head, Pressure, Elevation, Quality) crosses its own ranks twice.
-	// Sorting here makes the agreement a RULE rather than a coincidence of two default tables, and
-	// it is what makes the column legible: the top line is the one that survives longest and the
-	// bottom line is the one about to go, so a reader watches the label shed from the bottom up.
-	//
-	// **THE ID LEADS AND IS NOT IN THE COLUMN AT ALL.** nodeFieldRank() answers -Infinity for an
-	// unranked field, which is right for shedding (give it up first) and exactly backwards here, so
-	// the display rank is its own function rather than a reuse: the ID is what the other values are
-	// ABOUT, it is never shed, and a label whose name migrated to the bottom would be unreadable.
-	// The empty placeholder line has no field either and rides along with it, harmlessly.
-	function nodeDisplayRank(field) {
-		var r = field && labelSettings.priority.node[field];
-		return typeof r === 'number' ? r : Infinity;
-	}
-	// Highest rank first. Array.prototype.sort has been stable since ES2019, so two lines that tie
-	// (the ID and the placeholder) keep the order they were built in.
-	function nodeDisplayOrder(lines) {
-		return lines.slice().sort(function (a, b) {
-			var ra = nodeDisplayRank(a.field), rb = nodeDisplayRank(b.field);
-			return ra === rb ? 0 : rb - ra;
-		});
-	}
+	// **A NODE LABEL READS IN ITS SHOW ORDER, NOT ITS DROP ORDER** (Tom, 2026-09-26, R-329: *"I
+	// don't like that ID needs to display first, but also may need to drop first. We have been using
+	// drop first as display last, which is efficient, but lazy."*). Until then this sorted on the
+	// Drop column (Tom, 2026-09-08), so the bottom line was always the next to go; now the two are
+	// separate columns, and the ID can head a label and still be one of the first things it sheds.
+	// labelShowOrder() is the one sort, shared with link and customer labels.
+	function nodeDisplayOrder(lines) { return labelShowOrder('node', lines); }
 	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.** If
 	// the shed fires at `width > length` and linkLabelTooShort() hides at `length < width` -- the
 	// same comparison -- the only band in which a reader could SEE a shed is too wide at N values and
@@ -5093,182 +5070,337 @@ var EngCalcs = EngCalcs || {};
 		applyScenarioChange();
 	}
 
+	/**
+	 * **THE SHIPPED LABEL DEFAULTS, ONE ROW PER PROPERTY** (Tom, 2026-09-26, R-326..R-334: *"Initial
+	 * defaults and all examples need to be consistent"*). The authority is Tom's own table,
+	 * `dev/symbology-defaults.csv`; this is its transcription, and
+	 * `dev/lpn-spike/symbology-table-harness.js` fails if the two differ, or if any gallery example
+	 * opens on anything else. Edit the CSV first, then this.
+	 *
+	 *   on     -- the Show? tick a new project opens with
+	 *   before -- the prefix; the roughness row's is really the friction method's symbol
+	 *             (labelDefaultPrefix()), and 'C=' is its Hazen-Williams face
+	 *   show   -- Show order: where the value sits on its label, 1 first (R-329)
+	 *   drop   -- Drop order: 1 is the first value given up when a label is crowded (Task 445)
+	 *   dec    -- decimals: a number, or 'u' for "what the field's display unit calls for"
+	 *             (labelUnitDecimals(), R-328); absent for a word (an ID, a status), which has none
+	 *   units  -- the "Use units" tick a new project opens with (R-331)
+	 *
+	 * **EVERY ROW HAS A DROP ORDER** (R-326: *"Drop order is missing for Node ID and several Customer
+	 * properties."*). The quality row is one row wearing three names (qualityLabel()), so its show
+	 * and drop orders are kept per mode under `modes`; its decimals keep the flat/`quality:trace`
+	 * split qualityDecimals() already reads. Row order here is the order of the Settings rows.
+	 */
+	var LPN_LABEL_TABLE = {
+		node: {
+			id: { on: true, before: '', show: 1, drop: 2 },
+			desc: { on: false, before: '', show: 2, drop: 4 },
+			tag: { on: false, before: '', show: 3, drop: 6 },
+			demand: { on: true, before: 'Qb=', show: 4, drop: 10, dec: 'u' },
+			elev: { on: true, before: 'Z=', show: 5, drop: 8, dec: 'u' },
+			initQuality: { on: false, before: 'Init. ', show: 6, drop: 16, dec: 2, units: true },
+			demandActual: { on: false, before: 'Q=', show: 7, drop: 26, dec: 'u' },
+			level: { on: false, before: 'Y=', show: 9, drop: 12, dec: 'u' },
+			head: { on: false, before: 'H=', show: 10, drop: 14, dec: 'u' },
+			pressure: { on: true, before: 'P=', show: 11, drop: 28, dec: 'u' },
+			quality: { on: false, before: '', dec: 1, decTrace: 0, units: true,
+				modes: { chemical: { show: 12, drop: 22 }, trace: { show: 13, drop: 20 }, age: { show: 14, drop: 18 } } }
+		},
+		link: {
+			id: { on: true, before: '', show: 1, drop: 2 },
+			desc: { on: false, before: '', show: 2, drop: 4 },
+			tag: { on: false, before: '', show: 3, drop: 6 },
+			length: { on: false, before: '', show: 4, drop: 18, dec: 'u', units: true },
+			diameter: { on: false, before: '', show: 5, drop: 38, dec: 'u', units: true },
+			roughness: { on: false, before: 'C=', show: 6, drop: 22, dec: 0 },
+			km: { on: false, before: 'km=', show: 7, drop: 16, dec: 2 },
+			initStatus: { on: false, before: 'Init. ', show: 8, drop: 12 },
+			bulkCoeff: { on: false, before: 'Cb=', show: 9, drop: 10, dec: 1 },
+			wallCoeff: { on: false, before: 'Cw=', show: 10, drop: 8, dec: 1 },
+			flow: { on: true, before: 'Q=', show: 11, drop: 40, dec: 'u' },
+			velocity: { on: true, before: 'V=', show: 12, drop: 36, dec: 'u' },
+			headloss: { on: false, before: 'Hl=', show: 13, drop: 28, dec: 'u' },
+			gradient: { on: false, before: 'S=', show: 14, drop: 34, dec: 'u' },
+			friction: { on: false, before: 'f=', show: 15, drop: 14, dec: 3 },
+			rate: { on: false, before: 'R=', show: 16, drop: 20, dec: 1 },
+			quality: { on: false, before: '', dec: 1, decTrace: 0, units: true,
+				modes: { chemical: { show: 17, drop: 32 }, trace: { show: 18, drop: 30 }, age: { show: 19, drop: 26 } } },
+			status: { on: false, before: '', show: 20, drop: 24 }
+		},
+		customer: {
+			id: { on: false, before: '', show: 1, drop: 2 },
+			desc: { on: false, before: '', show: 2, drop: 4 },
+			tag: { on: false, before: '', show: 3, drop: 6 },
+			demand: { on: true, before: 'Qb=', show: 4, drop: 8, dec: 'u' },
+			// A whole number of services. Tom's table gives it 0 decimals US and 1 SI; a count has
+			// no unit for the two to differ by, so it stays a word here, printed whole (see the
+			// harness's declared exception, which names this row).
+			count: { on: false, before: 'x', show: 5, drop: 10 },
+			demandActual: { on: false, before: 'Q=', show: 6, drop: 12, dec: 'u' }
+		}
+	};
+	// Which unit selector a label field is read in. The one table labelUnitDecimals() and
+	// labelUnitSuffix() both read, so a field's decimals and its "Use units" text cannot come from
+	// two different units. Head loss is an Elevation/Head quantity (resultUnit('elevhead')).
+	var LPN_LABEL_FIELD_UNIT = {
+		node: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow', elev: 'lpn_u_elevhead',
+			level: 'lpn_u_elevhead', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' },
+		link: { length: 'lpn_u_length', diameter: 'lpn_u_diameter', flow: 'lpn_u_flow',
+			velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' },
+		customer: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow' }
+	};
+	/**
+	 * **DEFAULT DECIMALS, BY UNIT** (Tom, 2026-09-26, R-328: *"we need an internal way to guess
+	 * decimals based on the units factor. And/or we need our table of initial decimals to include at
+	 * least the main US and SI units."*). Keyed by the SELECTOR and the unit's name, because one name
+	 * can mean two magnitudes: a length in metres (1 place) is not a diameter in metres.
+	 *
+	 * **ONE LINE PER UNIT, SO A REVIEWER'S CORRECTION IS A ONE-LINE EDIT.** The preset units' values
+	 * are Tom's table; gradient `grade` and the three large flow units are the utility planning
+	 * engineer's review (2026-09-26). A unit not listed falls to LPN_LABEL_TYPICAL_SI below.
+	 */
+	var LPN_UNIT_DECIMALS = {
+		lpn_u_flow: { gpm: 0, lps: 1, mgd: 3, m3ps: 3, ft3ps: 3 },
+		lpn_u_length: { ft: 0, m: 1 },
+		lpn_u_diameter: { 'in': 0, mm: 0 },
+		lpn_u_elevhead: { fth2o: 2, mh2o: 3 },
+		lpn_u_pressure: { psi: 2, mh2o: 3, fth2o: 2 },
+		lpn_u_velocity: { ftps: 1, mps: 2 },
+		lpn_u_gradient: { gradePercent: 2, grade: 4 }
+	};
+	// **THE GUESS FROM THE FACTOR, for a unit the table above does not list** (Tom's first half of
+	// R-328). A typical magnitude of each quantity in SI, times the unit's own factor, is what the
+	// number usually looks like on screen; three significant figures of that is the guess. So a
+	// 0.01 m3/s flow reads 0.19 in imperial MGD (3 places) and 36 in m3/h (1 place).
+	var LPN_LABEL_TYPICAL_SI = {
+		lpn_u_flow: 0.01, lpn_u_length: 100, lpn_u_diameter: 0.2, lpn_u_elevhead: 30,
+		lpn_u_pressure: 40, lpn_u_velocity: 1, lpn_u_gradient: 0.005
+	};
+	// **WHEN NO UNIT IS SHOWING YET** -- the selects are not on the page, which happens only outside a
+	// browser -- a count is the US preset's, the same US a page with no Accept-Language opens on.
+	var LPN_LABEL_UNIT_US = { lpn_u_flow: 'gpm', lpn_u_length: 'ft', lpn_u_diameter: 'in',
+		lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent' };
+	function labelDecimalsForUnit(sel, key) {
+		var row = LPN_UNIT_DECIMALS[sel] || {}, f, typ = LPN_LABEL_TYPICAL_SI[sel], d;
+		if (!key) { key = LPN_LABEL_UNIT_US[sel]; }
+		if (key && typeof row[key] === 'number') { return row[key]; }
+		f = key && EngCalcs.unitFactors ? EngCalcs.unitFactors[key] : undefined;
+		if (typeof f !== 'number' || !isFinite(f) || f <= 0 || !typ) { return 2; }
+		d = 2 - Math.floor(Math.log10(typ * f));
+		return Math.max(0, Math.min(6, d));
+	}
+	function labelUnitDecimals(group, field) {
+		var sel = (LPN_LABEL_FIELD_UNIT[group] || {})[field];
+		return sel ? labelDecimalsForUnit(sel, unitKey(sel)) : 2;
+	}
+	/**
+	 * **A DECIMALS COUNT STILL AT ITS UNIT'S DEFAULT FOLLOWS THE UNIT; ONE THE USER CHANGED STAYS.**
+	 * Called when a unit selector moves (afterUnitChange()) and when a new project is given its
+	 * units (createProjectFrom()): the count was the default for `from`, so it becomes the default
+	 * for the unit now showing. Anything else is somebody's own choice and is left alone -- which is
+	 * what keeps a flow switched from gpm to MGD from printing every flow as "0".
+	 */
+	function followUnitDecimals(sel, from) {
+		var to = unitKey(sel), was = labelDecimalsForUnit(sel, from), now = labelDecimalsForUnit(sel, to);
+		if (from === to || was === now) { return; }
+		['node', 'link', 'customer'].forEach(function (group) {
+			var units = LPN_LABEL_FIELD_UNIT[group], dec = labelSettings.decimals[group], f;
+			for (f in units) {
+				if (units[f] === sel && dec && dec[f] === was) { dec[f] = now; }
+			}
+		});
+	}
+	// The table as the parallel maps defaultLabelSettings() ships. Read afresh each call, because a
+	// 'u' decimals entry depends on the units showing at the moment it is asked.
+	function labelTableDefaults() {
+		var out = { on: {}, show: {}, priority: {}, decimals: {}, useUnits: {} };
+		Object.keys(LPN_LABEL_TABLE).forEach(function (group) {
+			var rows = LPN_LABEL_TABLE[group];
+			Object.keys(out).forEach(function (k) { out[k][group] = {}; });
+			Object.keys(rows).forEach(function (f) {
+				var r = rows[f];
+				out.on[group][f] = !!r.on;
+				if (r.modes) {
+					Object.keys(r.modes).forEach(function (m) {
+						out.show[group][f + ':' + m] = r.modes[m].show;
+						out.priority[group][f + ':' + m] = r.modes[m].drop;
+					});
+				} else {
+					out.show[group][f] = r.show;
+					out.priority[group][f] = r.drop;
+				}
+				if (r.dec === 'u') { out.decimals[group][f] = labelUnitDecimals(group, f); }
+				else if (typeof r.dec === 'number') { out.decimals[group][f] = r.dec; }
+				if (typeof r.decTrace === 'number') { out.decimals[group][f + ':trace'] = r.decTrace; }
+				// **R-347: A DRAWN MARK IS A FIXED SYMBOL, NOT A TICK** (Tom: "Length and Diameter
+				// for US projects should have ' and \", not 'Use units' ticked... for US, I provided
+				// suffixes"). A field whose CURRENT unit draws its own mark (feet, inches) opens
+				// UNTICKED with that literal character as ordinary After text, so it stops changing
+				// once the model has one; any other unit (m, mm, ...) has no mark and opens ticked,
+				// so it keeps following the unit selector, per his reading for SI.
+				if (r.units) {
+					var unitSel = (LPN_LABEL_FIELD_UNIT[group] || {})[f];
+					out.useUnits[group][f] = unitSel ? (labelUnitMark(unitSel, unitKey(unitSel)) === null) : true;
+				}
+			});
+		});
+		return out;
+	}
+	// **R-342: WHICH `settings.defaults` FIELD A UNIT SELECTOR OWNS THE MAGNITUDE OF.** A typed
+	// default (a node's default elevation, demand, or pipe diameter) is a number in whatever unit
+	// was showing when it was typed; roughness is handled separately (it follows the friction
+	// method, not a length unit) and `k` is a dimensionless minor-loss coefficient.
+	var LPN_DEFAULTS_UNIT_FIELD = { lpn_u_elevhead: 'nodeElev', lpn_u_flow: 'demand', lpn_u_diameter: 'diameter' };
+	/**
+	 * **R-342: A NEW PROJECT FOLLOWS THE ONE IT LEFT AS MUCH AS IT CAN** (Tom: *"A new project
+	 * copies the open project where units are the same... Otherwise a new project gets built-in
+	 * defaults... new projects follow current project as much as they can"*). newProject() already
+	 * clones the whole of `settings` and `labelSettings` unconditionally -- prefixes, colouring
+	 * choices, show/drop order, on/off toggles are all preferences a person carries between
+	 * projects whether or not a unit moved, and none of them is a number stated in a unit. This
+	 * function is the narrow correction for the pieces that ARE: a decimals count and a "Use
+	 * units" tick are calibrated to one specific unit's magnitude or drawn mark, a `defaults` entry
+	 * is a number typed in the unit that was showing, and `customerMaxWidth` is stated in the
+	 * length unit (R-347's comment on labelUnitMark makes the same distinction for the tick).
+	 * CLAUDE.md: "Changing a unit reinterprets the typed number; it never converts it" -- a value
+	 * calibrated to a unit that is no longer showing is exactly that reinterpretation risk, so it
+	 * is dropped to the built-in default rather than carried across silently.
+	 *
+	 * `changedSelectors` names only the unit selects the New Project wizard actually left different
+	 * from the project it was opened on (changedUnitSelectors()); called AFTER applyUnitSelections()
+	 * so unitKey() reads the NEW unit. Everything not named here -- which is most of `settings` and
+	 * `labelSettings`, DECIMALS INCLUDED -- is left exactly as newProject() cloned it: decimals are
+	 * a display-format preference, not a modelled quantity, and afterUnitChange()'s own
+	 * followUnitDecimals() (called right before this, on the SAME `fromUnits`) already moves an
+	 * untouched count to its new unit's default and leaves a customized one alone -- the identical
+	 * rule an ordinary in-place unit change on an existing project already follows, so a new
+	 * project should not answer that question differently. A "Use units" TICK has no such follow
+	 * mechanism (it only decides once, at label-set construction), so it is the one thing reset here.
+	 */
+	function resetUnitBearingDefaultsFor(changedSelectors) {
+		var set = {}, group, field, sel, row;
+		if (!changedSelectors || !changedSelectors.length) { return; }
+		changedSelectors.forEach(function (n) { set[n] = true; });
+		Object.keys(LPN_DEFAULTS_UNIT_FIELD).forEach(function (s) {
+			if (set[s] && settings.defaults) { settings.defaults[LPN_DEFAULTS_UNIT_FIELD[s]] = null; }
+		});
+		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
+		for (group in LPN_LABEL_FIELD_UNIT) {
+			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
+			for (field in LPN_LABEL_FIELD_UNIT[group]) {
+				if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT[group], field)) { continue; }
+				sel = LPN_LABEL_FIELD_UNIT[group][field];
+				if (!set[sel]) { continue; }
+				row = (LPN_LABEL_TABLE[group] || {})[field];
+				if (row && row.units && labelSettings.useUnits[group]) {
+					labelSettings.useUnits[group][field] = labelUnitMark(sel, unitKey(sel)) === null;
+				}
+			}
+		}
+	}
+	// The unit selects the wizard actually left DIFFERENT from the project it was opened on --
+	// only those it can answer for (both sides must have a value) count as "changed".
+	function changedUnitSelectors(from, to) {
+		var out = [], name;
+		for (name in to) {
+			if (!Object.prototype.hasOwnProperty.call(to, name)) { continue; }
+			if (to[name] && from && from[name] && to[name] !== from[name]) { out.push(name); }
+		}
+		return out;
+	}
+	/**
+	 * **A FIELD'S SHOW OR DROP NUMBER** (`kind` is 'show' or 'priority'), or undefined for a field
+	 * that has none. The quality row reads its CURRENT MODE's number first and a flat `quality`
+	 * entry second -- the flat one being what a project saved before R-329 carries.
+	 */
+	function labelRank(kind, group, field) {
+		var map = (labelSettings[kind] || {})[group] || {}, k;
+		if (!field) { return undefined; }
+		if (field === 'quality') {
+			k = 'quality:' + qualityMode();
+			if (typeof map[k] === 'number') { return map[k]; }
+		}
+		return typeof map[field] === 'number' ? map[field] : undefined;
+	}
+	// The key a Settings row writes its show or drop number to: the mode's own for the quality row.
+	function labelRankKey(field) { return field === 'quality' ? 'quality:' + qualityMode() : field; }
+	// **LINES IN SHOW ORDER**, 1 first. A line with no show number (the empty placeholder) goes
+	// last. Stable, so two lines that tie keep the order they were built in.
+	function labelShowOrder(group, lines) {
+		return lines.slice().sort(function (a, b) {
+			var ra = labelRank('show', group, a.field), rb = labelRank('show', group, b.field);
+			ra = typeof ra === 'number' ? ra : Infinity; rb = typeof rb === 'number' ? rb : Infinity;
+			return ra === rb ? 0 : (ra < rb ? -1 : 1);
+		});
+	}
 	// Map label toggles -- a VIEW preference, not network content, so it is deliberately NOT part of
 	// the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
 	function defaultLabelSettings() {
+		var t = labelTableDefaults();
 		return {
-			// **DEMAND ON, BASE DEMAND OFF** (Tom, 2026-08-25). The map's job is to be readable
-			// against itself: the number beside a junction should be the one the pipes into it add
-			// up to, and on a patterned network the base is not that number. Both remain one tick
-			// away. A project saved before this existed carries `demand: true` and keeps showing
-			// exactly the number it always showed -- now under the honest heading -- because the
-			// boolean maps are merged key by key and nothing reinterprets a stored toggle.
-			// **BASE DEMAND STAYS THE DEFAULT, AND DEMAND IS THE ONE TICK AWAY** (Tom, 2026-08-26).
-			// A previous pass flipped this to show the resolved Demand by default, reasoning that a
-			// fresh map should show the number the pipes add up to. He reversed it: *"no options, no
-			// demand: true. It's just showing Base Demand as user requested (without sufficient
-			// advice) in Settings."* The bug was never the CHOICE, it was the LABEL — a base demand
-			// printed under the word "Demand". Relabelled, the default is honest, every project that
-			// ever existed keeps showing the number it always showed, and nobody's map changes under
-			// them for a reason they did not ask for.
-			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
-				// OFF, like every other field a network does not have until it is asked for.
-				quality: false, initQuality: false,
-				// **TANK WATER DEPTH, OFF BY DEFAULT** (Task 696, Tom, 2026-09-25: fix the missing
-				// coverage rather than disable it in Convert as). A junction and a reservoir have no
-				// 'level' to print, exactly as they have no diameter -- see the node loop below.
-				level: false },
-			// Every INPUT property a link carries is offered, not just the ones a result depends on:
-			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
-			// you want spread across a drawing when checking someone's model. Off by default --
-			// turning every one on would bury the results.
-
-			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false,
-				// Task 638's three, all OFF: a friction factor, a status and an average quality are
-				// each asked for by name, and turning them on by default would bury the two rows
-				// (flow and velocity) a link label ships showing.
-				// And Task 652's reaction rate on the same argument.
-				friction: false, status: false, quality: false, rate: false },
-			// Per-field decimal places (Task 189). A PARALLEL map, not a boolean-turned-object: the
-			// boolean maps are merged key-by-key out of localStorage, and a shape change there
-			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
-			// have no entry. Three fields depart from the default 2, each for a reason about the
-			// QUANTITY:
-			//   roughness 0 -- a Hazen-Williams C-factor is a dimensionless integer: 100, 130, 140.
-			//     **THE SHIPPED 0 IS THE HAZEN-WILLIAMS CASE ONLY.** The method is selectable
-			//     (Task 271) and a Manning n or a Darcy-Weisbach e printed as "0" at 0 places, so
-			//     syncRoughnessLabelDecimals() raises this entry whenever the method or the
-			//     roughness unit leaves it unable to show the number. Every other entry here is a
-			//     constant and this one is a starting value.
-			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade.
-			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
-			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
-			//     pipe gradient is 0.0043; 4 covers both.
-
+			// **EVERY NUMBER BELOW COMES OUT OF LPN_LABEL_TABLE** (Tom, 2026-09-26, R-327: "Initial
+			// defaults and all examples need to be consistent"). The history of each value -- base
+			// demand on and resolved demand off (Tom, 2026-08-26), the quality rows off until asked
+			// for, the drop column reading 1-goes-first (Task 445) -- is his table now, and the table
+			// is dev/symbology-defaults.csv. The maps stay PARALLEL rather than nested into the
+			// boolean ones for the reason they always were: the boolean maps are merged key by key out
+			// of a saved project, and a shape change there silently reinterprets every saved toggle.
+			node: t.on.node, link: t.on.link,
 			/**
 			 * **CUSTOMER SYMBOLOGY: WHICH VALUES A CUSTOMER LABEL SHOWS, AND ITS OWN ANSWER**
 			 * (Tom, 2026-09-19: *"I think we need a third separate Customer symbology area in
-			 * settings so that we can control Customer labels differently than other labels, since
-			 * we may want only demand or only demand and description."*).
-			 *
-			 * **THIS REPLACES "A CUSTOMER LABEL FOLLOWS THE NODE CHECKBOXES", which was his own
-			 * earlier instruction and which he has now overruled** -- and the reason he gives is the
-			 * one that could not have been guessed: a node label and a service label are read for
-			 * different things. A junction's label answers *what is the pressure here*; a service's
-			 * answers *whose is this and how much does it draw*, and the second list is not a subset
-			 * of the first.
-			 *
-			 * **AND THERE IS STILL NO SEPARATE TEXT SIZE** (same message: *"I **don't** think we
-			 * need a separate text size. That's a bug."*). Every label on this map is drawn at
-			 * `effectiveFontSize()` and a customer's is no exception; what made his look bigger was
-			 * that it STACKED its values where a link label concatenates them, which is fixed in
-			 * customerLabelLines()'s caller rather than by a size of its own.
-			 *
-			 * **BASE DEMAND ON, EVERYTHING ELSE OFF**, which is the one value a service is drawn to
-			 * be read for and is the same starting answer the node group makes.
+			 * settings so that we can control Customer labels differently than other labels"*).
+			 * A junction's label answers *what is the pressure here*; a service's answers *whose
+			 * is this and how much does it draw*, and the second list is not a subset of the first.
+			 * **AND THERE IS STILL NO SEPARATE TEXT SIZE** (same message: *"I don't think we need a
+			 * separate text size. That's a bug."*).
 			 */
-			customer: { id: false, demandActual: false, demand: true, desc: false, tag: false, count: false },
-			decimals: {
-				// quality 1 -- a water age in hours reads as a whole number and a first decimal
-				// ("14.3 hr"); two would be a minute and a half of false precision on a quantity
-				// whose own transport step is five minutes. A source share in percent is the same
-				// shape of number, EXCEPT that Tom wants it whole (Task 664): a share reading
-				// "43.0%" claims a precision the trace does not have, so 'quality:trace' is the one
-				// MODE-SPECIFIC override this map carries -- see qualityDecimals() below, which is
-				// the only reader of it. It is a new key, so an old save (which never had an opinion
-				// on it) picks it up the same way it would pick up any other field added after it
-				// was written; a save that DID customize the flat `quality` entry keeps governing
-				// water age and concentration exactly as before.
-				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
-				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
-				// level 2 -- a water depth reads in the same Elevation/Head unit and precision as
-				//   elev and head, which it sits between physically.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, level: 2, quality: 1,
-					'quality:trace': 0, initQuality: 2 },
-				// The customer group's own two numbers, its own entries: this map is what decides
-				// which rows get a decimals spinner, so borrowing the node's would have tied a
-				// service's demand to a junction's for no reason anybody could re-derive. A COUNT
-				// is a whole number of services and has no entry, exactly as an ID has none.
-				customer: { demand: 2, demandActual: 2 },
-				// friction 4 -- a Darcy f runs 0.015 to 0.04, so 2 places is two significant figures
-				//   at best and reads as "0.02" for most of a network.
-				// **STATUS HAS NO ENTRY AND THAT IS THE POINT**: this map is the one place naming
-				// which fields are numeric, so a status prints its word with no decimals spinner
-				// beside it, exactly as ID does.
-				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4,
-				// rate 2 -- a reaction rate runs from a hundredth to a few units of the chemical's
-				//   own concentration per day, and the report EPANET prints it in shows two places.
-					friction: 4, quality: 1, 'quality:trace': 0, rate: 2 }
-			},
-			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
-			// of them and the number.
-			//
-			// EMPTY IS NOT THE SAME AS UNSET, which is why these maps ship EMPTY rather than
-			// pre-filled. A field with no entry uses labelDefaultPrefix(), which is allowed to be
-			// dynamic -- roughness prints C, n or e depending on the friction method selected, and a
-			// stored 'C' could not follow that. So: undefined -> ask the default; '' -> print nothing.
-			//
-			// The separator is blanket and goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1').
-			// A prefix's own punctuation is part of the prefix string, so the defaults carry '='.
-
+			customer: t.on.customer,
+			// Per-field decimal places (Task 189). **THIS MAP IS STILL THE ONE PLACE NAMING WHICH
+			// FIELDS ARE NUMERIC**: a word (an ID, a status, a description) has no entry and gets no
+			// spinner. A unit-bearing field's number is the one its DISPLAY UNIT calls for
+			// (labelUnitDecimals(), R-328), so an SI project and a US one each open on their own.
+			// `quality:trace` is the one mode-specific entry (Task 664, qualityDecimals()).
+			decimals: t.decimals,
+			// Per-field PREFIX and SUFFIX text (Task 333). EMPTY IS NOT THE SAME AS UNSET, which is
+			// why these maps ship EMPTY: a field with no entry uses labelDefaultPrefix(), which is
+			// allowed to be dynamic (roughness prints C, n or e with the friction method). So:
+			// undefined -> ask the default; '' -> print nothing.
 			prefix: { node: {}, link: {}, customer: {} },
 			suffix: { node: {}, link: {}, customer: {} },
+			/**
+			 * **"USE UNITS" -- THE AFTER BOX FOLLOWS THE UNIT** (Tom, 2026-09-26, R-331: *"We need a
+			 * code or a toggle to 'Use units' for the After string. It should put space and units in
+			 * the After field and disable it."*). A tick here makes labelSuffixFor() answer with the
+			 * field's own display unit (labelUnitSuffix()), so changing the unit changes the label
+			 * with it. Project data, like every map in this object: it rides in serializeProject().
+			 */
+			useUnits: t.useUnits,
+			// The blanket separator goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1'). A
+			// prefix's own punctuation is part of the prefix string, so the defaults carry '='.
 			separator: ' ',
-			// **LABEL PRIORITY -- WHICH IS NOT A WEIGHT** (Task 397; dev/label-placement-goals.md
-			// §2.2, §3.1). ESRI Maplex keeps three numbers apart: LABEL PRIORITY is the order labels
-			// are ATTEMPTED in, LABEL WEIGHT is how much a placed label resists being pushed out, and
-			// FEATURE WEIGHT is how much a map feature resists being COVERED. Collide.GOAL_WEIGHT is a
-			// feature-weight table and only that. This is the first number. Do not merge them.
-			//
-			// **THE NUMBER IS A DROP ORDER: 1 IS THE FIRST TO GO** (Task 445, Tom 2026-08-19: "our
-			// labels priority paradigm really wants to be Labels.Drop First In Case of Conflict").
-			// It read the other way round until then -- 1 kept longest -- so a document written
-			// before the change is INVERTED by the v8 -> v9 migration, never reinterpreted in place.
-			//
-			// **ONE COLUMN, TWO AXES, ON PURPOSE.** Both read "lower means this field is given up
-			// sooner", but a LINK number orders ROWS INSIDE one label (a label that will not fit
-			// sheds from the bottom of the column) while a NODE number orders the TESTS that decide
-			// which whole label gives up a contested spot -- the lowest-numbered test is consulted
-			// last, so it is the first to stop mattering.
-			//
-			// **THE ORDER IS THE USER'S. THE DIRECTION IS NOT** -- LPN_NODE_DROP_RULE is that compiled
-			// table. A per-row max/min/least-extreme picker was declined: four controls per row that a
-			// user must reason through to arrive back at the only sensible setting.
-			//
-			// PARALLEL to decimals/prefix/suffix rather than nested into the boolean maps, for the
-			// reason the decimals comment gives.
-			//
-			// Link order puts the flow highest so it survives longest. **`id` IS RANK 1 AND SHEDS
-			// FIRST**, not the top rank never-shed: a link label lies ALONG its own pipe, so the
-			// drawing already says which pipe the numbers belong to and the ID is the one value whose
-			// job the label's own position is doing. That argument does NOT carry to node labels,
-			// which is why no node ID rank exists.
-			priority: {
-				// Demand outranks Base demand: on a crowded drawing the resolved number is the one
-				// worth the last space, and the base is recoverable from it and the pattern.
-				// **QUALITY OUTRANKS EVERYTHING AND SHEDS LAST**, because unlike the five below it is
-				// never on unless somebody switched the analysis on and re-ran: a field a user asked for
-				// by name is the last one to give up its space. It carries a rank and NO entry in
-				// LPN_NODE_DROP_RULE, which is the pair of statements "order this row inside the column"
-				// and "do not make this a criterion for which whole label wins a contested spot".
-				// initQuality ranks just under quality for the same argument: it is only ever on
-				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
-				// **RENUMBERED AGAIN, NOT REORDERED** (Task 696): level (tank water depth) slots
-				// between elev and head, on the same argument nodeFieldDefs()'s ordering comment
-				// gives for elev trailing head/pressure -- head is DERIVED from elev and level, so
-				// it is still the first of the three to give up its space when a label is crowded.
-				node: { quality: 8, initQuality: 7, demandActual: 6, demand: 5, pressure: 4, elev: 3,
-					level: 2, head: 1 },
-				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
-				// neighbours it had, and the three new ones are slotted where they belong -- the
-				// friction factor beside the gradient it is derived from, the status and the
-				// average quality on top because neither is ever on unless it was asked for.
-				// **RENUMBERED AGAIN, NOT REORDERED** (Task 652), on the rule the line above states:
-				// the reaction rate goes on top beside the average quality, because like it the row
-				// is never on unless the chemical analysis was switched on and run.
-				link: { rate: 13, quality: 12, status: 11, flow: 10, velocity: 9, headloss: 8, gradient: 7,
-					friction: 6, diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
-			},
+			/**
+			 * **SHOW ORDER AND DROP ORDER ARE TWO COLUMNS** (Tom, 2026-09-26, R-329: *"I don't like
+			 * that ID needs to display first, but also may need to drop first. We have been using
+			 * drop first as display last, which is efficient, but lazy."*).
+			 *
+			 * `show` is where a value sits on its label, 1 first -- the top of a stacked label, the
+			 * start of a one-line one. `priority` is the DROP order (Task 445): 1 is the first value
+			 * given up when a label is crowded. Until R-329 a label's reading order was derived from
+			 * the drop column, so the value about to go was always the last one printed; now the two
+			 * are independent and the ID can lead a label and still be the first thing it sheds.
+			 *
+			 * **LABEL PRIORITY IS NOT A WEIGHT** (Task 397; dev/label-placement-goals.md §2.2): ESRI
+			 * Maplex keeps priority, label weight and feature weight apart, and Collide.GOAL_WEIGHT is
+			 * the third. Do not merge them. The DIRECTION of each node criterion is not the user's --
+			 * LPN_NODE_DROP_RULE is that compiled table.
+			 *
+			 * The quality row keeps one number per MODE (`quality:chemical`, `quality:trace`,
+			 * `quality:age`), read through labelRank(), because Tom's table ranks a concentration, a
+			 * source share and a water age differently and only one of them is ever on a map at once.
+			 */
+			show: t.show,
+			priority: t.priority,
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field. Here rather than in `settings` because a label mark is a property
 			// of a label -- and, like the rest of labelSettings, a view preference kept out of `doc`.
@@ -7527,6 +7659,22 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_result_status_closed || 'Closed')
 			: (pc.lpn_result_status_open || 'Open');
 	}
+	// The document's own status, never the run's -- linkStatusOf()'s second road on its own.
+	function linkInitialStatusText(l) {
+		var pc = EngCalcs.pageConfig || {};
+		return effective(l, 'status') === 'closed'
+			? (pc.lpn_result_status_closed || 'Closed')
+			: (pc.lpn_result_status_open || 'Open');
+	}
+	// A pipe's reaction coefficient in force: its own where it states one, else the network's
+	// (`settings.reactions.globalBulk` / `globalWall`), in the document's own units -- the pair
+	// docReactions() hands the engine. Undefined where neither is stated.
+	function linkReactionCoeff(l, prop) {
+		var v = effective(l, prop), r = settings.reactions || {},
+			g = prop === 'bulkCoeff' ? r.globalBulk : r.globalWall;
+		if (typeof v === 'number' && isFinite(v)) { return v; }
+		return (typeof g === 'number' && isFinite(g)) ? g : undefined;
+	}
 	/**
 	 * **STATUS AS A NUMBER, BECAUSE A COLOUR RAMP IS A NUMBER LINE** -- 1 open, 0 closed.
 	 *
@@ -9470,7 +9618,7 @@ var EngCalcs = EngCalcs || {};
 		if (ls.customer.count) {
 			lines.push(affix('customer', 'count', { text: String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1) }));
 		}
-		return lines;
+		return labelShowOrder('customer', lines);
 	}
 	function buildCustomerLabelEls(c) {
 		var text = annotationEl('text', {
@@ -29486,9 +29634,43 @@ var EngCalcs = EngCalcs || {};
 		// Task 397's priorities, merged one level deeper for the reason the block above gives. This
 		// one carries real shipped defaults, so a document saved before a field existed must come
 		// back at that field's default RANK: undefined in a sort comparator is a non-total order.
-		var savedPri = savedLS.priority || {};
-		Object.assign(labelSettings.priority.node, savedPri.node || {});
-		Object.assign(labelSettings.priority.link, savedPri.link || {});
+		var savedPri = savedLS.priority || {}, savedShow = savedLS.show || {};
+		['node', 'link', 'customer'].forEach(function (g) {
+			Object.assign(labelSettings.priority[g], savedPri[g] || {});
+			Object.assign(labelSettings.show[g], savedShow[g] || {});
+			// **A FLAT `quality` RANK IS WHAT A PROJECT SAVED BEFORE R-329 CARRIES**, one number for
+			// all three modes. It governs all three rather than losing to the new per-mode defaults.
+			['priority', 'show'].forEach(function (kind) {
+				var src = kind === 'priority' ? savedPri[g] : savedShow[g], m = labelSettings[kind][g];
+				if (!src || typeof src.quality !== 'number') { return; }
+				['chemical', 'trace', 'age'].forEach(function (mode) {
+					if (typeof src['quality:' + mode] !== 'number') { m['quality:' + mode] = src.quality; }
+				});
+				delete m.quality;
+			});
+		});
+		/**
+		 * **"USE UNITS" NEVER HIDES AN AFTER TEXT A PROJECT ALREADY STATES** (R-331). A project saved
+		 * before the tick existed has no `useUnits` at all; for it, a row whose default is ticked stays
+		 * ticked only where the project has typed no suffix of its own -- otherwise the text the user
+		 * typed would vanish behind the unit on the first open. `symbology-defaults-harness.js` opens
+		 * exactly such a project.
+		 */
+		if (savedLS.useUnits && typeof savedLS.useUnits === 'object') {
+			['node', 'link', 'customer'].forEach(function (g) {
+				Object.assign(labelSettings.useUnits[g], savedLS.useUnits[g] || {});
+			});
+		} else {
+			['node', 'link', 'customer'].forEach(function (g) {
+				var own = savedSuf[g] || {}, m = labelSettings.useUnits[g];
+				Object.keys(m).forEach(function (f) {
+					var typed = Object.keys(own).some(function (k) {
+						return (k === f || k.indexOf(f + ':') === 0) && typeof own[k] === 'string';
+					});
+					if (typed) { m[f] = false; }
+				});
+			});
+		}
 		// A bare string, so it takes the same guarded assignment markExtrema does. An EMPTY string
 		// is a real setting ("Q12.5", no gap) and must survive this, which is why the test is on the
 		// type and not on truthiness.
@@ -29621,6 +29803,17 @@ var EngCalcs = EngCalcs || {};
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
+		// **A DECIMALS COUNT THE FILE DOES NOT STATE IS THE ONE ITS OWN UNITS CALL FOR** (R-328). The
+		// defaults above were computed under whatever units were showing BEFORE this document's own
+		// were installed; a count the file states is the user's and is never touched.
+		(function () {
+			var fresh = labelTableDefaults().decimals;
+			['node', 'link', 'customer'].forEach(function (g) {
+				Object.keys(fresh[g]).forEach(function (f) {
+					if (!(savedDec[g] && typeof savedDec[g][f] === 'number')) { labelSettings.decimals[g][f] = fresh[g][f]; }
+				});
+			});
+		}());
 		// A different document is a different network, so whether it HAS minor losses or Manning
 		// roughness is a new question and its engine notes are worth saying once again (Task 525).
 		resetEngineNotes();
@@ -32169,7 +32362,7 @@ var EngCalcs = EngCalcs || {};
 	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
 	// unit names that actually changed, which is what the rounding reads.
 	function convasApplyUnits(a) {
-		var changed = {};
+		var changed = {}, fromUnits = readUnitSelections();
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
 			if (!to || !from || to === from) { return; }
@@ -32183,7 +32376,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		convasRound(changed, a.rounding || {});
 		rememberUnitSelections();
-		afterUnitChange();
+		afterUnitChange(fromUnits);
 		return changed;
 	}
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
@@ -32239,12 +32432,23 @@ var EngCalcs = EngCalcs || {};
 	// importProject() has switched context onto it, exactly as convasApplyUnits() already does.
 	function convasApplyLabelSuffixes(a) {
 		var s = a.suffix || {};
-		if (typeof s.diameter === 'string') { setLabelAffix('suffix', 'link', 'diameter', s.diameter); }
-		if (typeof s.depth === 'string') { setLabelAffix('suffix', 'node', 'level', s.depth); }
-		if (typeof s.head === 'string') { setLabelAffix('suffix', 'node', 'head', s.head); }
+		// **A TICKED "USE UNITS" ROW GIVEN ITS OWN UNIT'S TEXT STAYS TICKED** (R-331), so it keeps
+		// following the unit; any other text is the user's own words, stored as typed, and the tick
+		// comes off so those words are what the map prints.
+		function put(group, field, v) {
+			var m = labelSettings.useUnits && labelSettings.useUnits[group];
+			if (m && m[field] && labelUnitsCapable(group, field)) {
+				if (v === labelUnitSuffix(group, field)) { return; }
+				m[field] = false;
+			}
+			setLabelAffix('suffix', group, field, v);
+		}
+		if (typeof s.diameter === 'string') { put('link', 'diameter', s.diameter); }
+		if (typeof s.depth === 'string') { put('node', 'level', s.depth); }
+		if (typeof s.head === 'string') { put('node', 'head', s.head); }
 		if (typeof s.flow === 'string') {
-			setLabelAffix('suffix', 'node', 'demand', s.flow);
-			setLabelAffix('suffix', 'customer', 'demand', s.flow);
+			put('node', 'demand', s.flow);
+			put('customer', 'demand', s.flow);
 		}
 	}
 	/**
@@ -35013,8 +35217,15 @@ var EngCalcs = EngCalcs || {};
 			crs = a.geo ? '' : (a.crs || ''),
 			place = a.place || null,
 			method = a.method || frictionMethod(),
-			units = a.units || {}, id;
+			units = a.units || {}, id, fromUnits, changedUnits;
 		id = newProject(coords, crs);
+		fromUnits = readUnitSelections();
+		// **R-342: DID THE WIZARD LEAVE ANY UNIT DIFFERENT FROM THE PROJECT IT WAS OPENED ON?** Asked
+		// here, before applyUnitSelections() moves the strip, so `fromUnits` is still the project this
+		// one was created from -- newProject() clones its whole settings unconditionally ("as much as
+		// they can"); resetUnitBearingDefaultsFor(), below, is the one correction for the pieces a
+		// unit change actually invalidates.
+		changedUnits = changedUnitSelectors(fromUnits, units);
 		// **THE UNITS GO IN THROUGH applyUnitSelections(), the same door a document's own units come
 		// in through.** Not through a change event on each select: that is the user-gesture path, and
 		// it would ask an empty project whether to reinterpret or convert numbers it does not have.
@@ -35025,7 +35236,10 @@ var EngCalcs = EngCalcs || {};
 		settings.method = method;
 		settings.defaults.roughness = defaultRoughnessFor(method);
 		applyMethodUI();
-		afterUnitChange();
+		afterUnitChange(fromUnits);
+		// AFTER the unit selects and afterUnitChange() have both run, so unitKey() and
+		// labelUnitDecimals() read the units this project is actually opening on.
+		resetUnitBearingDefaultsFor(changedUnits);
 		// stampProjectSaved AFTER all of it: everything above is a change like any other and marks the
 		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
 		// the very defect the baseline exists to remove (Task 264).
@@ -38599,6 +38813,9 @@ var EngCalcs = EngCalcs || {};
 	// the same shape of invariant unprojectStoredGeo() uses on `_ysrc`.
 	var unitElCache = {};
 	function unitEl(name) {
+		// **ASKED BEFORE THIS LINE HAS RUN** by defaultLabelSettings() at load (LPN_LABEL_TABLE's
+		// unit decimals), while the `var` above is hoisted and still undefined.
+		if (!unitElCache) { unitElCache = {}; }
 		var c = unitElCache[name];
 		if (c && c.isConnected !== false && c.parentNode && (c.name || c.getAttribute('name')) === name) { return c; }
 		c = document.querySelector('select[name="' + name + '"]');
@@ -38988,6 +39205,7 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(d);
 		});
 	}
+	function unitFromMap(name, from) { var m = {}; m[name] = from; return m; }
 	function onUnitChange(sel, name) {
 		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
 		if (!from || !to || from === to) { rememberUnitSelections(); return; }
@@ -38996,7 +39214,7 @@ var EngCalcs = EngCalcs || {};
 			// units are part of the PROJECT (there are no browser units on this page), so the choice
 			// has to survive the next open exactly as an element would.
 			rememberUnitSelections();
-			afterUnitChange();
+			afterUnitChange(unitFromMap(name, from));
 			return;
 		}
 		// Put it back until the question is answered. Nothing acts on the new unit before then --
@@ -39012,7 +39230,7 @@ var EngCalcs = EngCalcs || {};
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
-				afterUnitChange();
+				afterUnitChange(unitFromMap(name, from));
 				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
@@ -39041,7 +39259,7 @@ var EngCalcs = EngCalcs || {};
 				applyOneUnit(name, to);
 				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
 				rememberUnitSelections();
-				afterUnitChange();
+				afterUnitChange(unitFromMap(name, from));
 				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
@@ -39079,7 +39297,16 @@ var EngCalcs = EngCalcs || {};
 	// Properties (an open popup), the Tables pane, the legend, the status readout, and any colour
 	// break defined in this quantity. All of it is READ FROM `doc`/`lastSolveResult` at render
 	// time, so re-rendering it -- not rebuilding the DOM it renders into -- is the whole job.
-	function afterUnitChange() {
+	// `fromUnits`, when given, is {selectName: the unit it was on}: a decimals count still at that
+	// unit's default follows the new unit (followUnitDecimals(), R-328).
+	function afterUnitChange(fromUnits) {
+		if (fromUnits) {
+			Object.keys(fromUnits).forEach(function (sel) { followUnitDecimals(sel, fromUnits[sel]); });
+		}
+		// A ticked "Use units" After box names the unit, so it follows the change (R-331), and a
+		// decimals count that just followed the unit shows its new number in an open panel.
+		refreshUseUnitsBoxes();
+		refreshLabelNumberBoxes();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -39439,97 +39666,116 @@ var EngCalcs = EngCalcs || {};
 	// find a control by the word that describes it rather than by the word on it, and a row with no
 	// tip silently opts out of that. Tom, 2026-08-19, asking for "underline" and "overline" to be
 	// findable, had found the one row in this box that had no tip at all.
-	// **trailingCols NAMES WHICH NUMERIC COLUMNS THIS GROUP HAS**, so a group with fewer of them
-	// (Customer has no Drop column -- see customerFieldDefs()) reserves fewer slots rather than
-	// showing an always-empty one under a heading that names a control nothing on the row can do.
-	// Defaults to both, which is every node/link call site's existing behaviour unchanged.
-	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority, tip, trailingCols) {
+	// **SEVEN CHILDREN ON EVERY FIELD ROW, IN EVERY GROUP** (R-326, R-329, R-331): the name, Before,
+	// Use units, After, Decimals, Show and Drop. A row that has no use for a column holds it open
+	// with a spacer, so every heading stands over its column in all three lists -- the customer
+	// list included, which until R-326 had fewer columns than the other two. css/engcalcs.css
+	// addresses these columns by POSITION (children 2 to 7), so keep the two in step.
+	// `orders` is {show, drop}, each a spinner spec or null.
+	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, orders, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
-			input = document.createElement('input'), span = document.createElement('span');
+			input = document.createElement('input'), span = document.createElement('span'), after;
 		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
-		// enough to wrap -- "Head loss gradient", "Minor (local) loss coefficient" -- used to drag
-		// its checkbox and its four boxes down to the middle of BOTH lines, so nothing on the row
-		// sat beside the words it answers. The first line's baseline is fixed whatever the name does
-		// below it, which is the same rule .lpn-set-row carries in css/engcalcs.css.
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
+		// enough to wrap used to drag its checkbox and its boxes down to the middle of BOTH lines.
+		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = LPN_LABEL_ROW_GAP;
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
 		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
 		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
 		if (tip) { span.title = tip; span.className = 'ec-help'; }
-		// The box's one name treatment (.lpn-set-name -> .lpn-units-name's .85em at .8 opacity), so a
-		// field name in a labels list reads as the same kind of thing as the name on every other row.
 		label.className = 'lpn-set-name';
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
-		// The name takes the slack. What lets it SHRINK below its longest word -- and so what keeps
-		// this list from pushing the Settings box sideways -- is `min-width: 0` and
-		// `overflow-wrap: anywhere` in css/engcalcs.css, stated once there beside the list's own
-		// width floor rather than half here and half there.
+		// The name takes the slack; css/engcalcs.css lets it shrink below its longest word.
 		label.style.flex = '1 1 auto';
 		row.appendChild(label);
-		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }
-		// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** A LIST rather than a
-		// spacer bolted beside one control: a one-off spacer handles only the case that existed when
-		// it was written, and the next column staggers every row that has one control but not the
-		// other. Same slots, same order, on every field row.
-		// Only field rows participate; the whole-panel options below are not a field list.
 		if (affixOpt) {
-			(trailingCols || ['decimals', 'priority']).map(function (col) {
-				return col === 'decimals' ? decimals : priority;
-			}).forEach(function (spec) {
+			row.appendChild(affixBox(affixOpt.prefix));
+			after = affixBox(affixOpt.suffix);
+			row.appendChild(after);
+			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
+			// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** Same slots, same
+			// order, on every field row; only field rows participate.
+			[decimals, orders && orders.show, orders && orders.drop].forEach(function (spec) {
 				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
 		}
 		container.appendChild(row);
 	}
-	// The reserved width of one trailing numeric column, and the gap before it. Both are read by the
-	// spinner and by the spacer that stands in for a missing one, so the two cannot drift apart --
-	// which they had, the old spacer carrying the width and not the margin.
-	// **BORDER-BOX IS WHAT MAKES THE HEADINGS LINE UP.** An <input> is content-box by default, so a
-	// declared width of 3.5em renders 3.5em PLUS its padding and border. With heading spans at
-	// exactly their declared width, each control sits wider than its own heading and the flex spacer
-	// at the left absorbs the difference: every heading slides right, the LEFTMOST by the sum of all
-	// four errors and the rightmost by one. That signature -- worst at the left, almost right at the
-	// right -- is accumulated box-model drift, not a wrong width anywhere.
-	// **IN rem, NOT em** -- Task 435's finding, stated as a unit rather than as a comment: the
-	// heading row is drawn at 0.85em and an <input> inherits 1rem, so the same declared `em` is
-	// two different lengths and every heading slides off its column. Narrowed by Tom, 2026-08-18
-	// ("Node Decimals and Priority columns can be much narrower") once the box was halved in width:
-	// four columns at the old sizes were wider than the whole content pane.
-	var LPN_LABEL_COL_W = '3.2rem', LPN_LABEL_COL_GAP = '6px', LPN_LABEL_AFFIX_W = '2.6rem';
-	function labelColumnSpacer() {
+	// The reserved width of each column, read by the controls, their headings and the spacers that
+	// stand in for a missing control, so none of them can drift apart.
+	// **BORDER-BOX IS WHAT MAKES THE HEADINGS LINE UP**, and **rem, NOT em** (Task 435): the heading
+	// row is drawn at 0.85em and an <input> inherits 1rem, so the same declared `em` would be two
+	// lengths. **THE GAP BEFORE A NUMERIC COLUMN IS NOW ONLY THE ROW'S OWN 6px** (R-329 added a
+	// third numeric column): the extra margin each one used to carry was the width the Show column
+	// needed to fit the content pane without a sideways scrollbar.
+	// **SIZED TO THE PANE WITH 56 px TAKEN AWAY** (dev/browser-pass/specs/labelcols.js): six columns
+	// and five 4px gaps come to 15.3rem, which fits the 252 px a squeezed pane leaves -- the test
+	// that caught the Settings box scrolling sideways (Tom, 2026-08-19: "It should not"). The Use
+	// units column is as wide as its heading's longer word, so "units" never breaks.
+	var LPN_LABEL_COL_W = '2.6rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
+		LPN_LABEL_UNITS_W = '1.85rem', LPN_LABEL_ROW_GAP = '4px';
+	function labelColumnSpacer(width, isUnits) {
 		var spacer = document.createElement('span');
-		spacer.style.width = LPN_LABEL_COL_W;
-		spacer.style.marginLeft = LPN_LABEL_COL_GAP;
+		spacer.style.width = width || LPN_LABEL_COL_W;
+		if (!isUnits) { spacer.style.marginLeft = LPN_LABEL_COL_GAP; }
 		spacer.style.flex = '0 0 auto';
 		return spacer;
 	}
-	// One small bounded-integer spinner in a Labels row. `spec` is {value, max, title, onChange}.
-	// Shared by the decimals column (Task 189) and the priority column (Task 397): the same control
-	// with a different bound and tip, and a second hand-rolled copy is how the two would come to
-	// differ in clamping, in width, or in whether they save.
-	//
-	// Decimals bound 32, not a defensible-looking 4: a limit low enough to argue about is a limit
-	// someone will hit and resent. Zero is the floor in both columns.
-	//
-	// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide -- right
-	// for a physical quantity, wrong for a small bounded integer. Width allows for them.
+	/**
+	 * **A NUMBER BOX THAT A PHONE CAN SELECT AND TYPE INTO** (Tom, 2026-09-26, R-330: *"when tapped,
+	 * these should (a) highlight entirely like other inputs ... and (b) they should open the
+	 * scroll/spin interface if there is one."*).
+	 *
+	 * A phone draws no spinner for `type=number` -- there is no native scroll/spin control for a
+	 * plain number field on either Android or iOS -- and its selection support for that type is the
+	 * weakest of any input, which is why a tap placed a caret instead of selecting. So on a touch
+	 * screen this box is TEXT with `inputmode="numeric"`: the whole value is selected on the tap
+	 * (EngCalcs.wireSelectAllOnFocus(), which already covers every text box on the page), and the
+	 * phone opens its digit keypad, which is the honest version of "the scroll/spin interface". A
+	 * pointer keeps the real number box and its arrows. The same test the stylesheet's touch block
+	 * asks, `(hover: none) and (pointer: coarse)`, so the two cannot disagree about which device
+	 * this is.
+	 */
+	function labelTouchScreen() {
+		try { return !!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches); }
+		catch (e) { return false; }
+	}
+	// One small bounded-integer box in a Labels row. `spec` is {value, max, title, onChange}.
+	// Shared by the Decimals, Show and Drop columns: the same control with a different bound and tip.
+	// Zero is the floor in all three; a limit low enough to argue about is one someone will resent.
+	// Every Labels number box whose spec can re-read its own value, so a change made somewhere else
+	// -- a unit switch moving a default decimals count (followUnitDecimals()) -- shows at once in a
+	// panel that is already open, rather than only after the panel is rebuilt.
+	var labelNumberBoxes = [];
+	function refreshLabelNumberBoxes() {
+		labelNumberBoxes = labelNumberBoxes.filter(function (u) { return u.box.isConnected !== false; });
+		labelNumberBoxes.forEach(function (u) {
+			var v = u.spec.read();
+			if (typeof v === 'number' && String(v) !== String(u.box.value)) { u.box.value = v; u.spec.value = v; }
+		});
+	}
 	function labelNumberBox(spec) {
 		var box = document.createElement('input');
-		box.type = 'number'; box.min = '0'; box.max = String(spec.max); box.step = '1';
+		if (spec.read) { labelNumberBoxes.push({ box: box, spec: spec }); }
+		if (labelTouchScreen()) {
+			box.type = 'text';
+			box.setAttribute('inputmode', 'numeric');
+			box.setAttribute('pattern', '[0-9]*');
+		} else {
+			box.type = 'number'; box.min = '0'; box.max = String(spec.max); box.step = '1';
+			// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide.
+			box.className = 'ec-spin';
+		}
 		box.value = spec.value;
-		box.className = 'ec-spin';
 		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
 		box.style.flex = '0 0 auto'; box.style.boxSizing = 'border-box';
 		box.title = spec.title;
 		box.setAttribute('aria-label', spec.title);
 		box.addEventListener('change', function () {
-			// Clamped rather than rejected: a spinner held down runs past its own max, and silently
-			// snapping back to the nearest legal value reads better than an alert for a field where
-			// every out-of-range value has an obvious intended meaning.
+			// Clamped rather than rejected: every out-of-range value has an obvious intended meaning.
 			var v = Math.round(+box.value);
 			if (!isFinite(v)) { v = spec.value; }
 			v = Math.max(0, Math.min(spec.max, v));
@@ -39543,11 +39789,48 @@ var EngCalcs = EngCalcs || {};
 		});
 		return box;
 	}
-	// One prefix or suffix box. The VALUE shown is always the EFFECTIVE one (labelPrefixFor()
-	// resolves an unset field to its default), so the box reads as what the map is printing rather
-	// than as an empty box beside a label that visibly carries a letter. Typing stores whatever is
-	// there, empty string included -- that is the user saying "none", and it is honoured.
-	// `input`, not `change`: a prefix is one or two characters and the map follows the keystroke.
+	/**
+	 * **THE "USE UNITS" TICK, BESIDE THE AFTER BOX IT GOVERNS** (Tom, 2026-09-26, R-331: *"It should
+	 * put space and units in the After field and disable it."*). `spec` is {checked, text(),
+	 * onChange(on)}; `after` is that row's After box. Ticked, the box shows the unit text and cannot
+	 * be typed into; unticked, it holds whatever the user types. The After box is repainted from
+	 * text() whenever the unit changes (refreshUseUnitsBoxes()).
+	 */
+	var useUnitsBoxes = [];
+	function labelUnitsBox(spec, after) {
+		var pc = EngCalcs.pageConfig || {}, cell = document.createElement('span'),
+			box = document.createElement('input'),
+			name = pc.lpn_labels_use_units || 'Use units';
+		cell.style.width = LPN_LABEL_UNITS_W; cell.style.flex = '0 0 auto';
+		cell.style.textAlign = 'center';
+		box.type = 'checkbox';
+		box.checked = !!spec.checked;
+		box.title = name;
+		box.setAttribute('aria-label', name);
+		function paint() {
+			after.disabled = box.checked;
+			if (box.checked) { after.value = spec.text(); }
+		}
+		box.addEventListener('change', function () {
+			spec.onChange(box.checked);
+			paint();
+			if (!box.checked) { after.value = spec.text(); }
+			saveToStorage();
+			requestLabelRefresh();
+		});
+		paint();
+		useUnitsBoxes.push({ box: box, after: after, spec: spec });
+		cell.appendChild(box);
+		return cell;
+	}
+	// A unit or a quality mode just changed: every ticked After box shows the new unit text.
+	function refreshUseUnitsBoxes() {
+		useUnitsBoxes = useUnitsBoxes.filter(function (u) { return u.box.isConnected !== false; });
+		useUnitsBoxes.forEach(function (u) { if (u.box.checked) { u.after.value = u.spec.text(); } });
+	}
+	// One prefix or suffix box. The VALUE shown is always the EFFECTIVE one, so the box reads as what
+	// the map is printing. Typing stores whatever is there, empty string included -- that is the
+	// user saying "none", and it is honoured. `input`, not `change`: the map follows the keystroke.
 	function affixBox(spec) {
 		var box = document.createElement('input');
 		box.type = 'text';
@@ -39561,58 +39844,54 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
 	// checkbox/legend text says, so the popover and the legend can never drift out of sync.
-	// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Base demand, Head, Pressure,
-	// Elevation -- matches the same reordering in refreshLabelText()'s node loop above, so the
-	// checkbox list, the on-map label, and the legend all agree.
+	// **THE ROWS RUN IN TOM'S TABLE'S ORDER** (dev/symbology-defaults.csv, R-334), which is also the
+	// default Show order: identity, then what you typed, then what the model worked out. What a
+	// label prints first is the Show column's answer, not this list's (R-329).
 	function nodeFieldDefs(pc) {
 		return [
 			['id', pc.lpn_field_id || 'ID'],
+			['desc', pc.lpn_field_desc || 'Description'],
+			['tag', pc.lpn_field_tag || 'Tag'],
 			// Two rows, two quantities: the typed BASE and the DEMAND that base resolves to under
 			// its pattern at the moment on the clock. See resolvedDemand().
-			['demandActual', pc.bpn_demand || 'Demand'],
 			['demand', pc.lpn_field_base_demand || 'Base demand'],
-			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			['elev', pc.lpn_field_elev || 'Elevation'],
-			// **TANK WATER DEPTH** (Task 696, Tom, 2026-09-25: give the coverage this was missing
-			// rather than disable it in Convert as). Trails Elevation on the same physical-order
-			// argument: a tank is the one node type that has it, and the node loop below prints it
-			// only where one is typed, exactly as Elevation prints nothing for an imported reservoir
-			// with none. The same key names it in the tank's own Properties popup (renderNodeFields).
-			['level', pc.lpn_field_tank_level || 'Water depth'],
-			// LAST, and off by default. It is the one field here that no network has until a run
-			// has been made with the analysis switched on, and its heading follows that switch.
-			['quality', qualityLabel()],
 			// **THE NUMBER THE NODE STARTS WITH, under EPANET's own name for it** (Task 638). An
-			// INPUT rather than a result, so it sits after the result it feeds rather than with
-			// Elevation: the two quality rows belong beside each other, and this is the only input
-			// on this list that a hydraulic run cannot produce.
-			['initQuality', (pc.lpn_quality_initial || 'Initial quality')]
+			// INPUT, so it sits with the inputs.
+			['initQuality', (pc.lpn_quality_initial || 'Initial quality')],
+			['demandActual', pc.bpn_demand || 'Demand'],
+			// **TANK WATER DEPTH** (Task 696). A tank is the one node type that has it, and the node
+			// loop prints it only where one is typed.
+			['level', pc.lpn_field_tank_level || 'Water depth'],
+			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
+			// Off by default. No network has it until a run has been made with the analysis switched
+			// on, and its heading follows that switch -- the name comes from qualityLabel(), never a
+			// literal, so a chemical's own name reaches this row the day the resolver gives one.
+			['quality', qualityLabel()]
 		];
 	}
 	function linkFieldDefs(pc) {
 		return [
-			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
-			['length', pc.lpn_field_length || 'Length'],
-			// The two new inputs sit with the other inputs, after Length and before the solved
-			// results: inputs-then-results is the order the existing list follows.
+			['id', pc.lpn_field_id || 'ID'],
+			['desc', pc.lpn_field_desc || 'Description'],
+			['tag', pc.lpn_field_tag || 'Tag'],
+			['length', pc.lpn_field_length || 'Length'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
 			// Carries the method's symbol like every other roughness label (Task 271) -- the Labels
 			// popover is the map's only legend, so "Roughness" alone leaves the numbers unattributed.
-
 			['roughness', roughnessLabel()], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
+			['initStatus', pc.lpn_labels_init_status || 'Initial status'],
+			// Printed only while a chemical is tracked (reactionFieldsShown()), like every other
+			// place that shows them.
+			['bulkCoeff', pc.lpn_reaction_bulk || 'Bulk reaction coefficient'],
+			['wallCoeff', pc.lpn_reaction_wall || 'Wall reaction coefficient'],
 			['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
 			['gradient', pc.lpn_result_gradient || 'Head loss gradient'],
-			// **EPANET'S OWN FOUR LINK REPORT COLUMNS, COMPLETED** (Task 638). The friction factor
-			// goes with the loss it is back-computed from; the status and the average quality trail
-			// it, both off by default for the reason the node's quality row is -- neither exists
-			// until somebody asks for it.
+			// **EPANET'S OWN LINK REPORT COLUMNS, COMPLETED** (Task 638, Task 652).
 			['friction', pc.lpn_result_friction_factor || 'Friction factor'],
-			['status', pc.lpn_result_status || 'Status'],
+			['rate', pc.lpn_result_reaction_rate || 'Reaction rate'],
 			['quality', linkQualityLabel()],
-			// **THE FIFTH AND LAST OF EPANET'S LINK REPORT COLUMNS** (Task 652), read off the
-			// engine's own binary output. Off by default with the other three: it is a chemical
-			// answer and does not exist until somebody switches the analysis on.
-			['rate', pc.lpn_result_reaction_rate || 'Reaction rate']
+			['status', pc.lpn_result_status || 'Status']
 		];
 	}
 	/**
@@ -39622,26 +39901,26 @@ var EngCalcs = EngCalcs || {};
 	 * and description."*).
 	 *
 	 * **THERE IS NO TEXT SIZE ROW AND THERE MUST NOT BE ONE** (same message: *"I **don't** think we
-	 * need a separate text size. That's a bug."*). Text size is one setting for the whole map, in
-	 * Map appearance, and a customer label is drawn at it like every other label.
+	 * need a separate text size. That's a bug."*).
 	 *
-	 * **AND NO DROP COLUMN.** The link list's Drop number orders the rows a label SHEDS when it
-	 * will not fit; a customer label has two candidate spots and a drop, so there is nothing to
-	 * shed and a spinner there would order a queue that does not exist.
+	 * **IT HAS A DROP COLUMN NOW** (Tom, 2026-09-26, R-326: *"Drop order is missing for ... several
+	 * Customer properties."*). A customer label is placed at one of two spots or not at all, so today
+	 * nothing sheds its values one at a time; the column states the order for when one does, and the
+	 * Show column orders the values on the label now.
 	 */
 	function customerFieldDefs(pc) {
 		return [
 			['id', pc.lpn_field_id || 'ID'],
-			// The junction's own two demand rows, same order and same two headings: the typed base
-			// and what it resolves to at the moment on the clock.
-			['demandActual', pc.bpn_demand || 'Demand'],
-			['demand', pc.lpn_field_base_demand || 'Base demand'],
-			// The two identity strings a customer now carries, in place of the account number that
-			// was removed on the same day (Tom: *"provide existing properties like Description and
-			// Tag instead of Account number"*). The description is the one he named for a label.
+			// The two identity strings a customer carries in place of the account number that was
+			// removed (Tom: *"provide existing properties like Description and Tag instead of Account
+			// number"*).
 			['desc', pc.lpn_field_desc || 'Description'],
 			['tag', pc.lpn_field_tag || 'Tag'],
-			['count', pc.lpn_field_meter_count || 'Number of services']
+			// The junction's own two demand rows, same two headings: the typed base and what it
+			// resolves to at the moment on the clock.
+			['demand', pc.lpn_field_base_demand || 'Base demand'],
+			['count', pc.lpn_field_meter_count || 'Number of services'],
+			['demandActual', pc.bpn_demand || 'Demand']
 		];
 	}
 	// **THE HEADING ROW IS THE CALLER'S JOB NOW** (Task 247, Tom's screenshot 2026-09-20: "the hard
@@ -39707,25 +39986,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, line = document.createElement('label'),
 			text = document.createElement('span'), note = document.createElement('div');
 		customerFieldDefs(pc).forEach(function (f) {
+			var r = labelRowSpecs('customer', f[0]);
 			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
-				function (v) { labelSettings.customer[f[0]] = v; },
-				(typeof labelSettings.decimals.customer[f[0]] === 'number') ? {
-					value: labelSettings.decimals.customer[f[0]], max: 32,
-					title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
-					onChange: function (v) { labelSettings.decimals.customer[f[0]] = v; }
-				} : null,
-				{
-					prefix: {
-						value: labelPrefixFor('customer', f[0]),
-						title: pc.lpn_labels_prefix_tip || 'Text added before this property on map labels',
-						onChange: function (v) { setLabelAffix('prefix', 'customer', f[0], v); }
-					},
-					suffix: {
-						value: labelSuffixFor('customer', f[0]),
-						title: pc.lpn_labels_suffix_tip || 'Text added after this property on map labels',
-						onChange: function (v) { setLabelAffix('suffix', 'customer', f[0], v); }
-					}
-				}, null, null, ['decimals']);
+				function (v) { labelSettings.customer[f[0]] = v; }, r.decimals, r.affix, r.orders);
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
@@ -39757,6 +40020,90 @@ var EngCalcs = EngCalcs || {};
 		line.appendChild(text); line.appendChild(lw.wrap);
 		host.appendChild(line);
 	}
+	// The Drop column's tip, which differs by group because the three orders do different jobs: rows
+	// inside one link label, whole node labels against each other, and a customer label's values.
+	function labelDropTip(group) {
+		var pc = EngCalcs.pageConfig || {};
+		if (group === 'node') {
+			return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
+		}
+		if (group === 'customer') {
+			return pc.lpn_labels_priority_customer_tip || 'The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
+		}
+		return pc.lpn_labels_priority_link_tip || 'The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
+	}
+	// Turning "Use units" OFF leaves the unit text in the After box as the user's own, ready to edit,
+	// rather than snapping the box back to whatever it held before the tick.
+	function setLabelUseUnits(group, field, on) {
+		var m = labelSettings.useUnits || (labelSettings.useUnits = { node: {}, link: {}, customer: {} });
+		if (!m[group]) { m[group] = {}; }
+		if (!on) { setLabelAffix('suffix', group, field, labelUnitSuffix(group, field)); }
+		m[group][field] = !!on;
+	}
+	/**
+	 * **ONE LABELS ROW'S CONTROLS, FOR ANY OF THE THREE GROUPS** -- the decimals spinner, the two
+	 * affix boxes with their Use units tick, and the Show and Drop spinners. One function for node,
+	 * link and customer, so a column added to one list cannot be missing from another (the customer
+	 * list was, until R-326).
+	 *
+	 * A field gets a decimals spinner exactly when labelSettings.decimals carries an entry for it --
+	 * that map is the one place naming which fields are numeric. The quality row's spinner follows
+	 * the current mode (qualityDecimalsKey()), and its Show and Drop spinners read and write the
+	 * mode's own number (labelRankKey()). Bound 99 on the two orders: high enough that nobody meets
+	 * it, low enough to stay one glance wide.
+	 */
+	function labelRowSpecs(group, key) {
+		var pc = EngCalcs.pageConfig || {}, dec = labelSettings.decimals[group] || {}, k, out = {};
+		if (typeof dec[key] === 'number') {
+			k = (key === 'quality') ? qualityDecimalsKey() : key;
+			out.decimals = {
+				value: (typeof dec[k] === 'number') ? dec[k] : dec[key], max: 32,
+				read: function () {
+					var d = labelSettings.decimals[group] || {};
+					return (typeof d[k] === 'number') ? d[k] : d[key];
+				},
+				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
+				onChange: function (v) { dec[k] = v; }
+			};
+		} else { out.decimals = null; }
+		function order(kind, title) {
+			var v = labelRank(kind, group, key);
+			if (typeof v !== 'number') { return null; }
+			return { value: v, max: 99, title: title,
+				onChange: function (n) {
+					var m = labelSettings[kind] || (labelSettings[kind] = {});
+					if (!m[group]) { m[group] = {}; }
+					m[group][labelRankKey(key)] = n;
+				} };
+		}
+		out.orders = {
+			show: order('show', pc.lpn_labels_show_tip || 'The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.'),
+			drop: order('priority', labelDropTip(group))
+		};
+		// The prefix/suffix pair: both boxes show the EFFECTIVE text, so an untouched row displays
+		// the default the map is printing. **ONE ROW GETS ITS OWN SUFFIX TIP, AND IT IS THE
+		// GRADIENT** -- it prints a '%' nobody typed. A tip, NOT a parenthetical in the row's label:
+		// those strings are shared with renderLabelsLegend().
+		out.affix = {
+			prefix: {
+				value: labelPrefixFor(group, key),
+				title: pc.lpn_labels_prefix_tip || 'Text added before this property on map labels',
+				onChange: function (v) { setLabelAffix('prefix', group, key, v); }
+			},
+			suffix: {
+				value: labelSuffixFor(group, key),
+				title: (key === 'gradient' && group === 'link' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
+					'Text added after this property on map labels',
+				onChange: function (v) { setLabelAffix('suffix', group, key, v); }
+			},
+			units: labelUnitsCapable(group, key) ? {
+				checked: labelUsesUnits(group, key),
+				text: function () { return labelUnitSuffix(group, key); },
+				onChange: function (on) { setLabelUseUnits(group, key, on); }
+			} : null
+		};
+		return out;
+	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
 	function rebuildLabelsFields() {
@@ -39765,154 +40112,61 @@ var EngCalcs = EngCalcs || {};
 			custBox = document.getElementById('lpn_labels_customer_fields'),
 			optBox = document.getElementById('lpn_labels_options');
 		nodeBox.innerHTML = ''; linkBox.innerHTML = '';
-		// A field gets a decimals spinner exactly when labelSettings.decimals carries an entry for it
-		// -- that map is the one place naming which fields are numeric, so ID (and any future
-		// non-numeric field) is skipped without a second list to keep in sync.
-		function decimalsFor(group, key) {
-			var map = labelSettings.decimals[group], k;
-			if (typeof map[key] !== 'number') { return null; }
-			// **THE SPINNER FOLLOWS THE CURRENT QUALITY MODE** for the one field that has a
-			// mode-specific override (qualityDecimalsKey()) -- Source share reads and writes its own
-			// 0, and Water age / Concentration keep reading and writing the flat `quality` entry they
-			// always have. Every other field is unaffected: k === key and this is decimalsFor() as it
-			// was.
-			k = (key === 'quality') ? qualityDecimalsKey() : key;
-			return {
-				value: (typeof map[k] === 'number') ? map[k] : map[key], max: 32,
-				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
-				onChange: function (v) { map[k] = v; }
-			};
-		}
-		// **THE SAME GATE AS decimalsFor(), AND THE SAME REASON: THE MAP IS THE LIST.** A field gets a
-		// priority spinner exactly when labelSettings.priority carries an entry for it, so a node's ID
-		// row is skipped without a second list of participants to keep in step with the first.
-		// The two tips differ because the two columns order different things -- rows inside one label
-		// on a link, whole labels against each other on a node.
-		// Bound 99: high enough that nobody meets it, low enough to stay one glance wide.
-		function priorityFor(group, key) {
-			var map = labelSettings.priority[group];
-			if (typeof map[key] !== 'number') { return null; }
-			return {
-				value: map[key], max: 99,
-				title: (group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) ||
-					'The order in which values are dropped when a label does not fit. 1 is dropped first.',
-				onChange: function (v) { map[key] = v; }
-			};
-		}
-		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
-		// row still displays the default the map is printing) and write into labelSettings, which
-		// is what makes them per-project and what carries them into a saved file.
-		// **ONE ROW GETS ITS OWN TIP, AND IT IS THE GRADIENT** -- it prints a '%' nobody typed, which
-		// is real behaviour the user cannot see anywhere else. The ID row used to get one too, and
-		// it is gone (Tom, 2026-08-21: *"Are IDs processed specially, such as stripping alphabetics
-		// or checking something in the event a prefix is given under symbology? I am thinking that
-		// this should not happen and ID should not need a special tip."*). It is not, and it should
-		// not: an ID label prints the stored ID exactly, a prefix typed on that row prints exactly
-		// as typed in front of it, and the only thing that made the row look special was that its
-		// DEFAULT prefix is blank -- which is also true of diameter and length, neither of which
-		// explains itself. A tip that exists to reassure the reader about a rule the page does not
-		// have is a tip that invents the rule.
-		// A tip, NOT a parenthetical in the row's LABEL: those label strings are shared with
-		// renderLabelsLegend(), so a parenthetical would print on the map legend too.
-
-		function affixFor(group, key) {
-			return {
-				prefix: {
-					value: labelPrefixFor(group, key),
-					title: pc.lpn_labels_prefix_tip ||
-						'Text added before this property on map labels',
-					onChange: function (v) { setLabelAffix('prefix', group, key, v); }
-				},
-				suffix: {
-					value: labelSuffixFor(group, key),
-					title: (key === 'gradient' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
-						'Text shown after this value on the map',
-					onChange: function (v) { setLabelAffix('suffix', group, key, v); }
-				}
-			};
-		}
-		// **THE COLUMNS NEED NAMING NOW THAT THERE ARE FOUR OF THEM.** Three unlabelled boxes are
-		// inferable from their contents; four are not, because the two integers look alike and mean
-		// entirely different things. Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a
-		// heading cannot drift off its column. The name column is a flex spacer, not a heading: it is
-		// the row's subject, not a column of values.
-		// **ONE OF THE FOUR HEADINGS IS NOT A WORD** (Tom, 2026-08-18: "Node Decimals and Priority
-		// columns can be much narrower; maybe 'Decimals' can turn into '0.000'"). The decimals column
-		// is headed by an EXAMPLE of what it does.
-		//
-		// **THE PRIORITY COLUMN IS HEADED BY THE WORD "Drop", NOT BY AN ICON** (Task 445). It carried
-		// the icon of numbers getting smaller while the number meant importance; now that it means
-		// the order things are given up in, a word needs no learning, and "Drop" is short enough that
-		// the column does not widen -- which is the constraint that picked an icon in the first place.
-		//
-		// **THE EXAMPLE IS A LANGUAGE KEY, NOT A LITERAL** (Tom: "We could translate to '0,000'
-		// where needed"). A decimal COMMA is a locale fact, and a heading that demonstrates a
-		// decimal point demonstrates the wrong thing to most of Europe and South America.
-		//
-		// **THE TERM OF ART SURVIVES IN THE TIP**: both numeric headings carry their full name in
-		// `title`, so a reader who knows the word "priority" still finds it, and the search box
-		// matches it.
-		// **trailingCols NAMES WHICH NUMERIC COLUMNS THIS GROUP HAS**, the same list labelCheckbox()
-		// is given for every row in the group, so a header can never advertise a column no row in
-		// its section ever draws (Customer has no Drop column at all -- customerFieldDefs()).
-		// Defaults to both, unchanged from every existing node/link call.
-		function columnHeadings(box, group, trailingCols) {
+		useUnitsBoxes = [];
+		labelNumberBoxes = [];
+		// **THE COLUMNS NEED NAMING.** Six unlabelled boxes are not inferable from their contents:
+		// three integers look alike and mean entirely different things. Built from the same widths
+		// the boxes use, so a heading cannot drift off its column. The name column is a flex spacer.
+		// **THE DECIMALS HEADING IS AN EXAMPLE, NOT A WORD** (Tom, 2026-08-18), and a language key,
+		// because a decimal COMMA is a locale fact. **Show and Drop are words** short enough that
+		// the columns need not widen; each carries its full meaning in its tip, which the search box
+		// matches too.
+		function columnHeadings(box, group) {
 			var row = document.createElement('div'), lead = document.createElement('span');
-			// The box's one small-text treatment, from the stylesheet rather than from here -- see
-			// .lpn-set-note. Only the LAYOUT stays inline, because it is measured off the same
-			// LPN_LABEL_COL_W the boxes below use.
 			row.className = 'lpn-set-note';
-			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
+			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = LPN_LABEL_ROW_GAP;
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
-			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** -- the box's own
-			// rule, stated in css/engcalcs.css beside the text-align declarations it governs, and
-			// the last thing in this list that still read as "too far right" (Task 435). The two
-			// numeric columns draw their own spinner arrows and centre their digit, so their
-			// headings centre; the affix boxes hold WORDS and keep their natural start alignment,
-			// so a centred "Before" stood right of every letter it named. `start`, not `left`,
-			// because the same row has to read correctly in an RTL language.
-			var trailingDefs = {
-				decimals: [pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
-					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
+			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
+			// numeric columns centre their digit, so their headings centre; the affix boxes hold
+			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
+			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
+				[pc.lpn_labels_use_units || 'Use units', LPN_LABEL_UNITS_W, pc.lpn_labels_use_units_tip, 'center'],
+				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
+					(pc.lpn_labels_col_decimals || 'Decimals') + ' — ' +
 						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
-				priority: [pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
-					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
-						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
-					'center']
-			};
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start']
-			].concat((trailingCols || ['decimals', 'priority']).map(function (k) { return trailingDefs[k]; })
-			).forEach(function (h, i) {
+				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
+				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
+					(pc.lpn_labels_priority || 'Priority') + ' — ' + (labelDropTip(group) || ''), 'center']
+			].forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
 				cell.style.textAlign = h[3];
 				if (h[2]) { cell.title = h[2]; cell.className = 'ec-help'; }
-				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
-				// margin as well, so their headings must match or they sit half a gap left of the box
-				// they name.
-				if (i >= 2) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
+				// The numeric columns carry LPN_LABEL_COL_GAP as well as the row's own gap, so their
+				// headings must match or they sit off the box they name.
+				if (i >= 3) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
 				row.appendChild(cell);
 			});
 			box.appendChild(row);
 		}
 		columnHeadings(nodeBox, 'node');
 		nodeFieldDefs(pc).forEach(function (f) {
+			var r = labelRowSpecs('node', f[0]);
 			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
-				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]),
-				affixFor('node', f[0]), priorityFor('node', f[0]));
+				function (v) { labelSettings.node[f[0]] = v; }, r.decimals, r.affix, r.orders);
 		});
 		columnHeadings(linkBox, 'link');
 		linkFieldDefs(pc).forEach(function (f) {
+			var r = labelRowSpecs('link', f[0]);
 			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
-				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]),
-				affixFor('link', f[0]), priorityFor('link', f[0]));
+				function (v) { labelSettings.link[f[0]] = v; }, r.decimals, r.affix, r.orders);
 		});
 		if (custBox) {
 			custBox.innerHTML = '';
-			columnHeadings(custBox, 'customer', ['decimals']);
+			columnHeadings(custBox, 'customer');
 			buildCustomerLabelSection(custBox);
 		}
 		// Options applying to every field at once, below both field lists rather than on any one row:
@@ -39963,16 +40217,19 @@ var EngCalcs = EngCalcs || {};
 		// names (ID, Head, Flow/Demand) read plausibly as either kind of element. Emitted only when
 		// that group has a visible field, so a nodes-only legend does not grow a heading over nothing.
 		function addGroup(defs, fieldSettings, headingText) {
-			var shown = defs.filter(function (f) { return fieldSettings[f[0]]; });
+			var group = fieldSettings === labelSettings.node ? 'node' : 'link',
+				shown = defs.filter(function (f) { return fieldSettings[f[0]]; });
 			if (shown.length === 0) { return; }
+			// **IN SHOW ORDER** (R-329), so the key reads down in the order the label reads.
+			shown = labelShowOrder(group, shown.map(function (f) { return { field: f[0], def: f }; }))
+				.map(function (x) { return x.def; });
 			any = true;
 			var h = document.createElement('div');
 			h.style.fontWeight = 'bold';
 			h.textContent = headingText;
 			box.appendChild(h);
 			shown.forEach(function (f) {
-				var group = fieldSettings === labelSettings.node ? 'node' : 'link',
-					div = document.createElement('div'), key = document.createElement('span'),
+				var div = document.createElement('div'), key = document.createElement('span'),
 					p = labelPrefixFor(group, f[0]), suf = labelSuffixFor(group, f[0]);
 				div.style.display = 'flex'; div.style.gap = '0.5em';
 				// The key column is fixed-width so the field names line up under each other whether
@@ -51580,40 +51837,15 @@ var EngCalcs = EngCalcs || {};
 	// after its pattern and demand multiplier -- and before this they were 'Q=' and nothing at all,
 	// so the resolved value printed bare and the two were unreadable side by side. Q is the demand
 	// the network actually draws; the b says base.
-	var LPN_DEFAULT_LABEL_PREFIX = {
-		// **WATER QUALITY GETS NO DEFAULT PREFIX, DELIBERATELY.** Every symbol here is standard
-		// hydraulic notation a reader already knows -- Q, H, P, Z -- and neither a water age nor a
-		// source share has one. Inventing an English abbreviation would put untranslated words on
-		// a map in 27 languages to save a legend lookup; a diameter and a length are already
-		// unprefixed on the same argument. The field is off by default, the Labels list names it,
-		// and a user who wants a prefix can type their own.
-		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
-		// quality row's own input, and neither half of that pair has a symbol a reader would know.
-		// **TANK WATER DEPTH DEFAULTS TO 'Y='** (Tom, 2026-09-25: "For Water depth, initial default
-		// prefix can be 'Y='"). 'd' was ruled out as ambiguous with a pipe's own diameter on the
-		// same label set (Task 696); Y is the standard hydraulics symbol for depth.
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=',
-			level: 'Y=', quality: '', initQuality: '' },
-		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
-		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
-		// are. A status prints a WORD and would read as an equation with one; an average quality
-		// has no symbol for the same reason a node's quality has none.
-		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=',
-		// **AND A REACTION RATE GETS NONE** (Task 652), on the average quality's own argument: it
-		// is the reacting half of that same pair and has no symbol a reader would recognise.
-			friction: 'f=', status: '', quality: '', rate: '' },
-		// The node group's own symbols for the two quantities a customer shares with a junction, so
-		// a Q on a service reads as the Q on the junction it lumps at. A description and a tag are
-		// words rather than quantities and get none, exactly as an ID does; a count gets none
-		// because there is no symbol for it a reader of any of these 27 languages would know.
-		customer: { id: '', demand: 'Qb=', demandActual: 'Q=', desc: '', tag: '', count: '' }
-	};
+	// **THE PREFIXES THEMSELVES ARE LPN_LABEL_TABLE's `before` COLUMN** (R-334), so the table Tom
+	// edits is the one place a default symbol is stated. Water quality, a diameter and a length carry
+	// none; the reason each was left bare is his table's to give now, not a comment's.
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
 	// follows the method selector rather than being frozen at the moment defaults were built.
 	function labelDefaultPrefix(group, field) {
 		if (group === 'link' && field === 'roughness') { return roughnessSymbol() + '='; }
-		var m = LPN_DEFAULT_LABEL_PREFIX[group] || {};
-		return typeof m[field] === 'string' ? m[field] : '';
+		var r = (LPN_LABEL_TABLE[group] || {})[field];
+		return (r && typeof r.before === 'string') ? r.before : '';
 	}
 	// **THE QUALITY ROW AND initQuality GET A REAL DEFAULT** (Task 664), everything else stays
 	// empty exactly as it always has. Both are computed here rather than stored in
@@ -51630,6 +51862,13 @@ var EngCalcs = EngCalcs || {};
 			return mode === 'trace' ? '%' : mode === 'chemical' ? ' mg/L' : ' hr';
 		}
 		if (field === 'initQuality') { return ' mg/L'; }
+		// **R-347: THE MARK IS THE DEFAULT TEXT TOO**, so a Length/Diameter row that opens UNTICKED
+		// (feet, inches) still prints the ' / " character it would have shown ticked -- untying it
+		// from the unit selector changes nothing about what it prints today.
+		if (group === 'link' && (field === 'length' || field === 'diameter')) {
+			var sel = LPN_LABEL_FIELD_UNIT[group][field], mark = labelUnitMark(sel, unitKey(sel));
+			if (mark !== null) { return mark; }
+		}
 		return '';
 	}
 	// undefined -> the default; '' -> the user's own answer of "none". See defaultLabelSettings().
@@ -51655,7 +51894,52 @@ var EngCalcs = EngCalcs || {};
 		if (k !== field && typeof m[field] === 'string') { return m[field]; }
 		return labelDefaultPrefix(group, field);
 	}
+	/**
+	 * **THE "USE UNITS" TEXT: A SPACE AND THE UNIT** (Tom, 2026-09-26, R-331), read live so it
+	 * follows a unit change. Two marks are written the way a drawing writes them, hard against the
+	 * number and with no space: a length in feet is 12' and a diameter in inches is 6" (Tom's own
+	 * table gives exactly those two). A source share is a percentage, '%', on the rule
+	 * gradientSuffix() already follows. A concentration's unit is the one the document states beside
+	 * the chemical (concentrationUnitText()), and where it states none, EPANET's own default, mg/L.
+	 */
+	function labelUnitsCapable(group, field) {
+		if (field === 'quality' || field === 'initQuality') { return group !== 'customer'; }
+		var sel = (LPN_LABEL_FIELD_UNIT[group] || {})[field];
+		// The gradient already prints its own '%' (gradientSuffix()), so a tick there would print two.
+		return !!sel && sel !== 'lpn_u_gradient';
+	}
+	/**
+	 * **THE DRAWN MARK, WHERE ONE EXISTS** (Tom's table: a length in feet is 12', a diameter in
+	 * inches is 6"). Shared by labelUnitSuffix() (what a ticked box PRINTS) and labelTableDefaults()
+	 * (R-347: whether a fresh project TICKS the box at all) so the two questions read the same unit.
+	 */
+	function labelUnitMark(sel, key) {
+		if (key === 'ft' && sel === 'lpn_u_length') { return "'"; }
+		if (key === 'in' && sel === 'lpn_u_diameter') { return '"'; }
+		return null;
+	}
+	function labelUnitSuffix(group, field) {
+		var sel, key, mode, mark;
+		if (!labelUnitsCapable(group, field)) { return ''; }
+		if (field === 'quality') {
+			mode = qualityMode();
+			if (mode === 'trace') { return '%'; }
+			if (mode === 'chemical') { return ' ' + (concentrationUnitText() || 'mg/L'); }
+			return ' ' + unitLabel(resultUnit('age'));
+		}
+		if (field === 'initQuality') { return ' ' + (concentrationUnitText() || 'mg/L'); }
+		sel = LPN_LABEL_FIELD_UNIT[group][field];
+		key = unitKey(sel);
+		mark = labelUnitMark(sel, key);
+		if (mark !== null) { return mark; }
+		return ' ' + unitLabel(sel);
+	}
+	function labelUsesUnits(group, field) {
+		var m = (labelSettings.useUnits || {})[group];
+		return !!(m && m[field]) && labelUnitsCapable(group, field);
+	}
 	function labelSuffixFor(group, field) {
+		if (labelUsesUnits(group, field)) { return labelUnitSuffix(group, field); }
 		var m = (labelSettings.suffix || {})[group] || {}, k = labelAffixKey(field);
 		if (typeof m[k] === 'string') { return m[k]; }
 		if (k !== field && typeof m[field] === 'string') { return m[field]; }
@@ -51993,6 +52277,11 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
+			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
+			// a description would be reads as a defect on every node that has none.
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
 			if (!isFixedHeadNode(n) && ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), extrema.demandActual, nd.demandActual))); }
@@ -52076,11 +52365,26 @@ var EngCalcs = EngCalcs || {};
 			var le = linkEls[l.id]; if (!le) { return; }
 			var lines = [];
 			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
+			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
+			// status"), beside the Status row below, which is the run's answer where there is one.
+			// EPANET's own pair of words for a link's starting state.
+			if (ls.link.initStatus) { lines.push(affix('link', 'initStatus', { text: linkInitialStatusText(l) })); }
 			if (l.type === 'pipe') {
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
 				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), extrema.length, ld.length))); }
 				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), extrema.roughness, ld.roughness))); }
 				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), extrema.km, ld.km))); }
+				// **THE TWO REACTION COEFFICIENTS** (Tom's table, R-327), under the gate every other
+				// place that shows them already asks (reactionFieldsShown()): a coefficient changes
+				// nothing unless a chemical is being tracked. The one in force: the pipe's own, or the
+				// network-wide one it inherits. Typed numbers, so rawLine(), with no high/low mark.
+				if (reactionFieldsShown()) {
+					var bulkVal = linkReactionCoeff(l, 'bulkCoeff'), wallVal = linkReactionCoeff(l, 'wallCoeff');
+					if (ls.link.bulkCoeff && bulkVal !== undefined) { lines.push(affix('link', 'bulkCoeff', rawLine(bulkVal, null, ld.bulkCoeff))); }
+					if (ls.link.wallCoeff && wallVal !== undefined) { lines.push(affix('link', 'wallCoeff', rawLine(wallVal, null, ld.wallCoeff))); }
+				}
 			} else if (l.type === 'valve') {
 				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
 				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
@@ -52115,6 +52419,9 @@ var EngCalcs = EngCalcs || {};
 			// already in the unit its heading names and there is no factor to run it through.
 			var lrVal = linkReactionRate(l);
 			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, extrema.rate, ld.rate))); }
+			// **SHOW ORDER** (R-329), before the full list is banked: the shed cascade and the drawn
+			// label are then the one order, exactly as a node label's are.
+			lines = labelShowOrder('link', lines);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One
