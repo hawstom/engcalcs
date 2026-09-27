@@ -80,7 +80,7 @@ affiliation question harder.
 **Headline:** EPANET++: scenarios, fire flow, and a network library, on the same engine EPA gave
 the world.
 
-**Lede:** EPANET++ is a free, open-source water network editor built on the EPANET engine itself —
+**Lede:** EPANET++ is a free, open-source water network editor built on the EPANET engine itself,
 the same solver the U.S. Environmental Protection Agency wrote and gave away, extended with
 scenarios, fire flow analysis, and a library of pumps and curves you can reuse across projects. It
 is not EPANET, and it is not affiliated with or endorsed by the EPA; it is one of many tools built
@@ -139,5 +139,4 @@ campaign needed; it is one more honestly labeled door.
    page, and the page most resembling its name is the highest-risk place for that credit.
 5. **Should the site get its own claims ledger**, like `not-epanet.org`'s `CLAIMS.md`? Recommend:
    yes, built alongside the site in step 3.
-6. **Timing against Tasks 715/716** (Full and Status Report), which the roadmap says come first.
-   Recommend: hold this build until those ship, per his 2026-09-25 sequencing.
+6. **Timing.** No longer a question: Tasks 715 and 716 closed 2026-09-26 with the feat/report merge.
