@@ -3198,9 +3198,27 @@ $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as t
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
 // concentration is TEXT the document states beside the chemical name and is never converted, which
 // is why there is no unit family and no unit key here.
-$ec_lang['lpn_quality_chemical_name']='Chemical and units';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_chemical_name_tip']='Label for the chemical and its concentration units: for example, Chlorine mg/L. Not used in calculations, but be consistent.';
+// R-323: "Our interface is very clear that these don't matter to the calculations. But
+// explanation aside, our interface is arguably less friendly than EPANET because they have a
+// dropdown for Mass Units ... and they don't 'require' the chemical name." Split into a name (this
+// key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
+// and Mass Units fields; the name is optional, exactly as EPANET's own is.
+$ec_lang['lpn_quality_chemical_name']='Chemical';
+$ec_lang['lpn_quality_chemical_name_tip']='The chemical you are tracking, for example Chlorine. Leave it blank for EPANET\'s own default label, Chemical. Shown on your reports, but not used in the calculations.';
+$ec_lang['lpn_quality_mass_units']='Mass units';
+$ec_lang['lpn_quality_mass_units_tip']='The mass half of the concentration unit, EPANET\'s own two choices.';
+$ec_lang['lpn_quality_unit_ug']='µg/L';
+// R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
+// diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
+// and handed to the engine with no box to read or change them from; EPANET's own names and its own
+// defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
+$ec_lang['lpn_quality_tolerance']='Quality tolerance';
+$ec_lang['lpn_quality_tolerance_tip']='How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET\'s own default of 0.01.';
+$ec_lang['lpn_quality_diffusivity']='Relative diffusivity';
+$ec_lang['lpn_quality_diffusivity_tip']='How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET\'s own default of 1.0.';
+// R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
+// would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
+$ec_lang['lpn_quality_named_concentration']='{chemical} concentration';
 $ec_lang['lpn_quality_initial']='Initial quality';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Blank means 0.';
@@ -3276,7 +3294,9 @@ $ec_lang['lpn_reaction_order_tank']='Tank reaction order';
 $ec_lang['lpn_reaction_order_tank_tip']='The exponent the concentration is raised to for reaction in the water held in a tank, separate from the bulk reaction order so a tank can react on a different order from the pipes. Any real number is allowed, and 1 is the default. EPANET states it as ORDER TANK in a file and offers no box for it in its own interface.';
 $ec_lang['lpn_reaction_order_wall']='Wall reaction order';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_order_wall_tip']='1 means that wall reaction occurs according to the given coefficient(s). 0 means it does not. This is an on and off switch. Default value is 1.';
+// R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
+// dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
+$ec_lang['lpn_reaction_order_wall_tip']='1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.';
 $ec_lang['lpn_reaction_order_unstated']='Not stated';
 $ec_lang['lpn_reaction_order_zero']='0, zero order';
 $ec_lang['lpn_reaction_order_first']='1, first order';

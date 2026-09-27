@@ -27,7 +27,8 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-304. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-325. (R-282 is taken on `feat/label-gang-search`;
+R-305-320 may be taken on other branches concurrent with this one -- reconcile at merge.)
 
 ---
 
@@ -262,3 +263,10 @@ judgement and does not belong to a script.
 - [ ] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared
 - [ ] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b
 - [ ] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording
+
+## Round of 2026-09-26 (night) -- WaterCAD/EPANET audit, the Quality panel
+
+- [x] R-321 feat/quality-settings | "Quality parameter order must be: None, Chemical, Trace, Age (as he sees in EPANET)." -- reordered
+- [x] R-322 feat/quality-settings | "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative diffusivity: I don't see this in our interface. Is it missing?" -- both added to Settings, Quality, Chemical, EPANET's own names and defaults (0.01, 1.0); already carried and handed to the engine, now with a box. Along the way: `lpnQualityText()` never composed an edited chemical name/mass unit, only carried or dropped one, so an edit on an imported Net1/Net2/Net3 never reached the exported file -- fixed on the same terms a retargeted trace already had
+- [x] R-323 feat/quality-settings | "(1) We should say 'Mass units' if EPANET says that. (2) ... they have a dropdown for Mass Units ... and they don't 'require' the chemical name. (3) ... we could put it in Properties, Find, and Tables as '{chemical} concentration', and that would be very cool." -- split into a Chemical name box (optional) and a Mass units dropdown (mg/L, µg/L); qualityLabel() now composes "{chemical} concentration" everywhere it is read, "Concentration" when nothing is named
+- [x] R-324 feat/quality-settings | "(1) Wall reaction coefficient units vary according to Wall reaction order; when order is 0, coefficient is mass/area/time and when order is 1, coefficient is length/time. I guess we can dynamically change the label. (2) Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.'" -- wallCoeffUnitText() now switches the unit (mg or µg per unit-length² per day at order 0, length per day at order 1) everywhere it is shown (Settings, pipe type Library, Tables); tip wording his exact words

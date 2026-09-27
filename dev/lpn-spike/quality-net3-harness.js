@@ -80,7 +80,18 @@ function check(ok, msg) {
 	check(EngCalcs.lpnQualityText({ mode: 'trace', traceNode: 'River', src: 'Trace Lake' }) === 'Trace River',
 		'a different source composes our own line');
 	check(EngCalcs.lpnQualityText({ mode: 'chemical', src: 'Chlorine mg/L' }) === 'Chlorine mg/L',
-		'a chemical is carried, never composed');
+		'an untouched chemical is carried, never composed');
+	// **R-323's Chemical/Mass units rows edit `q.chemical`, and the export must follow them** --
+	// the same "still matches the token?" test a retargeted trace already had. Byte-identical for
+	// an unedited value, composed the moment the name or the mass unit really changes.
+	check(EngCalcs.lpnQualityText({ mode: 'chemical', src: 'Chlorine mg/L', chemical: 'Chlorine mg/L' }) === 'Chlorine mg/L',
+		'touched but unchanged still round-trips the file\'s own text');
+	check(EngCalcs.lpnQualityText({ mode: 'chemical', src: 'Chlorine mg/L', chemical: 'Fluoride ug/L' }) === 'Fluoride ug/L',
+		'a renamed chemical or a changed mass unit composes our own line');
+	check(EngCalcs.lpnQualityText({ mode: 'chemical', chemical: 'Chlorine mg/L' }) === 'Chlorine mg/L',
+		'a brand new project with a stated name composes one, with no token to carry');
+	check(EngCalcs.lpnQualityText({ mode: 'chemical' }) === '',
+		'a brand new project with nothing named writes nothing, letting EPANET\'s own default stand');
 	check(EngCalcs.lpnQualityText({ mode: 'none' }) === '',
 		'a document stating nothing writes nothing');
 	// **THE LEGACY CASE, AND IT IS THE ONE THAT COULD DELETE SOMEBODY'S LINE.** A project saved
