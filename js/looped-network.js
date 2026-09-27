@@ -39148,7 +39148,7 @@ var EngCalcs = EngCalcs || {};
 	function labelDropTip(group) {
 		var pc = EngCalcs.pageConfig || {};
 		if (group === 'node') {
-			return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first.';
+			return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 		}
 		if (group === 'customer') {
 			return pc.lpn_labels_priority_customer_tip || 'The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
@@ -39196,7 +39196,7 @@ var EngCalcs = EngCalcs || {};
 				} };
 		}
 		out.orders = {
-			show: order('show', pc.lpn_labels_show_tip || 'The order in which values appear on a label. The value numbered 1 comes first.'),
+			show: order('show', pc.lpn_labels_show_tip || 'The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.'),
 			drop: order('priority', labelDropTip(group))
 		};
 		// The prefix/suffix pair: both boxes show the EFFECTIVE text, so an untouched row displays
