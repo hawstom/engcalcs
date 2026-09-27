@@ -2578,9 +2578,9 @@ $ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped 
 $ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
-$ec_lang['lpn_labels_col_before']='Before';
+$ec_lang['lpn_labels_col_before']='Bef.';
 $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time';
-$ec_lang['lpn_labels_col_after']='After';
+$ec_lang['lpn_labels_col_after']='Aft.';
 $ec_lang_syn['lpn_labels_col_after']='After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time';
 $ec_lang['lpn_labels_col_decimals']='Decimals';
 // ---- R-326..R-334 (2026-09-26): Show order, Use units, the customer Drop column, the new rows ----

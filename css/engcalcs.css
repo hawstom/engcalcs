@@ -3698,24 +3698,25 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    rather than by the body happening to be 1rem.
 
    The selectors are the columns themselves: child 1 is the flexible name/spacer, children 2-7 are
-   Before, Use units, After, 0.000 (decimals), Show and Drop, in all three lists and both row types
-   (R-326..R-331 added Use units and Show and gave the customer list every column). `span:nth-child(2|3)`
-   therefore matches only a heading cell (a field row carries an <input> there), and `span:nth-child(4|5)` matches a
-   heading cell or the reserved-column spacer -- which needs the same treatment for the same reason
-   and lands on the same 3.2rem it already had. Keep in step with labelCheckbox() and
-   columnHeadings() in js/looped-network.js if a column is ever added. */
+   Before, After, Use units, 0.000 (decimals), Show and Drop, in all three lists and both row types
+   (R-326..R-331 added Use units and Show and gave the customer list every column; R-346 moved Use
+   units after After). `span:nth-child(2|3)` therefore matches only a heading cell (a field row
+   carries an <input> there), and `span:nth-child(4|5)` matches a heading cell or the
+   reserved-column spacer -- which needs the same treatment for the same reason and lands on the
+   same 3.2rem it already had. Keep in step with labelCheckbox() and columnHeadings() in
+   js/looped-network.js if a column is ever added. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
 #lpn_labels_customer_fields { font-size: 1rem; }
 #lpn_labels_node_fields > div > span:nth-child(2),
 #lpn_labels_link_fields > div > span:nth-child(2),
 #lpn_labels_customer_fields > div > span:nth-child(2),
-#lpn_labels_node_fields > div > span:nth-child(4),
-#lpn_labels_link_fields > div > span:nth-child(4),
-#lpn_labels_customer_fields > div > span:nth-child(4) { width: 2.2rem !important; }
 #lpn_labels_node_fields > div > span:nth-child(3),
 #lpn_labels_link_fields > div > span:nth-child(3),
-#lpn_labels_customer_fields > div > span:nth-child(3) { width: 1.85rem !important; }
+#lpn_labels_customer_fields > div > span:nth-child(3) { width: 2.2rem !important; }
+#lpn_labels_node_fields > div > span:nth-child(4),
+#lpn_labels_link_fields > div > span:nth-child(4),
+#lpn_labels_customer_fields > div > span:nth-child(4) { width: 1.85rem !important; }
 #lpn_labels_node_fields > div > span:nth-child(5),
 #lpn_labels_link_fields > div > span:nth-child(5),
 #lpn_labels_customer_fields > div > span:nth-child(5),

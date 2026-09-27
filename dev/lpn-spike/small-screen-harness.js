@@ -715,7 +715,7 @@ const TOUCH = true;
 	// width, and with and without a spinner.
 	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '2.3rem', 6: '2.3rem', 7: '2.3rem' };
 	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem', 6: '1.6rem', 7: '1.6rem' };
-	const wantWide = { 2: '2.2rem', 3: '1.85rem', 4: '2.2rem', 5: '2.6rem', 6: '2.6rem', 7: '2.6rem' };
+	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.6rem', 6: '2.6rem', 7: '2.6rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
 		const h = heading.children[i - 1], b = field.children[i - 1];
 		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',

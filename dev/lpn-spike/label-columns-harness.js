@@ -71,7 +71,7 @@ function importantWidths() {
 }
 const IMPORTANT = importantWidths();
 console.log('\n--- the stylesheet claims six columns, by index ---');
-// Before, Use units, After, Decimals, Show, Drop (R-326..R-331).
+// Before, After, Use units, Decimals, Show, Drop (R-326..R-331, reordered R-346).
 ok('columns 2-7 all carry an !important width',
 	[2, 3, 4, 5, 6, 7].every((i) => IMPORTANT[i]),
 	JSON.stringify(IMPORTANT));
@@ -157,10 +157,10 @@ function describe(edges) {
 	{
 		const head = rows[0].children;
 		ok('the Before/After headings start where their text boxes start',
-			head[1].style.textAlign === 'start' && head[3].style.textAlign === 'start',
-			head[1].style.textAlign + ',' + head[3].style.textAlign);
+			head[1].style.textAlign === 'start' && head[2].style.textAlign === 'start',
+			head[1].style.textAlign + ',' + head[2].style.textAlign);
 		ok('...the Use units heading is centred over its tick',
-			head[2].style.textAlign === 'center', head[2].style.textAlign);
+			head[3].style.textAlign === 'center', head[3].style.textAlign);
 		ok('...and the three spinner headings are centred, like the digit under them',
 			[4, 5, 6].every((k) => head[k].style.textAlign === 'center'),
 			[4, 5, 6].map((k) => head[k].style.textAlign).join(','));
@@ -179,7 +179,7 @@ function describe(edges) {
 	{
 		const idRow = rows.filter((r) => /ID/.test(r.children[0].textContent || ''))[0];
 		ok('the ' + group + ' ID row is present and reserves Use units and Decimals with spacers',
-			!!idRow && idRow.children[2].tagName === 'SPAN' && idRow.children[2].children.length === 0 &&
+			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[3].children.length === 0 &&
 			idRow.children[4].tagName === 'SPAN',
 			idRow ? idRow.children.map((c) => c.tagName).join(',') : 'missing');
 	}

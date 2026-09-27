@@ -5232,9 +5232,80 @@ var EngCalcs = EngCalcs || {};
 				if (r.dec === 'u') { out.decimals[group][f] = labelUnitDecimals(group, f); }
 				else if (typeof r.dec === 'number') { out.decimals[group][f] = r.dec; }
 				if (typeof r.decTrace === 'number') { out.decimals[group][f + ':trace'] = r.decTrace; }
-				if (r.units) { out.useUnits[group][f] = true; }
+				// **R-347: A DRAWN MARK IS A FIXED SYMBOL, NOT A TICK** (Tom: "Length and Diameter
+				// for US projects should have ' and \", not 'Use units' ticked... for US, I provided
+				// suffixes"). A field whose CURRENT unit draws its own mark (feet, inches) opens
+				// UNTICKED with that literal character as ordinary After text, so it stops changing
+				// once the model has one; any other unit (m, mm, ...) has no mark and opens ticked,
+				// so it keeps following the unit selector, per his reading for SI.
+				if (r.units) {
+					var unitSel = (LPN_LABEL_FIELD_UNIT[group] || {})[f];
+					out.useUnits[group][f] = unitSel ? (labelUnitMark(unitSel, unitKey(unitSel)) === null) : true;
+				}
 			});
 		});
+		return out;
+	}
+	// **R-342: WHICH `settings.defaults` FIELD A UNIT SELECTOR OWNS THE MAGNITUDE OF.** A typed
+	// default (a node's default elevation, demand, or pipe diameter) is a number in whatever unit
+	// was showing when it was typed; roughness is handled separately (it follows the friction
+	// method, not a length unit) and `k` is a dimensionless minor-loss coefficient.
+	var LPN_DEFAULTS_UNIT_FIELD = { lpn_u_elevhead: 'nodeElev', lpn_u_flow: 'demand', lpn_u_diameter: 'diameter' };
+	/**
+	 * **R-342: A NEW PROJECT FOLLOWS THE ONE IT LEFT AS MUCH AS IT CAN** (Tom: *"A new project
+	 * copies the open project where units are the same... Otherwise a new project gets built-in
+	 * defaults... new projects follow current project as much as they can"*). newProject() already
+	 * clones the whole of `settings` and `labelSettings` unconditionally -- prefixes, colouring
+	 * choices, show/drop order, on/off toggles are all preferences a person carries between
+	 * projects whether or not a unit moved, and none of them is a number stated in a unit. This
+	 * function is the narrow correction for the pieces that ARE: a decimals count and a "Use
+	 * units" tick are calibrated to one specific unit's magnitude or drawn mark, a `defaults` entry
+	 * is a number typed in the unit that was showing, and `customerMaxWidth` is stated in the
+	 * length unit (R-347's comment on labelUnitMark makes the same distinction for the tick).
+	 * CLAUDE.md: "Changing a unit reinterprets the typed number; it never converts it" -- a value
+	 * calibrated to a unit that is no longer showing is exactly that reinterpretation risk, so it
+	 * is dropped to the built-in default rather than carried across silently.
+	 *
+	 * `changedSelectors` names only the unit selects the New Project wizard actually left different
+	 * from the project it was opened on (changedUnitSelectors()); called AFTER applyUnitSelections()
+	 * so unitKey() reads the NEW unit. Everything not named here -- which is most of `settings` and
+	 * `labelSettings`, DECIMALS INCLUDED -- is left exactly as newProject() cloned it: decimals are
+	 * a display-format preference, not a modelled quantity, and afterUnitChange()'s own
+	 * followUnitDecimals() (called right before this, on the SAME `fromUnits`) already moves an
+	 * untouched count to its new unit's default and leaves a customized one alone -- the identical
+	 * rule an ordinary in-place unit change on an existing project already follows, so a new
+	 * project should not answer that question differently. A "Use units" TICK has no such follow
+	 * mechanism (it only decides once, at label-set construction), so it is the one thing reset here.
+	 */
+	function resetUnitBearingDefaultsFor(changedSelectors) {
+		var set = {}, group, field, sel, row;
+		if (!changedSelectors || !changedSelectors.length) { return; }
+		changedSelectors.forEach(function (n) { set[n] = true; });
+		Object.keys(LPN_DEFAULTS_UNIT_FIELD).forEach(function (s) {
+			if (set[s] && settings.defaults) { settings.defaults[LPN_DEFAULTS_UNIT_FIELD[s]] = null; }
+		});
+		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
+		for (group in LPN_LABEL_FIELD_UNIT) {
+			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
+			for (field in LPN_LABEL_FIELD_UNIT[group]) {
+				if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT[group], field)) { continue; }
+				sel = LPN_LABEL_FIELD_UNIT[group][field];
+				if (!set[sel]) { continue; }
+				row = (LPN_LABEL_TABLE[group] || {})[field];
+				if (row && row.units && labelSettings.useUnits[group]) {
+					labelSettings.useUnits[group][field] = labelUnitMark(sel, unitKey(sel)) === null;
+				}
+			}
+		}
+	}
+	// The unit selects the wizard actually left DIFFERENT from the project it was opened on --
+	// only those it can answer for (both sides must have a value) count as "changed".
+	function changedUnitSelectors(from, to) {
+		var out = [], name;
+		for (name in to) {
+			if (!Object.prototype.hasOwnProperty.call(to, name)) { continue; }
+			if (to[name] && from && from[name] && to[name] !== from[name]) { out.push(name); }
+		}
 		return out;
 	}
 	/**
@@ -35146,9 +35217,15 @@ var EngCalcs = EngCalcs || {};
 			crs = a.geo ? '' : (a.crs || ''),
 			place = a.place || null,
 			method = a.method || frictionMethod(),
-			units = a.units || {}, id, fromUnits;
+			units = a.units || {}, id, fromUnits, changedUnits;
 		id = newProject(coords, crs);
 		fromUnits = readUnitSelections();
+		// **R-342: DID THE WIZARD LEAVE ANY UNIT DIFFERENT FROM THE PROJECT IT WAS OPENED ON?** Asked
+		// here, before applyUnitSelections() moves the strip, so `fromUnits` is still the project this
+		// one was created from -- newProject() clones its whole settings unconditionally ("as much as
+		// they can"); resetUnitBearingDefaultsFor(), below, is the one correction for the pieces a
+		// unit change actually invalidates.
+		changedUnits = changedUnitSelectors(fromUnits, units);
 		// **THE UNITS GO IN THROUGH applyUnitSelections(), the same door a document's own units come
 		// in through.** Not through a change event on each select: that is the user-gesture path, and
 		// it would ask an empty project whether to reinterpret or convert numbers it does not have.
@@ -35160,6 +35237,9 @@ var EngCalcs = EngCalcs || {};
 		settings.defaults.roughness = defaultRoughnessFor(method);
 		applyMethodUI();
 		afterUnitChange(fromUnits);
+		// AFTER the unit selects and afterUnitChange() have both run, so unitKey() and
+		// labelUnitDecimals() read the units this project is actually opening on.
+		resetUnitBearingDefaultsFor(changedUnits);
 		// stampProjectSaved AFTER all of it: everything above is a change like any other and marks the
 		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
 		// the very defect the baseline exists to remove (Task 264).
@@ -39614,8 +39694,8 @@ var EngCalcs = EngCalcs || {};
 		if (affixOpt) {
 			row.appendChild(affixBox(affixOpt.prefix));
 			after = affixBox(affixOpt.suffix);
-			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
 			row.appendChild(after);
+			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
 			// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** Same slots, same
 			// order, on every field row; only field rows participate.
 			[decimals, orders && orders.show, orders && orders.drop].forEach(function (spec) {
@@ -40050,9 +40130,9 @@ var EngCalcs = EngCalcs || {};
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
 				[pc.lpn_labels_use_units || 'Use units', LPN_LABEL_UNITS_W, pc.lpn_labels_use_units_tip, 'center'],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					(pc.lpn_labels_col_decimals || 'Decimals') + ' — ' +
 						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
@@ -51782,6 +51862,13 @@ var EngCalcs = EngCalcs || {};
 			return mode === 'trace' ? '%' : mode === 'chemical' ? ' mg/L' : ' hr';
 		}
 		if (field === 'initQuality') { return ' mg/L'; }
+		// **R-347: THE MARK IS THE DEFAULT TEXT TOO**, so a Length/Diameter row that opens UNTICKED
+		// (feet, inches) still prints the ' / " character it would have shown ticked -- untying it
+		// from the unit selector changes nothing about what it prints today.
+		if (group === 'link' && (field === 'length' || field === 'diameter')) {
+			var sel = LPN_LABEL_FIELD_UNIT[group][field], mark = labelUnitMark(sel, unitKey(sel));
+			if (mark !== null) { return mark; }
+		}
 		return '';
 	}
 	// undefined -> the default; '' -> the user's own answer of "none". See defaultLabelSettings().
@@ -51821,8 +51908,18 @@ var EngCalcs = EngCalcs || {};
 		// The gradient already prints its own '%' (gradientSuffix()), so a tick there would print two.
 		return !!sel && sel !== 'lpn_u_gradient';
 	}
+	/**
+	 * **THE DRAWN MARK, WHERE ONE EXISTS** (Tom's table: a length in feet is 12', a diameter in
+	 * inches is 6"). Shared by labelUnitSuffix() (what a ticked box PRINTS) and labelTableDefaults()
+	 * (R-347: whether a fresh project TICKS the box at all) so the two questions read the same unit.
+	 */
+	function labelUnitMark(sel, key) {
+		if (key === 'ft' && sel === 'lpn_u_length') { return "'"; }
+		if (key === 'in' && sel === 'lpn_u_diameter') { return '"'; }
+		return null;
+	}
 	function labelUnitSuffix(group, field) {
-		var sel, key, mode;
+		var sel, key, mode, mark;
 		if (!labelUnitsCapable(group, field)) { return ''; }
 		if (field === 'quality') {
 			mode = qualityMode();
@@ -51833,8 +51930,8 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'initQuality') { return ' ' + (concentrationUnitText() || 'mg/L'); }
 		sel = LPN_LABEL_FIELD_UNIT[group][field];
 		key = unitKey(sel);
-		if (key === 'ft' && sel === 'lpn_u_length') { return "'"; }
-		if (key === 'in' && sel === 'lpn_u_diameter') { return '"'; }
+		mark = labelUnitMark(sel, key);
+		if (mark !== null) { return mark; }
 		return ' ' + unitLabel(sel);
 	}
 	function labelUsesUnits(group, field) {

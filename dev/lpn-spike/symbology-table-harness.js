@@ -184,46 +184,59 @@ L.resetLS();
 L.setQuality(MODES.age);
 
 // ---- 4. Use units ------------------------------------------------------------------------------
-console.log('== 4. "Use units" fills, disables, follows and round-trips ==');
+// R-347 reordered the row (Before, After, Use units, ...) and changed the DEFAULT tick: a unit
+// that draws its own mark (feet, inches) opens UNTICKED with that mark as ordinary After text --
+// Tom's own words, "Length and Diameter for US projects should have ' and \", not 'Use units'
+// ticked... for US, I provided suffixes" -- while a unit with no mark (metres, millimetres) opens
+// TICKED, so it keeps following the unit selector, per his own "may have intended ... for SI".
+console.log('== 4. "Use units" defaults to the mark, ticks, disables, follows and round-trips ==');
 {
 	setUnitSet('us');
 	L.resetLS();
 	L.rebuildLabels();
 	const linkBox = byId['lpn_labels_link_fields'];
-	// Row 0 is the headings; find the Length row by its label text.
+	// Row 0 is the headings; find a row by its label text.
 	const rowOf = (box, text) => box.children.find((r) => r.children[0] && (r.children[0].textContent || '').indexOf(text) >= 0);
-	const lenRow = rowOf(linkBox, 'Length');
-	ok('every field row has seven children: name, Before, Use units, After, Decimals, Show, Drop',
+	const lenRow = rowOf(linkBox, 'Length'), diaRow = rowOf(linkBox, 'Diameter');
+	ok('every field row has seven children: name, Before, After, Use units, Decimals, Show, Drop',
 		linkBox.children.slice(1).every((r) => r.children.length === 7),
 		q(linkBox.children.map((r) => r.children.length)));
-	const tick = lenRow && lenRow.children[2].children[0], after = lenRow && lenRow.children[3];
-	ok('Length has a Use units tick, ticked by default', !!tick && tick.type === 'checkbox' && tick.checked === true);
-	ok('its After box shows the foot mark and is disabled', after && after.value === "'" && after.disabled === true,
+	const tickOf = (row) => row && row.children[3].children[0], afterOf = (row) => row && row.children[2];
+	let tick = tickOf(lenRow), after = afterOf(lenRow);
+	ok('Length opens UNTICKED in a US project (R-347)', !!tick && tick.type === 'checkbox' && tick.checked === false);
+	ok('its After box shows the foot mark, as ordinary editable text', after && after.value === "'" && after.disabled === false,
 		after && q(after.value) + ' disabled=' + after.disabled);
 	ok('the tick names itself "Use units"', tick && tick.getAttribute('aria-label') === 'Use units');
-	// A unit change: feet to metres.
+	const diaTick = tickOf(diaRow), diaAfter = afterOf(diaRow);
+	ok('Diameter opens UNTICKED in a US project too (R-347), showing the inch mark',
+		!!diaTick && diaTick.checked === false && diaAfter.value === '"' && diaAfter.disabled === false,
+		diaAfter && q(diaAfter.value) + ' checked=' + diaTick.checked);
+	// Ticking it on: the box disables and fills with the live unit text, and now follows a change.
+	tick.checked = true; (tick._listeners.change || []).forEach((f) => f({ type: 'change', target: tick }));
+	ok('ticking Length disables the After box and keeps the same foot mark',
+		after.disabled === true && after.value === "'", q(after.value) + ' disabled=' + after.disabled);
 	L.applyOneUnit('lpn_u_length', 'm');
 	L.afterUnitChange({ lpn_u_length: 'ft' });
-	ok('changing Length to metres changes the ticked After box to " m"', after.value === ' m', q(after.value));
+	ok('...and now a unit change moves the ticked After box to " m"', after.value === ' m', q(after.value));
 	ok('...and the label suffix itself', L.suffixFor('link', 'length') === ' m', q(L.suffixFor('link', 'length')));
-	// Untick: the box opens, keeps the unit text as the user's own.
+	// Untick again: the box opens, keeps the unit text as the user's own.
 	tick.checked = false; (tick._listeners.change || []).forEach((f) => f({ type: 'change', target: tick }));
 	ok('unticking enables the After box', after.disabled === false);
 	ok('...and leaves the unit text in it as ordinary text', after.value === ' m' && L.suffixFor('link', 'length') === ' m');
 	L.applyOneUnit('lpn_u_length', 'ft');
 	L.afterUnitChange({ lpn_u_length: 'm' });
 	ok('an unticked row does NOT follow the unit', L.suffixFor('link', 'length') === ' m', q(L.suffixFor('link', 'length')));
-	// Round trip.
+	// Round trip: Length untied by the user's own choice above, Diameter left at its US default.
 	const out = JSON.parse(JSON.stringify(L.serializeProject()));
 	ok('the tick rides in the project file (serializeProject().labelSettings.useUnits)',
 		out.labelSettings && out.labelSettings.useUnits && out.labelSettings.useUnits.link.length === false &&
-		out.labelSettings.useUnits.link.diameter === true, q(out.labelSettings && out.labelSettings.useUnits));
+		out.labelSettings.useUnits.link.diameter === false, q(out.labelSettings && out.labelSettings.useUnits));
 	ok('Show order rides in the project file too', out.labelSettings.show && out.labelSettings.show.node.id === 1);
 	L.resetLS();
 	L.migrateSaved(out); L.applySaved(out);
 	ok('reopened: Length stays unticked with its own text', L.ls().useUnits.link.length === false &&
 		L.suffixFor('link', 'length') === ' m');
-	ok('reopened: Diameter stays ticked and prints the inch mark', L.ls().useUnits.link.diameter === true &&
+	ok('reopened: Diameter stays unticked with the inch mark', L.ls().useUnits.link.diameter === false &&
 		L.suffixFor('link', 'diameter') === '"', q(L.suffixFor('link', 'diameter')));
 	// A project saved before the tick existed, with its own typed quality After text.
 	const old = JSON.parse(JSON.stringify(out));
@@ -237,7 +250,23 @@ console.log('== 4. "Use units" fills, disables, follows and round-trips ==');
 	ok('...while a row it never typed into takes the ticked default',
 		L.ls().useUnits.node.initQuality === true && L.suffixFor('node', 'initQuality') === ' mg/L');
 	L.setQuality(MODES.age);
-	ok('a row with no unit has no tick (ID)', rowOf(linkBox, 'ID') && rowOf(linkBox, 'ID').children[2].children.length === 0);
+	ok('a row with no unit has no tick (ID)', rowOf(linkBox, 'ID') && rowOf(linkBox, 'ID').children[3].children.length === 0);
+
+	// **AND AN SI PROJECT TICKS BOTH BY DEFAULT** (R-347's "may have intended it for SI"): neither
+	// metres nor millimetres draws a mark of its own, so there is nothing fixed to fall back to.
+	setUnitSet('si');
+	L.resetLS();
+	L.rebuildLabels();
+	const siBox = byId['lpn_labels_link_fields'];
+	const siLen = rowOf(siBox, 'Length'), siDia = rowOf(siBox, 'Diameter');
+	ok('Length opens TICKED in an SI project, After showing " m", disabled',
+		tickOf(siLen).checked === true && afterOf(siLen).value === ' m' && afterOf(siLen).disabled === true,
+		q(afterOf(siLen).value) + ' checked=' + tickOf(siLen).checked);
+	ok('Diameter opens TICKED in an SI project, After showing " mm", disabled',
+		tickOf(siDia).checked === true && afterOf(siDia).value === ' mm' && afterOf(siDia).disabled === true,
+		q(afterOf(siDia).value) + ' checked=' + tickOf(siDia).checked);
+	setUnitSet('us');
+	L.resetLS();
 }
 
 // ---- 5. decimals follow a unit while they are still its default --------------------------------
@@ -304,7 +333,7 @@ console.log('== 6. Settings > Symbology is Node labels, Node colors, Link labels
 	ok('Node colors fills', byId['lpn_set_colors_node'].children.length > 0);
 	ok('Link colors fills', byId['lpn_set_colors_link'].children.length > 0);
 	const headings = byId['lpn_labels_node_fields'].children[0].children.map((c) => c.textContent);
-	ok('the headings name all six columns', q(headings.slice(1)) === q(['Before', 'Use units', 'After', '0.000', 'Show', 'Drop']),
+	ok('the headings name all six columns', q(headings.slice(1)) === q(['Bef.', 'Aft.', 'Use units', '0.000', 'Show', 'Drop']),
 		q(headings));
 }
 

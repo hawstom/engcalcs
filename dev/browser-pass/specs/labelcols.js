@@ -35,8 +35,9 @@ const LISTS = [
 // "carries something", not as a string -- which is also what keeps this check honest the day the
 // icon lands and the word goes away.
 // R-326..R-331 (2026-09-26) made it six, the same in all three lists: Use units beside After, and
-// Show beside Drop.
-const COLUMNS = ['Before', 'Use units', 'After', '0.000', 'Show', 'Drop'];
+// Show beside Drop. R-346 (2026-09-27) moved Use units after After and shortened the two headings
+// to "Bef." and "Aft."
+const COLUMNS = ['Bef.', 'Aft.', 'Use units', '0.000', 'Show', 'Drop'];
 
 // The heading row and every field row of one list, as painted. Column 1 is the field's name and is
 // a flex spacer, not a column of values, so only children 2..5 are read.
@@ -131,7 +132,7 @@ exports.run = async function ({ browser, report }) {
 			// Since R-326 every ID has a Show and a Drop order, so an ID row holds exactly two
 			// columns open with a spacer in all three lists: Use units and Decimals.
 			const idRow = got.fields[0];
-			const spacers = [1, 3];
+			const spacers = [2, 3];
 			report.eq(idRow.name, 'ID', `${list.what}: the first row is the ID`);
 			report.ok(spacers.every(k => idRow.cells[k].tag === 'span' && !idRow.cells[k].text),
 				`${list.what}: it holds Use units and Decimals open with a spacer`,
