@@ -562,6 +562,9 @@ EngCalcs.lpnCollide = (function () {
 	// Net3-Novato-CA-World at 2x of master's fit needs about this much per placement for its 24
 	// rescues (R-290); beyond it the remaining labels are dropped as though the rescue had not run.
 	var RESCUE_WORK_PER_CALL = 3e5;
+	// Past this share deferred the view is hopeless for leaders -- a whole-network view where nearly
+	// every label is deferred -- and nobody is rescued, as before the grading.
+	var RESCUE_HOPELESS_FRAC = 0.5;
 	// **POLAR, NOT RECTANGULAR, AND THAT FOLLOWS FROM THE SHAPE OF WHAT IS BEING SAMPLED.** A sector
 	// is bounded by two angles and a radius, so a polar grid needs no rejection step at all, where a
 	// rectangular one samples a square and throws most of it away. Radii are geometric inner->outer
@@ -1908,7 +1911,7 @@ EngCalcs.lpnCollide = (function () {
 		// work budgets (RESCUE_WORK_PER_CALL, `opts.rescue`) bound the cost that the cliff used to.
 		// `opts.widenCrowd` is the fraction, for a harness fixture built to be full on purpose.
 		var crowdFrac = (opts && opts.widenCrowd > 0) ? opts.widenCrowd : 0.25;
-		var budget = Math.floor(labels.length * crowdFrac);
+		var budget = deferred.length > labels.length * RESCUE_HOPELESS_FRAC ? 0 : Math.floor(labels.length * crowdFrac);
 		if (deferred.length > budget) {
 			deferred.slice(budget).forEach(function (lbl) {
 				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,

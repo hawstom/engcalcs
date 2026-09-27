@@ -2755,7 +2755,15 @@ var EngCalcs = EngCalcs || {};
 	// labels giving a value up and 14 hidden, worse than no rescue budget at all); the 480-pipe
 	// grid spends all of it, about 0.4 s of a 5 s pass that is mostly link-label shedding.
 	var LPN_RESCUE_WORK_PER_PASS = 3e6, passRescueBudget = null;
-	function labelRescueWork() { return LPN_RESCUE_WORK_PER_PASS; }
+	// **AND NONE WHILE ZOOM TO FIT IS MEASURING** (R-290). The fit lays the labels out at each scale
+	// it tries and steps back until all the ink is clear of the frame and the furniture, and past the
+	// labeling threshold it gives the labels up (R-263). A rescued label is the likeliest ink to
+	// stand far out, and on Net3-Novato-CA-World in a 1900 x 950 window one rescued leader grazing the
+	// top band by 0.7 px sent the fit past the threshold: no labels at all where master draws 60
+	// (label-drag-fit-harness.js). So the fit chooses the view from the ordinary placement, and the
+	// labels are then laid out once more, rescue included, at the view it chose.
+	var fitMeasuring = false;
+	function labelRescueWork() { return fitMeasuring ? 0 : LPN_RESCUE_WORK_PER_PASS; }
 	function shedNodeLabelsForCrowding(nodeLabels, placed, obs, pad, fsNow) {
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
@@ -11898,6 +11906,11 @@ var EngCalcs = EngCalcs || {};
 		// overlay's own measured depth -- whichever edge gives up the smaller share of the canvas --
 		// and the fit is solved again. Reserves only grow and the scale only steps down, so it ends.
 		function settleOnDrawnInk() {
+			fitMeasuring = true;
+			try { settleLoop(); } finally { fitMeasuring = false; }
+			reshedNow();
+		}
+		function settleLoop() {
 			var k, all, s2, p2, hit;
 			for (k = 0; k < LPN_FIT_SETTLE_PASSES; k++) {
 				reshedNow();
@@ -11917,7 +11930,6 @@ var EngCalcs = EngCalcs || {};
 				if (!modelInside(s2, p2)) { return; }
 				apply(s2, p2);
 			}
-			reshedNow();
 		}
 		// `true` when something is outside the padded frame, the overlay's rectangle when something
 		// is under an overlay, null when all is clear.
