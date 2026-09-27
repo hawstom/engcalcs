@@ -194,6 +194,20 @@
             "words": "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete.",
             "context": "Said 2026-09-26 evening after his browser pass on port 8105, in the same message as R-285 (\"Yes. It's perfect. We are gold now.\"). Recorded on his explicit approval, the permission guard having refused the edit.",
             "pin_note": "HE CLEARED IT AT c28c6f3c AND THE PIN IS LATER: a merge of master and the regenerated translation payloads, nothing of the branch's own."
+        },
+        "feat/placement-wizard": {
+            "head": "56c6e88b6dd83340ffe038e8a717781b46654236",
+            "date": "2026-09-26",
+            "words": "1. (a) Step 1 happily fades my image to 50%. ... 2. OK. 3. OK. 4. OK. Done. Close, merge, and delete branch.",
+            "context": "Said 2026-09-26 night after his browser pass on port 8117, and confirmed when asked whether to record it ('Yes, write both'). His 1(b), the Step 1 initial world view, is R-306 on fix/placement-world-view rather than holding this merge.",
+            "pin_note": "HE CLEARED IT AT a7917752 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message ('Merge this fix into the branches'), and a regenerated dev/new-english-keys.md. Nothing of the branch's own."
+        },
+        "feat/find-coordinate": {
+            "head": "a3688c0ec84886c38bb28cef148678c150a67b13",
+            "date": "2026-09-26",
+            "words": "All good. Close, merge, and delete branch.",
+            "context": "Said 2026-09-26 night after his browser pass on port 8118, and confirmed when asked whether to record it ('Yes, write both').",
+            "pin_note": "HE CLEARED IT AT a75480e0 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message. Nothing of the branch's own."
         }
     }
 }
