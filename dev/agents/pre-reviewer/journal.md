@@ -2468,3 +2468,95 @@ wall-clock measurement.
 UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom to fit lands on
 the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
 no browser session was opened this pass, only Node DOM-stub harnesses.
+
+---
+
+## 2026-09-27 — feat/quality-settings (R-321..R-324), head d945719a
+
+OBSERVED: `git merge-base dbbb2ce7 d75a944c` = `72b9086c` -- d75a944c's parent is NOT master's
+tip. Diffing `dbbb2ce7..d75a944c` directly (two divergent commits) prints an unrelated-looking
+CSS diff (placement-wizard drag bar, backdrop opacity var) that is an artifact of comparing
+across the fork point, not a real change on this branch. The honest diff is
+`dbbb2ce7..d945719a` (current head, master already merged in): 7 files, no CSS, exactly the
+Quality panel plus its harness and docs. Recorded so nobody re-panics over the same comparison.
+
+OBSERVED: `node dev/lpn-spike/quality-settings-harness.js` on this worktree -- all checks pass
+(order, tolerance/diffusivity box+export+engine-input, chemical/mass-units split+export,
+wall-unit-by-order in Settings/Library/Tables, SI length unit).
+
+OBSERVED, mutation test: copied the same harness onto a worktree of dbbb2ce7 (pre-fix) via
+`git worktree add --detach ... dbbb2ce7` -- it fails hard and early: parameter order reads
+`none,age,trace,chemical` (R-321's actual defect), then a `TypeError` on the tolerance box
+because it does not exist yet. The harness is not decoration.
+
+OBSERVED, node stub, SI + order 0 (a cell the shipped harness does not cover): wall coefficient
+unit reads "mg/m²/day" -- sensible, matches R-324(1)'s "mass/area/time" under SI.
+
+OBSERVED, node stub, Net1/Net2 unedited import -> export: `[OPTIONS]` block byte-identical
+including `Diffusivity 1.0` / `Tolerance 0.01` carried verbatim (not renormalized to `1`/`0.01`
+etc). Net3 (Trace) confirmed byte-identical via the existing
+`inp-roundtrip-net3-harness.js` (1229/1229 tokens). Editing Net2's mass unit after import
+(`Fluoride mg/L` -> `ug/L`) reaches the exported `.inp` as `Fluoride ug/L`; an untouched import
+still exports `Fluoride mg/L` unchanged.
+
+OBSERVED, real headless Chromium via `dev/browser-pass/lib/env.js` + `Session`, flock'd, at
+desktop width: Quality parameter select order is exactly None/Chemical/Trace/Age; the Chemical
+section shows rows in order Chemical, Mass units, Quality tolerance, Relative diffusivity, Bulk
+reaction coefficient, Wall reaction coefficient, Bulk/Tank/Wall reaction order, Limiting
+concentration, Roughness correlation -- Mass units dropdown is exactly `mg/L, µg/L`; Wall
+reaction order's tip reads Tom's R-324(2) sentence verbatim, char for char.
+
+OBSERVED, same session, ROW-SCOPED element selection (found the input inside the `.lpn-set-row`
+whose own label span reads "Chemical", not the first blank `input[type=text]` on the whole
+Settings box -- the box renders every section's fields at once, ~90 text inputs, so a
+loosely-scoped query silently grabs an unrelated field): typing "Chlorine" into the real
+Chemical name box and tabbing out persists `"chemical":"Chlorine mg/L"` to the saved project
+(localStorage), and afterward the Junctions Tables tab heading reads "Chlorine concentration
+(mg/L)" and Find's Junction-scope property list offers "Chlorine concentration" -- both R-323(3)
+claims CONFIRMED live in a browser, not just in the node harness.
+
+**A false alarm worth recording against my own method.** My first two passes at this used
+`document.querySelectorAll('#lpn_setbox_content input[type=text]')[0]`-style selection (first
+match by a placeholder filter) rather than row-scoped selection, and it silently edited some
+*other* settings field. That produced an apparent defect -- "the name box shows Chlorine but
+the Tables heading still says plain Concentration, and localStorage never gains a `chemical`
+key" -- reproduced identically across three independent scripts, which felt like confirmation.
+It was a bug in the harness, not the product: the loose selector never touched the real
+Chemical box at all. Row-scoped selection (found the row by its own label text, then the input
+inside that row) reversed the finding completely. Recorded because it is exactly the trap this
+seat exists to catch in someone else's work, and I nearly shipped it against my own.
+
+OBSERVED: no em dash in any of this branch's new English strings (`lib/lang.ec.en.php` diff
+`dbbb2ce7..d945719a`); every pre-existing em dash elsewhere in the file predates this branch.
+
+UNVERIFIED: the Quality panel's layout at phone width (360 px). The Settings toolbar button is
+not reachable at 360 px viewport in this headless setup -- `toolbarClick('Settings')` times out
+waiting for a visible "Settings" button, meaning it has gone into whatever overflow mechanism
+the toolbar uses below some breakpoint, which this session did not chase further. This is a
+property of the toolbar generally, not something this branch touches, but it means I could not
+personally look at the Quality section's row layout on a narrow screen. **A person should open
+Settings > Quality on an actual phone-width window (or a resized desktop browser) and confirm
+the rows read cleanly** -- row labels, the Mass units dropdown, and the two small text boxes.
+
+VERDICT
+
+R-321 (parameter order None/Chemical/Trace/Age): CONFIRMED, live browser + harness + mutation
+test.
+
+R-322 (Quality tolerance / Relative diffusivity boxes): CONFIRMED, live browser (rows present,
+EPANET's own names) + harness (blank-is-a-state export/engine-input behaviour, Net1's stated
+0.01/1.0 carried verbatim on import).
+
+R-323 (Mass units dropdown, chemical name optional, "{chemical} concentration" in
+Properties/Find/Tables): CONFIRMED for Mass units, Tables and Find, all in a live browser. Did
+not independently open the Properties popup on a node (ran out of budget after the false-alarm
+detour) -- UNVERIFIED FROM HERE specifically for the Properties popup row, though it reads off
+the same shared `qualityLabel()` function proven correct for Tables and Find, and the code
+comment names it as the same resolver.
+
+R-324 (wall coefficient unit follows wall reaction order; corrected tip text): CONFIRMED, live
+browser for the tip's exact wording, and harness + node-stub spot-check for the unit switch
+(ft/day, mg/ft²/day, µg/ft²/day, m/day, and the untested-by-the-shipped-harness mg/m²/day cell).
+
+No other findings. This is a well-built, well-tested branch; the one genuine gap is the phone
+layout, which nobody in this pass could reach.
