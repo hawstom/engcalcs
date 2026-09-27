@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**38 still to read on master**, of 302 untranslated keys, of 2133 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 304 untranslated keys, of 2135 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (302, 38 to read @@ NEEDS RULING)
+## lpn_  (304, 40 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -645,6 +645,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_quality_mass_units_tip`**
   > The mass half of the concentration unit, EPANET's own two choices.
   @@ NEEDS RULING
+- **`lpn_quality_named_avg_concentration`**
+  > Average {chemical} concentration
+  @@ NEEDS RULING
 - **`lpn_quality_named_concentration`**
   > {chemical} concentration
   @@ NEEDS RULING
@@ -696,6 +699,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   _Ruled OK 2026-09-23._
+- **`lpn_source_type_none`**
+  > None
+  @@ NEEDS RULING
 - **`lpn_status_closed`**
   > {type} {id} closed
   _Ruled OK 2026-09-26._
@@ -938,7 +944,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**8 still to read**, of 11 new keys across 4 unmerged branch(es).
+**9 still to read**, of 12 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -949,9 +955,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0927b (`ed19d9d0`) — adds no English strings
+### feat/ctrl-enter (`ed33a911`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/label-gang-search (`d8afdd5f`) — 3 new, all ruled
+- **`lpn_pane_ctrlenter_filled`**
+  > Filled {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`8ce9ce7c`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -963,9 +973,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/quality-settings (`43d22a0f`) — adds no English strings
+### feat/quality-settings (`b0588be2`) — adds no English strings
 
-### feat/symbology-label (`aef7185e`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/symbology-label (`78b7ef98`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_labels_col_show`**
   > Show
