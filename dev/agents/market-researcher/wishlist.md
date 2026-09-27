@@ -5,6 +5,24 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0a. Before building epanet-plus-plus.org / epanetpp.org: settle the "++" completeness-claim
+tension, and pick ONE canonical domain
+
+2026-09-26, answering Task 697. Two converging pieces of external evidence, both new this session:
+(a) "++" is an engineering convention (C++ being the namesake case) that reads as a strict SUPERSET
+claim — everything the base does, plus more — which is a stronger claim than "we extend EPANET" and
+sits in direct tension with `dev/positioning.md` §2's own rule, "never write a completeness claim
+against EPANET"; (b) fresh searches for "epanet online" / "epanet web" / "epanet browser" put
+epanetjs.com on page one of every result set and neither librewaternet.org nor hawsedc.com anywhere
+in any of them — confirming, with outside evidence, the exact SEO risk the Task 697 roadmap block
+already raised from internal Search Console data (librewaternet.org at position 34 vs. hawsedc.com's
+7,575 clicks/quarter at position 9.7). **Two brand-new, zero-authority, self-canonical domains for
+the same content do not add reach against that gap — they split it, and compete with each other for
+it besides.** Full reasoning and citations: journal entry 2026-09-26. **Cost: one conversation with
+Tom before any copy is written; zero engineering.** Ranked first because it is cheap, time-sensitive
+(copy work is apparently imminent per the task framing), and every hour spent writing for two
+domains before this is settled is an hour that may need re-doing.
+
 ## 0b1. Get one real WaterCAD-exported `.inp` and run it through `js/lpn-inp.js` — cheapest possible unlock
 
 2026-09-25, answering Tom's WaterCAD-migration question (`dev/agents/market-researcher/
