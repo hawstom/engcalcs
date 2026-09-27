@@ -28,6 +28,18 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   collision pass (`refreshLabelTextPass()` + `relayoutLabels()`) is exactly the delay the switch
   exists to avoid, so a plain edit must never trigger one. `dev/lpn-spike/stale-snapshot-harness.js`
   asserts all of this, mutation-tested.
+- **A LABEL ON A LEADER ALWAYS READS AS BELONGING TO ITS NODE** (Tom, 2026-09-26, R-318: *"For the
+  permanent record, a label on a leader **always** reads as belonging to its node. You have repeated
+  the misconception about this many times, and it's important that you dispel it so that we are not
+  working to false priorities. Long leaders are only unfavored because they are inefficient and
+  extra ink, which generally is clutter in a weak way. But a stack of labels with long and parallel
+  leaders can be very effective."*). So **leader length is priced as INK, never as a loosening of
+  the label from its node**: no placement term, gate, tiebreak or bound may be argued from "a far
+  label reads as someone else's", and a stack of labels on long parallel leaders is a legitimate
+  answer, not a failure to be minimised. Three places argued from attachment and were rewritten
+  that day (`lpn-collide.js`: `SPOT.reachFactor`, `spotPrime()`'s nearest-first order, and rank 4 of
+  `shedCrossingSurvivors()`; `dev/label-placement-algorithms.md` §11a and §12a). Their numbers did not
+  change; whether ink alone still earns rank 4 in the crossing shed is a separate decision.
 - **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
   EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
   EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.

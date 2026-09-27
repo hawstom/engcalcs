@@ -174,6 +174,8 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
 - **Vocabulary:** our **Label** is EPANET's Notation; EPANET's **Label** is our **Text**. That one
   collision is the only place we depart from EPANET — **otherwise default to EPANET terminology**
   (static pressure, drawdown, converge, runs), and never invent plain-English substitutes.
+- **A label on a leader always reads as belonging to its node** (Tom, 2026-09-26). Long leaders cost
+  ink and nothing else; never argue a placement rule from a far label reading as someone else's.
 - **When one name does two jobs, split it.** Source trace (the analysis, on a Trace node) vs Source
   share (the percentage).
 - **Extended-period simulation shipped, through the EPANET engine only** (`js/lpn-time.js`), with

@@ -581,8 +581,12 @@ each redraw and the map flickers as you pan. Worst goes first:
    approximation to the minimum vertex cover this problem really is. **It sits below rank on
    purpose**: clearing a cluster of junction labels is worth more than clearing it by hiding the one
    tank in it.
-4. **Leader length, longest first** — the weakest attachment left. A label far from what it names is
-   the one whose association a reader is least sure of anyway.
+4. **Leader length, longest first** — of two hides that buy the same, the one that takes more ink
+   off the map. **Not because a far label is weakly attached to its node: it is not.** Tom,
+   2026-09-26 (R-318): *"a label on a leader **always** reads as belonging to its node ... Long
+   leaders are only unfavored because they are inefficient and extra ink."* This term was first
+   argued from attachment; ink is the only reason left for it, and whether ink alone earns it a
+   rank is his call, not settled here.
 5. **The id**, so the order is total. Nothing should reach here; without it, two identical labels
    would be chosen by array order, which is the flicker term 1 exists to avoid.
 
@@ -791,9 +795,9 @@ the affordable form of largest-empty-rectangle and is what Luboschik's particle-
   description: tallest skinny, widest squat and biggest square are read off every maximal rectangle
   that CONTAINS the spot's centre. Without that, a run of forty maximal rectangles over one patch of
   empty ground reads as forty spots.
-- **Spots come back nearest first**, because a leader is an association: of two spots that both hold
-  the stack, the near one says which node it belongs to and the far one asks the reader to follow a
-  line.
+- **Spots come back nearest first**, because of two spots that both hold the stack the near one
+  costs less leader. Ink, and only ink: a label on a leader reads as its node's however long the
+  leader is (Tom, 2026-09-26, R-318; `dev/lpn-rulings.md`).
 - **It runs only where the cheap routes have left a crossing standing**, which is his *"near
   failures or needs"* read as a schedule rather than as a place. On the shipped drawings that is a
   minority of gangs, and it is what keeps the pass inside its frame budget.

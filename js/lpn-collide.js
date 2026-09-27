@@ -2034,8 +2034,10 @@ EngCalcs.lpnCollide = (function () {
 		maxCells: 48,
 		minCells: 8,
 		// How much further than the existing candidate reach a spot may sit. The whole point is
-		// ground the candidate raster cannot see, so it must be more than 1; a leader is an
-		// association and a long one is a weak one, so it must not be much more. **The obstacle
+		// ground the candidate raster cannot see, so it must be more than 1; a longer leader is more
+		// ink, so it must not be much more. (Not because a long leader loosens the label from its
+		// node -- Tom, 2026-09-26, R-318: *"a label on a leader **always** reads as belonging to its
+		// node."* The measured case below is what holds the number.) **The obstacle
 		// neighborhood and the placements-in-reach set are both widened to match** -- a raster
 		// reaching past the obstacles it was given would call occupied ground free, and score()
 		// would not see the crossing it made out there.
@@ -2129,9 +2131,9 @@ EngCalcs.lpnCollide = (function () {
 	 * the needed height, which is the quantity a stack of rows is measured in.
 	 *
 	 * Returns spots NEAREST FIRST -- `[{cx, cy, dist, tall, squat, square}]`, each extreme box
-	 * `{cx, cy, w, h}` in world units. Nearest first because a leader is an association: of two
-	 * spots that both hold the stack, the near one says which node it belongs to and the far one
-	 * asks the reader to follow a line.
+	 * `{cx, cy, w, h}` in world units. Nearest first because of two spots that both hold the stack
+	 * the near one costs less leader -- ink, and only ink. A label on a leader reads as its node's
+	 * however long the leader is (Tom, 2026-09-26, R-318; dev/lpn-rulings.md).
 	 */
 	function spotPrime(center, reach, obs, opts) {
 		opts = opts || {};
@@ -3057,8 +3059,10 @@ EngCalcs.lpnCollide = (function () {
 	//      choice by degree is the standard approximation to the minimum vertex cover this problem
 	//      really is. It sits BELOW rank on purpose: clearing a cluster of junction labels is worth
 	//      more than clearing it by hiding the one tank in it.
-	//   4. LEADER LENGTH, longest first -- the weakest attachment left. A label far from what it
-	//      names is the one whose association a reader is least sure of anyway.
+	//   4. LEADER LENGTH, longest first -- of two hides that buy the same, the one that takes more
+	//      ink off the map. NOT because a far label is weakly attached: Tom, 2026-09-26 (R-318),
+	//      *"a label on a leader always reads as belonging to its node."* It was first argued from
+	//      attachment; ink is the only reason left, and whether that earns it a rank is his call.
 	//   5. The id, so the order is total. Nothing should reach here; without it, two identical
 	//      labels would be chosen by array order, which is the flicker term 1 exists to avoid.
 	//
