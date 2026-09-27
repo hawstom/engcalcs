@@ -254,7 +254,7 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 {
 	const cols = L.headings('pipes');
 	const vh = cols.filter((c) => c.key === 'verts')[0];
-	report(!!vh && vh.h === 'Vertices (X/Y/…)', 'the Pipes table has a Vertices column whose heading states the order', vh && vh.h);
+	report(!!vh && vh.h === 'Vertices (X/Y|…)', 'the Pipes table has a Vertices column whose heading states the order', vh && vh.h);
 	const keys = cols.map((c) => c.key);
 	function pipeRow(o) { return keys.map((k) => (o[k] === undefined ? '' : String(o[k]))).join('\t'); }
 	let r = L.pasteAppend('pipes', pipeRow({ id: 'P4', from: 'N1', to: 'N3', verts: '0/100/50/120' }));
@@ -263,7 +263,9 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 	report(p4 && L.outwardX(p4.verts[0].x) === 0 && L.outwardY(p4.verts[0].y) === 100 &&
 		L.outwardX(p4.verts[1].x) === 50 && L.outwardY(p4.verts[1].y) === 120,
 		'...read in pairs, X then Y on a grid project, From end first');
-	report(L.cellText('pipes', 'P4', 'verts') === '0/100/50/120', 'the cell reads back exactly as typed', L.cellText('pipes', 'P4', 'verts'));
+	// A pasted flat n1/n2/n3/n4 cell (the old format) reads back with the new '|'-between-vertices
+	// display (Tom, 2026-09-27): '/' still joins a pair, '|' now separates one vertex from the next.
+	report(L.cellText('pipes', 'P4', 'verts') === '0/100|50/120', 'the cell reads back with the new vertex-separator display', L.cellText('pipes', 'P4', 'verts'));
 	report(p4 && Math.abs(p4._length - (100 + Math.hypot(50, 20) + Math.hypot(50, 20))) < 1e-9,
 		'the auto length follows the bends', p4 && String(p4._length));
 	r = L.pasteAppend('pipes', pipeRow({ id: 'P5', from: 'N1', to: 'N3', verts: '0/100/50' }));
@@ -288,10 +290,10 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 	const gh = L.headings('junctions');
 	report(gh[1].h === 'Latitude' && gh[2].h === 'Longitude', 'a geographic project reads Latitude, Longitude', gh[1].h + ', ' + gh[2].h);
 	const vcol = L.headings('pipes').filter((c) => c.key === 'verts')[0];
-	report(vcol && vcol.h === 'Vertices (Latitude/Longitude/…)', '...and so does the Vertices heading', vcol && vcol.h);
+	report(vcol && vcol.h === 'Vertices (Latitude/Longitude|…)', '...and so does the Vertices heading', vcol && vcol.h);
 	const gkeys = L.headings('pipes').map((c) => c.key);
 	pasteIntoEmpty('pipes', gkeys.map((k) => ({ id: 'GP', from: 'G1', to: 'G2', verts: '40.7135/-74.0071/40.72/-73.99' })[k] || '').join('\t'));
-	report(L.cellText('pipes', 'GP', 'verts') === '40.7135/-74.0071/40.72/-73.99', 'the vertex cell reads back the typed latitude and longitude',
+	report(L.cellText('pipes', 'GP', 'verts') === '40.7135/-74.0071|40.72/-73.99', 'the vertex cell reads back the typed latitude and longitude',
 		L.cellText('pipes', 'GP', 'verts'));
 	const saved = L.serialize();
 	const sv = saved.links.filter((l) => l.id === 'GP')[0].verts;

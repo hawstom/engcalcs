@@ -21243,18 +21243,26 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
-	 * `n1/n2/n3/n4/...`, read two at a time from the From end toward the To end, in the SAME slot
-	 * order the two coordinate columns of the node tables use (latitude first on a geographic
-	 * project, northing first on a projected one, x first on a grid). An empty cell is a straight
-	 * link.
+	 * read two at a time from the From end toward the To end, in the SAME slot order the two
+	 * coordinate columns of the node tables use (latitude first on a geographic project, northing
+	 * first on a projected one, x first on a grid). An empty cell is a straight link.
 	 *
-	 * **`/` AND NOTHING ELSE**, because libPasteCells() splits a line with no tab on whitespace,
-	 * commas and semicolons: a vertices-only paste arrives with no tab at all, and any of those
-	 * separators would shred it into false columns. A hyphen is out because it is a minus sign.
+	 * **DISPLAY (Tom, 2026-09-27, on the old flat `n1/n2/n3/n4/...`: *"That is not very
+	 * readable."*): `n1/n2|n3/n4|...` -- a pair stays `/`-joined exactly as before, one vertex
+	 * from the next now reads `|` rather than the same slash, so a reader can see where a vertex
+	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: libPasteCells() splits a
+	 * line with no tab on whitespace (`/[\s,;]+/`), which is exactly the shape a vertices-only
+	 * single-cell paste arrives in -- `A | B` splits into three tokens ("A", "|", "B") the moment
+	 * either space is there, `A|B` does not split at all. A hyphen stays out for the same reason
+	 * it always was: it is a minus sign.
 	 *
-	 * **THE WHOLE CELL OR NOTHING.** An odd count, or one token that is not a number or is off the
-	 * map, refuses the cell and leaves the link's vertices as they were: a polyline half-read still
-	 * draws and solves, wrong, quietly.
+	 * **THE PARSER TAKES EITHER FORM.** `|`-separated is tried first (unambiguous: '|' is never a
+	 * coordinate); its absence falls back to the original flat, all-`/` reading, so a table
+	 * someone copied before this change still pastes back exactly as it did.
+	 *
+	 * **THE WHOLE CELL OR NOTHING.** A malformed group, or one token that is not a number or is
+	 * off the map, refuses the cell and leaves the link's vertices as they were: a polyline
+	 * half-read still draws and solves, wrong, quietly.
 	 *
 	 * **A TYPED LATITUDE KEEPS ITS OWN CHARACTERS** through the same `_xsrc`/`_ysrc` channel a
 	 * typed node coordinate and an `.inp` vertex use, so 40.7128 is saved as 40.7128 and not as a
@@ -21267,21 +21275,39 @@ var EngCalcs = EngCalcs || {};
 				(isY ? inwardY(src) === v.y : inwardX(src) === v.x)) { return String(src); }
 		return paneNumText(isY ? outwardY(v.y) : outwardX(v.x));
 	}
+	// One N/E pair -> a point, or null if the pair is not a legal coordinate.
+	function paneParseVertPair(a, b) {
+		var xv, yv, pt;
+		if (a === '' || b === '' || !isFinite(+a) || !isFinite(+b)) { return null; }
+		a = +a; b = +b;
+		if (!coordValueOk(coordSlotIsY(1), a) || !coordValueOk(coordSlotIsY(2), b)) { return null; }
+		yv = coordSlotIsY(1) ? a : b;
+		xv = coordSlotIsY(1) ? b : a;
+		pt = { x: inwardX(xv), y: inwardY(yv) };
+		if (isLatLonProject()) { pt[LPN_GEO_XSRC] = xv; pt[LPN_GEO_YSRC] = yv; }
+		return pt;
+	}
 	function paneParseVerts(t) {
-		var parts, i, pts = [], a, b, xv, yv, pt;
+		var groups, parts, i, pts = [], pt;
 		if (t === '') { return { ok: true, v: [] }; }
+		// NEW FORMAT: one vertex per `|`-separated group, each group an N/E pair.
+		if (t.indexOf('|') !== -1) {
+			groups = t.split('|');
+			for (i = 0; i < groups.length; i++) {
+				parts = groups[i].trim().split('/').map(function (x) { return x.trim(); });
+				if (parts.length !== 2) { return { ok: false }; }
+				pt = paneParseVertPair(parts[0], parts[1]);
+				if (!pt) { return { ok: false }; }
+				pts.push(pt);
+			}
+			return { ok: true, v: pts };
+		}
+		// OLD FORMAT: every value flat and `/`-joined, read two at a time.
 		parts = t.split('/').map(function (x) { return x.trim(); });
 		if (parts.length % 2) { return { ok: false }; }
 		for (i = 0; i < parts.length; i += 2) {
-			if (parts[i] === '' || parts[i + 1] === '' || !isFinite(+parts[i]) || !isFinite(+parts[i + 1])) {
-				return { ok: false };
-			}
-			a = +parts[i]; b = +parts[i + 1];
-			if (!coordValueOk(coordSlotIsY(1), a) || !coordValueOk(coordSlotIsY(2), b)) { return { ok: false }; }
-			yv = coordSlotIsY(1) ? a : b;
-			xv = coordSlotIsY(1) ? b : a;
-			pt = { x: inwardX(xv), y: inwardY(yv) };
-			if (isLatLonProject()) { pt[LPN_GEO_XSRC] = xv; pt[LPN_GEO_YSRC] = yv; }
+			pt = paneParseVertPair(parts[i], parts[i + 1]);
+			if (!pt) { return { ok: false }; }
 			pts.push(pt);
 		}
 		return { ok: true, v: pts };
@@ -21293,10 +21319,10 @@ var EngCalcs = EngCalcs || {};
 			// should never have to open a popup to learn the order of a cell.
 			unitText: function () {
 				var n = axisNames();
-				return (n.firstShort || n.first) + '/' + (n.secondShort || n.second) + '/…';
+				return (n.firstShort || n.first) + '/' + (n.secondShort || n.second) + '|…';
 			},
 			get: function (l) {
-				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('/');
+				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('|');
 			},
 			set: function (l, pts) {
 				l.verts = (pts || []).map(function (p) {
@@ -22317,20 +22343,18 @@ var EngCalcs = EngCalcs || {};
 	function savePaneColPrefs() {
 		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
 	}
-	// The width a column is drawn at: what the reader dragged it to, else what the spec declares,
-	// else the stylesheet's own 7em fallback. In `em`, like every declared width, so it still
-	// follows the reader's text size.
-	function paneColWidthEm(specId, c) {
-		var w = paneColUserWidth(specId, c);
-		return w || (c.em || 0);
+	// The width a column is drawn at: what the reader dragged it to, else the rule-based initial
+	// width (paneColInitialEm(), Tom 2026-09-27), else the stylesheet's own 7em fallback. In `em`,
+	// like every declared width, so it still follows the reader's text size. Takes the whole spec,
+	// not just its id, because the initial width has to see the table's own current rows.
+	function paneColWidthEm(spec, c) {
+		var w = paneColUserWidth(spec.id, c);
+		return w || paneColInitialEm(spec, c) || (c.em || 0);
 	}
-	// **HAS THE READER DRAGGED THIS COLUMN?** -- which is a different question from how wide it is,
-	// and the one that decides whether the heading is allowed to break mid-word (Task 690, Tom
-	// 2026-09-19). A column nobody has touched keeps the layout he has already approved: the
-	// heading holds the column open at its longest word, exactly as it always did. A column he has
-	// dragged is HIS width, and the heading wraps to the character to fit inside it, which is what
-	// *"Let selectors and inputs be truncated and headings be wrapped to the character level"*
-	// asks for -- relaxed for the gesture, not for everybody's first look at the table.
+	// **HAS THE READER DRAGGED THIS COLUMN?** (Task 690, Tom 2026-09-19). A column nobody has
+	// touched keeps the rule-based initial width; a column he has dragged is HIS width, and the
+	// heading wraps to the character to fit inside it, which is what *"Let selectors and inputs be
+	// truncated and headings be wrapped to the character level"* asks for.
 	function paneColUserWidth(specId, c) {
 		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
 		return (typeof w === 'number' && isFinite(w) && w > 0) ? Math.max(w, paneColFloorEm(c)) : 0;
@@ -22366,6 +22390,105 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneColFloorEm(c) {
 		return Math.max(1, Math.ceil((paneLongestWordEm(paneHeadingText(c)) / 3 + 0.55) * 100) / 100);
+	}
+	// ---- INITIAL COLUMN WIDTH (Tom, 2026-09-27) -------------------------------------------------
+	// **THE RULE, VERBATIM:** *"Set initial table column width to hold the greater (max) of (a) the
+	// known, present, current contents of the column not counting 'No....' selectors or (b) the
+	// heading's longest word not counting units, with any word 8 characters or longer split into
+	// two parts for the purposes of this calculation."* This governs the width a column opens at
+	// UNDRAGGED, in the current network -- it is not the drag floor above (paneColFloorEm(), a
+	// fraction of the heading word, meant only to stop a dragged column from shrinking to one
+	// letter per line). One canvas-measured `em` cache serves both halves of the rule.
+	var paneMeasureEmCache = {};
+	function paneMeasureEm(text, bold) {
+		var key = (bold ? 'b:' : 'r:') + text, ctx, host, px, cs, w = 0;
+		if (Object.prototype.hasOwnProperty.call(paneMeasureEmCache, key)) { return paneMeasureEmCache[key]; }
+		try {
+			ctx = document.createElement('canvas').getContext('2d');
+			host = document.getElementById('lpn_pane_body') || document.body;
+			cs = window.getComputedStyle(host);
+			px = parseFloat(cs.fontSize) * 0.9;
+			if (ctx && px > 0) {
+				ctx.font = (bold ? 'bold ' : '') + px + 'px ' + cs.fontFamily;
+				w = ctx.measureText(text).width / px;
+			}
+		} catch (e) { w = 0; }
+		if (!(w > 0)) { w = String(text || '').length * 0.62; }
+		paneMeasureEmCache[key] = w;
+		return w;
+	}
+	// The label alone, with no unit appended -- rule (b) reads "not counting units", and
+	// paneHeadingText() is the function that appends one.
+	function paneHeadingLabelOnly(c) {
+		var pc = EngCalcs.pageConfig || {};
+		return (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key);
+	}
+	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word of 8 or more characters is cut in half
+	// (the longer half first, for an odd length) and only the wider of the two halves counts --
+	// not the whole word. A shorter word is measured whole. This is what lets the heading-wrap CSS
+	// rule (css/engcalcs.css, the th rule beside `.lpn-pane-tight`) actually narrow the column: the
+	// browser's own min-content floor is the LONGEST UNBROKEN RUN in the heading, so the column
+	// cannot go below this number once the heading is free to wrap.
+	function paneWordSplitEm(word, bold) {
+		var mid, a, b;
+		if (word.length < 8) { return paneMeasureEm(word, bold); }
+		mid = Math.ceil(word.length / 2);
+		a = word.slice(0, mid); b = word.slice(mid);
+		return Math.max(paneMeasureEm(a, bold), paneMeasureEm(b, bold));
+	}
+	function paneHeadingInitEm(c) {
+		var words = paneHeadingLabelOnly(c).replace(/[▲▼]/g, '').split(/\s+/).filter(Boolean),
+			best = 0;
+		words.forEach(function (w) { best = Math.max(best, paneWordSplitEm(w, true)); });
+		return best;
+	}
+	// **Rule (a): "the known, present, current contents of the column"** -- so a table with no
+	// pumps yet cannot know a pump's own price and this is 0 for it, leaving the heading (b) to
+	// decide alone. A `str` field's actual text, a number's own rounded/typed display text
+	// (paneCellText() is the one function both the screen and the printed sheet already use, so
+	// this never disagrees with either) -- and for a pull-down, the OPTION'S OWN LABEL, since that
+	// is what is on screen, not the stored id.
+	// **"NOT COUNTING 'No....' SELECTORS":** a pull-down with nothing chosen reads back a falsy
+	// value from `get()` by construction (every "No pattern"/"No curve"/etc. choice is stored as
+	// `''`), so skipping an unset selector is the same test paneCellText() and paneTableSorted()
+	// already use for "this cell has nothing in it" -- no string-matching on "No " needed, and
+	// nothing to break in a language where that word is not "No".
+	// A checkbox has no text at all to measure; rule (b) alone decides its width.
+	function paneColContentEm(c, rows) {
+		var best = 0, choiceMap = null, i, el, v, text;
+		if (c.bool) { return 0; }
+		if (c.choices) {
+			choiceMap = {};
+			c.choices().forEach(function (o) { choiceMap[o[0]] = o[1]; });
+		}
+		for (i = 0; i < rows.length; i++) {
+			el = rows[i];
+			if (c.choices) {
+				v = c.get(el);
+				if (!panePresent(v) || v === '') { continue; }
+				text = Object.prototype.hasOwnProperty.call(choiceMap, v) ? choiceMap[v] : String(v);
+			} else {
+				text = paneCellText(c, el);
+			}
+			if (!text) { continue; }
+			best = Math.max(best, paneMeasureEm(text, false));
+		}
+		return best;
+	}
+	// **THE INITIAL WIDTH ITSELF, CACHED PER RENDER** -- scanning every row for every column on
+	// every cell built would be O(columns x rows^2); renderPaneTable() clears this cache (alongside
+	// `spec.cells`) whenever it rebuilds the table, and a live refill (typing, a solve) never calls
+	// this at all, because the rule is about the INITIAL width, not a width that chases every
+	// keystroke. +0.3em is padding for the box the number or text sits in, not part of either half
+	// of the rule.
+	function paneColInitialEm(spec, c) {
+		var v;
+		if (!spec.initEmCache) { spec.initEmCache = {}; }
+		if (Object.prototype.hasOwnProperty.call(spec.initEmCache, c.key)) { return spec.initEmCache[c.key]; }
+		v = Math.max(paneColContentEm(c, paneTableRowsInOrder(spec)), paneHeadingInitEm(c));
+		v = v > 0 ? Math.round((v + 0.3) * 100) / 100 : 0;
+		spec.initEmCache[c.key] = v;
+		return v;
 	}
 	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
 	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
@@ -22795,7 +22918,7 @@ var EngCalcs = EngCalcs || {};
 		var th = spec.headCells && spec.headCells[c.key], w = 0;
 		try { w = (th && th.getBoundingClientRect) ? th.getBoundingClientRect().width : 0; } catch (e) { w = 0; }
 		if (w > 0 && unit > 0) { return Math.round((w / unit) * 100) / 100; }
-		return paneColWidthEm(spec.id, c) || 7;
+		return paneColWidthEm(spec, c) || 7;
 	}
 	function paneStartColResize(spec, key, ev) {
 		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
@@ -22967,7 +23090,7 @@ var EngCalcs = EngCalcs || {};
 		return { move: move, up: up, begin: begin, plan: function () { return plan; } };
 	}
 	function paneApplyColWidth(input, c, spec) {
-		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
+		var em = spec ? paneColWidthEm(spec, c) : c.em;
 		if (em) { input.style.setProperty('--lpn-pane-col-w', em + 'em'); }
 		// A pull-down gives up its natural width only in a column the reader has dragged (R-110;
 		// the rule and its reason are in css/engcalcs.css beside `select.lpn-pane-dragged`).
@@ -23069,6 +23192,7 @@ var EngCalcs = EngCalcs || {};
 		spec.sig = sig;
 		spec.cells = {};
 		spec.tds = {};
+		spec.initEmCache = {};   // the rule's inputs (the rows) are about to change under it
 		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
@@ -23121,7 +23245,7 @@ var EngCalcs = EngCalcs || {};
 		// `--lpn-pane-col-w` because that is what sizes the BOX inside the cell.
 		cg = document.createElement('colgroup');
 		paneCols(spec).forEach(function (c) {
-			var col = document.createElement('col'), em = paneColWidthEm(spec.id, c);
+			var col = document.createElement('col'), em = paneColWidthEm(spec, c);
 			if (em) { col.style.width = em + 'em'; }
 			cg.appendChild(col);
 		});

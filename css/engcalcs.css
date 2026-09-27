@@ -2329,6 +2329,12 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
+/* **THE ID COLUMN IS CENTRED EVEN THOUGH IT LEADS** (Tom, 2026-09-27: *"Let's try making the ID
+   column of every table centered horizontally; it's not printing beautifully yet."*). It carries
+   `.lpn-pane-first` for its border and padding (it is still the leading column), but the general
+   "first column reads start" rule above is for a customer's tag or a text object's words, not an
+   id -- so this rule, keyed on the column and not the position, comes after it and wins the tie. */
+.lpn-pane-table th.lpn-pane-col-id, .lpn-pane-table td.lpn-pane-col-id { text-align: center; }
 /* padding-top, because the panel's own is gone; and every rule around a heading is an INSET SHADOW
    rather than a border -- under `border-collapse: collapse` the border belongs to the table, not to
    the cell, so it scrolls away from the heading that owns it.
@@ -2458,9 +2464,16 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
      * `min-width: 0` on both, so the declared width is the floor rather than the content.
    Truncation is then the browser's own: an over-long option or value is clipped by its control.
    THIS IS A TRIAL AND HE SAID SO. If it reads badly in public, the thing to change is these three
-   lines, not the drag. */
-.lpn-pane-table thead th.lpn-pane-tight,
-.lpn-pane-table thead th.lpn-pane-tight .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
+   lines, not the drag.
+   **NO LONGER ONLY ON `.lpn-pane-tight` (a dragged column)** (Tom's initial-width rule,
+   2026-09-27: an undragged column's own initial width is now the greater of its content and its
+   heading's longest word, with an 8-character-or-longer word split in half and only the longer
+   half counted -- js/looped-network.js's paneHeadingInitEm()). That floor only holds if the
+   heading is free to break the word it was measured on; without wrap-anywhere here, the browser's
+   own min-content rule (the paragraph above) forces the column back open to the FULL unsplit
+   word, which is exactly the defect the split rule exists to avoid. */
+.lpn-pane-table thead th,
+.lpn-pane-table thead th .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
 .lpn-pane-table tbody td select {
 	/* NO 7em FALLBACK HERE, and that is deliberate: an unset custom property with no fallback
 	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the

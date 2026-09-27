@@ -72,9 +72,15 @@ a new mechanism.
 
 ## 5. Vertex cell format
 
-Unchanged from `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` §1: `n1/n2/n3/n4/…`,
-lat/lon (public order) on a geographic project, x/y (plan units) on an XY-grid one, empty = straight,
-whole-cell refuse-or-commit, `mergeTok()`-style source-token preservation on write.
+`dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` §1's grammar still governs what is
+ACCEPTED: lat/lon (public order) on a geographic project, x/y (plan units) on an XY-grid one, empty
+= straight, whole-cell refuse-or-commit, `mergeTok()`-style source-token preservation on write.
+**What is DISPLAYED and pasted back changed 2026-09-27** (Tom: the old flat `n1/n2/n3/n4/…` "is not
+very readable"): a pair still reads `n/n`, but one vertex now reads apart from the next with `|`
+(`n1/n2|n3/n4|…`), never a space — a space would be swallowed by `libPasteCells()`'s own
+whitespace-split for a single-cell, no-tab paste. The parser accepts BOTH forms, so a table copied
+before this change still pastes back losslessly; a fresh copy or paste round-trips through the new
+one.
 
 ## 6. Undo
 
