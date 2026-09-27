@@ -1766,20 +1766,6 @@ the block.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 
-- 100|708| **Every property in every venue: an audit, then a check.**
-  Tom, 2026-09-22, testing Task 705: *"Show at all zoom levels does not appear for Text in
-  multi-properties. Should we do an audit to ensure that all properties are represented in all
-  venues?"* Yes. Venues: the Properties box (single and multi-select), the Tables pane, Find and
-  replace, Settings symbology, labels, `.inp` export. Produce the element-by-venue matrix first, then
-  hold it with a check so a new property cannot ship in one venue only. Task 690 already asks the
-  popup-vs-table half.
-  - **AUDIT SHIPPED 2026-09-23:** `dev/property-venue-matrix.md` (8 element types x 8 venues) and
-    `property_venue_check.php` (advisory, 42 table columns with no Find row). Top gaps a user would
-    hit: Active/Closed not findable on any link; emitter coefficient; a tank's levels, diameter and
-    mixing; pump speed and energy price; pipe length findable but not replaceable.
-  - **ALL SIX FILLED AND MERGED**, Text's allZoom included; `property_venue_check.php` now FAILS if
-    any reopens. **Left for Tom:** matrix gaps 7 (coordinates are not in Find, while a Customer's
-    Station and Offset are) and 8 (no Replace row for a Text's words). Close on his word.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
