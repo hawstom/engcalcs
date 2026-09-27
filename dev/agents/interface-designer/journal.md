@@ -3387,3 +3387,51 @@ Provenance: bug location and current behavior are OBSERVED against
 conventions (Excel, Google Sheets, AG Grid, MUI DataGrid, Airtable, QGIS) are CITED from general
 product knowledge, not fetched fresh this session — flag for a follow-up web check before this is
 built if any single claim needs to be load-bearing.
+## Task 690 — Ctrl+Enter fill, endorsement read (feat/ctrl-enter)
+
+**Question:** does an invisible keyboard chord deserve a place in this suite's hierarchy, and is
+its discovery handled.
+
+**What's actually added, OBSERVED (`js/looped-network.js:24568-24634` diff; `Looped-Network.php:1834`
+diff; `lib/lang.ec.en.php:909-912,2256` diff):**
+- One new branch in `paneHandleKey()`. No new DOM, no button, no menu row, no toolbar icon, no
+  tooltip on the cell or the selection box. Zero chrome.
+- One new language key, `lpn_pane_ctrlenter_filled`, text identical to `lpn_pane_filled` minus the
+  word "down" — a real but small translation cost (27 languages, one short string) justified
+  because the semantics differ: this fills the selection with the anchor's value, `lpn_pane_filled`
+  fills DOWN from the top row. Reusing the old key verbatim would have misdescribed the action.
+- Discovery is exactly one instrument: a row added to the existing "Table keyboard shortcuts" Notes
+  table (`lpn_notes_7_def`), alongside Ctrl+D, Ctrl+C, Ctrl+A, which were already there undocumented-
+  elsewhere. Same instrument, same place, no new one invented.
+
+**Why this is a different case from the menu-bar hierarchy problem (SPECULATION, reasoned from the
+brief's own framing):** the four-bars problem is about a FIRST-TIME reader's eye on a page they did
+not choose to specialize in — a civil engineer opening the suite cold. The bottom-pane table editor
+is a surface a person has already committed to as a grid, and Ctrl+Enter is not an invented gesture:
+it is Excel's and Google Sheets' own binding for "fill selection with active cell, keep selection"
+(CITED: Microsoft Excel and Google Sheets both bind Ctrl+Enter to this in every current version — I
+did not verify against a written Microsoft/Google source in this session, so treat the specific
+citation as SPECULATION even though the behavior is widely known; the spec document itself asserts
+the same match). A person who already knows the chord from a spreadsheet gets it for free; a person
+who does not, gets it from the same Notes table that already documents Ctrl+D, one row below.
+
+**On the "skipped N cells" notice:** reuses the fill-down notice's shape exactly
+(`"Filled {n} cells. {skipped} were not changed."` vs `"Filled down {n} cells...")`. Consistent
+verdict-string convention already established in this file; no marker word, states the count. Reads
+fine. No objection.
+
+**Verdict: ENDORSE, no change requested.**
+This is the cheapest possible feature in hierarchy terms — it costs one row in a help table already
+proven to be read by SOMEONE for Ctrl+D (no counter-evidence it isn't), one short translated string,
+and adds not one visible pixel of new chrome to a page (`lpn_`) whose whole argument against chrome
+is that every pixel competes with the drawing. The invisible-chord risk this suite has real evidence
+against (menu bar, PCW/MJH) is a risk to FIRST-CONTACT discovery of NAVIGATION. This is a productivity
+accelerator for a returning power user already inside a table, discoverable by convention-transfer
+from Excel/Sheets and, failing that, by the same Notes table Ctrl+D already relies on. I would not
+ask for a first-use toast, a highlighted row, or any teaching beyond what Ctrl+D already gets — adding
+one now would be inconsistent (why teach this shortcut harder than its sibling) and is exactly the
+kind of transient-highlight instrument this repo's own evidence (the 120-second Hide-titles mark)
+already shows doesn't work on a person who isn't looking at that row.
+
+Provenance: OBSERVED for all diff claims above; SPECULATION for the Excel/Sheets citation strength and
+for the analogy to the menu-bar case; no external CITED source verified in this session.

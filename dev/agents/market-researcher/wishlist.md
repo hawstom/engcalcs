@@ -487,3 +487,14 @@ misunderstanding risk for a small UI convenience. Rank this low — not a build 
 this as currently framed" finding. If Tom still wants it, it should be a read-only pass-through of
 the node's own value (no new solve) with the disclaimer text drafted in the journal entry. Full
 reasoning and citations: journal entry 2026-09-26 (night), Q2.
+## Added 2026-09-27
+
+- **Verify LibreOffice's mid-edit Ctrl+Enter collision by hand before shipping** (relates to Task
+  690 / `feat/ctrl-enter`). CITED collision: LibreOffice Calc binds Ctrl+Enter, while the text
+  cursor is placed inside a cell during in-cell edit, to inserting a line break
+  (https://ask.libreoffice.org/t/ctrl-enter-in-calc/33601). Declan's spec commits the in-progress
+  edit first, which should absorb this, but nobody has confirmed on an actual keyboard/browser that
+  a stray newline character can't slip into the committed value first. Low effort, cheap to check
+  with the existing `dev/lpn-spike/` harness style, worth doing before Tom's browser pass rather
+  than after a report comes in from a LibreOffice-habituated tester.
+</content>
