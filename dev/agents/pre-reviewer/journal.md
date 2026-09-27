@@ -2534,3 +2534,71 @@ wall-clock measurement.
 UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom to fit lands on
 the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
 no browser session was opened this pass, only Node DOM-stub harnesses.
+
+# Perry review, feat/label-gang-search round e4bb4f3b..2b4a73a4 (R-315, R-318), 2026-09-27
+
+OBSERVED: ran `node dev/lpn-spike/eps-step-label-harness.js` for real (playwright/Chromium, its own
+flock, its own PHP server) on the branch head 2b4a73a4: 12/12 checks passed. Real numbers this run:
+step worst 74 ms, one settle placement pass 2280 ms (ratio 0.03), Play at 4x took 2.6 s with a 61 ms
+worst freeze, and where a label's shape held after settling, the step-written text matched the
+placement pass's text 214/214.
+
+OBSERVED, mutation test: copied only the harness file into a disposable git worktree checked out at
+828ed06e (this branch's tip immediately BEFORE the R-315 commit) via a symlinked node_modules, and
+ran it there unmodified. It genuinely fails without the fix: 4/12 checks failed -- longest step
+blocked the page 6080 ms, Play at 4x took 44.9 s (not 2.6 s), and a 4538 ms placement pass ran mid-
+Play. This is not decoration; the harness discriminates the fix from its absence.
+
+OBSERVED: wrote a standalone script against MASTER (58934db3, no worktree changes, nothing
+committed there) that opens the same Net3-World example, zooms until labels show, and times six
+Step-forward clicks. Master step times: 385-499 ms -- consistent with the build agent's claimed
+"master's placement pass is ~0.6 s at this view" and with master having no step/settle split at all
+(every step on master IS the full pass). The branch's own settle pass (2.28 s, above) is genuinely
+~5x master's, which matches the build agent's disclosed 2.4 s vs 0.6 s gap. That gap is R-290's
+already-disclosed cost from merging master's Novato example and symbol-size rule (2026-09-26
+journal entry above), not something this round's four commits touched -- this round only defers
+paying it until the clock stops, it does not shrink it.
+
+OBSERVED: wrote a script exercising three things the shipped harness does not check itself. (1)
+Whether a placement pass runs after PLAY stops rather than only after STEPPING stops -- the
+2b4a73a4 commit deleted the harness's own check of this ("EPS step harness waits out one placement
+pass, not three"), so it is now asserted nowhere in the suite. I drove Play at 8x to the end myself
+and watched for a PerformanceObserver long-task after the stop: one landed, 1392-1992 ms across two
+runs. It does run. (2) Tom's specific worry -- a label whose value grows a digit mid-step overlapping
+a neighbour until the deferred pass -- 25 widen-events were captured across 24 steps on this same
+zoomed Net3 view and NONE produced a new bounding-box overlap that had not existed before the
+widen. On this drawing the concern did not materialize, but this is one dataset at one zoom, not a
+general clearance guarantee -- a denser view could differ, and nothing in the code bounds this the
+way the settle-pass ratio is bounded. (3) Dragging a node label while Play was running: no thrown
+error, no page error, across one drag gesture.
+
+OBSERVED, code-reading: grepped for every other place in js/lpn-collide.js, js/looped-network.js,
+and dev/label-placement-algorithms.md that could still argue a placement choice from "a far label
+reads as weakly attached" after the R-318 rewrite (0d45f03a). Found none outside the three named
+sites (SPOT.reachFactor, spotPrime()'s nearest-first order, shedCrossingSurvivors() rank 4) plus the
+matching doc passages -- the fix does not leak and does not miss a sibling instance. The new
+CLAUDE.md line and dev/lpn-rulings.md entry quote Tom's words correctly and are filed under the
+`lpn_` section where the existing vocabulary rule lives, not duplicated elsewhere.
+
+OBSERVED: `node dev/lpn-spike/stale-snapshot-harness.js` (touched by bff4af96, which only excludes a
+step's textOnly call from the full-pass counter) passes 21/21 including its four live-mutation
+self-checks (reverting rebuildLink/updateNode/scheduleSolve one at a time and confirming the
+harness's own assertions then fail) -- Recalculate OFF's snapshot rule is intact on this tree.
+
+SPECULATION: `stepSettlePending()` (js/looped-network.js ~51595) is defined and never called from
+anywhere in the tree (grepped) -- dead code, harmless, not worth a build agent's time to remove but
+worth naming so nobody mistakes it for load-bearing.
+
+Verdict, ranked by cost to Tom if wrong:
+1. R-315 (sluggish EPS stepping / browser freeze) -- CONFIRMED, measured in real Chrome, and the
+   harness mutation-fails on the pre-fix code so the protection is real, not decorative.
+2. R-318 (doc/comment correction, no behavior change) -- CONFIRMED, faithful rewording, no leak,
+   correctly filed.
+3. Digit-growth mid-step overlap -- CONFIRMED not observed on Net3-Novato zoomed in (25 widen
+   events, 0 new overlaps), but UNVERIFIABLE AS A GENERAL GUARANTEE -- only this one dataset was
+   exercised and nothing in the code bounds it.
+4. Placement-after-Play-stops -- CONFIRMED by my own instrumentation; NOTE the shipped harness no
+   longer checks this itself (2b4a73a4 removed that assertion for runtime cost), so it is currently
+   unguarded by the automated suite.
+5. Drag/selection during Play -- CONFIRMED no crash on one drag; did not verify the dragged label's
+   final resting position was sensible, only that nothing threw.
