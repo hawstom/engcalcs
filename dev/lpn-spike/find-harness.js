@@ -1270,5 +1270,32 @@ console.log('\n--- the Find box comes back where it was left ---');
 		String(L.results().length));
 }
 
+{
+	// **JUNCTION 10 AND PIPE 10** (Task 610; Tom, 2026-09-26: nodes and links may share an ID, as
+	// in EPANET). Two rows reading "10" would be two identical rows naming different things.
+	console.log('\n--- an ID shared by a node and a link says which each row is ---');
+	setUnitSet('us');
+	L.reset();
+	L.addNode('junction', 0, 0, '10'); L.addNode('junction', 100, 0, '11'); L.addNode('junction', 200, 0, '12');
+	L.addLink('pipe', '10', '11', [], '10');
+	L.addLink('pipe', '11', '12', [], '20');
+	L.buildPanel();
+	L.setState('all', 'id', 'contains', '0');   // junction 10, pipe 10, pipe 20
+	L.pressFind();
+	// Its own walk: a block further up this file declares another function called walk.
+	const btns = [];
+	(function each(e) { (e.children || []).forEach((k) => { if (k._tag === 'button' && k._listeners && k._listeners.click) { btns.push(k); } each(k); }); })(L.resultsBox());
+	const texts = btns.map((b) => b.textContent);
+	const PCw = global.EngCalcs.pageConfig;
+	ok('junction 10 and pipe 10 are told apart by their own nouns',
+		texts.indexOf(PCw.lpn_tool_add_junction + ' 10') >= 0 && texts.indexOf(PCw.lpn_tool_add_pipe + ' 10') >= 0, JSON.stringify(texts));
+	ok('...and an ID only one element has stays bare', texts.indexOf('20') >= 0, JSON.stringify(texts));
+	const jRow = btns[texts.indexOf(PCw.lpn_tool_add_junction + ' 10')], pRow = btns[texts.indexOf(PCw.lpn_tool_add_pipe + ' 10')];
+	jRow._listeners.click.forEach((f) => f({}));
+	ok('clicking the Junction 10 row selects junction 10', JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'node', id: '10' }), JSON.stringify(L.selectedRef()));
+	pRow._listeners.click.forEach((f) => f({}));
+	ok('clicking the Pipe 10 row selects pipe 10', JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'link', id: '10' }), JSON.stringify(L.selectedRef()));
+}
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);

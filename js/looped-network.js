@@ -18612,6 +18612,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One result, as a row you can click. Extracted so the top of the range and the bottom of it are
 	// built by the same code -- two copies would be two chances for one end to stop being clickable.
+	// **AN ID SHARED BY A NODE AND A LINK SAYS WHICH ONE IT IS** (Tom, 2026-09-26: junctions and
+	// pipes may share an ID, as in EPANET). Junction 10 and pipe 10 would otherwise be two rows
+	// reading "10"; each gets the element's own noun, the one the run report already uses. An ID
+	// only one element answers to stays bare, as it always was.
+	function findRowId(c) {
+		var other = c.group === 'node' ? linkById(c.el.id) : c.group === 'link' ? nodeById(c.el.id) : null;
+		return other ? reportTypeNoun(c.group, c.el.type) + ' ' + c.el.id : c.el.id;
+	}
 	function findResultRow(c) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('button'),
 			val = findValueOf(c, findState.prop);
@@ -18625,7 +18633,7 @@ var EngCalcs = EngCalcs || {};
 		// question the user did not ask. The id alone is the honest row.
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
-			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
+			: findRowId(c) + (findResultsCompound || findState.prop === 'id' ? ''
 				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val)
 					// **A CHOICE PROPERTY'S RESULT ROW PRINTS THE TRANSLATED WORD** (pre-review
 					// fix, Task 708), not the stored English code -- the second half of the same
