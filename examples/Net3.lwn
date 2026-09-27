@@ -2526,56 +2526,7 @@
 			"headloss": false,
 			"gradient": false
 		},
-		"decimals": {
-			"node": {
-				"demand": 2,
-				"head": 2,
-				"pressure": 2,
-				"elev": 2
-			},
-			"link": {
-				"diameter": 0,
-				"length": 2,
-				"roughness": 0,
-				"km": 2,
-				"flow": 2,
-				"velocity": 2,
-				"headloss": 2,
-				"gradient": 4
-			}
-		},
-		"prefix": {
-			"node": {},
-			"link": {
-				"id": "L"
-			}
-		},
-		"suffix": {
-			"node": {},
-			"link": {
-				"diameter": "\""
-			}
-		},
 		"separator": " ",
-		"priority": {
-			"node": {
-				"demand": 1,
-				"pressure": 2,
-				"elev": 3,
-				"head": 4
-			},
-			"link": {
-				"flow": 1,
-				"velocity": 2,
-				"headloss": 3,
-				"gradient": 4,
-				"diameter": 5,
-				"length": 6,
-				"roughness": 7,
-				"km": 8,
-				"id": 0
-			}
-		},
 		"markExtrema": true
 	},
 	"backdrop": {

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 272 untranslated keys, of 2103 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**16 still to read on master**, of 280 untranslated keys, of 2109 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (272, 8 to read @@ NEEDS RULING)
+## lpn_  (280, 16 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -270,12 +270,30 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_inp_report_no_crs`**
   > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
   _Ruled OK 2026-09-25._
+- **`lpn_labels_col_show`**
+  > Show
+  @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
   > Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
   _Ruled OK 2026-09-26._
+- **`lpn_labels_init_status`**
+  > Initial status
+  @@ NEEDS RULING
+- **`lpn_labels_priority_customer_tip`**
+  > The order in which values are dropped from a customer label. The value numbered 1 is dropped first.
+  @@ NEEDS RULING
+- **`lpn_labels_show_tip`**
+  > The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.
+  @@ NEEDS RULING
+- **`lpn_labels_use_units`**
+  > Use units
+  @@ NEEDS RULING
+- **`lpn_labels_use_units_tip`**
+  > Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.
+  @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -594,6 +612,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_sym_customer`**
   > Customer
   _Ruled OK 2026-09-23._
+- **`lpn_settings_sym_link_colors`**
+  > Link colors
+  @@ NEEDS RULING
+- **`lpn_settings_sym_node_colors`**
+  > Node colors
+  @@ NEEDS RULING
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
   _Ruled OK 2026-09-23._
@@ -848,7 +872,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 3 unmerged branch(es).
+**31 still to read**, of 34 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -859,9 +883,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0926c (`588e5257`) — adds no English strings
-
-### feat/label-gang-search (`c0104534`) — 3 new, all ruled
+### feat/label-gang-search (`bff4af96`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -873,4 +895,104 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### fix/table-help (`84bfdc5f`) — adds no English strings
+### feat/quality-settings (`d945719a`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_crs_count_network`**
+  > {n} of {total} coordinate systems cover this network.
+  @@ NEEDS RULING
+- **`lpn_quality_diffusivity`**
+  > Relative diffusivity
+  @@ NEEDS RULING
+- **`lpn_quality_diffusivity_tip`**
+  > How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.
+  @@ NEEDS RULING
+- **`lpn_quality_mass_units`**
+  > Mass units
+  @@ NEEDS RULING
+- **`lpn_quality_mass_units_tip`**
+  > The mass half of the concentration unit, EPANET's own two choices.
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration`**
+  > {chemical} concentration
+  @@ NEEDS RULING
+- **`lpn_quality_tolerance`**
+  > Quality tolerance
+  @@ NEEDS RULING
+- **`lpn_quality_tolerance_tip`**
+  > How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.
+  @@ NEEDS RULING
+- **`lpn_quality_unit_ug`**
+  > µg/L
+  @@ NEEDS RULING
+
+### feat/row-paste (`33e7ca1b`) — 21 new, 21 to read @@ NEEDS RULING
+
+- **`lpn_pane_paste_append`**
+  > Paste as new rows
+  @@ NEEDS RULING
+- **`lpn_pane_paste_armed`**
+  > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_cell`**
+  > Row {row}: {text} is not a valid {col}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_bad_id`**
+  > Row {row}: the ID {id} has a space or a quotation mark in it.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_here`**
+  > Click here and paste rows from a spreadsheet to add them.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_taken`**
+  > Row {row}: the ID {id} is already in use.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_id_twice`**
+  > Row {row}: the ID {id} is used twice in this paste.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_ids_differ`**
+  > {n} IDs don't match. Paste anyway?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_more`**
+  > Rows with problems not shown here: {n}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_ends`**
+  > Row {row}: a new link needs a From node and a To node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_id`**
+  > Row {row}: a new row needs an ID.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_node`**
+  > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_position`**
+  > Row {row}: a new node needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow`**
+  > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_add`**
+  > Add {extra} rows
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_bad`**
+  > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_overflow_fit`**
+  > Paste only the {fit} that fit
+  @@ NEEDS RULING
+- **`lpn_pane_paste_refused`**
+  > Nothing was pasted. {reasons}
+  @@ NEEDS RULING
+- **`lpn_pane_paste_same_ends`**
+  > Row {row}: From and To are the same node.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows`**
+  > Pasted {n} rows and added {created} of them to the network.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_rows_skipped`**
+  > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
+  @@ NEEDS RULING
+
+### fix/placement-world-view (`929dcf08`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_crs_count_network`**
+  > {n} of {total} coordinate systems cover this network.
+  @@ NEEDS RULING

@@ -268,10 +268,14 @@ console.log('\n--- the property numbered 1 in the Drop column is the first one g
 		{ field: 'pressure' }, { field: 'elev' }];
 	const pr = ls.priority.node;
 	const order = L.shedOrder(lines).map(function (i) { return lines[i].field; });
-	report(order.join(',') === 'head,elev,pressure,demand',
-		'nodeShedOrder() ranks the four ranked fields lowest-number-first',
+	// **THE ID IS IN THE COLUMN SINCE R-326** (Tom, 2026-09-26: "Drop order is missing for Node
+	// ID"), and his table ranks it 2 -- among the first things a crowded label gives up.
+	const want = lines.map(function (l) { return l.field; })
+		.sort(function (a, b) { return pr[a] - pr[b]; });
+	report(order.join(',') === want.join(','),
+		'nodeShedOrder() ranks every ranked field lowest-number-first, the ID included',
 		order.join(' -> ') + '   (column: ' + JSON.stringify(pr) + ')');
-	report(order.indexOf('id') < 0, '...and the ID is not in the order at all');
+	report(order[0] === 'id', '...and under Tom\'s table the ID is the first to go', order[0]);
 
 	zoomTo(30000);
 	const before = shedders().map(function (n) {
@@ -290,12 +294,13 @@ console.log('\n--- the property numbered 1 in the Drop column is the first one g
 		'every shedding label kept exactly the values the Drop column says it should',
 		`${before.length} shedding labels checked`);
 
-	// Reordering the column reorders what goes. Demand is 4 (last to go) and head is 1 (first);
-	// swap them and the labels that were keeping demand must now be keeping head.
+	// Reordering the column reorders what goes. Put Demand first to go and Head last to go, and the
+	// labels that were keeping demand must now be keeping head instead.
 	const keptDemand = shedders().filter(function (n) {
 		return shownFields(nodeEls[n.id]).indexOf('demand') >= 0;
 	}).length;
-	pr.demand = 1; pr.head = 4;
+	const wasDemand = pr.demand, wasHead = pr.head;
+	pr.demand = 0; pr.head = 99;
 	zoomTo(30000);
 	const keptHead = shedders().filter(function (n) {
 		return shownFields(nodeEls[n.id]).indexOf('head') >= 0;
@@ -306,20 +311,23 @@ console.log('\n--- the property numbered 1 in the Drop column is the first one g
 	report(keptHead > 0 && stillDemand < keptDemand,
 		'swapping the two ends of the column swaps which value survives',
 		`demand kept by ${keptDemand} -> ${stillDemand}; head kept by ${keptHead}`);
-	pr.demand = 4; pr.head = 1;
+	pr.demand = wasDemand; pr.head = wasHead;
 	zoomTo(30000);
 }
 
-// ---- 4. the ID is never shed, and the last ranked value is never shed ---------------------------
-console.log('\n--- a label sheds down to its name and one number, and then goes whole ---');
+// ---- 4. the ID can be shed now, and the last ranked value is never shed -------------------------
+// Tom, 2026-09-26 (R-329): *"I don't like that ID needs to display first, but also may need to drop
+// first."* His table gives the node ID a Drop order of its own, so a crowded label gives it up in
+// that order like any other value; what it never gives up is its LAST value.
+console.log('\n--- a label sheds down to one value, and then goes whole ---');
 {
 	zoomTo(30000);
 	const lostId = shedders().filter(function (n) {
 		const ne = nodeEls[n.id];
 		return askedFields(ne).indexOf('id') >= 0 && shownFields(ne).indexOf('id') < 0;
 	});
-	report(lostId.length === 0, 'no label ever gives up its ID',
-		lostId.map(function (n) { return n.id; }).join(', ') || 'none did');
+	report(lostId.length > 0, 'a crowded label can give up its ID, which is Tom\'s table ranking it 2',
+		lostId.length + ' labels did');
 	const stripped = shedders().filter(function (n) {
 		const ne = nodeEls[n.id];
 		return shownFields(ne).filter(function (f) {
@@ -565,69 +573,54 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 }
 
 // ================================================================================================
-// THE DROP COLUMN ORDERS THE DISPLAY TOO (Tom, 2026-09-08)
+// THE SHOW COLUMN ORDERS THE DISPLAY, AND THE DROP COLUMN NO LONGER DOES (Tom, 2026-09-26, R-329)
 // ================================================================================================
 //
-// *"For links, but not nodes, drop order is also used to order display: 5 4 3 2 1. This is very
-// cool and intuitive and should be done for nodes."*
-//
-// **WHY THIS SECTION IS ABOUT A RULE AND NOT ABOUT THE DEFAULT NUMBERS.** A link label got the
-// agreement by accident: its lines are pushed in a hard-coded semantic order that happens to run
-// 5 4 3 2 1 down the inputs and 9 8 7 6 down the results, so the column and the label agreed
-// without anything making them. A node's hard-coded order crossed its own ranks twice. Asserting
-// the shipped default order would therefore pass on a coincidence, so this REWRITES the column and
-// asks whether the label followed -- which no default table can be right about by luck.
-console.log('\n--- a node label is stacked in the user\'s own drop order, highest first ---');
+// *"I don't like that ID needs to display first, but also may need to drop first. We have been using
+// drop first as display last, which is efficient, but lazy."* Until then a node label was stacked
+// in its Drop order (Tom, 2026-09-08). Now it is stacked in its Show order, and the two columns are
+// independent -- so this REWRITES each column and asks which one the label followed.
+console.log('\n--- a node label is stacked in its Show order, and the Drop column does not move it ---');
 {
-	const lsN = L.labelSettings().priority.node;
-	// A node with every value on it, so the order is visible rather than inferred from two lines.
+	const lsAll = L.labelSettings(), show = lsAll.show.node, drop = lsAll.priority.node;
 	const n = doc.nodes.filter(function (q) {
 		const ne = nodeEls[q.id];
 		return ne && (ne.allLines || []).length >= 4;
 	})[0];
 	report(!!n, 'there is a node carrying four or more label values to order');
 	if (n) {
-		const ranked = function () {
-			return askedFields(nodeEls[n.id]).filter(function (f) { return typeof lsN[f] === 'number'; });
-		};
-		const descends = function (fields) {
+		const ascends = function (fields) {
 			for (let i = 1; i < fields.length; i++) {
-				if (lsN[fields[i - 1]] < lsN[fields[i]]) { return false; }
+				if (show[fields[i - 1]] > show[fields[i]]) { return false; }
 			}
 			return true;
 		};
 		zoomTo(80000);
-		const shipped = ranked();
-		report(descends(shipped), 'the shipped defaults come out highest rank first',
-			shipped.map(function (f) { return f + '=' + lsN[f]; }).join(' '));
-		// **THE ID LEADS AND IS NOT IN THE COLUMN.** nodeFieldRank() answers -Infinity for an
-		// unranked field, which is right for shedding and exactly backwards for display; a label
-		// whose own name migrated to the bottom would be unreadable.
-		report(askedFields(nodeEls[n.id])[0] === 'id',
-			'...with the ID still the first line, because it is what the others are about',
-			askedFields(nodeEls[n.id]).join(' '));
+		const shipped = askedFields(nodeEls[n.id]);
+		report(ascends(shipped), 'the shipped defaults come out in Show order, 1 first',
+			shipped.map(function (f) { return f + '=' + show[f]; }).join(' '));
+		report(shipped[0] === 'id', '...with the ID first, which is Tom\'s table (Show 1)', shipped.join(' '));
 
-		// NOW MOVE THE COLUMN. Reversing the ranks must reverse the label, or the agreement above
-		// was the default table's and not the rule's.
-		const keys = Object.keys(lsN), before = keys.map(function (k) { return lsN[k]; });
-		keys.forEach(function (k, i) { lsN[k] = keys.length - before[i] + 1; });
+		// Reverse the DROP column: the stack must not move.
+		const dk = Object.keys(drop), dBefore = dk.map(function (k) { return drop[k]; });
+		dk.forEach(function (k, i) { drop[k] = 100 - dBefore[i]; });
 		zoomTo(80000);
-		const moved = ranked();
-		report(descends(moved), 'a rewritten column re-stacks the label, so the order is the rule and not the defaults',
-			moved.map(function (f) { return f + '=' + lsN[f]; }).join(' '));
-		report(moved.join(' ') !== shipped.join(' '), '...and it really moved',
+		report(askedFields(nodeEls[n.id]).join(' ') === shipped.join(' '),
+			'reversing the Drop column leaves the stack alone', askedFields(nodeEls[n.id]).join(' '));
+		dk.forEach(function (k, i) { drop[k] = dBefore[i]; });
+
+		// Reverse the SHOW column: the stack must reverse.
+		const sk = Object.keys(show), sBefore = sk.map(function (k) { return show[k]; });
+		sk.forEach(function (k, i) { show[k] = 100 - sBefore[i]; });
+		zoomTo(80000);
+		const moved = askedFields(nodeEls[n.id]);
+		report(ascends(moved) && moved.join(' ') === shipped.slice().reverse().join(' '),
+			'reversing the Show column reverses the stack, so the order is the rule and not the defaults',
 			shipped.join(' ') + '  ->  ' + moved.join(' '));
-		report(askedFields(nodeEls[n.id])[0] === 'id', '...the ID still leading', askedFields(nodeEls[n.id])[0]);
-
-		// **A SHED STILL COMES OFF THE BOTTOM OF WHAT IS ON THE SCREEN.** keptLines() preserves
-		// relative order, so the two orders are one order; a reader watches the label lose its
-		// lowest line rather than one out of the middle.
-		const ne = nodeEls[n.id];
-		const shownRanked = shownFields(ne).filter(function (f) { return typeof lsN[f] === 'number'; });
-		report(descends(shownRanked), 'the DRAWN lines descend too, so a shed comes off the bottom',
-			shownRanked.join(' '));
-
-		keys.forEach(function (k, i) { lsN[k] = before[i]; });
+		// A shed keeps what survives in Show order: keptLines() preserves relative order.
+		report(ascends(shownFields(nodeEls[n.id])), 'the DRAWN lines keep Show order too',
+			shownFields(nodeEls[n.id]).join(' '));
+		sk.forEach(function (k, i) { show[k] = sBefore[i]; });
 		zoomTo(80000);
 	}
 }

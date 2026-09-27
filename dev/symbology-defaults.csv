@@ -1,0 +1,46 @@
+Property	Show?	Before	After US	After SI	Dec. US	Dec. SI	Show order	Drop order	Key
+## Node									
+ID	1						1	2	node:id
+Description	0						2	4	node:desc
+Tag	0						3	6	node:tag
+Base demand	1	Qb=			0	1	4	10	node:demand
+Elevation	1	Z=			2	3	5	8	node:elev
+Initial quality	0	Init. 	 mg/L	 mg/L	2	2	6	16	node:initQuality
+Demand	0	Q=			0	1	7	26	node:demandActual
+Net inflow	0	Qin=			0	1	8	24	-
+Water depth	0	Y=			2	3	9	12	node:level
+Total head (HGL)	0	H=			2	3	10	14	node:head
+Pressure	1	P=			2	3	11	28	node:pressure
+Concentration	0		 mg/L	 mg/L	1	1	12	22	node:quality:chemical
+Source share	0		%	%	0	0	13	20	node:quality:trace
+Water age	0		 hr	 hr	1	1	14	18	node:quality:age
+									
+## Link									
+ID	1						1	2	link:id
+Description	0						2	4	link:desc
+Tag	0						3	6	link:tag
+Length	0		'	 m	0	1	4	18	link:length
+Diameter	0		"	 mm	0	0	5	38	link:diameter
+Roughness	0	C=			0	0	6	22	link:roughness
+Minor loss, k	0	km=			2	2	7	16	link:km
+Initial status	0	Init. 					8	12	link:initStatus
+Bulk coeff.	0	Cb=			1	1	9	10	link:bulkCoeff
+Wall coeff.	0	Cw=			1	1	10	8	link:wallCoeff
+Flow	1	Q=			0	1	11	40	link:flow
+Velocity	1	V=			1	2	12	36	link:velocity
+Head loss	0	Hl=			2	3	13	28	link:headloss
+Head loss gradient %	0	S=			2	2	14	34	link:gradient
+Friction factor	0	f=			3	3	15	14	link:friction
+Reaction rate	0	R=			1	1	16	20	link:rate
+Average concentration	0		 mg/L	 mg/L	1	1	17	32	link:quality:chemical
+Average source share	0		%	%	0	0	18	30	link:quality:trace
+Average water age	0		 hr	 hr	1	1	19	26	link:quality:age
+Status	0						20	24	link:status
+									
+## Customer									
+ID	0						1	2	customer:id
+Description	0						2	4	customer:desc
+Tag	0						3	6	customer:tag
+Base demand	1	Qb=			0	1	4	8	customer:demand
+Number of services	0	x			0	1	5	10	customer:count
+Demand	0	Q=			0	1	6	12	customer:demandActual

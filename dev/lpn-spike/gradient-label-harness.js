@@ -73,6 +73,10 @@ await settleEpanet();
 // Only the gradient, so a stray '%' anywhere in the stack is unmistakably this line.
 const ls = L.labelSettings();
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'gradient'); });
+// **ONE DECIMALS COUNT FOR BOTH FORMS, HELD HERE.** A new project's count follows the unit since
+// R-328 (2 as a percent, 4 as a plain ratio -- symbology-table-harness.js holds that); this file
+// switches the select directly, so it pins the count the comparison below needs.
+ls.decimals.link.gradient = 4;
 
 ok('the units strip offers the percent form at all', setGradientUnit('gradePercent'));
 L.refreshLabelText();

@@ -440,7 +440,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // assert; and wireSetboxDivider() returns at its first line without the strip.
   'lpn_setbox_panes', 'lpn_setbox_divider',
   'lpn_set_sec_visual', 'lpn_set_sec_map', 'lpn_set_sec_elements', 'lpn_set_sec_calc',
-  'lpn_set_sub_nodeSym', 'lpn_set_sub_linkSym', 'lpn_set_sub_nodeLink',
+  'lpn_set_sub_nodeSym', 'lpn_set_sub_nodeColors', 'lpn_set_sub_linkSym', 'lpn_set_sub_linkColors',
+  'lpn_set_sub_custLbl', 'lpn_set_sub_nodeLink',
   'lpn_set_sub_mapDisplay', 'lpn_set_sub_page',
   'lpn_set_sub_idPrefixes', 'lpn_set_sub_defaults', 'lpn_set_sub_customProps',
   'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics', 'lpn_set_sub_quality',

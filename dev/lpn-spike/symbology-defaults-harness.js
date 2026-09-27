@@ -116,6 +116,10 @@ console.log('== 3. an existing project keeps whatever suffix it already stored =
 	delete saved.labelSettings.suffix.node['quality:chemical'];
 	saved.labelSettings.decimals.node.quality = 3;
 	delete saved.labelSettings.decimals.node['quality:trace'];
+	// **AND WITHOUT THE "USE UNITS" MAP, WHICH SUCH A PROJECT NEVER HAD** (R-331). A save from now
+	// on carries it, and a ticked row prints its unit; one from before has none, and applySaved()
+	// leaves a row it typed an After for unticked, so the words it typed still show.
+	delete saved.labelSettings.useUnits;
 
 	L.applySaved(saved);
 
