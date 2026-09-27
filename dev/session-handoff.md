@@ -95,44 +95,49 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-26 (late evening)
+## STATE — 2026-09-27
 
-### Production is 83bf02d5 (Tom pulled 2026-09-26). Master f038eba5 is ahead of it
+### Production is 83bf02d5 (Tom pulled 2026-09-26). Master 58934db3 is ahead of it
 
-Master now carries feat/table-editing and feat/convert-as (both on his all-clear) and fix/table-help
-(his two Help tables, verbatim). Also still unpulled: the two error_log fatal fixes from d6132d0c.
-The permission guard refuses an AI write to `dev/branch-all-clears.json` from Bash; the Edit tool
-raises a prompt he can approve, which is how both all-clears were recorded.
+Unpulled on master: feat/table-editing, feat/convert-as, fix/table-help, the two error_log fatal
+fixes, and now feat/placement-wizard + feat/find-coordinate (his all-clears 2026-09-26 night) and
+fix/placement-world-view (R-306). The permission guard refuses an AI write to
+`dev/branch-all-clears.json` until he has confirmed in the conversation (AskUserQuestion worked).
 
-### Awaiting his browser pass (all green but for payload freshness, all Perry-reviewed)
+### Awaiting his browser pass (all green but payload freshness; all Perry-reviewed; pushed)
 
-- **8117 `feat/placement-wizard`** a7917752 -- R-291..R-295: backdrop capped at 50% in both
-  wizards, draggable bars, coordinate-system list filtered to the location (40 of 5,347 at Prescott
-  Valley), UTM zone preselected. New string: '{n} of {total} coordinate systems cover this network.'
-- **8118 `feat/find-coordinate`** a75480e0 -- Task 708 gaps 7 and 8: node coordinates in Find and
-  Replace; a Text's words replaceable whole. No new strings.
-- **8119 `feat/row-paste`** 79689882 -- Task 610, Declan's spec (`dev/paste-creates-rows-spec.md`)
-  reshaped by his rulings: an explicit "Paste as new rows" (menu arms, then Ctrl+V; or
-  Ctrl+Shift+V), overflow prompt, his "{n} IDs don't match. Paste anyway?", separate node and link
-  ID namespaces (his ruling). Open: does Ctrl+Shift+V reach the page in real Chrome (Perry could
-  not test a native paste); the status-bar line with a shared ID is unchecked; Ctrl+Shift+V is not
-  in his Help table (his text).
-- **8090 `feat/label-gang-search`** 091e58b9 -- R-290 answered: the merge was clean; master's
-  Novato example changed and its symbol cap shrank the search. Reworked rescue: Novato 2x 72 -> 49,
-  but a pass is ~2.5 s vs ~2.0 s; seven limits re-baselined on master's drawing.
-- Ports 8117-8119 need his Apache reload (commands below).
+- **8119 `feat/row-paste`** 56ab0925 -- R-308..R-312: Text coordinates, "Paste as new rows at end
+  of table", copy without headings, both Help rows. Perry could not drive Ctrl+Z after typing a
+  Text coordinate in headless Chrome; ask Tom to try it.
+- **8120 `feat/symbology-label`** 2bb37987 (NEW, needs the Apache reload) -- R-326..R-334.
+  Questions open: R-328 Sue's decimals, R-331 Use units default for blank-After rows, whether a
+  new project should stop inheriting the open project's label settings (`newProject()`), an "All"
+  index entry kept beyond his five. Deleted keys: lpn_settings_sym_node, lpn_settings_sym_link.
+  Seams: it rewrote label-order functions in js/looped-network.js that feat/label-gang-search also
+  touches, and its concentration row must read the quality branch's `qualityLabel()` -- merge the
+  first of the two, then merge master into the other and run its harnesses.
+- **8121 `feat/quality-settings`** 43d22a0f (NEW, needs the Apache reload) -- R-321..R-324. Its
+  last check_all was queued when handed back; rerun on the merge before asking for the all-clear.
+- **8090 `feat/label-gang-search`** d8afdd5f -- R-315 stepping fixed; R-315 and R-318 carry his
+  decisions (repair budget; two leader rules). Perry: the harness no longer checks the settle pass
+  after Play stops.
 
 ### Open with him
 
-- R-297: the `$ec_lang_syn` for lpn_geomap / lpn_xymap, context given in the report.
-- Task 697 (EPANET++): Mary says "++" reads as a superset claim and two self-canonical domains split
-  a weak signal; recommends one canonical domain and a 301. His call before any copy.
+- R-336 / Task 697: Mary votes epanet-plus-plus.org canonical.
 - R-235 (WaterCAD sample .inp from IOD).
 
 ### Translation sprint
 
-Not launched. Table-editing's keys are on master; placement-wizard and row-paste add ~20 more.
-Launch once those two merge, so one sprint covers all three.
+Not launched. Wait until row-paste, symbology-label and quality-settings merge, then one sprint
+covers them with table-editing and placement-wizard (already on master).
+
+### Traps met 2026-09-26/27
+
+- **A fresh worktree has no `dev/browser-pass/node_modules`**, so four browser harnesses fail with
+  "playwright-core is not installed". Symlink it from the main checkout when creating a worktree.
+- **Give each agent a unique scratchpad log name**; one agent's check_all log overwrote another's.
+- `example-open-guard-harness.js` fails 2 of 18 under load and passes alone.
 
 ## Commands to hand Tom with any panel change
 

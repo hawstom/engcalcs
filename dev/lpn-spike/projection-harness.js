@@ -37,6 +37,8 @@ const L = loadLoopedNetwork(
 	"\t\tcrsCatalogue: crsCatalogue, crsLabel: crsLabel, crsName: crsDisplayName,\n" +
 	// Phase 2: the spatial filter, the box that drives it, and the New-project box's own answer.
 	"\t\tcrsExtent: crsExtent, crsCovers: crsCoversPoint, crsFiltered: crsFiltered,\n" +
+	// Tom, 2026-09-26: the network's whole extent filters the list, and UTM opens on the right zone.
+	"\t\tcrsUtmCodeFor: crsUtmCodeFor,\n" +
 	"\t\tcrsCannotBePlaced: crsCannotBePlaced,\n" +
 	"\t\tWEBMERC: LPN_CRS_WEBMERC, GEOWGS84: LPN_CRS_GEOWGS84,\n" +
 	// Phase 4: the fetched register behind the two readers above.
@@ -445,6 +447,25 @@ setUnitSet('si');
 		L.crsFiltered(PETALUMA, 'UTM').map(e => e.code).join(','));
 	ok('a name that matches nothing leaves nothing, rather than everything',
 		L.crsFiltered(null, 'State Plane').length === 0);
+
+	console.log('\n--- Tom 2026-09-26: a NETWORK\'S extent filters, and UTM opens on its own zone ---');
+	// Prescott Valley, Arizona: *"I am at Prescott Valley, AZ, but I see the full list of CRSes"*
+	// and *"UTM, I am choosing 12N, not 10N, for Arizona."*
+	const PV = { lon: -112.32, lat: 34.61 };
+	ok('Prescott Valley is UTM zone 12 north, EPSG:32612', L.crsUtmCodeFor(PV) === ZONE12N, L.crsUtmCodeFor(PV));
+	ok('Petaluma is zone 10 north', L.crsUtmCodeFor(PETALUMA) === 'EPSG:32610', L.crsUtmCodeFor(PETALUMA));
+	ok('Wellington is zone 60 south, EPSG:32760', L.crsUtmCodeFor({ lon: 174.78, lat: -41.29 }) === 'EPSG:32760');
+	ok('longitude 180 is zone 60, not a zone 61', L.crsUtmCodeFor({ lon: 180, lat: 10 }) === 'EPSG:32660');
+	ok('no place, no zone', L.crsUtmCodeFor(null) === null);
+	ok('...and none north of UTM\'s own 84 degrees', L.crsUtmCodeFor({ lon: 0, lat: 86 }) === null);
+	const inZone = { lon: PV.lon, lat: PV.lat, bounds: { w: -112.33, s: 34.60, e: -112.31, n: 34.62 } };
+	const straddle = { lon: -114, lat: 34.6, bounds: { w: -114.2, s: 34.5, e: -113.8, n: 34.7 } };
+	ok('a network inside zone 12 is covered by zone 12', L.crsCovers(ZONE12N, inZone) === true);
+	ok('...and not by zone 11', L.crsCovers('EPSG:32611', inZone) === false);
+	ok('a network straddling 114 W is covered by neither zone, since neither holds all of it',
+		L.crsCovers(ZONE12N, straddle) === false && L.crsCovers('EPSG:32611', straddle) === false);
+	ok('...while the two world-wide systems always stay listed',
+		L.crsFiltered(straddle, '').some(e => e.code === L.WEBMERC) && L.crsFiltered(straddle, '').some(e => e.code === L.GEOWGS84));
 }
 
 // ---- 9. THE BOX ITSELF: two filters, one catalogue, and the answer it hands back -----------------

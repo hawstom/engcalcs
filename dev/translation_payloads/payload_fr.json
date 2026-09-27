@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 2103,
-        "delta_key_count": 274,
+        "expected_key_count": 2125,
+        "delta_key_count": 296,
         "exempt_key_count": 48,
         "exempt_keys": [
             "u_depthFrac",
@@ -573,6 +573,27 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_pasted_rows": "Pasted {n} rows and added {created} of them to the network.",
+        "lpn_pane_pasted_rows_skipped": "Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.",
+        "lpn_pane_paste_here": "Click here and paste rows from a spreadsheet to add them.",
+        "lpn_pane_paste_append": "Paste as new rows at end of table",
+        "lpn_pane_paste_armed": "Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.",
+        "lpn_pane_paste_overflow": "This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?",
+        "lpn_pane_paste_overflow_add": "Add {extra} rows",
+        "lpn_pane_paste_overflow_fit": "Paste only the {fit} that fit",
+        "lpn_pane_paste_overflow_bad": "This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}",
+        "lpn_pane_paste_ids_differ": "{n} IDs don't match. Paste anyway?",
+        "lpn_pane_paste_refused": "Nothing was pasted. {reasons}",
+        "lpn_pane_paste_more": "Rows with problems not shown here: {n}.",
+        "lpn_pane_paste_no_id": "Row {row}: a new row needs an ID.",
+        "lpn_pane_paste_bad_id": "Row {row}: the ID {id} has a space or a quotation mark in it.",
+        "lpn_pane_paste_id_taken": "Row {row}: the ID {id} is already in use.",
+        "lpn_pane_paste_id_twice": "Row {row}: the ID {id} is used twice in this paste.",
+        "lpn_pane_paste_no_position": "Row {row}: a new node needs both {first} and {second}.",
+        "lpn_pane_paste_no_ends": "Row {row}: a new link needs a From node and a To node.",
+        "lpn_pane_paste_no_node": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
+        "lpn_pane_paste_same_ends": "Row {row}: From and To are the same node.",
+        "lpn_pane_paste_bad_cell": "Row {row}: {text} is not a valid {col}.",
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
@@ -647,6 +668,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -671,9 +693,9 @@
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_notes_6_term": "Table columns help",
-        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><tr><td>Paste as new rows at end of table<\/td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V<\/td><\/tr><\/tbody><\/table>",
         "lpn_notes_7_term": "Table keyboard shortcuts",
-        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -849,6 +871,27 @@
         "lpn_customer_detached_count": "{n} customers are not connected to a pipe. Their demand is not accounted for.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_pane_pasted_rows": "Pasted {n} rows and added {created} of them to the network.",
+        "lpn_pane_pasted_rows_skipped": "Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.",
+        "lpn_pane_paste_here": "Click here and paste rows from a spreadsheet to add them.",
+        "lpn_pane_paste_append": "Paste as new rows at end of table",
+        "lpn_pane_paste_armed": "Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.",
+        "lpn_pane_paste_overflow": "This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?",
+        "lpn_pane_paste_overflow_add": "Add {extra} rows",
+        "lpn_pane_paste_overflow_fit": "Paste only the {fit} that fit",
+        "lpn_pane_paste_overflow_bad": "This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}",
+        "lpn_pane_paste_ids_differ": "{n} IDs don't match. Paste anyway?",
+        "lpn_pane_paste_refused": "Nothing was pasted. {reasons}",
+        "lpn_pane_paste_more": "Rows with problems not shown here: {n}.",
+        "lpn_pane_paste_no_id": "Row {row}: a new row needs an ID.",
+        "lpn_pane_paste_bad_id": "Row {row}: the ID {id} has a space or a quotation mark in it.",
+        "lpn_pane_paste_id_taken": "Row {row}: the ID {id} is already in use.",
+        "lpn_pane_paste_id_twice": "Row {row}: the ID {id} is used twice in this paste.",
+        "lpn_pane_paste_no_position": "Row {row}: a new node needs both {first} and {second}.",
+        "lpn_pane_paste_no_ends": "Row {row}: a new link needs a From node and a To node.",
+        "lpn_pane_paste_no_node": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
+        "lpn_pane_paste_same_ends": "Row {row}: From and To are the same node.",
+        "lpn_pane_paste_bad_cell": "Row {row}: {text} is not a valid {col}.",
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
@@ -923,6 +966,7 @@
         "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
         "lpn_ts_axis_time": "Elapsed time",
         "lpn_crsbox_title": "Coordinate system",
+        "lpn_crs_count_network": "{n} of {total} coordinate systems cover this network.",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected.",
         "lpn_crs_unnamed": "unnamed",
@@ -947,9 +991,9 @@
         "lpn_msglog_ago": "{x} ago",
         "lpn_msglog_note": "Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.",
         "lpn_notes_6_term": "Table columns help",
-        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><tr><td>Paste as new rows at end of table<\/td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V<\/td><\/tr><\/tbody><\/table>",
         "lpn_notes_7_term": "Table keyboard shortcuts",
-        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -1632,6 +1676,342 @@
                     "key": "lpn_area_hint_window_start",
                     "value": "Cliquez sur un coin de la fenêtre.",
                     "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_pane_pasted_rows": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_pasted_rows_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_here": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_append": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_armed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_overflow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_overflow_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_overflow_fit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_overflow_bad": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_ids_differ": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_bad_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_id_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_id_twice": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_ends": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_same_ends": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_bad_cell": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "{n} cellules collées. {skipped} n'ont pas été modifiées.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Sélectionner une fenêtre",
+                    "english": "Select a window"
                 }
             }
         },
@@ -2816,6 +3196,22 @@
                     "key": "lpn_crs_view",
                     "value": "Filtrer selon la vue de la carte",
                     "english": "Filter by map view"
+                }
+            }
+        },
+        "lpn_crs_count_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_count",
+                    "value": "{n} projection(s) sur {total} listée(s).",
+                    "english": "{n} of {total} coordinate systems listed."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Non géoréférencé",
+                    "english": "Not georeferenced"
                 }
             }
         },
@@ -5333,8 +5729,8 @@
         }
     },
     "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map",
-        "lpn_xymap": "Cartesian map or plane map",
+        "lpn_geomap": "coordinate system referenced to the world map",
+        "lpn_xymap": "local, arbitrary, or schematic coordinate system",
         "lpn_field_northing_abbr": "Northing",
         "lpn_field_easting_abbr": "Easting"
     }

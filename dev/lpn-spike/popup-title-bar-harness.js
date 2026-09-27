@@ -116,8 +116,10 @@ console.log('\n--- the line ---');
 console.log('\n--- the bar is still what drags the box ---');
 {
 	const js = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
-	ok('makePanelDraggable() still starts a drag only where the target IS the panel',
-		/function makePanelDraggable\(popup[\s\S]{0,2500}?if \(e\.target !== popup\) \{ return; \}/.test(js));
+	// ...or a HANDLE its caller declared by name (the placement wizard bars' titles, 2026-09-26);
+	// the property popup declares none, so for it this is still "the target IS the panel".
+	ok('makePanelDraggable() still starts a drag only where the target IS the panel (or a declared handle)',
+		/function makePanelDraggable\(popup[\s\S]{0,2500}?if \(e\.target !== popup && !\(handles && handles\.indexOf\(e\.target\) >= 0\)\) \{ return; \}/.test(js));
 	ok('...and the property popup is one of the panels it is called on',
 		/popup\.classList\.add\('lpn-dragpanel'\)/.test(js));
 }

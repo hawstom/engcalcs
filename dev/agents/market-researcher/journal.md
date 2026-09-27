@@ -1942,3 +1942,137 @@ one seat's inference from one analogy, and a future invocation should re-derive 
 as settled.
 
 — Mary
+
+## 2026-09-26 (night) — three direct questions from Tom, via the orchestrator
+
+### 1. Task 697 — Tom asked for ONE vote: `epanetpp.org` or `epanet-plus-plus.org`?
+
+**My vote: `epanet-plus-plus.org`.** Reasons, all CITED:
+
+- **Domain names cannot contain `+`.** The one project everyone already knows by a "++" name that
+  also had to solve this exact problem — Notepad++ — chose the spelled-out form,
+  `notepad-plus-plus.org`, not a squashed `notepadpp.org`. CITED, Wikipedia
+  (`en.wikipedia.org/wiki/Notepad%2B%2B`) and the project's own community site at that domain,
+  confirmed live via WebSearch 2026-09-26. That is the single closest precedent that exists — a
+  program named with the same C-derived "++" convention, choosing a domain for the same reason
+  Tom is choosing one now — and it did not pick the terse form.
+- **`pp` is not a reliable read of "++" and Tom already said so himself** ("pp isn't immediately
+  obvious"). `epanetpp.org` asks a reader to decode an abbreviation with no visual cue that it
+  stands for anything other than a suffix; `epanet-plus-plus.org`, read aloud or typed from
+  memory, reconstructs "EPANET plus plus" — i.e. "EPANET++" — losslessly. A domain that has to be
+  explained the first time someone hears it is a worse word-of-mouth vehicle than one that does not.
+- **Search engines and Google's own guidance disfavor `+` and prefer hyphens as word separators**
+  (CITED, `developers.google.com/search/docs/crawling-indexing/url-structure`: Google recommends
+  hyphens over "+", "_", "."), which is a mild point in favor of the hyphenated form generally, but
+  is not the deciding factor here since neither candidate domain contains a literal `+` — both are
+  already hyphen/no-separator ASCII strings. I list it because it was one of the four evidence types
+  the task asked for; it does not move the vote on its own.
+- **Against my vote:** `epanetpp.org` is shorter to type and say once learned, and typeable in one
+  breath without a hyphen dance — a real advantage for a business card or a spoken URL at a
+  conference. But "learned" is the operative word: the SEO and WOM problem this whole task exists to
+  solve (2026-09-26 entry above: neither `librewaternet.org` nor `hawsedc.com` shows up in any
+  "epanet online/web/browser" search result) is precisely the PRE-learned-name problem, and a name
+  that decodes itself on first encounter serves that better than a name that is shorter once you
+  already know what it means.
+
+**This vote does not reopen the standing finding above it in this same file**: pick ONE of the two
+as canonical and 301 the other to it; my vote is for which one to keep, not a retraction of "don't
+run both as self-canonical front doors."
+
+### 2. Customer quality (concentration, water age, source share), inherited from node with disclaimer
+
+**My recommendation: no, not now, and not by default if it is ever added.**
+
+**What the market leader actually does, checked directly (CITED, Bentley's own WaterCAD CONNECT
+Edition Help, "Customer Meter Elements" page, fetched 2026-09-26):** WaterCAD/WaterGEMS's Customer
+Meter element reports **pressure and HGL only, and only optionally** — controlled by a
+"Calculate Customer Results?" flag that defaults to not calculating them at all. **Water quality
+(concentration, water age, source trace) is not in that element's result set at all** — not
+disabled, not optional, simply absent from the documented field list. Bentley is the incumbent this
+suite is most often compared against by name (WaterCAD migration is already an open thread in this
+journal, 2026-09-25 entry); their own choice, made with a much larger product and user base to draw
+feature requests from, is evidence against there being a strong unmet want for exactly this.
+
+**No independent evidence of a named "per-customer quality" feature anywhere else.** Targeted
+searches for InfoWater/InfoWater Pro "customer point" quality results, and for WaterGEMS quality at
+a customer element specifically, returned general disinfectant-residual-modeling literature (chlorine
+decay, CT, tank residence time) but nothing describing a demand-side "customer" object carrying its
+own quality readout, inherited or otherwise. **Absence result, not a confirmed absence of the
+feature everywhere** — three queries, not exhaustive, and no direct access to a live InfoWater
+install to check its Customer Point property grid myself.
+
+**Why the practice side argues against it too.** Lead & Copper Rule tap sampling and disinfectant
+residual monitoring exist BECAUSE water quality at a customer's tap and water quality at the nearest
+model node are two different things — premise plumbing, lead service lines, stagnation in a dead
+private line, and water heater effects all happen downstream of the node the model can see (CITED,
+EPA's Lead and Copper Rule Improvements fact sheet and 40 CFR 141.86's site-selection-by-plumbing-
+material rule — the entire compliance apparatus is built around the fact that a model node's number
+is not the tap's number). **A Customer inheriting its node's quality value verbatim is not a new
+computed result — it is a copy of a number the Table/map already shows one click away at the node —
+and the honest version of that copy is the disclaimer itself admitting it may be wrong at the one
+place (the tap) a real quality question usually gets asked.** That is a real risk (a number that
+looks like an answer to "is this customer's water safe" but isn't one) for a UI convenience (avoid
+clicking to the node) that Bentley itself, with far more feature-request signal than we have,
+apparently didn't judge worth building as a first-class result.
+
+**If Tom wants it anyway** — e.g. as a pass-through label only, never a new solve — the disclaimer
+should say something close to: *"Water quality shown here is the simulated result at this
+customer's supply node, not a measurement at the tap. Actual water at the tap can differ due to
+premise plumbing, stagnation in the service line, and conditions downstream of the network model."*
+That wording is mine, SPECULATION on phrasing only; the underlying fact it states (model-node vs.
+tap divergence) is the CITED LCR/40 CFR 141.86 finding above.
+
+**What I could not check:** a live InfoWater Pro or WaterGEMS install's actual property grid for a
+Customer/Customer Point element — all findings above are from public documentation and search
+results, not a hands-on session with either product.
+
+### 3. Symbology default decimals — `dev/settings-symbology-defaults.csv`
+
+**One clear defect, OBSERVED:** `## Customer` block, **"Number of services"** row has `Dec. US = 0`,
+`Dec. SI = 1`. A count of services is dimensionless and identical in both unit systems — it should
+never carry a fractional digit in either column. This is the one row I'd flag as an outright
+copy-paste slip rather than a judgment call; every other row's US/SI decimal split tracks an actual
+unit-magnitude difference (e.g., `flow_node` gpm vs. lps), and this row has no such difference to
+track. Recommend `Dec. SI` → `0`.
+
+**Everything else I checked lines up with, or improves on, EPANET's own convention, and I would not
+change it.** EPANET's own default report precision is a flat 2 decimals for every quantity
+(CITED, multiple EPANET 2.2 documentation mirrors found via search — `PRECISION` option in
+`[OPTIONS]`, with per-parameter overrides like "PRESSURE PRECISION 3" available but 2 the
+out-of-the-box default for all of Demand/Head/Pressure/Quality/Flow/Velocity/Headloss). This CSV
+does NOT use a flat 2 everywhere — it varies by unit magnitude (friction factor 3, diameter 0,
+source share 0, roughness 0) — which is a more careful convention than EPANET's own flat default,
+consistent with the unit-scaled reasoning already recorded for velocity and head loss gradient in
+`lib/Units.lib.php:126-131` (OBSERVED). I checked each family against the unit it actually renders
+in (`lib/Units.lib.php`'s `us`/`si` presets) rather than against EPANET's flat 2, and found the
+choices defensible in every other row:
+
+- **Concentration (mg/L), Dec. 1/1**, matches published chlorine-residual reporting convention —
+  EPA's guidance range for disinfectant residual is stated in tenths of mg/L (0.2 to 5 mg/L,
+  CITED per the disinfectant-residual search above) — so 1 decimal is the right resolution, not a
+  rounding error. **Initial quality, also mg/L, uses 2 decimals** — that is not an inconsistency to
+  fix; Initial quality is a typed INPUT (per `CLAUDE.md`'s "Only the user touches a file's numbers"
+  rule, an input keeps more precision than a rounded result display) while Concentration is a
+  computed RESULT, so the two rows serving different decimal counts for the same unit is
+  intentional, not a bug — I would leave both as they are.
+- **Diameter (in/mm), Dec. 0/0**: matches nominal pipe sizing practice in both systems (6-in, 8-in;
+  150 mm, 200 mm) — correct as is.
+- **Friction factor, Dec. 3/3**: Darcy friction factors run roughly 0.015-0.05; 3 decimals resolves
+  to 0.001, which is the conventional resolution in published Darcy-Weisbach worked examples —
+  correct as is, not too coarse.
+- **Velocity, Dec. 1 (ftps) / 2 (mps)**: 0.1 ftps ≈ 0.03 mps, so 1 decimal in ftps and 2 in mps are
+  matched resolutions, not an arbitrary asymmetry — correct as is.
+- **One item I would flag as worth a second look, SPECULATION not a firm recommendation**: Base
+  demand / Demand, **Dec. SI = 1 (lps)**. A single residential connection's demand is commonly on
+  the order of 0.05-0.3 L/s; at 1 decimal that reads as "0.1" for a wide range of real small
+  connections, which is coarser than the Customer block's own reason for existing (looking at one
+  customer's demand specifically, not a main's). I have no cited utility-reporting convention
+  either way on this one — flagging it for Sue's or Tom's judgment, not asserting it is wrong.
+
+**What I could not verify:** no primary-source AWWA (e.g., M32) or utility-published model-report
+decimal-precision table was found or read this session — the EPANET default and the disinfectant-
+residual guidance above are the only outside numeric precision conventions I could actually cite;
+everything else above is this seat's own unit-magnitude arithmetic, not a third-party convention,
+and should be re-derived rather than quoted as an outside standard.
+
+— Mary

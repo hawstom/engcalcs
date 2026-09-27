@@ -2574,3 +2574,80 @@ node only" shape both predate this branch (the note div was built the same way b
 new is only that this branch is the first to point the automated pixel-alignment spec AT the
 Customer list at all, so the pre-existing DOM shape and the new coverage collided for the first
 time here.
+# Perry review, feat/row-paste R-308..R-312, 2026-09-27
+
+Reviewed commit 1631a562 (round head, on branch head d7e6084b) against dev/tom-review-queue.md
+R-308..R-312. Served the branch myself with `php -S` (docroot set to the worktree's own parent so
+`/engcalcs/...` resolves without a symlink -- a symlinked docroot made Looped-Network.php silently
+render the SUITE HOMEPAGE instead, 200 OK, no error, an hour lost to it; noted here so nobody repeats
+it), drove real headless Chrome through dev/lpn-spike/browser-drive.js under
+flock /tmp/engcalcs-browser.lock, and ran the committed Node harnesses.
+
+CONFIRMED -- R-310 (headings on an unselected copy), the sharpest one, because it is a real
+regression test, not decoration: ran dev/lpn-spike/pane-select-harness.js on this commit (75/75
+pass, "Ctrl+A selects every cell, so the copy is the four rows and NO heading"), then re-ran the
+SAME (copied) harness against the pre-1631a562 tree in a second worktree at
+1631a562^ -- it FAILS there ("Ctrl+A selects every cell... 5" and the first line carries the heading
+words), so the test genuinely discriminates old from new code rather than passing on both.
+
+CONFIRMED -- R-308 (Text table location columns), on the real Novato example loaded through the
+actual file-load path (not a guessed-frame addText() call, which I tried first and got a bogus
+Web-Mercator double-transform for my trouble -- see SPECULATION below): real Chrome, Text table
+headers read "ID|Latitude|Longitude|..." and the LAKE row reads 38.125264 | -122.607554, exactly
+the file's own lat/lon (lat first, per CLAUDE.md's public-order rule) -- OBSERVED directly in a
+rendered page, not inferred. Wrote an ad-hoc Node check (not committed) that loads the same file
+through applySaved()+refreshAllFromDocument() and drives paneWriteCellText()/undo() on the
+production functions: typing a new latitude into the Text's own cell moves it (lb.y changed,
+verified against a FRESH doc reference after undo -- the first pass falsely failed because I read
+a stale `doc` closure, a bug in my own script, not the product), and Ctrl+Z-equivalent undo()
+restores the original 38.125264 exactly. 10/10 on that check.
+
+CONFIRMED -- R-311/R-312 (Help, Notes rows), read straight off the server-rendered HTML with curl,
+no browser needed: both rows appear verbatim in the two `lpn-notes-table`s exactly as Tom typed
+them ("Ctrl+Shift+V | Paste as new rows at end of table." and "Paste as new rows at end of table |
+Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V"). dev/lpn-spike/help-menu-harness.js
+also passes (80/80) and pins the row counts (7 and 11) so a future edit that drops either is loud.
+
+CONFIRMED -- R-309 (rename), in a REAL Chrome on a loaded project: a junction cell's right-click
+menu reads "Paste as new rows at end of tableCtrl+Shift+V" and the heading's own ⋮ menu reads
+"Paste as new rows at end of table". Tom offered three alternate wordings and got a fourth
+("at end of table") built from combining two of them -- not a defect, since he offered options
+rather than dictating one, but worth a one-line flag: he has not seen this exact final wording
+and may want to bless it explicitly rather than have it inferred.
+
+CONFIRMED -- the dashed-line indicator he praised ("I really like the dashed line clarifying
+indicator") is untouched by this round: css/engcalcs.css:2316 `.lpn-pane-appending
+.lpn-pane-table { outline: 2px dashed #0645ad; }` predates this commit. Armed it live in Chrome
+from both the cell and heading menus and read the computed style back: `outline: dashed
+rgb(6, 69, 173)`, `lpn-pane-appending` class present both ways -- his compliment still holds and
+needed no work this round.
+
+MISSED nothing found in the code itself. LEAK CHECK: the new Text coordinate write
+(setLabelCoordAxis()) is Base-owned like size/justification (bypasses scenario overrides on
+purpose, matching the existing paneTextCols() comment) and goes through the SAME generic
+paneCommitCell() -> saveUndoSnapshot() -> c.set() path every other coordinate column uses, so
+undo is not a new mechanism for this column -- it rides the one everything else already trusts.
+Checked for the R-027/R-054-shaped failure (a change escaping its declared scope) specifically on
+paneCopyTsv(): the heading-drop is scoped to whole-table copies only (paneIsHeadingLine(), the
+PASTE side, still recognizes an external heading row like Net1's own -- ran
+dev/lpn-spike/pane-row-paste-harness.js, 116/116, including its own "a real exported network...
+pasted table by table" case) -- nothing in the paste path assumes a heading is always present or
+always absent, so dropping it from OUR copies does not touch foreign-data import.
+
+UNVERIFIABLE FROM HERE -- whether Ctrl+Z, pressed with an actual keyboard on the Text table's new
+coordinate cell in a REAL (non-headless) Chrome, visibly moves the pin/label back on the map. I
+confirmed the underlying function is correct (see above, Node-level, production code, real file),
+and confirmed the Junction/Customer tables' identical coordinate-write mechanism is long-shipped
+and trusted, but I could not get a live headless click+type+Enter+Ctrl+Z sequence to commit through
+CDP's synthetic input on this specific cell (three escalating attempts: DOM dispatchEvent, then
+Input.dispatchKeyEvent with real modifiers, then a real mouse click first) -- consistent with the
+Ctrl+Shift+V ceiling noted in an earlier review here, and likely the same headless input-delivery
+gap rather than a real defect, but I did not prove that; a person should type a new latitude into
+the Novato "LAKE" Text's own Latitude cell, press Enter, then press Ctrl+Z, and watch the note.
+
+SPECULATION: a geographic project's Text/Node x/y are NOT raw latitude/longitude in memory -- they
+are Web-Mercator-with-a-sign-flip, and outwardY()/inwardY() are the only door between that and the
+lat/lon a person types or reads. I worked this out empirically (mercLat(-38.125) = -35.588,
+matching my own wrong test output to six figures) rather than reading a single comment that states
+it plainly; worth a doc note somewhere for the next person who tries to fabricate a label position
+by hand instead of loading a file, since it costs about the hour it cost me.
