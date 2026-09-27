@@ -58,7 +58,7 @@ async function columns(a, listId) {
 					left: +r.left.toFixed(2), width: +r.width.toFixed(2), mid: +(r.left + r.width / 2).toFixed(2)
 				};
 			});
-			return { name: (row.children[0].textContent || '').trim(), cells,
+			return { name: ((row.children[0] && row.children[0].textContent) || '').trim(), cells,
 				// A field row opens with its <label>; the customer list also carries a note and its
 				// zoom-limit row below the fields, which are not columns of anything.
 				isField: !!(row.children[0] && row.children[0].tagName === 'LABEL') };
