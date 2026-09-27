@@ -494,6 +494,8 @@
 	}
 
 	EC.lpnTimeNow = function () { return state.t; };
+	// Whether Play is running, so the page can hold its label placement until it stops (R-315).
+	EC.lpnTimePlaying = function () { return !!state.playing; };
 
 	/**
 	 * THE RUN AS IT STANDS AT THIS INSTANT, in the shape a solve returns -- levels, statuses and
@@ -1073,9 +1075,16 @@
 
 	// Repaint the map at the moment the transport is on. NO SOLVE -- the frames are already
 	// computed, so scrubbing the slider is a redraw and not 25 round trips through WASM.
-	function showFrame() {
+	//
+	// **A STEP IS NOT A SOLVE, AND IT TELLS THE PAGE SO** (Tom, 2026-09-26, R-315: *"My browser froze
+	// while advancing through EPS time steps. It eventually caught up. But we may want to
+	// delay/debounce label placement"*). `stepping` is true for a move of the clock -- a step, the
+	// step picker, a Play tick -- and false for a run landing. The page's `applyFrame` then writes the
+	// new numbers into the labels where they stand and places them once the clock stops, instead of
+	// running the whole placement search on every step. A run landing is new content and gets it.
+	function showFrame(stepping) {
 		var r = state.run ? EC.lpnTimeFrameResult(state.run, state.t) : null;
-		if (r) { host.apply(r); }
+		if (r) { (stepping && host.applyFrame ? host.applyFrame : host.apply)(r); }
 		renderPanel();
 	}
 
@@ -1083,7 +1092,7 @@
 
 	function setTime(t) {
 		state.t = t;
-		if (state.run) { showFrame(); return; }
+		if (state.run) { showFrame(true); return; }
 		renderPanel();
 		// **NO FRAMES, AND THE USER HAS ASKED TO SEE ANOTHER MOMENT.** That gesture is the same
 		// request the Run button makes, so it makes it -- a transport that answered "press Run

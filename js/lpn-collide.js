@@ -2483,8 +2483,36 @@ EngCalcs.lpnCollide = (function () {
 		var p = labelBound(o);
 		return p.r < 0 || pointToSegmentDistance(p.cx, p.cy, g) > p.r;
 	}
+	// **THE RECTANGLE ROUND A LABEL AND ITS LEADER, CACHED, AND THE PAIR TEST'S FIRST QUESTION**
+	// (R-315, 2026-09-26). Every way repairPairFlagged() can answer yes needs a leader of one to
+	// reach the other's leader or its label, and both of those lie inside this rectangle -- the
+	// label's own bounding circle squared off, grown to take in the leader. So two rectangles that do
+	// not touch are a pair that cannot be flagged, and the answer is the same one the full test
+	// would give. Measured before it existed, on Net3-World zoomed in with every label field on: 1.3 s
+	// of a 3.8 s placement pass was the full test asked of pairs a screen apart.
+	//
+	// Keyed on the circle and the leader themselves: a trial replaces both on a member, and a member
+	// committed to a new place carries new ones, so a stale rectangle is never read.
+	function pairExtent(o) {
+		var bd = labelBound(o), g = o.leader, e = o._ext, x0, y0, x1, y1, pad;
+		if (e && o._extB === bd && o._extG === g) { return e; }
+		if (bd.r >= 0) { x0 = bd.cx - bd.r; y0 = bd.cy - bd.r; x1 = bd.cx + bd.r; y1 = bd.cy + bd.r; }
+		else { x0 = y0 = Infinity; x1 = y1 = -Infinity; }
+		if (g) {
+			x0 = Math.min(x0, g.ax, g.bx); y0 = Math.min(y0, g.ay, g.by);
+			x1 = Math.max(x1, g.ax, g.bx); y1 = Math.max(y1, g.ay, g.by);
+		}
+		// Grown by a hair, so a pair touching at the very edge still goes to the full test.
+		pad = x1 >= x0 ? 1e-9 * (Math.abs(x0) + Math.abs(x1) + Math.abs(y0) + Math.abs(y1) + 1) : 0;
+		e = x1 >= x0 ? { x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad } : null;
+		o._ext = e; o._extB = bd; o._extG = g;
+		return e;
+	}
 	function repairPairFlagged(a, b) {
-		var i;
+		var i, ea, eb;
+		if (!a.leader && !b.leader) { return false; }
+		ea = pairExtent(a); eb = pairExtent(b);
+		if (!ea || !eb || ea.x1 < eb.x0 || eb.x1 < ea.x0 || ea.y1 < eb.y0 || eb.y1 < ea.y0) { return false; }
 		if (a.leader && b.leader && segmentsCross(a.leader, b.leader)) { return true; }
 		if (b.leader && !leaderMissesLabel(b.leader, a)) {
 			for (i = 0; i < a.boxes.length; i++) {

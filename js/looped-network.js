@@ -1885,7 +1885,7 @@ var EngCalcs = EngCalcs || {};
 	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
 	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
 	// only while the instrument is armed, so a shipped page pays one comparison per label.
-	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0 };
+	var perfDebugCounts = { measures: 0, labelPasses: 0, labelSteps: 0, elements: 0, stations: 0 };
 	function perfDebugCount(what, n) {
 		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
 	}
@@ -51544,13 +51544,129 @@ var EngCalcs = EngCalcs || {};
 		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
 		// elements and the legend is chrome; both are visible under a thematic map, so they are the
 		// part of this pass a suppressor has no business cancelling.
-		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
+		// A synchronous pass answers every request made before it (see requestLabelRefresh()), and
+		// the placement a time step put off (see refreshLabelTextForStep()).
 		labelRefreshPending = false;
+		cancelStepSettle();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+	}
+	/**
+	 * **A TIME STEP CHANGES THE NUMBERS, NOT THE DRAWING** (Tom, 2026-09-26, R-315: *"It's very
+	 * sluggish. My browser froze while advancing through EPS time steps. It eventually caught up.
+	 * But we may want to delay/debounce label placement unless we succeed in making it a lot
+	 * faster."*).
+	 *
+	 * Measured before this existed, in headless Chrome on Net3 (Novato) with ID, demand, head,
+	 * pressure, elevation, flow and velocity on: every step ran the whole content pass -- compose,
+	 * measure, shed, and the full placement search -- 300-670 ms of blocked page per step. Play
+	 * ticks every 400 ms at 1x and 100 ms at 4x, so steps queued behind each other and the page
+	 * froze until the queue drained. That is what "it eventually caught up" was.
+	 *
+	 * So a step does the part a reader needs AT ONCE -- every label shows the new moment's numbers,
+	 * with the network-wide high/low marks recomputed -- and writes them into the labels WHERE THEY
+	 * STAND: no measurement, no shed, no placement. The placement pass runs once, LABEL_STEP_SETTLE_MS
+	 * after the clock stops (and never while Play is running), exactly as it would have after the
+	 * last step. Numbers are a few characters wider or narrower from one hour to the next, so a
+	 * label may crowd its neighbour by a digit for that half second; that is the price, and it is
+	 * paid only while the clock is moving.
+	 *
+	 * **NOT the Recalculate-OFF snapshot rule's business.** A step shows another moment of a run
+	 * already on screen; nothing is solved and nothing is hidden.
+	 * `dev/lpn-spike/eps-step-label-harness.js` holds it, in a real Chrome.
+	 */
+	var LABEL_STEP_SETTLE_MS = 600, stepSettleTimer = null, labelFrameStep = false;
+	function cancelStepSettle() {
+		if (stepSettleTimer) { clearTimeout(stepSettleTimer); stepSettleTimer = null; }
+	}
+	function scheduleStepSettle() {
+		cancelStepSettle();
+		stepSettleTimer = setTimeout(function () {
+			stepSettleTimer = null;
+			// Still playing: the next tick is coming, so placing now would be placing for nothing.
+			if (EngCalcs.lpnTimePlaying && EngCalcs.lpnTimePlaying()) { scheduleStepSettle(); return; }
+			refreshLabelText();
+		}, LABEL_STEP_SETTLE_MS);
+	}
+	// Whether a step's placement is still owed. For harnesses, and for nothing else.
+	function stepSettlePending() { return !!stepSettleTimer; }
+	function refreshLabelTextForStep() {
+		// An owed full pass, or lettering that is off, goes the ordinary way: the first because it is
+		// owed anyway, the second because refreshLabelText() already skips it cheaply.
+		if (labelRefreshPending || dataLabelsHidden) { refreshLabelText(); return; }
+		perfDebugCount('labelSteps');
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try { refreshLabelTextPass(true); } finally { endMapBoxHold(); endLinkGeomHold(); }
+		scheduleStepSettle();
+	}
+	// The fields a label is showing now, carried across to the new moment's lines: what the last
+	// placement pass shed stays shed, a field that has gone away goes, and a field the last pass
+	// never saw (a value that has just come into existence) is shown.
+	function stepKeptLines(prevAll, prevKept, lines) {
+		var had = {}, shown = {}, i;
+		for (i = 0; i < (prevAll || []).length; i++) { if (prevAll[i].field) { had[prevAll[i].field] = true; } }
+		for (i = 0; i < (prevKept || []).length; i++) { if (prevKept[i].field) { shown[prevKept[i].field] = true; } }
+		var kept = lines.filter(function (ln) { return !ln.field || shown[ln.field] || !had[ln.field]; });
+		return kept.length ? kept : lines.slice(0, 1);
+	}
+	function flatSegments(rows) {
+		var out = [];
+		rows.forEach(function (row) { row.forEach(function (seg) { out.push(seg); }); });
+		return out;
+	}
+	// Rewrites a label's tspans' TEXT and high/low marks without rebuilding them, which keeps every
+	// x the placement pass set. Only when the tspans on screen are exactly `oldRows` and `newRows` has
+	// the same shape -- the same fields, which is the ordinary step. Anything else answers false and
+	// the caller rebuilds the label.
+	function rewriteTspansInPlace(textEl, oldRows, newRows) {
+		var kids = textEl && textEl.childNodes, oldSegs = flatSegments(oldRows || []),
+			newSegs = flatSegments(newRows), i, seg, t;
+		if (!kids || kids.length !== oldSegs.length || oldSegs.length !== newSegs.length) { return false; }
+		for (i = 0; i < kids.length; i++) {
+			if (kids[i].nodeType !== 1 || kids[i].textContent !== oldSegs[i].text) { return false; }
+		}
+		for (i = 0; i < kids.length; i++) {
+			seg = newSegs[i]; t = kids[i];
+			if (t.textContent !== seg.text) { t.textContent = seg.text; }
+			if (seg.decoration) {
+				t.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
+				t.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
+			} else if (t.getAttribute('text-decoration') != null) {
+				t.removeAttribute('text-decoration');
+				t.removeAttribute('class');
+			}
+		}
+		return true;
+	}
+	function stepNodeText(ne, n, prevAll, lines, fsNow) {
+		var kept = stepKeptLines(prevAll, ne.lines, lines),
+			newRows = composeRows(kept, true);
+		if (ne.lines && rewriteTspansInPlace(ne.text, composeRows(ne.lines, true), newRows)) {
+			ne.lines = kept;
+			return;
+		}
+		writeNodeLabelGlyphs(ne, n, kept, fsNow);
+		layoutNodeLabel(n.id);
+	}
+	function stepLinkText(le, l, prevAll, lines, fsNow) {
+		var dragged = labelIsDragged(l), kept = stepKeptLines(prevAll, le.lines, lines),
+			owners = [], newRows = composeRows(kept, dragged, owners);
+		if (le.lines && rewriteTspansInPlace(le.text, composeRows(le.lines, dragged), newRows)) {
+			le.lines = kept;
+			le.rows = newRows;
+			le.segOwners = owners;
+			// A repeat is the same words said again, and syncRepeatText() is how it is told.
+			le.rowsSeq = (le.rowsSeq || 0) + 1;
+			(le.repeats || []).forEach(function (r) { syncRepeatText(le, r); });
+			le.shedCount = (le.allLines || []).length - kept.length;
+			return;
+		}
+		writeLabelGlyphs(le, l, kept, fsNow);
+		layoutLinkLabel(l.id);
 	}
 	// The end of a content pass that is NOT about the lettering, so it can be run on its own when
 	// the lettering is skipped. One definition and two callers rather than two copies.
@@ -51558,7 +51674,7 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		refreshScenarioMarks();
 	}
-	function refreshLabelTextPass() {
+	function refreshLabelTextPass(textOnly) {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
 			fsNow = effectiveFontSize() + 'px';
@@ -51752,8 +51868,10 @@ var EngCalcs = EngCalcs || {};
 			// 469). The node shed cascade starts from the whole label every time; shedding down from
 			// whatever survived last pass is a ratchet, and a label that gave up a value at one
 			// crowded zoom could never get it back.
+			var prevAll = ne.allLines;
 			ne.allLines = lines;
 			nodeLines[n.id] = lines;
+			if (textOnly) { stepNodeText(ne, n, prevAll, lines, fsNow); return; }
 			writeNodeLabelGlyphs(ne, n, lines, fsNow);
 		});
 		// **EVERY WRITE, THEN EVERY READ -- AND THAT SPLIT IS THE WHOLE OF WHY IT IS TWO LOOPS.**
@@ -51763,10 +51881,12 @@ var EngCalcs = EngCalcs || {};
 		// the writes finished, the first read lays out once and the other 255 are free. The font size
 		// is set in the loop above for the reason its comment gives -- a width measured at one scale
 		// and banked at another is wrong by the zoom ratio -- and it is a WRITE, so it belongs there.
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id]; if (!ne) { return; }
-			measureLabelWidths(ne);
-		});
+		if (!textOnly) {
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id]; if (!ne) { return; }
+				measureLabelWidths(ne);
+			});
+		}
 		// **THE LINK HALF IS THREE PASSES FOR THE SAME REASON THE NODE HALF IS TWO** (Task 440), with
 		// one extra turn of the screw: its shed cascade is itself a write-then-read loop, so the
 		// cascade too is iterated a RUNG at a time across every label rather than run to the bottom
@@ -51830,7 +51950,9 @@ var EngCalcs = EngCalcs || {};
 			// re-deriving what this link has -- and, more importantly, so every shed is measured from
 			// the whole label rather than from whatever survived last time, which would ratchet a
 			// label down and never let it recover.
+			var prevAll = le.allLines;
 			le.allLines = lines;
+			if (textOnly) { stepLinkText(le, l, prevAll, lines, fsNow); return; }
 			writeLabelGlyphs(le, l, lines, fsNow);
 			linkWork.push({ l: l, le: le, all: lines });
 		});
@@ -51854,6 +51976,16 @@ var EngCalcs = EngCalcs || {};
 			ce.empty = cLines.length === 0;
 			if (!cLines.length) { cLines = [{ text: '' }]; }
 			var cRows = composeRows(cLines, false);
+			if (textOnly) {
+				// Where it stands, as the node and link labels above; rebuilt at its own x when
+				// the shape changed, and placed properly by the settle pass.
+				if (!(ce.lines && rewriteTspansInPlace(ce.text, composeRows(ce.lines, false), cRows))) {
+					setMultilineText(ce.text, ce.text.getAttribute('x') || customerPoint(c).x, cRows);
+				}
+				ce.lines = cLines;
+				ce.allLines = cLines;
+				return;
+			}
 			setMultilineText(ce.text, customerPoint(c).x, cRows);
 			ce.text.style.fontSize = fsNow;
 			ce.lineCount = cRows.length;
@@ -51861,6 +51993,13 @@ var EngCalcs = EngCalcs || {};
 			ce.allLines = cLines;
 			custWork.push(ce);
 		});
+		// A time step stops here: the arrows follow the flow, which reverses between moments, and the
+		// legend and halos are the tail every pass runs. See refreshLabelTextForStep().
+		if (textOnly) {
+			doc.links.forEach(function (l) { updateArrow(l.id); });
+			refreshLabelPassTail();
+			return;
+		}
 		custWork.forEach(function (ce) { measureLabelWidths(ce); });
 		linkWork.forEach(function (rec) { measureLabelWidths(rec.le); });
 		// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
@@ -54679,7 +54818,7 @@ var EngCalcs = EngCalcs || {};
 			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : ''
 		].filter(function (t) { return !!t; }).join(' ');
 		if (engineNotes) { setEngineNotes(engineNotes); }
-		refreshLabelText();
+		if (labelFrameStep) { refreshLabelTextForStep(); } else { refreshLabelText(); }
 		refreshValueColors();
 		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
 		// schedules a solve, so the open tab follows the document with no listener of its own.
@@ -54769,6 +54908,11 @@ var EngCalcs = EngCalcs || {};
 			tabs: paneTabs,
 			doc: function () { return doc; },
 			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
+			// A move of the clock rather than a run landing (R-315): see refreshLabelTextForStep().
+			applyFrame: function (r) {
+				labelFrameStep = true;
+				try { applySolveResult(r); } finally { labelFrameStep = false; }
+			},
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
 			// quiet moment that has already been waited out -- and going through the 300 ms
