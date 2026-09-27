@@ -347,8 +347,8 @@ judgement and does not belong to a script.
 
 ### feat/quality-settings (8121)
 
-- [ ] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task."
-- [ ] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank."
+- [ ] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task." -- feat/quality-settings 016576a4: a link's own average (Task 638's `linkQualityLabel()`/`linkQualityValue()`) is now in the pipe/pump/valve Tables columns, Find and the Properties popup -- the three venues that had none -- named "Average {chemical} concentration" (one whole template, never "Average" glued to the node's own string). Node labels settings, Find and Tables were already correct; awaiting your pass
+- [ ] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank." -- feat/quality-settings 016576a4: Source type reads None and is disabled, in Properties and the Tables column, while Source quality is blank; typing a quality enables it defaulting to EPANET's own CONCEN. An unedited file's export is unchanged (no `sourceType` line where none was written before); awaiting your pass
 
 ### feat/label-gang-search (8090)
 
