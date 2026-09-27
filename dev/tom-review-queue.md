@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-300. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-304. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -230,8 +230,8 @@ judgement and does not belong to a script.
 - [x] R-287 feat/table-editing | "(1) The heavy blue line is not meaningful at the left and right edge of the selection ... you can't drag a column to its own left or right edge; that is a do-nothing case. (2) If and only if you drag beyond the middle of the adjacent column, a blue line appears at the new insertion place." -- c28c6f3c, with R-289's dark line as the marker -- master 893b7a3f
 - [x] R-288 feat/table-editing | "Spreadsheets don't highlight cell contents in Navigation (Ready) mode. When I tab from cell to cell, the only indicator I should see is cell outline." -- c28c6f3c, checked on read-only and editable cells -- master 893b7a3f
 - [x] R-289 feat/table-editing | "(1) Turn an entire heading solid blue on select. (2) Drag a column (not heading) shaded outline (see Google Sheets). (3) Make a wide black or dark gray destination line on entire column (not heading) divider when middle of drag rectangle (not cursor) is between middle of two columns." -- c28c6f3c: solid #0b57d0 heading, grey whole-column ghost, 4 px dark-grey full-height line decided by the ghost's middle -- master 893b7a3f
-- [?] R-290 feat/label-gang-search | (no new words; the master merge) -- c0104534: master's symbol-size rule and zoom-to-fit make this branch's own numbers worse (x2 Novato 72 labels give up a value, was 22; switching the crowding rule off gets 30 but a pass takes 8.3 s, not 0.8 s). Relax the crowding rule, accept slower passes, or rework?
-  - TGH 2026-09-26: "Merging master into it undid much of its gains: Is there anything we can do to figure out why this happened and fix it? What did master have that sabotaged us? Was the merge just inept? We can't proceed unmerged, so this must be dealt with." -- being diagnosed on the branch
+- [ ] R-290 feat/label-gang-search | (no new words; the master merge) -- c0104534: master's symbol-size rule and zoom-to-fit make this branch's own numbers worse (x2 Novato 72 labels give up a value, was 22; switching the crowding rule off gets 30 but a pass takes 8.3 s, not 0.8 s). Relax the crowding rule, accept slower passes, or rework?
+  - TGH 2026-09-26: "Merging master into it undid much of its gains: Is there anything we can do to figure out why this happened and fix it? What did master have that sabotaged us? Was the merge just inept? We can't proceed unmerged, so this must be dealt with." -- 091e58b9: the merge was clean; master's Novato example (text 12, fit 4% wider) and symbol cap caused it; graded rescue with work caps: 2x 72 -> 49, pass ~2.5 s vs ~2.0 s; seven limits re-baselined on master's drawing
 
 ### Rulings recorded, nothing to build
 
@@ -254,7 +254,11 @@ judgement and does not belong to a script.
 - [ ] R-293 feat/placement-wizard | "File, Convert as should automatically filter EPSG CRSes for the displayed area or network extents. I am at Prescott Valley, AZ, but I see the full list of CRSes."
 - [ ] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona."
 - [ ] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?"
-- [ ] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim
+- [x] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim -- master f038eba5
 - [?] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
 - [ ] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users."
 - [ ] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)."
+- [ ] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V)
+- [ ] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared
+- [ ] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b
+- [ ] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording
