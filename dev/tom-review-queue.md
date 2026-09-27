@@ -72,7 +72,7 @@ judgement and does not belong to a script.
 
 ### Calculation and time steps
 
-- [ ] R-171 -- | When I change Base demand in Properties, Demand, Pressure etc. change on the node label, but not in Properties.
+- [x] R-171 -- | When I change Base demand in Properties, Demand, Pressure etc. change on the node label, but not in Properties. -- already shipped as Task 708, 1dbc095b (2026-09-22); dev/lpn-spike/property-echo-harness.js now also covers a pipe's Flow/Velocity/Head loss (same seam) and confirms the multi-select box carries no result column to go stale.
 
 ### Task 696, the coordinate conversion wizard
 

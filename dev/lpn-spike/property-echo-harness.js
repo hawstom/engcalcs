@@ -15,12 +15,22 @@
 // sat on the numbers it drew a third of a second earlier, forever, until the popup was closed and
 // reopened. The three venues therefore agree for an instant and then drift apart on every solve.
 //
-// TWO GROUPS, each with its own live mutation so a harness that passes because the fix already
+// FOUR GROUPS, each with its own live mutation so a harness that passes because the fix already
 // works some other way is worth nothing:
-//   1. RECALCULATE ON: after an edit and the debounced solve, the popup, the label and the table
-//      cell all read the SAME pressure for the same node.
-//   2. RECALCULATE OFF: an edit runs no solve, and all three venues go on agreeing with each
-//      other about the STALE number -- off means a snapshot, not a disagreement.
+//   1. RECALCULATE ON, a node: after an edit and the debounced solve, the popup, the label and the
+//      table cell all read the SAME pressure for the same node.
+//   2. RECALCULATE OFF, a node: an edit runs no solve, and all three venues go on agreeing with
+//      each other about the STALE number -- off means a snapshot, not a disagreement.
+//   3. RECALCULATE ON, a link: editing a pipe's diameter and letting the debounced solve land, the
+//      popup's Flow/Velocity/Head loss rows must agree with the map label and the table, same as a
+//      node's Pressure. renderLinkFields() reads lastSolveResult exactly as renderNodeFields()
+//      does, so this is the same defect on the same seam -- Tom's report named both venues
+//      ("Demand, Pressure etc.") and CLAUDE.md's brief asked this be checked for a link too.
+//   4. THE MULTI-SELECT PROPERTIES BOX never shows a result column at all (multiSection() skips
+//      any column with `c.result`, on purpose -- a result is not editable one at a time or forty at
+//      a time), so there is no stale-result field for it to carry. This group asserts that
+//      exclusion holds, so a future column addition cannot reopen the defect for a venue nobody
+//      thought to re-check.
 
 'use strict';
 
@@ -35,7 +45,12 @@ const INJECT =
 	"\t\tscheduleSolve: scheduleSolve, runSolve: runSolve,\n" +
 	"\t\tafterPropertyEdit: afterPropertyEdit, setProp: setProp, updateNode: updateNode,\n" +
 	"\t\tnodeEls: function () { return nodeEls; },\n" +
+	"\t\tlinkEls: function () { return linkEls; },\n" +
 	"\t\topenPopup: openPopup,\n" +
+	"\t\topenLinkPopup: openLinkPopup,\n" +
+	"\t\tsetSelectionList: setSelectionList,\n" +
+	"\t\topenMultiProperties: openMultiProperties,\n" +
+	"\t\tcurrentPopup: function () { return currentPopup; },\n" +
 	"\t\tclosePopup: closePopup,\n" +
 	"\t\tpopupFieldsDom: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tpaneTables: paneTables, renderPaneTable: renderPaneTable,\n" +
@@ -122,6 +137,36 @@ function tablePressure(L, nodeId) {
 	return text === undefined || text === '' ? undefined : parseFloat(text);
 }
 
+// The same three readers, for a link's Flow row -- renderLinkFields()'s readonlyUnitField() writes
+// a <label> whose text starts with the field's own name ("Flow"), same shape as a node's Pressure.
+function popupFlow(L) {
+	var fields = L.popupFieldsDom();
+	if (!fields) { return undefined; }
+	var found = null;
+	(fields.children || []).forEach(function (label) {
+		if (found || label.tagName !== 'LABEL') { return; }
+		if (String(label.textContent || '').indexOf('Flow') === 0) { found = label; }
+	});
+	if (!found || !found.children.length) { return undefined; }
+	var span = found.children[found.children.length - 1];
+	return span ? parseFloat(span.textContent) : undefined;
+}
+function labelFlow(L, linkId) {
+	var le = L.linkEls()[linkId];
+	if (!le || !le.allLines) { return undefined; }
+	var line = le.allLines.filter(function (l) { return l.field === 'flow'; })[0];
+	if (!line) { return undefined; }
+	var numPart = (line.parts || []).filter(function (p) { return /^-?\d/.test(p.text); })[0];
+	return numPart ? parseFloat(numPart.text) : parseFloat(line.text.replace(/^[^-\d]+/, ''));
+}
+function tableFlow(L, linkId) {
+	L.openPaneTab('pipes');
+	var cell = L.paneCellDom('lpn_pane_pipes', linkId, 'flow');
+	if (!cell) { return undefined; }
+	var text = cell.value !== undefined && cell.value !== '' ? cell.value : cell.textContent;
+	return text === undefined || text === '' ? undefined : parseFloat(text);
+}
+
 async function group(title) {
 	console.log('\n' + title);
 	const page = openPage();
@@ -197,6 +242,61 @@ async function group(title) {
 			Math.abs(afterPopup - afterLabel) < 0.05, 'popup ' + afterPopup + ' vs label ' + afterLabel);
 		ok('Properties and the Tables pane agree on the stale snapshot',
 			Math.abs(afterPopup - afterTable) < 0.05, 'popup ' + afterPopup + ' vs table ' + afterTable);
+	}
+
+	// =========================================================================================
+	// 3. RECALCULATE ON, a LINK: the same defect on the same seam, for Flow/Velocity/Head loss
+	// =========================================================================================
+	{
+		const page = await group('-- 3. an edited pipe\'s Flow agrees in Properties, label and table --');
+		const pipe = page.doc.links.filter(function (l) { return l.type === 'pipe'; })[0];
+
+		page.L.openLinkPopup(pipe.id, 0, 0);
+		const beforePopup = popupFlow(page.L);
+		const beforeLabel = labelFlow(page.L, pipe.id);
+		ok('the popup opened on a pipe and shows a Flow row', typeof beforePopup === 'number', beforePopup);
+
+		// Halve the diameter -- a big enough change that flow through the rest of the loop moves.
+		page.L.setProp(pipe, 'diameter', (pipe._diameter || pipe.diameter || 12) / 2);
+		page.L.afterPropertyEdit(pipe);
+		await wait(400);   // the 300 ms debounce, plus margin
+
+		ok('a new solve actually ran (lastSolveResult reflects the edit)',
+			!!page.L.lastResult() && page.L.lastResult().flows[pipe.id] !== undefined);
+
+		const afterPopup = popupFlow(page.L);
+		const afterLabel = labelFlow(page.L, pipe.id);
+		const afterTable = tableFlow(page.L, pipe.id);
+
+		ok('the map label\'s Flow changed from the edit', afterLabel !== beforeLabel,
+			beforeLabel + ' -> ' + afterLabel);
+		ok('the Properties popup\'s Flow changed from the SAME edit -- the link side of the same defect',
+			afterPopup !== beforePopup, 'popup stuck at ' + afterPopup + ', label moved to ' + afterLabel);
+		ok('Properties and the map label now show the same number',
+			Math.abs(afterPopup - afterLabel) < 0.05, 'popup ' + afterPopup + ' vs label ' + afterLabel);
+		ok('Properties and the Tables pane now show the same number',
+			Math.abs(afterPopup - afterTable) < 0.05, 'popup ' + afterPopup + ' vs table ' + afterTable);
+		ok('the Tables pane and the map label agree with each other too',
+			Math.abs(afterTable - afterLabel) < 0.05, 'table ' + afterTable + ' vs label ' + afterLabel);
+	}
+
+	// =========================================================================================
+	// 4. THE MULTI-SELECT PROPERTIES BOX carries no result column, so it has nothing to go stale.
+	//    This is not "untested" -- it is asserted so a future column addition cannot reopen the
+	//    defect for a venue nobody thought to re-check.
+	// =========================================================================================
+	{
+		const page = await group('-- 4. the multi-select Properties box shows no result column to go stale --');
+		const juncs = page.doc.nodes.filter(function (n) { return n.type === 'junction'; }).slice(0, 2);
+		page.L.setSelectionList(juncs.map(function (n) { return { kind: 'node', id: n.id }; }));
+		page.L.openMultiProperties();
+		ok('the multi popup actually opened', page.L.currentPopup() && page.L.currentPopup().kind === 'multi');
+		var fields = page.L.popupFieldsDom();
+		var text = fields ? String(fields.textContent || '') : '';
+		ok('no "Pressure" row appears in the multi-select box',
+			text.indexOf('Pressure') === -1, text);
+		ok('no "Demand actual" row appears in the multi-select box either',
+			text.indexOf('Demand actual') === -1, text);
 	}
 
 	console.log('\n' + (fails === 0 ? 'ALL OK' : fails + ' FAILURE(S)'));
