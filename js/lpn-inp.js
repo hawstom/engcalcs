@@ -1705,15 +1705,24 @@
 		var mode = (q && q.mode) || 'none', src = q && q.src, was;
 		if (src !== undefined && src !== null && src !== '') {
 			was = EngCalcs.lpnQualityParse(src);
-			if (was.mode === mode && (mode !== 'trace' || was.traceNode === ((q && q.traceNode) || ''))) {
+			// **A CHEMICAL NOW HAS THE SAME "STILL MATCHES THE TOKEN?" TEST A TRACE NODE ALREADY
+			// HAD** (R-323's Chemical/Mass units rows): `q.chemical` undefined means the name and
+			// units have never been touched since import, so `src` still wins byte for byte; a
+			// stated `chemical` that differs from `src` is a real edit and must fall through to be
+			// composed below, the same way retargeting a trace already did.
+			if (was.mode === mode && (mode !== 'trace' || was.traceNode === ((q && q.traceNode) || ''))
+				&& (mode !== 'chemical' || (q && q.chemical) === undefined
+					|| String(q.chemical) === String(src))) {
 				return String(src);
 			}
 		}
 		if (mode === 'age') { return 'Age'; }
 		if (mode === 'trace') { return 'Trace ' + ((q && q.traceNode) || ''); }
-		// 'chemical' with no source token is not a state anything can produce -- the mode exists
-		// only to name a token we did not interpret -- so it falls through with 'none' to the one
-		// honest answer: say nothing, and let EPANET's own default stand.
+		// **A CHEMICAL WITH A STATED NAME COMPOSES**, on the same terms a retargeted trace does;
+		// one with none stated is not a state anything can produce -- the mode exists only to name
+		// a token we did not interpret -- so it falls through with 'none' to the one honest answer:
+		// say nothing, and let EPANET's own default stand.
+		if (mode === 'chemical' && q && q.chemical) { return String(q.chemical); }
 		return '';
 	};
 	function qualityOptionRows(qual, row, live) {

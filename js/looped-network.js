@@ -7516,6 +7516,44 @@ var EngCalcs = EngCalcs || {};
 		return qualityMode() === 'trace' ? '%' : '';
 	}
 	/**
+	 * **THE CHEMICAL'S NAME ALONE, WITH NO UNIT AND NO GENERIC FALLBACK WORD** (R-323): the same
+	 * text `concentrationUnitText()` strips its unit from, minus EPANET's own default keyword
+	 * (`Chemical`/`CHEMICAL`) when that is all a document states. '' means "no name was ever
+	 * given", which `qualityLabel()` reads as leave the heading generic.
+	 */
+	function chemicalName() {
+		var t = String(qualitySetting().chemical || '').trim(), w, nm;
+		if (!t) { return ''; }
+		w = t.split(/\s+/);
+		nm = w.length > 1 ? w.slice(0, -1).join(' ') : t;
+		return /^chemical$/i.test(nm) ? '' : nm;
+	}
+	/**
+	 * **THE MASS HALF OF THE CONCENTRATION UNIT, AS A BARE SYMBOL** -- 'mg' or 'µg' -- for the one
+	 * place a wall coefficient needs it (R-324): a zero-order coefficient is a mass over an area
+	 * over a time, and the mass is whatever Mass units names. Defaults to 'mg', EPANET's own
+	 * default Mass units choice, when nothing is stated yet.
+	 */
+	function qualityMassUnitText() {
+		return /^u/i.test(concentrationUnitText()) ? 'µg' : 'mg';
+	}
+	/**
+	 * **THE WALL REACTION COEFFICIENT'S UNIT, WHICH FOLLOWS THE WALL REACTION ORDER** (R-324, Tom:
+	 * "Wall reaction coefficient units vary according to Wall reaction order; when order is 0,
+	 * coefficient is mass/area/time and when order is 1, coefficient is length/time"). EPANET's own
+	 * default order is 1 (a length per day), so anything but a stated 0 reads as order 1 -- the same
+	 * "unstated means EPANET's own default" rule `wallOrder`'s row already follows. ONE function, so
+	 * the Settings box, the pipe type Library and the Tables column can never disagree about it.
+	 */
+	function wallCoeffUnitText() {
+		var pc = EngCalcs.pageConfig || {}, order = (settings.reactions || {}).orderWall;
+		if (order === 0) {
+			return qualityMassUnitText() + '/' + unitLabel('lpn_u_length') + '²/'
+				+ (pc.lpn_reaction_day || 'day');
+		}
+		return unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day');
+	}
+	/**
 	 * **IS A REACTION COEFFICIENT A LIVE CONTROL RIGHT NOW?** One question, asked in five places --
 	 * the pipe popup, the tank popup, the two Tables columns, the Find property list and the
 	 * writable-property list Replace reads. They must agree: a property offered to Find and Replace
@@ -7527,11 +7565,24 @@ var EngCalcs = EngCalcs || {};
 	function reactionFieldsShown() { return qualityMode() === 'chemical'; }
 	// The heading, in OUR vocabulary rather than EPANET's (CLAUDE.md): EPANET says "Source Trace"
 	// and reports a bare "Quality" column, and neither tells a reader what the number is.
+	//
+	// **THE ONE RESOLVER FOR "WHAT DOES THIS QUALITY COLUMN MEAN?"** (R-323, Tom: "If EPANET
+	// doesn't offer a UI for the chemical name, what are we doing with it? We could put it in
+	// Properties, Find, and Tables as '{chemical} concentration', and that would be very cool.").
+	// Named chemical -> "{chemical} concentration"; nothing named -> the plain "Concentration" it
+	// always said. Every reader of this quantity -- the popup, the Tables column, Find's property
+	// list, the Labels legend and the colour legend -- already calls this one function, so a name
+	// typed once reaches every one of them and a Symbology row built from this same function
+	// cannot say something different from the popup beside it.
 	function qualityLabel() {
-		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
+		var pc = EngCalcs.pageConfig || {}, mode = qualityMode(), nm;
 		if (mode === 'trace') { return pc.lpn_result_source_share || 'Source share'; }
 		// EPANET's own word for the quantity, which is what an engineer reads on a report.
-		if (mode === 'chemical') { return pc.lpn_result_concentration || 'Concentration'; }
+		if (mode === 'chemical') {
+			nm = chemicalName();
+			return nm ? (pc.lpn_quality_named_concentration || '{chemical} concentration').replace('{chemical}', nm)
+				: (pc.lpn_result_concentration || 'Concentration');
+		}
 		return pc.lpn_result_water_age || 'Water age';
 	}
 	/**
@@ -7561,12 +7612,19 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **THREE WHOLE NAMES, NOT A WORD PLUS A HEADING.** Composing "Average" + qualityLabel() at
 	 * render time is the fragment composition CLAUDE.md forbids: it breaks in a gendered language,
-	 * in a word-order language and in the five right-to-left ones.
+	 * in a word-order language and in the five right-to-left ones. The named-chemical case (R-349,
+	 * the link half of R-323) follows the same rule: `lpn_quality_named_avg_concentration` is one
+	 * WHOLE template ("Average {chemical} concentration"), never "Average" glued to
+	 * qualityLabel()'s own named string.
 	 */
 	function linkQualityLabel() {
-		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
+		var pc = EngCalcs.pageConfig || {}, mode = qualityMode(), nm;
 		if (mode === 'trace') { return pc.lpn_result_avg_source_share || 'Average source share'; }
-		if (mode === 'chemical') { return pc.lpn_result_avg_concentration || 'Average concentration'; }
+		if (mode === 'chemical') {
+			nm = chemicalName();
+			return nm ? (pc.lpn_quality_named_avg_concentration || 'Average {chemical} concentration').replace('{chemical}', nm)
+				: (pc.lpn_result_avg_concentration || 'Average concentration');
+		}
 		return pc.lpn_result_avg_water_age || 'Average water age';
 	}
 	/**
@@ -17198,7 +17256,10 @@ var EngCalcs = EngCalcs || {};
 			['flow', 'lpn_result_flow', 'Flow'],
 			['velocity', 'lpn_result_velocity', 'Velocity'],
 			['headloss', 'lpn_result_headloss', 'Head loss'],
-			['gradient', 'lpn_result_gradient', 'Head loss gradient']
+			['gradient', 'lpn_result_gradient', 'Head loss gradient'],
+			// **THE LINK'S OWN AVERAGE** (R-349, Task 638 completed): the same result as the node's
+			// `quality` row, one band down, but never the node's word for it -- see linkQualityLabel().
+			['quality', null, 'Average water age']
 		];
 		// A row is offered only where it can match, which is the standing honesty rule: a property
 		// that silently matches nothing does not go in the menu.
@@ -17233,7 +17294,10 @@ var EngCalcs = EngCalcs || {};
 				}
 				// The heading follows the quality mode and the friction method, so those two are
 				// asked for rather than stored -- the same reason nodeFieldDefs() calls them.
-				var label = key === 'quality' ? qualityLabel()
+				// **A LINK'S QUALITY READS linkQualityLabel(), NEVER qualityLabel()** (R-349): the two
+				// are different quantities (a node's own value vs. a link's average) and must never
+				// share one word, the same split linkFieldDefs()/nodeFieldDefs() already keep.
+				var label = key === 'quality' ? (d.group === 'link' ? linkQualityLabel() : qualityLabel())
 					: key === 'roughness' ? roughnessLabel()
 					: (f[1] && pc[f[1]]) || f[2];
 				out.push([key, label, f[2]]);
@@ -21503,6 +21567,15 @@ var EngCalcs = EngCalcs || {};
 		c.unitText = qualityUnitText;
 		return c;
 	}
+	// **THE LINK'S OWN AVERAGE, IN EVERY VENUE A NODE'S HAS IT** (R-349, Task 638 completed): the
+	// same dynamic-heading arrangement as paneColNodeQuality(), reading linkQualityLabel() instead
+	// of qualityLabel() -- EPANET reports a link's quality as the average standing in it, a
+	// different quantity from a node's own value, so the two never share one word.
+	function paneColLinkQuality() {
+		var c = paneColLinkResult('quality', linkQualityLabel, null);
+		c.unitText = qualityUnitText;
+		return c;
+	}
 	/**
 	 * **THE STARTING CONCENTRATION AS A COLUMN** (Tom, 2026-09-14: *"Initial quality is in no Table
 	 * and no multi-properties. Embarrassing, and we are committed to finishing it."*).
@@ -21560,10 +21633,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return pc.lpn_reaction_per_day || '1/day';
 	}
-	function paneReactionWallUnit() {
-		var pc = EngCalcs.pageConfig || {};
-		return unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day');
-	}
+	// **FOLLOWS THE WALL REACTION ORDER** (R-324): wallCoeffUnitText() is the one function every
+	// reader of this coefficient's unit calls, so this column can never disagree with the Settings
+	// box or the pipe type Library about what the number in it means.
+	function paneReactionWallUnit() { return wallCoeffUnitText(); }
 	// **THE RESULT the two paneColReaction() coefficients above feed** (Task 664): a pipe's own
 	// reaction rate, read the identical way the map label and the Properties popup read it --
 	// linkReactionRate() through colorLinkValue(), so a number in this column can never disagree
@@ -21634,21 +21707,36 @@ var EngCalcs = EngCalcs || {};
 		if (overridable) { c.prop = key; }
 		return c;
 	}
+	// **HAS A NODE BEEN GIVEN A SOURCE QUALITY?** (R-350). The one question the type column, the
+	// type's own cell in the popup and its disabled state must all answer alike.
+	function hasSourceQuality(n) {
+		var sq = effective(n, 'sourceQuality');
+		return sq !== undefined && sq !== null && sq !== '';
+	}
 	// **WHERE A CHEMICAL ENTERS THE NETWORK** (Task 566): on every kind of node, and only while one
 	// is being tracked, which is the popup's own gate asked rather than stored.
+	//
+	// **DISABLED AND READING NONE WHILE SOURCE QUALITY IS BLANK** (R-350, Tom: *"Source type should
+	// default to none. Maybe just disable if Source quality is blank... it's ignored if Source
+	// Quality is blank."*) -- the same rule and the same `hasSourceQuality()` question sourceFields()
+	// asks in the popup, so the two surfaces can never show two different states for one node.
 	function paneColSourceType() {
 		return { key: 'sourceType', label: 'lpn_source_type', em: 5,
 			when: function () { return qualityMode() === 'chemical'; },
 			prop: 'sourceType',
-			choices: function () {
-				var pc = EngCalcs.pageConfig || {};
-				return [['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+			choices: function (n) {
+				var pc = EngCalcs.pageConfig || {},
+					out = (n && !hasSourceQuality(n)) ? [['', pc.lpn_source_type_none || 'None']] : [];
+				return out.concat([['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
 					['MASS', pc.lpn_source_type_mass || 'Mass booster'],
 					['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
-					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']];
+					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']]);
 			},
-			get: function (n) { return effective(n, 'sourceType') || 'CONCEN'; },
-			set: function (n, v) { setProp(n, 'sourceType', v); } };
+			disabledFor: function (n) { return !hasSourceQuality(n); },
+			get: function (n) { return hasSourceQuality(n) ? (effective(n, 'sourceType') || 'CONCEN') : ''; },
+			// '' is the disabled state's own value, never a type to store -- writing it would be a
+			// stated "no type" where EPANET's own vocabulary has none.
+			set: function (n, v) { setProp(n, 'sourceType', v || undefined); } };
 	}
 	function paneColSourceQuality() {
 		return { key: 'sourceQuality', label: 'lpn_source_quality', unitText: concentrationUnitText,
@@ -22248,6 +22336,7 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
 					paneColLinkStatus(),
+					paneColLinkQuality(),
 					paneColLinkReactionRate()
 				])
 			},
@@ -22273,7 +22362,8 @@ var EngCalcs = EngCalcs || {};
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
-					paneColLinkStatus()
+					paneColLinkStatus(),
+					paneColLinkQuality()
 				])
 			},
 			{
@@ -22302,7 +22392,8 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
 					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient),
-					paneColLinkStatus()
+					paneColLinkStatus(),
+					paneColLinkQuality()
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -23503,12 +23594,16 @@ var EngCalcs = EngCalcs || {};
 				input = document.createElement(c.bool ? 'input' : 'select');
 				if (c.bool) { input.type = 'checkbox'; input.checked = !!c.get(el); input.readOnly = true; }
 				else {
-					c.choices().forEach(function (o) {
+					c.choices(el).forEach(function (o) {
 						var opt = document.createElement('option');
 						opt.value = o[0]; opt.textContent = o[1];
 						input.appendChild(opt);
 					});
 					input.value = paneCellText(c, el);
+					// **THE SAME GREYED-OUT DOOR THE POPUP HAS** (R-350): a column can declare
+					// `disabledFor(el)` for a per-row reason a choice is not live right now -- the
+					// Source type column's own reason, while Source quality is blank.
+					if (c.disabledFor && c.disabledFor(el)) { input.disabled = true; }
 				}
 				paneApplyColWidth(input, c, spec);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
@@ -43683,8 +43778,8 @@ var EngCalcs = EngCalcs || {};
 			return (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
 				+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')';
 		}
-		return (pc.lpn_reaction_wall || 'Wall reaction coefficient')
-			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')';
+		// **FOLLOWS THE WALL REACTION ORDER, LIKE EVERY OTHER READER OF THIS UNIT** (R-324).
+		return (pc.lpn_reaction_wall || 'Wall reaction coefficient') + ' (' + wallCoeffUnitText() + ')';
 	}
 	// **A CURVE'S KIND DECIDES WHAT ITS SECOND COLUMN IS**, and therefore its heading and its unit.
 	// One table, so the Library, the popup and the exporter cannot disagree about what a curve of a
@@ -44511,14 +44606,18 @@ var EngCalcs = EngCalcs || {};
 		var n = labelSettings.node || {}, l = labelSettings.link || {};
 		return !!(n.quality || n.initQuality || l.quality || l.rate);
 	}
+	// **ORDER: None, Chemical, Trace, Age** (Tom, R-321: "Quality parameter order must be:
+	// None, Chemical, Trace, Age (as he sees in EPANET)"). EPANET's own Parameter combo lists
+	// them in that order, and this box does not reorder an EPANET control without a reason
+	// (Tom: "I don't think we should change things in the EPANET UI without a reason").
 	function settingsQualityRows(host, rowFn, noteFn) {
 		var pc = EngCalcs.pageConfig || {}, q = qualitySetting(),
 			sel = document.createElement('select'), opts = [
 				['none', pc.lpn_quality_none || 'Nothing'],
-				['age', pc.lpn_quality_age || 'Water age'],
-				['trace', pc.lpn_quality_trace || 'Source trace']
+				['chemical', pc.lpn_quality_chemical || 'A reactive chemical'],
+				['trace', pc.lpn_quality_trace || 'Source trace'],
+				['age', pc.lpn_quality_age || 'Water age']
 			];
-		opts.push(['chemical', pc.lpn_quality_chemical || 'A reactive chemical']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -44613,21 +44712,76 @@ var EngCalcs = EngCalcs || {};
 	 * a plausible number in a box is read as our recommendation.
 	 */
 	function settingsChemicalRows(host, rowFn, noteFn) {
-		var pc = EngCalcs.pageConfig || {}, q = qualitySetting();
-		var name = document.createElement('input');
-		name.type = 'text'; name.size = 14;
-		name.value = q.chemical || '';
-		name.addEventListener('change', function () {
+		var pc = EngCalcs.pageConfig || {};
+		// **THE NAME AND ITS UNIT WERE ONE FIELD ("Chlorine mg/L") AND ARE NOW TWO** (R-323, Tom:
+		// "Our interface is arguably less friendly than EPANET because they have a dropdown for
+		// Mass Units ... and they don't 'require' the chemical name."). `q.chemical` -- the token
+		// that round-trips through the file -- is still ONE string; these two controls only split
+		// it apart for editing and recompose it on every change, through `commitChemical()` below,
+		// so the document's own storage and the export path (`lpnQualityText`) do not change shape.
+		var nameInput = document.createElement('input'), massSel = document.createElement('select');
+		nameInput.type = 'text'; nameInput.size = 14;
+		nameInput.value = chemicalName();
+		massSel.appendChild(mkOpt('mg/L', 'mg/L'));
+		massSel.appendChild(mkOpt('ug/L', pc.lpn_quality_unit_ug || 'µg/L'));
+		massSel.value = /^ug/i.test(concentrationUnitText()) ? 'ug/L' : 'mg/L';
+		function mkOpt(v, t) {
+			var o = document.createElement('option'); o.value = v; o.textContent = t; return o;
+		}
+		// **NOT REQUIRED, ON EPANET'S OWN TERMS** (R-323 (2)): a blank name is not a state this
+		// control demands out of the user, it just means EPANET's own default label -- literally
+		// the word `Chemical` in the file EPANET itself would write -- and `qualityLabel()` shows
+		// the plain word "Concentration" for it rather than "Chemical concentration".
+		function commitChemical() {
 			if (!settings.quality) { settings.quality = { mode: 'chemical', traceNode: '' }; }
-			settings.quality.chemical = name.value;
+			var nm = nameInput.value.trim();
+			settings.quality.chemical = (nm || 'Chemical') + ' ' + massSel.value;
 			saveToStorage();
 			rebuildSettingsBox();
 			if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			scheduleSolve();
-		});
-		rowFn(host, pc.lpn_quality_chemical_name || 'Chemical and units', name,
+		}
+		nameInput.addEventListener('change', commitChemical);
+		massSel.addEventListener('change', commitChemical);
+		rowFn(host, pc.lpn_quality_chemical_name || 'Chemical', nameInput,
 			pc.lpn_quality_chemical_name_tip);
+		rowFn(host, pc.lpn_quality_mass_units || 'Mass units', massSel,
+			pc.lpn_quality_mass_units_tip);
+		// **QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
+		// see this in our interface. Is it missing?" -- twice). They were carried in the file and
+		// handed to the engine all along (`qualitySetting()`, js/lpn-epanet.js) with no box to read
+		// or change them from; this is that box, for the two EPANET applies only to a chemical.
+		//
+		// **TEXT, NOT A NUMBER BOX**, on the same argument `[OPTIONS] Diffusivity`/`Tolerance`
+		// already carry verbatim in js/lpn-inp.js: `String(parseFloat('1.0'))` is `'1'`, so parsing
+		// this into a Number and back would silently rewrite an untouched Net1/Net2/Net3 import and
+		// break the byte-identical export CLAUDE.md requires. Blank is a state -- EPANET's own
+		// default stands -- exactly as every other sparse `[OPTIONS]` control on this page.
+		function qualityOptionRow(key, labelText, tip, placeholderText) {
+			var input = document.createElement('input');
+			input.type = 'text'; input.size = 8;
+			var cur = (settings.qualityOptions || {})[key];
+			input.value = (cur === undefined || cur === null) ? '' : String(cur);
+			input.placeholder = placeholderText;
+			input.addEventListener('change', function () {
+				var v = input.value.trim();
+				if (v !== '' && !isFinite(parseFloat(v))) {
+					input.value = (settings.qualityOptions || {})[key] || '';
+					return;
+				}
+				if (!settings.qualityOptions) { settings.qualityOptions = {}; }
+				if (v === '') { delete settings.qualityOptions[key]; }
+				else { settings.qualityOptions[key] = v; }
+				saveToStorage();
+				scheduleSolve();
+			});
+			rowFn(host, labelText, input, tip);
+		}
+		qualityOptionRow('tolerance', pc.lpn_quality_tolerance || 'Quality tolerance',
+			pc.lpn_quality_tolerance_tip, '0.01');
+		qualityOptionRow('diffusivity', pc.lpn_quality_diffusivity || 'Relative diffusivity',
+			pc.lpn_quality_diffusivity_tip, '1.0');
 		// **A COEFFICIENT ROW: BLANK IS A STATE, NOT A ZERO WE TYPED.** Clearing the box removes the
 		// key, so the exporter writes no line and EPANET's own default stands -- the same sparse
 		// rule every other `[OPTIONS]` on this page follows.
@@ -44649,11 +44803,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		coeffRow('globalBulk', (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
 			+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')', pc.lpn_reaction_bulk_tip);
-		// **THE ONE COEFFICIENT WITH A LENGTH IN IT**, so the unit is named on the label the way a
-		// Darcy-Weisbach roughness names its own. engineQuality() converts it at the engine
-		// boundary and nowhere else.
+		// **THE ONE COEFFICIENT WHOSE UNIT FOLLOWS THE REACTION ORDER** (R-324): a length per day at
+		// order 1, a mass per area per day at order 0 -- wallCoeffUnitText() is the one function
+		// that decides which, so this label, the pipe type Library and the Tables column agree.
+		// engineQuality() converts the order-1 length at the engine boundary and nowhere else.
 		coeffRow('globalWall', (pc.lpn_reaction_wall || 'Wall reaction coefficient')
-			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
+			+ ' (' + wallCoeffUnitText() + ')',
 		pc.lpn_reaction_wall_tip);
 		/**
 		 * **THE FIVE A FILE CAN STATE AND NOTHING COULD SHOW** (Task 593). Net2 and Net3 both state
@@ -48097,17 +48252,29 @@ var EngCalcs = EngCalcs || {};
 	 * a zero would be a booster that is switched on and dosing nothing, and EPANET writes those two
 	 * as a line and as no line. All three go through setProp(), being overridable -- see
 	 * LPN_OVERRIDABLE, where the reason is that a dose is an operating question.
+	 *
+	 * **THE TYPE IS DISABLED, AND READS AS NONE, WHILE THE QUALITY IS BLANK** (R-350, Tom: *"Source
+	 * type should default to none. Maybe just disable if Source quality is blank, since that's
+	 * what's really happening; it's ignored if Source Quality is blank."*). `CONCEN` sat there as a
+	 * live-looking choice on a node that was not a source at all, which is EPANET's own default and
+	 * not this suite's -- so an untyped node showed a type that implied dosing nobody asked for.
+	 * `sourceType` is unwritten in that state and stays that way: choosing "None" here writes
+	 * nothing to `.inp` where an unedited import wrote nothing before, and TYPING a quality is what
+	 * turns the control on, defaulting to `CONCEN` -- EPANET's own rule -- unless the user then
+	 * picks something else.
 	 */
 	function sourceFields(fields, n, unitText) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, sq = effective(n, 'sourceQuality'),
+			hasQuality = (sq !== undefined && sq !== null && sq !== '');
 		selectFieldPlain(fields, pc.lpn_source_type || 'Source type',
-			[['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+			(hasQuality ? [] : [['', pc.lpn_source_type_none || 'None']]).concat([
+				['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
 				['MASS', pc.lpn_source_type_mass || 'Mass booster'],
 				['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
-				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']],
-			effective(n, 'sourceType') || 'CONCEN',
-			function (v) { setProp(n, 'sourceType', v); refreshPopupIfOpen(); },
-			pc.lpn_source_type_tip);
+				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']]),
+			hasQuality ? (effective(n, 'sourceType') || 'CONCEN') : '',
+			function (v) { setProp(n, 'sourceType', v || undefined); refreshPopupIfOpen(); },
+			pc.lpn_source_type_tip, !hasQuality);
 		numberFieldBlank(fields,
 			(pc.lpn_source_quality || 'Source quality') + (unitText ? ' (' + unitText + ')' : ''),
 			effective(n, 'sourceQuality'),
@@ -48160,6 +48327,23 @@ var EngCalcs = EngCalcs || {};
 		// which is the ONE place that question is answered -- this row, the Tables heading and the
 		// colour legend printed three different answers to it until they shared one.
 		readonlyField(fields, qualityLabel() + (u ? ' (' + u + ')' : ''), v,
+			mode === 'age' ? pc.lpn_result_water_age_tip
+				: mode === 'chemical' ? pc.lpn_result_concentration_tip
+					: pc.lpn_result_source_share_tip);
+	}
+	/**
+	 * **THE LINK'S OWN TAIL, ON THE SAME TERMS AS A NODE'S** (R-349, closing the gap Task 638 left:
+	 * a pipe, pump and valve had `linkQualityValue()` and `linkQualityLabel()` since Task 638, but
+	 * no popup row ever read them -- the Properties box was the one venue Find, the Tables pane and
+	 * the Labels legend all got and this one did not). Absent where there is no answer, exactly as
+	 * qualityResultRow() is; the tips are the node row's own, because the sentence explaining what
+	 * the number means does not change when it is an average rather than one node's value.
+	 */
+	function linkQualityResultRow(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, v = linkQualityValue(l),
+			mode = qualityMode(), u = qualityUnitText();
+		if (v === undefined) { return; }
+		readonlyField(fields, linkQualityLabel() + (u ? ' (' + u + ')' : ''), v,
 			mode === 'age' ? pc.lpn_result_water_age_tip
 				: mode === 'chemical' ? pc.lpn_result_concentration_tip
 					: pc.lpn_result_source_share_tip);
@@ -49339,6 +49523,9 @@ var EngCalcs = EngCalcs || {};
 			// row is what EPANET reports for the step on screen, the column its own link report
 			// ends on.
 			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
+			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
+			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
+			linkQualityResultRow(fields, l);
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -50194,7 +50381,12 @@ var EngCalcs = EngCalcs || {};
 	// A dropdown field. `options` is [[value, label], ...]. The only popup control that is not a
 	// number or a checkbox, added for the valve type (Task 248 phase 2) -- a valve's type decides
 	// what its other fields MEAN, so it cannot be a free-text or numeric input.
-	function selectFieldPlain(fields, labelText, options, current, onChange, tip) {
+	//
+	// **`disabled` IS THE SOURCE TYPE'S OWN DOOR** (R-350, Tom: *"Source type should default to
+	// none. Maybe just disable if Source quality is blank, since that's what's really
+	// happening."*) -- greyed out rather than removed, so the row stays in its place and a reader
+	// still sees the four choices a quality would put in play.
+	function selectFieldPlain(fields, labelText, options, current, onChange, tip, disabled) {
 		var label = document.createElement('label'), sel = document.createElement('select'), i, o;
 		for (i = 0; i < options.length; i++) {
 			o = document.createElement('option');
@@ -50203,6 +50395,7 @@ var EngCalcs = EngCalcs || {};
 			if (options[i][0] === current) { o.selected = true; }
 			sel.appendChild(o);
 		}
+		sel.disabled = !!disabled;
 		sel.addEventListener('change', function () { saveUndoSnapshot(); onChange(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
