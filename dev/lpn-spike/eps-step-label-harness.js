@@ -15,8 +15,10 @@
 // elevation and flow/velocity on), 24 steps clicked 150 ms apart:
 //   before: every step blocked the page 300-1,270 ms (it ran the whole placement pass), and Play
 //           at 4x took 17 s to show 24 hours that should take 2.4 s
-//   after:  the longest step blocked 61-150 ms, Play at 4x took 2.6 s, and ONE placement pass of
-//           ~0.7 s ran after the clock stopped
+//   after:  the longest step blocked 61-360 ms, Play at 4x took 2.5-2.8 s, and ONE placement pass
+//           ran after the clock stopped -- 2.4 s quiet, up to 12.7 s under a concurrent check_all.
+//           That pass is this branch's own cost (master's is ~0.6 s at this view); it is waited
+//           for once, in section 2, and nowhere else, so the harness stays well inside 300 s.
 //
 // **THE BAR IS A RATIO, NOT A STOPWATCH**, because this runs beside other agents' check_all runs
 // and absolute milliseconds swing 2-3x with the load (the same master build measured 527 ms and
@@ -89,7 +91,6 @@ function labelTexts(page) {
 }
 const now = (page) => page.evaluate(() => performance.now());
 const longTasks = (page) => page.evaluate(() => window.__ecLongTasks.slice());
-const clearLongTasks = (page) => page.evaluate(() => { window.__ecLongTasks.length = 0; });
 const longest = (a) => a.reduce((m, e) => Math.max(m, e.d), 0);
 // Waits until the page has been quiet for QUIET ms after `from` (a performance.now() reading): no
 // long task running or ending inside that window. A placement pass is seconds on a loaded machine,
@@ -189,13 +190,17 @@ async function main() {
 			same + '/' + compared + (differ.length ? '  ' + differ.join(' | ') : ''));
 
 		console.log('\n--- 3. Play at 4x runs at the speed it says ---');
-		const g0 = await now(page);
-		await page.evaluate(() => EngCalcs.lpnTimeGoTo(0));
-		await quietAfter(page, g0, 2000);
-		await page.evaluate(() => { const s = document.getElementById('lpn_time_speed'); s.value = '4'; s.dispatchEvent(new Event('change')); });
-		await clearLongTasks(page);
-		const p0 = await now(page);
-		await page.evaluate(() => document.querySelector('button[data-icon="play"]').click());
+		// One task: back to the start (a step, so text only), the speed, and Play. Nothing is waited
+		// out in between -- the placement the rewind owes is held while Play runs, which is the
+		// point, and waiting it out costs this harness a whole pass on a loaded machine.
+		const p0 = await page.evaluate(() => {
+			const s = document.getElementById('lpn_time_speed'); s.value = '4'; s.dispatchEvent(new Event('change'));
+			EngCalcs.lpnTimeGoTo(0);
+			window.__ecLongTasks.length = 0;
+			const t = performance.now();
+			document.querySelector('button[data-icon="play"]').click();
+			return t;
+		});
 		let pEnd = null;
 		for (let i = 0; i < 600 && pEnd === null; i++) {
 			await page.waitForTimeout(100);
@@ -203,12 +208,10 @@ async function main() {
 			if (!st[0] && st[1] === 86400) { pEnd = st[2]; }
 		}
 		ok('Play reached the end of the run', pEnd !== null);
-		await quietAfter(page, pEnd, 2000);
-		const playTasks = await longTasks(page);
-		const during = playTasks.filter((e) => e.s < pEnd), afterPlay = playTasks.filter((e) => e.s >= pEnd);
+		const during = (await longTasks(page)).filter((e) => e.s < pEnd);
 		const playMs = pEnd - p0;
 		console.log('      24 hours at 4x took ' + (playMs / 1000).toFixed(1) + ' s (2.4 s at full speed); longest freeze while playing '
-			+ longest(during).toFixed(0) + ' ms; placement after it stopped ' + longest(afterPlay).toFixed(0) + ' ms');
+			+ longest(during).toFixed(0) + ' ms');
 		ok('Play took at most ' + PLAY_RATIO + ' of what ' + STEPS + ' placement passes cost', pass > 0 && playMs <= PLAY_RATIO * STEPS * pass,
 			'ratio ' + (pass ? (playMs / (STEPS * pass)).toFixed(2) : 'n/a'));
 		ok('no placement pass ran while Play was running', longest(during) <= STEP_RATIO * pass,
