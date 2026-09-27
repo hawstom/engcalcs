@@ -35063,7 +35063,23 @@ var EngCalcs = EngCalcs || {};
 		// tools' alone -- deleting a pipe and bending it are what those two tools are FOR, so a link
 		// click cannot mean "leave" there -- but Escape asks for nothing and costs nothing, and
 		// being in Delete without knowing it is the scariest of the three.
-		if (!hadBox && mode !== 'select') { setMode('select'); }
+		//
+		// **THE KEYSTROKE ITSELF IS WHAT LIGHTS THE BUTTON UP** (Tom, 2026-09-27: a heavy border
+		// on the mode button "after Esc", on every mode button he tried). Clicking Vertices left
+		// it holding plain mouse focus, no ring -- but Escape is a keydown, and a keydown on an
+		// already-focused element is exactly what flips a browser's own :focus-visible heuristic
+		// to true, so the default ring appears on a button nobody tabbed to. Blurring it here, the
+		// instant Escape sends the tool home, is the fix: Select has no toolbar button of its own
+		// to hold focus, and a reader who really did Tab to a toolbar button (and is still moving
+		// through it with the keyboard) is untouched, because this only runs on the way OUT of a
+		// tool, guarded exactly like the setMode() call it sits beside.
+		if (!hadBox && mode !== 'select') {
+			var modeBtn = document.activeElement;
+			if (modeBtn && modeBtn.matches && modeBtn.matches('#lpn_toolbar button[data-tool]')) {
+				modeBtn.blur();
+			}
+			setMode('select');
+		}
 		// **AND IN SELECT, WITH NOTHING OPEN, ESCAPE CLEARS THE SELECTION** (Tom, 2026-09-08: *"How
 		// can I unselect an asset? Select empty map space. Esc doesn't do it, and maybe it should
 		// when in select (home) mode."*). The same one-thing-per-press rule: a box costs the box,
