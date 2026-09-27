@@ -2580,3 +2580,126 @@ objections. Absorbed the correction; not re-arguing coordinate slot. Brief:
 | Results and quick graph | ok | 7 | 2 (exempt from 3-row rule) | 2 (exempt) |
 
 — Sue
+
+---
+
+## 2026-09-26 — Symbology default decimals (Tom's CSV): the real defect is a fixed decimals count under a unit the reader can switch; two rows are copy-paste artifacts
+
+Tom (via Mary and me) asked to review `dev/settings-symbology-defaults.csv`'s proposed per-field
+decimal counts for Settings > Symbology map labels. I checked what unit each property actually
+renders in under each preset before judging any number.
+
+- **OBSERVED, `lib/Units.lib.php:143-206`, `Looped-Network.php:116-130`: the family-to-unit map
+  every `lpn_u_*` selector actually resolves to.** `lpn_u_length` (distance_site) us=ft/si=m;
+  `lpn_u_diameter` (distance_small) us=in/si=mm; `lpn_u_elevhead` (total_head) us=fth2o/si=**mh2o**;
+  `lpn_u_pressure` (partial_head) us=psi/si=**mh2o**; `lpn_u_flow` (flow_epanet) us=gpm/si=lps;
+  `lpn_u_velocity` us=ftps/si=mps; `lpn_u_gradient` (gradient) us=si=**gradePercent** (same unit
+  both presets); `lpn_u_age` (elapsed_time) us=si=**hr** (same both); `lpn_u_roughness`
+  (roughness) us=ft/si=mm. **The load-bearing fact for this whole review: SI pressure's default
+  unit is METRES OF WATER, not kPa** (`$ec_unit_sets['si']['partial_head']='mh2o'`,
+  `js/looped-network.js:37858-37866` `LPN_RESULT_UNIT.pressure: 'lpn_u_pressure'`). Tom's own
+  framing question ("pressure in kPa with 3 decimals would be absurd, in m with 1 decimal fine")
+  already anticipates this, and the CSV's own Dec SI=3 for Pressure is the "absurd" branch of his
+  own sentence, just in metres instead of kPa — 0.001 m of water is ≈0.0014 psi, false precision far
+  past what a solved model or a field gauge means.
+- **OBSERVED, `js/looped-network.js:7674, 7591`: Head loss shares the SAME unit as Elevation and
+  Total head** (`resultUnit('elevhead')`, fth2o/mh2o) but is a fundamentally different-scaled
+  quantity — elevation/head are ABSOLUTE numbers running tens to hundreds of metres; head loss on
+  one pipe is typically a DELTA of a few centimetres to a couple of metres. One shared decimals
+  number cannot serve both well: the CSV gives them the same count (2 US/3 SI) because they share a
+  unit, not because they share a magnitude. **My recommendation: decouple head loss's decimals from
+  elevation/head's** — head loss needs relatively MORE decimals (it is a small number whose whole
+  value could vanish at coarse rounding) while elevation needs relatively FEWER (an absolute number
+  already over-precise at 2, per the next point).
+- **OBSERVED, `js/looped-network.js:14412-14415` (`v = +toDisplay(e.meters,'lpn_u_elevhead').toFixed(2)`,
+  the terrain-ingestion code's own comment): "Two decimals in the displayed unit. The raster's own
+  quantum is 0.1 m, so more digits [are false precision]."** This is the suite's own prior finding,
+  standing exactly against the CSV's proposed 3 decimals (SI) for Elevation, Total head and
+  Pressure. I agree with the suite's own comment over the CSV here: 3 decimals in metres for any of
+  these three claims mm-level knowledge a DEM-fed elevation, a solved head or a field-verified
+  pressure never actually has.
+- **OBSERVED, `js/looped-network.js:5117-5119`, the shipped code's own comment on why Head loss
+  gradient currently ships at 4 decimals, not 2:** "the only field whose unit family offers two
+  forms differing by 100x (gradePercent and plain rise/run). 2 decimals is useless as a ratio,
+  where a typical pipe gradient is 0.0043; 4 covers both." **This sentence is itself the answer to
+  Tom's "should decimals derive from the unit chosen" question, already half-discovered in this
+  suite's own code**: the ONLY reason 4 decimals was chosen over the more natural 2 is that a
+  single decimals number has to survive the user switching between gradePercent (0.43) and grade
+  (0.0043) — two units differing by exactly 100x. If decimals were instead keyed to the CHOSEN
+  unit (2 for gradePercent, 4 for grade), gradient would show "0.43" under its own default the way
+  the CSV proposes (Dec 2/2), AND still show "0.0043" correctly if a reader switches to raw grade —
+  something the current single-number design cannot do (today, switching to 'grade' at the shipped
+  default of 4 decimals over-displays "0.0043" fine, but switching AWAY from gradePercent's natural
+  reading to satisfy the rarer unit is the compromise the comment names directly). **This is the
+  single clearest piece of internal evidence that per-unit decimals is a real, not cosmetic, fix.**
+- **OBSERVED, `js/looped-network.js:9471`: "Number of services" (customer `count`) has NO decimals
+  entry in `labelSettings.decimals.customer` at all** (only `demand`/`demandActual` are numeric
+  there, 5165) — it is printed as `String(c.count)`, structurally undecimalized, the same treatment
+  as an ID. **The CSV's "Number of services" row (Dec US 0, Dec SI 1) describes a control that does
+  not exist and, if it existed, a decimal place on a COUNT of services would be a defect, not a
+  design choice** — this is very likely a copy-paste artifact from the "Base demand" row directly
+  above it in the CSV, and I would flag it back to Tom rather than treat it as a real number to rule
+  on.
+- **OBSERVED: "Bulk coeff." and "Wall coeff." are Properties-popup fields today
+  (`js/looped-network.js:4886-4889`, `l._bulkCoeff`/`l._wallCoeff`) with NO map-label decimals entry
+  in `labelSettings.decimals.link`** (the shipped map lists `diameter, length, roughness, km, flow,
+  velocity, headloss, gradient, friction, quality, quality:trace, rate` only). **The CSV's rows for
+  these two are proposing NEW label fields, not reconciling existing ones** — worth Tom knowing this
+  is new UI surface, not a decimals tweak, before he rules on the number. On the number itself: a
+  bulk decay coefficient is a TYPED input, not a solved result, and my own 2026-08-25/09-01 water-
+  quality research (this journal) found published bulk-decay values spanning roughly 0.04-2.0 day⁻¹
+  — nearly two orders of magnitude. **1 decimal (the CSV's proposal) rounds 0.04 to "0.0", visually
+  erasing a value a user deliberately typed** — the same failure mode CLAUDE.md's unit rules warn
+  against for stored numbers generally ("a supplied number and a computed one never share a field").
+  I would want at least 2, probably 3, decimals on these two specific rows for that reason alone,
+  independent of the unit question.
+- **My answer to the standing design question, stated plainly: yes, decimals should derive from the
+  UNIT actually selected, not from the FIELD alone, and the gradient row above is the suite's own
+  proof this already matters today.** A single decimals number per field, chosen to survive whatever
+  unit a reader might pick (today's actual architecture, `js/looped-network.js:5144-5175`, one flat
+  `decimals` map with no unit key), is either wrong for the common unit (gradient's 4, chosen to
+  protect the rare 'grade' option) or wrong for the rare one (2, which would under-display 'grade').
+  **A per-unit decimals table, keyed on the unit NAME the way every other unit-facing map in this
+  suite already is** (`dev/unit-families.md`'s own rule: "a stored unit is its NAME, never its
+  factor"), removes the compromise entirely and is a small, mechanical change relative to the
+  redesign it would look like from outside — `unitFactor()`/`resultUnit()` already carry the unit
+  NAME everywhere a decimals lookup would need it.
+- **My own default decimals table for the units actually in play, reasoned from typical magnitude,
+  not one I can cite to a standard — SPECULATION, mine, re-derive before quoting to Tom as settled:**
+
+  | Unit | Typical value range (SPECULATION, my own engineering judgment) | My recommended decimals |
+  |---|---|---|
+  | gpm (flow) | 1 – few thousand | 0 |
+  | lps (flow) | 0.05 – few hundred | 1 |
+  | mgd, m3ps, ft3ps | sub-1 to tens | 2-3 |
+  | ft (length, diameter input) | tens to thousands (length); 4-60 (diameter) | 0 |
+  | m (length); mm (diameter) | tens to hundreds (length); 100-1500 (diameter) | 1 (length) / 0 (diameter) |
+  | psi (pressure) | 0 – 150 | 1 |
+  | mh2o (pressure, elevation, head — SAME unit, DIFFERENT roles) | 0-100 (pressure/headloss); tens-hundreds (elevation/head) | **1 for pressure and headloss; 1 for elevation/head too, NOT 3** — the DEM-quantum comment above already made this case for elevation; I extend it to pressure and head for the same reason |
+  | fth2o | 0-300 (pressure); tens-hundreds (elevation/head) | 1 |
+  | ftps (velocity) | 0.1 – 10 | 1 |
+  | mps (velocity) | 0.03 – 3 | 2 |
+  | gradePercent | 0.01 – 5 | 2 |
+  | grade (raw ratio) | 0.0001 – 0.05 | 4 |
+  | mg/L (quality) | 0 – 5 | 1-2 |
+  | hr (water age) | 0 – few hundred | 1 (unchanged, already right, see shipped comment 5145-5150) |
+  | day⁻¹ / ft-per-day (reaction coefficients) | 0.04 – 2 (bulk), a wider spread for wall | 2-3, not 1 |
+  | % (source share) | 0 – 100 | 0 (unchanged, Tom's own prior ruling, Task 664) |
+
+- **What I would NOT change from the CSV:** Base demand/Demand/Net inflow at 0(US)/1(SI); Diameter
+  at 0/0; Roughness at 0/0 (Hazen-Williams C, already the shipped special case); Concentration and
+  Average concentration at 1/1; Water age and Average water age at 1/1; Source share and Average
+  source share at 0/0; Minor loss k at 2/2; Velocity's US/SI split (1/2) is defensible, not wrong.
+  These already match either the shipped code's own reasoning or ordinary field-precision practice
+  I have no better number for.
+- **What I would flag back to Tom rather than silently correct:** "Number of services" (structural
+  mismatch — no decimals control exists for a count); Elevation, Total head and Pressure at Dec SI 3
+  (the DEM-quantum comment already argues against this, in this suite's own words); Head loss
+  sharing Elevation's decimal count despite being a different-scaled quantity; Bulk/Wall coefficient
+  rows describing an unbuilt label field, with a decimals count that would visually erase real typed
+  values at the low end of the published range.
+
+Wishlist: added as a new row, ranked low-to-medium — a real, cheap, and well-evidenced fix (the
+gradient comment is the suite's own proof), but a decimals-display polish, not a capability.
+
+— Sue
