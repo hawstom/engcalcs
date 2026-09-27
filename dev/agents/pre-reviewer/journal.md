@@ -2363,3 +2363,75 @@ stub — real Chrome timing not measured here (UNVERIFIABLE FROM HERE).
 No keyboard path (Enter/Tab/Arrow at the last row) creates a row either — paneHandleKey navigation
 uses the same clamped paneSelSet, confirming paste is the ONLY door and the append-destroys-a-row
 finding is not sidesteppable by any other gesture.
+
+# Perry journal, second pass — feat/row-paste, head f312278b, 2026-09-26
+
+OBSERVED (real Chrome, headless, driven via CDP through dev/lpn-spike/browser-drive.js against a
+plain `php -S 127.0.0.1:8119` instance serving the worktree, since the Apache vhost for 8119 in
+ports.conf was never reloaded into the live Apache config): loaded Net1.lwn (junction 10 + pipe 10
+already present), Junctions pane.
+
+CONFIRMED — original repro (A,B,C append D,E,F, existing rows byte-identical): armed the table via
+the cell context menu's "Paste as new rows", fired a real DOM `paste` ClipboardEvent (real
+listener, real code path — see the Ctrl+Shift+V finding below for why this substitutes for OS
+keystrokes) with 3 new junction rows. Before: 9 rows ids 10,11,12,13,21,22,23,31,32. After: same 9
+first, then NEW1,NEW2,NEW3 appended. `appendArmed` class was present before the paste and gone
+after — the table disarms itself once used.
+
+CONFIRMED — ordinary paste never overwrites silently: standing on an existing row (id "10") and
+firing a plain paste with a different ID produces the dialog "1 IDs don't match. Paste anyway?"
+rather than a silent overwrite — this is the R-side of the very defect my first review found.
+
+CONFIRMED — rename-then-overflow order and wording, in a real rendered dialog, not the jsdom
+harness: pasted 11 differently-IDed rows onto a 9-row table. Dialog 1: "9 IDs don't match. Paste
+anyway?" [Paste/Cancel]. Clicking Paste raised dialog 2: "This paste has 11 rows, and 9 of them fit
+in the table. Add the other 2 as new rows at the bottom?" [Add 2 rows / Paste only the 9 that fit /
+Cancel] — exact wording Tom asked for, exact order (rows judged first, is-it-an-overflow second).
+Add 2 rows landed all 11 renamed IDs; one Ctrl+Z (dispatched as a JS KeyboardEvent against the
+app's own document-level `ctrlKey && key==='z'` listener — legitimate, since that is app code
+reading the event, not a native browser command) restored the original 9 rows and IDs exactly.
+
+MISSED — a node and a link both "10": Find does not tell them apart. Searched
+`Everything.ID equal to 10` on Net1 (its own junction 10 and pipe 10). Real rendered results box:
+"2 found. Click one to go to it." with both result rows' visible text being the bare string `"10"`
+— nothing on screen says one is the junction and one is the pipe. Traced to
+`js/looped-network.js` `findResultRow()`: `row.textContent = ... c.el.id + (... findState.prop ===
+'id' ? '' : ...)` — when the search property is literally ID (the exact case a shared-ID collision
+produces), the group-distinguishing half of the label is suppressed, leaving two identical rows. A
+person who pastes J1/P1-style same-ID data (which Tom explicitly ruled in) and then goes looking
+for "10" cannot tell which result is which without clicking through both. This sits squarely on
+Tom's own named risk ("a node and a link both '10' then Find ... tell them apart") and is not
+covered by dev/lpn-spike/pane-row-paste-harness.js, which never drives the Find UI at all.
+UNVERIFIABLE FROM HERE past this: whether the two rows land on visually distinguishable map
+symbols/labels once clicked, and whether the .inp export keeps them apart on the page (the .inp
+format itself keeps [JUNCTIONS] and [PIPES] in separate sections by construction, so export is very
+likely fine, but I did not get a clean read on the Properties popup selector to confirm click-through
+selection targets the right element each time — a person should click both "10" rows and check the
+status/property box names the right element type each).
+
+UNVERIFIABLE FROM HERE, and worth Tom's own attention rather than mine: whether Ctrl+Shift+V
+"really works" as a physical keystroke in a real (non-headless) Chrome. I could not settle this
+from here at all: CDP's `Input.dispatchKeyEvent`, sent with real modifier bits against a real
+focused `<input>`, does NOT deliver a native `paste` DOM event in this headless Chrome even for a
+PLAIN Ctrl+V on a bare `<textarea>` with real clipboard content (control test: 0 characters landed).
+That is a ceiling of the measurement tool, not evidence the feature is broken — but it is also not
+evidence it works. The armed-Ctrl+V path (arm via menu, then the ordinary browser paste event) is
+the one Tom is more likely to actually use day to day and is unaffected by this gap, since it needs
+no native key interception at all, only the same `paste` event the mouse-menu route needs. Ctrl+Shift+V
+specifically still needs a real keyboard on a real desktop Chrome window to settle.
+
+CONFIRMED — armed-state visibility: right-clicking a cell shows "Paste as new rows  Ctrl+Shift+V"
+in the menu; choosing it adds a real, visible notice text ("Press Ctrl+V to add the copied rows at
+the bottom of this table. Press Esc to cancel.") measured non-empty and laid out (offsetWidth/
+offsetHeight > 0) in the rendered page, plus a CSS class on the pane host. Escape clears the class.
+
+CONFIRMED — 69/69 and 116/116 of dev/lpn-spike/pane-row-paste-harness.js pass against this exact
+commit (re-ran it myself, not trusting the builder's own report of green). It covers the vertex
+cell format, Net1 verbatim, the twenty-bad-IDs-one-notice case, node/link ID-sharing at the data
+level, and one-paste-one-undo — none of that needed re-verifying by hand once I'd re-run it and
+independently confirmed its overflow/rename/append findings against real DOM dialogs above.
+
+SPECULATION: the Find defect above is a pre-existing `findResultRow()` behavior, not new code in
+this branch — but this branch is what makes shared IDs a normal, encouraged outcome (Tom: "Junctions
+and pipes can use same ID. Yes."), so the branch is what turns a previously rare cosmetic gap into
+a routine one. Worth naming to Tom as a one-line follow-up regardless of whose branch owns the fix.
