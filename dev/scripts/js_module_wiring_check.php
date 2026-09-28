@@ -278,8 +278,19 @@ if (!$modules || !$pageOrder) {
     exit(1);
 }
 
+// **A LABEL PLACER IS LOADED BY NAME, ON A DEVELOPMENT HOST ONLY.** Looped-Network.php's
+// `?placer=<name>` switch writes `js/lpn-placer-<name>.js` into its tag from the parameter, so no
+// literal tag names any one of them, and each is declared here by its family rather than one by
+// one: the builders of the label rebuild add their files without learning about this check.
+$unreferenced = EC_UNREFERENCED_MODULES;
+foreach ($modules as $mod) {
+    if (preg_match('/^lpn-placer-[a-z0-9-]+\.js$/', $mod)) {
+        $unreferenced[$mod] = 'a contract label placer, loaded only by the dev-only ?placer= switch';
+    }
+}
+
 $problems = ecJsWiringFindings($modules, $tagged, $pageOrder, $stubLoads, $harnessLoads,
-    EC_UNREFERENCED_MODULES, EC_HARNESS_LAZY_MODULES);
+    $unreferenced, EC_HARNESS_LAZY_MODULES);
 
 if ($problems) {
     echo 'JS module wiring: ' . count($problems) . " finding(s)\n\n";
