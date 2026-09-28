@@ -53314,7 +53314,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		lastLayoutScale = state.s;
 		// A contract placer (dev only, ?placer=) owns every node and link label; see placerActive().
-		if (placerActive()) { placerRelayout(); return; }
+		// A settle already armed means the view is still moving (a wheel burst arrives here once per
+		// notch, after setTransform() armed it): the settle runs the one layout. Running it here as
+		// well queued a full layout per notch, 27 s behind a hard flick (pre-review, 2026-09-28; R10).
+		if (placerActive()) { if (!placerSettleTimer) { placerRelayout(); } return; }
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
