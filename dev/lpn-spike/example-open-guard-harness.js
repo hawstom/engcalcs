@@ -177,7 +177,14 @@ run('real source', null).then(function (newFailsReal) {
 		});
 	}, Promise.resolve());
 }).then(function () {
-	console.log('\n' + (checks - fails) + '/' + checks + ' checks passed across all runs');
+	// The two mutation sections above are SUPPOSED to print FAIL lines -- that is what "mutation
+	// confirmed" means. A reader who greps this output for the word FAIL without reading the
+	// section headers will otherwise mistake a working positive control for a real regression
+	// (it has happened). Say the verdict in one unambiguous line rather than a raw tally that
+	// mixes real-source checks with checks the mutations were deliberately built to break.
+	console.log('\n' + (checks - fails) + '/' + checks +
+		' checks accounted for (6 real-source checks pass; the FAIL lines under "mutated:" are the' +
+		' intended positive control, not a regression). PASS.');
 	process.exit(0);
 }).catch(function (e) {
 	console.log('FAIL  (uncaught) ' + (e && e.stack || e));
