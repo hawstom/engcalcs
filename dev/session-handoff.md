@@ -115,9 +115,10 @@ symbology on dev once he pulls.**
 - **8126 EPANET++ landing site** (Option A), `~/webdev/epanet-plus-plus.org` and
   `~/webdev/epanetpp.org`: new local repos, NO GitHub remote yet (ask him). Every claim needs his
   reading; the agent's list of claims beyond his hero copy is in the 09-27 report.
-- **`feat/water-tower`** (Tasks 679/648/645): comparison page
-  `dev/icon-preview/larger-tower-2026-09-27.html` on that branch (dev/ is not web-served; open
-  the file). Nothing shipped changes until he picks.
+- **`feat/water-tower`** (Tasks 679/648/645): a comparison page, `larger-tower-2026-09-27.html`
+  in the branch's own icon-preview folder, at
+  `~/webdev/worktrees/feat-water-tower/engcalcs/dev/icon-preview/larger-tower-2026-09-27.html`
+  (not web-served; open the file). Nothing shipped changes until he picks.
 - **Label placement (R-357..R-359): the branch is PAUSED for the interview**
   https://claude.ai/artifact/PyZpPyHbpACHsu7fHVZEZJ -- read answers with ArtifactData list
   `answers`, write them into a scope doc, then build per his Q01 answer. Do NOT keep repairing
