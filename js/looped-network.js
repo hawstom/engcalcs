@@ -22746,6 +22746,38 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) { panePaneProbe = null; }
 		return panePaneProbe;
 	}
+	// **A PULL-DOWN'S OWN BOX, MEASURED** (R-356, Tom's browser pass 2026-09-28: *"Pipe type,
+	// Fittings list, ... Speed pattern, Pump efficiency curve, Price pattern"* all stood on one line
+	// because every pull-down held its column open to its WIDEST OPTION -- the "No ..." choice
+	// included, which the rule says not to count). A chosen value's box is its text plus a drop
+	// arrow and the control's own padding, and the browser rounds it to a whole pixel, so neither a
+	// canvas measurement nor a fixed chrome allowance matches it (measured: "Complete mixing" drew
+	// 132px against a 129.3px estimate). A `<select>` holding just that one option, in a detached
+	// `.lpn-pane-table` cell attached to <body> (a closed pane is `display: none`, and nothing inside
+	// it has a width), is measured instead, once per label, in the table font's em. With no real
+	// DOM, or nothing laid out, the text plus 1.7em stands in and is not cached.
+	var paneSelBoxEmCache = {};
+	function paneSelBoxEm(text) {
+		var table, tbody, tr, td, sel, opt, px, w = 0;
+		if (Object.prototype.hasOwnProperty.call(paneSelBoxEmCache, text)) { return paneSelBoxEmCache[text]; }
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			tr = document.createElement('tr'); td = document.createElement('td');
+			sel = document.createElement('select'); opt = document.createElement('option');
+			opt.textContent = text; sel.appendChild(opt); td.appendChild(sel); tr.appendChild(td);
+			tbody = document.createElement('tbody'); tbody.appendChild(tr); table.appendChild(tbody);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;';
+			document.body.appendChild(table);
+			w = sel.getBoundingClientRect().width;
+			px = parseFloat(window.getComputedStyle(sel).fontSize);
+			document.body.removeChild(table);
+		} catch (e) { w = 0; }
+		if (w > 0 && px > 0) {
+			paneSelBoxEmCache[text] = Math.round((w / px + 0.06) * 1000) / 1000;
+			return paneSelBoxEmCache[text];
+		}
+		return paneMeasureEm(text, false) + 1.7;
+	}
 	// The heading's real font (bold, its actual cascaded size, its actual family) -- null where
 	// there is no real DOM to ask, which is the Node harnesses' signal to fall back to the
 	// per-character estimate below exactly as before.
@@ -22818,7 +22850,9 @@ var EngCalcs = EngCalcs || {};
 	function paneWordSplitEm(word, heading) {
 		var mid = paneWordSplitIndex(word), a, b;
 		if (mid < 0) { return paneMeasureEm(word, heading); }
-		a = word.slice(0, mid); b = word.slice(mid);
+		// The first half is measured WITH the hyphen the browser draws when it breaks at the soft
+		// hyphen, because that is the line the reader sees (R-356 follow-up, 2026-09-28).
+		a = word.slice(0, mid) + '-'; b = word.slice(mid);
 		return Math.max(paneMeasureEm(a, heading), paneMeasureEm(b, heading));
 	}
 	function paneHeadingInitEm(c) {
@@ -22826,16 +22860,6 @@ var EngCalcs = EngCalcs || {};
 			best = 0;
 		words.forEach(function (w) { best = Math.max(best, paneWordSplitEm(w, true)); });
 		return best;
-	}
-	// The content font's real size -- the same host paneMeasureEm() reads content against, asked
-	// once here rather than duplicated, for the pad calculation below.
-	function paneContentFontPx() {
-		var host, cs;
-		try {
-			host = document.getElementById('lpn_pane_body') || document.body;
-			cs = window.getComputedStyle(host);
-			return parseFloat(cs.fontSize) || 0;
-		} catch (e) { return 0; }
 	}
 	// **Rule (a): "the known, present, current contents of the column"** -- so a table with no
 	// pumps yet cannot know a pump's own price and this is 0 for it, leaving the heading (b) to
@@ -22850,15 +22874,21 @@ var EngCalcs = EngCalcs || {};
 	// nothing to break in a language where that word is not "No".
 	// A checkbox has no text at all to measure; rule (b) alone decides its width.
 	function paneColContentEm(c, rows) {
-		var best = 0, choiceMap = null, i, el, v, text;
+		var best = 0, choiceMap = null, i, el, v, text, plain;
 		if (c.bool) { return 0; }
 		if (c.choices) {
 			choiceMap = {};
 			c.choices().forEach(function (o) { choiceMap[o[0]] = o[1]; });
 		}
+		// **EACH VALUE IS MEASURED AS THE BOX IT IS DRAWN IN** (R-356 follow-up, 2026-09-28): a
+		// plain cell (a result, an identity the drawing owns, a stated word) is text inside the
+		// `<td>`'s own padding; a typed value is text inside an `<input>` whose padding is inside
+		// the column; a CHOSEN pull-down is its text plus its arrow and padding. An unset one is
+		// skipped whole -- rule (b) alone decides a column of nothing but "No ..." choices.
 		for (i = 0; i < rows.length; i++) {
 			el = rows[i];
-			if (c.choices) {
+			plain = paneCellIsPlain(c, el);
+			if (c.choices && !plain) {
 				v = c.get(el);
 				if (!panePresent(v) || v === '') { continue; }
 				text = Object.prototype.hasOwnProperty.call(choiceMap, v) ? choiceMap[v] : String(v);
@@ -22866,7 +22896,8 @@ var EngCalcs = EngCalcs || {};
 				text = paneCellText(c, el);
 			}
 			if (!text) { continue; }
-			best = Math.max(best, paneMeasureEm(text, false));
+			best = Math.max(best, (c.choices && !plain) ? paneSelBoxEm(text)
+				: paneMeasureEm(text, false) + (plain ? paneCellPadEm().td : paneCellPadEm().input));
 		}
 		return best;
 	}
@@ -22877,20 +22908,57 @@ var EngCalcs = EngCalcs || {};
 	// keystroke. The pad is the CELL'S OWN padding (panePadEm()), read against whichever side of
 	// the max() actually won -- the heading's bold, `.9em`-scaled font if rule (b) did, the plain
 	// content font if rule (a) did -- so the number added is never a guess about either.
+	//
+	// **EACH SIDE CARRIES ITS OWN BOX** (R-356 follow-up, 2026-09-28). The heading's text sits in
+	// the `<th>`'s content box, inside the `<th>`'s own padding; a value's box (paneColContentEm())
+	// already carries its own padding or pull-down chrome. So the column is the wider of the two.
 	function paneColInitialEm(spec, c) {
-		var v, contentEm, headingEm, hf;
+		var v = 0, contentEm, headingEm, hf, headPad;
 		if (!spec.initEmCache) { spec.initEmCache = {}; }
 		if (Object.prototype.hasOwnProperty.call(spec.initEmCache, c.key)) { return spec.initEmCache[c.key]; }
 		contentEm = paneColContentEm(c, paneTableRowsInOrder(spec));
 		headingEm = paneHeadingInitEm(c);
-		v = Math.max(contentEm, headingEm);
-		if (v > 0) {
-			if (headingEm >= contentEm) { hf = paneHeadFont(); v += panePadEm(hf ? hf.px : 0); }
-			else { v += panePadEm(paneContentFontPx()); }
-			v = Math.round(v * 100) / 100;
+		hf = paneHeadFont();
+		headPad = panePadEm(hf ? hf.px : 0);
+		if (headingEm > 0 || contentEm > 0) {
+			v = Math.round(Math.max(contentEm, headingEm + headPad) * 100) / 100;
 		}
 		spec.initEmCache[c.key] = v;
 		return v;
+	}
+	// A value's own box padding, in em of the table font: `input` for a typed value (`padding: 1px
+	// 4px` on the control, which fills its cell), `td` for a plain cell (`padding: 1px 6px` on the
+	// cell). Read off real ones where there is a DOM, in a detached `.lpn-pane-table` on <body> so a
+	// closed pane cannot hide them -- WITH a `<tbody>`, which every rule for these cells names and
+	// which the DOM, unlike the HTML parser, never inserts by itself -- so a
+	// 0.6em and 0.9em otherwise. A 0.06em hair is added to each, as
+	// panePadEm() does, for sub-pixel rounding between canvas and layout.
+	var paneCellPadEmCache = null;
+	function paneCellPadEm() {
+		var table, tbody, tr, td, td2, inp, px, hor;
+		if (paneCellPadEmCache) { return paneCellPadEmCache; }
+		hor = function (cs) {
+			return (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) +
+				(parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.borderRightWidth) || 0);
+		};
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			tr = document.createElement('tr'); td = document.createElement('td'); td2 = document.createElement('td');
+			inp = document.createElement('input'); td.appendChild(inp); td2.textContent = 'M';
+			tr.appendChild(td); tr.appendChild(td2);
+			tbody = document.createElement('tbody'); tbody.appendChild(tr); table.appendChild(tbody);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;';
+			document.body.appendChild(table);
+			px = parseFloat(window.getComputedStyle(td2).fontSize);
+			if (px > 0) {
+				paneCellPadEmCache = {
+					input: Math.round(hor(window.getComputedStyle(inp)) / px * 1000) / 1000 + 0.06,
+					td: Math.round(hor(window.getComputedStyle(td2)) / px * 1000) / 1000 + 0.06
+				};
+			}
+			document.body.removeChild(table);
+		} catch (e) { /* no real DOM */ }
+		return paneCellPadEmCache || { input: 0.6, td: 0.9 };
 	}
 	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
 	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
@@ -23564,14 +23632,46 @@ var EngCalcs = EngCalcs || {};
 	// character sitting in the source as a raw byte is one a future edit could delete without
 	// anyone seeing it happen.
 	var PANE_SHY = String.fromCharCode(173);
+	function paneHeadingDisplayLabel(c) {
+		return paneHeadingLabelOnly(c).split(/(\s+)/).map(function (tok) {
+			var mid = /\s/.test(tok) ? -1 : paneWordSplitIndex(tok);
+			return mid < 0 ? tok : tok.slice(0, mid) + PANE_SHY + tok.slice(mid);
+		}).join('');
+	}
+	function paneHeadingUnitText(c) {
+		var u = c.unit ? c.unit() : '';
+		return c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
+	}
 	function paneHeadingDisplayText(c) {
-		var text = paneHeadingLabelOnly(c).split(/(\s+)/).map(function (tok) {
-				var mid = /\s/.test(tok) ? -1 : paneWordSplitIndex(tok);
-				return mid < 0 ? tok : tok.slice(0, mid) + PANE_SHY + tok.slice(mid);
-			}).join(''),
-			u = c.unit ? c.unit() : '',
-			t = c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
+		var t = paneHeadingUnitText(c), text = paneHeadingDisplayLabel(c);
 		return t ? text + ' (' + t + ')' : text;
+	}
+	// **THE UNIT IS ITS OWN BOX, AND IT NEVER WIDENS THE COLUMN** (R-356, Tom's browser pass
+	// 2026-09-28: *"Vertices (Lat....) is wrapped to two lines, but its units are not wrapped in
+	// violation of the rule to ignore units in the wrapping calculation"*). The label goes in as a
+	// text node, exactly the string paneHeadingDisplayText() starts with; the unit goes in as a
+	// `.lpn-pane-hunit` span, which css/engcalcs.css makes an inline-block that may break
+	// anywhere. Inline-block, so the unit stays beside the label only when the WHOLE unit fits
+	// there and otherwise starts its own line; break-anywhere, so a unit wider than the column
+	// ("(Lat/Lon|…)", "(% rise/run)") wraps inside the column instead of holding it open. The
+	// element's textContent is still paneHeadingDisplayText(c), character for character.
+	function paneHeadingFill(node, c) {
+		var t = paneHeadingUnitText(c), span;
+		node.appendChild(document.createTextNode(paneHeadingDisplayLabel(c) + (t ? ' ' : '')));
+		if (t) {
+			span = document.createElement('span');
+			span.className = 'lpn-pane-hunit';
+			// A `<wbr>` after every `/` and `|`, so a unit that has to break breaks at its own
+			// seams first -- "(ft/" over "sec)", never "(ft/se" over "c)" -- and anywhere only
+			// when one piece is still wider than the column. `<wbr>` has no text, so the span's
+			// textContent is the unit exactly.
+			('(' + t + ')').split(/([\/|])/).forEach(function (piece) {
+				if (!piece) { return; }
+				span.appendChild(document.createTextNode(piece));
+				if (piece === '/' || piece === '|') { span.appendChild(document.createElement('wbr')); }
+			});
+			node.appendChild(span);
+		}
 	}
 	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
@@ -23725,7 +23825,7 @@ var EngCalcs = EngCalcs || {};
 			// `<th>`'s own uniform pointer. Every glyph that used to compete with this text for
 			// room -- the "..." menu and the sort arrow -- now overlays it, at zero layout cost; see
 			// their own comments below for why no space is reserved for either any more.
-			b.appendChild(document.createTextNode(paneHeadingDisplayText(c)));
+			paneHeadingFill(b, c);
 			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
 			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
 			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
@@ -26077,7 +26177,7 @@ var EngCalcs = EngCalcs || {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th');
 			th.className = paneCellClass(c, i);
-			th.textContent = paneHeadingDisplayText(c);
+			paneHeadingFill(th, c);
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -26141,30 +26241,27 @@ var EngCalcs = EngCalcs || {};
 	// **A MEASURED MARGIN, NOT A COLUMN TYPE.** The first draft of this gave headroom only to `str`/
 	// `choices` columns (custom properties, Mixing model...) on the theory that a plain number is
 	// short and rounded and therefore safe. That theory is WRONG: `paneColCoord()`'s own X/Y columns
-	// are plain numbers (no `str`, no `choices`) and print through `paneNumText()`
-	// (`+v.toFixed(6)`), which keeps up to six decimal places -- a typed coordinate or an elevation
-	// with real precision behind it prints exactly as long an unbreakable token as a custom
-	// property does, and is exactly as unprotected by a space to wrap at. Numbers are not exempt.
-	// The right test is not what KIND of column this is, but whether THIS column, as actually
-	// printed, is running close enough to the edge that the measured shortfall above could reach it:
-	// take the column's own current margin (its screen-drawn width minus its widest unbreakable
-	// value's own content width -- the padding/border cushion the initial-width rule already gave
-	// it) and ask whether that margin is smaller than the shortfall's own share of that value.
-	// A typed "-122.123457" (11 characters, drawn to fit with only its ordinary padding to spare)
-	// fails that test and gets the headroom, exactly as "-122.419415917969" does; a rounded result
-	// like "3.28" or a plain "150" has the SAME fixed padding cushion sitting behind a far shorter
-	// value, so the shortfall's few-percent share of it never approaches that cushion and no
-	// headroom is added -- not because it is a number, but because it was never close to the edge.
-	function paneColPrintNeedsHeadroom(spec, c, colEm) {
-		var rows = paneTableRowsInOrder(spec), i, text, contentEm, margin;
+	// are plain numbers and print through `paneNumText()` (`+v.toFixed(6)`), which keeps up to six
+	// decimal places -- as long an unbreakable token as a custom property, and as unprotected by a
+	// space to wrap at. Numbers are not exempt.
+	// **THE PRINTED WIDTH EACH VALUE NEEDS, NOT A GUESS AT A MARGIN** (R-356 follow-up, 2026-09-28).
+	// The second draft asked whether the SCREEN column's cushion was smaller than the shortfall and,
+	// if so, multiplied the whole column by 1.12 -- which silently depended on the screen cushion
+	// being the heading cell's 6px: when the initial-width rule began counting an input's own 8px
+	// padding, a Latitude cushion grew past the test, no headroom was given, and "37.123456"
+	// wrapped on paper again. Stated directly instead: an unbreakable value needs its own measured
+	// width times the print shortfall, plus the PRINT cell's own padding (`padding: .07em .42em` on
+	// `#lpn_print_area .lpn-print-table tbody td` in css/engcalcs.css), and a column is printed at
+	// least that wide. A value with a space in it can wrap and needs nothing.
+	var PANE_PRINT_TD_PAD_EM = 0.84;
+	function paneColPrintNeedEm(spec, c) {
+		var rows = paneTableRowsInOrder(spec), i, text, need = 0;
 		for (i = 0; i < rows.length; i++) {
 			text = paneCellDisplayText(c, rows[i]);
 			if (!text || /\s/.test(text)) { continue; }   // a space is always a place left to wrap
-			contentEm = paneMeasureEm(text, false);
-			margin = colEm - contentEm;
-			if (margin < contentEm * (PANE_PRINT_HEADROOM - 1)) { return true; }
+			need = Math.max(need, paneMeasureEm(text, false) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM);
 		}
-		return false;
+		return need;
 	}
 	function panePrintWidths(spec, table) {
 		var cols = paneCols(spec), unit, ems, sum = 0, cg;
@@ -26172,7 +26269,7 @@ var EngCalcs = EngCalcs || {};
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
 		ems = ems.map(function (e, i) {
-			return paneColPrintNeedsHeadroom(spec, cols[i], e) ? Math.round(e * PANE_PRINT_HEADROOM * 100) / 100 : e;
+			return Math.round(Math.max(e, paneColPrintNeedEm(spec, cols[i])) * 100) / 100;
 		});
 		ems.forEach(function (e) { sum += e; });
 		if (!(sum > 0)) { return null; }

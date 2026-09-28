@@ -2294,7 +2294,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset 1px 0 0 #ddd; }
 html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
 html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset -1px 0 0 #ddd; }
-.lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)) { padding: 1px 6px; }
+/* A pull-down, like an input, IS its cell and brings its own padding (R-356: the column's rule
+   width counts the pull-down's own box, so a cell padding around it pushed the column 12px past
+   the rule). */
+.lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)):not(:has(select)) { padding: 1px 6px; }
 /* The control IS the cell: no border of its own, no background of its own, and the cell's own
    padding rather than the browser's. Its width is still the column's, so nothing Tom approved
    about column widths moves. */
@@ -2497,20 +2500,20 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
 	   width it has always been. Only a column that names an em -- or that the reader has
 	   dragged -- pulls its pull-down in with it. */
-	width: var(--lpn-pane-col-w); max-width: 100%; min-width: max-content;
+	width: var(--lpn-pane-col-w); max-width: 100%; min-width: 0;
 	border: 0; background: transparent; padding: 1px 2px; margin: 0; font: inherit;
 	text-align: inherit;
 }
-/* **AND A PULL-DOWN NOBODY HAS DRAGGED HOLDS ITS COLUMN OPEN TO ITS OWN WIDEST CHOICE** (Tom,
-   2026-09-21, R-110: *"Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
-   pattern, width = 3em (due to selector?)"*). He was right that it was the selector. The trial
-   above made `min-width: 0` unconditional, and a control with a percentage `max-width` and no
-   minimum contributes NOTHING to an automatic table column's width -- so an untouched pull-down
-   column was as wide as its heading's longest word and no wider, and clipped "No fittings list
-   selected" to "No fittings" on first sight, before anybody had asked for a narrow column at all.
-   Measured on Net3: four pull-down columns clipped their own shown choice. `max-content` gives
-   it back its natural width; the truncation his trial asked for is kept for exactly the case he
-   described -- a column he has DRAGGED, which js/looped-network.js marks on the control. */
+/* **A PULL-DOWN NO LONGER HOLDS ITS COLUMN OPEN TO ITS WIDEST CHOICE** (R-356, Tom 2026-09-27:
+   the initial width counts present content *"not counting 'No....' selectors"*; his browser pass
+   2026-09-28 found Pipe type, Fittings list, Speed pattern, Pump efficiency curve and Price
+   pattern still one line wide because `min-width: max-content` here, from R-110, let every
+   pull-down lay its column out at its widest option). The column's rule width already holds a
+   CHOSEN value's own text plus the pull-down's arrow and padding (paneColContentEm() and
+   paneSelBoxEm() in js/looped-network.js), so `min-width: 0` costs a chosen value nothing; an
+   unset "No ..." pull-down is clipped to the column, which is what the rule asks. The rejected
+   alternative, re-proposed easily: `max-content` for unset pull-downs only -- it would hold the
+   column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
@@ -2572,6 +2575,14 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    live here (percentage heights on a table cell's child do not resolve to the cell's real
    height). */
 .lpn-pane-sort { font-weight: bold; display: block; width: 100%; cursor: inherit; }
+/* **THE UNIT IS IGNORED BY THE WIDTH AND WRAPS INSIDE IT** (R-356: *"not counting units"*; Tom,
+   2026-09-28, on "Vertices": *"its units are not wrapped in violation of the rule to ignore units
+   in the wrapping calculation"*). An inline-block, so it stays on the label's last line only when
+   the WHOLE unit fits there and otherwise starts a line of its own; `overflow-wrap: anywhere`, so
+   a unit wider than the column ("(Lat/Lon|…)", "(% rise/run)") breaks inside the column instead
+   of holding it open -- `anywhere`, unlike `break-word`, is counted by the browser when it sizes
+   the column, which is the whole point. */
+.lpn-pane-hunit { display: inline-block; overflow-wrap: anywhere; }
 /* The browser's OWN default focus ring on a focused `<button>` is not "unstyled", it is a second
    ring drawn tight around the text -- exactly the thing point (1) objects to, just undoing the fix
    a different way. The `<th>`'s own `:has(:focus-visible)` rule is the only ring this table draws. */

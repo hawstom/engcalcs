@@ -184,9 +184,11 @@ console.log('\n--- A PRESS THAT NEVER TRAVELS IS NOT A DRAG ---');
 	// initial-width rule (2026-09-27) an empty junctions table has no description TEXT to measure,
 	// so rule (a) contributes nothing and rule (b) alone decides: "Description" is 11 characters,
 	// >= 8, so it is split in half (Math.ceil(11/2) = 6 and 5 characters, "Descri"/"ption") and
-	// only the longer half's width counts, plus the 0.3em pad.
+	// only the longer half's width counts, plus the 0.3em pad. The first half is measured with the
+	// hyphen the browser draws at a soft-hyphen break ("Descri-", 7 characters at the stub's 0.62em),
+	// since the heading's own width is now exactly this number (R-356, 2026-09-28).
 	report(L.userWidth('junctions', 'desc') === 0, 'a freshly opened table has no width stored for Description');
-	report(Math.abs(L.widthEm('junctions', 'desc') - 4.02) < 0.01,
+	report(Math.abs(L.widthEm('junctions', 'desc') - 4.64) < 0.01,
 		'...so Description opens at half its longest heading word, not the old flat 8em',
 		L.widthEm('junctions', 'desc'));
 	report(String(thFor('desc').className).indexOf('lpn-pane-tight') < 0,

@@ -492,11 +492,14 @@ console.log('\n--- the sheet is the screen table at one scale ---');
 	L.forgetWidths('junctions');
 	L.setUserWidth('junctions', keys[1], 20);
 	L.renderTable('junctions');
-	// The stub's em is 16px. Column 1 is drawn at 80px (5em) and every other at 32px (2em) -- the
+	// The stub's em is 16px. Column 1 is drawn at 128px (8em) and every other at 112px (7em) -- the
 	// DRAWN width wins over the stored 20em, because the drawn one is what the reader is looking at.
+	// (Wide enough that no value here needs more on paper: paneColPrintNeedEm() prints a column
+	// wider than drawn only for an unbreakable value that would otherwise wrap, and that has its
+	// own harness, pane-print-cell-wrap-harness.js.)
 	const heads = L.headCells('junctions');
 	Object.keys(heads).forEach((k, i) => {
-		const w = k === keys[1] ? 80 : 32;
+		const w = k === keys[1] ? 128 : 112;
 		heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: w, bottom: 20, width: w, height: 20 });
 	});
 	const got = cg(L.buildPrintable('junctions'));
@@ -505,7 +508,7 @@ console.log('\n--- the sheet is the screen table at one scale ---');
 		'every printed column is given a width, fixed layout', got.cols.length + ' / ' + keys.length);
 	report(parsed.every(Boolean), '...each one its drawn em plus its 1px rule', got.cols.map((c) => c.style.width).slice(0, 3).join(' '));
 	const ems = parsed.map((m) => m ? parseFloat(m[1]) : NaN);
-	report(ems[1] === 5 && ems.every((e, i) => i === 1 || e === 2), '...at the width it is DRAWN, dragged or not', ems.join(','));
+	report(ems[1] === 8 && ems.every((e, i) => i === 1 || e === 7), '...at the width it is DRAWN, dragged or not', ems.join(','));
 	const sum = ems.reduce((x, y) => x + y, 0), n = keys.length + 1;
 	report(got.t.style.width === 'calc(' + sum + 'em + ' + n + 'px)', 'the table is the sum of those widths', got.t.style.width);
 	report(got.t.style.fontSize === 'min(16px, calc((100cqw - ' + n + 'px) / ' + sum + '))',

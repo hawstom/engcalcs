@@ -17,9 +17,10 @@
 // the screen the width was measured on (see the CSS comment beside `.lpn-print-fixed th, td {
 // overflow-wrap: anywhere }` in css/engcalcs.css for the citations and the measured numbers), so
 // that width is not guaranteed to survive to the paper down to the sub-pixel.
-//   1. panePrintWidths() now gives a column MEASURED HEADROOM (PANE_PRINT_HEADROOM,
-//      js/looped-network.js) when its own margin is smaller than that measured shortfall, so an
-//      HONESTLY-SIZED value should never come close to needing to wrap at all.
+//   1. panePrintWidths() prints a column at least as wide as each unbreakable value's measured
+//      width times that shortfall (PANE_PRINT_HEADROOM) plus the print cell's own padding
+//      (paneColPrintNeedEm(), js/looped-network.js), so an HONESTLY-SIZED value should never come
+//      close to needing to wrap at all.
 //   2. `overflow-wrap: anywhere` is restored on print `td` as the LAST RESORT, so a value that
 //      genuinely does not fit -- a column dragged narrow and then typed or pasted into with
 //      something longer than it was ever sized for -- wraps inside its own column instead of
