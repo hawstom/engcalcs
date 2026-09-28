@@ -22657,7 +22657,7 @@ var EngCalcs = EngCalcs || {};
 			table = document.createElement('table'); table.className = 'lpn-pane-table';
 			thead = document.createElement('thead'); tr = document.createElement('tr');
 			th = document.createElement('th'); btn = document.createElement('button');
-			btn.className = 'lpn-pane-sort';
+			btn.type = 'button'; btn.className = 'lpn-pane-sort';
 			th.appendChild(btn); tr.appendChild(th); thead.appendChild(tr); table.appendChild(thead);
 			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;' +
 				'pointer-events:none;';
