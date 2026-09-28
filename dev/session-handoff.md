@@ -122,6 +122,21 @@ remind him to test symbology on dev once he pulls.**
   builders build to "use convenient available space effectively"). Then his side-by-side look:
   **8129 = A, 8130 = B**, each with the seam merged in; the URL needs `?placer=a` / `?placer=b`
   (without it the port shows today's labels). Both ports need his Apache reload (commands below).
+- **HIS PASS ON BOTH, 2026-09-28 (R-362..R-364), AND THE NEXT STEP: round 2.** Interview answers are
+  `dev/label-placer-interview-a.md` and `-b.md`. Then write into Part A of the rules every
+  NON-CONTROVERSIAL lesson (his line: "anything non-controversial, we should specify in our rules,
+  but things like open sector or open box caching are experimental, and we don't share them"):
+  (1) a label hangs from its leader's end, aligned and justified to the leader's side, never centred
+  (B does this right); (2) dropped rows and hidden labels come back as zoom-in frees room, without
+  jumping; leaving the view resets them; (3) a pipe label's default is BESIDE its pipe, not on it,
+  and realigns with its pipe when room allows; (4) a rule for repeating pipe labels is MISSING --
+  ask him for it; (5) unwrapping a node label to one line is a good habit where room allows (A);
+  (6) a leader may lengthen to save a neighbour's properties (B would not). (7) ASK HIM: once the view
+  settles, does stillness or fullness win? Builder A's interview says this one missing line cost it
+  the most (its T1 reading forbade regrowth). **Both interviews agree the BENCH shares the blame:** its
+  "unforced moves" counts a move that REGAINS rows as a fault, so both placers refused to regrow.
+  Fix the metric (a move that shows more is not unforced) in the same round as the rules. Show him the rule
+  diff before launching a fresh clean-room pair; the old pair's ports stay up for comparison.
 - Known flaws, from the builders: A hides ~18% at fit in dense cores, turned pipe labels never grow,
   never uses the hook. B never relocates a label that settled small, no wrapping, no hook, and a
   hand point INSIDE a symbol still breaks N1/N3 (not in the bench scenes: add such a scene).
