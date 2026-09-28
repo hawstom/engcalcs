@@ -4,17 +4,24 @@
 // each label's measured rows and the view go in; each label's position, shown rows and leader come
 // out. No DOM, no text measurement, no closure over the editor. Everything is in VIEW PIXELS.
 //
-// How it works, in one paragraph. Every label gets a list of CANDIDATES: each drop level (all rows,
-// then the user's drop order applied one row at a time down to the ID alone) crossed with the
-// places it could hang -- touching its node on eight sides, beside its pipe (along it or level),
-// or further out on a straight leader or a leader with the one standard hook. A candidate's worth
-// is the rows it shows (the label itself worth four rows, so rows go before labels), less the
-// crossings it makes in Tom's cost order, less a little for distance from home. Hard rules
-// (N1, N3, N4, N5, the viewport) are never traded: a candidate that breaks one is not a candidate.
-// A greedy pass seats the hardest-placed labels first; a repair pass then tries to show more of
-// every short-changed label by moving (or trimming) at most two neighbours out of its way, and a
-// polish pass lets every label re-seat itself to cut crossings. The previous view's placement is
-// offered back to each label with a small bonus, so a label only moves when that buys something.
+// How it works. Every label gets CANDIDATES: each drop level (all rows, then the user's drop order
+// applied one row at a time down to the ID alone) crossed with the places it could hang --
+// touching its node (the standard quadrants and the sides), beside its pipe (along it or level),
+// or further out on a straight leader or one with the standard short hook. A candidate's worth is
+// the rows it shows (the label itself worth four rows), less what it crosses in Tom's cost order,
+// less a little for distance from home. The never-rules (N1, N3, N4, N5) and the edge of the view
+// are not traded at any price: a place that breaks one is not a candidate. Free space is looked up
+// in a summed-area table of the symbols and Text objects, so most places are refused without
+// building anything. Candidates are built one drop level at a time, and the leadered ones only
+// when the touching ones cannot win, so a roomy view does little work.
+//
+// Seating: hand-placed labels first, where the user put them. Then every other label, smallest
+// first and most crowded first, so that as many labels as possible are shown before any label
+// shows a property (G). Then each label grows into the room around it; a repair pass lets a label
+// that is still short of rows or hidden push at most two neighbours elsewhere (or trim them) when
+// that shows more in all; and a polish pass lets each label re-seat itself to cut crossings.
+// Last view's place is offered back to each label with a bonus, so a label moves only when that
+// buys something; on a zoom-in or a pan, last view's labels are seated first and keep their rows.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -23,6 +30,8 @@ var EngCalcs = EngCalcs || {};
 
 EngCalcs.lpnPlacerD = (function () {
 	'use strict';
+
+	var NAME = 'D (candidates, labels first, ejection repair)';
 
 	// ---- tuning --------------------------------------------------------------------------------
 	var TOL = 1.0;          // box overlap tolerated as leading (the bench tolerates 1.5)
@@ -46,7 +55,7 @@ EngCalcs.lpnPlacerD = (function () {
 
 	var DIRS = 8;
 	var DISTS = [1, 2.2, 3.8];          // leader lengths beyond the symbol, in row heights
-	var MAX_EVALS = 25000;                 // work cap per place(); deterministic, not wall-clock
+	var MAX_DYN = 25000;                    // repair work cap per place(); deterministic, not wall-clock
 	var TRIES = 2;                          // blocked places a short-changed label tries per level
 	var PASSES = 1;
 	var DIRSET = [];
@@ -242,24 +251,20 @@ EngCalcs.lpnPlacerD = (function () {
 	// whole input, so any change to the network, the text or the settings misses it (R13).
 	function create() {
 		var mem = { occ: null, sat: null }, cache = null;
-		function keyOf(scene, opts) {
+		function inputKey(scene, opts) {
 			var p = opts && opts.prev;
 			return JSON.stringify(scene) + '|' + (p ? JSON.stringify(p.layout) : '');
 		}
 		return {
-			name: 'D (candidate search, ejection repair, sticky)',
+			name: NAME,
 			place: function (scene, opts) {
-				if (cache && cache.scene === scene) {
-					var k = keyOf(scene, opts);
-					if (k === cache.key) { var out = cache.out; cache = null; return out; }
-				}
+				var hit = cache && inputKey(scene, opts) === cache.key ? cache.out : null;
 				cache = null;
-				return place(scene, opts, mem);
+				return hit || place(scene, opts, mem);
 			},
 			idle: function (budgetMs, info) {
 				if (!info || !info.opening || !info.scene || budgetMs < 500) { return; }
-				var scene = info.scene;
-				cache = { scene: scene, key: keyOf(scene, null), out: place(scene, null, mem) };
+				cache = { key: inputKey(info.scene, null), out: place(info.scene, null, mem) };
 			}
 		};
 	}
@@ -268,9 +273,7 @@ EngCalcs.lpnPlacerD = (function () {
 		var text = scene.text, vp = scene.viewport, rowH = text.rowHeightPx || 14.4;
 		var hookLen = Math.min(text.hookMaxPx || 0, 9);
 		var spacing = text.repeatSpacingPx || 0;
-		var evals = 0;
-		var DBG = typeof process !== 'undefined' && process.env && process.env.PD_DEBUG, T0 = Date.now(), tl = [];
-		function mark(k) { if (DBG) { tl.push(k + ' ' + (Date.now() - T0) + 'ms/' + evals + '/' + nDyn + '/' + nGen); } }
+		var nDyn = 0;       // label-against-label tests made, for the repair's work cap
 
 		// ---- the fixed world: symbols and Text objects (hard), pipes, arrows, callouts (soft) ----
 		var hardG = new Grid(vp), softG = new Grid(vp), nodesById = {}, linksById = {}, custById = {};
@@ -352,15 +355,14 @@ EngCalcs.lpnPlacerD = (function () {
 			return false;
 		}
 		function rasterHit(b) { return rasterRect(b.x0, b.y0, b.x1, b.y1); }
-		mark('world');
 
 		var reqs = scene.labels, N = reqs.length;
 		var prev = opts && opts.prev, prevReq = {}, prevPl = (prev && prev.layout && prev.layout.labels) || {};
 		if (prev && prev.scene) { prev.scene.labels.forEach(function (r) { prevReq[r.id] = r; }); }
 
-		// R11: on a zoom-in, a label keeps what it showed last view unless keeping it costs more
-		// than this; what it gains is then a bonus on top.
-		var zoomIn = !!(prev && prev.scene && prev.scene.view && scene.view && scene.view.s > prev.scene.view.s * 1.001);
+		// R11: on a zoom-in (or a pan), a label keeps what it showed last view unless keeping it
+		// costs more than this; what it gains is then a bonus on top.
+		var zoomIn = !!(prev && prev.scene && prev.scene.view && scene.view && scene.view.s >= prev.scene.view.s * 0.999);
 		function keepBonus(li, lv) {
 			if (!zoomIn) { return 0; }
 			var pl = prevPl[reqs[li].id];
@@ -386,7 +388,6 @@ EngCalcs.lpnPlacerD = (function () {
 		// Ink of a candidate: one box per stacked row (the staircase), one for a line, and the same
 		// for every repeat along a long pipe.
 		function build(c) {
-			CNT.build++;
 			var req = reqs[c.li], out = [];
 			function at(x, y, ang, rep) {
 				var bcx = x + c.w / 2, bcy = y + c.h / 2, r = ang * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
@@ -423,8 +424,6 @@ EngCalcs.lpnPlacerD = (function () {
 		// `hand` turns hard hits into large costs instead (a hand label cannot be refused).
 		function fixedCost(c, hand) {
 			build(c);
-			var req0 = reqs[c.li];
-			evals++;
 			var req = reqs[c.li], ownLink = req.kind === 'link' ? req.owner : null;
 			var ownNode = req.kind === 'node' ? req.owner : null;
 			var boxes = c.boxes, nb = boxes.length, bad = null, hard = 0, cost = 0, i, j, b, it, n, q;
@@ -481,7 +480,6 @@ EngCalcs.lpnPlacerD = (function () {
 		// free-space raster row by row without building anything; turned text, repeats and leaders
 		// take the exact tests.
 		function blockFree(req, rows, layout, d, align, x, y) {
-			evals++;
 			if (x < vp.x + 1 || y < vp.y + 1 || x + d.w > vp.x + vp.w - 1 || y + d.h > vp.y + vp.h - 1) { return false; }
 			if (layout === 'line') { return !rasterRect(x, y, x + d.w, y + d.h); }
 			for (var i = 0, top = y; i < rows.length; i++) {
@@ -517,7 +515,6 @@ EngCalcs.lpnPlacerD = (function () {
 
 		// The soft cost of a candidate against the fixed world, in Tom's order.
 		function softCost(c) {
-			CNT.soft++;
 			if (!c.boxes) { build(c); }
 			var req = reqs[c.li], ownLink = req.kind === 'link' ? req.owner : null;
 			var boxes = c.boxes, nb = boxes.length, cost = 0, i, j, b, it, n, q, L = c.leader;
@@ -604,7 +601,7 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 
 		// ---- the labels, their levels, and their candidate lists (built a level at a time) ----
-		var lab = new Array(N), li, nGen = 0, nValid = 0, nDyn = 0, CNT = { best: 0, pair: 0, soft: 0, build: 0, near: 0, att1: 0, att2: 0, ok1: 0, ok2: 0, free: 0 };
+		var lab = new Array(N), li;
 		for (li = 0; li < N; li++) {
 			lab[li] = { req: reqs[li], hand: !!reqs[li].hand, levels: levelsOf(reqs[li], scene.dropOrder), lists: [] };
 		}
@@ -625,7 +622,6 @@ EngCalcs.lpnPlacerD = (function () {
 				if (L.hand) { c.fx = fixedCost(c, true); out.push(c); } else if (c.ok || hardOK(c)) { out.push(c); }
 			}
 			out.sort(function (a, b) { return b.base - a.base; });
-			nGen += raw.length; nValid += out.length;
 			L.lists[key] = out;
 			return out;
 		}
@@ -649,15 +645,13 @@ EngCalcs.lpnPlacerD = (function () {
 				for (i = 0; i < c.items.length; i++) { b = c.items[i].b; dynB.add(c.items[i], b.x0, b.y0, b.x1, b.y1); }
 			}
 		}
-		// Crossing cost of c against every seated label but its own and those in `skip`; NaN if
-		// blocked. With `blockers`, collects who blocks instead of stopping at the first.
 		// Crossing cost of c against every seated label but its own; NaN if one blocks it (N1).
 		// With `blockers`, collects every label that blocks it. A candidate remembers the seated
 		// label that last blocked it, which answers again for as long as that label stays put.
 		var qd = [];
 		function dynCost(c, blockers) {
 			var cost = 0, n, i, it, o, top;
-			evals++; nDyn++;
+			nDyn++;
 			if (!blockers && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
 			var hit = false, q, b;
 			if (!c.boxes && !c.angle && !c.reps) {
@@ -675,7 +669,6 @@ EngCalcs.lpnPlacerD = (function () {
 						var left = line || c.align === 'left' ? c.x : (c.align === 'right' ? c.x + c.w - rw : c.x + (c.w - rw) / 2);
 						var top0 = top;
 						top += rh;
-						CNT.pair++;
 						if (b.x1 - left <= -PADX || left + rw - b.x0 <= -PADX || b.y1 - top0 <= -PADY || top - b.y0 <= -PADY) { continue; }
 						if (b.rot && !boxesOverlap(mkBox(left + rw / 2, top0 + rh / 2, rw, rh, 0), b, -PADY)) { continue; }
 						c.bl = it.c; hit = h1 = true;
@@ -694,7 +687,6 @@ EngCalcs.lpnPlacerD = (function () {
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
 					b = it.b;
 					for (i = 0; i < c.boxes.length; i++) {
-						CNT.pair++;
 						if (padOverlap(c.boxes[i], b)) {
 							c.bl = it.c; hit = true;
 							if (!blockers) { return NaN; }
@@ -712,28 +704,25 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			return cost;
 		}
-		function dynCostN(c, nb, skip, blockers) { return dynCost(c, blockers); }
-		function near() { return null; }
 		function keyOf(c) { if (c.fx === undefined) { c.fx = softCost(c); } return c.base - c.fx; }
 		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
 		// The best candidate for label li as things stand; hidden (null, worth 0) if nothing fits
 		// or nothing is worth showing. A hand-placed label is always shown.
 		// With `floor`, only a place worth more than it will do (null if none).
 		function bestFor(li, minK, floor) {
-			CNT.best++;
 			var L = lab[li], best = null, bs = L.hand ? -Infinity : 0;
 			if (floor !== undefined && floor > bs) { bs = floor; }
 			for (var k = minK ? Math.max(0, L.levels.length - 1) : 0; k < L.levels.length; k++) {
 				if (tierMax(li, k, 0) <= bs) { break; }
 				for (var t = 0; t < 2; t++) {
 					if (tierMax(li, k, t) <= bs) { continue; }
-					var list = ensure(li, k, t), nb = near(list);
+					var list = ensure(li, k, t);
 					for (var i = 0; i < list.length; i++) {
 						var c = list[i];
 						if (c.base <= bs) { break; }
-						if (nDyn > MAX_EVALS && best) { break; }
+						if (nDyn > MAX_DYN && best) { break; }
 						if (c.fx !== undefined && c.base - c.fx <= bs) { continue; }
-						var d = dynCostN(c, nb, null);
+						var d = dynCost(c, null);
 						if (d !== d) { if (!L.hand) { continue; } d = HARD_HAND; }
 						if (keyOf(c) - d > bs) { bs = c.base - c.fx - d; best = c; }
 					}
@@ -1004,13 +993,10 @@ EngCalcs.lpnPlacerD = (function () {
 		// R11: on a zoom-in, the labels shown last view are seated first, so none is lost to room.
 		function wasShown(li) { var pl = prevPl[reqs[li].id]; return zoomIn && pl && pl.shown ? 0 : 1; }
 		order.sort(function (a, b) { return (wasShown(a) - wasShown(b)) || (crowd[b] - crowd[a]) || (a - b); });
-		mark('setup');
 		// Every label first, as small as it comes (G: properties go before labels) ...
 		order.forEach(function (li) { seat(li, bestFor(li, true).c); });
-		mark('labels');
 		// ... then each grows into the room around it.
 		order.forEach(function (li) { var b = bestFor(li); if (b.c && b.w > worthNow(li) + 1e-6) { seat(li, b.c); } });
-		mark('greedy');
 
 		// ---- 3. repair: show more of each short-changed label, moving at most two neighbours ----
 		function levelOf(li) { return cur[li] ? lab[li].levels.indexOf(cur[li].lv) : lab[li].levels.length; }
@@ -1028,21 +1014,20 @@ EngCalcs.lpnPlacerD = (function () {
 			for (var kt = 0; kt < 2 * cl; kt++) {
 				var k = kt >> 1;
 				if (tierMax(li, k, kt & 1) <= here) { continue; }
-				var list = ensure(li, k, kt & 1), tried = 0, nb = near(list);
+				var list = ensure(li, k, kt & 1), tried = 0;
 				for (var m = 0; m < list.length && tried < TRIES; m++) {
 					var c = list[m];
 					if (c.base <= here) { break; }
 					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
-					var bl = [], d = dynCostN(c, nb, null, bl);
+					var bl = [], d = dynCost(c, bl);
 					if (d === d) {
-						if (keyOf(c) - d > here + 1e-6) { CNT.free++; seat(li, c); return true; }
+						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
 						continue;
 					}
 					if (keyOf(c) <= here) { continue; }
 					tried++;
 					if (bl.length > 2 || bl.some(function (b) { return lab[b].hand; })) { continue; }
-					if (nDyn > MAX_EVALS) { return false; }
-					CNT['att' + bl.length]++;
+					if (nDyn > MAX_DYN) { return false; }
 					var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
 					var before = unseatAll(set);
 					seat(li, c);
@@ -1056,7 +1041,7 @@ EngCalcs.lpnPlacerD = (function () {
 						seat(bl[q], b.c);
 						after += b.w;
 					}
-					if (ok && after > before + 1e-6) { CNT['ok' + bl.length]++; return true; }
+					if (ok && after > before + 1e-6) { return true; }
 					for (q = 0; q < set.length; q++) { seat(set[q], null); }
 					for (q = 0; q < set.length; q++) { seat(set[q], saved[q]); }
 				}
@@ -1068,16 +1053,13 @@ EngCalcs.lpnPlacerD = (function () {
 			todo.sort(function (a, b) { return (cur[a] ? 1 : 0) - (cur[b] ? 1 : 0) || levelOf(b) - levelOf(a) || a - b; });
 			var changed = false;
 			for (i = 0; i < todo.length; i++) { if (tryUpgrade(todo[i])) { changed = true; } }
-			mark('repair' + pass);
 			// ---- 4. polish: every label re-seats itself if that is worth more ----
 			for (i = 0; i < order.length; i++) {
 				var lj = order[i], here = worthNow(lj), b = bestFor(lj);
 				if (b.c && b.c !== cur[lj] && b.w > here + 1e-6) { seat(lj, b.c); changed = true; }
 			}
-			mark('polish' + pass);
-			if (!changed || nDyn > MAX_EVALS) { break; }
+			if (!changed || nDyn > MAX_DYN) { break; }
 		}
-		if (DBG) { console.error(scene.id + ': gen ' + nGen + ' valid ' + nValid + ' dyn ' + nDyn + ' ' + JSON.stringify(CNT) + ' ' + tl.join(', ')); }
 
 		// ---- answer ----
 		var out = {};
@@ -1093,7 +1075,7 @@ EngCalcs.lpnPlacerD = (function () {
 		return { labels: out };
 	}
 
-	return { name: 'D (candidate search, ejection repair, sticky)', create: create };
+	return { name: NAME, create: create };
 }());
 
 if (typeof module !== 'undefined' && module.exports) {
