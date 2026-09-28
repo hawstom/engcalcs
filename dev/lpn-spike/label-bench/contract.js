@@ -120,7 +120,8 @@ function placementBoxes(req, pl, text) {
 }
 
 // What is wrong with a placement AS A STATEMENT, before any of it is scored. Returns a reason or
-// null. An invalid placement is a break like N1-N4: a placer must not rely on the bench guessing.
+// null. An invalid placement is a break like N1, N3, N4 or N5: a placer must not rely on the bench
+// guessing.
 function invalidReason(req, pl, scene, owners) {
 	if (!pl || !pl.shown) { return null; }
 	if (!Array.isArray(pl.rows) || !pl.rows.length) { return 'shown with no rows'; }
