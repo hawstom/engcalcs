@@ -16,7 +16,7 @@
 	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
 	const LABEL_CAP = 0.6;      // a label whose best spot costs more than this is dropped (two pipes)
-	const KEEP_CAP = 1.0;       // a label held from the last view is let go above this cost
+	const KEEP_CAP = 0.3;       // a label held from the last view is let go if a leader or a second pipe now crosses it
 	const RING_STEP = 7;        // px between leader rings
 	const RING_MAX = 4;         // rings tried (S3: drop rather than travel)
 	const RING_DIRS = 12;       // directions tried on each ring
@@ -774,16 +774,26 @@
 					const rows = sets[si];
 					if (rows.length <= cur.c.rows.length) { break; }
 					const sz = sizeOf(req, rows, cur.c.layout);
-					// A label lying along its pipe does not grow in place: turned, its block's corner
-					// is not its start, and growing would slide it along or off the pipe.
-					if (cur.c.angle) { continue; }
-					const x = cur.c.align === 'right' ? cur.c.x + cur.c.w - sz.w : cur.c.x;
-					const c = Object.assign({}, cur.c, { rows: rows, x: x, w: sz.w, h: sz.h });
-					const ink = inkOf(req, c);
-					if (c.leader && !leaderReaches(c.leader, ink)) { continue; }
-					const cost = evaluate(req, c, ink, ownOf(req), false);
-					if (cost !== Infinity && cost - ROW_VALUE * rows.length < cur.cost - ROW_VALUE * cur.c.rows.length) {
-						insert(req, c, ink, cost); done = true;
+					const tries = [];
+					if (!cur.c.angle) {
+						tries.push(cur.c.align === 'right' ? cur.c.x + cur.c.w - sz.w : cur.c.x);
+					} else {
+						// A label lying along its pipe grows along the pipe from one end, which stays
+						// where it was; either end may be the one that holds.
+						const a = cur.c.angle * Math.PI / 180, ux = Math.cos(a), uy = Math.sin(a);
+						const cx = cur.c.x + cur.c.w / 2, cy = cur.c.y + cur.c.h / 2, d = (sz.w - cur.c.w) / 2;
+						[1, -1].forEach(function (sgn) { tries.push([cx + sgn * d * ux - sz.w / 2, cy + sgn * d * uy - sz.h / 2]); });
+					}
+					for (let ti = 0; ti < tries.length && !done; ti++) {
+						const t = tries[ti];
+						const c = Object.assign({}, cur.c, typeof t === 'number' ? { rows: rows, x: t, w: sz.w, h: sz.h }
+							: { rows: rows, x: t[0], y: t[1], w: sz.w, h: sz.h });
+						const ink = inkOf(req, c);
+						if (c.leader && !leaderReaches(c.leader, ink)) { continue; }
+						const cost = evaluate(req, c, ink, ownOf(req), false);
+						if (cost !== Infinity && cost - ROW_VALUE * rows.length < cur.cost - ROW_VALUE * cur.c.rows.length) {
+							insert(req, c, ink, cost); done = true;
+						}
 					}
 				}
 				if (!done) { insert(req, cur.c, cur.ink, cur.cost); }
