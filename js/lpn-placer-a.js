@@ -341,8 +341,17 @@ function createPlacer() {
 	function place(scene, opts) {
 		return run(scene, (opts && opts.prev) || null, gapsFor(scene));
 	}
+	// The breathers. Every time: the network's gap lists (zoom-proof, so kept until the network
+	// changes). When a project opens and there are seconds to spare: one rehearsal of the opening
+	// view, thrown away, so the engine is warm for the first real layout and every zoom after it.
+	let warmed = false;
 	function idle(budgetMs, ctx) {
-		if (ctx && ctx.scene) { gapsFor(ctx.scene); }
+		if (!ctx || !ctx.scene) { return; }
+		gapsFor(ctx.scene);
+		if (!warmed && ctx.opening && budgetMs >= 1000) {
+			warmed = true;
+			run(ctx.scene, null, gapsFor(ctx.scene));
+		}
 	}
 	return { name: 'a (free-space grid, near home first, drop before travel)', place: place, idle: idle };
 }
@@ -660,7 +669,7 @@ function run(scene, prev, gaps) {
 		const key = k * NT + t;
 		if (f.cc[key]) { return f.cc[key]; }
 		const rows = f.subsets[k], rowPen = W.row * (f.R - rows.length), raw = [];
-		if (f.kind === 'link' && f.req.layout === 'line') { linkCandidates(f, rows, rowPen, raw, t); } else { pointCandidates(f, rows, rowPen, raw, t); }
+		if (f.link && f.link.points.length > 1 && f.req.layout === 'line') { linkCandidates(f, rows, rowPen, raw, t); } else { pointCandidates(f, rows, rowPen, raw, t); }
 		for (let i = 0; i < raw.length; i++) { raw[i].k = k; }
 		raw.sort(function (a, b) { return a.base - b.base; });
 		f.cc[key] = raw;
@@ -807,8 +816,9 @@ function run(scene, prev, gaps) {
 
 	// ---- 1. hand-placed labels: hung at the user's point, shown whatever happens (N4) ----
 	const kept = new Array(N);
+	info.forEach(function (f) { if (!f.R) { kept[f.li] = 'empty'; } });
 	info.forEach(function (f) {
-		if (!f.req.hand) { return; }
+		if (!f.req.hand || kept[f.li]) { return; }
 		const H = [f.req.hand.x, f.req.hand.y];
 		const start = ownerPointToward(f, H);
 		const ux = H[0] - start[0], uy = H[1] - start[1], len = Math.hypot(ux, uy);
@@ -950,7 +960,7 @@ function run(scene, prev, gaps) {
 	for (let round = 0; round < maxSets; round++) {
 		const last = false;
 		info.forEach(function (f) {
-			if (kept[f.li] === 'hand') { return; }
+			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
 			if (kept[f.li] === 'held') { growHeld(f, last); return; }
 			const n = f.subsets.length, p = placed[f.li];
 			const curK = p ? p.cand.k : n;
