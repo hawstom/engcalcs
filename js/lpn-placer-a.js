@@ -13,6 +13,8 @@ const DIRS = [];          // the compass, 16 ways
 for (let k = 0; k < 16; k++) { DIRS.push(k * Math.PI / 8); }
 const RINGS = [0.8, 1.6, 2.6, 4.0];   // leader lengths tried, in row heights
 const RINGS_ALT = [0.8, 1.8];         // and for the other shape, which is lazier
+const RS_ALT = [0, 4], NRS = 5;       // ring slots: RINGS are 0-3, RINGS_ALT reuse 0 and add 4
+const NSLOT = (4 + 16) * NRS;         // leader slots per label: up to 4 gap directions and the compass
 const SIDES = [[1, 0], [-1, 0.15], [0, 1.5]];   // a pipe label above, below, or on its pipe: [side, cost]
 let tol = TOL;
 const DIRS8 = [];
@@ -125,23 +127,7 @@ function Grid(vp) {
 	this.buf = [];
 	this.r = [0, 0, 0, 0];
 	this.all = [[], [], []];
-	this.touch = new Int32Array(n);
-	this.tick = 0;
 }
-// Records that something changed over a rectangle (for the "has anything near me moved?" test).
-Grid.prototype.mark = function (x0, y0, x1, y1) {
-	const r = this.range(x0, y0, x1, y1);
-	if (!r) { return; }
-	const t = this.tick;
-	for (let j = r[2]; j <= r[3]; j++) { for (let i = r[0]; i <= r[1]; i++) { this.touch[j * this.nx + i] = t; } }
-};
-Grid.prototype.lastTouch = function (bb) {
-	const r = this.range(bb[0], bb[1], bb[2], bb[3]);
-	if (!r) { return 0; }
-	let m = 0;
-	for (let j = r[2]; j <= r[3]; j++) { for (let i = r[0]; i <= r[1]; i++) { const v = this.touch[j * this.nx + i]; if (v > m) { m = v; } } }
-	return m;
-};
 Grid.prototype.range = function (x0, y0, x1, y1) {
 	let i0 = Math.floor((x0 - this.x0) / CS), i1 = Math.floor((x1 - this.x0) / CS);
 	let j0 = Math.floor((y0 - this.y0) / CS), j1 = Math.floor((y1 - this.y0) / CS);
@@ -219,24 +205,28 @@ Grid.prototype.query = function (layer, x0, y0, x1, y1, fn) {
 // ---- the free-space raster: the static real estate at 2 px, as summed-area tables, so that
 // "is this rectangle clear?" costs four reads ------------------------------------------------
 const RR = 2, RMARGIN = 48;
-function Raster(vp, G) {
+function Raster(vp, G, pool) {
 	const ox = vp.x - RMARGIN, oy = vp.y - RMARGIN;
 	const nx = Math.ceil((vp.w + 2 * RMARGIN) / RR), ny = Math.ceil((vp.h + 2 * RMARGIN) / RR);
 	this.ox = ox; this.oy = oy; this.nx = nx; this.ny = ny;
-	const hard = new Uint8Array(nx * ny), pipe = new Uint8Array(nx * ny), tldr = new Uint8Array(nx * ny);
-	const self = this;
-	function markRect(a, x0, y0, x1, y1) {
+	// The buffers live on the placer and are reused from view to view (no garbage per layout).
+	const n = nx * ny, n1 = (nx + 1) * (ny + 1);
+	if (!pool.cell || pool.cell.length !== n) {
+		pool.cell = new Uint8Array(n); pool.flag = new Uint8Array(n);
+		pool.hard = new Int32Array(n1); pool.pipe = new Int32Array(n1); pool.tldr = new Int32Array(n1);
+	} else { pool.cell.fill(0); pool.flag.fill(0); }
+	const cell = pool.cell, flag = pool.flag;   // bit 1 hard, 2 pipe, 4 Text callout
+	function markRect(v, x0, y0, x1, y1) {
 		let i0 = Math.floor((x0 - ox) / RR), i1 = Math.floor((x1 - ox) / RR), j0 = Math.floor((y0 - oy) / RR), j1 = Math.floor((y1 - oy) / RR);
 		if (i1 < 0 || j1 < 0 || i0 >= nx || j0 >= ny) { return; }
 		if (i0 < 0) { i0 = 0; } if (j0 < 0) { j0 = 0; } if (i1 >= nx) { i1 = nx - 1; } if (j1 >= ny) { j1 = ny - 1; }
-		for (let j = j0; j <= j1; j++) { for (let i = i0; i <= i1; i++) { a[j * nx + i] = 1; } }
+		for (let j = j0; j <= j1; j++) { for (let i = i0; i <= i1; i++) { cell[j * nx + i] |= v; } }
 	}
-	function markSeg(a, x0, y0, x1, y1) {
-		const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(1, Math.ceil(len / 0.5));
-		for (let k = 0; k <= n; k++) {
-			const x = x0 + (x1 - x0) * k / n, y = y0 + (y1 - y0) * k / n;
-			const i = Math.floor((x - ox) / RR), j = Math.floor((y - oy) / RR);
-			if (i >= 0 && j >= 0 && i < nx && j < ny) { a[j * nx + i] = 1; }
+	function markSeg(v, x0, y0, x1, y1) {
+		const len = Math.hypot(x1 - x0, y1 - y0), m = Math.max(1, Math.ceil(len / 0.5));
+		for (let k = 0; k <= m; k++) {
+			const i = Math.floor((x0 + (x1 - x0) * k / m - ox) / RR), j = Math.floor((y0 + (y1 - y0) * k / m - oy) / RR);
+			if (i >= 0 && j >= 0 && i < nx && j < ny) { cell[j * nx + i] |= v; }
 		}
 	}
 	const X0 = ox, Y0 = oy, X1 = ox + nx * RR, Y1 = oy + ny * RR;
@@ -252,34 +242,26 @@ function Raster(vp, G) {
 		}
 		return [it.ax + t0 * dx, it.ay + t0 * dy, it.ax + t1 * dx, it.ay + t1 * dy];
 	}
-	G.all[0].forEach(function (it) { const b = it.box; markRect(hard, b.x0, b.y0, b.x1, b.y1); });
-	G.all[1].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(pipe, c[0], c[1], c[2], c[3]); } });
-	G.all[2].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(tldr, c[0], c[1], c[2], c[3]); } });
-	this.hard = sat(hard); this.pipe = sat(pipe); this.tldr = sat(tldr);
-	// One byte per cell for walking a leader: bit 1 hard, 2 pipe, 4 Text callout, each spread by
-	// one cell so a walk that passes within a pixel of a thing cannot miss it.
-	const flag = new Uint8Array(nx * ny);
+	G.all[0].forEach(function (it) { const b = it.box; markRect(1, b.x0, b.y0, b.x1, b.y1); });
+	G.all[1].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(2, c[0], c[1], c[2], c[3]); } });
+	G.all[2].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(4, c[0], c[1], c[2], c[3]); } });
+	// Summed-area tables, one per kind, in one sweep; and the walking flags, each mark spread by
+	// one cell so a leader that passes within a pixel of a thing cannot miss it.
+	const H = pool.hard, P = pool.pipe, T = pool.tldr, W1 = nx + 1;
 	for (let j = 0; j < ny; j++) {
+		let rh = 0, rp = 0, rt = 0;
+		const base = j * nx, up = j * W1 + 1, dn = (j + 1) * W1 + 1;
 		for (let i = 0; i < nx; i++) {
-			const k = j * nx + i, v = (hard[k] ? 1 : 0) | (pipe[k] ? 2 : 0) | (tldr[k] ? 4 : 0);
-			if (!v) { continue; }
-			for (let dj = -1; dj <= 1; dj++) {
-				const jj = j + dj;
-				if (jj < 0 || jj >= ny) { continue; }
-				for (let di = -1; di <= 1; di++) { const ii = i + di; if (ii >= 0 && ii < nx) { flag[jj * nx + ii] |= v; } }
+			const v = cell[base + i];
+			if (v) {
+				if (v & 1) { rh++; } if (v & 2) { rp++; } if (v & 4) { rt++; }
+				const j0 = j > 0 ? j - 1 : 0, j1 = j < ny - 1 ? j + 1 : j, i0 = i > 0 ? i - 1 : 0, i1 = i < nx - 1 ? i + 1 : i;
+				for (let jj = j0; jj <= j1; jj++) { for (let ii = i0; ii <= i1; ii++) { flag[jj * nx + ii] |= v; } }
 			}
+			H[dn + i] = H[up + i] + rh; P[dn + i] = P[up + i] + rp; T[dn + i] = T[up + i] + rt;
 		}
 	}
-	this.flag = flag;
-	function sat(a) {
-		const W1 = nx + 1, S = new Int32Array(W1 * (ny + 1));
-		for (let j = 0; j < ny; j++) {
-			let row = 0;
-			for (let i = 0; i < nx; i++) { row += a[j * nx + i]; S[(j + 1) * W1 + i + 1] = S[j * W1 + i + 1] + row; }
-		}
-		return S;
-	}
-	void self;
+	this.hard = H; this.pipe = P; this.tldr = T; this.flag = flag;
 }
 // What a straight segment passes near: the OR of the flags of every cell it crosses (sampled
 // every half pixel), or 7 (everything) when it leaves the raster.
@@ -310,7 +292,7 @@ Raster.prototype.sum = function (S, x0, y0, x1, y1) {
 
 // ---- the placer ------------------------------------------------------------------------------
 function createPlacer() {
-	const memo = { sig: null, gaps: null };
+	const memo = { sig: null, gaps: null }, pool = {};
 
 	// Ranked gap list per node: angular gaps between the pipes leaving it, widest first. Angles
 	// are the same at every zoom, so this is worked out once per network and kept (T2, T3).
@@ -339,7 +321,7 @@ function createPlacer() {
 	}
 
 	function place(scene, opts) {
-		return run(scene, (opts && opts.prev) || null, gapsFor(scene));
+		return run(scene, (opts && opts.prev) || null, gapsFor(scene), pool);
 	}
 	// The breathers. Every time: the network's gap lists (zoom-proof, so kept until the network
 	// changes). When a project opens and there are seconds to spare: one rehearsal of the opening
@@ -350,13 +332,13 @@ function createPlacer() {
 		gapsFor(ctx.scene);
 		if (!warmed && ctx.opening && budgetMs >= 1000) {
 			warmed = true;
-			run(ctx.scene, null, gapsFor(ctx.scene));
+			run(ctx.scene, null, gapsFor(ctx.scene), pool);
 		}
 	}
 	return { name: 'a (free-space grid, near home first, drop before travel)', place: place, idle: idle };
 }
 
-function run(scene, prev, gaps) {
+function run(scene, prev, gaps, pool) {
 	const vp = scene.viewport, T = scene.text, RH = T.rowHeightPx;
 	const G = new Grid(vp);   // static real estate: symbols, Text, pipes, Text callouts
 	const D = new Grid(vp);   // what this pass has placed: label ink and label leaders
@@ -385,7 +367,7 @@ function run(scene, prev, gaps) {
 			for (let i = 1; i < L.length; i++) { G.addSeg(2, { ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1], ld: id, lab: -1 }); }
 		}
 	});
-	const Rs = new Raster(vp, G);
+	const Rs = new Raster(vp, G, pool);
 	const custBox = {};
 	(scene.customers || []).forEach(function (c) { custBox[c.id] = c.box; });
 
@@ -395,7 +377,7 @@ function run(scene, prev, gaps) {
 
 	// ---- per-label facts ----
 	const info = reqs.map(function (req, li) {
-		const f = { req: req, li: li, kind: req.kind, pt: null, sym: null, link: null, node: null, cc: [], lc: new Map(), lg: new Map(), tick: -1, k0: 0, k1: -1, region: null };
+		const f = { req: req, li: li, kind: req.kind, pt: null, sym: null, link: null, node: null, cc: [], lgA: new Array(NSLOT), lcA: new Float64Array(NSLOT), dmA: new Int32Array(NSLOT) };
 		if (req.kind === 'node' && nodes[req.owner]) {
 			f.node = nodes[req.owner]; f.pt = [f.node.x, f.node.y]; f.sym = f.node.symbol;
 		} else if (req.kind === 'link' && links[req.owner]) {
@@ -478,8 +460,7 @@ function run(scene, prev, gaps) {
 		if (needInView && (bb[0] < vp.x + 1 || bb[1] < vp.y + 1 || bb[2] > vp.x + vp.w - 1 || bb[3] > vp.y + vp.h - 1)) { return Infinity; }
 		let cost = cand.base;
 		if (cand.leader) {
-			let lc = f.lc.get(cand.lk);
-			if (lc === undefined) { lc = leaderStatic(f, cand.leader); f.lc.set(cand.lk, lc); }
+			let lc = cand.lk === undefined ? leaderStatic(f, cand.leader) : f.lcA[cand.lk];
 			if (lc === Infinity) { return Infinity; }
 			cost += lc;
 		}
@@ -599,14 +580,12 @@ function run(scene, prev, gaps) {
 	const placed = new Array(N);      // {cand, cost, items}
 	function commit(f, cand, cost) {
 		const items = [];
-		D.tick++;
-		boxesFor(cand).forEach(function (b) { const it = { box: b, lab: f.li }; D.addBox(it); items.push(it); D.mark(b.x0, b.y0, b.x1, b.y1); });
+		boxesFor(cand).forEach(function (b) { const it = { box: b, lab: f.li }; D.addBox(it); items.push(it); });
 		if (cand.leader) {
 			const id = ldrSeq++, L = cand.leader;
 			for (let i = 1; i < L.length; i++) {
 				const it = { ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1], ld: id, lab: f.li };
 				D.addSeg(2, it); items.push(it);
-				D.mark(Math.min(it.ax, it.bx), Math.min(it.ay, it.by), Math.max(it.ax, it.bx), Math.max(it.ay, it.by));
 			}
 		}
 		placed[f.li] = { cand: cand, cost: cost, items: items };
@@ -614,11 +593,7 @@ function run(scene, prev, gaps) {
 	function uncommit(f) {
 		const p = placed[f.li];
 		if (!p) { return null; }
-		D.tick++;
-		p.items.forEach(function (it) {
-			it.dead = true;
-			if (it.box) { D.mark(it.box.x0, it.box.y0, it.box.x1, it.box.y1); } else { D.mark(Math.min(it.ax, it.bx), Math.min(it.ay, it.by), Math.max(it.ax, it.bx), Math.max(it.ay, it.by)); }
-		});
+		p.items.forEach(function (it) { it.dead = true; });
 		placed[f.li] = null;
 		return p;
 	}
@@ -713,24 +688,24 @@ function run(scene, prev, gaps) {
 		}
 		if (t - 1 >= RG.length) { return; }
 		const rs = Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 2;
-		const dirs = dirsFor(f, D);
+		const dirs = dirsFor(f, D), ng = dirs.length - D.length;
 		for (let d = 0; d < dirs.length; d++) {
 			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
 			for (let r = t - 1; r < t; r++) {
 				const dist = rOut + RG[r] * RH;
 				const px = cx + ux * dist, py = cy + uy * dist;
 				// One leader serves every shape and row set hung on it: judged once, kept.
-				const lk = Math.round(dirs[d] * 1e4) * 64 + Math.round(RG[r] * 10);
-				let L = f.lg.get(lk);
+				const lk = (D === DIRS || d < ng ? d : ng + 2 * (d - ng)) * NRS + (RG === RINGS ? r : RS_ALT[r]);
+				let L = f.lgA[lk];
 				if (L === undefined) {
 					L = [[cx + ux * rs, cy + uy * rs], [px, py]];
 					// ... and so does the core every shape hung there must cover: if a symbol or
 					// Text sits on it, nothing hung on this leader can stand.
 					let lc = leaderStatic(f, L);
 					if (lc < Infinity && coreHits(G, coreBox(f, side, px, py), -1)) { lc = Infinity; }
-					f.lc.set(lk, lc);
+					f.lcA[lk] = lc;
 					if (lc === Infinity) { L = null; }
-					f.lg.set(lk, L);
+					f.lgA[lk] = L;
 				}
 				if (L === null) { continue; }
 				const c = hang(sh, px, py, side, extra + distCost((dist - rs) / RH), L);
@@ -784,7 +759,7 @@ function run(scene, prev, gaps) {
 	let searchStamp = 0;
 	function search(f, bound, k0, k1) {
 		let best = null, bestCost = bound;
-		const ss = ++searchStamp, dm = f.dm || (f.dm = new Map());
+		const ss = ++searchStamp, dm = f.dmA;
 		for (let k = k0; k <= k1; k++) {
 			const rowPen = W.row * (f.R - f.subsets[k].length);
 			if (rowPen >= bestCost) { continue; }
@@ -796,11 +771,11 @@ function run(scene, prev, gaps) {
 				if (c0.base >= bestCost) { break; }
 				if (c0.lk !== undefined) {
 					// A leader whose core another label already covers: skip every shape on it.
-					const m = dm.get(c0.lk);
+					const m = dm[c0.lk];
 					if (m === ss) { continue; }
 					if (m !== -ss) {
-						if (coreHits(D, coreBox(f, c0.side, c0.leader[1][0], c0.leader[1][1]), f.li)) { dm.set(c0.lk, ss); continue; }
-						dm.set(c0.lk, -ss);
+						if (coreHits(D, coreBox(f, c0.side, c0.leader[1][0], c0.leader[1][1]), f.li)) { dm[c0.lk] = ss; continue; }
+						dm[c0.lk] = -ss;
 					}
 				}
 				if (c0.st === undefined) { c0.st = evalStatic(f, c0, true); }
@@ -965,26 +940,13 @@ function run(scene, prev, gaps) {
 			const n = f.subsets.length, p = placed[f.li];
 			const curK = p ? p.cand.k : n;
 			const k0 = last ? 0 : Math.max(0, curK - 1), k1 = last ? n - 1 : Math.min(curK, n - 1);
-			// Nothing near it has changed since it last looked over these row sets: nothing new to find.
-			if (f.tick >= 0 && k0 >= f.k0 && k1 <= f.k1 && D.lastTouch(regionOf(f)) <= f.tick) { return; }
-			f.tick = D.tick; f.k0 = k0; f.k1 = k1;
 			const cur = p ? evalDyn(f, p.cand, p.cand.st, Infinity) : hideCost(f);
 			const r = search(f, cur, k0, k1);
 			if (r && (!p || r.cand !== p.cand)) {
 				if (p) { uncommit(f); }
 				commit(f, r.cand, r.cost);
-				f.tick = D.tick;
 			} else if (p) { p.cost = cur; }
 		});
-	}
-	function regionOf(f) {
-		if (f.region) { return f.region; }
-		const R = f.req.rows;
-		let wLine = 0, hStack = 0, wMax = 0;
-		for (let i = 0; i < R.length; i++) { wLine += R[i].w + T.separatorW; hStack += R[i].h; wMax = Math.max(wMax, R[i].w); }
-		const r = Math.max(f.sym.w, f.sym.h) / 2 + 4 + RINGS[RINGS.length - 1] * RH + 1.5 * Math.max(wLine, wMax) + hStack;
-		f.region = [f.pt[0] - r, f.pt[1] - r, f.pt[0] + r, f.pt[1] + r];
-		return f.region;
 	}
 
 	// ---- out ----
