@@ -164,9 +164,11 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 		}
 	};
-	// Fills `out` with each item whose cells meet the box, once, and returns it.
+	// Fills `out` with each item whose cells meet the box, once, and returns it; out.n is the
+	// count (the array is reused and never shrunk, so a query allocates nothing).
 	Grid.prototype.query = function (x0, y0, x1, y1, out) {
-		out.length = 0;
+		var cnt = 0;
+		out.n = 0;
 		if (!this.range(x0, y0, x1, y1)) { return out; }
 		var st = ++this.stamp, i1 = this.i1, j1 = this.j1, nx = this.nx, cells = this.cells;
 		for (var j = this.j0; j <= j1; j++) {
@@ -175,10 +177,11 @@ EngCalcs.lpnPlacerD = (function () {
 				if (!c) { continue; }
 				for (var n = 0; n < c.length; n++) {
 					var it = c[n];
-					if (it.st !== st) { it.st = st; out.push(it); }
+					if (it.st !== st) { it.st = st; out[cnt++] = it; }
 				}
 			}
 		}
+		out.n = cnt;
 		return out;
 	};
 	// ---- polylines -------------------------------------------------------------------------------
@@ -282,7 +285,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// Every indexed thing has one shape, so the hot loops stay monomorphic.
 		function Item(t, node, link, b, ax, ay, bx, by) {
 			this.t = t; this.node = node; this.link = link; this.b = b;
-			this.ax = ax; this.ay = ay; this.bx = bx; this.by = by; this.st = 0; this.li = -1; this.c = null;
+			this.ax = ax; this.ay = ay; this.bx = bx; this.by = by; this.st = 0; this.li = -1; this.c = null; this.k = -1;
 		}
 		function addHard(it, b) { hardG.add(it, b.x0, b.y0, b.x1, b.y1); hardRects.push(b); }
 		scene.nodes.forEach(function (n) {
@@ -290,13 +293,17 @@ EngCalcs.lpnPlacerD = (function () {
 			var sb = rectBox(n.symbol);
 			addHard(new Item('sym', n.id, null, sb, 0, 0, 0, 0), sb);
 		});
-		scene.links.forEach(function (l) {
+		// Each link gets an index, so one crossing per link is counted with a stamp, not a map.
+		var linkMark = new Int32Array(scene.links.length + 1), markStamp = 0;
+		scene.links.forEach(function (l, lk) {
 			linksById[l.id] = l;
 			(l.symbols || []).forEach(function (s) { var b = oBox(s); addHard(new Item('lsym', null, l.id, b, 0, 0, 0, 0), b); });
 			(l.arrows || []).forEach(function (s) { var b = oBox(s); softG.add(new Item('arrow', null, l.id, b, 0, 0, 0, 0), b.x0, b.y0, b.x1, b.y1); });
 			for (var i = 1; i < l.points.length; i++) {
 				var a = l.points[i - 1], b = l.points[i];
-				softG.add(new Item('pipe', null, l.id, null, a[0], a[1], b[0], b[1]),
+				var pit = new Item('pipe', null, l.id, null, a[0], a[1], b[0], b[1]);
+				pit.k = lk;
+				softG.add(pit,
 					Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1]));
 			}
 		});
@@ -352,7 +359,7 @@ EngCalcs.lpnPlacerD = (function () {
 			if (!satSum(sat, Math.floor(a0), Math.floor(b0), Math.ceil(a1), Math.ceil(b1))) { return false; }
 			if (satSum(csat, Math.ceil(a0), Math.ceil(b0), Math.floor(a1), Math.floor(b1))) { return true; }
 			var box = mkBox((x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, 0), q = hardG.query(x0, y0, x1, y1, qa);
-			for (var n = 0; n < q.length; n++) { if (boxesOverlap(box, q[n].b, TOL)) { return true; } }
+			for (var n = 0; n < q.n; n++) { if (boxesOverlap(box, q[n].b, TOL)) { return true; } }
 			return false;
 		}
 		function rasterHit(b) { return rasterRect(b.x0, b.y0, b.x1, b.y1); }
@@ -441,7 +448,7 @@ EngCalcs.lpnPlacerD = (function () {
 				if (!hit) {
 					if (!b.rot && !hand) { hit = rasterHit(b); } else if (!hand && !rasterTouched(b)) { hit = false; } else {
 						q = hardG.query(b.x0, b.y0, b.x1, b.y1, qa);
-						for (n = 0; n < q.length; n++) { if (boxesOverlap(b, q[n].b, TOL)) { hit = true; if (hand) { hard++; } else { break; } } }
+						for (n = 0; n < q.n; n++) { if (boxesOverlap(b, q[n].b, TOL)) { hit = true; if (hand) { hard++; } else { break; } } }
 						if (hand) { hit = false; }
 					}
 				}
@@ -454,7 +461,7 @@ EngCalcs.lpnPlacerD = (function () {
 			for (j = 1; L && j < L.length; j++) {
 				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
 				q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
-				for (n = 0; n < q.length; n++) {
+				for (n = 0; n < q.n; n++) {
 					it = q[n];
 					if (it.t === 'sym') {
 						if (it.node === ownNode || !segHitsBox(ax, ay, bx, by, it.b, -1)) { continue; }
@@ -522,7 +529,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// A leader leg clear of every other node's symbol (N3) and every Text object.
 		function segFree(ax, ay, bx, by, ownNode) {
 			var q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
-			for (var n = 0; n < q.length; n++) {
+			for (var n = 0; n < q.n; n++) {
 				var it = q[n];
 				if (it.t === 'sym' ? it.node !== ownNode : it.t === 'text') {
 					if (segHitsBox(ax, ay, bx, by, it.b, -1)) { return false; }
@@ -540,15 +547,15 @@ EngCalcs.lpnPlacerD = (function () {
 			for (j = 1; L && j < L.length; j++) {
 				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
 				q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
-				for (n = 0; n < q.length; n++) {
+				for (n = 0; n < q.n; n++) {
 					it = q[n];
 					if (it.t === 'lsym' && it.link !== ownLink && segHitsBox(ax, ay, bx, by, it.b, 0)) { cost += C_LEADER_LINKSYM; }
 				}
 			}
 			// Pipes, flow arrows and Text callouts under the text.
-			var links = null, own = false;
+			var own = false, mk = ++markStamp;
 			q = softG.query(c.bx0, c.by0, c.bx1, c.by1, qa);
-			for (n = 0; n < q.length; n++) {
+			for (n = 0; n < q.n; n++) {
 				it = q[n];
 				for (i = 0; i < nb; i++) {
 					b = boxes[i];
@@ -559,29 +566,28 @@ EngCalcs.lpnPlacerD = (function () {
 						if (!b.rep && segHitsBox(it.ax, it.ay, it.bx, it.by, b, -1)) { own = true; break; }
 					} else if (segHitsBox(it.ax, it.ay, it.bx, it.by, b, 1.5)) {
 						if (it.t === 'tlead') { cost += C_LABEL_LEADER; break; }
-						if (!links) { links = {}; }
-						if (!links[it.link]) { links[it.link] = 1; cost += C_LABEL_PIPE; }
+						if (linkMark[it.k] !== mk) { linkMark[it.k] = mk; cost += C_LABEL_PIPE; }
 						break;
 					}
 				}
 			}
 			if (own) { cost += C_LABEL_OWN_PIPE; }
 			// Soft: pipes and Text callouts the leader crosses, away from its own start.
-			var lk = null;
+			var mk2 = ++markStamp;
 			for (j = 1; L && j < L.length; j++) {
 				var sx = L[0][0], sy = L[0][1], px = L[j - 1][0], py = L[j - 1][1], ex = L[j][0], ey = L[j][1];
 				q = softG.query(Math.min(px, ex), Math.min(py, ey), Math.max(px, ex), Math.max(py, ey), qb);
-				for (n = 0; n < q.length; n++) {
+				for (n = 0; n < q.n; n++) {
 					it = q[n];
 					if (it.t === 'arrow') { continue; }
 					if (it.t === 'tlead') {
 						if (segCross(px, py, ex, ey, it.ax, it.ay, it.bx, it.by) >= 0) { cost += C_LEADER_LEADER; }
 						continue;
 					}
-					if (it.link === ownLink || (lk && lk[it.link])) { continue; }
+					if (it.link === ownLink || linkMark[it.k] === mk2) { continue; }
 					var t = segCross(px, py, ex, ey, it.ax, it.ay, it.bx, it.by);
 					if (t >= 0 && Math.hypot(px + t * (ex - px) - sx, py + t * (ey - py) - sy) > 1.5) {
-						(lk || (lk = {}))[it.link] = 1; cost += C_LEADER_PIPE;
+						linkMark[it.k] = mk2; cost += C_LEADER_PIPE;
 					}
 				}
 			}
@@ -754,10 +760,10 @@ EngCalcs.lpnPlacerD = (function () {
 						if (v === 1) { return NaN; }
 						if (v === -1) { undecided = true; }
 					}
-					if (!undecided) { q = qd; q.length = 0; } else { q = null; }
+					if (!undecided) { q = qd; q.n = 0; } else { q = null; }
 				} else { q = null; }
 				if (!q) { q = dynB.query(c.x - PADX, c.y - PADY, c.x + c.w + PADX, c.y + c.h + PADY, qd); }
-				for (n = 0; n < q.length; n++) {
+				for (n = 0; n < q.n; n++) {
 					it = q[n];
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
 					b = it.b;
@@ -789,8 +795,8 @@ EngCalcs.lpnPlacerD = (function () {
 						if (bv === -1) { und = true; }
 					}
 				}
-				if (und) { q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd); } else { q = qd; q.length = 0; }
-				for (n = 0; n < q.length; n++) {
+				if (und) { q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd); } else { q = qd; q.n = 0; }
+				for (n = 0; n < q.n; n++) {
 					it = q[n];
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
 					b = it.b;
@@ -806,7 +812,7 @@ EngCalcs.lpnPlacerD = (function () {
 				if (hit) { return NaN; }
 			}
 			q = dyn.query(c.x0, c.y0, c.x1, c.y1, qd);
-			for (n = 0; n < q.length; n++) {
+			for (n = 0; n < q.n; n++) {
 				o = q[n];
 				if (o.li !== c.li) { cost += pairSoft(c, o); }
 			}
@@ -1115,7 +1121,7 @@ EngCalcs.lpnPlacerD = (function () {
 		reqs.forEach(function (r, k) { var it = new Item('anchor', null, null, null, 0, 0, 0, 0); it.li = k; anchors.add(it, r.anchor.x, r.anchor.y, r.anchor.x, r.anchor.y); });
 		order.forEach(function (li) {
 			var a = reqs[li].anchor, R = 4 * rowH, n = 0, q = anchors.query(a.x - R, a.y - R, a.x + R, a.y + R, qn);
-			for (var k = 0; k < q.length; k++) { var b = reqs[q[k].li].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
+			for (var k = 0; k < q.n; k++) { var b = reqs[q[k].li].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
 			crowd[li] = n;
 		});
 		// R11: on a zoom-in, the labels shown last view are seated first, so none is lost to room.
@@ -1180,7 +1186,9 @@ EngCalcs.lpnPlacerD = (function () {
 						// What this blocker must still be worth for the move to pay.
 						var rest = 0;
 						for (var r = q + 1; r < bl.length; r++) { rest += lab[bl[r]].levels[0].value + B_STICK + B_KEEP; }
-						var need = before - after - rest, b = bestFor(bl[q], 0, Infinity, need);
+						// It keeps its rows or gives up one; it never grows here.
+						var lvB = lab[bl[q]].levels.indexOf(saved[q + 1].lv);
+						var need = before - after - rest, b = bestFor(bl[q], lvB, lvB + 1, need);
 						if (!b.c && need >= 0) { ok = false; break; }
 						seat(bl[q], b.c);
 						after += b.w;
