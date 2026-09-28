@@ -62,6 +62,27 @@ function sectionNodeCopy() {
 	ok('it is a contract module for node (place is a function)', typeof mine.place === 'function');
 }
 
+// ---- 0b. every js/lpn-placer-<name>.js answers to ?placer=<name> --------------------------------
+// **THE BENCH CANNOT SEE THIS**: it require()s a placer file directly, so a file that exports
+// itself for node but never lands in EngCalcs.lpnPlacers scores well and does NOTHING on the page.
+// Round 2's builders C and D both shipped exactly that (2026-09-28, caught only in real Chrome).
+// Each file is run as the browser would run it -- a plain script, no `module` -- and must register.
+function sectionRegistration() {
+	console.log('\n--- 0b. every js/lpn-placer-<name>.js registers as EngCalcs.lpnPlacers[<name>] ---');
+	const vm = require('vm');
+	fs.readdirSync(path.join(REPO, 'js')).filter((f) => /^lpn-placer-[a-z0-9]+\.js$/.test(f)).forEach((f) => {
+		const name = f.replace(/^lpn-placer-|\.js$/g, '');
+		const box = {};
+		box.window = box;
+		let err = null;
+		try { vm.runInNewContext(fs.readFileSync(path.join(REPO, 'js', f), 'utf8'), box, { filename: f }); }
+		catch (e) { err = e.message; }
+		const mod = box.EngCalcs && box.EngCalcs.lpnPlacers && box.EngCalcs.lpnPlacers[name];
+		ok(f + ' registers as lpnPlacers.' + name, !err && !!mod && (typeof mod.place === 'function' || typeof mod.create === 'function'),
+			err ? 'threw: ' + err : (mod ? '' : 'not in EngCalcs.lpnPlacers, so ?placer=' + name + ' silently shows today\'s labels'));
+	});
+}
+
 if (process.env[LOCK_ENV] !== '1') {
 	let hasFlock = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); hasFlock = true; } catch (e) { /* no flock */ }
@@ -427,5 +448,6 @@ async function main() {
 
 if (process.env[LOCK_ENV] === '1') {
 	sectionNodeCopy();
+	sectionRegistration();
 	main().catch((e) => { console.error(e); process.exitCode = 1; }).finally(() => { process.exit(process.exitCode || 0); });
 }
