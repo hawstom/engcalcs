@@ -2993,3 +2993,89 @@ branch for the merge-approval mechanism and touches nothing else.
 Verdict: READY for Tom's browser pass, with two things worth his own five minutes rather than mine:
 the contrast/visibility question above, and a deliberate hover-then-Properties-dialog check to see
 whether he notices any stray mark (I found none, but did not exhaust every dialog-opening path).
+
+## 2026-09-27 -- Task 690, feat/ctrl-enter (d0858ea8), Declan's Ctrl+Enter spec
+
+MUTATION-TESTED (OBSERVED): dev/lpn-spike/pane-ctrlenter-harness.js is not decorative. Loaded the
+pre-fix commit's js/looped-network.js (fc862fa5) through the harness's own dom-stub `mutate` hook
+and re-ran the anchor-broadcast assertion: the keystroke is still claimed (`preventDefault()`
+fires) but only the anchor row carries the typed value -- rows 0-3 stay at their old demand while
+row 4 (the anchor) reads 99. The harness's own assertions go red on old code, not just green on
+new. 54/54 on the current tree.
+
+CONFIRMED (real Chrome, `dev/browser-pass/lib/{env,session}.js` served from this worktree) --
+multi-row single-column fill: selected a 3-row Elevation block on Net1's Junctions table, typed
+555 into the anchor, Ctrl+Enter: all 3 rows read 555, notice read "Filled 2 cells. 0 were not
+changed.", selection markup (`lpn-pane-sel` on all 3 cells) stayed standing after the fill -- not
+collapsed to one cell.
+
+CONFIRMED -- ID column in the block: selected ID..Elevation (7 columns x 3 rows), typed into the
+Elevation anchor, Ctrl+Enter: the ID column's 3 values were byte-identical before and after,
+Elevation filled, notice counted skips correctly.
+
+CONFIRMED -- a computed column in the block: selected Elevation..Pressure (spans Head, Pressure),
+anchor at Elevation, typed 654, Ctrl+Enter: Elevation filled to 654 in all 3 rows; Pressure NEVER
+showed the literal broadcast text "654" -- it changed to new, differently-valued numbers because
+the model legitimately recalculated pressure from the new elevations (Recalculate is on by
+default), which is correct behavior, not the column being overwritten.
+
+CONFIRMED -- mid-edit gesture (Tom's own scenario: type without pressing Enter first): selected a
+4-row Elevation block, re-clicked the anchor cell (already inside the standing selection) to
+re-enter edit mode, confirmed the selection markup survived the re-click (still 4 selected cells,
+not 1), typed 808, Ctrl+Enter: all 4 rows read 808. The re-click does not collapse the range.
+
+CONFIRMED -- single-cell selection behaves as plain Enter: typed 42 into a lone selected cell,
+Ctrl+Enter committed it (42), no broadcast, no extra notice.
+
+NOT CONFIRMED -- acceptance test 5 / the spec's own words ("Undo after a multi-row Ctrl+Enter
+restores all filled cells to their pre-fill values in one Ctrl+Z, not N"). Reproduced in real
+Chrome: select 3 rows, type 555 into the anchor (a real keystroke through the UI, not
+`L.setCell()`), Ctrl+Enter fills all 3 to 555, then ONE Ctrl+Z restores only rows 1-2 to their
+original values (710, 700) and LEAVES the anchor row at 555 -- a SECOND Ctrl+Z is required to put
+the anchor back to 710. This is the anchor's own edit-commit taking its own undo snapshot,
+separate from the "one saveUndoSnapshot() for the whole operation" the spec calls for in step 5 --
+Ctrl+Enter's step 1 ("commit it first ... via paneCommitCell(active)") pushes its own snapshot
+before the broadcast's snapshot goes on, so the stack ends up two deep instead of one. THE
+HARNESS DOES NOT SEE THIS: `pane-ctrlenter-harness.js`'s test 1 and test 5 both pre-load the
+anchor's value with `L.setCell()` (a direct model write) BEFORE selecting the range, never
+exercising `paneCommitCell()` on a value the person actually just typed -- so the harness's "one
+saveUndoSnapshot()" claim is true of the broadcast alone and silent about the realistic gesture
+that types into the cell first. This is the same shape as R-054/R-027: the harness checked what
+the code intended to do, on an input shaped to avoid the one path where it does something else.
+A person doing exactly what Declan's spec describes -- type into the anchor, then Ctrl+Enter --
+will find one Ctrl+Z does not fully undo the fill.
+
+CONFIRMED (with a caveat) -- inside a scenario: created "Scenario X" via the scenario button's
+menu, filled a 3-row Elevation block to 271 there (all 3 rows read 271, as expected for an
+override). Could NOT cleanly confirm "base does not move" from the browser in this pass -- my own
+selector for switching back to Base matched the wrong control ("Base demand (gpm)" column header,
+a false positive on `textContent.indexOf('Base') === 0`), so that specific browser check is
+UNVERIFIABLE FROM HERE in this run; a person should click the Scenario control, choose Base by
+name, and confirm Elevation still reads 710/710/700. The claim itself is not in doubt on other
+grounds: the node-level harness's mutation-tested "BASE DOES NOT MOVE" check (test 6, `hasOverride`
+and `baseValue` read directly against the document) already passes against the real production
+functions.
+
+CONFIRMED -- no shortcut collision found: Ctrl+Enter inside the Find and replace query box left its
+typed text unchanged and fired no page error. Did not find a Properties/Settings text box to try
+Ctrl+Enter in during this pass (UNVERIFIABLE FROM HERE) -- a person should open a node's Properties
+box, click into a text field there (e.g. Description), press Ctrl+Enter, and confirm nothing
+happens beyond what a plain Enter would do.
+
+CONFIRMED -- Help, Notes shortcuts table gained the row verbatim: `lpn_notes_7_def` (en) now reads
+"Ctrl+Enter | Fill the selection with the active cell's value." alongside the existing rows.
+
+UNVERIFIABLE FROM HERE -- how the selection LOOKS. I read computed CSS off the selected cells
+(`background-color: rgb(232, 240, 254)`, a light blue fill on every selected cell, `outline: solid`
+only on the current/anchor cell) which matches the Google Sheets convention Declan's spec cites and
+does not obviously conflict with R-288/R-289's rulings (those were about TEXT highlighting inside
+one cell and heading colour, not a multi-cell range fill) -- but I did not put a screenshot in
+front of a human eye. A person should glance at the filled block and confirm the light-blue wash
+reads as "still selected," not as leftover text-highlight.
+
+Click-list for Tom's own browser pass, in order of what would cost him the most: (1) On Junctions,
+select 3 cells in one column, type a value, Ctrl+Enter, then press Ctrl+Z exactly once and check
+whether the whole block reverts (my finding says it will not -- the anchor cell will keep the new
+value). (2) The same gesture inside a scenario, then switch back to Base and confirm elevation is
+untouched there. (3) Open a node's Properties box and press Ctrl+Enter in a text field, just to see
+nothing surprising happens.

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 2141,
-        "delta_key_count": 312,
+        "expected_key_count": 2142,
+        "delta_key_count": 313,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -572,6 +572,7 @@
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_ctrlenter_filled": "Filled {n} cells. {skipped} were not changed.",
         "lpn_pane_hide_col": "Hide this column",
         "lpn_pane_hide_cols": "Hide these columns",
         "lpn_pane_show_all_cols": "Show all columns",
@@ -670,7 +671,7 @@
         "lpn_notes_6_term": "Table columns help",
         "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><tr><td>Paste as new rows at end of table<\/td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V<\/td><\/tr><\/tbody><\/table>",
         "lpn_notes_7_term": "Table keyboard shortcuts",
-        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+Enter<\/td><td>Fill the selection with the active cell's value.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -733,7 +734,7 @@
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_quality_mass_units": "Mass units",
-        "lpn_quality_mass_units_tip": "The mass half of the concentration unit, EPANET's own two choices.",
+        "lpn_quality_mass_units_tip": "The units half of the quality entry, EPANET's own two choices.",
         "lpn_quality_unit_ug": "µg\/L",
         "lpn_quality_tolerance": "Quality tolerance",
         "lpn_quality_tolerance_tip": "How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.",
@@ -886,6 +887,7 @@
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
+        "lpn_pane_ctrlenter_filled": "Filled {n} cells. {skipped} were not changed.",
         "lpn_pane_hide_col": "Hide this column",
         "lpn_pane_hide_cols": "Hide these columns",
         "lpn_pane_show_all_cols": "Show all columns",
@@ -984,7 +986,7 @@
         "lpn_notes_6_term": "Table columns help",
         "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><tr><td>Paste as new rows at end of table<\/td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V<\/td><\/tr><\/tbody><\/table>",
         "lpn_notes_7_term": "Table keyboard shortcuts",
-        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_notes_7_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys<\/td><td>Navigate.<\/td><\/tr><tr><td>Tab, Enter<\/td><td>Finish entry and navigate across \/ down one cell.<\/td><\/tr><tr><td>Shift+Tab, Shift+Enter<\/td><td>Navigate backward.<\/td><\/tr><tr><td>Shift+arrow keys<\/td><td>Extend the selection.<\/td><\/tr><tr><td>Ctrl+C<\/td><td>Copy the selection.<\/td><\/tr><tr><td>Ctrl+D<\/td><td>Fill the selection down from its top row.<\/td><\/tr><tr><td>Ctrl+Enter<\/td><td>Fill the selection with the active cell's value.<\/td><\/tr><tr><td>Ctrl+A<\/td><td>Select the whole table.<\/td><\/tr><tr><td>Ctrl+Shift+V<\/td><td>Paste as new rows at end of table.<\/td><\/tr><tr><td>Delete<\/td><td>Clear a cell.<\/td><\/tr><tr><td>F2<\/td><td>Open a cell to edit it.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel an edit.<\/td><\/tr><\/tbody><\/table>",
         "lpn_engine_bar_label": "Solver loading progress",
         "lpn_engine_wait": "Loading solver. Results delayed momentarily. Continue working.",
         "lpn_engine_wait_pct": "Solver {percent}% loaded.",
@@ -1047,7 +1049,7 @@
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_quality_mass_units": "Mass units",
-        "lpn_quality_mass_units_tip": "The mass half of the concentration unit, EPANET's own two choices.",
+        "lpn_quality_mass_units_tip": "The units half of the quality entry, EPANET's own two choices.",
         "lpn_quality_unit_ug": "µg\/L",
         "lpn_quality_tolerance": "Quality tolerance",
         "lpn_quality_tolerance_tip": "How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.",
@@ -2055,6 +2057,22 @@
             }
         },
         "lpn_pane_fill_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Вставлено ячеек: {n}. Не изменено: {skipped}.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Выбрать окном",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_ctrlenter_filled": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
