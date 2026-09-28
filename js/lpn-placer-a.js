@@ -578,6 +578,25 @@ function run(scene, prev, gaps) {
 		return p;
 	}
 
+	// The least ink any shape hung at P on this side must cover: the narrowest row, one row high.
+	function coreBox(f, side, px, py) {
+		if (f.minW === undefined) {
+			f.minW = Infinity; f.minH = Infinity;
+			f.req.rows.forEach(function (r) { f.minW = Math.min(f.minW, r.w); f.minH = Math.min(f.minH, r.h); });
+		}
+		const w = f.minW, h = f.minH;
+		if (side === 'E') { return mkBox(px + w / 2, py, w, h, 0); }
+		if (side === 'W') { return mkBox(px - w / 2, py, w, h, 0); }
+		if (side === 'N') { return mkBox(px, py - h / 2, w, h, 0); }
+		return mkBox(px, py + h / 2, w, h, 0);
+	}
+	function coreHits(grid, b, li) {
+		if (grid === G && Rs.covers([b.x0, b.y0, b.x1, b.y1]) && Rs.sum(Rs.hard, b.x0 + tol / 2, b.y0 + tol / 2, b.x1 - tol / 2, b.y1 - tol / 2) === 0) { return false; }
+		const n = grid.collect(0, b.x0, b.y0, b.x1, b.y1), buf = grid.buf;
+		for (let i = 0; i < n; i++) { if (buf[i].lab !== li && boxesOverlap(b, buf[i].box)) { return true; } }
+		return false;
+	}
+
 	// ---- candidates ----
 	function hang(sh, px, py, side, base, leader) {
 		let x, y, align;
@@ -647,14 +666,17 @@ function run(scene, prev, gaps) {
 				let L = f.lg.get(lk);
 				if (L === undefined) {
 					L = [[cx + ux * rs, cy + uy * rs], [px, py]];
-					const lc = leaderStatic(f, L);
+					// ... and so does the core every shape hung there must cover: if a symbol or
+					// Text sits on it, nothing hung on this leader can stand.
+					let lc = leaderStatic(f, L);
+					if (lc < Infinity && coreHits(G, coreBox(f, side, px, py), -1)) { lc = Infinity; }
 					f.lc.set(lk, lc);
 					if (lc === Infinity) { L = null; }
 					f.lg.set(lk, L);
 				}
 				if (L === null) { continue; }
 				const c = hang(sh, px, py, side, extra + distCost((dist - rs) / RH), L);
-				c.lk = lk;
+				c.lk = lk; c.side = side;
 				out.push(c);
 			}
 		}
@@ -695,8 +717,10 @@ function run(scene, prev, gaps) {
 	}
 
 	// Best candidate for label f among row sets k0..k1, given everything placed.
+	let searchStamp = 0;
 	function search(f, bound, k0, k1) {
 		let best = null, bestCost = bound;
+		const ss = ++searchStamp, dm = f.dm || (f.dm = new Map());
 		for (let k = k0; k <= k1; k++) {
 			const rowPen = W.row * (f.R - f.subsets[k].length);
 			if (rowPen >= bestCost) { continue; }
@@ -704,6 +728,15 @@ function run(scene, prev, gaps) {
 			for (let i = 0; i < list.length; i++) {
 				const c0 = list[i];
 				if (c0.base >= bestCost) { break; }
+				if (c0.lk !== undefined) {
+					// A leader whose core another label already covers: skip every shape on it.
+					const m = dm.get(c0.lk);
+					if (m === ss) { continue; }
+					if (m !== -ss) {
+						if (coreHits(D, coreBox(f, c0.side, c0.leader[1][0], c0.leader[1][1]), f.li)) { dm.set(c0.lk, ss); continue; }
+						dm.set(c0.lk, -ss);
+					}
+				}
 				if (c0.st === undefined) { c0.st = evalStatic(f, c0, true); }
 				if (c0.st >= bestCost) { continue; }
 				const c = evalDyn(f, c0, c0.st, bestCost);
