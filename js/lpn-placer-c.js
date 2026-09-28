@@ -54,6 +54,9 @@ EngCalcs.lpnPlacerC = (function () {
 	var LBL_TOL = 0.5;         // two labels may share this much (the row pitch carries leading)
 	var CELL = 36;
 	var MEND_BUDGET_MS = 12;
+	var KEEP_MAX = 3.0;         // last view's spot is kept unless it now costs this much
+	var GROW_TRIES = 60;        // growing looks only this far down its list: convenient space
+	var NAME = 'C (keep, show, grow, mend)';
 
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
 
@@ -209,6 +212,23 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		it.cellIdx = [];
 	};
+	// Every item near bb, once each, into `out` (reused, so no garbage per query).
+	Grid.prototype.collect = function (bb, out) {
+		out.length = 0;
+		var r = this.range(bb);
+		if (!r) { return out; }
+		var st = ++this.stamp;
+		for (var j = r[2]; j <= r[3]; j++) {
+			for (var i = r[0]; i <= r[1]; i++) {
+				var arr = this.cells[j * this.nx + i];
+				for (var k = 0; k < arr.length; k++) {
+					var it = arr[k];
+					if (it.q !== st) { it.q = st; out.push(it); }
+				}
+			}
+		}
+		return out;
+	};
 	// Calls fn(item) once per item near bb; stops and returns true when fn does.
 	Grid.prototype.query = function (bb, fn) {
 		var r = this.range(bb);
@@ -302,11 +322,11 @@ EngCalcs.lpnPlacerC = (function () {
 	}
 
 	// ---- the placer ------------------------------------------------------------------------
+	// ---- the placer ------------------------------------------------------------------------
 	function create() {
-		var dirCache = {};   // node id -> signature and directions of the pipes meeting there
+		var dirCache = {};   // node id -> the directions of the pipes meeting there (H-b)
 
 		function place(scene, opts) {
-			var t0 = now();
 			var prev = opts && opts.prev && opts.prev.layout && opts.prev.scene ? opts.prev : null;
 			var st = setup(scene, prev);
 			var labels = st.labels, i;
@@ -314,20 +334,18 @@ EngCalcs.lpnPlacerC = (function () {
 			// 0. Hand-placed labels: where the user put them, whole, always (N4).
 			labels.forEach(function (L) { if (L.req.hand) { commit(st, L, handCand(st, L)); } });
 
-			var order = labels.filter(function (L) { return !L.req.hand && L.rowsets.length; });
+			var order = labels.filter(function (L) { return !L.req.hand; });
 			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || b.dens - a.dens || (a.id < b.id ? -1 : 1); });
 
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
-				if (!L.prevPl) { return; }
-				var rsI = L.prevRs;
-				if (rsI < 0) { return; }
-				var c = matPrev(st, L, rsI);
+				if (!L.prevPl || L.prevRs < 0) { return; }
+				var c = matPrev(st, L, L.prevRs);
 				if (!c) { return; }
-				var cost = evalCand(st, L, c, 3.0);
-				if (cost < 3.0) { c.cost = cost; commit(st, L, c); }
+				var cost = evalCand(st, L, c, KEEP_MAX);
+				if (cost < KEEP_MAX) { c.cost = cost; commit(st, L, c); }
 			});
-			// 2. SHOW: everything else, ID row only.
+			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
 				if (L.cur) { return; }
 				var c = bestFor(st, L, L.rowsets.length - 1, Infinity);
@@ -338,8 +356,7 @@ EngCalcs.lpnPlacerC = (function () {
 			// 4. MEND: a hidden label may evict one neighbour who can move.
 			if (mend(st, order, now() + MEND_BUDGET_MS)) { grow(st, order); }
 			// 5. Repeats along long pipes (R9), in whatever room is left.
-			for (i = 0; i < order.length; i++) { if (order[i].cur && order[i].kind === 'link') { repeats(st, order[i]); } }
-			labels.forEach(function (L) { if (L.req.hand && L.kind === 'link') { repeats(st, L); } });
+			for (i = 0; i < labels.length; i++) { if (labels[i].cur && labels[i].owner.t === 'link') { repeats(st, labels[i]); } }
 
 			var out = {};
 			labels.forEach(function (L) {
@@ -347,25 +364,30 @@ EngCalcs.lpnPlacerC = (function () {
 				if (!c) { out[L.id] = { shown: false }; return; }
 				var pl = { shown: true, rows: c.rows.slice(), layout: c.layout, align: c.align, x: c.x, y: c.y, leader: c.leader };
 				if (c.angle) { pl.angle = c.angle; }
-				if (c.reps && c.reps.length) { pl.repeats = c.reps.map(function (r) { return { x: r.x, y: r.y, angle: r.angle }; }); }
+				if (c.reps && c.reps.length) { pl.repeats = c.reps; }
 				out[L.id] = pl;
 			});
+			scene.labels.forEach(function (req) { if (!out[req.id]) { out[req.id] = { shown: false }; } });
 			return { labels: out };
 		}
 
-		// ---- scene setup: obstacles into the grid, labels into working records -------------
+		// ---- scene setup: obstacles into the grids, labels into working records ------------
+		// Three grids: HARD (node, pump and valve symbols, Text objects: never covered), SOFT
+		// (pipes, flow arrows, Text callouts: crossed at a cost) and PLACED (the labels and
+		// leaders placed so far). The first two are fixed for the view, so what a candidate
+		// costs against them is worked out once per view and kept.
 		function setup(scene, prev) {
 			var vp = scene.viewport, text = scene.text;
 			var vpbb = { x0: vp.x, y0: vp.y, x1: vp.x + vp.w, y1: vp.y + vp.h };
 			var gbb = { x0: vpbb.x0 - CELL, y0: vpbb.y0 - CELL, x1: vpbb.x1 + CELL, y1: vpbb.y1 + CELL };
-			var grid = new Grid(gbb, CELL);
+			var hg = new Grid(gbb, CELL), sg = new Grid(gbb, CELL), dg = new Grid(gbb, CELL);
 			var nodes = {}, links = {}, incident = {};
 			scene.nodes.forEach(function (n) {
 				nodes[n.id] = n;
 				var raw = obox(n.symbol.x + n.symbol.w / 2, n.symbol.y + n.symbol.h / 2, n.symbol.w, n.symbol.h, 0);
 				if (!bbHit(raw.bb, gbb)) { return; }
 				var ob = inflate(raw, SYM_PAD);
-				grid.insert({ k: SYM, ob: ob, raw: raw, bb: ob.bb, own: n.id });
+				hg.insert({ k: SYM, ob: ob, raw: raw, bb: ob.bb, own: n.id });
 			});
 			scene.links.forEach(function (l) {
 				links[l.id] = l;
@@ -373,25 +395,25 @@ EngCalcs.lpnPlacerC = (function () {
 				(incident[l.to] = incident[l.to] || []).push(l);
 				(l.symbols || []).forEach(function (b) {
 					var ob = inflate(obox(b.cx, b.cy, b.w, b.h, b.angle), SYM_PAD);
-					if (bbHit(ob.bb, gbb)) { grid.insert({ k: LSYM, ob: ob, bb: ob.bb, own: l.id }); }
+					if (bbHit(ob.bb, gbb)) { hg.insert({ k: LSYM, ob: ob, bb: ob.bb, own: l.id }); }
 				});
 				(l.arrows || []).forEach(function (b) {
 					var ob = obox(b.cx, b.cy, b.w * 0.8, b.h * 0.8, b.angle);
-					if (bbHit(ob.bb, gbb)) { grid.insert({ k: ARROW, ob: ob, bb: ob.bb, own: l.id }); }
+					if (bbHit(ob.bb, gbb)) { sg.insert({ k: ARROW, ob: ob, bb: ob.bb, own: l.id }); }
 				});
 				for (var i = 1; i < l.points.length; i++) {
 					var s = clipSeg([l.points[i - 1][0], l.points[i - 1][1], l.points[i][0], l.points[i][1]], gbb);
-					if (s) { grid.insert({ k: PIPE, s: s, bb: segBB(s), own: l.id }); }
+					if (s) { sg.insert({ k: PIPE, s: s, bb: segBB(s), own: l.id }); }
 				}
 			});
 			(scene.texts || []).forEach(function (t) {
 				var ob = inflate(obox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle), SYM_PAD);
-				if (bbHit(ob.bb, gbb)) { grid.insert({ k: TEXT, ob: ob, bb: ob.bb, own: t.id }); }
+				if (bbHit(ob.bb, gbb)) { hg.insert({ k: TEXT, ob: ob, bb: ob.bb, own: t.id }); }
 				var ld = t.leader;
 				if (ld && ld.length > 1) {
 					for (var i = 1; i < ld.length; i++) {
 						var s = clipSeg([ld[i - 1][0], ld[i - 1][1], ld[i][0], ld[i][1]], gbb);
-						if (s) { grid.insert({ k: TLEAD, s: s, bb: segBB(s), own: 'T' + t.id }); }
+						if (s) { sg.insert({ k: TLEAD, s: s, bb: segBB(s), own: 'T' + t.id }); }
 					}
 				}
 			});
@@ -401,21 +423,22 @@ EngCalcs.lpnPlacerC = (function () {
 			var prevL = prev ? prev.layout.labels || {} : {}, prevReq = {};
 			if (prev) { prev.scene.labels.forEach(function (r) { prevReq[r.id] = r; }); }
 
-			var st = { scene: scene, text: text, vp: vpbb, grid: grid, nodes: nodes, links: links, labels: [] };
+			var st = { scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, labels: [], byId: {}, buf: [], seen: [], seen2: [] };
 			scene.labels.forEach(function (req) {
 				var L = mkLabel(st, req, nodes, links, incident, customers);
 				if (!L) { return; }
 				var pp = prevL[req.id], pr = prevReq[req.id];
-				if (pp && pp.shown && pr && pp.rows && pp.rows.length) {
+				if (pp && pp.shown && pr && pp.rows && pp.rows.length && !pr.hand) {
 					L.prevPl = pp; L.prevReq = pr;
 					L.prevRs = rowsetMatching(L, pp.rows, pr);
 				}
 				st.labels.push(L);
+				st.byId[L.id] = L;
 			});
 			// How crowded each label's home is: the most crowded are placed first.
 			st.labels.forEach(function (L) {
 				var a = L.anchor, n = 0, bb = { x0: a.x - 45, y0: a.y - 45, x1: a.x + 45, y1: a.y + 45 };
-				grid.query(bb, function (it) { if (it.k === SYM || it.k === PIPE || it.k === TEXT) { n++; } return false; });
+				n = hg.collect(bb, st.buf).length + sg.collect(bb, st.buf).length;
 				L.dens = n;
 			});
 			return st;
@@ -433,7 +456,7 @@ EngCalcs.lpnPlacerC = (function () {
 				if (k.length && k.length < keep.length) { keep = k; rowsets.push(keep.slice()); }
 			});
 			var L = { id: req.id, req: req, kind: req.kind, rows: rows, rowsets: rowsets, anchor: req.anchor,
-				usual: req.layout === 'line' ? 'line' : 'stack', cur: null, items: [], dimC: {} };
+				usual: req.layout === 'line' ? 'line' : 'stack', cur: null, items: [], dimC: [[], []], cc: [] };
 			if (req.kind === 'link' && links[req.owner] && links[req.owner].points.length > 1) {
 				var lk = links[req.owner], poly = polyOf(lk.points);
 				var na = nearestOn(poly, req.anchor.x, req.anchor.y);
@@ -470,20 +493,19 @@ EngCalcs.lpnPlacerC = (function () {
 			for (k = 0; k < L.rowsets.length; k++) { if (L.rowsets[k].length <= rows.length) { return k; } }
 			return L.rowsets.length - 1;
 		}
-		// Directions (degrees) of the pipes leaving a node, cached across views: a zoom does
-		// not turn them (H-b).
+		// Directions (degrees) of the pipes leaving a node. A zoom does not turn them, so they
+		// are kept across views (H-b) and recomputed only when the pipes change.
 		function pipeDirs(id, nodes, incident) {
-			var ls = incident[id] || [], n = nodes[id], out = [], sig = [];
+			var ls = incident[id] || [], n = nodes[id], out = [], sig = '';
 			ls.forEach(function (l) {
 				var p = l.points, q = l.from === id ? p[1] : p[p.length - 2];
 				if (!q) { return; }
 				var a = Math.atan2(q[1] - n.y, q[0] - n.x) * 180 / Math.PI;
-				out.push(a); sig.push(Math.round(a));
+				out.push(a); sig += Math.round(a) + ',';
 			});
-			var key = sig.join(',');
 			var c = dirCache[id];
-			if (c && c.key === key) { return c.dirs; }
-			dirCache[id] = { key: key, dirs: out };
+			if (c && c.key === sig) { return c.dirs; }
+			dirCache[id] = { key: sig, dirs: out };
 			return out;
 		}
 
@@ -496,7 +518,7 @@ EngCalcs.lpnPlacerC = (function () {
 				var s = pipes.slice().sort(function (a, b) { return a - b; });
 				for (i = 0; i < s.length; i++) {
 					var a = s[i], b = i + 1 < s.length ? s[i + 1] : s[0] + 360, gap = b - a;
-					if (gap >= 50) { dirs.push(((a + gap / 2 + 180) % 360) - 180); }
+					if (gap >= 50) { dirs.push(((a + gap / 2 + 540) % 360) - 180); }
 				}
 			} else if (pipes.length === 1) {
 				dirs.push(((pipes[0] + 360) % 360) - 180);
@@ -516,8 +538,7 @@ EngCalcs.lpnPlacerC = (function () {
 					});
 				});
 			});
-			specs.sort(function (a, b) { return a.base - b.base; });
-			return specs;
+			return finishSpecs(specs);
 		}
 		function linkSpecs(L) {
 			var o = L.owner, pa = pointAt(o.poly, o.sA), specs = [];
@@ -541,28 +562,33 @@ EngCalcs.lpnPlacerC = (function () {
 					});
 				}
 			});
+			return finishSpecs(specs);
+		}
+		function finishSpecs(specs) {
 			specs.sort(function (a, b) { return a.base - b.base; });
+			specs.forEach(function (s, i) { s.i = i; });
 			return specs;
 		}
 
 		// ---- materialising a spec for one rowset -------------------------------------------
 		function dims(st, L, rsI, layout) {
-			var key = rsI + layout;
-			if (!L.dimC[key]) { L.dimC[key] = blockDims(L.rowsets[rsI].map(function (i) { return L.rows[i]; }), layout, st.text.separatorW); }
-			return L.dimC[key];
+			var arr = L.dimC[layout === 'line' ? 1 : 0];
+			if (!arr[rsI]) { arr[rsI] = blockDims(L.rowsets[rsI].map(function (i) { return L.rows[i]; }), layout, st.text.separatorW); }
+			return arr[rsI];
 		}
 		function mkCand(st, L, rsI, layout, align, x, y, angle, leader, base, spec) {
-			var rows = L.rowsets[rsI], rr = rows.map(function (i) { return L.rows[i]; });
-			var boxes = inkBoxes(rr, layout, align, x, y, angle, st.text.separatorW);
-			var bb = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
-			boxes.forEach(function (b) {
-				bb.x0 = Math.min(bb.x0, b.bb.x0); bb.y0 = Math.min(bb.y0, b.bb.y0);
-				bb.x1 = Math.max(bb.x1, b.bb.x1); bb.y1 = Math.max(bb.y1, b.bb.y1);
-			});
+			var d = dims(st, L, rsI, layout), rows = L.rowsets[rsI];
+			var blk = obox(x + d.w / 2, y + d.h / 2, d.w, d.h, angle || 0);
 			var segs = [];
 			if (leader) { for (var i = 1; i < leader.length; i++) { segs.push([leader[i - 1][0], leader[i - 1][1], leader[i][0], leader[i][1]]); } }
+			// A one-row or one-line block is its own ink; a stack of unequal rows is a staircase.
+			var single = layout === 'line' || rows.length === 1;
 			return { rs: rsI, rows: rows, layout: layout, align: align, x: x, y: y, angle: angle || 0, leader: leader,
-				segs: segs, boxes: boxes, bb: bb, base: base, spec: spec };
+				segs: segs, blk: blk, bb: blk.bb, single: single, boxes: single ? [blk] : null, base: base, spec: spec, stat: undefined };
+		}
+		function boxesOf(st, L, c) {
+			if (!c.boxes) { c.boxes = inkBoxes(c.rows.map(function (i) { return L.rows[i]; }), c.layout, c.align, c.x, c.y, c.angle, st.text.separatorW); }
+			return c.boxes;
 		}
 		function hookLen(st) { return Math.min(HOOK, st.text.hookMaxPx || HOOK); }
 		// A block hung from the leader's end E, on the side away from the leader (R5: the text is
@@ -576,17 +602,25 @@ EngCalcs.lpnPlacerC = (function () {
 		function leaderFrom(st, sx, sy, ux, uy, hx, hy, side) {
 			// Straight, or the one standard short hook when the leader climbs steeply.
 			if (Math.abs(uy) > 0.72) {
-				var hk = hookLen(st), ex = hx + side * hk;
+				var ex = hx + side * hookLen(st);
 				return { pts: [[sx, sy], [hx, hy], [ex, hy]], ex: ex, ey: hy };
 			}
 			return { pts: [[sx, sy], [hx, hy]], ex: hx, ey: hy };
 		}
+		// The candidate for spec index si at rowset rsI, made once per view and kept.
+		function candAt(st, L, si, rsI) {
+			var arr = L.cc[rsI] || (L.cc[rsI] = []);
+			var c = arr[si];
+			if (c === undefined) { c = arr[si] = materialize(st, L, L.specs[si], rsI) || null; }
+			return c;
+		}
 		function materialize(st, L, spec, rsI) {
 			var d = dims(st, L, rsI, spec.layout), o = L.owner;
+			if (spec.layout !== L.usual && L.rowsets[rsI].length === 1) { return null; }   // the same block twice
 			if (o.t === 'link') { return matLink(st, L, spec, rsI, d); }
 			var ux = spec.ux, uy = spec.uy;
 			if (spec.t === 'adj') {
-				// On the square ring round the symbol: corners are the classic quadrant positions.
+				// On the square ring round the symbol: its corners are the classic quadrant positions.
 				var m = Math.max(Math.abs(ux), Math.abs(uy)), qx = ux / m, qy = uy / m;
 				var cx = o.x + qx * (o.sw + GAP + d.w / 2), cy = o.y + qy * (o.sh + GAP + d.h / 2);
 				var align = ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center');
@@ -645,11 +679,14 @@ EngCalcs.lpnPlacerC = (function () {
 			var x, y, angle = pp.angle || 0;
 			if (angle) {
 				if (L.owner.t !== 'link') { return null; }
-				var pa = pointAt(L.owner.poly, L.owner.sA), now_ = Math.atan2(pa.dy, pa.dx) * 180 / Math.PI;
-				if (angDiff(normAngle(now_), angle) > 3 && angDiff(normAngle(now_) + 180, angle) > 3) { return null; }
+				var pa = pointAt(L.owner.poly, L.owner.sA), a = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI);
+				if (angDiff(a, angle) > 3 && angDiff(a + 180, angle) > 3) { return null; }
 				var ccx = pp.x + dp.w / 2 - px, ccy = pp.y + dp.h / 2 - py;
 				x = ax + ccx - d.w / 2; y = ay + ccy - d.h / 2;
-				return mkCand(st, L, rsI, layout, align, x, y, angle, null, PREV_BONUS, { t: 'prev' });
+				var c = mkCand(st, L, rsI, layout, align, x, y, angle, null, PREV_BONUS, { t: 'prev' });
+				var q = nearestOn(L.owner.poly, ax + ccx, ay + ccy);
+				c.s = q.s; c.side = ((ax + ccx - q.x) * Math.sin(angle * Math.PI / 180) - (ay + ccy - q.y) * Math.cos(angle * Math.PI / 180)) >= 0 ? 1 : -1;
+				return c;
 			}
 			if (align === 'right') { x = ax + (pp.x - px) + dp.w - d.w; } else if (align === 'center') { x = ax + (pp.x - px) + dp.w / 2 - d.w / 2; } else { x = ax + (pp.x - px); }
 			var above = pp.y + dp.h / 2 < py - 2;
@@ -664,8 +701,8 @@ EngCalcs.lpnPlacerC = (function () {
 				if (pp.leader.length === 3) { hx = ex + (pp.leader[1][0] - pe[0]); }
 				var o = L.owner, sx, sy;
 				if (o.t === 'link') {
-					var ps = pp.leader[0], q = nearestOn(o.poly, ax + ps[0] - px, ay + ps[1] - py);
-					sx = q.x; sy = q.y;
+					var ps = pp.leader[0], qq = nearestOn(o.poly, ax + ps[0] - px, ay + ps[1] - py);
+					sx = qq.x; sy = qq.y;
 				} else {
 					var vx = hx - o.x, vy = hy - o.y, vl = Math.hypot(vx, vy) || 1, r0 = Math.min(o.sw, o.sh);
 					if (vl <= r0) { return null; }
@@ -676,30 +713,27 @@ EngCalcs.lpnPlacerC = (function () {
 			}
 			return mkCand(st, L, rsI, layout, align, x, y, 0, leader, PREV_BONUS, { t: 'prev' });
 		}
-		// A hand-placed label hangs at the user's point, on the side away from its owner.
+		// A hand-placed label hangs at the user's point, on the side away from its owner, whole.
 		function handCand(st, L) {
-			var h = L.req.hand, o = L.owner, rsI = 0, layout = L.usual, d = dims(st, L, rsI, layout);
+			var h = L.req.hand, o = L.owner, layout = L.usual, d = dims(st, L, 0, layout);
 			var ox = o.t === 'link' ? L.anchor.x : o.x;
-			var side = h.x >= ox ? 1 : -1, align = side > 0 ? 'left' : 'right';
+			var side = h.x >= ox ? 1 : -1;
 			var rows = L.rowsets[0], first = L.rows[rows[0]].h, last = L.rows[rows[rows.length - 1]].h;
 			var ys = layout === 'line' ? [h.y - d.h / 2] : [h.y - first / 2, h.y - d.h / 2, h.y - d.h + last / 2];
-			var sides = [side, -side];
-			var best = null, bestBad = Infinity;
-			sides.forEach(function (sd) {
+			var starts = leaderStarts(L, h), best = null, bestBad = Infinity;
+			[side, -side].forEach(function (sd) {
 				ys.forEach(function (y) {
 					var x = sd > 0 ? h.x : h.x - d.w, al = sd > 0 ? 'left' : 'right';
-					var starts = leaderStarts(st, L, h);
 					starts.forEach(function (sp) {
-						var c = mkCand(st, L, rsI, layout, al, x, y, 0, [[sp[0], sp[1]], [h.x, h.y]], 0, { t: 'hand' });
+						var c = mkCand(st, L, 0, layout, al, x, y, 0, [[sp[0], sp[1]], [h.x, h.y]], 0, { t: 'hand' });
 						var bad = hardCount(st, L, c) * 10 + (sd === side ? 0 : 1) + Math.hypot(sp[0] - h.x, sp[1] - h.y) / 1000;
 						if (bad < bestBad) { bestBad = bad; best = c; }
 					});
 				});
 			});
-			void align;
 			return best;
 		}
-		function leaderStarts(st, L, h) {
+		function leaderStarts(L, h) {
 			var o = L.owner, out = [];
 			if (o.t === 'link') {
 				var q = nearestOn(o.poly, h.x, h.y), a = pointAt(o.poly, o.sA);
@@ -712,100 +746,156 @@ EngCalcs.lpnPlacerC = (function () {
 			return out;
 		}
 		function hardCount(st, L, c) {
-			var n = 0, g = st.grid, own = L.owner.nodeId;
-			c.boxes.forEach(function (b) {
-				g.query(b.bb, function (it) {
-					if ((it.k === SYM || it.k === LSYM || it.k === TEXT) && obOverlap(b, it.ob, 0)) { n++; }
-					if (it.k === LABEL && it.own !== L.id && obOverlap(b, it.ob, LBL_TOL)) { n++; }
-					return false;
-				});
+			var n = 0, own = L.owner.nodeId, arr, k;
+			boxesOf(st, L, c).forEach(function (b) {
+				arr = st.hg.collect(b.bb, st.buf);
+				for (k = 0; k < arr.length; k++) { if (obOverlap(b, arr[k].ob, 0)) { n++; } }
+				arr = st.dg.collect(b.bb, st.buf);
+				for (k = 0; k < arr.length; k++) { if (arr[k].k === LABEL && arr[k].own !== L.id && obOverlap(b, arr[k].ob, LBL_TOL)) { n++; } }
 			});
 			c.segs.forEach(function (s) {
-				g.query(segBB(s), function (it) {
-					if (it.k === SYM && it.own !== own && segHitsOB(s[0], s[1], s[2], s[3], it.raw, -0.5)) { n++; }
-					return false;
-				});
+				arr = st.hg.collect(segBB(s), st.buf);
+				for (k = 0; k < arr.length; k++) { if (arr[k].k === SYM && arr[k].own !== own && segHitsOB(s[0], s[1], s[2], s[3], arr[k].raw, -0.5)) { n++; } }
 			});
 			return n;
 		}
 
 		// ---- judging one candidate: Infinity if it breaks a never-rule, else its cost -------
-		function evalCand(st, L, c, bound) {
-			var vp = st.vp, g = st.grid, i, j;
+		// Hard ink test against one grid's box obstacles: the whole block first, and a
+		// staircase's rows one by one only when the block hits something.
+		function boxHitsHard(b, arr, n, tolLabel, selfId) {
+			for (var k = 0; k < n; k++) {
+				var it = arr[k];
+				if (it.k === LABEL) { if (it.own !== selfId && obOverlap(b, it.ob, tolLabel)) { return true; } } else if (it.ob && it.k !== ARROW && obOverlap(b, it.ob, 0)) { return true; }
+			}
+			return false;
+		}
+		function inkHits(st, L, c, g) {
+			var arr = g.collect(c.blk.bb, st.buf), n = arr.length;
+			if (!n || !boxHitsHard(c.blk, arr, n, LBL_TOL, L.id)) { return false; }
+			if (c.single) { return true; }
+			var bs = boxesOf(st, L, c);
+			for (var i = 0; i < bs.length; i++) {
+				arr = g.collect(bs[i].bb, st.buf);
+				if (boxHitsHard(bs[i], arr, arr.length, LBL_TOL, L.id)) { return true; }
+			}
+			return false;
+		}
+		// The part of a candidate's cost that depends only on the fixed map, worked out once.
+		function staticCost(st, L, c) {
+			if (c.stat !== undefined) { return c.stat; }
+			var vp = st.vp, i, j, k, arr, it, s;
+			c.stat = Infinity;
 			if (c.bb.x0 < vp.x0 || c.bb.y0 < vp.y0 || c.bb.x1 > vp.x1 || c.bb.y1 > vp.y1) { return Infinity; }
-			var ownNode = L.owner.nodeId, ownLink = L.owner.linkId, id = L.id;
-			for (i = 0; i < c.boxes.length; i++) {
-				var b = c.boxes[i];
-				var hit = g.query(b.bb, function (it) {
-					if (it.k === SYM || it.k === LSYM || it.k === TEXT) { return obOverlap(b, it.ob, 0); }
-					if (it.k === LABEL) { return it.own !== id && obOverlap(b, it.ob, LBL_TOL); }
-					return false;
-				});
-				if (hit) { return Infinity; }
-			}
+			if (inkHits(st, L, c, st.hg)) { return Infinity; }
+			var ownNode = L.owner.nodeId, ownLink = L.owner.linkId, cost = c.base;
+			// Leaders: never through another node's symbol (N3); through a pump, valve or Text
+			// object at a cost.
 			for (j = 0; j < c.segs.length; j++) {
-				var s = c.segs[j];
-				var bad = g.query(segBB(s), function (it) {
-					return it.k === SYM && it.own !== ownNode && segHitsOB(s[0], s[1], s[2], s[3], it.raw, -0.5);
-				});
-				if (bad) { return Infinity; }
+				s = c.segs[j];
+				arr = st.hg.collect(segBB(s), st.buf);
+				for (k = 0; k < arr.length; k++) {
+					it = arr[k];
+					if (it.k === SYM) {
+						if (it.own !== ownNode && segHitsOB(s[0], s[1], s[2], s[3], it.raw, -0.5)) { return Infinity; }
+					} else if (segHitsOB(s[0], s[1], s[2], s[3], it.ob, 0)) {
+						cost += it.k === TEXT ? COST.LDR_TEXT : COST.LDR_LSYM;
+					}
+				}
 			}
-			var cost = c.base, pipes = [], leads = [], labs = [], xld = [], xpipe = [], own = false, arrows = [];
-			for (i = 0; i < c.boxes.length && cost < bound; i++) {
-				var bx = c.boxes[i];
-				g.query(bx.bb, function (it) {
-					if (it.k === PIPE) {
-						if (it.own === ownLink) {
+			// Ink on pipes, arrows and Text callouts.
+			arr = st.sg.collect(c.blk.bb, st.buf);
+			if (arr.length) {
+				var bs = boxesOf(st, L, c), seen = st.seen, own = false;
+				seen.length = 0;
+				for (i = 0; i < bs.length; i++) {
+					var bx = bs[i], a2 = i ? st.sg.collect(bx.bb, st.buf) : (bs.length === 1 ? arr : st.sg.collect(bx.bb, st.buf));
+					for (k = 0; k < a2.length; k++) {
+						it = a2[k];
+						if (it.k === ARROW) {
+							if (seen.indexOf(it) < 0 && obOverlap(bx, it.ob, 0.5)) { seen.push(it); cost += COST.LBL_ARROW; }
+						} else if (it.own === ownLink) {
 							if (!own && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) { own = true; cost += COST.OWN_PIPE; }
-						} else if (pipes.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
-							pipes.push(it.own); cost += COST.LBL_PIPE;
+						} else if (seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
+							seen.push(it.own); cost += it.k === TLEAD ? COST.LBL_LDR : COST.LBL_PIPE;
 						}
-					} else if (it.k === LEAD || it.k === TLEAD) {
-						if (it.own !== id && leads.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
-							leads.push(it.own); cost += COST.LBL_LDR;
-						}
-					} else if (it.k === ARROW) {
-						if (arrows.indexOf(it) < 0 && obOverlap(bx, it.ob, 0.5)) { arrows.push(it); cost += COST.LBL_ARROW; }
 					}
-					return cost >= bound;
-				});
+				}
 			}
-			for (j = 0; j < c.segs.length && cost < bound; j++) {
-				var sg = c.segs[j], start = c.segs[0];
-				g.query(segBB(sg), function (it) {
-					if (it.k === LABEL) {
-						if (it.own !== id && labs.indexOf(it.own) < 0 && segHitsOB(sg[0], sg[1], sg[2], sg[3], it.ob, 1)) { labs.push(it.own); cost += COST.LBL_LDR; }
-					} else if (it.k === LEAD || it.k === TLEAD) {
-						if (it.own !== id && xld.indexOf(it.own) < 0 && segsCross(sg, it.s)) { xld.push(it.own); cost += COST.LDR_LDR; }
-					} else if (it.k === PIPE) {
-						if (it.own !== ownLink && xpipe.indexOf(it.own) < 0 && segsCross(sg, it.s)) {
-							var p = crossPoint(sg, it.s);
-							if (!p || Math.hypot(p[0] - start[0], p[1] - start[1]) > 1.5) { xpipe.push(it.own); cost += COST.LDR_PIPE; }
-						}
-					} else if (it.k === LSYM) {
-						if (segHitsOB(sg[0], sg[1], sg[2], sg[3], it.ob, 0)) { cost += COST.LDR_LSYM; }
-					} else if (it.k === TEXT) {
-						if (segHitsOB(sg[0], sg[1], sg[2], sg[3], it.ob, 0)) { cost += COST.LDR_TEXT; }
+			// Leaders across pipes and Text callouts.
+			if (c.segs.length) {
+				var xs = st.seen2, start = c.segs[0];
+				xs.length = 0;
+				for (j = 0; j < c.segs.length; j++) {
+					s = c.segs[j];
+					arr = st.sg.collect(segBB(s), st.buf);
+					for (k = 0; k < arr.length; k++) {
+						it = arr[k];
+						if (it.k === ARROW || it.own === ownLink || xs.indexOf(it.own) >= 0 || !segsCross(s, it.s)) { continue; }
+						if (it.k === TLEAD) { xs.push(it.own); cost += COST.LDR_LDR; continue; }
+						var p = crossPoint(s, it.s);
+						if (!p || Math.hypot(p[0] - start[0], p[1] - start[1]) > 1.5) { xs.push(it.own); cost += COST.LDR_PIPE; }
 					}
-					return cost >= bound;
-				});
+				}
 			}
+			c.stat = cost;
 			return cost;
+		}
+		function evalCand(st, L, c, bound) {
+			var id = L.id, g = st.dg, i, j, k, arr, it;
+			var cost = staticCost(st, L, c);
+			if (cost >= bound) { return Infinity; }
+			if (inkHits(st, L, c, g)) { return Infinity; }
+			var seen = st.seen;
+			seen.length = 0;
+			arr = g.collect(c.blk.bb, st.buf);
+			var anyLead = false;
+			for (k = 0; k < arr.length; k++) { if (arr[k].k === LEAD && arr[k].own !== id) { anyLead = true; break; } }
+			if (anyLead) {
+				var bs = boxesOf(st, L, c);
+				for (i = 0; i < bs.length; i++) {
+					var bx = bs[i];
+					arr = g.collect(bx.bb, st.buf);
+					for (k = 0; k < arr.length; k++) {
+						it = arr[k];
+						if (it.k === LEAD && it.own !== id && seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
+							seen.push(it.own); cost += COST.LBL_LDR;
+						}
+					}
+				}
+				if (cost >= bound) { return Infinity; }
+			}
+			if (c.segs.length) {
+				var labs = st.seen2;
+				labs.length = 0; seen.length = 0;
+				for (j = 0; j < c.segs.length; j++) {
+					var s = c.segs[j];
+					arr = g.collect(segBB(s), st.buf);
+					for (k = 0; k < arr.length; k++) {
+						it = arr[k];
+						if (it.own === id) { continue; }
+						if (it.k === LABEL) {
+							if (labs.indexOf(it.own) < 0 && segHitsOB(s[0], s[1], s[2], s[3], it.ob, 1)) { labs.push(it.own); cost += COST.LBL_LDR; }
+						} else if (seen.indexOf(it.own) < 0 && segsCross(s, it.s)) { seen.push(it.own); cost += COST.LDR_LDR; }
+					}
+				}
+			}
+			return cost < bound ? cost : Infinity;
 		}
 
 		// The cheapest legal spot for label L showing rowset rsI, or null. Specs are tried in
 		// order of their own cost; once that alone reaches the best found, nothing cheaper is left.
-		function bestFor(st, L, rsI, bound) {
-			var best = null, bestCost = bound, specs = L.specs, c, cost, i;
+		function bestFor(st, L, rsI, bound, maxTries) {
+			var best = null, bestCost = bound, specs = L.specs, c, cost, i, tries = 0;
 			if (L.prevPl) {
 				c = matPrev(st, L, rsI);
 				if (c) { cost = evalCand(st, L, c, bestCost); if (cost < bestCost) { bestCost = cost; best = c; } }
 			}
 			for (i = 0; i < specs.length; i++) {
-				var sp = specs[i];
-				if (sp.base >= bestCost) { break; }
-				c = materialize(st, L, sp, rsI);
+				if (specs[i].base >= bestCost) { break; }
+				c = candAt(st, L, i, rsI);
 				if (!c) { continue; }
+				if (maxTries && ++tries > maxTries) { break; }
 				cost = evalCand(st, L, c, bestCost);
 				if (cost < bestCost) { bestCost = cost; best = c; }
 			}
@@ -817,27 +907,29 @@ EngCalcs.lpnPlacerC = (function () {
 			uncommit(st, L);
 			if (!c) { return; }
 			L.cur = c;
-			c.boxes.forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.grid.insert(it); L.items.push(it); });
-			c.segs.forEach(function (s) { var it = { k: LEAD, s: s, bb: segBB(s), own: L.id }; st.grid.insert(it); L.items.push(it); });
+			boxesOf(st, L, c).forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.dg.insert(it); L.items.push(it); });
+			c.segs.forEach(function (s) { var it = { k: LEAD, s: s, bb: segBB(s), own: L.id }; st.dg.insert(it); L.items.push(it); });
 		}
 		function uncommit(st, L) {
-			L.items.forEach(function (it) { st.grid.remove(it); });
+			L.items.forEach(function (it) { st.dg.remove(it); });
 			L.items = []; L.cur = null;
 		}
 
 		// GROW: each round every shown label may take back one more property, if a spot for the
-		// bigger label costs no more than the property is worth.
+		// bigger label costs no more than the property is worth. Space only shrinks as others
+		// grow, so a label that cannot grow this round is not asked again.
 		function grow(st, order) {
-			for (var round = 0; round < 6; round++) {
+			order.forEach(function (L) { L.stuck = false; });
+			for (var round = 0; round < 8; round++) {
 				var changed = false;
 				for (var i = 0; i < order.length; i++) {
 					var L = order[i], c0 = L.cur;
-					if (!c0 || c0.rs === 0) { continue; }
+					if (!c0 || c0.rs === 0 || L.stuck) { continue; }
 					uncommit(st, L);
 					var cur = evalCand(st, L, c0, Infinity);
-					// A label regrowing to what it showed last view may take its old spot back first.
-					var c = bestFor(st, L, c0.rs - 1, cur + ROW_GAIN);
-					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); }
+					if (cur === Infinity) { cur = c0.cost || 0; }
+					var c = bestFor(st, L, c0.rs - 1, cur + ROW_GAIN, GROW_TRIES);
+					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
 			}
@@ -851,11 +943,11 @@ EngCalcs.lpnPlacerC = (function () {
 				if (now() > deadline) { break; }
 				var L = order[i];
 				if (L.cur) { continue; }
-				var rsI = L.rowsets.length - 1, specs = L.specs, tried = {};
-				for (var k = 0; k < specs.length && k < 60; k++) {
-					var c = materialize(st, L, specs[k], rsI);
-					if (!c) { continue; }
-					var bl = blockers(st, L, c);
+				var rsI = L.rowsets.length - 1, tried = {};
+				for (var k = 0; k < L.specs.length && k < 80; k++) {
+					var c = candAt(st, L, k, rsI);
+					if (!c || staticCost(st, L, c) === Infinity) { continue; }
+					var bl = blocker(st, L, c);
 					if (!bl || tried[bl.id]) { continue; }
 					tried[bl.id] = 1;
 					var old = bl.cur;
@@ -863,57 +955,45 @@ EngCalcs.lpnPlacerC = (function () {
 					if (evalCand(st, L, c, Infinity) === Infinity) { commit(st, bl, old); continue; }
 					commit(st, L, c);
 					var moved = null;
-					for (var r = old.rs; r < bl.rowsets.length && !moved; r++) { moved = bestFor(st, bl, r, Infinity); }
-					if (moved) { commit(st, bl, moved); any = true; break; }
+					for (var r = old.rs; r < bl.rowsets.length && !moved; r++) { moved = bestFor(st, bl, r, Infinity, 120); }
+					if (moved) { commit(st, bl, moved); bl.stuck = false; any = true; break; }
 					uncommit(st, L);
 					commit(st, bl, old);
 				}
 			}
 			return any;
 		}
-		// The one placed label (not hand-placed) that alone keeps c from being legal, or null.
-		function blockers(st, L, c) {
-			var vp = st.vp;
-			if (c.bb.x0 < vp.x0 || c.bb.y0 < vp.y0 || c.bb.x1 > vp.x1 || c.bb.y1 > vp.y1) { return null; }
-			var g = st.grid, found = null, fatal = false, ownNode = L.owner.nodeId;
-			c.boxes.forEach(function (b) {
-				g.query(b.bb, function (it) {
-					if ((it.k === SYM || it.k === LSYM || it.k === TEXT) && obOverlap(b, it.ob, 0)) { fatal = true; return true; }
+		// The one placed label (not hand-placed) whose ink alone keeps c from being legal, or null.
+		function blocker(st, L, c) {
+			var found = null, many = false;
+			boxesOf(st, L, c).forEach(function (b) {
+				st.dg.query(b.bb, function (it) {
 					if (it.k === LABEL && it.own !== L.id && obOverlap(b, it.ob, LBL_TOL)) {
-						if (found && found !== it.own) { fatal = true; return true; }
+						if (found && found !== it.own) { many = true; return true; }
 						found = it.own;
 					}
 					return false;
 				});
 			});
-			if (fatal || !found) { return null; }
-			c.segs.forEach(function (s) {
-				g.query(segBB(s), function (it) {
-					if (it.k === SYM && it.own !== ownNode && segHitsOB(s[0], s[1], s[2], s[3], it.raw, -0.5)) { fatal = true; return true; }
-					return false;
-				});
-			});
-			if (fatal) { return null; }
-			var B = null;
-			st.labels.forEach(function (M) { if (M.id === found) { B = M; } });
+			if (many || !found) { return null; }
+			var B = st.byId[found];
 			return B && !B.req.hand ? B : null;
 		}
 
 		// R9: a pipe longer than the repeat spacing carries its label again, evenly along it,
-		// wherever the copy fits beside the pipe.
+		// wherever a copy fits beside the pipe.
 		function repeats(st, L) {
 			var c = L.cur, o = L.owner, sp = st.text.repeatSpacingPx;
 			if (!c || o.t !== 'link' || !(sp > 0) || o.poly.len <= sp) { return; }
 			var n = Math.max(3, 2 * Math.round(o.poly.len / (2 * sp)) + 1), gap = o.poly.len / n;
 			var d = dims(st, L, c.rs, c.layout), reps = [];
-			var mainS = c.s !== undefined ? c.s : o.sA;
+			var mainS = c.s !== undefined ? c.s : o.sA, sd0 = c.side || 1;
 			for (var k = 0; k < n; k++) {
 				var s0 = (k + 0.5) * gap;
 				if (Math.abs(s0 - mainS) < gap / 2) { continue; }
 				var done = false;
 				[0, 0.15, -0.15, 0.3, -0.3].forEach(function (f) {
-					if (done) { return; }
-					[c.side || 1, -(c.side || 1)].forEach(function (side) {
+					[sd0, -sd0].forEach(function (side) {
 						if (done) { return; }
 						var s = s0 + f * gap, pa = pointAt(o.poly, s), j = pa.seg, last = o.poly.pts.length - 2;
 						var lo = o.poly.cum[j] + (j === 0 ? o.pad0 : GAP) + d.w / 2, hi = o.poly.cum[j + 1] - (j === last ? o.pad1 : GAP) - d.w / 2;
@@ -922,7 +1002,7 @@ EngCalcs.lpnPlacerC = (function () {
 						var off = side * (d.h / 2 + GAP + 0.5), cx = pa.x + Math.sin(rad) * off, cy = pa.y - Math.cos(rad) * off;
 						var rc = mkCand(st, L, c.rs, c.layout, c.align, cx - d.w / 2, cy - d.h / 2, ang, null, 0, null);
 						if (evalCand(st, L, rc, 1.5) < 1.5) {
-							rc.boxes.forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.grid.insert(it); L.items.push(it); });
+							boxesOf(st, L, rc).forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.dg.insert(it); L.items.push(it); });
 							reps.push({ x: rc.x, y: rc.y, angle: ang });
 							done = true;
 						}
@@ -932,16 +1012,16 @@ EngCalcs.lpnPlacerC = (function () {
 			c.reps = reps;
 		}
 
-		// H-b: nothing needs thinking ahead of a view yet beyond the per-node pipe directions,
-		// which place() caches as it meets them; opening a project clears that cache.
+		// H-b: the per-node pipe directions are the only thinking kept across views; opening a
+		// project starts them afresh.
 		function idle(budgetMs, info) {
 			if (info && info.opening) { dirCache = {}; }
 		}
 
-		return { name: 'C (keep, show, grow, mend)', place: place, idle: idle };
+		return { name: NAME, place: place, idle: idle };
 	}
 
-	return { name: 'C (keep, show, grow, mend)', create: create };
+	return { name: NAME, create: create };
 }());
 
 if (typeof module !== 'undefined' && module.exports) {
