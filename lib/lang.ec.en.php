@@ -3269,7 +3269,7 @@ $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as t
 $ec_lang['lpn_quality_chemical_name']='Chemical';
 $ec_lang['lpn_quality_chemical_name_tip']='The chemical you are tracking, for example Chlorine. Leave it blank for EPANET\'s own default label, Chemical. Shown on your reports, but not used in the calculations.';
 $ec_lang['lpn_quality_mass_units']='Mass units';
-$ec_lang['lpn_quality_mass_units_tip']='The mass half of the concentration unit, EPANET\'s own two choices.';
+$ec_lang['lpn_quality_mass_units_tip']='The units half of the quality entry, EPANET\'s own two choices.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
