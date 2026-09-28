@@ -131,7 +131,7 @@ EngCalcs.lpnPlacerC = (function () {
 		return t0 < t1;
 	}
 	function orient(ax, ay, bx, by, cx, cy) { return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax); }
-	function near(x0, y0, x1, y1) { return Math.abs(x0 - x1) <= 1.5 && Math.abs(y0 - y1) <= 1.5; }
+	function near(x0, y0, x1, y1) { return Math.hypot(x0 - x1, y0 - y1) <= 1; }
 	// A proper crossing of two segments; touching at an end point is not one.
 	function segsCross(s, t) {
 		var d1 = orient(t[0], t[1], t[2], t[3], s[0], s[1]), d2 = orient(t[0], t[1], t[2], t[3], s[2], s[3]);
@@ -139,6 +139,18 @@ EngCalcs.lpnPlacerC = (function () {
 		var d3 = orient(s[0], s[1], s[2], s[3], t[0], t[1]), d4 = orient(s[0], s[1], s[2], s[3], t[2], t[3]);
 		if (!d3 || !d4 || (d3 > 0) === (d4 > 0)) { return false; }
 		return !(near(s[0], s[1], t[0], t[1]) || near(s[0], s[1], t[2], t[3]) || near(s[2], s[3], t[0], t[1]) || near(s[2], s[3], t[2], t[3]));
+	}
+	function ptSegDist(px, py, t) {
+		var vx = t[2] - t[0], vy = t[3] - t[1], L2 = vx * vx + vy * vy;
+		var u = L2 ? Math.max(0, Math.min(1, ((px - t[0]) * vx + (py - t[1]) * vy) / L2)) : 0;
+		return Math.hypot(px - t[0] - u * vx, py - t[1] - u * vy);
+	}
+	// Two leaders touch if they cross or pass within 2 px of each other at an end.
+	function leadersTouch(s, t) {
+		var d1 = orient(t[0], t[1], t[2], t[3], s[0], s[1]), d2 = orient(t[0], t[1], t[2], t[3], s[2], s[3]);
+		var d3 = orient(s[0], s[1], s[2], s[3], t[0], t[1]), d4 = orient(s[0], s[1], s[2], s[3], t[2], t[3]);
+		if ((d1 > 0) !== (d2 > 0) && (d3 > 0) !== (d4 > 0)) { return true; }
+		return ptSegDist(s[0], s[1], t) < 2 || ptSegDist(s[2], s[3], t) < 2 || ptSegDist(t[0], t[1], s) < 2 || ptSegDist(t[2], t[3], s) < 2;
 	}
 	// Distance from s's start to where s crosses t.
 	function crossDist(s, t) {
@@ -706,7 +718,10 @@ EngCalcs.lpnPlacerC = (function () {
 				var qx = -P.dy, qy = P.dx, dn = ux * qx + uy * qy;
 				if (Math.abs(dn) < 0.45) { return false; }
 				var t = (d.w / 2 * Math.abs(qx) + d.h / 2 * Math.abs(qy) + GAP + 1) / Math.abs(dn);
-				fillBlock(st, L, c, rsI, spec.layout, ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center'), P.x + ux * t - d.w / 2, P.y + uy * t - d.h / 2, 0);
+				var bx = P.x + ux * t, by = P.y + uy * t;
+				// Beside the pipe means touching distance from the middle of it, or it needs a leader.
+				if (Math.max(0, Math.abs(bx - P.x) - d.w / 2) + Math.max(0, Math.abs(by - P.y) - d.h / 2) > GAP + 6) { return false; }
+				fillBlock(st, L, c, rsI, spec.layout, ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center'), bx - d.w / 2, by - d.h / 2, 0);
 				return true;
 			}
 			return hang(st, L, c, rsI, spec.layout, P.x, P.y, P.x + ux * (spec.len + 4), P.y + uy * (spec.len + 4), ux, uy);
@@ -874,8 +889,9 @@ EngCalcs.lpnPlacerC = (function () {
 					arr = st.sg.collect(s.bb, st.buf);
 					for (k = 0; k < arr.length; k++) {
 						it = arr[k];
-						if (it.k === ARROW || it.own === ownLink || xs.indexOf(it.own) >= 0 || !segsCross(s, it.s)) { continue; }
-						if (it.k === TLEAD) { xs.push(it.own); cost += COST.LDR_LDR; continue; }
+						if (it.k === ARROW || it.own === ownLink || xs.indexOf(it.own) >= 0) { continue; }
+						if (it.k === TLEAD) { if (leadersTouch(s, it.s)) { xs.push(it.own); cost += COST.LDR_LDR; } continue; }
+						if (!segsCross(s, it.s)) { continue; }
 						if (j > 0 || crossDist(start, it.s) > 1.5) { xs.push(it.own); cost += COST.LDR_PIPE; }
 					}
 				}
@@ -920,7 +936,7 @@ EngCalcs.lpnPlacerC = (function () {
 						if (it.own === id) { continue; }
 						if (it.k === LABEL) {
 							if (labs.indexOf(it.own) < 0 && segHitsOB(s[0], s[1], s[2], s[3], it.ob, 1)) { labs.push(it.own); cost += COST.LBL_LDR; }
-						} else if (seen.indexOf(it.own) < 0 && segsCross(s, it.s)) { seen.push(it.own); cost += COST.LDR_LDR; }
+						} else if (seen.indexOf(it.own) < 0 && leadersTouch(s, it.s)) { seen.push(it.own); cost += COST.LDR_LDR; }
 					}
 				}
 			}
