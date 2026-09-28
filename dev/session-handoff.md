@@ -105,7 +105,8 @@ symbology on dev once he pulls.**
 ### Awaiting his browser pass or ruling
 
 - **8124 `feat/table-width`** (R-354, R-356) -- his width rule, centred ID, vertices `n/e|n/e`.
-  Perry's review: see the 09-27 report. Green; not yet cleared.
+  5ce78416. Perry found headings breaking mid-word anywhere; fixed (real font measurement, a soft
+  hyphen at the rule's own split, `anywhere` back to dragged columns only). Green; not cleared.
 - **8123 `feat/ctrl-enter`** d6558eb4 -- he asked for endorsement; Mary and Ida both endorse
   (their journals 2026-09-27). Needs his merge word.
 - **`feat/epanet-plus-plus`** 1ca95ff5 (Task 697 B1, no preview port: the brand shows only on
