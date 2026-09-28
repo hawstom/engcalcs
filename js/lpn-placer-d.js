@@ -6,22 +6,30 @@
 //
 // How it works. Every label gets CANDIDATES: each drop level (all rows, then the user's drop order
 // applied one row at a time down to the ID alone) crossed with the places it could hang --
-// touching its node (the standard quadrants and the sides), beside its pipe (along it or level),
-// or further out on a straight leader or one with the standard short hook. A candidate's worth is
-// the rows it shows (the label itself worth four rows), less what it crosses in Tom's cost order,
-// less a little for distance from home. The never-rules (N1, N3, N4, N5) and the edge of the view
-// are not traded at any price: a place that breaks one is not a candidate. Free space is looked up
-// in a summed-area table of the symbols and Text objects, so most places are refused without
-// building anything. Candidates are built one drop level at a time, and the leadered ones only
-// when the touching ones cannot win, so a roomy view does little work.
+// touching its node (the standard quadrants and the sides), beside its pipe (turned along it where
+// the user's "along the link line" setting asks, reading inside the scene's reading window, and
+// level only as the fallback, R14), or further out on a straight leader or one with the standard
+// short hook, in rings of growing length. A candidate's worth is the rows it shows (the label itself
+// worth four rows), less what it crosses in Tom's cost order, less a little for distance from
+// home. The never-rules (N1, N3, N4, N5) and the edge of the view are not traded at any price: a
+// place that breaks one is not a candidate.
+//
+// Free space is two rasters: summed-area tables of the symbols and Text objects (fixed), and a
+// count raster of the seated labels' rows grown by their clearance (changing as labels are
+// seated). Most places are accepted or refused by a few array reads; only a place on a fringe gets
+// an exact test. Candidates are built one drop level and one leader ring at a time, only when the
+// ones before cannot win, and an along place is tested only when the search reaches it.
 //
 // Seating: hand-placed labels first, where the user put them. Then every other label, smallest
 // first and most crowded first, so that as many labels as possible are shown before any label
-// shows a property (G). Then each label grows into the room around it; a repair pass lets a label
-// that is still short of rows or hidden push at most two neighbours elsewhere (or trim them) when
-// that shows more in all; and a polish pass lets each label re-seat itself to cut crossings.
-// Last view's place is offered back to each label with a bonus, so a label moves only when that
-// buys something; on a zoom-in or a pan, last view's labels are seated first and keep their rows.
+// shows a property (G). Then each label grows a row at a time while there is room; a repair pass
+// lets a label that is still short of rows, hidden, or drawn level against the setting push at
+// most two neighbours elsewhere (or trim them a row) when that shows more in all; and a polish
+// pass lets each label re-seat itself to cut crossings. Last view's place is offered back to each
+// label with a bonus, so a label moves only when that buys something.
+//
+// Time (R10, R15): candidates, their leaders and their boxes come from a pool kept across layouts,
+// so a layout allocates little; pauses warm the placer up on the real network (H-b).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
