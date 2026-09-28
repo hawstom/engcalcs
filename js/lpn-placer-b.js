@@ -15,7 +15,7 @@
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
 	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
-	const LABEL_CAP = 1.0;      // a label whose best spot costs more than this is dropped
+	const LABEL_CAP = 0.6;      // a label whose best spot costs more than this is dropped (two pipes)
 	const KEEP_CAP = 1.0;       // a label held from the last view is let go above this cost
 	const RING_STEP = 7;        // px between leader rings
 	const RING_MAX = 4;         // rings tried (S3: drop rather than travel)
@@ -765,7 +765,7 @@
 			});
 			// Kept labels grow only in place, on the edge they hang from.
 			Object.keys(kept).forEach(function (id) {
-				const req = reqs.find(function (r) { return r.id === id; });
+				const req = reqById[id];
 				const cur = placed[id];
 				const sets = setsOf[id];
 				remove(id);
@@ -774,6 +774,8 @@
 					const rows = sets[si];
 					if (rows.length <= cur.c.rows.length) { break; }
 					const sz = sizeOf(req, rows, cur.c.layout);
+					// A label lying along its pipe does not grow in place: turned, its block's corner
+					// is not its start, and growing would slide it along or off the pipe.
 					if (cur.c.angle) { continue; }
 					const x = cur.c.align === 'right' ? cur.c.x + cur.c.w - sz.w : cur.c.x;
 					const c = Object.assign({}, cur.c, { rows: rows, x: x, w: sz.w, h: sz.h });
