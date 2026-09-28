@@ -474,6 +474,7 @@ run_check "harvest selftest"            blocking php dev/scripts/harvest_rulings
 LPN_HARNESS_N=$(ls dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js 2>/dev/null | wc -l | tr -d ' ')
 run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesses.sh
 run_check "label bench selftest"        blocking node dev/lpn-spike/label-bench/selftest-harness.js
+run_check "label judges selftest"       blocking node dev/lpn-spike/label-bench/judges/selftest-harness.js
 
 # --- the other 19 calculators ------------------------------------------------------------------
 # Task 292. Runs every calculator page's own pageCalculator against its own rendered HTML: all of

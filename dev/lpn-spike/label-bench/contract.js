@@ -29,6 +29,10 @@
  * @property {{node:string[], link:string[], customer:string[]}} dropOrder   the user's per-kind
  *          value drop order, FIRST TO GO first. A row whose `field` is not listed ('id') is the
  *          label itself and is never dropped.
+ * @property {{alignPipeLabels:boolean, readableAngleDeg:{min:number, max:number}}} [settings]   the
+ *          user's "Draw link labels along the link line" setting (Settings > Symbology > Labels), and
+ *          the reading window a turned label keeps to: its `angle` lies in (min, max], so no label
+ *          reads upside down. Scenes made before 2026-09-28 lack it; read it as off.
  * @property {Array<{id:string, type:string, x:number, y:number, symbol:Rect}>} nodes   EVERY node,
  *          on screen or not
  * @property {Array<{id:string, type:string, from:string, to:string, points:number[][],
@@ -51,6 +55,10 @@
  *          one line. A placer may choose the other (H-a) and says so in its output.
  * @property {Pt|null} hand                 the leader end point the USER dragged it to, or null.
  *          A hand-placed label must stay attached there and must be shown (N4).
+ * @property {boolean} [along]              a pipe label only: true when the setting above asks this
+ *          label to lie ALONG its pipe (turned to the pipe where it sits, read the right way up,
+ *          beside the line), which R14 asks for when there is space available. False for a label
+ *          the user dragged, which opts out; absent (false) on a node label.
  *
  * @typedef {Object} Placement              ONE LABEL'S ANSWER. Missing or {shown:false} = hidden.
  * @property {boolean} shown

@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-369. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-370. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -149,3 +149,8 @@ judgement and does not belong to a script.
 - [ ] R-366 feat/table-width | "Printing seems to always take a little more room than on-screen. Therefore a column whose values fit fine on-screen may wrap in the print. This happened to Latitude, Longitude, and Date installed (long value strings). Research how to avoid surprises like this and ensure that the width decisions account for this if it's an unavoidable fact of browser printing."
 - [ ] R-367 feat/table-width | "Mixing model prints a different value than appears on-screen. I am led to wonder, if the short terms are good enough for a printout, why they aren't good enough for the UI. And if they aren't good enough for the UI, are they good enough for the printout? And what is done in translations?"
 - [x] R-368 feat/table-width | "Everything else was nice."
+
+## 2026-09-28, later -- scenarios and demand categories
+
+- [x] R-369 fix/scenario-demand-category | "Add a demand category in a scenario. It adds to Base. Bad." -- fixed 4df591f8: in a scenario the whole demand table is one override; Base is untouched
+  - TGH 2026-09-28, on "In a scenario, the whole demand table will become one scenario override": "I agree."

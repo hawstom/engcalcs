@@ -10,7 +10,7 @@
 //      label over a Text object is N5, not N1; a label over another label is N1, not N5.
 //   2. Churn (there is no stillness rule): a move that regains rows (regrowing a dropped row on
 //      zoom-in) is never churn, even though the block moved; a move that gains nothing and fixed no
-//      break is. The R5, R7 and R9 reported scores are exercised minimally.
+//      break is. The R5, R7, R9 and R14 reported scores are exercised minimally.
 //   3. The trivial placer on the committed Net1 scene: it hangs every label whole at its node's
 //      upper right, so it must break N1 (its pipe labels run over the next node) and must not
 //      break N4 (it hangs a hand-placed label at the user's point); master's recorded layout of the
@@ -22,7 +22,7 @@
 'use strict';
 
 const path = require('path');
-const { scoreView, stability, zoomRowChange, WEIGHTS } = require('./score.js');
+const { scoreView, stability, zoomRowChange, RANKS } = require('./score.js');
 const { runBench, loadSets } = require('./run.js');
 
 let checks = 0, failures = 0;
@@ -93,7 +93,7 @@ crossed.labels['n:A'] = { shown: true, rows: [0, 1], x: 250, y: 140, leader: [[1
 crossed.labels['n:B'] = { shown: true, rows: [0], x: 120, y: 145, align: 'left', leader: [[300, 100], [140, 150]] };
 const x2 = scoreView(scene, crossed);
 report(only(x2, null, 0) && x2.counts.leaderOnLeader === 1 && x2.crossings.leaderOnLeader.length === 1
-	&& x2.cost >= WEIGHTS.leaderOnLeader,
+	&& x2.cost >= RANKS.leaderOnLeader,
 	'leader on leader crosses clean (no break) but raises the cost', count(x2) + ' cost ' + x2.cost);
 
 const through = scoreView(scene, withLabel('n:A', { shown: true, rows: [0, 1], x: 330, y: 95, leader: [[100, 100], [330, 102]] }));
@@ -114,13 +114,13 @@ report(only(goodHook, null, 0), 'the one standard hook (short, horizontal last l
 // Weighted costs, one crossing at a time: a label on a pipe, a leader over a pipe, a label on a
 // leader. Each must cost exactly its §3.1 weight.
 const onLink = scoreView(scene, withLabel('n:B', { shown: true, rows: [0], x: 190, y: 95, leader: [[300, 100], [210, 100]] }));
-report(onLink.counts.labelOnLink === 1 && Math.abs(onLink.cost - WEIGHTS.labelOnLink) < 1e-9,
-	'a label on a pipe costs ' + WEIGHTS.labelOnLink, 'cost ' + onLink.cost + ' ' + count(onLink));
+report(onLink.counts.labelOnLink === 1 && Math.abs(onLink.cost - RANKS.labelOnLink) < 1e-9,
+	'a label on a pipe costs ' + RANKS.labelOnLink, 'cost ' + onLink.cost + ' ' + count(onLink));
 const leaderLink = scoreView(scene, withLabel('n:B', { shown: true, rows: [0], x: 150, y: 240, leader: [[300, 100], [170, 240]] }));
 report(leaderLink.counts.leaderOnLink === 0 && leaderLink.cost === 0, 'a leader that does not reach a pipe costs nothing', 'cost ' + leaderLink.cost);
 const leaderLink2 = scoreView(scene, withLabel('n:B', { shown: true, rows: [0], x: 100, y: 240, leader: [[300, 100], [120, 240]] }));
-report(leaderLink2.counts.leaderOnLink === 1 && Math.abs(leaderLink2.cost - WEIGHTS.leaderOnLink) < 1e-9,
-	'a leader across a pipe costs ' + WEIGHTS.leaderOnLink, 'cost ' + leaderLink2.cost + ' ' + count(leaderLink2));
+report(leaderLink2.counts.leaderOnLink === 1 && Math.abs(leaderLink2.cost - RANKS.leaderOnLink) < 1e-9,
+	'a leader across a pipe costs ' + RANKS.leaderOnLink, 'cost ' + leaderLink2.cost + ' ' + count(leaderLink2));
 const onLeader = clean();
 onLeader.labels['n:B'] = { shown: true, rows: [0], x: 225, y: 293, leader: [[300, 100], [235, 293]] };
 const ol = scoreView(scene, onLeader);
@@ -183,6 +183,34 @@ report(r11In && r11In.regained === 1 && r11In.lost === 0, 'R11: a zoom-in that r
 const r11Flat = zoomRowChange(scene, clean(), scene2, clean());
 report(r11Flat === null, 'R11: a step that is not a zoom-in (same scale) reports nothing', JSON.stringify(r11Flat));
 
+// R14: a pipe label the "Draw link labels along the link line" setting asks to lie along its pipe
+// (req.along) is counted along when turned to its pipe and reading the right way up; one drawn
+// otherwise is a miss, and a miss WITH ROOM when an aligned spot beside the pipe was free. Pipe AC
+// runs (100,100)-(200,300), 63.4 degrees on screen, inside the reading window (-110, 70].
+const alongScene = JSON.parse(JSON.stringify(scene));
+alongScene.settings = { alignPipeLabels: true, readableAngleDeg: { min: -110, max: 70 } };
+alongScene.labels.push({ id: 'l:AC', owner: 'AC', kind: 'link', anchor: { x: 150, y: 200 }, rows: [row('AC')], layout: 'line', hand: null, along: true });
+const acDeg = Math.atan2(200, 100) * 180 / Math.PI, acN = [-Math.sin(acDeg * Math.PI / 180), Math.cos(acDeg * Math.PI / 180)];
+const alongPl = { shown: true, rows: [0], layout: 'line', align: 'center', angle: acDeg,
+	x: 150 + 10 * acN[0] - 10, y: 200 + 10 * acN[1] - 5, leader: null };
+const r14Along = scoreView(alongScene, withLabel('l:AC', alongPl));
+report(r14Along.r14.asked === 1 && r14Along.r14.along === 1 && r14Along.r14.missedWithRoom === 0,
+	'R14: a pipe label turned to its pipe, beside it, is counted along', JSON.stringify(r14Along.r14));
+const r14Flat = scoreView(alongScene, withLabel('l:AC', { shown: true, rows: [0], layout: 'line', x: 160, y: 190, leader: null }));
+report(r14Flat.r14.asked === 1 && r14Flat.r14.along === 0 && r14Flat.r14.missedWithRoom === 1 && only(r14Flat, null, 0),
+	'R14: drawn level beside a sloping pipe with open ground round it is a miss WITH ROOM (reported, never fails)', JSON.stringify(r14Flat.r14));
+const r14Upside = scoreView(alongScene, withLabel('l:AC', Object.assign({}, alongPl, { angle: acDeg - 180 })));
+report(r14Upside.r14.along === 0, 'R14: turned to the pipe but reading upside down is not along', JSON.stringify(r14Upside.r14));
+const crowded = JSON.parse(JSON.stringify(alongScene));
+crowded.texts.push({ id: 'T2', text: 'wall', box: { cx: 150, cy: 200, w: 120, h: 260, angle: 0 } });
+const r14NoRoom = scoreView(crowded, withLabel('l:AC', { shown: true, rows: [0], layout: 'line', x: 230, y: 190, leader: null }));
+report(r14NoRoom.r14.asked === 1 && r14NoRoom.r14.along === 0 && r14NoRoom.r14.missedWithRoom === 0,
+	'R14: a miss where every aligned spot beside the pipe is covered has no room', JSON.stringify(r14NoRoom.r14));
+const notAsked = JSON.parse(JSON.stringify(alongScene));
+notAsked.labels[notAsked.labels.length - 1].along = false;
+const r14Off = scoreView(notAsked, withLabel('l:AC', { shown: true, rows: [0], layout: 'line', x: 160, y: 190, leader: null }));
+report(r14Off.r14.asked === 0, 'R14: a pipe label the setting does not ask (off, or dragged) is not counted', JSON.stringify(r14Off.r14));
+
 // ---- 3. the committed Net1 scene ----------------------------------------------------------------
 const sets = loadSets(path.join(__dirname, 'scenes'), ['net1']);
 report(sets.length === 1 && sets[0].steps[0].labels.length === 24, 'the Net1 scene is committed and has its 24 labels',
@@ -197,6 +225,14 @@ if (sets.length) {
 	report(mast.breaks.N4.length === 3 && mast.breaks.N1.length === 0,
 		'master\'s recorded Net1: three hand-placed node labels pushed out along their rays (N4)',
 		count(mast) + '; hand-placed: ' + hands.join(' '));
+	// The scene carries the user's alignment setting (Net1 is saved with it on), and master, which
+	// honours it, draws every one of those pipe labels along its pipe.
+	const s0 = sets[0].steps[0];
+	report(!!(s0.settings && s0.settings.alignPipeLabels) && s0.labels.some(function (l) { return l.along; }),
+		'the Net1 scene says "Draw link labels along the link line" is on, and which pipe labels it asks',
+		JSON.stringify(s0.settings) + '; ' + s0.labels.filter(function (l) { return l.along; }).length + ' asked');
+	report(mast.r14.asked > 0 && mast.r14.along === mast.r14.asked, 'master\'s recorded Net1: every pipe label asked lies along its pipe (R14)',
+		JSON.stringify(mast.r14));
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed.`);
