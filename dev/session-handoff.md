@@ -119,15 +119,25 @@ remind him to test symbology on dev once he pulls.**
   **Both FAIL R-075**: long IDs move 61% (A) and 52% (B) of shown labels, master 13%. Both pass all 10
   screenshot assertions.
 - **His open decision:** how to feed the R-075 failure back without revealing the test (his Q11:
-  builders build to "use convenient available space effectively"). Then his side-by-side look on
-  preview ports (see the panel rows for A and B, if this session got that far).
+  builders build to "use convenient available space effectively"). Then his side-by-side look:
+  **8129 = A, 8130 = B**, each with the seam merged in; the URL needs `?placer=a` / `?placer=b`
+  (without it the port shows today's labels). Both ports need his Apache reload (commands below).
+- Known flaws, from the builders: A hides ~18% at fit in dense cores, turned pipe labels never grow,
+  never uses the hook. B never relocates a label that settled small, no wrapping, no hook, and a
+  hand point INSIDE a symbol still breaks N1/N3 (not in the bench scenes: add such a scene).
+  Both declared their file bench-only in `EC_UNREFERENCED_MODULES`; the winner needs that undone.
 
 ### Awaiting his browser pass or ruling
 
 - **8124 `feat/table-width`** 5ce78416 and **8123 `feat/ctrl-enter`** d6558eb4 -- unchanged since
   09-27; ctrl-enter needs only his merge word (Mary and Ida endorse).
-- **`feat/epanet-plus-plus`** 111b6243 -- he looked on 8127 ("lpn: Good"). Held for release per his
-  "Release as B1". Host steps: `dev/epanet-plus-plus-plan.md` section 6.
+- **`feat/epanet-plus-plus`** 111b6243 -- he looked on 8127 ("lpn: Good"). Held until he says
+  "release". Then, in order: merge master in, suite, merge, push; he pulls engcalcs; he sets
+  ea-php83, makes the `engcalcs` symlink, adds the host to the Mapbox token; we push the landing
+  repo's release commit (swap the temporary `/app` 302 in its .htaccess for the rewrite, carry
+  cPanel's ea-php83 handler block in the tracked .htaccess as LWN does, point APP_URL in
+  tools/build.py at epanet-plus-plus.org/app/, sitemap via `generate_sitemap.php --host=`); he
+  pulls; we verify with the curls in the plan, section 6.
 - **R-253** wording ruling (`lpn_convas_no_transform`), the one loose end of closed Task 696.
 
 ### EPANET++ is live (Option A), 2026-09-28
