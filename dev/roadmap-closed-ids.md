@@ -638,3 +638,7 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|716| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Status, what switched and when.
 - 0|708| CLOSED 2026-09-27: every property in every venue; audit, six fills, gaps 7 and 8 (coordinates and Text words in Find) merged with feat/find-coordinate on Tom's all-clear; `property_venue_check.php` holds it.
 - 0|696| CLOSED 2026-09-28: File, Convert as... shipped on master (feat/convert-as, feat/placement-wizard, both on his all-clear) with 688's units and rounding and 693's Length / read-only Map coordinates split. Left in the review queue, not here: R-253's wording ruling and R-172 (2), satellite after Convert as, not reproduced.
+- 0|610| CLOSED 2026-09-28 (merged 2026-09-27): paste that creates rows, feat/row-paste on Tom's "OK. Done. Close, merge and delete branch." Not built: the Ctrl+Shift+PageUp/PageDn table switch he called "lower priority, but very cool".
+- 0|645| CLOSED 2026-09-28 with feat/water-tower on Tom's "We are gold. Publish it everywhere.": the larger towers (about, 192, 512) redrawn as one piece of work with 648 and 679.
+- 0|648| CLOSED 2026-09-28 with feat/water-tower (see 645): the About rendering, option 3.
+- 0|679| CLOSED 2026-09-28 with feat/water-tower (see 645): narrower strokes and more detail at About's size.
