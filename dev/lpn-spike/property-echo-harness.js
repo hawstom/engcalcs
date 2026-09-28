@@ -159,6 +159,13 @@ function labelFlow(L, linkId) {
 	var numPart = (line.parts || []).filter(function (p) { return /^-?\d/.test(p.text); })[0];
 	return numPart ? parseFloat(numPart.text) : parseFloat(line.text.replace(/^[^-\d]+/, ''));
 }
+function labelFlowDecimals(L, linkId) {
+	var le = L.linkEls()[linkId];
+	var line = le && le.allLines ? le.allLines.filter(function (l) { return l.field === 'flow'; })[0] : null;
+	var numPart = line ? (line.parts || []).filter(function (p) { return /^-?\d/.test(p.text); })[0] : null;
+	var m = numPart ? /\.(\d+)/.exec(numPart.text) : null;
+	return m ? m[1].length : 0;
+}
 function tableFlow(L, linkId) {
 	L.openPaneTab('pipes');
 	var cell = L.paneCellDom('lpn_pane_pipes', linkId, 'flow');
@@ -249,7 +256,16 @@ async function group(title) {
 	// =========================================================================================
 	{
 		const page = await group('-- 3. an edited pipe\'s Flow agrees in Properties, label and table --');
-		const pipe = page.doc.links.filter(function (l) { return l.type === 'pipe'; })[0];
+		// A pipe INSIDE the network, not the main from a reservoir or tank: a source main carries the
+		// total demand whatever its diameter, so its flow moves only in the hundredths and a label
+		// showing whole units (US gpm, R-328) does not change at all.
+		const fixedHead = {};
+		page.doc.nodes.forEach(function (n) { if (n.type === 'reservoir' || n.type === 'tank') { fixedHead[n.id] = true; } });
+		const pipes = page.doc.links.filter(function (l) { return l.type === 'pipe'; });
+		const flows = page.L.lastResult().flows || {};
+		const inner = pipes.filter(function (l) { return !fixedHead[l.from] && !fixedHead[l.to]; })
+			.sort(function (a, b) { return Math.abs(flows[b.id] || 0) - Math.abs(flows[a.id] || 0); });
+		const pipe = inner[0] || pipes[0];   // the busiest interior pipe, so halving it moves its flow
 
 		page.L.openLinkPopup(pipe.id, 0, 0);
 		const beforePopup = popupFlow(page.L);
@@ -272,12 +288,15 @@ async function group(title) {
 			beforeLabel + ' -> ' + afterLabel);
 		ok('the Properties popup\'s Flow changed from the SAME edit -- the link side of the same defect',
 			afterPopup !== beforePopup, 'popup stuck at ' + afterPopup + ', label moved to ' + afterLabel);
+		// The label rounds to ITS OWN decimals (per unit since R-328: whole gpm), so it agrees with
+		// the others to half its last place, not to 0.05.
+		const labelTol = Math.max(0.05, 0.5 * Math.pow(10, -labelFlowDecimals(page.L, pipe.id)) + 1e-9);
 		ok('Properties and the map label now show the same number',
-			Math.abs(afterPopup - afterLabel) < 0.05, 'popup ' + afterPopup + ' vs label ' + afterLabel);
+			Math.abs(afterPopup - afterLabel) <= labelTol, 'popup ' + afterPopup + ' vs label ' + afterLabel);
 		ok('Properties and the Tables pane now show the same number',
 			Math.abs(afterPopup - afterTable) < 0.05, 'popup ' + afterPopup + ' vs table ' + afterTable);
 		ok('the Tables pane and the map label agree with each other too',
-			Math.abs(afterTable - afterLabel) < 0.05, 'table ' + afterTable + ' vs label ' + afterLabel);
+			Math.abs(afterTable - afterLabel) <= labelTol, 'table ' + afterTable + ' vs label ' + afterLabel);
 	}
 
 	// =========================================================================================
