@@ -199,8 +199,9 @@ the block.
 
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
-  undo, widths, print). Still open under this umbrella: paste that creates rows (610), column hide,
-  fill-down, multi-cell selection.
+  undo, widths, print). Since shipped: paste that creates rows (610), column hide, fill-down,
+  multi-cell selection, Ctrl+Enter fill (2026-09-28). Still open: drag-to-fill (parked by Tom as
+  its own build), Ctrl+Shift+PageUp/PageDn between tables, and whatever Declan ranks next.
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not
@@ -271,26 +272,6 @@ the block.
     repo, no remote yet); B1, the app itself at epanet-plus-plus.org/app/ with its own canonical, is
     `feat/epanet-plus-plus`, held for release. Host steps: the plan, section 6.
 
-- 99|679| **Narrower strokes on the About mark, and more pixels used.**
-  Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
-  photo-realistic since there are many more pixels. First item of business, narrower strokes on
-  the outlines."*
-  - **A NEW TASK, NOT A REOPENING.** Task 615 is CLOSED on his own *"mark 615 complete"* and a
-    closed block is never re-scanned, so the unbuilt phase is extracted here as the length rule
-    requires. What shipped is the favicon and the mark; what he wants now is a rendering of it at
-    the size Help, About actually has room for.
-  - **HIS FIRST ITEM OF BUSINESS IS THE STROKE WIDTH**, and only that. A favicon needs heavy
-    outlines to survive 16 px; the About box is showing the same geometry at many times that, where
-    the same strokes read as a cartoon. So this is a SIZE-DEPENDENT rendering, not a redesign.
-  - **DO NOT RE-OPEN THE GEOMETRY.** Tom on the favicon: *"my one true love."* The shading rule the
-    whole mark follows -- one light above, three surfaces, and the shading follows the SOLID -- is
-    in `ship-notes.md`, and `dev/icon-preview/gen-about-icon.js` is the generator.
-  - **ANSWERED 2026-09-17: BOTH, SHOWN SIDE BY SIDE.** He chose *"Show me both and I will pick"*,
-    so the deliverable is a comparison and not a build. **And he added the detail that decides what
-    "more surfaces" means here:** *"possibly more realistic leg thicknesses and catwalk rendering,
-    where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
-    elements, not a line -- that is the drawing note, and it is his, not ours.
-  - **Part of the one water-tower piece of work with Tasks 645 and 648** (Tom, 2026-09-21).
 - 99|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -472,16 +453,6 @@ the block.
     simplifies as a side effect: `worktrees/<branch>` Aliased, with no stand-in parent directory
     whose only job is to make `/engcalcs/...` resolve.
 
-- 75|648| **The About icon's outlines are too heavy for its scale.**
-  Tom, 2026-09-13, closing out the icon work: *"the About icon has outlines unduly heavy for its
-  scale, and it can be adjusted to look right (appropriate stroke width) for that scale, which could
-  open up additional detail on the roof and belly shading and the legs and catwalk."*
-  - The reward is the second half of that sentence: a correct stroke weight BUYS detail rather than
-    only fixing a blemish, because what is currently crowding the drawing out is the outline itself.
-  - `dev/icon-preview/gen-about-icon.js` is the generator; the shading rule the whole mark follows
-    is in `ship-notes.md` (one light above, three surfaces, and the shading follows the SOLID).
-    Do not re-open the geometry: Tom on the favicon, *"my one true love."*
-  - **Part of the one water-tower piece of work with Tasks 645 and 679** (Tom, 2026-09-21).
 - 25|185| **Match/Copy properties tool (originated during Task 146).**
   **DROPPED TO 50 BY TOM, 2026-09-17** (*"Task 185: Demote to 50"*), which supersedes the
   promotion below rather than cancelling its reasoning: the feature is still wanted, nothing is
@@ -760,31 +731,6 @@ the block.
     know."* Ask the `utility-planning-engineer` seat and a real surveyor before choosing between a
     factor and an increment; the difference matters to whoever has to defend a length in a report.
 
-- 75|645| **The app icon's legs are leggier than the favicon's.**
-  Left open when Task 615 closed 2026-09-13, and flagged for Tom rather than decided. The app
-  icon's legs are **21.5% longer relative to the tank** than `icons/favicon.svg` draws them.
-  - **THE TWO RULES ARE MUTUALLY EXCLUSIVE AND THAT IS WHY IT IS OPEN.** A maskable icon must keep
-    its body inside a circle of 80% diameter; Tom's own ruling says descenders reach the bottom.
-    Any point on the frame edge is >=12 units from center against a 9.6 safe radius. The body is
-    scaled 0.85 and the descenders run to the true edge, so both rules hold, at that proportion cost.
-  - Shipped on the coordinator's judgement. It reads as the same mark and is visibly leggier.
-    The fallbacks are a smaller safe margin or a second shorter-legged tower drawn for the maskable
-    pair alone. `dev/icon-preview/ship-notes.md` has every measured distance.
-  - **NOT urgent and possibly not worth doing:** Tom on the favicon, *"Favicon as it stands is my
-    one true love."* Only the app icon is in question, and only when installed.
-  - **TOM 2026-09-21 TIES 645, 648 AND 679 INTO ONE PIECE OF WORK: the beauty of the LARGER water
-    tower.** *"promote to 75 and cross reference mutually and with 679 as a single task to work on
-    the beauty of the larger versions of the water tower icon. The app has a shortcut icon and a
-    splash screen icon that could be really beautiful, as can the Help, About icon. We want to
-    achieve more beauty and nostalgia for that small-town iconic water tower 'My home town water
-    tower', with realistic legs, catwalk, and maybe even seams and rivets for the installed app
-    splash screen."*
-    - **THE BRIEF IS NOSTALGIA, NOT FIDELITY**, and the phrase to design against is his own: *my
-      home town water tower*. Legs, catwalk, and at the largest size seams and rivets.
-    - **SIZE IS THE WHOLE POINT.** The small icon must stay legible at 16 px and is a different
-      drawing from the splash screen, which can carry detail. Do not let one drawing be scaled to
-      serve both -- that is what makes the big one look empty.
-    - See also Task 648 and Task 679.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -997,18 +943,6 @@ the block.
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
 
-- 99|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
-  **TOM PROMOTED THIS TO 100 ON 2026-09-21**, in the same breath as refusing to let Declan's
-  performance win read as the bigger story: it is his top item *"because the network has to exist
-  first."*
-  Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
-  that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
-  having read the clerk's wish list, *"I am sympathetic."* His conditions, which are the whole
-  task: the Junction table gains the project's location coordinates (xy, or lat,lon) as columns;
-  a paste that ADDS is refused unless every row carries an ID that validates as non-duplicating,
-  and a link row names two existing nodes; and pipe vertices need a stated cell format, which the
-  `data-entry-clerk` must specify (*"there is no point in our guessing it"*) before anything is
-  built. Ctrl+Shift+PageUp/PageDn to the next table (*"lower priority, but very cool"*) rides here.
 
 - 50|614| **The sewer-slope cluster is the largest demand we do not convert.**
   Raised by Tom, 2026-09-08. Measured twice, 2026-07-27 and 2026-09-07, and unmoved: sewer, drainage
