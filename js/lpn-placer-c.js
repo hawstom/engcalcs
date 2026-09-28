@@ -833,7 +833,8 @@ EngCalcs.lpnPlacerC = (function () {
 		function fillPrev(st, L, rsI, c) {
 			var pp = L.prevPl, pr = L.prevReq, layout = pp.layout || pr.layout || L.usual;
 			if (rsI < 0 || (layout !== 'stack' && layout !== 'line')) { return false; }
-			var d = dims(st, L, rsI, layout), dp = blockDims(pp.rows.map(function (i) { return pr.rows[i]; }).filter(Boolean), layout, st.text.separatorW);
+			var d = dims(st, L, rsI, layout);
+			var dp = L.prevDims || (L.prevDims = blockDims(pp.rows.map(function (i) { return pr.rows[i]; }).filter(Boolean), layout, st.text.separatorW));
 			var ax = L.anchor.x, ay = L.anchor.y, px = pr.anchor.x, py = pr.anchor.y, align = pp.align || 'left';
 			var x, y, angle = pp.angle || 0, o = L.owner;
 			c.base = PREV_BONUS; c.spec = null;
@@ -1031,7 +1032,8 @@ EngCalcs.lpnPlacerC = (function () {
 					if (seen.indexOf(it.own) < 0 && inkOnSeg(c, it.s)) { seen.push(it.own); cost += COST.LBL_LDR; }
 					for (j = 0; j < c.ns; j++) {
 						s = c.segs[j];
-						if (labs.indexOf(it) < 0 && bbHit(s.bb, { x0: it.bb.x0 - 2, y0: it.bb.y0 - 2, x1: it.bb.x1 + 2, y1: it.bb.y1 + 2 }) && leadersTouch(s, it.s)) { labs.push(it); cost += COST.LDR_LDR; }
+						var q = it.bb, r = s.bb;
+						if (r.x0 < q.x1 + 2 && q.x0 - 2 < r.x1 && r.y0 < q.y1 + 2 && q.y0 - 2 < r.y1 && labs.indexOf(it) < 0 && leadersTouch(s, it.s)) { labs.push(it); cost += COST.LDR_LDR; }
 					}
 				} else {
 					for (j = 0; j < c.ns; j++) {
