@@ -424,7 +424,7 @@ EngCalcs.lpnPlacerC = (function () {
 			labels.forEach(function (L) { if (L.req.hand) { commit(st, L, handCand(st, L)); } });
 
 			var order = labels.filter(function (L) { return !L.req.hand; });
-			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || b.dens - a.dens || (a.id < b.id ? -1 : 1); });
+			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || a.dens - b.dens || (a.id < b.id ? -1 : 1); });
 
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
@@ -523,7 +523,8 @@ EngCalcs.lpnPlacerC = (function () {
 				st.labels.push(L);
 				st.byId[L.id] = L;
 			});
-			// How crowded each label's home is: the most crowded are placed first.
+			// How crowded each label's home is: the least crowded are placed first (they take the
+			// obvious spots; the crowded then search round them).
 			st.labels.forEach(function (L) {
 				var a = L.anchor, bb = { x0: a.x - 45, y0: a.y - 45, x1: a.x + 45, y1: a.y + 45 };
 				L.dens = hg.collect(bb, st.buf).length + sg.collect(bb, st.buf).length;
