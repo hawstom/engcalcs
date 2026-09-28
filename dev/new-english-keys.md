@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 313 untranslated keys, of 2142 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 313 untranslated keys, of 2142 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,65 +21,11 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (6 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-### from sprint 2026-09-28-delta
-
-- **`lpn_find_op_gt`**
-  > above
-  *The finding:* 'above' is the label for the mathematical greater-than operator in a Find/condition query (js/looped-network.js:17689, where the code itself lists 'greater than' as a recognized synonym -- evidence this exact ambiguity was already noticed once). The operator is used against any numeric property, including ones like elevation where 'above' also has an ordinary spatial meaning. A translator will plausibly render it as a spatial preposition rather than a comparison operator.
-  1. the comparison operator 'greater than' (correct, matches lpn_find_op_lt's counterpart 'below'/'less than')
-  2. a spatial/directional word meaning physically above, especially plausible for a property like elevation
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_gt']='greater than, more than, over, exceeding | avoid: spatially above, higher on the map';
-  @@ NEEDS RULING
-- **`lpn_find_op_lt`**
-  > below
-  *The finding:* Same issue as lpn_find_op_gt: 'below' labels the mathematical less-than operator (code lists 'less than' as a recognized synonym), but reads equally well as a spatial direction, especially for a property like elevation.
-  1. the comparison operator 'less than' (correct, pairs with lpn_find_op_gt's 'greater than')
-  2. a spatial/directional word meaning physically below
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_lt']='less than, under | avoid: spatially below, lower on the map';
-  @@ NEEDS RULING
-- **`lpn_help_icons`**
-  > Toolbar key
-  *The finding:* "key" is used elsewhere on this same page for a KEYBOARD shortcut (lpn_tool_key_hint: 'Shortcut: {key}'), but here it means a map LEGEND (a key to the icons, like a map key). A translator sees only the bare string 'Toolbar key' with no indication which sense applies, and the suite's own dominant usage of 'key' points the wrong way.
-  1. a legend/index explaining what each toolbar icon means (the intended reading, per the code comment)
-  2. a keyboard shortcut for the toolbar (the reading suggested by every other 'key' string on this page)
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_help_icons']='Toolbar legend, Key to the toolbar icons, What each toolbar icon means | avoid: a keyboard key or shortcut';
-  @@ NEEDS RULING
-- **`lpn_labels_priority_node_tip`**
-  > The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
-  *The finding:* 'the elevation or head more like neighboring nodes' is genuinely ambiguous about what 'like' compares. It could mean the node whose elevation/head VALUE is numerically closest to its neighbors' values (least of an outlier), or it could mean the node most similar in KIND/role to its neighbors. These are different comparisons and a translator has to pick one to render grammatically, since many languages cannot preserve English's vague 'like' without choosing.
-  1. the node whose elevation or head value is numerically closest to (least different from) its neighboring nodes' values
-  2. the node that most resembles its neighboring nodes in kind or role
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind';
-  @@ NEEDS RULING
-- **`lpn_scenario_push_tip`**
-  > Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.
-  *The finding:* 'the properties whose labels are showing right now' names 'labels' with no further context. On this page 'label' is a defined term for the text drawn on the map next to an asset (Settings, Symbology, Labels), and the code confirms that meaning (pushBaseToScenarios scopes to properties currently selected as map labels) -- but a translator with only this sentence could just as easily read 'labels' as the ordinary UI sense (the text captions on form fields currently visible on screen), which is a different, unrelated set of properties.
-  1. the properties currently turned on as map labels in the Labels panel (correct, per the code)
-  2. the properties whose form-field captions happen to be visible in whatever panel is open right now
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields';
-  @@ NEEDS RULING
-- **`lpn_settings_sym_all`**
-  > All
-  *The finding:* The bare word 'All' is used as a sub-heading in the Settings box over controls that apply to both nodes and links (per the code comment: a third sub-group alongside node-only and link-only settings). A translator sees only 'All' with no surrounding sentence, and in a settings panel context 'All' commonly means a select-all / show-all-items control, not 'both categories at once'.
-  1. a sub-heading meaning 'settings that apply to both nodes and links' (the intended meaning)
-  2. a 'select all' or 'show all' action/filter control, as elsewhere in list/filter UIs
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';
-  @@ NEEDS RULING
-
-## lpn_  (313, 2 to read @@ NEEDS RULING)
+## lpn_  (313, all ruled)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -578,7 +524,7 @@ is the one you meant. "The first one" is a complete answer.
   _Ruled OK 2026-09-28._
 - **`lpn_notes_7_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell's value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
-  @@ NEEDS RULING
+  _Ruled 2026-09-28: @@ NEEDS RULING Approved._
 - **`lpn_notes_7_term`**
   > Table keyboard shortcuts
   _Ruled OK 2026-09-28._
@@ -590,7 +536,7 @@ is the one you meant. "The first one" is a complete answer.
   _Ruled OK 2026-09-28._
 - **`lpn_pane_ctrlenter_filled`**
   > Filled {n} cells. {skipped} were not changed.
-  @@ NEEDS RULING
+  _Ruled 2026-09-28: @@ NEEDS RULING Approved._
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
   _Ruled OK 2026-09-25._
@@ -1036,11 +982,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/label-bench-r2 (`1071d1fa`) — adds no English strings
-
-### chore/label-rules-r2 (`1071d1fa`) — adds no English strings
-
-### chore/roadmap-0928 (`5169479d`) — adds no English strings
+### feat/fill-handle (`76716393`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -1054,10 +996,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`12c0d10e`) — adds no English strings
+### feat/label-placer (`a5131fc4`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
 
-### feat/table-width (`16014e49`) — adds no English strings
+### feat/label-placer-c (`6dbd4e9c`) — adds no English strings
+
+### feat/label-placer-d (`7d99b54f`) — adds no English strings
+
+### feat/table-width (`f57dedf5`) — adds no English strings

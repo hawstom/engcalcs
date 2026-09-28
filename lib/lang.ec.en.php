@@ -3702,6 +3702,12 @@ $ec_lang['lpn_fitting_tee_run']='Standard tee, flow through run';
 $ec_lang['lpn_fitting_tee_branch']='Standard tee, flow through branch';
 $ec_lang['lpn_fitting_entrance']='Square entrance';
 $ec_lang_syn['lpn_fitting_entrance']='Sharp-edged entrance, Sharp-angled entrance, Square-edged entrance | avoid: an entrance that is square in outline';
+$ec_lang_syn['lpn_help_icons']='Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut';
+$ec_lang_syn['lpn_settings_sym_all']='For all labels | layout: sub-heading; avoid: select all, show all (a command)';
+$ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields';
+$ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors\' values | avoid: similar in kind';
+$ec_lang_syn['lpn_find_op_gt']='greater than, more than, exceeding | avoid: spatially above, higher on the map';
+$ec_lang_syn['lpn_find_op_lt']='less than | avoid: spatially below, lower on the map';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.

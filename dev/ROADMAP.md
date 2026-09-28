@@ -1667,6 +1667,15 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
+- 75|737| **Coined names for interface elements, so every language names each one once.**
+  Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
+  element and to use them consistently... it might be handy to literally make up unique, but memorable
+  keys"*, e.g. a Sally (symbology annotation label). A glossary.json term per element, cited by
+  every key that names it; translators map the coined name once per language.
+- 75|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
+  Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
+  standing filter while the Find box is open, with a toggle next to Filter in table to make it a
+  snapshot. Declan's and Ida's readings go in their journals first.
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

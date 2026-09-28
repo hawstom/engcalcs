@@ -2631,9 +2631,9 @@
             "answer": "OK."
         },
         "lpn_notes_7_def": {
-            "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>",
+            "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell's value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>",
             "ruled": "2026-09-28",
-            "answer": "OK."
+            "answer": "@@ NEEDS RULING Approved."
         },
         "lpn_notes_7_term": {
             "on": "Table keyboard shortcuts",
@@ -2649,6 +2649,11 @@
             "on": "Hide or manage columns",
             "ruled": "2026-09-28",
             "answer": "OK."
+        },
+        "lpn_pane_ctrlenter_filled": {
+            "on": "Filled {n} cells. {skipped} were not changed.",
+            "ruled": "2026-09-28",
+            "answer": "@@ NEEDS RULING Approved."
         },
         "lpn_pane_fill_none": {
             "on": "Nothing in this selection can be filled down.",

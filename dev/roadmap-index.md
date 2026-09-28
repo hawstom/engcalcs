@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**103 open tasks.** Next (100): 2 · Soon (75): 20 · Someday (50): 43 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
+**105 open tasks.** Next (100): 2 · Soon (75): 22 · Someday (50): 43 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
 
 ## 100 — Next (2)
 
@@ -21,7 +21,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 
-## 75 — Soon (20)
+## 75 — Soon (22)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -43,6 +43,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
 - Task 718 — File menu: Recents just above Exit, and an Import submenu.
 - ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
+- Task 737 — Coined names for interface elements, so every language names each one once.
+- ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
 
 ## 50 — Someday (43)
 
@@ -134,5 +136,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-93 of 103 titles are within 4–12 words. `!` marks the rest;
+94 of 105 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
