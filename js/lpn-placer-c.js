@@ -50,11 +50,12 @@ EngCalcs.lpnPlacerC = (function () {
 	var LDR_PER_PX = 0.02;     // and each pixel of it
 	var PREV_BONUS = -1.6;     // staying where it was last view
 	var KEEP_MAX = 3.0;        // last view's spot is kept unless it now costs this much
-	var LEADER_LENS = [9, 22, 38, 58];
+	var LEADER_LENS = [8, 18, 30, 44];
 	var HOOK = 8;              // the one standard short hook (clamped to text.hookMaxPx)
 	var GAP = 2.5;               // clear space between a label and its own symbol or pipe
 	var SYM_PAD = 0.5;           // clear space kept round every symbol and Text object
-	var LBL_TOL = 0.5;         // two labels may share this much (the row pitch carries leading)
+	var LBL_TOL = 0.5;         // two labels may share this much up and down (the row pitch carries leading)
+	var HGAP = 4;              // and keep this much apart side by side, or they read as one
 	var EDGE = 160;            // px from the view's edge where a pan can change what fits
 	var CELL = 36;             // the obstacle grids' cell, px
 	var RES = 3;               // the free-space raster's cell, px
@@ -92,6 +93,8 @@ EngCalcs.lpnPlacerC = (function () {
 	}
 	function obox(cx, cy, w, h, angle) { return setBox(newBox(), cx, cy, w, h, angle); }
 	function inflate(b, by) { return obox(b.cx, b.cy, b.w + 2 * by, b.h + 2 * by, b.angle); }
+	var WIDE = { x0: 0, y0: 0, x1: 0, y1: 0 };
+	function widened(b) { WIDE.x0 = b.x0 - HGAP; WIDE.x1 = b.x1 + HGAP; WIDE.y0 = b.y0; WIDE.y1 = b.y1; return WIDE; }
 	function bbHit(a, b) { return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1; }
 	function segBB(s) {
 		return s.bb || (s.bb = { x0: Math.min(s[0], s[2]), y0: Math.min(s[1], s[3]), x1: Math.max(s[0], s[2]), y1: Math.max(s[1], s[3]) });
@@ -111,6 +114,13 @@ EngCalcs.lpnPlacerC = (function () {
 		if (!bbHit(a, b)) { return false; }
 		return axisOverlap(a, b, a.ca, a.sa) > tol && axisOverlap(a, b, -a.sa, a.ca) > tol
 			&& axisOverlap(a, b, b.ca, b.sa) > tol && axisOverlap(a, b, -b.sa, b.ca) > tol;
+	}
+	// Do two labels' boxes clash: overlap up and down, or come closer than HGAP side by side?
+	function clash(a, b) {
+		if (!a.angle && !b.angle) {
+			return Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) > -HGAP && Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) > LBL_TOL;
+		}
+		return obOverlap(a, b, -1);
 	}
 	// Does segment a-b pass through box `b` shrunk by `shrink` (negative grows it)?
 	function segHitsOB(ax, ay, bx, by, b, shrink) {
@@ -909,8 +919,8 @@ EngCalcs.lpnPlacerC = (function () {
 				var b = c.boxes[i];
 				arr = st.hg.collect(b, st.buf);
 				for (k = 0; k < arr.length; k++) { if (obOverlap(b, arr[k].ob, 0)) { n++; } }
-				arr = st.dg.collect(b, st.buf);
-				for (k = 0; k < arr.length; k++) { if (arr[k].k === LABEL && arr[k].own !== L.id && obOverlap(b, arr[k].ob, LBL_TOL)) { n++; } }
+				arr = st.dg.collect(widened(b), st.buf);
+				for (k = 0; k < arr.length; k++) { if (arr[k].k === LABEL && arr[k].own !== L.id && clash(b, arr[k].ob)) { n++; } }
 			}
 			for (i = 0; i < c.ns; i++) {
 				var s = c.segs[i];
@@ -921,32 +931,10 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 
 		// ---- judging a candidate: Infinity if it breaks a never-rule, else its cost ---------
-		// Does c's ink overlap a box obstacle in grid g? The raster answers "certainly" first;
-		// then the whole block is tried, and a staircase's rows one by one only when it hits.
-		function inkHits(st, L, c, g, ras) {
-			var i, k, arr, b;
-			for (i = 0; i < c.nb; i++) { if (ras.solidUnder(c.boxes[i])) { return true; } }
-			arr = g.collect(c.blk, st.buf);
-			if (!arr.length || !boxHitsAny(c.blk, arr, L.id)) { return false; }
-			if (c.single) { return true; }
-			for (i = 0; i < c.nb; i++) {
-				b = c.boxes[i];
-				arr = g.collect(b, st.buf);
-				if (boxHitsAny(b, arr, L.id)) { return true; }
-			}
-			return false;
-			function boxHitsAny(bx, a, selfId) {
-				for (k = 0; k < a.length; k++) {
-					var it = a[k];
-					if (it.k === LABEL) { if (it.own !== selfId && obOverlap(bx, it.ob, LBL_TOL)) { return true; } } else if (it.k !== LEAD && obOverlap(bx, it.ob, 0)) { return true; }
-				}
-				return false;
-			}
-		}
 		// The bounding box of a candidate's block and leader together: one grid query each.
 		function ubbOf(c) {
 			var u = c.ubb || (c.ubb = { x0: 0, y0: 0, x1: 0, y1: 0 }), b = c.blk;
-			u.x0 = b.x0; u.y0 = b.y0; u.x1 = b.x1; u.y1 = b.y1;
+			u.x0 = b.x0 - HGAP; u.y0 = b.y0; u.x1 = b.x1 + HGAP; u.y1 = b.y1;
 			for (var j = 0; j < c.ns; j++) {
 				var q = c.segs[j].bb;
 				if (q.x0 < u.x0) { u.x0 = q.x0; } if (q.y0 < u.y0) { u.y0 = q.y0; }
@@ -958,6 +946,12 @@ EngCalcs.lpnPlacerC = (function () {
 			if (!bbHit(c.blk, ob) || !obOverlap(c.blk, ob, tol)) { return false; }
 			if (c.single) { return true; }
 			for (var i = 0; i < c.nb; i++) { if (obOverlap(c.boxes[i], ob, tol)) { return true; } }
+			return false;
+		}
+		function inkClash(c, ob) {
+			if (!clash(c.blk, ob)) { return false; }
+			if (c.single) { return true; }
+			for (var i = 0; i < c.nb; i++) { if (clash(c.boxes[i], ob)) { return true; } }
 			return false;
 		}
 		function inkOnSeg(c, s) {
@@ -1021,7 +1015,7 @@ EngCalcs.lpnPlacerC = (function () {
 			arr = st.dg.collect(ubbOf(c), st.buf);
 			for (k = 0; k < arr.length; k++) {
 				it = arr[k];
-				if (it.k === LABEL && it.own !== id && inkOn(c, it.ob, LBL_TOL)) { return Infinity; }
+				if (it.k === LABEL && it.own !== id && inkClash(c, it.ob)) { return Infinity; }
 			}
 			var seen = st.seen, labs = st.seen2;
 			seen.length = 0; labs.length = 0;
@@ -1184,10 +1178,10 @@ EngCalcs.lpnPlacerC = (function () {
 			var found = null, arr, k, i;
 			for (i = 0; i < c.nb; i++) {
 				var b = c.boxes[i];
-				arr = st.dg.collect(b, st.buf);
+				arr = st.dg.collect(widened(b), st.buf);
 				for (k = 0; k < arr.length; k++) {
 					var it = arr[k];
-					if (it.k === LABEL && it.own !== L.id && obOverlap(b, it.ob, LBL_TOL)) {
+					if (it.k === LABEL && it.own !== L.id && clash(b, it.ob)) {
 						if (found && found !== it.own) { return null; }
 						found = it.own;
 					}
