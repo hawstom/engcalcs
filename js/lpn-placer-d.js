@@ -67,6 +67,17 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 	}());
 
+	// ---- candidates: one fixed shape, pooled across layouts (see newCand) -------------------------
+	function Cand() {
+		this.li = 0; this.lv = null; this.layout = ''; this.align = '';
+		this.x = 0; this.y = 0; this.w = 0; this.h = 0; this.angle = 0; this.leader = null;
+		this.reps = null; this.boxes = null; this.fx = NaN; this.ok = false;
+		this.bl = null; this.items = null; this.st = 0; this.along = false;
+		this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0; this.base = 0;
+		this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
+		this.lb2 = null; this.lb3 = null;
+	}
+
 	// ---- boxes and segments --------------------------------------------------------------------
 	function mkBox(cx, cy, w, h, angDeg) {
 		var a = angDeg || 0, r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
@@ -383,19 +394,39 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 
 		// ---- candidates ----
-		function Cand(li, lv, layout, align, x, y, w, h, angle, leader, pref) {
-			this.li = li; this.lv = lv; this.layout = layout; this.align = align;
-			this.x = x; this.y = y; this.w = w; this.h = h; this.angle = angle || 0; this.leader = leader;
-			this.reps = null; this.boxes = null; this.fx = undefined; this.ok = false; this.stick = false;
-			this.bl = null; this.items = null; this.st = 0; this.along = !!angle;
-			this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0;
-			this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
+		// Candidates come from a pool kept across layouts, so a layout allocates almost none
+		// (a zoom's layout would otherwise make tens of thousands, and the garbage collector's
+		// pauses were a sixth of the time).
+		var pool = mem.pool || (mem.pool = []), np = 0;
+		function newCand(li, lv, layout, align, x, y, w, h, angle, leader, pref) {
+			var c = np < pool.length ? pool[np] : (pool[np] = new Cand());
+			np++;
+			c.li = li; c.lv = lv; c.layout = layout; c.align = align;
+			c.x = x; c.y = y; c.w = w; c.h = h; c.angle = angle || 0; c.leader = null;
+			c.reps = null; c.boxes = null; c.fx = NaN; c.ok = false;
+			c.bl = null; c.items = null; c.st = 0; c.along = !!angle;
+			c.lazy = false; c.dead = false; c.nx = 0; c.ny = 0;
+			c.base = lv.value - pref + keepBonus(li, lv);
+			if (leader) { setLeader(c, leader); }
+			return c;
+		}
+		// The leader costs its length (R1: nearness is the first thing given up).
+		function setLeader(c, L) {
 			var len = 0;
-			if (leader) {
-				for (var i = 1; i < leader.length; i++) { len += Math.hypot(leader[i][0] - leader[i - 1][0], leader[i][1] - leader[i - 1][1]); }
-				pref += C_LEADER_BASE + C_LEADER_PER_ROW * len / rowH;
-			}
-			this.base = lv.value - pref + keepBonus(li, lv);
+			for (var i = 1; i < L.length; i++) { len += Math.hypot(L[i][0] - L[i - 1][0], L[i][1] - L[i - 1][1]); }
+			c.leader = L;
+			c.base -= C_LEADER_BASE + C_LEADER_PER_ROW * len / rowH;
+		}
+		// A candidate's own two- or three-point leader buffer.
+		function lead2(c, ax, ay, bx, by) {
+			var L = c.lb2 || (c.lb2 = [[0, 0], [0, 0]]);
+			L[0][0] = ax; L[0][1] = ay; L[1][0] = bx; L[1][1] = by;
+			return L;
+		}
+		function lead3(c, ax, ay, bx, by, ex, ey) {
+			var L = c.lb3 || (c.lb3 = [[0, 0], [0, 0], [0, 0]]);
+			L[0][0] = ax; L[0][1] = ay; L[1][0] = bx; L[1][1] = by; L[2][0] = ex; L[2][1] = ey;
+			return L;
 		}
 
 		// Ink of a candidate: one box per stacked row (the staircase), one for a line, and the same
@@ -510,7 +541,7 @@ EngCalcs.lpnPlacerD = (function () {
 			c.lazy = false;
 			if (hardOK(c)) { c.ok = true; return true; }
 			var sh = rowH / 2 - PIPE_GAP;
-			c.x += c.nx * sh; c.y += c.ny * sh; c.base -= 0.3; c.boxes = null; c.fx = undefined;
+			c.x += c.nx * sh; c.y += c.ny * sh; c.base -= 0.3; c.boxes = null; c.fx = NaN;
 			if (hardOK(c)) { c.ok = true; return true; }
 			c.dead = true;
 			return false;
@@ -818,7 +849,7 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			return cost;
 		}
-		function keyOf(c) { if (c.fx === undefined) { c.fx = softCost(c); } return c.base - c.fx; }
+		function keyOf(c) { if (c.fx !== c.fx) { c.fx = softCost(c); } return c.base - c.fx; }
 		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
 		// The best candidate for label li as things stand; hidden (null, worth 0) if nothing fits
 		// or nothing is worth showing. A hand-placed label is always shown.
@@ -837,7 +868,7 @@ EngCalcs.lpnPlacerD = (function () {
 						var c = list[i];
 						if (c.base <= bs) { break; }
 						if (nDyn > MAX_DYN && best) { break; }
-						if (c.fx !== undefined && c.base - c.fx <= bs) { continue; }
+						if (c.fx === c.fx && c.base - c.fx <= bs) { continue; }
 						if (c.dead || (c.lazy && !hardLazy(c))) { continue; }
 						var d = dynCost(c, null);
 						if (d !== d) { if (!L.hand) { continue; } d = HARD_HAND; }
@@ -896,7 +927,8 @@ EngCalcs.lpnPlacerD = (function () {
 						al = right ? 'left' : 'right'; x = right ? px : px - d.w;
 						if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
 						if (!segFree(sx, sy, px, py, own)) { continue; }
-						var c = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, [[sx, sy], [px, py]], pref);
+						var c = newCand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, null, pref);
+						setLeader(c, lead2(c, sx, sy, px, py));
 						c.ok = true; list.push(c);
 					} else if (hookLen > 0) {
 						for (var sd = -1; sd <= 1; sd += 2) {
@@ -905,7 +937,8 @@ EngCalcs.lpnPlacerD = (function () {
 							if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
 							if (legFree === null) { legFree = segFree(sx, sy, px, py, own); }
 							if (!legFree || !segFree(px, py, ex, py, own)) { continue; }
-							var c2 = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, [[sx, sy], [px, py], [ex, py]], pref + 0.1);
+							var c2 = newCand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, null, pref + 0.1);
+							setLeader(c2, lead3(c2, sx, sy, px, py, ex, py));
 							c2.ok = true; list.push(c2);
 						}
 					}
@@ -922,7 +955,7 @@ EngCalcs.lpnPlacerD = (function () {
 				if (tier) { genLeadered(li, o, lv, layout, d, alt, list, DIRSET, tier - 1); return; }
 				function put(align, x, y, pref) {
 					if (blockFree(req, lv.rows, layout, d, align, x, y)) {
-						var c = new Cand(li, lv, layout, align, x, y, d.w, d.h, 0, null, pref + alt);
+						var c = newCand(li, lv, layout, align, x, y, d.w, d.h, 0, null, pref + alt);
 						c.ok = true; list.push(c);
 					}
 				}
@@ -1034,7 +1067,7 @@ EngCalcs.lpnPlacerD = (function () {
 			if (kind === 'along') {
 				off = d.h / 2 + PIPE_GAP;
 				cx = P.x + nx * off; cy = P.y + ny * off;
-				c = new Cand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null, pref + sidePref);
+				c = newCand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null, pref + sidePref);
 				c.along = true; c.nx = nx; c.ny = ny;
 				// Tested only when the search reaches it (hardLazy); most never are.
 				c.lazy = !!check;
@@ -1046,7 +1079,7 @@ EngCalcs.lpnPlacerD = (function () {
 			cx = P.x + nx * off; cy = P.y + ny * off;
 			if (layout === 'stack') { align = nx > 0.3 ? 'left' : (nx < -0.3 ? 'right' : 'center'); }
 			if (check && !blockFree(reqs[li], lv.rows, layout, d, align, cx - d.w / 2, cy - d.h / 2)) { return null; }
-			c = new Cand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null, pref + sidePref);
+			c = newCand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null, pref + sidePref);
 			c.ok = !!check;
 			return c;
 		}
@@ -1066,7 +1099,7 @@ EngCalcs.lpnPlacerD = (function () {
 			var right = dx >= 0, d = dims(req, lv.rows, req.layout, text);
 			for (var k = 0; k < d.mids.length; k++) {
 				var leader = far ? (owner.hw !== undefined ? leaderFrom(owner, [[H.x, H.y]]) : [[owner.x, owner.y], [H.x, H.y]]) : null;
-				list.push(new Cand(li, lv, req.layout, right ? 'left' : 'right', right ? H.x : H.x - d.w, H.y - d.mids[k],
+				list.push(newCand(li, lv, req.layout, right ? 'left' : 'right', right ? H.x : H.x - d.w, H.y - d.mids[k],
 					d.w, d.h, 0, leader, 0.1 * k));
 			}
 		}
@@ -1102,7 +1135,7 @@ EngCalcs.lpnPlacerD = (function () {
 					leader = [s0].concat(tail);
 				}
 			}
-			var c = new Cand(li, lv, layout, pl.align || 'left', x, y, d.w, d.h, pl.angle || 0, leader, 0);
+			var c = newCand(li, lv, layout, pl.align || 'left', x, y, d.w, d.h, pl.angle || 0, leader, 0);
 			c.base += B_STICK;
 			if (pl.repeats && pl.repeats.length) {
 				c.reps = pl.repeats.map(function (r) {
@@ -1165,7 +1198,7 @@ EngCalcs.lpnPlacerD = (function () {
 				for (var m = 0; m < list.length && tried < TRIES; m++) {
 					var c = list[m];
 					if (c.base <= here) { break; }
-					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
+					if (c.fx === c.fx && c.base - c.fx <= here) { continue; }
 					if (c.dead || (c.lazy && !hardLazy(c))) { continue; }
 					if (lifted !== li) { lift(li); }
 					var bl = [], d = dynCost(c, null);
