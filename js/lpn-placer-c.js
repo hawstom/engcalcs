@@ -741,7 +741,9 @@ EngCalcs.lpnPlacerC = (function () {
 			var nx = -pa.dy, ny = pa.dx;   // a normal of the pipe at its middle
 			['line', 'stack'].forEach(function (layout) {
 				var sh = layout === L.usual ? 0 : SHAPE;
+				// Along the pipe only as one line: a turned stack reads badly.
 				[0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
+					if (layout !== 'line') { return; }
 					[1, -1].forEach(function (side) {
 						specs.push({ t: 'along', k: k, side: side, layout: layout, base: steep + Math.abs(k) * 0.12 + (side < 0 ? 0.04 : 0) + sh });
 					});
