@@ -547,8 +547,8 @@ the block.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
 - 99|539| **Gang the neighbour labels so their leaders stop crossing.**
-  **REBUILD FROM RULES, 2026-09-28:** his couch interview chose two clean-room builders and a neutral
-  bench; the rules are `dev/label-placement-rules.md`, a draft awaiting his review. Build nothing first.
+  **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
+  seam built, two clean-room placers done and both fail R-075; state in the handoff.
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
   `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
   write up** -- so the branch waits on his reading, not on more building.
@@ -1729,6 +1729,10 @@ the block.
 - 50|735| **Honour `[TIMES] Statistic` instead of discarding it.** Mary, 2026-09-27: AVERAGED,
   MINIMUM, MAXIMUM and RANGE are read and dropped (`js/lpn-inp.js:726`, `js/lpn-patterns.js:136`); a
   file that sets one reports differently in EPANET. Her journal 2026-09-27; not a site-honesty defect.
+- 50|736| **[H] Count installs and app launches, if the consent text allows it.** Tom, 2026-09-28:
+  *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
+  button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
+  answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

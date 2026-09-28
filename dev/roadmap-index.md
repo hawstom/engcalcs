@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**106 open tasks.** Next (100): 2 · Soon (75): 22 · Someday (50): 42 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 6
+**107 open tasks.** Next (100): 2 · Soon (75): 22 · Someday (50): 43 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 6
 
 ## 100 — Next (2)
 
@@ -48,7 +48,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 718 — File menu: Recents just above Exit, and an Import submenu.
 - ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
 
-## 50 — Someday (42)
+## 50 — Someday (43)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -92,6 +92,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
+- Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 
 ## 25 — Maybe (15)
 
@@ -137,5 +138,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-96 of 106 titles are within 4–12 words. `!` marks the rest;
+97 of 107 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
