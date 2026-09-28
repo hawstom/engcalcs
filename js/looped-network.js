@@ -369,7 +369,7 @@ var EngCalcs = EngCalcs || {};
 	// buildNodeEls(), updateNode() and refreshLabelText().
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
-		if (placerActive()) { placerRedrawOne('n:' + id, ne); return; }   // dev only, ?placer=
+		if (placerActive()) { placerRedrawOne(nodeLabelKey(id), ne); return; }   // dev only, ?placer=
 		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, through
 		// the same visibility seam a too-short link label uses. `visibility` rather than `display`:
 		// the element keeps its box, so nothing downstream re-measures what is merely invisible.
@@ -1372,7 +1372,7 @@ var EngCalcs = EngCalcs || {};
 	// is how many copies of a label a long pipe carries.
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
-		if (placerActive()) { placerRedrawOne('l:' + id, le, id); return; }   // dev only, ?placer=
+		if (placerActive()) { placerRedrawOne(linkLabelKey(id), le, id); return; }   // dev only, ?placer=
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
 		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
@@ -53026,23 +53026,30 @@ var EngCalcs = EngCalcs || {};
 		setLabelAssemblyHidden(holder, false);
 		placerLeader(holder, p.leader);
 	}
+	// The hook's second leg is shown and hidden by its `display` ATTRIBUTE: it is cloned from a
+	// leader that is showing, so its own style never says otherwise.
+	function placerHookShown(holder, on) {
+		var hook = holder.placerHook;
+		if (!hook) { return; }
+		if (on) { hook.removeAttribute('display'); } else { hook.setAttribute('display', 'none'); }
+	}
 	function placerLeader(holder, L) {
 		var ld = holder.leader, hook = holder.placerHook;
 		if (!ld) { return; }
 		if (!L) {
-			ld.style.display = 'none';
-			if (hook) { hook.style.display = 'none'; }
+			holder.leader.style.display = 'none';
+			placerHookShown(holder, false);
 			return;
 		}
-		ld.style.display = '';
+		holder.leader.style.display = '';
 		ld.setAttribute('x1', L[0][0]); ld.setAttribute('y1', L[0][1]);
 		ld.setAttribute('x2', L[1][0]); ld.setAttribute('y2', L[1][1]);
-		if (L.length < 3) { if (hook) { hook.style.display = 'none'; } return; }
+		if (L.length < 3) { placerHookShown(holder, false); return; }
 		if (!hook) {
 			hook = holder.placerHook = ld.cloneNode(false);
 			ld.parentNode.insertBefore(hook, ld.nextSibling);
 		}
-		hook.style.display = '';
+		placerHookShown(holder, true);
 		hook.style.visibility = ld.style.visibility;
 		hook.setAttribute('x1', L[1][0]); hook.setAttribute('y1', L[1][1]);
 		hook.setAttribute('x2', L[2][0]); hook.setAttribute('y2', L[2][1]);
@@ -53050,7 +53057,7 @@ var EngCalcs = EngCalcs || {};
 	function placerHide(holder) {
 		setLabelAssemblyHidden(holder, true);
 		if (holder.leader) { holder.leader.style.display = 'none'; }
-		if (holder.placerHook) { holder.placerHook.style.display = 'none'; }
+		placerHookShown(holder, false);
 	}
 	// Every node and link label: its placement, or hidden. An owner off the screen was not asked
 	// about, so it is hidden too -- nobody can see it, and the next layout asks again.
@@ -53058,14 +53065,14 @@ var EngCalcs = EngCalcs || {};
 		var jobs = [], placed = placerRt ? placerRt.placed : {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			var p = placed['n:' + n.id];
+			var p = placed[nodeLabelKey(n.id)];
 			if (!p || ne.empty) { placerHide(ne); return; }
 			jobs.push({ h: ne, p: p });
 			placerWrite(ne, p);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			var p = placed['l:' + l.id];
+			var p = placed[linkLabelKey(l.id)];
 			if (!p || le.empty) { ensureLabelRepeats(le, 0, l.id); placerHide(le); return; }
 			jobs.push({ h: le, p: p });
 			placerWrite(le, p, l.id);

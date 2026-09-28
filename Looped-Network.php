@@ -3431,7 +3431,7 @@ EngCalcs.pageConfig = {
         && is_file(__DIR__ . '/js/lpn-placer-' . $_GET['placer'] . '.js')) ? $_GET['placer'] : null;
 if ($ecPlacer !== null) { ?>
 <script src="/engcalcs/js/lpn-label-scene.js?v=<?=filemtime(__DIR__.'/js/lpn-label-scene.js')?>"></script>
-<script src="/engcalcs/js/lpn-placer-<?=$ecPlacer?>.js?v=<?=filemtime(__DIR__.'/js/lpn-placer-' . $ecPlacer . '.js')?>"></script>
+<script src="/engcalcs/js/lpn-placer-<?=$ecPlacer?>.js?v=<?=json_encode(filemtime(__DIR__ . '/js/lpn-placer-' . $ecPlacer . '.js'))?>"></script>
 <script>EngCalcs.lpnPlacerName = <?=json_encode($ecPlacer)?>;</script>
 <?php } ?>
 <script>
