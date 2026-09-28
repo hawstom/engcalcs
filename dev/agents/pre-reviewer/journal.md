@@ -3079,3 +3079,57 @@ whether the whole block reverts (my finding says it will not -- the anchor cell 
 value). (2) The same gesture inside a scenario, then switch back to Base and confirm elevation is
 untouched there. (3) Open a node's Properties box and press Ctrl+Enter in a text field, just to see
 nothing surprising happens.
+
+---
+
+## 2026-09-28 -- feat/table-width, R-366/R-367 (commit 526f56a5), checked at 64e15535
+
+OBSERVED, this worktree, checked 2026-09-28.
+
+**R-366 (print wrapping of long values).** CONFIRMED for the actual complaint. Built a real
+page.pdf() print pass (not just emulateMedia) against the fixture dev/lpn-spike/pane-print-long-values.lwn
+and read back true glyph y-positions with pdfjs-dist. Every Latitude/Longitude/Date-installed value
+printed on ONE line at both US Letter and A4, in a genuine Chromium print job. Learned along the way
+that page.pdf() actually fires real afterprint events (stubbing window.print() does not stop that),
+which tears down #lpn_print_area between captures -- my first attempt produced nonsense (a map-legend
+render) because I read a torn-down print area. Re-clicking Print before each capture fixed my test.
+Mutation-tested: re-added the old `overflow-wrap: anywhere` to print `td` via an injected stylesheet
+and reran -- the fixture's Longitude values immediately split mid-digit across two/three lines
+(row 10: "37.774929817963" torn into "2", "7", "37.77492981796", spread over 3 y-positions). The
+CSS change is genuinely load-bearing, not decorative.
+
+**But the closing note's confidence ("overflows by a hair... invisible in practice") is unverified
+past the three tested values, and I found the boundary case it describes as harmless is not.**
+Directly overflowed a Longitude cell with an oversized single-token string (40 chars vs the ~18
+the column was sized for) in the built print DOM and measured the glyph's actual painted extent
+against the neighbouring Date-installed cell's rect: the text bled 133px into the next column
+(no overflow:hidden anywhere in the print CSS chain -- checked). So when an unbreakable token's
+print-pass shortfall is NOT a hair -- a longer custom-property value, a different OS/printer font
+substitution, anything past whatever margin the existing (pre-existing, not new) 3% print font
+shrink actually buys -- the failure mode is two adjacent columns' digits visually merging into one
+unreadable smear, not an invisible edge. That is arguably a worse surprise than the mid-word wrap
+it replaces, and nothing in this fix bounds it or detects it. Tom's "research how to avoid
+surprises... ensure width decisions account for this" asked for more than a citation of why the
+discrepancy exists -- it asked for the surprise to stop being possible, and this fix narrows it
+without closing it.
+
+**R-367 (Mixing model prints stored EPANET word, not the label).** CONFIRMED, in English and in
+Spanish (?lang=es: on-screen "Flujo pistón FIFO", printed "Flujo pistón FIFO", matching). Mutation
+test: reverted paneCellDisplayText() to just call paneCellText() in a scratch docroot (symlinked
+tree with one file swapped) and reran by hand -- printed cell reverted to the bare "FIFO", proving
+the fix (not the harness alone) is what makes them agree. The fix is generic over every c.choices
+column (checked paneColSourceType, paneColPipeType, paneColFittings, paneColCurveRef,
+paneColMixingModel, pattern-reference columns) -- not special-cased to Mixing model, so other
+choice columns get the same correctness with no separate leak to check for.
+
+**Scope check.** Commit 526f56a5 touches only print-path code (css/engcalcs.css print block,
+paneCellDisplayText, its one caller in paneBuildPrintable) plus a new harness+fixture -- nothing
+in the on-screen table, drag, or heading-wrap machinery from the rest of this branch. "Everything
+else was nice" (R-368) has no code surface in this commit to have regressed.
+
+**Not checked / needs a human:** actual print PREVIEW/paper appearance (colour, margins, page
+breaks across a longer network) -- page.pdf() proves the text geometry but not how it looks read
+off paper; whether a customer's longest real-world custom-property value (beyond this fixture's
+three) still fits given the same margin.
+
+Orchestrator note, 2026-09-28: the overlap finding above was acted on in e3a59b3e (measured headroom plus the wrap fallback restored).
