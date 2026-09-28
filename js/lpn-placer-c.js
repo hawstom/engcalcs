@@ -58,13 +58,17 @@ EngCalcs.lpnPlacerC = (function () {
 	var CELL = 36;             // the obstacle grids' cell, px
 	var RES = 3;               // the free-space raster's cell, px
 	var SHOW_MAX = 4.4;          // dearer than this, a label is better hidden
-	var SHOW_TRIES = 120;      // a label looks this far down its list before giving up
-	var GROW_TRIES = 30;       // growing looks only this far: convenient space
-	var MEND_WORK = 1500;      // candidates MEND may judge in one view
+	// How hard a pan or zoom may look: a label looks this far down its list before giving up,
+	// growing looks only this far (convenient space), and MEND judges at most this many spots.
+	var QUICK = { show: 120, grow: 30, mend: 1500, deadline: 0 };
 	var NAME = 'C (keep, show, grow, mend)';
 
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
 	var D2R = Math.PI / 180;
+
+	function now() {
+		return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+	}
 
 	// ---- boxes: centred, turned `angle` degrees; the box is its own bounding box -----------
 	function newBox() {
@@ -415,10 +419,63 @@ EngCalcs.lpnPlacerC = (function () {
 		var dirCache = {};   // node id -> the directions of the pipes meeting there (H-b)
 		var specCache = {};  // label id -> its candidate specs (H-b)
 
+		var last = null;     // the view place() answered last: {scene, prev, fp, layout}
+		var ready = null;    // a layout idle() thought out ahead: {fp, layout}
+
 		function place(scene, opts) {
 			var prev = opts && opts.prev && opts.prev.layout && opts.prev.scene ? opts.prev : null;
+			var fp = fingerprint(scene, prev), out;
+			if (ready && ready.fp === fp) { out = ready.layout; } else { out = layout(scene, prev, QUICK); }
+			ready = null;
+			last = { scene: scene, prev: prev, fp: fp, layout: out };
+			return out;
+		}
+
+		// H-b: hard thinking waits for the pauses. Opening a project lays out its first view with
+		// a far deeper search than a pan or zoom can afford; a pause after a view deepens that
+		// view's layout, starting from exactly what is on screen so nothing already shown moves,
+		// and place() hands it over if it is asked for the same view again. Either is thrown
+		// away if it cannot finish inside the budget.
+		function idle(budgetMs, info) {
+			var deadline = now() + Math.max(0, (budgetMs || 0) - 5), out;
+			if (info && info.opening) {
+				dirCache = {}; specCache = {}; ready = null; last = null;
+				if (!info.scene) { return; }
+				out = layout(info.scene, null, deep(deadline));
+				if (out) { ready = { fp: fingerprint(info.scene, null), layout: out }; }
+				return;
+			}
+			if (!last || (info && info.scene && info.scene !== last.scene) || last.deepened) { return; }
+			last.deepened = true;
+			out = layout(last.scene, { scene: last.scene, layout: last.layout, again: true }, deep(deadline));
+			if (out) { ready = { fp: last.fp, layout: out }; }
+		}
+		function deep(deadline) { return { show: 400, grow: 90, mend: 8000, deadline: deadline }; }
+
+		// A cheap signature of everything a layout depends on: the view, the lettering, the
+		// labels and their rows, where every node is, and which layout the last view had (R13).
+		function fingerprint(scene, prev) {
+			var h = 0, i;
+			function mix(v) { h = (h * 31 + (typeof v === 'number' ? Math.round(v * 100) : hashStr(String(v)))) | 0; }
+			function hashStr(t) { var k = 0; for (var j = 0; j < t.length; j++) { k = (k * 33 + t.charCodeAt(j)) | 0; } return k; }
+			mix(scene.view.s); mix(scene.view.tx); mix(scene.view.ty); mix(scene.viewport.w); mix(scene.viewport.h);
+			mix(scene.text.sizePx); mix(JSON.stringify(scene.dropOrder || {}));
+			for (i = 0; i < scene.nodes.length; i++) { mix(scene.nodes[i].x); mix(scene.nodes[i].y); mix(scene.nodes[i].symbol.w); }
+			for (i = 0; i < scene.links.length; i++) { mix(scene.links[i].points.length); mix(scene.links[i].points[0][0]); }
+			for (i = 0; i < (scene.texts || []).length; i++) { mix(scene.texts[i].box.cx); mix(scene.texts[i].box.cy); mix(scene.texts[i].text); }
+			for (i = 0; i < scene.labels.length; i++) {
+				var r = scene.labels[i];
+				mix(r.id); mix(r.layout); mix(r.hand ? r.hand.x + ',' + r.hand.y : '-');
+				for (var j = 0; j < r.rows.length; j++) { mix(r.rows[j].text); mix(r.rows[j].w); }
+			}
+			mix(prev ? (prev.layout === (last && last.layout) ? 'last' : 'other') : 'none');
+			return h;
+		}
+
+		function layout(scene, prev, effort) {
 			var st = setup(scene, prev);
 			var labels = st.labels, i;
+			st.effort = effort;
 
 			// 0. Hand-placed labels: where the user put them, whole, always (N4).
 			labels.forEach(function (L) { if (L.req.hand) { commit(st, L, handCand(st, L)); } });
@@ -429,12 +486,13 @@ EngCalcs.lpnPlacerC = (function () {
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
 				if (!L.prevPl || !fillPrev(st, L, L.prevRs, st.probe)) { return; }
-				var cost = judge(st, L, st.probe, KEEP_MAX + PREV_BONUS);
-				if (cost < KEEP_MAX + PREV_BONUS) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
+				var cap = prev.again ? Infinity : KEEP_MAX + PREV_BONUS;
+				var cost = judge(st, L, st.probe, cap);
+				if (cost < cap) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
 			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
-				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, SHOW_TRIES)); }
+				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, effort.show)); }
 			});
 			// 3. GROW, in rounds.
 			grow(st, order);
@@ -453,7 +511,7 @@ EngCalcs.lpnPlacerC = (function () {
 				out[L.id] = pl;
 			});
 			scene.labels.forEach(function (req) { if (!out[req.id]) { out[req.id] = { shown: false }; } });
-			return { labels: out };
+			return st.late ? null : { labels: out };
 		}
 
 		// ---- scene setup: obstacles into the grids, labels into working records ------------
@@ -960,6 +1018,7 @@ EngCalcs.lpnPlacerC = (function () {
 			if (!sc) { sc = L.sc[rsI] = new Float64Array(specs.length); sc.fill(NaN); }
 			for (i = 0; i < specs.length; i++) {
 				if (specs[i].base >= bestCost) { break; }
+				if (st.effort.deadline && (i & 31) === 31 && now() > st.effort.deadline) { st.late = true; break; }
 				sv = sc[i];
 				if (sv >= bestCost) { continue; }            // known illegal, or too dear already
 				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
@@ -1001,7 +1060,7 @@ EngCalcs.lpnPlacerC = (function () {
 					uncommit(st, L);
 					var cur = dynCost(st, L, c0, c0.stat === undefined ? (c0.stat = staticCost(st, L, c0)) : c0.stat, Infinity);
 					if (cur === Infinity) { cur = c0.cost || 0; }
-					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), GROW_TRIES);
+					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), st.effort.grow);
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
@@ -1011,7 +1070,7 @@ EngCalcs.lpnPlacerC = (function () {
 		// MEND: a hidden label looks for a spot blocked by exactly one movable label; if that one
 		// can go somewhere else (with fewer rows if it must), both are shown.
 		function mend(st, order) {
-			var any = false, limit = st.work + MEND_WORK, c = st.probe;
+			var any = false, limit = st.work + st.effort.mend, c = st.probe;
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
 				if (L.cur) { continue; }
@@ -1089,12 +1148,6 @@ EngCalcs.lpnPlacerC = (function () {
 				});
 			}
 			c.reps = reps;
-		}
-
-		// H-b: the per-node pipe directions and each label's list of places to try are the
-		// thinking kept across views; opening a project starts them afresh.
-		function idle(budgetMs, info) {
-			if (info && info.opening) { dirCache = {}; specCache = {}; }
 		}
 
 		return { name: NAME, place: place, idle: idle };
