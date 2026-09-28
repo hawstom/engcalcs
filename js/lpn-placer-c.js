@@ -461,7 +461,12 @@ EngCalcs.lpnPlacerC = (function () {
 			mix(scene.view.s); mix(scene.view.tx); mix(scene.view.ty); mix(scene.viewport.w); mix(scene.viewport.h);
 			mix(scene.text.sizePx); mix(JSON.stringify(scene.dropOrder || {}));
 			for (i = 0; i < scene.nodes.length; i++) { mix(scene.nodes[i].x); mix(scene.nodes[i].y); mix(scene.nodes[i].symbol.w); }
-			for (i = 0; i < scene.links.length; i++) { mix(scene.links[i].points.length); mix(scene.links[i].points[0][0]); }
+			for (i = 0; i < scene.links.length; i++) {
+				var l = scene.links[i];
+				mix(l.id); mix((l.symbols || []).length);
+				for (var k = 0; k < l.points.length; k++) { mix(l.points[k][0]); mix(l.points[k][1]); }
+			}
+			for (i = 0; i < (scene.customers || []).length; i++) { mix(scene.customers[i].box.x); mix(scene.customers[i].box.y); }
 			for (i = 0; i < (scene.texts || []).length; i++) { mix(scene.texts[i].box.cx); mix(scene.texts[i].box.cy); mix(scene.texts[i].text); }
 			for (i = 0; i < scene.labels.length; i++) {
 				var r = scene.labels[i];
