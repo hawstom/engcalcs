@@ -75,17 +75,25 @@ EngCalcs.lpnPlacerD = (function () {
 		this.bl = null; this.items = null; this.st = 0; this.along = false;
 		this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0; this.base = 0;
 		this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
-		this.lb2 = null; this.lb3 = null;
+		this.lb2 = null; this.lb3 = null; this.bbuf = null;
 	}
 
 	// ---- boxes and segments --------------------------------------------------------------------
-	function mkBox(cx, cy, w, h, angDeg) {
-		var a = angDeg || 0, r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+	function Box() {
+		this.cx = 0; this.cy = 0; this.hw = 0; this.hh = 0; this.c = 1; this.s = 0; this.rot = false; this.rep = false;
+		this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0;
+	}
+	// Fills box o (reused, so the hot paths allocate nothing) and returns it.
+	function setBox(o, cx, cy, w, h, angDeg) {
+		var a = angDeg || 0, r = a * Math.PI / 180, c = a ? Math.cos(r) : 1, s = a ? Math.sin(r) : 0;
 		var hw = w / 2, hh = h / 2;
 		var ex = hw * Math.abs(c) + hh * Math.abs(s), ey = hw * Math.abs(s) + hh * Math.abs(c);
-		return { cx: cx, cy: cy, hw: hw, hh: hh, c: c, s: s, rot: a !== 0, rep: false,
-			x0: cx - ex, y0: cy - ey, x1: cx + ex, y1: cy + ey };
+		o.cx = cx; o.cy = cy; o.hw = hw; o.hh = hh; o.c = c; o.s = s; o.rot = a !== 0; o.rep = false;
+		o.x0 = cx - ex; o.y0 = cy - ey; o.x1 = cx + ex; o.y1 = cy + ey;
+		return o;
 	}
+	function mkBox(cx, cy, w, h, angDeg) { return setBox(new Box(), cx, cy, w, h, angDeg); }
+	var SCRATCH = new Box();
 	function rectBox(r) { return mkBox(r.x + r.w / 2, r.y + r.h / 2, r.w, r.h, 0); }
 	function oBox(b) { return mkBox(b.cx, b.cy, b.w, b.h, b.angle || 0); }
 
@@ -369,7 +377,7 @@ EngCalcs.lpnPlacerD = (function () {
 			if (a1 <= a0 || b1 <= b0) { return false; }
 			if (!satSum(sat, Math.floor(a0), Math.floor(b0), Math.ceil(a1), Math.ceil(b1))) { return false; }
 			if (satSum(csat, Math.ceil(a0), Math.ceil(b0), Math.floor(a1), Math.floor(b1))) { return true; }
-			var box = mkBox((x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, 0), q = hardG.query(x0, y0, x1, y1, qa);
+			var box = setBox(SCRATCH, (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, 0), q = hardG.query(x0, y0, x1, y1, qa);
 			for (var n = 0; n < q.n; n++) { if (boxesOverlap(box, q[n].b, TOL)) { return true; } }
 			return false;
 		}
@@ -431,25 +439,30 @@ EngCalcs.lpnPlacerD = (function () {
 
 		// Ink of a candidate: one box per stacked row (the staircase), one for a line, and the same
 		// for every repeat along a long pipe.
-		function build(c) {
-			var req = reqs[c.li], out = [];
-			function at(x, y, ang, rep) {
-				var bcx = x + c.w / 2, bcy = y + c.h / 2, r = ang * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
-				function put(cx, cy, w, h) {
-					var dx = cx - bcx, dy = cy - bcy, b = mkBox(bcx + dx * co - dy * si, bcy + dx * si + dy * co, w, h, ang);
-					b.rep = rep; out.push(b);
-				}
-				if (c.layout === 'line') { put(bcx, bcy, c.w, c.h); return; }
-				var top = y, rows = c.lv.rows;
-				for (var i = 0; i < rows.length; i++) {
-					var rw = req.rows[rows[i]].w, rh = req.rows[rows[i]].h;
-					var left = c.align === 'right' ? x + c.w - rw : (c.align === 'center' ? x + (c.w - rw) / 2 : x);
-					put(left + rw / 2, top + rh / 2, rw, rh);
-					top += rh;
-				}
+		// One copy of c's block, its top-left at x, y and turned by ang about its centre, into out
+		// from index nb; returns the new count.
+		function buildAt(c, out, nb, x, y, ang, rep) {
+			var req = reqs[c.li], bcx = x + c.w / 2, bcy = y + c.h / 2, r = ang * Math.PI / 180;
+			var co = ang ? Math.cos(r) : 1, si = ang ? Math.sin(r) : 0, rows = c.lv.rows, line = c.layout === 'line';
+			var top = y, n = line ? 1 : rows.length;
+			for (var i = 0; i < n; i++) {
+				var rw = line ? c.w : req.rows[rows[i]].w, rh = line ? c.h : req.rows[rows[i]].h;
+				var left = line ? x : (c.align === 'right' ? x + c.w - rw : (c.align === 'center' ? x + (c.w - rw) / 2 : x));
+				var dx = left + rw / 2 - bcx, dy = top + rh / 2 - bcy, b = out[nb] || (out[nb] = new Box());
+				setBox(b, bcx + dx * co - dy * si, bcy + dx * si + dy * co, rw, rh, ang);
+				b.rep = rep; nb++;
+				top += rh;
 			}
-			at(c.x, c.y, c.angle, false);
-			(c.reps || []).forEach(function (r) { at(r.x, r.y, r.angle, true); });
+			return nb;
+		}
+		// The boxes live in the candidate's own array, refilled in place.
+		function build(c) {
+			var out = c.bbuf || (c.bbuf = []), nb = 0, nr = c.reps ? c.reps.length : 0;
+			for (var k = -1; k < nr; k++) {
+				var r = k < 0 ? c : c.reps[k];
+				nb = buildAt(c, out, nb, r.x, r.y, r.angle || 0, k >= 0);
+			}
+			if (out.length !== nb) { out.length = nb; }
 			c.boxes = out;
 			var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, i;
 			for (i = 0; i < out.length; i++) {
@@ -806,7 +819,7 @@ EngCalcs.lpnPlacerD = (function () {
 						var top0 = top;
 						top += rh;
 						if (b.x1 - left <= -PADX || left + rw - b.x0 <= -PADX || b.y1 - top0 <= -PADY || top - b.y0 <= -PADY) { continue; }
-						if (b.rot && !boxesOverlap(mkBox(left + rw / 2, top0 + rh / 2, rw, rh, 0), b, -PADY)) { continue; }
+						if (b.rot && !boxesOverlap(setBox(SCRATCH, left + rw / 2, top0 + rh / 2, rw, rh, 0), b, -PADY)) { continue; }
 						c.bl = it.c; hit = h1 = true;
 						break;
 					}
