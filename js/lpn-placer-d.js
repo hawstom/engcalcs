@@ -44,7 +44,7 @@ EngCalcs.lpnPlacerD = (function () {
 
 	var DIRS = 8;
 	var DISTS = [1, 2.2, 3.8];          // leader lengths beyond the symbol, in row heights
-	var MAX_EVALS = 50000;                 // work cap per place(); deterministic, not wall-clock
+	var MAX_EVALS = 25000;                 // work cap per place(); deterministic, not wall-clock
 	var TRIES = 2;                          // blocked places a short-changed label tries per level
 	var PASSES = 1;
 	var DIRSET = [];
@@ -60,7 +60,7 @@ EngCalcs.lpnPlacerD = (function () {
 		var a = angDeg || 0, r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
 		var hw = w / 2, hh = h / 2;
 		var ex = hw * Math.abs(c) + hh * Math.abs(s), ey = hw * Math.abs(s) + hh * Math.abs(c);
-		return { cx: cx, cy: cy, hw: hw, hh: hh, c: c, s: s, rot: a !== 0,
+		return { cx: cx, cy: cy, hw: hw, hh: hh, c: c, s: s, rot: a !== 0, rep: false,
 			x0: cx - ex, y0: cy - ey, x1: cx + ex, y1: cy + ey };
 	}
 	function rectBox(r) { return mkBox(r.x + r.w / 2, r.y + r.h / 2, r.w, r.h, 0); }
@@ -250,26 +250,33 @@ EngCalcs.lpnPlacerD = (function () {
 		// ---- the fixed world: symbols and Text objects (hard), pipes, arrows, callouts (soft) ----
 		var hardG = new Grid(vp), softG = new Grid(vp), nodesById = {}, linksById = {}, custById = {};
 		var hardRects = [], qa = [], qb = [];
-		function addHard(it, b) { it.b = b; hardG.add(it, b.x0, b.y0, b.x1, b.y1); hardRects.push(b); }
+		// Every indexed thing has one shape, so the hot loops stay monomorphic.
+		function Item(t, node, link, b, ax, ay, bx, by) {
+			this.t = t; this.node = node; this.link = link; this.b = b;
+			this.ax = ax; this.ay = ay; this.bx = bx; this.by = by; this.st = 0; this.li = -1; this.c = null;
+		}
+		function addHard(it, b) { hardG.add(it, b.x0, b.y0, b.x1, b.y1); hardRects.push(b); }
 		scene.nodes.forEach(function (n) {
 			nodesById[n.id] = n;
-			addHard({ t: 'sym', node: n.id }, rectBox(n.symbol));
+			var sb = rectBox(n.symbol);
+			addHard(new Item('sym', n.id, null, sb, 0, 0, 0, 0), sb);
 		});
 		scene.links.forEach(function (l) {
 			linksById[l.id] = l;
-			(l.symbols || []).forEach(function (s) { addHard({ t: 'lsym', link: l.id }, oBox(s)); });
-			(l.arrows || []).forEach(function (s) { var b = oBox(s); softG.add({ t: 'arrow', link: l.id, b: b }, b.x0, b.y0, b.x1, b.y1); });
+			(l.symbols || []).forEach(function (s) { var b = oBox(s); addHard(new Item('lsym', null, l.id, b, 0, 0, 0, 0), b); });
+			(l.arrows || []).forEach(function (s) { var b = oBox(s); softG.add(new Item('arrow', null, l.id, b, 0, 0, 0, 0), b.x0, b.y0, b.x1, b.y1); });
 			for (var i = 1; i < l.points.length; i++) {
 				var a = l.points[i - 1], b = l.points[i];
-				softG.add({ t: 'pipe', link: l.id, ax: a[0], ay: a[1], bx: b[0], by: b[1] },
+				softG.add(new Item('pipe', null, l.id, null, a[0], a[1], b[0], b[1]),
 					Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1]));
 			}
 		});
 		(scene.texts || []).forEach(function (t) {
-			addHard({ t: 'text' }, oBox(t.box));
+			var tb = oBox(t.box);
+			addHard(new Item('text', null, null, tb, 0, 0, 0, 0), tb);
 			var L = t.leader;
 			for (var i = 1; L && i < L.length; i++) {
-				softG.add({ t: 'tlead', ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1] },
+				softG.add(new Item('tlead', null, null, null, L[i - 1][0], L[i - 1][1], L[i][0], L[i][1]),
 					Math.min(L[i - 1][0], L[i][0]), Math.min(L[i - 1][1], L[i][1]), Math.max(L[i - 1][0], L[i][0]), Math.max(L[i - 1][1], L[i][1]));
 			}
 		});
@@ -330,7 +337,9 @@ EngCalcs.lpnPlacerD = (function () {
 		function Cand(li, lv, layout, align, x, y, w, h, angle, leader, pref) {
 			this.li = li; this.lv = lv; this.layout = layout; this.align = align;
 			this.x = x; this.y = y; this.w = w; this.h = h; this.angle = angle || 0; this.leader = leader;
-			this.reps = null; this.boxes = null; this.fx = undefined;
+			this.reps = null; this.boxes = null; this.fx = undefined; this.ok = false; this.stick = false;
+			this.bl = null; this.items = null; this.st = 0;
+			this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
 			var len = 0;
 			if (leader) {
 				for (var i = 1; i < leader.length; i++) { len += Math.hypot(leader[i][0] - leader[i - 1][0], leader[i][1] - leader[i - 1][1]); }
@@ -558,7 +567,7 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 
 		// ---- the labels, their levels, and their candidate lists (built a level at a time) ----
-		var lab = new Array(N), li, nGen = 0, nValid = 0, nDyn = 0, CNT = { best: 0, pair: 0, soft: 0, build: 0, near: 0 };
+		var lab = new Array(N), li, nGen = 0, nValid = 0, nDyn = 0, CNT = { best: 0, pair: 0, soft: 0, build: 0, near: 0, att1: 0, att2: 0, ok1: 0, ok2: 0, free: 0 };
 		for (li = 0; li < N; li++) {
 			lab[li] = { req: reqs[li], hand: !!reqs[li].hand, levels: levelsOf(reqs[li], scene.dropOrder), lists: [] };
 		}
@@ -599,7 +608,7 @@ EngCalcs.lpnPlacerD = (function () {
 			if (c) {
 				if (!c.boxes) { build(c); }
 				dyn.add(c, c.x0, c.y0, c.x1, c.y1);
-				if (!c.items) { c.items = c.boxes.map(function (bx) { return { li: li, b: bx, c: c }; }); }
+				if (!c.items) { c.items = c.boxes.map(function (bx) { var it = new Item('lbl', null, null, bx, 0, 0, 0, 0); it.li = li; it.c = c; return it; }); }
 				for (i = 0; i < c.items.length; i++) { b = c.items[i].b; dynB.add(c.items[i], b.x0, b.y0, b.x1, b.y1); }
 			}
 		}
@@ -610,26 +619,55 @@ EngCalcs.lpnPlacerD = (function () {
 		// label that last blocked it, which answers again for as long as that label stays put.
 		var qd = [];
 		function dynCost(c, blockers) {
-			var cost = 0, n, i, it, o;
+			var cost = 0, n, i, it, o, top;
 			evals++; nDyn++;
-			if (!c.boxes) { build(c); }
 			if (!blockers && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
-			var q = dynB.query(c.bx0, c.by0, c.bx1, c.by1, qd), hit = false;
-			for (n = 0; n < q.length; n++) {
-				it = q[n];
-				if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
-				var b = it.b;
-				for (i = 0; i < c.boxes.length; i++) {
-					CNT.pair++;
-					if (boxesOverlap(c.boxes[i], b, TOL)) {
-						c.bl = it.c; hit = true;
-						if (!blockers) { return NaN; }
-						blockers.push(it.li);
+			var hit = false, q, b;
+			if (!c.boxes && !c.angle && !c.reps) {
+				// Unturned rows as plain rectangles: no ink is built for a candidate that is blocked.
+				var req = reqs[c.li], rows = c.lv.rows, line = c.layout === 'line';
+				q = dynB.query(c.x, c.y, c.x + c.w, c.y + c.h, qd);
+				for (n = 0; n < q.length; n++) {
+					it = q[n];
+					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
+					b = it.b;
+					if (b.x1 - c.x <= TOL || c.x + c.w - b.x0 <= TOL || b.y1 - c.y <= TOL || c.y + c.h - b.y0 <= TOL) { continue; }
+					var h1 = false;
+					for (i = 0, top = c.y; i < (line ? 1 : rows.length); i++) {
+						var rw = line ? c.w : req.rows[rows[i]].w, rh = line ? c.h : req.rows[rows[i]].h;
+						var left = line || c.align === 'left' ? c.x : (c.align === 'right' ? c.x + c.w - rw : c.x + (c.w - rw) / 2);
+						var top0 = top;
+						top += rh;
+						CNT.pair++;
+						if (b.x1 - left <= TOL || left + rw - b.x0 <= TOL || b.y1 - top0 <= TOL || top - b.y0 <= TOL) { continue; }
+						if (b.rot && !boxesOverlap(mkBox(left + rw / 2, top0 + rh / 2, rw, rh, 0), b, TOL)) { continue; }
+						c.bl = it.c; hit = h1 = true;
 						break;
 					}
+					if (h1 && !blockers) { return NaN; }
+					if (h1 && blockers.indexOf(it.li) < 0) { blockers.push(it.li); }
 				}
+				if (hit) { return NaN; }
+				build(c);
+			} else {
+				if (!c.boxes) { build(c); }
+				q = dynB.query(c.bx0, c.by0, c.bx1, c.by1, qd);
+				for (n = 0; n < q.length; n++) {
+					it = q[n];
+					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
+					b = it.b;
+					for (i = 0; i < c.boxes.length; i++) {
+						CNT.pair++;
+						if (boxesOverlap(c.boxes[i], b, TOL)) {
+							c.bl = it.c; hit = true;
+							if (!blockers) { return NaN; }
+							blockers.push(it.li);
+							break;
+						}
+					}
+				}
+				if (hit) { return NaN; }
 			}
-			if (hit) { return NaN; }
 			q = dyn.query(c.x0, c.y0, c.x1, c.y1, qd);
 			for (n = 0; n < q.length; n++) {
 				o = q[n];
@@ -643,10 +681,12 @@ EngCalcs.lpnPlacerD = (function () {
 		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
 		// The best candidate for label li as things stand; hidden (null, worth 0) if nothing fits
 		// or nothing is worth showing. A hand-placed label is always shown.
-		function bestFor(li) {
+		// With `floor`, only a place worth more than it will do (null if none).
+		function bestFor(li, minK, floor) {
 			CNT.best++;
 			var L = lab[li], best = null, bs = L.hand ? -Infinity : 0;
-			for (var k = 0; k < L.levels.length; k++) {
+			if (floor !== undefined && floor > bs) { bs = floor; }
+			for (var k = minK ? Math.max(0, L.levels.length - 1) : 0; k < L.levels.length; k++) {
 				if (tierMax(li, k, 0) <= bs) { break; }
 				for (var t = 0; t < 2; t++) {
 					if (tierMax(li, k, t) <= bs) { continue; }
@@ -886,15 +926,19 @@ EngCalcs.lpnPlacerD = (function () {
 
 		// ---- 2. greedy, most crowded first ----
 		var crowd = new Array(N), anchors = new Grid(vp), qn = [];
-		reqs.forEach(function (r, k) { anchors.add({ k: k }, r.anchor.x, r.anchor.y, r.anchor.x, r.anchor.y); });
+		reqs.forEach(function (r, k) { var it = new Item('anchor', null, null, null, 0, 0, 0, 0); it.li = k; anchors.add(it, r.anchor.x, r.anchor.y, r.anchor.x, r.anchor.y); });
 		order.forEach(function (li) {
 			var a = reqs[li].anchor, R = 4 * rowH, n = 0, q = anchors.query(a.x - R, a.y - R, a.x + R, a.y + R, qn);
-			for (var k = 0; k < q.length; k++) { var b = reqs[q[k].k].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
+			for (var k = 0; k < q.length; k++) { var b = reqs[q[k].li].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
 			crowd[li] = n;
 		});
 		order.sort(function (a, b) { return (crowd[b] - crowd[a]) || (a - b); });
 		mark('setup');
-		order.forEach(function (li) { seat(li, bestFor(li).c); });
+		// Every label first, as small as it comes (G: properties go before labels) ...
+		order.forEach(function (li) { seat(li, bestFor(li, true).c); });
+		mark('labels');
+		// ... then each grows into the room around it.
+		order.forEach(function (li) { var b = bestFor(li); if (b.c && b.w > worthNow(li) + 1e-6) { seat(li, b.c); } });
 		mark('greedy');
 
 		// ---- 3. repair: show more of each short-changed label, moving at most two neighbours ----
@@ -920,23 +964,28 @@ EngCalcs.lpnPlacerD = (function () {
 					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
 					var bl = [], d = dynCostN(c, nb, null, bl);
 					if (d === d) {
-						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
+						if (keyOf(c) - d > here + 1e-6) { CNT.free++; seat(li, c); return true; }
 						continue;
 					}
 					if (keyOf(c) <= here) { continue; }
 					tried++;
 					if (bl.length > 2 || bl.some(function (b) { return lab[b].hand; })) { continue; }
 					if (nDyn > MAX_EVALS) { return false; }
+					CNT['att' + bl.length]++;
 					var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
 					var before = unseatAll(set);
 					seat(li, c);
-					var after = keyOf(c) - dynCost(c, null);
-					for (var q = 0; q < bl.length; q++) {
-						var b = bestFor(bl[q]);
+					var after = keyOf(c) - dynCost(c, null), ok = true;
+					for (var q = 0; q < bl.length && ok; q++) {
+						// What this blocker must still be worth for the move to pay.
+						var rest = 0;
+						for (var r = q + 1; r < bl.length; r++) { rest += lab[bl[r]].levels[0].value + B_STICK; }
+						var need = before - after - rest, b = bestFor(bl[q], false, need);
+						if (!b.c && need >= 0) { ok = false; break; }
 						seat(bl[q], b.c);
 						after += b.w;
 					}
-					if (after > before + 1e-6) { return true; }
+					if (ok && after > before + 1e-6) { CNT['ok' + bl.length]++; return true; }
 					for (q = 0; q < set.length; q++) { seat(set[q], null); }
 					for (q = 0; q < set.length; q++) { seat(set[q], saved[q]); }
 				}
