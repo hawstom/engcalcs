@@ -1,7 +1,9 @@
 // LABEL BENCH: THE SCORER. One view's layout in, the rules' numbers out.
 //
-// N1-N4 are breaks and must be zero (dev/label-placement-rules.md §2). The weighted crossing cost
-// is Tom's §3.1 table. Everything is counted in view pixels, on the ink contract.js derives.
+// N1, N3, N4 and N5 are breaks and must be zero (dev/label-placement-rules.md §2). A leader
+// crossing another leader is no longer a break (N2 is removed): it is a weighted crossing cost,
+// like the other crossings in Tom's §3.1 table. Everything is counted in view pixels, on the ink
+// contract.js derives.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -56,7 +58,8 @@ function drawn(scene, layout) {
 
 function scoreView(scene, layout) {
 	const d = drawn(scene, layout), items = d.items;
-	const breaks = { N1: [], N2: [], N3: [], N4: [], invalid: d.invalid };
+	const breaks = { N1: [], N3: [], N4: [], N5: [], invalid: d.invalid };
+	const crossings = { leaderOnLeader: [] };
 	const counts = { labelOnText: 0, labelOnSymbol: 0, labelOnLabel: 0, leaderOnLeader: 0,
 		labelOnLeader: 0, labelOnLink: 0, leaderOnLink: 0, labelOnCustomer: 0 };
 	const symbols = [];
@@ -75,13 +78,13 @@ function scoreView(scene, layout) {
 		for (let i = 0; i < boxes.length; i++) { if (C.segHitsBox(p, q, boxes[i])) { return true; } }
 		return false;
 	}
-	// ---- N1: a label on a symbol, a label, or a Text object ------------------------------------
+	// ---- N1: a label on a symbol or another label. N5: a label on a Text object. ---------------
 	items.forEach(function (it, i) {
 		symbols.forEach(function (s) {
 			if (bbHit(it.bb, s.bb, 0) && anyBoxHit(it.boxes, [s.box])) { counts.labelOnSymbol++; breaks.N1.push(it.id + ' on ' + s.id); }
 		});
 		texts.forEach(function (t) {
-			if (bbHit(it.bb, t.bb, 0) && anyBoxHit(it.boxes, [t.box])) { counts.labelOnText++; breaks.N1.push(it.id + ' on Text ' + t.id); }
+			if (bbHit(it.bb, t.bb, 0) && anyBoxHit(it.boxes, [t.box])) { counts.labelOnText++; breaks.N5.push(it.id + ' on Text ' + t.id); }
 		});
 		customers.forEach(function (c) {
 			if (bbHit(it.bb, c.bb, 0) && anyBoxHit(it.boxes, [c.box])) { counts.labelOnCustomer++; }
@@ -96,7 +99,8 @@ function scoreView(scene, layout) {
 	items.forEach(function (it) { if (it.leader) { leaders.push({ id: it.id, pts: it.leader, segs: segsOf(it.leader), item: it }); } });
 	texts.forEach(function (t) { if (t.leader) { leaders.push({ id: 'Text ' + t.id, pts: t.leader, segs: segsOf(t.leader), text: true }); } });
 	leaders.forEach(function (ld) { ld.bb = bboxOf(ld.pts.map(function (p) { return { cx: p[0], cy: p[1], w: 0, h: 0 }; })); });
-	// N2: leader on leader. Two of the user's own callouts crossing are not the placer's doing.
+	// Leader on leader: no longer a break (N2 removed, Tom 2026-09-28); a weighted crossing cost.
+	// Two of the user's own callouts crossing is not the placer's doing and is not counted.
 	for (let i = 0; i < leaders.length; i++) {
 		for (let j = i + 1; j < leaders.length; j++) {
 			const a = leaders[i], b = leaders[j];
@@ -104,7 +108,7 @@ function scoreView(scene, layout) {
 			if (!bbHit(a.bb, b.bb, 1)) { continue; }
 			let hit = false;
 			a.segs.forEach(function (s) { b.segs.forEach(function (t) { if (!hit && C.segsCross(s[0], s[1], t[0], t[1])) { hit = true; } }); });
-			if (hit) { counts.leaderOnLeader++; breaks.N2.push(a.id + ' x ' + b.id); }
+			if (hit) { counts.leaderOnLeader++; crossings.leaderOnLeader.push(a.id + ' x ' + b.id); }
 		}
 	}
 	// N3: a label's leader through another node's symbol.
@@ -173,7 +177,7 @@ function scoreView(scene, layout) {
 	const leaderLH = items.filter(function (it) { return it.leader; }).map(function (it) {
 		return C.polylineLength(it.leader) / (it.blockH || scene.text.rowHeightPx);
 	});
-	return { breaks: breaks, counts: counts, cost: cost, labelsReq: scene.labels.length,
+	return { breaks: breaks, crossings: crossings, counts: counts, cost: cost, labelsReq: scene.labels.length,
 		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH };
 }
 function intersectPoint(p, q, r, s) {
