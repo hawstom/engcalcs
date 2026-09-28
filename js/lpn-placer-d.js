@@ -40,6 +40,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
 	var C_ALT_LAYOUT = 0.8;         // the label's other shape (line for a node, stack for a pipe)
+	var B_KEEP = 6;                 // keeping last view's rows on a zoom-in (R11)
 	var B_STICK = 6;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
 
@@ -357,6 +358,16 @@ EngCalcs.lpnPlacerD = (function () {
 		var prev = opts && opts.prev, prevReq = {}, prevPl = (prev && prev.layout && prev.layout.labels) || {};
 		if (prev && prev.scene) { prev.scene.labels.forEach(function (r) { prevReq[r.id] = r; }); }
 
+		// R11: on a zoom-in, a label keeps what it showed last view unless keeping it costs more
+		// than this; what it gains is then a bonus on top.
+		var zoomIn = !!(prev && prev.scene && prev.scene.view && scene.view && scene.view.s > prev.scene.view.s * 1.001);
+		function keepBonus(li, lv) {
+			if (!zoomIn) { return 0; }
+			var pl = prevPl[reqs[li].id];
+			if (!pl || !pl.shown) { return 0; }
+			return lv.rows.length >= pl.rows.length ? B_KEEP : 0;
+		}
+
 		// ---- candidates ----
 		function Cand(li, lv, layout, align, x, y, w, h, angle, leader, pref) {
 			this.li = li; this.lv = lv; this.layout = layout; this.align = align;
@@ -369,7 +380,7 @@ EngCalcs.lpnPlacerD = (function () {
 				for (var i = 1; i < leader.length; i++) { len += Math.hypot(leader[i][0] - leader[i - 1][0], leader[i][1] - leader[i - 1][1]); }
 				pref += C_LEADER_BASE + C_LEADER_PER_ROW * len / rowH;
 			}
-			this.base = lv.value - pref;
+			this.base = lv.value - pref + keepBonus(li, lv);
 		}
 
 		// Ink of a candidate: one box per stacked row (the staircase), one for a line, and the same
@@ -618,7 +629,7 @@ EngCalcs.lpnPlacerD = (function () {
 			L.lists[key] = out;
 			return out;
 		}
-		function tierMax(li, k, t) { return lab[li].levels[k].value + (t ? -TIER1_PEN : B_STICK); }
+		function tierMax(li, k, t) { var lv = lab[li].levels[k]; return lv.value + keepBonus(li, lv) + (t ? -TIER1_PEN : B_STICK); }
 
 		// ---- the placed labels ----
 		// Two indexes of the seated labels: each whole label by its extent, leader included (for
@@ -990,7 +1001,9 @@ EngCalcs.lpnPlacerD = (function () {
 			for (var k = 0; k < q.length; k++) { var b = reqs[q[k].li].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
 			crowd[li] = n;
 		});
-		order.sort(function (a, b) { return (crowd[b] - crowd[a]) || (a - b); });
+		// R11: on a zoom-in, the labels shown last view are seated first, so none is lost to room.
+		function wasShown(li) { var pl = prevPl[reqs[li].id]; return zoomIn && pl && pl.shown ? 0 : 1; }
+		order.sort(function (a, b) { return (wasShown(a) - wasShown(b)) || (crowd[b] - crowd[a]) || (a - b); });
 		mark('setup');
 		// Every label first, as small as it comes (G: properties go before labels) ...
 		order.forEach(function (li) { seat(li, bestFor(li, true).c); });
@@ -1037,7 +1050,7 @@ EngCalcs.lpnPlacerD = (function () {
 					for (var q = 0; q < bl.length && ok; q++) {
 						// What this blocker must still be worth for the move to pay.
 						var rest = 0;
-						for (var r = q + 1; r < bl.length; r++) { rest += lab[bl[r]].levels[0].value + B_STICK; }
+						for (var r = q + 1; r < bl.length; r++) { rest += lab[bl[r]].levels[0].value + B_STICK + B_KEEP; }
 						var need = before - after - rest, b = bestFor(bl[q], false, need);
 						if (!b.c && need >= 0) { ok = false; break; }
 						seat(bl[q], b.c);
