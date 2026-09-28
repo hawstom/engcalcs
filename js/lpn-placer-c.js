@@ -45,6 +45,7 @@ EngCalcs.lpnPlacerC = (function () {
 		OWN_PIPE: 3.5    // a pipe label on its own pipe (R7: beside it, not on it)
 	};
 	var ROW_GAIN = 3.2;        // one more property is worth this much crossing
+	var LEVEL = 2.4;           // (halved) a level pipe label where the user asked for it along its pipe (R14)
 	var SHAPE = 1.8;           // a label not in its usual shape (R1: wholeness goes after nearness)
 	var LDR_BASE = 0.35;       // having a leader at all
 	var LDR_PER_PX = 0.02;     // and each pixel of it
@@ -187,11 +188,18 @@ EngCalcs.lpnPlacerC = (function () {
 		if (t0 > t1) { return null; }
 		return [s[0] + t0 * dx, s[1] + t0 * dy, s[0] + t1 * dx, s[1] + t1 * dy];
 	}
-	// A reading angle: text is never upside down.
+	// A reading angle: text is never upside down. The window is the user's own
+	// (scene.settings.readableAngleDeg), set per view in setup(); (-90, 90] until then.
+	var WIN = { min: -90, max: 90 };
 	function normAngle(a) {
+		while (a > WIN.max) { a -= 180; }
+		while (a <= WIN.min) { a += 180; }
+		return Math.round(a * 10) / 10;
+	}
+	function steepOf(a) {
 		while (a > 90) { a -= 180; }
 		while (a <= -90) { a += 180; }
-		return Math.round(a * 10) / 10;
+		return Math.abs(a);
 	}
 	function angDiff(a, b) { var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
 
@@ -551,7 +559,8 @@ EngCalcs.lpnPlacerC = (function () {
 		// leaders placed so far). The first two are fixed for the view, so what a candidate
 		// costs against them is worked out once per view and kept.
 		function setup(scene, prev) {
-			var vp = scene.viewport, text = scene.text;
+			var vp = scene.viewport, text = scene.text, rw = scene.settings && scene.settings.readableAngleDeg;
+			WIN = rw && isFinite(rw.min) && isFinite(rw.max) && rw.max - rw.min >= 179.9 ? { min: rw.min, max: rw.max } : { min: -90, max: 90 };
 			var vpbb = { x0: vp.x, y0: vp.y, x1: vp.x + vp.w, y1: vp.y + vp.h };
 			var gbb = { x0: vpbb.x0 - CELL, y0: vpbb.y0 - CELL, x1: vpbb.x1 + CELL, y1: vpbb.y1 + CELL };
 			var hg = new Grid(gbb, CELL), sg = new Grid(gbb, CELL), dg = new Grid(gbb, CELL);
@@ -650,7 +659,8 @@ EngCalcs.lpnPlacerC = (function () {
 					return n ? Math.max(n.symbol.w, n.symbol.h) / 2 + GAP + 1 : GAP;
 				};
 				L.owner = { t: 'link', linkId: lk.id, poly: poly, sA: pa.s, P: pa, pad0: pad(lk.from), pad1: pad(lk.to) };
-				L.specs = cachedSpecs(L, 'l' + Math.round(Math.atan2(pa.dy, pa.dx) * 90 / Math.PI), function () { return linkSpecs(L); });
+				L.along = !!req.along;
+				L.specs = cachedSpecs(L, 'l' + Math.round(Math.atan2(pa.dy, pa.dx) * 90 / Math.PI) + (L.along ? 'A' : '-'), function () { return linkSpecs(L); });
 			} else {
 				var o;
 				if (req.kind === 'node' && nodes[req.owner]) {
@@ -747,21 +757,25 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		function linkSpecs(L) {
 			var pa = L.owner.P, specs = [];
-			var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), steep = Math.abs(ang) > 60 ? 0.35 : Math.abs(ang) / 200;
+			var sa = steepOf(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), steep = sa > 60 ? 0.35 : sa / 200;
 			var nx = -pa.dy, ny = pa.dx;   // a normal of the pipe at its middle
 			['line', 'stack'].forEach(function (layout) {
 				var sh = layout === L.usual ? 0 : SHAPE;
-				// Along the pipe only as one line: a turned stack reads badly.
+				// Along the pipe only as one line (a turned stack reads badly), and only when the
+				// user's setting asks for it (R14); a level label is then the dearer fallback.
 				[0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
-					if (layout !== 'line') { return; }
+					if (layout !== 'line' || !L.along) { return; }
 					[1, -1].forEach(function (side) {
-						specs.push({ t: 'along', k: k, side: side, layout: layout, base: steep + Math.abs(k) * 0.12 + (side < 0 ? 0.04 : 0) + sh });
+						[0, 1].forEach(function (far) {
+							specs.push({ t: 'along', k: k, side: side, far: far, layout: layout,
+								base: steep + Math.abs(k) * 0.12 + (side < 0 ? 0.04 : 0) + far * 0.15 + sh });
+						});
 					});
 				});
 				for (var i = 0; i < 16; i++) {
 					var deg = i * 22.5 - 180, ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R);
 					if (Math.abs(ux * nx + uy * ny) < 0.5) { continue; }
-					var pref = prefOf(deg);
+					var pref = prefOf(deg) + (L.along ? LEVEL : 0);
 					specs.push({ t: 'beside', ux: ux, uy: uy, layout: layout, base: 0.3 + pref * 0.5 + sh });
 					LEADER_LENS.forEach(function (len) {
 						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout, base: 0.3 + LDR_BASE + len * LDR_PER_PX + pref * 0.5 + sh });
@@ -809,21 +823,38 @@ EngCalcs.lpnPlacerC = (function () {
 		function fillLink(st, L, spec, rsI, c, d) {
 			var o = L.owner, poly = o.poly, P = o.P;
 			if (spec.t === 'along') {
-				var step = 14 + d.w * 0.35, s0 = o.sA + spec.k * step, s = s0;
-				if (s < 0 || s > poly.len) { return false; }
-				var pa = spec.k ? pointAt(poly, s) : P, j = pa.seg, last = poly.pts.length - 2;
-				var lo = poly.cum[j] + (j === 0 ? o.pad0 : GAP) + d.w / 2, hi = poly.cum[j + 1] - (j === last ? o.pad1 : GAP) - d.w / 2;
-				if (lo > hi) { return false; }
-				if (s < lo || s > hi) {
-					if (spec.k === 0) { return false; }
-					s = Math.max(lo, Math.min(hi, s));
-					if (Math.abs(s - s0) > step * 0.6) { return false; }
+				var j = P.seg, last = poly.pts.length - 2, s, pa;
+				var span = function (jj) {
+					return [poly.cum[jj] + (jj === 0 ? o.pad0 : GAP) + d.w / 2, poly.cum[jj + 1] - (jj === last ? o.pad1 : GAP) - d.w / 2];
+				};
+				var lh = span(j), clear = spec.far ? Math.max(GAP + 0.5, st.text.rowHeightPx / 2) : GAP + 0.5;
+				if (lh[0] > lh[1]) {
+					// The stretch at home is shorter than the label: it may still lie beside it,
+					// overhanging its ends, if it stands off far enough to clear the symbols there
+					// (the judging decides whether it does). Stations are tenths either side of the
+					// stretch's middle.
+					if (Math.abs(spec.k) > 3 || !spec.far) { return false; }
+					s = (poly.cum[j] + poly.cum[j + 1]) / 2 + spec.k * 0.1 * (poly.cum[j + 1] - poly.cum[j]);
 					pa = pointAt(poly, s);
+					c.base += 0.3;
+				} else {
+					var step = 14 + d.w * 0.35, s0 = o.sA + spec.k * step;
+					s = s0;
+					if (s < 0 || s > poly.len) { return false; }
+					pa = spec.k ? pointAt(poly, s) : P;
+					lh = span(pa.seg);
+					if (lh[0] > lh[1]) { return false; }
+					if (s < lh[0] || s > lh[1]) {
+						s = Math.max(lh[0], Math.min(lh[1], s));
+						if (Math.abs(s - s0) > step * 0.6) { return false; }
+						pa = pointAt(poly, s);
+					}
 				}
-				var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), off = spec.side * (d.h / 2 + GAP + 0.5);
+				var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), off = spec.side * (d.h / 2 + clear);
 				var cx = pa.x + Math.sin(ang * D2R) * off, cy = pa.y - Math.cos(ang * D2R) * off;
+				var base = c.base;
 				fillBlock(st, L, c, rsI, spec.layout, 'left', cx - d.w / 2, cy - d.h / 2, ang);
-				c.s = s; c.side = spec.side;
+				c.base = base; c.s = s; c.side = spec.side;
 				return true;
 			}
 			var ux = spec.ux, uy = spec.uy;
