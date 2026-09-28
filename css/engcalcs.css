@@ -934,6 +934,18 @@ html[lang="zh"] .ec-welcome {
 .lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
 .lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
 .lpn-lbl.lpn-selected { fill: #1976d2; }
+/* HOVER PREVIEW, Select mode only (Ida's wishlist item 1): additive to the Task 618 cursor, which
+   stays `default` over an object and over nothing on purpose -- nothing else on screen said what a
+   click would hit. js/looped-network.js toggles this on the exact element selectionMarkEl() would
+   mark, from the same hit-test selectFromHit() uses, so the preview can never promise a click that
+   would not happen. `--lpn-hover-color` so a future theme can retune it without a second rule.
+   Weaker than `.lpn-selected` on purpose (thinner stroke, a greyer blue) and `:not(.lpn-selected)`
+   guarantees the selected look always wins when both classes land on the same element, regardless
+   of rule order. */
+:root { --lpn-hover-color: #78909e; }
+.lpn-link-halo.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(1.8 * var(--lpn-lw, 0)); }
+.lpn-node.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(0.32 * var(--lpn-symf, 0)); }
+.lpn-lbl.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); }
 /* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
    rather than hidden, because the whole point of the inactive/active pair is to see both at once --
    "with the new loop vs. without" wants the proposal visible beside the network it would join. */
@@ -1091,6 +1103,9 @@ html[lang="zh"] .ec-welcome {
    comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
    which is the half of that signal a reader is looking at anyway. */
 .lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
+/* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
+   above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */
+.lpn-meter.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); stroke: var(--lpn-hover-color); }
 /* THE CONNECTION GRIP: on the pipe, only while its customer is selected, and grabbable.
 
    **IT WAS RED, AND RED IS WHAT MADE IT UNREADABLE** (Tom, 2026-09-18: "The red circle at the pipe

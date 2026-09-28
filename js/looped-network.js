@@ -16468,6 +16468,43 @@ var EngCalcs = EngCalcs || {};
 		// Shift on bare canvas keeps what is there: clearing would make an accidental miss cost
 		// the whole selection, which is the one thing a modifier click exists to protect.
 	}
+	// ---- SELECTION PREVIEW: the hover highlight (Ida's wishlist item 1, dev/agents/interface-
+	// designer/wishlist.md, journal 2026-09-10) ----
+	// **ADDITIVE TO THE TASK 618 CURSOR**, which stays `default` over an object and over nothing on
+	// purpose (WYSIWYG hit areas). Nothing else on screen said what a click would select; this reads
+	// exactly the SAME dataset selectFromHit() reads, above, so the preview can never promise a hit
+	// a click would not make, and it marks the exact SAME element selectionMarkEl() marks, so hover
+	// and selection are one system rather than two rules that can drift apart.
+	function hoverTargetFromHit(t) {
+		var d = (t && t.dataset) || {};
+		if (d.node) { return { kind: 'node', id: d.node }; }
+		if (d.nodelbl !== undefined) { return { kind: 'node', id: d.nodelbl }; }
+		if (d.linklbl !== undefined) { return { kind: 'link', id: d.linklbl }; }
+		if (d.link !== undefined) { return { kind: 'link', id: d.link }; }
+		if (d.lbl !== undefined) { return { kind: 'label', id: d.lbl }; }
+		if (d.cust !== undefined) { return { kind: 'customer', id: d.cust }; }
+		if (d.custhandle !== undefined) { return { kind: 'customer', id: d.custhandle }; }
+		return null;
+	}
+	var hoverPreview = null;   // {kind, id} of the one element currently wearing .lpn-hover, or null
+	function paintHoverPreview(sel, on) {
+		var el = selectionMarkEl(sel);
+		if (el) { el.classList.toggle('lpn-hover', on); }
+	}
+	// **ONE WRITE SITE**, on the same argument setSelectionList() makes above: paint off the old,
+	// paint on the new, so a stale mark can never survive a target that no longer exists (an undo,
+	// a delete under the pointer).
+	function setHoverPreview(sel) {
+		if (sel && !selectionExists(sel)) { sel = null; }
+		if (hoverPreview && (!sel || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
+			paintHoverPreview(hoverPreview, false);
+		}
+		if (sel && (!hoverPreview || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
+			paintHoverPreview(sel, true);
+		}
+		hoverPreview = sel;
+	}
+	function clearHoverPreview() { setHoverPreview(null); }
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
 	// a selection still pointing at what they are working on.
@@ -27554,6 +27591,10 @@ var EngCalcs = EngCalcs || {};
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
+		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
+		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
+		// the pointermove listener that maintains it does no work outside 'select'.
+		if (mode === 'select' && newMode !== 'select') { clearHoverPreview(); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -37872,6 +37913,31 @@ var EngCalcs = EngCalcs || {};
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
 		svg.addEventListener('pointermove', function (e) {
 			profileDrawHover(e.clientX, e.clientY);
+		});
+
+		// **SELECTION PREVIEW** (Ida's wishlist item 1): the Select-mode hover highlight, driven by
+		// the SAME hit-test a click uses (`mapHitAt`), so it always shows exactly what a click would
+		// select. rAF-throttled to one update per frame, and it does no work at all outside 'select'
+		// mode, while a gesture is in progress (`drag`), or on a touch pointer, which has no hover to
+		// report and must never leave a highlight stuck after a tap.
+		var hoverPreviewRaf = null, hoverPreviewAt = null;
+		svg.addEventListener('pointermove', function (e) {
+			if (e.pointerType === 'touch') { return; }
+			if (mode !== 'select' || drag) { return; }
+			hoverPreviewAt = { x: e.clientX, y: e.clientY };
+			if (hoverPreviewRaf) { return; }
+			hoverPreviewRaf = requestAnimationFrame(function () {
+				hoverPreviewRaf = null;
+				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
+				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
+			});
+		});
+		// Leaving the canvas (or the window, or losing capture) is the one case a pointermove never
+		// fires to clear it -- same reasoning as every other "off means off" state on this map.
+		svg.addEventListener('pointerleave', function (e) {
+			if (e.pointerType === 'touch') { return; }
+			hoverPreviewAt = null;
+			clearHoverPreview();
 		});
 
 		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has
