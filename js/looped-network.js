@@ -53182,8 +53182,17 @@ var EngCalcs = EngCalcs || {};
 	//     after every later one. A gesture ends the chain.
 	//   - `prev` is the previous scene and layout of the same project; opening another project
 	//     calls create() again and starts from null.
+	//   - R15 (Tom, 2026-09-28: "when jumping into an untested (unfamiliar) view, hide the labels
+	//     immediately while you calculate positions"): see placerSetPending().
 	var placerRt = null, placerSettleTimer = null, placerIdleHandle = null;
 	var PLACER_SETTLE_MS = 150, PLACER_IDLE_OPENING_MS = 3000, PLACER_IDLE_VIEW_MS = 250;
+	// **A VIEW IS FAMILIAR WHEN IT IS AT THE SCALE THE LAST LAYOUT WAS MADE FOR** (R15). The labels
+	// are drawn in world units at their screen size, so at that scale a pan carries every one of
+	// them exactly where the placer put it, and an ordinary pan hides nothing. At any other scale
+	// they are unconfirmed -- the same words at a different spacing, about to jump -- so they are
+	// hidden the moment the scale moves and shown again by the layout for the new view. Half a
+	// percent is below what a pinch's jitter or a float round trip can produce by accident.
+	var PLACER_FAMILIAR_SCALE_TOL = 0.005, placerPendingOn = false;
 	// Where the first row's BASELINE sits below the top of the block a placer states, in ems: the
 	// bench's row box is the line pitch (1.2 em) and this is the arithmetic extract.js reads the
 	// shipped page's layout back with (top = baseline - 0.85 em), so the two frames agree.
@@ -53392,8 +53401,12 @@ var EngCalcs = EngCalcs || {};
 				});
 				rt.prev = { scene: scene, layout: res };
 				rt.step++;
+				rt.laidScale = state.s;
 				placerDrawAll();
 			}
+			// Shown again once placed -- and after a placer that threw, too, rather than leave a
+			// map with no labels until the next view change.
+			placerSetPending(false);
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 			layoutCustomerLabels(obs);
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
@@ -53403,9 +53416,35 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Every pan and zoom arrives at setTransform(), which calls this: the idle chain stops (T1, the
 	// view is moving) and a settle is armed, re-armed for as long as a pan or pinch is in the hand.
+	// R15: a view at a scale no layout was made for hides the data labels at once.
 	function placerViewMoved() {
 		placerIdleStop();
+		placerSetPending(!placerFamiliarView());
 		placerScheduleSettle();
+	}
+	function placerFamiliarView() {
+		var rt = placerRt, s = state.s;
+		return !!(rt && rt.laidScale && rt.project === String(library.openId || '')
+			&& Math.abs(s / rt.laidScale - 1) <= PLACER_FAMILIAR_SCALE_TOL);
+	}
+	// **ONE CLASS ON THE LABELS LAYER, NOT A STYLE PER LABEL** (R10: nothing here may slow a pan
+	// or a zoom). The rule behind it is written once, the first time it is needed, and covers the
+	// node and link data labels, their grab shapes and their leaders -- never a Text object, which
+	// the user placed and which does not move, nor anything outside the labels layer. It wins over
+	// the per-label inline visibility only while it is on, and only by hiding.
+	function placerSetPending(on) {
+		on = !!on;
+		if (on === placerPendingOn || !labelsLayer) { return; }
+		placerPendingOn = on;
+		if (on && !document.getElementById('lpn-placer-pending-css')) {
+			var css = document.createElement('style');
+			css.id = 'lpn-placer-pending-css';
+			css.textContent = '.lpn-placer-pending [data-nodelbl], .lpn-placer-pending [data-linklbl],'
+				+ ' .lpn-placer-pending line.lpn-leader.lpn-annotation { visibility: hidden !important; }';
+			document.head.appendChild(css);
+		}
+		if (on) { labelsLayer.classList.add('lpn-placer-pending'); } else { labelsLayer.classList.remove('lpn-placer-pending'); }
+		EngCalcs.lpnPlacerPending = on;
 	}
 	function placerScheduleSettle() {
 		if (placerSettleTimer) { clearTimeout(placerSettleTimer); }
