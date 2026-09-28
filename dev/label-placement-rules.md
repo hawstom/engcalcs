@@ -4,7 +4,7 @@
 (the couch, https://claude.ai/artifact/PyZpPyHbpACHsu7fHVZEZJ, 13 answers) and his two instructions
 that followed it, then revised with his review of 2026-09-28. His answers, verbatim, are in §6.
 
-Part A (§1-§4) is what the two builders receive. Part B (§5-§6) is held back from them on his
+Part A (§1-§5) is what the two builders receive. Part B (§5-§6) is held back from them on his
 ruling (Q11, Q12) and is for him and for the judges.
 
 Tom's §1 definitions in `dev/label-placement-goals.md` still hold. Where §2 of that file (the
