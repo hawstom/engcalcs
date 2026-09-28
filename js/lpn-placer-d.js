@@ -33,7 +33,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// Worth, in one currency. A shown row is 10; the label itself (its ID) is 40, so every property
 	// row goes before any label does (G, R1). Costs follow Tom's order, worst first.
 	var V_LABEL = 40, V_ROW = 10, V_ROW_ORDER = 0.5;
-	var C_LEADER_LEADER = 9, C_LABEL_LEADER = 7, C_LABEL_PIPE = 2.5, C_LEADER_PIPE = 0.8;
+	var C_LEADER_LEADER = 90, C_LABEL_LEADER = 80, C_LABEL_PIPE = 9, C_LEADER_PIPE = 2;
 	var C_LABEL_OWN_PIPE = 4;       // R7: beside its pipe, not on it
 	var C_ARROW = 0.8;              // text on a flow arrow (not scored; ugly)
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
@@ -42,9 +42,11 @@ EngCalcs.lpnPlacerD = (function () {
 	var B_STICK = 3;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
 
-	var DIRS = 16;
-	var DISTS = [0.8, 1.6, 2.6, 3.8, 5.2];   // leader lengths beyond the symbol, in row heights
-	var MAX_EVALS = 400000;                 // work cap per place(); deterministic, not wall-clock
+	var DIRS = 8;
+	var DISTS = [1, 2.2, 3.8];          // leader lengths beyond the symbol, in row heights
+	var MAX_EVALS = 50000;                 // work cap per place(); deterministic, not wall-clock
+	var TRIES = 2;                          // blocked places a short-changed label tries per level
+	var PASSES = 1;
 	var DIRSET = [];
 	(function () {
 		for (var k = 0; k < DIRS; k++) {
@@ -120,51 +122,50 @@ EngCalcs.lpnPlacerD = (function () {
 		this.cells = new Array(this.nx * this.ny);
 		this.stamp = 0;
 	}
+	// Sets this.i0..j1 to the cells a box meets; false if none.
 	Grid.prototype.range = function (x0, y0, x1, y1) {
 		var i0 = Math.floor((x0 - this.x0) / CELL), i1 = Math.floor((x1 - this.x0) / CELL);
 		var j0 = Math.floor((y0 - this.y0) / CELL), j1 = Math.floor((y1 - this.y0) / CELL);
-		if (i1 < 0 || j1 < 0 || i0 >= this.nx || j0 >= this.ny) { return null; }
-		return [Math.max(0, i0), Math.max(0, j0), Math.min(this.nx - 1, i1), Math.min(this.ny - 1, j1)];
+		if (i1 < 0 || j1 < 0 || i0 >= this.nx || j0 >= this.ny || !(i1 >= i0 && j1 >= j0)) { return false; }
+		this.i0 = i0 < 0 ? 0 : i0; this.j0 = j0 < 0 ? 0 : j0;
+		this.i1 = i1 >= this.nx ? this.nx - 1 : i1; this.j1 = j1 >= this.ny ? this.ny - 1 : j1;
+		return true;
 	};
 	Grid.prototype.add = function (item, x0, y0, x1, y1) {
-		var r = this.range(x0, y0, x1, y1);
-		if (!r) { return; }
-		for (var j = r[1]; j <= r[3]; j++) {
-			for (var i = r[0]; i <= r[2]; i++) {
+		if (!this.range(x0, y0, x1, y1)) { return; }
+		for (var j = this.j0; j <= this.j1; j++) {
+			for (var i = this.i0; i <= this.i1; i++) {
 				var k = j * this.nx + i;
 				(this.cells[k] || (this.cells[k] = [])).push(item);
 			}
 		}
 	};
 	Grid.prototype.remove = function (item, x0, y0, x1, y1) {
-		var r = this.range(x0, y0, x1, y1);
-		if (!r) { return; }
-		for (var j = r[1]; j <= r[3]; j++) {
-			for (var i = r[0]; i <= r[2]; i++) {
+		if (!this.range(x0, y0, x1, y1)) { return; }
+		for (var j = this.j0; j <= this.j1; j++) {
+			for (var i = this.i0; i <= this.i1; i++) {
 				var c = this.cells[j * this.nx + i], n = c ? c.indexOf(item) : -1;
 				if (n >= 0) { c.splice(n, 1); }
 			}
 		}
 	};
-	// Calls fn(item) once per item whose cells meet the box.
-	Grid.prototype.each = function (x0, y0, x1, y1, fn) {
-		var r = this.range(x0, y0, x1, y1);
-		if (!r) { return; }
-		var st = ++this.stamp;
-		for (var j = r[1]; j <= r[3]; j++) {
-			for (var i = r[0]; i <= r[2]; i++) {
-				var c = this.cells[j * this.nx + i];
+	// Fills `out` with each item whose cells meet the box, once, and returns it.
+	Grid.prototype.query = function (x0, y0, x1, y1, out) {
+		out.length = 0;
+		if (!this.range(x0, y0, x1, y1)) { return out; }
+		var st = ++this.stamp, i1 = this.i1, j1 = this.j1, nx = this.nx, cells = this.cells;
+		for (var j = this.j0; j <= j1; j++) {
+			for (var i = this.i0; i <= i1; i++) {
+				var c = cells[j * nx + i];
 				if (!c) { continue; }
 				for (var n = 0; n < c.length; n++) {
 					var it = c[n];
-					if (it.st === st) { continue; }
-					it.st = st;
-					if (fn(it) === false) { return; }
+					if (it.st !== st) { it.st = st; out.push(it); }
 				}
 			}
 		}
+		return out;
 	};
-
 	// ---- polylines -------------------------------------------------------------------------------
 	function cumLengths(pts) {
 		var cum = [0];
@@ -231,44 +232,95 @@ EngCalcs.lpnPlacerD = (function () {
 
 	// ---- the placer ------------------------------------------------------------------------------
 	function create() {
+		var mem = { occ: null, sat: null };   // raster buffers, reused across views
 		return {
 			name: 'D (candidate search, ejection repair, sticky)',
-			place: place
+			place: function (scene, opts) { return place(scene, opts, mem); }
 		};
 	}
 
-	function place(scene, opts) {
+	function place(scene, opts, mem) {
 		var text = scene.text, vp = scene.viewport, rowH = text.rowHeightPx || 14.4;
 		var hookLen = Math.min(text.hookMaxPx || 0, 9);
 		var spacing = text.repeatSpacingPx || 0;
 		var evals = 0;
+		var DBG = typeof process !== 'undefined' && process.env && process.env.PD_DEBUG, T0 = Date.now(), tl = [];
+		function mark(k) { if (DBG) { tl.push(k + ' ' + (Date.now() - T0) + 'ms/' + evals + '/' + nDyn + '/' + nGen); } }
 
-		// ---- the fixed world: symbols, Text objects, pipes, arrows, callouts ----
-		var fixed = new Grid(vp), nodesById = {}, linksById = {}, custById = {};
-		function addFixed(it, b) { it.b = b; fixed.add(it, b.x0, b.y0, b.x1, b.y1); }
+		// ---- the fixed world: symbols and Text objects (hard), pipes, arrows, callouts (soft) ----
+		var hardG = new Grid(vp), softG = new Grid(vp), nodesById = {}, linksById = {}, custById = {};
+		var hardRects = [], qa = [], qb = [];
+		function addHard(it, b) { it.b = b; hardG.add(it, b.x0, b.y0, b.x1, b.y1); hardRects.push(b); }
 		scene.nodes.forEach(function (n) {
 			nodesById[n.id] = n;
-			addFixed({ t: 'sym', node: n.id }, rectBox(n.symbol));
+			addHard({ t: 'sym', node: n.id }, rectBox(n.symbol));
 		});
 		scene.links.forEach(function (l) {
 			linksById[l.id] = l;
-			(l.symbols || []).forEach(function (s) { addFixed({ t: 'lsym', link: l.id }, oBox(s)); });
-			(l.arrows || []).forEach(function (s) { addFixed({ t: 'arrow', link: l.id }, oBox(s)); });
+			(l.symbols || []).forEach(function (s) { addHard({ t: 'lsym', link: l.id }, oBox(s)); });
+			(l.arrows || []).forEach(function (s) { var b = oBox(s); softG.add({ t: 'arrow', link: l.id, b: b }, b.x0, b.y0, b.x1, b.y1); });
 			for (var i = 1; i < l.points.length; i++) {
 				var a = l.points[i - 1], b = l.points[i];
-				fixed.add({ t: 'pipe', link: l.id, ax: a[0], ay: a[1], bx: b[0], by: b[1] },
+				softG.add({ t: 'pipe', link: l.id, ax: a[0], ay: a[1], bx: b[0], by: b[1] },
 					Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1]));
 			}
 		});
 		(scene.texts || []).forEach(function (t) {
-			addFixed({ t: 'text' }, oBox(t.box));
+			addHard({ t: 'text' }, oBox(t.box));
 			var L = t.leader;
 			for (var i = 1; L && i < L.length; i++) {
-				fixed.add({ t: 'tlead', ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1] },
+				softG.add({ t: 'tlead', ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1] },
 					Math.min(L[i - 1][0], L[i][0]), Math.min(L[i - 1][1], L[i][1]), Math.max(L[i - 1][0], L[i][0]), Math.max(L[i - 1][1], L[i][1]));
 			}
 		});
 		(scene.customers || []).forEach(function (c) { custById[c.id] = c; });
+
+		// ---- the free-space model: two summed-area tables of every symbol and Text object ----
+		// Cells of RC px over the view. TOUCHED marks a cell any obstacle touches, so a box whose
+		// touched sum is zero is clear; CORE marks a cell lying wholly inside an obstacle, so a box
+		// holding a core cell is blocked. Only a box neither table decides gets the exact test.
+		var RC = 2, RW = Math.max(1, Math.ceil(vp.w / RC)), RH = Math.max(1, Math.ceil(vp.h / RC)), SW = RW + 1;
+		if (!mem.occ || mem.occ.length !== RW * RH) {
+			mem.occ = new Uint8Array(RW * RH); mem.core = new Uint8Array(RW * RH);
+			mem.sat = new Int32Array(SW * (RH + 1)); mem.csat = new Int32Array(SW * (RH + 1));
+		} else { mem.occ.fill(0); mem.core.fill(0); }
+		var occ = mem.occ, core = mem.core, sat = mem.sat, csat = mem.csat;
+		hardRects.forEach(function (b) {
+			var fx0 = (b.x0 - vp.x) / RC, fx1 = (b.x1 - vp.x) / RC, fy0 = (b.y0 - vp.y) / RC, fy1 = (b.y1 - vp.y) / RC, j;
+			var i0 = Math.max(0, Math.floor(fx0)), i1 = Math.min(RW, Math.ceil(fx1));
+			var j0 = Math.max(0, Math.floor(fy0)), j1 = Math.min(RH, Math.ceil(fy1));
+			for (j = j0; j < j1; j++) { if (i1 > i0) { occ.fill(1, j * RW + i0, j * RW + i1); } }
+			if (b.rot) { return; }
+			i0 = Math.max(0, Math.ceil(fx0)); i1 = Math.min(RW, Math.floor(fx1));
+			j0 = Math.max(0, Math.ceil(fy0)); j1 = Math.min(RH, Math.floor(fy1));
+			for (j = j0; j < j1; j++) { if (i1 > i0) { core.fill(1, j * RW + i0, j * RW + i1); } }
+		});
+		(function () {
+			for (var j = 0; j < RH; j++) {
+				var run = 0, crun = 0, o = j * RW, s0 = j * SW, s1 = (j + 1) * SW;
+				for (var i = 0; i < RW; i++) {
+					run += occ[o + i]; sat[s1 + i + 1] = sat[s0 + i + 1] + run;
+					crun += core[o + i]; csat[s1 + i + 1] = csat[s0 + i + 1] + crun;
+				}
+			}
+		}());
+		function satSum(t, i0, j0, i1, j1) {
+			i0 = Math.max(0, i0); j0 = Math.max(0, j0); i1 = Math.min(RW, i1); j1 = Math.min(RH, j1);
+			if (i1 <= i0 || j1 <= j0) { return 0; }
+			return t[j1 * SW + i1] - t[j0 * SW + i1] - t[j1 * SW + i0] + t[j0 * SW + i0];
+		}
+		// Does an unturned box overlap a symbol or Text object by more than TOL?
+		function rasterRect(x0, y0, x1, y1) {
+			var a0 = (x0 + TOL - vp.x) / RC, a1 = (x1 - TOL - vp.x) / RC, b0 = (y0 + TOL - vp.y) / RC, b1 = (y1 - TOL - vp.y) / RC;
+			if (a1 <= a0 || b1 <= b0) { return false; }
+			if (!satSum(sat, Math.floor(a0), Math.floor(b0), Math.ceil(a1), Math.ceil(b1))) { return false; }
+			if (satSum(csat, Math.ceil(a0), Math.ceil(b0), Math.floor(a1), Math.floor(b1))) { return true; }
+			var box = mkBox((x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, 0), q = hardG.query(x0, y0, x1, y1, qa);
+			for (var n = 0; n < q.length; n++) { if (boxesOverlap(box, q[n].b, TOL)) { return true; } }
+			return false;
+		}
+		function rasterHit(b) { return rasterRect(b.x0, b.y0, b.x1, b.y1); }
+		mark('world');
 
 		var reqs = scene.labels, N = reqs.length;
 		var prev = opts && opts.prev, prevReq = {}, prevPl = (prev && prev.layout && prev.layout.labels) || {};
@@ -278,7 +330,7 @@ EngCalcs.lpnPlacerD = (function () {
 		function Cand(li, lv, layout, align, x, y, w, h, angle, leader, pref) {
 			this.li = li; this.lv = lv; this.layout = layout; this.align = align;
 			this.x = x; this.y = y; this.w = w; this.h = h; this.angle = angle || 0; this.leader = leader;
-			this.reps = null; this.boxes = null; this.fx = undefined; this.stick = false;
+			this.reps = null; this.boxes = null; this.fx = undefined;
 			var len = 0;
 			if (leader) {
 				for (var i = 1; i < leader.length; i++) { len += Math.hypot(leader[i][0] - leader[i - 1][0], leader[i][1] - leader[i - 1][1]); }
@@ -290,7 +342,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// Ink of a candidate: one box per stacked row (the staircase), one for a line, and the same
 		// for every repeat along a long pipe.
 		function build(c) {
-			if (c.boxes) { return c; }
+			CNT.build++;
 			var req = reqs[c.li], out = [];
 			function at(x, y, ang, rep) {
 				var bcx = x + c.w / 2, bcy = y + c.h / 2, r = ang * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
@@ -310,15 +362,12 @@ EngCalcs.lpnPlacerD = (function () {
 			at(c.x, c.y, c.angle, false);
 			(c.reps || []).forEach(function (r) { at(r.x, r.y, r.angle, true); });
 			c.boxes = out;
-			bbOf(c);
-			return c;
-		}
-		function bbOf(c) {
 			var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, i;
-			for (i = 0; i < c.boxes.length; i++) {
-				var b = c.boxes[i];
+			for (i = 0; i < out.length; i++) {
+				var b = out[i];
 				if (b.x0 < x0) { x0 = b.x0; } if (b.y0 < y0) { y0 = b.y0; } if (b.x1 > x1) { x1 = b.x1; } if (b.y1 > y1) { y1 = b.y1; }
 			}
+			c.bx0 = x0; c.by0 = y0; c.bx1 = x1; c.by1 = y1;
 			for (i = 0; c.leader && i < c.leader.length; i++) {
 				var p = c.leader[i];
 				if (p[0] < x0) { x0 = p[0]; } if (p[1] < y0) { y0 = p[1]; } if (p[0] > x1) { x1 = p[0]; } if (p[1] > y1) { y1 = p[1]; }
@@ -329,78 +378,163 @@ EngCalcs.lpnPlacerD = (function () {
 		// The fixed cost of a candidate against the fixed world: NaN if it breaks a hard rule.
 		// `hand` turns hard hits into large costs instead (a hand label cannot be refused).
 		function fixedCost(c, hand) {
-			if (c.fx !== undefined) { return c.fx; }
 			build(c);
+			var req0 = reqs[c.li];
 			evals++;
 			var req = reqs[c.li], ownLink = req.kind === 'link' ? req.owner : null;
 			var ownNode = req.kind === 'node' ? req.owner : null;
-			var cost = 0, hard = 0, links = {}, i, b, keep = [];
-			for (i = 0; i < c.boxes.length; i++) {
-				b = c.boxes[i];
-				var bad = b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1;
-				var own = false, ncost = 0;
-				if (!bad) {
-					fixed.each(b.x0, b.y0, b.x1, b.y1, function (it) {
-						if (it.t === 'pipe') {
-							if (segHitsBox(it.ax, it.ay, it.bx, it.by, b, 1.5)) {
-								if (it.link === ownLink) { own = true; } else if (!links[it.link]) { links[it.link] = 1; ncost += C_LABEL_PIPE; }
-							}
-						} else if (it.t === 'tlead') {
-							if (segHitsBox(it.ax, it.ay, it.bx, it.by, b, 1.5)) { ncost += C_LABEL_LEADER; }
-						} else if (boxesOverlap(b, it.b, TOL)) {
-							if (it.t === 'arrow') { ncost += C_ARROW; } else { bad = true; if (!hand) { return false; } }
-						}
-					});
+			var boxes = c.boxes, nb = boxes.length, bad = null, hard = 0, cost = 0, i, j, b, it, n, q;
+			// Hard: inside the view, clear of every symbol and Text object (N1, N5).
+			for (i = 0; i < nb; i++) {
+				b = boxes[i];
+				var hit = b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1;
+				if (!hit) {
+					if (!b.rot && !hand) { hit = rasterHit(b); } else {
+						q = hardG.query(b.x0, b.y0, b.x1, b.y1, qa);
+						for (n = 0; n < q.length; n++) { if (boxesOverlap(b, q[n].b, TOL)) { hit = true; if (hand) { hard++; } else { break; } } }
+						if (hand) { hit = false; }
+					}
 				}
-				if (bad && b.rep && !hand) { continue; }      // a repeat that does not fit is left off
-				if (bad) { if (!hand) { c.fx = NaN; return NaN; } hard++; }
-				if (own && !b.rep) { cost += C_LABEL_OWN_PIPE; }
-				cost += ncost;
-				keep.push(b);
+				if (!hit) { continue; }
+				if (!b.rep && !hand) { return NaN; }
+				(bad || (bad = []))[i] = true;
 			}
-			if (keep.length !== c.boxes.length) {
-				// Rebuild the repeat list from the boxes that survived.
+			// Leaders: never through another node's symbol (N3), nor a Text object.
+			var L = c.leader;
+			for (j = 1; L && j < L.length; j++) {
+				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
+				q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
+				for (n = 0; n < q.length; n++) {
+					it = q[n];
+					if (it.t === 'sym') {
+						if (it.node === ownNode || !segHitsBox(ax, ay, bx, by, it.b, -1)) { continue; }
+					} else if (it.t === 'text') {
+						if (!segHitsBox(ax, ay, bx, by, it.b, -1)) { continue; }
+					} else {
+						continue;
+					}
+					if (!hand) { return NaN; }
+					hard++;
+				}
+			}
+			if (bad) {
+				// Leave off the repeats that do not fit.
 				var per = c.layout === 'line' ? 1 : c.lv.rows.length, reps = [];
 				for (i = 0; c.reps && i < c.reps.length; i++) {
 					var ok = true;
-					for (var k = 0; k < per; k++) { if (keep.indexOf(c.boxes[per * (i + 1) + k]) < 0) { ok = false; } }
+					for (var k = 0; k < per; k++) { if (bad[per * (i + 1) + k]) { ok = false; } }
 					if (ok) { reps.push(c.reps[i]); }
 				}
 				c.reps = reps.length ? reps : null;
-				c.boxes = null; build(c);
+				build(c);
+				boxes = c.boxes; nb = boxes.length;
 			}
-			var L = c.leader, lk = {};
-			for (i = 1; L && i < L.length; i++) {
-				var ax = L[i - 1][0], ay = L[i - 1][1], bx = L[i][0], by = L[i][1], sx = L[0][0], sy = L[0][1];
-				var dead = false;
-				fixed.each(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), function (it) {
-					if (it.t === 'sym') {
-						if (it.node !== ownNode && segHitsBox(ax, ay, bx, by, it.b, -1)) { dead = true; if (!hand) { return false; } hard++; }
-					} else if (it.t === 'text') {
-						if (segHitsBox(ax, ay, bx, by, it.b, -1)) { dead = true; if (!hand) { return false; } hard++; }
-					} else if (it.t === 'lsym') {
-						if (it.link !== ownLink && segHitsBox(ax, ay, bx, by, it.b, 0)) { cost += C_LEADER_LINKSYM; }
-					} else if (it.t === 'pipe') {
-						if (it.link === ownLink || lk[it.link]) { return; }
-						var t = segCross(ax, ay, bx, by, it.ax, it.ay, it.bx, it.by);
-						if (t >= 0 && Math.hypot(ax + t * (bx - ax) - sx, ay + t * (by - ay) - sy) > 1.5) { lk[it.link] = 1; cost += C_LEADER_PIPE; }
-					} else if (it.t === 'tlead') {
-						if (segCross(ax, ay, bx, by, it.ax, it.ay, it.bx, it.by) >= 0) { cost += C_LEADER_LEADER; }
+			return softCost(c) + hard * HARD_HAND;
+		}
+
+		// Is a (non-hand) candidate clear of the fixed world? Unturned text is tested against the
+		// free-space raster row by row without building anything; turned text, repeats and leaders
+		// take the exact tests.
+		function blockFree(req, rows, layout, d, align, x, y) {
+			evals++;
+			if (x < vp.x + 1 || y < vp.y + 1 || x + d.w > vp.x + vp.w - 1 || y + d.h > vp.y + vp.h - 1) { return false; }
+			if (layout === 'line') { return !rasterRect(x, y, x + d.w, y + d.h); }
+			for (var i = 0, top = y; i < rows.length; i++) {
+				var rw = req.rows[rows[i]].w, rh = req.rows[rows[i]].h;
+				var left = align === 'right' ? x + d.w - rw : (align === 'center' ? x + (d.w - rw) / 2 : x);
+				if (rasterRect(left, top, left + rw, top + rh)) { return false; }
+				top += rh;
+			}
+			return true;
+		}
+		function hardOK(c) {
+			if (c.angle || c.reps) { var f = fixedCost(c, false); if (f === f) { c.fx = f; return true; } return false; }
+			if (!blockFree(reqs[c.li], c.lv.rows, c.layout, c, c.align, c.x, c.y)) { return false; }
+			return !c.leader || leaderFree(c.leader, reqs[c.li].kind === 'node' ? reqs[c.li].owner : null);
+		}
+		function leaderFree(L, ownNode) {
+			for (var j = 1; j < L.length; j++) {
+				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
+				var q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
+				for (var n = 0; n < q.length; n++) {
+					var it = q[n];
+					if (it.t === 'sym' ? it.node !== ownNode : it.t === 'text') {
+						if (segHitsBox(ax, ay, bx, by, it.b, -1)) { return false; }
 					}
-				});
-				if (dead && !hand) { c.fx = NaN; return NaN; }
+				}
 			}
-			c.fx = cost + hard * HARD_HAND;
-			return c.fx;
+			return true;
+		}
+
+		// The soft cost of a candidate against the fixed world, in Tom's order.
+		function softCost(c) {
+			CNT.soft++;
+			if (!c.boxes) { build(c); }
+			var req = reqs[c.li], ownLink = req.kind === 'link' ? req.owner : null;
+			var boxes = c.boxes, nb = boxes.length, cost = 0, i, j, b, it, n, q, L = c.leader;
+			// Leaders through a pump or valve.
+			for (j = 1; L && j < L.length; j++) {
+				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
+				q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
+				for (n = 0; n < q.length; n++) {
+					it = q[n];
+					if (it.t === 'lsym' && it.link !== ownLink && segHitsBox(ax, ay, bx, by, it.b, 0)) { cost += C_LEADER_LINKSYM; }
+				}
+			}
+			// Pipes, flow arrows and Text callouts under the text.
+			var links = null, own = false;
+			q = softG.query(c.bx0, c.by0, c.bx1, c.by1, qa);
+			for (n = 0; n < q.length; n++) {
+				it = q[n];
+				for (i = 0; i < nb; i++) {
+					b = boxes[i];
+					if (it.t === 'arrow') {
+						if (boxesOverlap(b, it.b, TOL)) { cost += C_ARROW; break; }
+					} else if (segHitsBox(it.ax, it.ay, it.bx, it.by, b, 1.5)) {
+						if (it.t === 'tlead') { cost += C_LABEL_LEADER; break; }
+						if (it.link === ownLink) { if (!b.rep) { own = true; } break; }
+						if (!links) { links = {}; }
+						if (!links[it.link]) { links[it.link] = 1; cost += C_LABEL_PIPE; }
+						break;
+					}
+				}
+			}
+			if (own) { cost += C_LABEL_OWN_PIPE; }
+			// Soft: pipes and Text callouts the leader crosses, away from its own start.
+			var lk = null;
+			for (j = 1; L && j < L.length; j++) {
+				var sx = L[0][0], sy = L[0][1], px = L[j - 1][0], py = L[j - 1][1], ex = L[j][0], ey = L[j][1];
+				q = softG.query(Math.min(px, ex), Math.min(py, ey), Math.max(px, ex), Math.max(py, ey), qb);
+				for (n = 0; n < q.length; n++) {
+					it = q[n];
+					if (it.t === 'arrow') { continue; }
+					if (it.t === 'tlead') {
+						if (segCross(px, py, ex, ey, it.ax, it.ay, it.bx, it.by) >= 0) { cost += C_LEADER_LEADER; }
+						continue;
+					}
+					if (it.link === ownLink || (lk && lk[it.link])) { continue; }
+					var t = segCross(px, py, ex, ey, it.ax, it.ay, it.bx, it.by);
+					if (t >= 0 && Math.hypot(px + t * (ex - px) - sx, py + t * (ey - py) - sy) > 1.5) {
+						(lk || (lk = {}))[it.link] = 1; cost += C_LEADER_PIPE;
+					}
+				}
+			}
+			return cost;
 		}
 
 		// Pairwise: NaN when the two cannot both stand (N1), else the crossing cost between them.
-		function pairCost(a, b) {
-			var i, j, cost = 0;
-			if (a.x1 <= b.x0 || b.x1 <= a.x0 || a.y1 <= b.y0 || b.y1 <= a.y0) { return 0; }
-			for (i = 0; i < a.boxes.length; i++) {
-				for (j = 0; j < b.boxes.length; j++) { if (boxesOverlap(a.boxes[i], b.boxes[j], TOL)) { return NaN; } }
+		function blocks(a, b) {
+			CNT.pair++;
+			if (a.bx1 - b.bx0 <= TOL || b.bx1 - a.bx0 <= TOL || a.by1 - b.by0 <= TOL || b.by1 - a.by0 <= TOL) { return false; }
+			for (var i = 0; i < a.boxes.length; i++) {
+				for (var j = 0; j < b.boxes.length; j++) { if (boxesOverlap(a.boxes[i], b.boxes[j], TOL)) { return true; } }
 			}
+			return false;
+		}
+		function pairCost(a, b) { return blocks(a, b) ? NaN : pairSoft(a, b); }
+		function pairSoft(a, b) {
+			var cost = 0;
+			if (a.x1 <= b.x0 || b.x1 <= a.x0 || a.y1 <= b.y0 || b.y1 <= a.y0) { return 0; }
 			if (b.leader && boxesOnLeader(a.boxes, b.leader)) { cost += C_LABEL_LEADER; }
 			if (a.leader && boxesOnLeader(b.boxes, a.leader)) { cost += C_LABEL_LEADER; }
 			if (a.leader && b.leader && leadersCross(a.leader, b.leader)) { cost += C_LEADER_LEADER; }
@@ -423,62 +557,114 @@ EngCalcs.lpnPlacerD = (function () {
 			return false;
 		}
 
+		// ---- the labels, their levels, and their candidate lists (built a level at a time) ----
+		var lab = new Array(N), li, nGen = 0, nValid = 0, nDyn = 0, CNT = { best: 0, pair: 0, soft: 0, build: 0, near: 0 };
+		for (li = 0; li < N; li++) {
+			lab[li] = { req: reqs[li], hand: !!reqs[li].hand, levels: levelsOf(reqs[li], scene.dropOrder), lists: [] };
+		}
+		// The candidates of one drop level, clear of the fixed world, best first.
+		// Tier 0 is the places touching the owner (and last view's place); tier 1 the leadered
+		// places, built only when tier 0 cannot win.
+		var TIER1_PEN = C_LEADER_BASE + C_LEADER_PER_ROW * DISTS[0];
+		function ensure(li, k, t) {
+			var L = lab[li], key = 2 * k + t;
+			if (L.lists[key]) { return L.lists[key]; }
+			var req = L.req, lv = L.levels[k], raw = [], out = [];
+			if (L.hand) { if (!t) { genHand(li, req, lv, raw); } } else {
+				if (req.kind === 'link' && linksById[req.owner]) { genPipe(li, req, lv, raw, t); } else { genPoint(li, req, lv, raw, t); }
+				if (!t) { genSticky(li, req, lv, raw); }
+			}
+			for (var i = 0; i < raw.length; i++) {
+				var c = raw[i];
+				if (L.hand) { c.fx = fixedCost(c, true); out.push(c); } else if (c.ok || hardOK(c)) { out.push(c); }
+			}
+			out.sort(function (a, b) { return b.base - a.base; });
+			nGen += raw.length; nValid += out.length;
+			L.lists[key] = out;
+			return out;
+		}
+		function tierMax(li, k, t) { return lab[li].levels[k].value + (t ? -TIER1_PEN : B_STICK); }
+
 		// ---- the placed labels ----
-		var cur = new Array(N), dyn = new Grid(vp), isHand = new Array(N);
+		// Two indexes of the seated labels: each whole label by its extent, leader included (for
+		// crossings), and each row box on its own (for the block test, the common case).
+		var cur = new Array(N), dyn = new Grid(vp), dynB = new Grid(vp);
 		function seat(li, c) {
-			if (cur[li]) { dyn.remove(cur[li], cur[li].x0, cur[li].y0, cur[li].x1, cur[li].y1); }
+			var o = cur[li], i, b;
+			if (o) {
+				dyn.remove(o, o.x0, o.y0, o.x1, o.y1);
+				for (i = 0; i < o.items.length; i++) { b = o.items[i].b; dynB.remove(o.items[i], b.x0, b.y0, b.x1, b.y1); }
+			}
 			cur[li] = c;
-			if (c) { dyn.add(c, c.x0, c.y0, c.x1, c.y1); }
+			if (c) {
+				if (!c.boxes) { build(c); }
+				dyn.add(c, c.x0, c.y0, c.x1, c.y1);
+				if (!c.items) { c.items = c.boxes.map(function (bx) { return { li: li, b: bx, c: c }; }); }
+				for (i = 0; i < c.items.length; i++) { b = c.items[i].b; dynB.add(c.items[i], b.x0, b.y0, b.x1, b.y1); }
+			}
 		}
-		// Crossing cost of c against every seated label except `li` and those in `skip`; NaN if
+		// Crossing cost of c against every seated label but its own and those in `skip`; NaN if
 		// blocked. With `blockers`, collects who blocks instead of stopping at the first.
-		function dynCost(c, skip, blockers) {
-			var cost = 0, blocked = false;
-			evals++;
-			dyn.each(c.x0, c.y0, c.x1, c.y1, function (o) {
-				if (o.li === c.li || (skip && skip[o.li])) { return; }
-				var p = pairCost(c, o);
-				if (p !== p) { blocked = true; if (blockers) { blockers.push(o.li); return; } return false; }
-				cost += p;
-			});
-			return blocked ? NaN : cost;
+		// Crossing cost of c against every seated label but its own; NaN if one blocks it (N1).
+		// With `blockers`, collects every label that blocks it. A candidate remembers the seated
+		// label that last blocked it, which answers again for as long as that label stays put.
+		var qd = [];
+		function dynCost(c, blockers) {
+			var cost = 0, n, i, it, o;
+			evals++; nDyn++;
+			if (!c.boxes) { build(c); }
+			if (!blockers && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
+			var q = dynB.query(c.bx0, c.by0, c.bx1, c.by1, qd), hit = false;
+			for (n = 0; n < q.length; n++) {
+				it = q[n];
+				if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
+				var b = it.b;
+				for (i = 0; i < c.boxes.length; i++) {
+					CNT.pair++;
+					if (boxesOverlap(c.boxes[i], b, TOL)) {
+						c.bl = it.c; hit = true;
+						if (!blockers) { return NaN; }
+						blockers.push(it.li);
+						break;
+					}
+				}
+			}
+			if (hit) { return NaN; }
+			q = dyn.query(c.x0, c.y0, c.x1, c.y1, qd);
+			for (n = 0; n < q.length; n++) {
+				o = q[n];
+				if (o.li !== c.li) { cost += pairSoft(c, o); }
+			}
+			return cost;
 		}
-		function worth(c, skip) {
-			var f = fixedCost(c, isHand[c.li]);
-			if (f !== f) { return NaN; }
-			var d = dynCost(c, skip);
-			return d !== d ? NaN : c.base - f - d;
-		}
+		function dynCostN(c, nb, skip, blockers) { return dynCost(c, blockers); }
+		function near() { return null; }
+		function keyOf(c) { if (c.fx === undefined) { c.fx = softCost(c); } return c.base - c.fx; }
+		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
 		// The best candidate for label li as things stand; hidden (null, worth 0) if nothing fits
 		// or nothing is worth showing. A hand-placed label is always shown.
-		function bestFor(li, skip) {
-			var list = cands[li], best = null, bs = isHand[li] ? -Infinity : 0;
-			for (var i = 0; i < list.length; i++) {
-				var c = list[i];
-				if (c.base <= bs) { break; }
-				if (evals > MAX_EVALS && best) { break; }
-				var f = fixedCost(c, isHand[li]);
-				if (f !== f || c.base - f <= bs) { continue; }
-				var d = dynCost(c, skip);
-				if (d !== d) { continue; }
-				if (c.base - f - d > bs) { bs = c.base - f - d; best = c; }
+		function bestFor(li) {
+			CNT.best++;
+			var L = lab[li], best = null, bs = L.hand ? -Infinity : 0;
+			for (var k = 0; k < L.levels.length; k++) {
+				if (tierMax(li, k, 0) <= bs) { break; }
+				for (var t = 0; t < 2; t++) {
+					if (tierMax(li, k, t) <= bs) { continue; }
+					var list = ensure(li, k, t), nb = near(list);
+					for (var i = 0; i < list.length; i++) {
+						var c = list[i];
+						if (c.base <= bs) { break; }
+						if (nDyn > MAX_EVALS && best) { break; }
+						if (c.fx !== undefined && c.base - c.fx <= bs) { continue; }
+						var d = dynCostN(c, nb, null);
+						if (d === d && keyOf(c) - d > bs) { bs = c.base - c.fx - d; best = c; }
+					}
+				}
 			}
 			return { c: best, w: best ? bs : 0 };
 		}
 
 		// ---- candidate generation ----
-		var cands = new Array(N);
-		for (var li = 0; li < N; li++) {
-			var req = reqs[li], list = [], levels = levelsOf(req, scene.dropOrder);
-			isHand[li] = !!req.hand;
-			if (req.hand) { genHand(li, req, levels, list); } else {
-				if (req.kind === 'link' && linksById[req.owner]) { genPipe(li, req, levels, list); } else { genPoint(li, req, levels, list); }
-				genSticky(li, req, levels, list);
-			}
-			list.sort(function (a, b) { return b.base - a.base; });
-			cands[li] = list;
-		}
-
 		function ownerPoint(req) {
 			var n = req.kind === 'node' ? nodesById[req.owner] : null;
 			if (n) { return { x: n.x, y: n.y, hw: n.symbol.w / 2, hh: n.symbol.h / 2, r: Math.min(n.symbol.w, n.symbol.h) / 2 }; }
@@ -496,109 +682,120 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 
 		// Leadered places around a point (a node, or a point on a pipe with r = 0): straight out
-		// on DIRS directions at DISTS distances, the text justified to the side the leader arrives
+		// on each direction at DISTS distances, the text justified to the side the leader arrives
 		// from (R5); a steep leader ends in the standard short hook instead (R6).
 		function genLeadered(li, o, lv, layout, d, pref, list, dirSet) {
+			var req = reqs[li], own = req.kind === 'node' ? req.owner : null;
 			for (var k = 0; k < dirSet.length; k++) {
 				var ux = dirSet[k][0], uy = dirSet[k][1];
 				for (var j = 0; j < DISTS.length; j++) {
 					var rr = o.r + DISTS[j] * rowH, px = o.x + ux * rr, py = o.y + uy * rr;
-					var row = uy < -0.2 ? d.mids.length - 1 : 0;
+					var row = uy < -0.2 ? d.mids.length - 1 : 0, x, al, L;
 					if (Math.abs(ux) >= 0.5) {
 						var right = ux > 0;
 						if (layout === 'line' && Math.abs(ux) < 0.7) { continue; }
-						list.push(new Cand(li, lv, layout, right ? 'left' : 'right', right ? px : px - d.w, py - d.mids[row],
-							d.w, d.h, 0, leaderFrom(o, [[px, py]]), pref));
+						al = right ? 'left' : 'right'; x = right ? px : px - d.w;
+						if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
+						L = leaderFrom(o, [[px, py]]);
+						if (!leaderFree(L, own)) { continue; }
+						var c = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, L, pref);
+						c.ok = true; list.push(c);
 					} else if (hookLen > 0) {
 						for (var sd = -1; sd <= 1; sd += 2) {
 							var ex = px + sd * hookLen;
-							list.push(new Cand(li, lv, layout, sd > 0 ? 'left' : 'right', sd > 0 ? ex : ex - d.w, py - d.mids[row],
-								d.w, d.h, 0, leaderFrom(o, [[px, py], [ex, py]]), pref + 0.1));
+							al = sd > 0 ? 'left' : 'right'; x = sd > 0 ? ex : ex - d.w;
+							if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
+							L = leaderFrom(o, [[px, py], [ex, py]]);
+							if (!leaderFree(L, own)) { continue; }
+							var c2 = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, L, pref + 0.1);
+							c2.ok = true; list.push(c2);
 						}
 					}
 				}
 			}
 		}
 
-		function genPoint(li, req, levels, list) {
+		function genPoint(li, req, lv, list, tier) {
 			var o = ownerPoint(req), L = o.x - o.hw - GAP, R = o.x + o.hw + GAP, T = o.y - o.hh - GAP, B = o.y + o.hh + GAP;
-			levels.forEach(function (lv) {
-				var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
-				if (req.layout === 'line') { layouts.reverse(); }
-				layouts.forEach(function (layout, li2) {
-					var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0, n = d.mids.length, k;
-					function put(align, x, y, pref) { list.push(new Cand(li, lv, layout, align, x, y, d.w, d.h, 0, null, pref + alt)); }
-					// Touching the symbol: the standard quadrants, then the sides with each row beside it.
-					put('left', R, T - d.h, 0);
-					put('left', R, B, 0.3);
-					put('right', L - d.w, T - d.h, 0.4);
-					put('right', L - d.w, B, 0.6);
-					for (k = 0; k < n; k++) {
-						put('left', R, o.y - d.mids[k], 0.15 + 0.1 * k);
-						put('right', L - d.w, o.y - d.mids[k], 0.45 + 0.1 * k);
+			var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
+			if (req.layout === 'line') { layouts.reverse(); }
+			layouts.forEach(function (layout, li2) {
+				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0, n = d.mids.length, k;
+				if (tier) { genLeadered(li, o, lv, layout, d, alt, list, DIRSET); return; }
+				function put(align, x, y, pref) {
+					if (blockFree(req, lv.rows, layout, d, align, x, y)) {
+						var c = new Cand(li, lv, layout, align, x, y, d.w, d.h, 0, null, pref + alt);
+						c.ok = true; list.push(c);
 					}
-					put('center', o.x - d.w / 2, T - d.h, 0.8);
-					put('center', o.x - d.w / 2, B, 0.9);
-					put('left', o.x - o.hw, T - d.h, 0.85);
-					put('right', o.x + o.hw - d.w, T - d.h, 0.85);
-					put('left', o.x - o.hw, B, 0.95);
-					put('right', o.x + o.hw - d.w, B, 0.95);
-					genLeadered(li, o, lv, layout, d, alt, list, DIRSET);
-				});
+				}
+				// Touching the symbol: the standard quadrants, then the sides with each row beside it.
+				put('left', R, T - d.h, 0);
+				put('left', R, B, 0.3);
+				put('right', L - d.w, T - d.h, 0.4);
+				put('right', L - d.w, B, 0.6);
+				for (k = 0; k < n; k++) {
+					put('left', R, o.y - d.mids[k], 0.15 + 0.1 * k);
+					put('right', L - d.w, o.y - d.mids[k], 0.45 + 0.1 * k);
+				}
+				put('center', o.x - d.w / 2, T - d.h, 0.8);
+				put('center', o.x - d.w / 2, B, 0.9);
+				put('left', o.x - o.hw, T - d.h, 0.85);
+				put('right', o.x + o.hw - d.w, T - d.h, 0.85);
+				put('left', o.x - o.hw, B, 0.95);
+				put('right', o.x + o.hw - d.w, B, 0.95);
 			});
 		}
 
-		function genPipe(li, req, levels, list) {
+		function genPipe(li, req, lv, list, tier) {
 			var link = linksById[req.owner], pts = link.points, cum = cumLengths(pts), Ltot = cum[cum.length - 1];
-			var long = spacing > 0 && Ltot > spacing, fr, reps = null, k;
+			var long = spacing > 0 && Ltot > spacing, fr = [0.5], reps = null, k;
 			if (long) {
 				var n = Math.ceil(Ltot / spacing);
-				fr = []; reps = [];
+				reps = [];
 				for (k = 0; k < n; k++) { reps.push((k + 0.5) / n); }
 				fr = reps.slice().sort(function (a, b) { return Math.abs(a - 0.5) - Math.abs(b - 0.5); });
-			} else {
-				fr = [0.5];
 			}
-			levels.forEach(function (lv) {
-				var layouts = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
-				if (req.layout === 'stack') { layouts.reverse(); }
-				layouts.forEach(function (layout, li2) {
-					var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0;
-					var ff = long ? fr : (Ltot > 2.2 * d.w ? [0.5, 0.33, 0.67, 0.2, 0.8] : (Ltot > 1.2 * d.w ? [0.5, 0.35, 0.65] : fr));
-					ff.forEach(function (f) {
-						var fpref = alt + 3 * Math.abs(f - 0.5);
-						for (var side = -1; side <= 1; side += 2) {
-							['along', 'level'].forEach(function (kind) {
-								var c = besidePipe(li, lv, layout, d, pts, cum, f * Ltot, side, kind, fpref);
-								if (!c) { return; }
-								if (long) {
-									var rr = [];
-									reps.forEach(function (g) {
-										if (g === f) { return; }
-										var r = besidePipe(li, lv, layout, d, pts, cum, g * Ltot, side, kind, 0);
-										if (r) { rr.push({ x: r.x, y: r.y, angle: r.angle }); }
-									});
-									c.reps = rr.length ? rr : null;
-								}
-								list.push(c);
-							});
-						}
-					});
+			var layouts = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
+			if (req.layout === 'stack') { layouts.reverse(); }
+			layouts.forEach(function (layout, li2) {
+				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0;
+				if (tier) {
 					// Out on a leader from the pipe's middle, when there is no room beside it.
 					var P = pointAt(pts, cum, Ltot / 2), nx = -P.uy, ny = P.ux, dirs = [];
 					[-1, 1].forEach(function (s) {
-						[0, 35, -35, 65, -65].forEach(function (deg) {
+						[0, 40, -40].forEach(function (deg) {
 							var r = deg * Math.PI / 180, c = Math.cos(r), sn = Math.sin(r);
 							dirs.push([s * (nx * c - ny * sn), s * (nx * sn + ny * c)]);
 						});
 					});
 					genLeadered(li, { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 }, lv, layout, d, alt + 0.3, list, dirs);
+					return;
+				}
+				var ff = long ? fr : (Ltot > 2.2 * d.w ? [0.5, 0.33, 0.67, 0.2, 0.8] : (Ltot > 1.2 * d.w ? [0.5, 0.35, 0.65] : fr));
+				ff.forEach(function (f) {
+					var fpref = alt + 3 * Math.abs(f - 0.5);
+					for (var side = -1; side <= 1; side += 2) {
+						['along', 'level'].forEach(function (kind) {
+							var c = besidePipe(li, lv, layout, d, pts, cum, f * Ltot, side, kind, fpref, !long);
+							if (!c) { return; }
+							if (long) {
+								var rr = [];
+								reps.forEach(function (g) {
+									if (g === f) { return; }
+									var r = besidePipe(li, lv, layout, d, pts, cum, g * Ltot, side, kind, 0);
+									if (r) { rr.push({ x: r.x, y: r.y, angle: r.angle }); }
+								});
+								c.reps = rr.length ? rr : null;
+							}
+							list.push(c);
+						});
+					}
 				});
 			});
 		}
 		// A pipe label beside its pipe (R7): 'along' lies parallel to it, 'level' stays horizontal
 		// and stands just clear of the pipe's line.
-		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref) {
+		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref, check) {
 			var P = pointAt(pts, cum, s), nx = -P.uy * side, ny = P.ux * side;
 			var ang = Math.atan2(P.uy, P.ux) * 180 / Math.PI;
 			if (ang > 90) { ang -= 180; } else if (ang <= -90) { ang += 180; }
@@ -615,14 +812,17 @@ EngCalcs.lpnPlacerD = (function () {
 			off = d.w / 2 * Math.abs(nx) + d.h / 2 * Math.abs(ny) + PIPE_GAP;
 			cx = P.x + nx * off; cy = P.y + ny * off;
 			if (layout === 'stack') { align = nx > 0.3 ? 'left' : (nx < -0.3 ? 'right' : 'center'); }
-			return new Cand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null,
+			if (check && !blockFree(reqs[li], lv.rows, layout, d, align, cx - d.w / 2, cy - d.h / 2)) { return null; }
+			var c = new Cand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null,
 				pref + sidePref + (Math.abs(ang) <= 45 && ang !== 0 ? 0.3 : 0));
+			c.ok = !!check;
+			return c;
 		}
 
 		// A hand-placed label (N4): it hangs from the user's point on the side away from its owner,
 		// the leader running from the owner to that point. Only its rows and which row the point
 		// meets are free.
-		function genHand(li, req, levels, list) {
+		function genHand(li, req, lv, list) {
 			var H = req.hand, start, owner;
 			if (req.kind === 'link' && linksById[req.owner]) {
 				start = nearestOnPolyline(linksById[req.owner].points, H.x, H.y);
@@ -631,135 +831,133 @@ EngCalcs.lpnPlacerD = (function () {
 				owner = ownerPoint(req);
 			}
 			var dx = H.x - owner.x, dy = H.y - owner.y, far = Math.hypot(dx, dy) > owner.r + 2;
-			var right = dx >= 0;
-			levels.forEach(function (lv) {
-				var d = dims(req, lv.rows, req.layout, text);
-				for (var k = 0; k < d.mids.length; k++) {
-					var leader = far ? (owner.hw !== undefined ? leaderFrom(owner, [[H.x, H.y]]) : [[owner.x, owner.y], [H.x, H.y]]) : null;
-					list.push(new Cand(li, lv, req.layout, right ? 'left' : 'right', right ? H.x : H.x - d.w, H.y - d.mids[k],
-						d.w, d.h, 0, leader, 0.1 * k));
-				}
-			});
+			var right = dx >= 0, d = dims(req, lv.rows, req.layout, text);
+			for (var k = 0; k < d.mids.length; k++) {
+				var leader = far ? (owner.hw !== undefined ? leaderFrom(owner, [[H.x, H.y]]) : [[owner.x, owner.y], [H.x, H.y]]) : null;
+				list.push(new Cand(li, lv, req.layout, right ? 'left' : 'right', right ? H.x : H.x - d.w, H.y - d.mids[k],
+					d.w, d.h, 0, leader, 0.1 * k));
+			}
 		}
 
-		// The last view's placement, held at the same offset from its anchor, at every drop level:
-		// a label that stays put is not churn, so it wins ties.
-		function genSticky(li, req, levels, list) {
+		// The last view's placement, held at the same offset from its anchor: a label that stays
+		// put is not churn, so it wins ties.
+		function genSticky(li, req, lv, list) {
 			var pl = prevPl[req.id], pr = prevReq[req.id];
 			if (!pl || !pl.shown || !pr) { return; }
 			var ox = pl.x - pr.anchor.x, oy = pl.y - pr.anchor.y;
 			var layout = pl.layout || pr.layout;
 			var pd = dims(pr, pl.rows, layout, text);
-			var rightEdge = ox + pd.w;
 			var o = req.kind === 'link' ? null : ownerPoint(req);
-			levels.forEach(function (lv) {
-				var d = dims(req, lv.rows, layout, text);
-				var x = pl.align === 'right' ? req.anchor.x + rightEdge - d.w
-					: (pl.align === 'center' ? req.anchor.x + ox + (pd.w - d.w) / 2 : req.anchor.x + ox);
-				var y = req.anchor.y + oy, leader = null;
-				if (pl.leader) {
-					var L = pl.leader, e = L[L.length - 1];
-					var ey = req.anchor.y + (e[1] - pr.anchor.y);
-					if (ey < y || ey > y + d.h) { ey = y + (ey < y ? d.mids[0] : d.mids[d.mids.length - 1]); }
-					var ex = e[0] - pl.x <= pl.x + pd.w - e[0] ? x : x + d.w;
-					var tail = [[ex, ey]];
-					if (L.length === 3) { tail.unshift([req.anchor.x + (L[1][0] - pr.anchor.x), ey]); }
-					if (o) { leader = leaderFrom(o, tail); } else {
-						var s0 = [req.anchor.x + (L[0][0] - pr.anchor.x), req.anchor.y + (L[0][1] - pr.anchor.y)];
-						var lk = linksById[req.owner];
-						if (lk) { s0 = nearestOnPolyline(lk.points, s0[0], s0[1]); }
-						leader = [s0].concat(tail);
-					}
-					if (L.length === 3 && Math.abs(tail[0][0] - ex) > (text.hookMaxPx || 0)) { return; }
+			var d = dims(req, lv.rows, layout, text);
+			var x = pl.align === 'right' ? req.anchor.x + ox + pd.w - d.w
+				: (pl.align === 'center' ? req.anchor.x + ox + (pd.w - d.w) / 2 : req.anchor.x + ox);
+			var y = req.anchor.y + oy, leader = null;
+			if (pl.leader) {
+				var L = pl.leader, e = L[L.length - 1];
+				var ey = req.anchor.y + (e[1] - pr.anchor.y);
+				if (ey < y || ey > y + d.h) { ey = y + (ey < y ? d.mids[0] : d.mids[d.mids.length - 1]); }
+				var ex = e[0] - pl.x <= pl.x + pd.w - e[0] ? x : x + d.w;
+				var tail = [[ex, ey]];
+				if (L.length === 3) {
+					var hx = req.anchor.x + (L[1][0] - pr.anchor.x);
+					if (Math.abs(hx - ex) > (text.hookMaxPx || 0)) { return; }
+					tail.unshift([hx, ey]);
 				}
-				var c = new Cand(li, lv, layout, pl.align || 'left', x, y, d.w, d.h, pl.angle || 0, leader, 0);
-				c.base += B_STICK; c.stick = true;
-				if (pl.repeats && pl.repeats.length) {
-					c.reps = pl.repeats.map(function (r) {
-						return { x: x + (r.x - pl.x), y: y + (r.y - pl.y), angle: r.angle === undefined ? pl.angle : r.angle };
-					});
+				if (o) { leader = leaderFrom(o, tail); } else {
+					var s0 = [req.anchor.x + (L[0][0] - pr.anchor.x), req.anchor.y + (L[0][1] - pr.anchor.y)];
+					var lk = linksById[req.owner];
+					if (lk) { s0 = nearestOnPolyline(lk.points, s0[0], s0[1]); }
+					leader = [s0].concat(tail);
 				}
-				list.push(c);
-			});
+			}
+			var c = new Cand(li, lv, layout, pl.align || 'left', x, y, d.w, d.h, pl.angle || 0, leader, 0);
+			c.base += B_STICK;
+			if (pl.repeats && pl.repeats.length) {
+				c.reps = pl.repeats.map(function (r) {
+					return { x: x + (r.x - pl.x), y: y + (r.y - pl.y), angle: r.angle === undefined ? pl.angle : r.angle };
+				});
+			}
+			list.push(c);
 		}
 
 		// ---- 1. hand-placed labels: fixed, seated first ----
 		var order = [], i;
-		for (i = 0; i < N; i++) { if (isHand[i]) { seat(i, bestFor(i).c); } else { order.push(i); } }
+		for (i = 0; i < N; i++) { if (lab[i].hand) { seat(i, bestFor(i).c); } else { order.push(i); } }
 
-		// ---- 2. greedy, hardest first: fewest free places for the whole label ----
-		var room = new Array(N);
+		// ---- 2. greedy, most crowded first ----
+		var crowd = new Array(N), anchors = new Grid(vp), qn = [];
+		reqs.forEach(function (r, k) { anchors.add({ k: k }, r.anchor.x, r.anchor.y, r.anchor.x, r.anchor.y); });
 		order.forEach(function (li) {
-			var n = 0, list = cands[li];
-			for (var k = 0; k < list.length; k++) {
-				if (list[k].lv !== list[0].lv && !list[k].stick) { continue; }
-				var f = fixedCost(list[k], false);
-				if (f === f) { n++; }
-			}
-			room[li] = n;
+			var a = reqs[li].anchor, R = 4 * rowH, n = 0, q = anchors.query(a.x - R, a.y - R, a.x + R, a.y + R, qn);
+			for (var k = 0; k < q.length; k++) { var b = reqs[q[k].k].anchor; if (Math.hypot(b.x - a.x, b.y - a.y) < R) { n++; } }
+			crowd[li] = n;
 		});
-		order.sort(function (a, b) { return (room[a] - room[b]) || (a - b); });
+		order.sort(function (a, b) { return (crowd[b] - crowd[a]) || (a - b); });
+		mark('setup');
 		order.forEach(function (li) { seat(li, bestFor(li).c); });
+		mark('greedy');
 
 		// ---- 3. repair: show more of each short-changed label, moving at most two neighbours ----
-		function valueOf(li) { return cur[li] ? cur[li].lv.value : 0; }
-		function contrib(set) {
+		function levelOf(li) { return cur[li] ? lab[li].levels.indexOf(cur[li].lv) : lab[li].levels.length; }
+		function unseatAll(set) {
 			// Worth of the labels in `set` as seated, each pair counted once; unseats them.
 			var tot = 0;
 			for (var k = 0; k < set.length; k++) {
 				var c = cur[set[k]];
-				if (c) { seat(set[k], null); tot += c.base - fixedCost(c, isHand[set[k]]) - dynCost(c, null); }
+				if (c) { seat(set[k], null); tot += keyOf(c) - dynCost(c, null); }
 			}
 			return tot;
 		}
 		function tryUpgrade(li) {
-			var list = cands[li], curV = valueOf(li), tried = 0;
-			for (var k = 0; k < list.length && tried < 40; k++) {
-				var c = list[k];
-				if (c.lv.value <= curV) { continue; }
-				var f = fixedCost(c, false);
-				if (f !== f) { continue; }
-				var bl = [];
-				var d = dynCost(c, null, bl);
-				if (d === d) {
-					// Free room: take it if it is worth more.
-					var old = cur[li], oldW = old ? worth(old) : 0;
-					if (c.base - f - d > oldW + 1e-6) { seat(li, c); return true; }
-					continue;
+			var cl = levelOf(li), here = worthNow(li);
+			for (var kt = 0; kt < 2 * cl; kt++) {
+				var k = kt >> 1;
+				if (tierMax(li, k, kt & 1) <= here) { continue; }
+				var list = ensure(li, k, kt & 1), tried = 0, nb = near(list);
+				for (var m = 0; m < list.length && tried < TRIES; m++) {
+					var c = list[m];
+					if (c.base <= here) { break; }
+					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
+					var bl = [], d = dynCostN(c, nb, null, bl);
+					if (d === d) {
+						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
+						continue;
+					}
+					if (keyOf(c) <= here) { continue; }
+					tried++;
+					if (bl.length > 2 || bl.some(function (b) { return lab[b].hand; })) { continue; }
+					if (nDyn > MAX_EVALS) { return false; }
+					var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
+					var before = unseatAll(set);
+					seat(li, c);
+					var after = keyOf(c) - dynCost(c, null);
+					for (var q = 0; q < bl.length; q++) {
+						var b = bestFor(bl[q]);
+						seat(bl[q], b.c);
+						after += b.w;
+					}
+					if (after > before + 1e-6) { return true; }
+					for (q = 0; q < set.length; q++) { seat(set[q], null); }
+					for (q = 0; q < set.length; q++) { seat(set[q], saved[q]); }
 				}
-				tried++;
-				if (bl.length > 2 || bl.some(function (b) { return isHand[b]; })) { continue; }
-				if (evals > MAX_EVALS) { return false; }
-				var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
-				var before = contrib(set);
-				var skipNone = null, after = 0;
-				seat(li, c);
-				after += c.base - f - dynCost(c, skipNone);
-				for (var m = 0; m < bl.length; m++) {
-					var b = bestFor(bl[m]);
-					seat(bl[m], b.c);
-					after += b.w;
-				}
-				if (after > before + 1e-6) { return true; }
-				for (m = 0; m < set.length; m++) { seat(set[m], null); }
-				for (m = 0; m < set.length; m++) { seat(set[m], saved[m]); }
 			}
 			return false;
 		}
-		function deficit(li) { var lv = cands[li].length ? cands[li][0].lv : null; return lv ? lv.value - valueOf(li) : 0; }
-		for (var pass = 0; pass < 3; pass++) {
-			var todo = order.filter(function (li) { return deficit(li) > 0; });
-			todo.sort(function (a, b) { return (valueOf(a) ? 1 : 0) - (valueOf(b) ? 1 : 0) || deficit(b) - deficit(a) || a - b; });
+		for (var pass = 0; pass < PASSES; pass++) {
+			var todo = order.filter(function (li) { return levelOf(li) > 0; });
+			todo.sort(function (a, b) { return (cur[a] ? 1 : 0) - (cur[b] ? 1 : 0) || levelOf(b) - levelOf(a) || a - b; });
 			var changed = false;
 			for (i = 0; i < todo.length; i++) { if (tryUpgrade(todo[i])) { changed = true; } }
+			mark('repair' + pass);
 			// ---- 4. polish: every label re-seats itself if that is worth more ----
 			for (i = 0; i < order.length; i++) {
-				var li3 = order[i], was = cur[li3], wasW = was ? worth(was) : 0;
-				var b = bestFor(li3);
-				if (b.c && b.c !== was && b.w > wasW + 1e-6) { seat(li3, b.c); changed = true; }
+				var lj = order[i], here = worthNow(lj), b = bestFor(lj);
+				if (b.c && b.c !== cur[lj] && b.w > here + 1e-6) { seat(lj, b.c); changed = true; }
 			}
-			if (!changed || evals > MAX_EVALS) { break; }
+			mark('polish' + pass);
+			if (!changed || nDyn > MAX_EVALS) { break; }
 		}
+		if (DBG) { console.error(scene.id + ': gen ' + nGen + ' valid ' + nValid + ' dyn ' + nDyn + ' ' + JSON.stringify(CNT) + ' ' + tl.join(', ')); }
 
 		// ---- answer ----
 		var out = {};
