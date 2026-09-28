@@ -5,7 +5,9 @@
 // Wired into dev/scripts/check_all.sh so the bench cannot rot silently. Two halves:
 //   1. A hand-built scene of three nodes, two pipes, one Text object and one hand-placed label,
 //      with one layout per rule that breaks exactly that rule, and one that breaks nothing. Each
-//      must be caught, and caught as itself, and the clean one must score zero.
+//      must be caught, and caught as itself, and the clean one must score zero. A leader crossing
+//      another leader (N2, removed) must NOT fail the run; it must raise the weighted cost. A
+//      label over a Text object is N5, not N1; a label over another label is N1, not N5.
 //   2. The trivial placer on the committed Net1 scene: it hangs every label whole at its node's
 //      upper right, so it must break N1 (its pipe labels run over the next node) and must not
 //      break N4 (it hangs a hand-placed label at the user's point); master's recorded layout of the
@@ -62,9 +64,9 @@ function clean() {
 	} };
 }
 function withLabel(id, pl) { const o = clean(); o.labels[id] = pl; return o; }
-function count(sc) { return ['N1', 'N2', 'N3', 'N4', 'invalid'].map(function (k) { return k + '=' + sc.breaks[k].length; }).join(' '); }
+function count(sc) { return ['N1', 'N3', 'N4', 'N5', 'invalid'].map(function (k) { return k + '=' + sc.breaks[k].length; }).join(' '); }
 function only(sc, key, n) {
-	return ['N1', 'N2', 'N3', 'N4', 'invalid'].every(function (k) { return sc.breaks[k].length === (k === key ? n : 0); });
+	return ['N1', 'N3', 'N4', 'N5', 'invalid'].every(function (k) { return sc.breaks[k].length === (k === key ? n : 0); });
 }
 
 const base = scoreView(scene, clean());
@@ -77,14 +79,17 @@ const onSymbol = scoreView(scene, withLabel('n:B', { shown: true, rows: [0], x: 
 report(only(onSymbol, 'N1', 1) && onSymbol.counts.labelOnSymbol === 1, 'N1: a label on a node symbol (its own) is caught', count(onSymbol));
 
 const onText = scoreView(scene, withLabel('n:B', { shown: true, rows: [0], x: 390, y: 296, leader: [[300, 100], [390, 296]] }));
-report(onText.breaks.N1.length === 1 && onText.counts.labelOnText === 1, 'N1: a label on a Text object is caught', count(onText));
+report(only(onText, 'N5', 1) && onText.counts.labelOnText === 1, 'N5: a label on a Text object is caught (not N1)', count(onText));
 
 // Two leaders crossing: A's runs east-south-east, B's west-south-west, an X between the nodes.
+// N2 is removed (Tom, 2026-09-28): this no longer fails the run, but it does raise the cost.
 const crossed = clean();
 crossed.labels['n:A'] = { shown: true, rows: [0, 1], x: 250, y: 140, leader: [[100, 100], [250, 145]] };
 crossed.labels['n:B'] = { shown: true, rows: [0], x: 120, y: 145, align: 'left', leader: [[300, 100], [140, 150]] };
 const x2 = scoreView(scene, crossed);
-report(x2.breaks.N2.length === 1 && x2.counts.leaderOnLeader === 1, 'N2: two leaders crossing are caught', count(x2));
+report(only(x2, null, 0) && x2.counts.leaderOnLeader === 1 && x2.crossings.leaderOnLeader.length === 1
+	&& x2.cost >= WEIGHTS.leaderOnLeader,
+	'leader on leader crosses clean (no break) but raises the cost', count(x2) + ' cost ' + x2.cost);
 
 const through = scoreView(scene, withLabel('n:A', { shown: true, rows: [0, 1], x: 330, y: 95, leader: [[100, 100], [330, 102]] }));
 report(through.breaks.N3.length === 1 && /through node B/.test(through.breaks.N3[0]), 'N3: a leader through another node\'s symbol is caught', count(through));

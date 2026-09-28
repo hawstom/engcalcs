@@ -11,7 +11,8 @@
 //          --idle-open <ms>      (idle budget when a set opens; default 3000)
 //          --idle-step <ms>      (idle budget between two views of a set; default 250)
 //
-// Exits 1 if any N1-N4 break (or an invalid placement) is found anywhere, 2 on a usage error.
+// Exits 1 if any N1, N3, N4 or N5 break (or an invalid placement) is found anywhere, 2 on a usage
+// error. A leader crossing another leader is no longer fatal (N2 removed); it raises the cost.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -20,7 +21,12 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { scoreView, stability, WEIGHTS } = require('./score.js');
+const { scoreView, stability } = require('./score.js');
+
+// The crossing costs, worst to least (dev/label-placement-rules.md §3.1). Builders get the order
+// only, not Tom's numbers (his ruling of 2026-09-28) -- the weights themselves stay in score.js.
+const CROSSING_ORDER = ['leader on leader', 'label on leader', 'label on pipe', 'leader on pipe',
+	'label on customer (free)'];
 
 function loadSets(dir, only) {
 	return fs.readdirSync(dir).filter(function (f) { return /\.json$/.test(f); }).sort()
@@ -81,34 +87,34 @@ function machine() {
 // One table: a row per view, then a TOTAL row.
 function printTable(results, log) {
 	log = log || console.log;
-	const cols = [['scene', 24, true], ['N1', 4], ['N2', 4], ['N3', 4], ['N4', 4], ['inv', 4], ['cost', 8],
+	const cols = [['scene', 24, true], ['N1', 4], ['N3', 4], ['N4', 4], ['N5', 4], ['inv', 4], ['cost', 8],
 		['rows', 12], ['labels', 12], ['ldr med', 8], ['p90', 6], ['max', 6], ['unforced', 10], ['ms', 7]];
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
-	const T = { N1: 0, N2: 0, N3: 0, N4: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
+	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, unforced: 0, compared: 0, ms: [] };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
-			T.N1 += b.N1.length; T.N2 += b.N2.length; T.N3 += b.N3.length; T.N4 += b.N4.length; T.invalid += b.invalid.length;
+			T.N1 += b.N1.length; T.N3 += b.N3.length; T.N4 += b.N4.length; T.N5 += b.N5.length; T.invalid += b.invalid.length;
 			T.cost += s.cost; T.rowsR += s.rowsReq; T.rowsS += s.rowsShown; T.labR += s.labelsReq; T.labS += s.labelsShown;
 			T.ldr = T.ldr.concat(s.leaderLH); T.ms.push(st.ms);
 			const stab = st.stability;
 			if (stab) { T.moved += stab.moved; T.unforced += stab.unforced; T.compared += stab.compared; }
-			log([pad(st.id, 24, true), pad(b.N1.length, 4), pad(b.N2.length, 4), pad(b.N3.length, 4), pad(b.N4.length, 4),
+			log([pad(st.id, 24, true), pad(b.N1.length, 4), pad(b.N3.length, 4), pad(b.N4.length, 4), pad(b.N5.length, 4),
 				pad(b.invalid.length, 4), pad(s.cost.toFixed(1), 8),
 				pad(s.rowsShown + '/' + s.rowsReq, 12), pad(s.labelsShown + '/' + s.labelsReq, 12),
 				pad(f1(quant(s.leaderLH, 0.5)), 8), pad(f1(quant(s.leaderLH, 0.9)), 6), pad(f1(quant(s.leaderLH, 1)), 6),
 				pad(stab ? stab.unforced + '/' + stab.compared : '', 10), pad(st.ms.toFixed(1), 7)].join(' '));
 		});
 	});
-	log([pad('TOTAL', 24, true), pad(T.N1, 4), pad(T.N2, 4), pad(T.N3, 4), pad(T.N4, 4), pad(T.invalid, 4),
+	log([pad('TOTAL', 24, true), pad(T.N1, 4), pad(T.N3, 4), pad(T.N4, 4), pad(T.N5, 4), pad(T.invalid, 4),
 		pad(T.cost.toFixed(1), 8), pad(pct(T.rowsS, T.rowsR), 12), pad(pct(T.labS, T.labR), 12),
 		pad(f1(quant(T.ldr, 0.5)), 8), pad(f1(quant(T.ldr, 0.9)), 6), pad(f1(quant(T.ldr, 1)), 6),
 		pad(T.unforced + '/' + T.compared, 10), pad('', 7)].join(' '));
 	log('time per layout: median ' + f1(quant(T.ms, 0.5)) + ' ms, max ' + f1(quant(T.ms, 1)) + ' ms, on ' + machine());
 	const idle = results.reduce(function (a, s) { return a + s.idleMs; }, 0);
 	if (idle) { log('idle hook time (not in the layout times): ' + idle.toFixed(0) + ' ms over ' + results.length + ' set(s)'); }
-	log('cost weights: ' + Object.keys(WEIGHTS).map(function (k) { return k + ' ' + WEIGHTS[k]; }).join(', '));
+	log('crossing costs, worst to least: ' + CROSSING_ORDER.join(', ') + ' (weights are judges-only)');
 	log('leader length in label heights (the shown block\'s own height); unforced = moved/compared between consecutive views');
 	return T;
 }
@@ -129,8 +135,11 @@ function main() {
 		res.forEach(function (set) {
 			set.steps.forEach(function (st) {
 				const b = st.score.breaks;
-				['N1', 'N2', 'N3', 'N4', 'invalid'].forEach(function (k) {
+				['N1', 'N3', 'N4', 'N5', 'invalid'].forEach(function (k) {
 					b[k].forEach(function (m) { console.log('  ' + st.id + ' ' + k + ': ' + m); });
+				});
+				st.score.crossings.leaderOnLeader.forEach(function (m) {
+					console.log('  ' + st.id + ' leader on leader (cost, not a break): ' + m);
 				});
 				if (st.stability && st.stability.unforcedIds.length) {
 					console.log('  ' + st.id + ' moved unforced: ' + st.stability.unforcedIds.join(' '));
@@ -139,8 +148,8 @@ function main() {
 		});
 	}
 	if (opt('--json')) { fs.writeFileSync(opt('--json'), JSON.stringify({ machine: machine(), results: res })); }
-	const bad = T.N1 + T.N2 + T.N3 + T.N4 + T.invalid;
-	console.log(bad ? 'BREAKS: ' + bad + ' (N1-N4 and invalid placements must be zero)' : 'No N1-N4 breaks.');
+	const bad = T.N1 + T.N3 + T.N4 + T.N5 + T.invalid;
+	console.log(bad ? 'BREAKS: ' + bad + ' (N1, N3, N4, N5 and invalid placements must be zero)' : 'No N1, N3, N4, N5 breaks.');
 	process.exit(bad ? 1 : 0);
 }
 
