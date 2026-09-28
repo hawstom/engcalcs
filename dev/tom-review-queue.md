@@ -153,3 +153,4 @@ judgement and does not belong to a script.
 ## 2026-09-28, later -- scenarios and demand categories
 
 - [x] R-369 fix/scenario-demand-category | "Add a demand category in a scenario. It adds to Base. Bad." -- fixed 4df591f8: in a scenario the whole demand table is one override; Base is untouched
+  - TGH 2026-09-28, on "In a scenario, the whole demand table will become one scenario override": "I agree."
