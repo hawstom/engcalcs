@@ -272,6 +272,13 @@ EngCalcs.lpnPlacerD = (function () {
 	// uses a pause to lay out a view it has been shown but not yet asked for -- the project's
 	// opening view -- so that view costs nothing when it is asked for. The cache is keyed on the
 	// whole input, so any change to the network, the text or the settings misses it (R13).
+	// A placer instance per project. It keeps its buffers and candidate pool across views, and
+	// (hint H-b) uses pauses: given a long one before the first view (the bench's project opening),
+	// it lays that view out then and keeps it; given short ones (the page's idle callbacks), it
+	// warms the engine up on a stand-in view built from the real network, so the first zoom's
+	// layout does not also pay for compiling the placer. The kept layout is keyed on the whole
+	// input, so any change to the network, the text or the settings misses it (R13).
+	var warmRuns = 0, WARM_SIZES = [12, 30, 60, 100];
 	function create() {
 		var mem = { occ: null, sat: null }, cache = null;
 		function inputKey(scene, opts) {
@@ -286,10 +293,45 @@ EngCalcs.lpnPlacerD = (function () {
 				return hit || place(scene, opts, mem);
 			},
 			idle: function (budgetMs, info) {
-				if (!info || !info.opening || !info.scene || budgetMs < 500) { return; }
-				cache = { key: inputKey(info.scene, null), out: place(info.scene, null, mem) };
+				if (!info || !info.scene) { return; }
+				var t0 = now();
+				if (info.opening && budgetMs >= 500 && !cache) {
+					cache = { key: inputKey(info.scene, null), out: place(info.scene, null, mem) };
+				}
+				while (warmRuns < WARM_SIZES.length && now() - t0 < budgetMs) {
+					var ws = warmScene(info.scene, WARM_SIZES[warmRuns++]);
+					if (!ws) { warmRuns = WARM_SIZES.length; break; }
+					place(ws, null, mem);
+				}
 			}
 		};
+	}
+	function now() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
+	// A stand-in view for warming up: the real view's network with up to n made-up labels (three
+	// rows at its nodes, two in a line along its pipes), so every path of the placer runs once.
+	function warmScene(sc, n) {
+		var vp = sc.viewport, rowH = (sc.text && sc.text.rowHeightPx) || 14.4, cw = rowH * 0.45, labels = [];
+		function on(x, y) { return x > vp.x && y > vp.y && x < vp.x + vp.w && y < vp.y + vp.h; }
+		function row(f, chars) { return { field: f, text: new Array(chars + 1).join('x'), w: chars * cw, h: rowH }; }
+		for (var i = 0; i < sc.nodes.length && labels.length < n * 0.6; i++) {
+			var nd = sc.nodes[i];
+			if (!on(nd.x, nd.y)) { continue; }
+			labels.push({ id: 'w:n' + i, owner: nd.id, kind: 'node', anchor: { x: nd.x, y: nd.y },
+				rows: [row('id', 3), row('wa', 7), row('wb', 6)], layout: 'stack', hand: null });
+		}
+		for (i = 0; i < sc.links.length && labels.length < n; i++) {
+			var lk = sc.links[i], P = lk.points, a = P[0], b = P[P.length - 1], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+			if (!on(mx, my)) { continue; }
+			labels.push({ id: 'w:l' + i, owner: lk.id, kind: 'link', anchor: { x: mx, y: my },
+				rows: [row('id', 3), row('wq', 6)], layout: 'line', hand: null, along: true });
+		}
+		if (!labels.length) { return null; }
+		var out = {};
+		for (var k in sc) { if (Object.prototype.hasOwnProperty.call(sc, k)) { out[k] = sc[k]; } }
+		out.labels = labels;
+		out.dropOrder = { node: ['wb', 'wa'], link: ['wq'], customer: [] };
+		out.settings = { alignPipeLabels: true, readableAngleDeg: (sc.settings && sc.settings.readableAngleDeg) || { min: -90, max: 90 } };
+		return out;
 	}
 
 	function place(scene, opts, mem) {
@@ -1273,6 +1315,32 @@ EngCalcs.lpnPlacerD = (function () {
 			out[reqs[i].id] = pl;
 		}
 		return { labels: out };
+	}
+
+	// In a browser, the first pause after the script loads warms the placer up on a made-up grid
+	// network, so even a project's first layout is not also compiling it (H-b). It stops at once if
+	// a project is opened first (warmRuns is shared with idle()).
+	function gridScene() {
+		var nodes = [], links = [], nx = 9, ny = 6, g = 95;
+		for (var j = 0; j < ny; j++) {
+			for (var i = 0; i < nx; i++) {
+				var x = 60 + i * g + (j % 2) * 20, y = 60 + j * g;
+				nodes.push({ id: 'g' + j + '_' + i, type: 'junction', x: x, y: y, symbol: { x: x - 6, y: y - 6, w: 12, h: 12 } });
+				if (i) { links.push({ id: 'h' + j + '_' + i, points: [[x - g, y], [x, y]], symbols: [], arrows: [] }); }
+				if (j) { links.push({ id: 'v' + j + '_' + i, points: [[x - ((j % 2) ? -20 : 20), y - g], [x, y]], symbols: [], arrows: [] }); }
+			}
+		}
+		return { id: 'warm', viewport: { x: 0, y: 0, w: 1000, h: 640 }, view: { s: 1, tx: 0, ty: 0 },
+			text: { sizePx: 12, rowHeightPx: 14.4, separator: ', ', separatorW: 13.09, hookMaxPx: 14.4, repeatSpacingPx: 480 },
+			dropOrder: {}, settings: {}, nodes: nodes, links: links, texts: [], customers: [], labels: [] };
+	}
+	if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+		window.requestIdleCallback(function tick(deadline) {
+			if (warmRuns >= WARM_SIZES.length) { return; }
+			var ws = warmScene(gridScene(), WARM_SIZES[warmRuns++]);
+			if (ws) { place(ws, null, { occ: null, sat: null }); }
+			if (warmRuns < WARM_SIZES.length) { window.requestIdleCallback(tick); }
+		});
 	}
 
 	return { name: NAME, create: create };
