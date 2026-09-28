@@ -256,6 +256,21 @@ function Raster(vp, G) {
 	G.all[1].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(pipe, c[0], c[1], c[2], c[3]); } });
 	G.all[2].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(tldr, c[0], c[1], c[2], c[3]); } });
 	this.hard = sat(hard); this.pipe = sat(pipe); this.tldr = sat(tldr);
+	// One byte per cell for walking a leader: bit 1 hard, 2 pipe, 4 Text callout, each spread by
+	// one cell so a walk that passes within a pixel of a thing cannot miss it.
+	const flag = new Uint8Array(nx * ny);
+	for (let j = 0; j < ny; j++) {
+		for (let i = 0; i < nx; i++) {
+			const k = j * nx + i, v = (hard[k] ? 1 : 0) | (pipe[k] ? 2 : 0) | (tldr[k] ? 4 : 0);
+			if (!v) { continue; }
+			for (let dj = -1; dj <= 1; dj++) {
+				const jj = j + dj;
+				if (jj < 0 || jj >= ny) { continue; }
+				for (let di = -1; di <= 1; di++) { const ii = i + di; if (ii >= 0 && ii < nx) { flag[jj * nx + ii] |= v; } }
+			}
+		}
+	}
+	this.flag = flag;
 	function sat(a) {
 		const W1 = nx + 1, S = new Int32Array(W1 * (ny + 1));
 		for (let j = 0; j < ny; j++) {
@@ -266,6 +281,19 @@ function Raster(vp, G) {
 	}
 	void self;
 }
+// What a straight segment passes near: the OR of the flags of every cell it crosses (sampled
+// every half pixel), or 7 (everything) when it leaves the raster.
+Raster.prototype.walk = function (x0, y0, x1, y1) {
+	const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(1, Math.ceil(len * 2)), nx = this.nx, ny = this.ny;
+	let v = 0;
+	for (let k = 0; k <= n; k++) {
+		const i = Math.floor((x0 + (x1 - x0) * k / n - this.ox) / RR), j = Math.floor((y0 + (y1 - y0) * k / n - this.oy) / RR);
+		if (i < 0 || j < 0 || i >= nx || j >= ny) { return 7; }
+		v |= this.flag[j * nx + i];
+		if (v === 7) { return 7; }
+	}
+	return v;
+};
 Raster.prototype.covers = function (bb) {
 	return bb[0] >= this.ox && bb[1] >= this.oy && bb[2] < this.ox + this.nx * RR && bb[3] < this.oy + this.ny * RR;
 };
@@ -482,25 +510,33 @@ function run(scene, prev, gaps) {
 		for (let s = 1; s < L.length; s++) {
 			const px = L[s - 1][0], py = L[s - 1][1], qx = L[s][0], qy = L[s][1];
 			const x0 = Math.min(px, qx), x1 = Math.max(px, qx), y0 = Math.min(py, qy), y1 = Math.max(py, qy);
-			let n = G.collect(0, x0, y0, x1, y1);
-			for (let i = 0; i < n; i++) {
-				const it = buf[i];
-				if (it.sym) {
-					if (!(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
-				} else if (segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 1; }
+			const near = Rs.walk(px, py, qx, qy);
+			let n;
+			if (near & 1) {
+				n = G.collect(0, x0, y0, x1, y1);
+				for (let i = 0; i < n; i++) {
+					const it = buf[i];
+					if (it.sym) {
+						if (!(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
+					} else if (segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 1; }
+				}
 			}
-			n = G.collect(1, x0, y0, x1, y1);
-			for (let i = 0; i < n; i++) {
-				const it = buf[i];
-				if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
-				const t = segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by);
-				if (t >= 0 && Math.hypot(px + t * (qx - px) - sx, py + t * (qy - py) - sy) > 1) { linkSeen[it.link] = es; cost += W.ldrPipe; }
+			if (near & 2) {
+				n = G.collect(1, x0, y0, x1, y1);
+				for (let i = 0; i < n; i++) {
+					const it = buf[i];
+					if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
+					const t = segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by);
+					if (t >= 0 && Math.hypot(px + t * (qx - px) - sx, py + t * (qy - py) - sy) > 1) { linkSeen[it.link] = es; cost += W.ldrPipe; }
+				}
 			}
-			n = G.collect(2, x0, y0, x1, y1);
-			for (let i = 0; i < n; i++) {
-				const it = buf[i];
-				if (ldrSeen[it.ld] === es) { continue; }
-				if (segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by) >= 0) { ldrSeen[it.ld] = es; cost += W.ldrLdr; }
+			if (near & 4) {
+				n = G.collect(2, x0, y0, x1, y1);
+				for (let i = 0; i < n; i++) {
+					const it = buf[i];
+					if (ldrSeen[it.ld] === es) { continue; }
+					if (segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by) >= 0) { ldrSeen[it.ld] = es; cost += W.ldrLdr; }
+				}
 			}
 		}
 		return cost;
@@ -612,53 +648,66 @@ function run(scene, prev, gaps) {
 		return uy < 0 ? 'N' : 'S';
 	}
 
-	// Every candidate for one row set, sorted by its own base cost and cached on the label. The
-	// static half of its cost is worked out the first time a search reaches it, and kept.
-	function cands(f, k) {
-		if (f.cc[k]) { return f.cc[k]; }
+	// The candidates for one row set come in TIERS, made only when a search could still use them:
+	// tier 0 is every place touching home (beside the symbol, along the pipe); tier t is the t-th
+	// ring of leaders. Each tier is sorted by its own base cost and cached on the label; the static
+	// half of a candidate's cost is worked out the first time a search reaches it, and kept.
+	const NT = 1 + RINGS.length;
+	function tierFloor(f, k, t) {
+		return W.row * (f.R - f.subsets[k].length) + (t === 0 ? 0 : distCost(Math.min(RINGS[t - 1], RINGS_ALT[t - 1] || Infinity)));
+	}
+	function cands(f, k, t) {
+		const key = k * NT + t;
+		if (f.cc[key]) { return f.cc[key]; }
 		const rows = f.subsets[k], rowPen = W.row * (f.R - rows.length), raw = [];
-		if (f.kind === 'link' && f.req.layout === 'line') { linkCandidates(f, rows, rowPen, raw); } else { pointCandidates(f, rows, rowPen, raw); }
+		if (f.kind === 'link' && f.req.layout === 'line') { linkCandidates(f, rows, rowPen, raw, t); } else { pointCandidates(f, rows, rowPen, raw, t); }
 		for (let i = 0; i < raw.length; i++) { raw[i].k = k; }
 		raw.sort(function (a, b) { return a.base - b.base; });
-		f.cc[k] = raw;
+		f.cc[key] = raw;
 		return raw;
 	}
-	function pointCandidates(f, rows, rowPen, out) {
+	function pointCandidates(f, rows, rowPen, out, t) {
 		const usual = f.req.layout === 'line' ? 'line' : 'stack';
-		around(f, shape(f, rows, usual), f.sym, rowPen, out, DIRS, RINGS);
+		around(f, shape(f, rows, usual), f.sym, rowPen, out, DIRS, RINGS, t);
 		// H1: the other shape too (a stack unwrapped to one line, or the reverse), a little dearer.
-		if (rows.length > 1) { around(f, shape(f, rows, usual === 'line' ? 'stack' : 'line'), f.sym, rowPen + ALT_SHAPE, out, DIRS8, RINGS_ALT); }
+		if (rows.length > 1) { around(f, shape(f, rows, usual === 'line' ? 'stack' : 'line'), f.sym, rowPen + ALT_SHAPE, out, DIRS8, RINGS_ALT, t); }
 		return out;
+	}
+	function dirsFor(f, D) {
+		const key = D === DIRS ? 'd16' : 'd8';
+		if (f[key]) { return f[key]; }
+		const dirs = [], gl = f.node ? gaps[f.node.id] : null;
+		if (gl) { for (let i = 0; i < gl.length && i < 4; i++) { if (gl[i].width > 0.5) { dirs.push(gl[i].mid); } } }
+		for (let i = 0; i < D.length; i++) { dirs.push(D[i]); }
+		f[key] = dirs;
+		return dirs;
 	}
 	// A label beside a point symbol, then out on leaders into open ground: the widest pipe gaps
 	// first, then the compass.
-	function around(f, sh, s, extra, out, D, RG) {
+	function around(f, sh, s, extra, out, D, RG, t) {
 		const g = GAP, cx = f.pt[0], cy = f.pt[1];
 		const sx0 = s.x - g, sx1 = s.x + s.w + g, sy0 = s.y - g, sy1 = s.y + s.h + g;
 		const w = sh.w, H = sh.h;
-		const adj = [
-			[sx1, sy0 - H, 'left', 0],
-			[sx1, cy - sh.h0 / 2, 'left', 0.1],
-			[sx1, sy1, 'left', 0.15],
-			[sx0 - w, sy0 - H, 'right', 0.2],
-			[sx0 - w, cy - sh.h0 / 2, 'right', 0.25],
-			[sx0 - w, sy1, 'right', 0.3],
-			[cx - w / 2, sy0 - H, 'center', 0.35],
-			[cx - w / 2, sy1, 'center', 0.4],
-			[sx1, cy - H / 2, 'left', 0.3],
-			[sx0 - w, cy - H / 2, 'right', 0.45]
-		];
-		for (let i = 0; i < adj.length; i++) {
-			out.push({ x: adj[i][0], y: adj[i][1], align: adj[i][2], angle: 0, sh: sh, leader: null, base: extra + adj[i][3] });
+		if (t === 0) {
+			function put(x, y, align, pref) { out.push({ x: x, y: y, align: align, angle: 0, sh: sh, leader: null, base: extra + pref }); }
+			put(sx1, sy0 - H, 'left', 0);
+			put(sx1, cy - sh.h0 / 2, 'left', 0.1);
+			put(sx1, sy1, 'left', 0.15);
+			put(sx0 - w, sy0 - H, 'right', 0.2);
+			put(sx0 - w, cy - sh.h0 / 2, 'right', 0.25);
+			put(sx0 - w, sy1, 'right', 0.3);
+			put(cx - w / 2, sy0 - H, 'center', 0.35);
+			put(cx - w / 2, sy1, 'center', 0.4);
+			put(sx1, cy - H / 2, 'left', 0.3);
+			put(sx0 - w, cy - H / 2, 'right', 0.45);
+			return;
 		}
+		if (t - 1 >= RG.length) { return; }
 		const rs = Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 2;
-		const dirs = [];
-		const gl = f.node ? gaps[f.node.id] : null;
-		if (gl) { for (let i = 0; i < gl.length && i < 4; i++) { if (gl[i].width > 0.5) { dirs.push(gl[i].mid); } } }
-		for (let i = 0; i < D.length; i++) { dirs.push(D[i]); }
+		const dirs = dirsFor(f, D);
 		for (let d = 0; d < dirs.length; d++) {
 			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
-			for (let r = 0; r < RG.length; r++) {
+			for (let r = t - 1; r < t; r++) {
 				const dist = rOut + RG[r] * RH;
 				const px = cx + ux * dist, py = cy + uy * dist;
 				// One leader serves every shape and row set hung on it: judged once, kept.
@@ -681,8 +730,14 @@ function run(scene, prev, gaps) {
 			}
 		}
 	}
-	function linkCandidates(f, rows, rowPen, out) {
+	function linkCandidates(f, rows, rowPen, out, t) {
 		const sh = shape(f, rows, 'line');
+		const pt0 = { x: f.pt[0], y: f.pt[1], w: 0, h: 0 };
+		if (t > 0) {
+			around(f, sh, pt0, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS, t);
+			if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt0, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT, t); }
+			return out;
+		}
 		const P = f.link.points, ax = f.pt[0], ay = f.pt[1];
 		let best = Infinity, si = 1;
 		for (let i = 1; i < P.length; i++) {
@@ -711,8 +766,8 @@ function run(scene, prev, gaps) {
 		}
 		// Horizontal, beside the anchor or out on a leader from it; as one line or as a stack.
 		const pt = { x: ax, y: ay, w: 0, h: 0 };
-		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS);
-		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT); }
+		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS, 0);
+		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT, 0); }
 		return out;
 	}
 
@@ -724,7 +779,9 @@ function run(scene, prev, gaps) {
 		for (let k = k0; k <= k1; k++) {
 			const rowPen = W.row * (f.R - f.subsets[k].length);
 			if (rowPen >= bestCost) { continue; }
-			const list = cands(f, k);
+			for (let t = 0; t < NT; t++) {
+			if (tierFloor(f, k, t) >= bestCost) { continue; }
+			const list = cands(f, k, t);
 			for (let i = 0; i < list.length; i++) {
 				const c0 = list[i];
 				if (c0.base >= bestCost) { break; }
@@ -741,6 +798,7 @@ function run(scene, prev, gaps) {
 				if (c0.st >= bestCost) { continue; }
 				const c = evalDyn(f, c0, c0.st, bestCost);
 				if (c < bestCost) { bestCost = c; best = c0; }
+			}
 			}
 		}
 		return best ? { cand: best, cost: bestCost } : null;
@@ -890,7 +948,7 @@ function run(scene, prev, gaps) {
 	let maxSets = 1;
 	info.forEach(function (f) { if (f.subsets.length > maxSets) { maxSets = f.subsets.length; } });
 	for (let round = 0; round < maxSets; round++) {
-		const last = round === maxSets - 1;
+		const last = false;
 		info.forEach(function (f) {
 			if (kept[f.li] === 'hand') { return; }
 			if (kept[f.li] === 'held') { growHeld(f, last); return; }
