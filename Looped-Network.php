@@ -3420,6 +3420,21 @@ EngCalcs.pageConfig = {
       // file could not be read, which is a lie about the file. ?>
 <script src="/engcalcs/js/lpn-survey.js?v=<?=filemtime(__DIR__.'/js/lpn-survey.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
+<?php // **A CONTRACT PLACER DRIVES THE LABELS, ON A DEVELOPMENT HOST ONLY** (the label rebuild,
+      // dev/label-placement-rules.md). `?placer=<name>` loads js/lpn-placer-<name>.js, which
+      // registers EngCalcs.lpnPlacers[<name>], and the editor hands it the labels in place of its
+      // own passes (placerActive() in js/looped-network.js). Without DEBUG_MODE, without the
+      // parameter, with a name outside [a-z0-9-] or naming no file, nothing is emitted at all, so
+      // production is the page it always was. AFTER the editor: it reads both at call time, and
+      // its first label pass runs on DOMContentLoaded, after every script here has run. ?>
+<?php $ecPlacer = (DEBUG_MODE && isset($_GET['placer']) && is_string($_GET['placer'])
+        && preg_match('/^[a-z0-9-]+$/', $_GET['placer'])
+        && is_file(__DIR__ . '/js/lpn-placer-' . $_GET['placer'] . '.js')) ? $_GET['placer'] : null;
+if ($ecPlacer !== null) { ?>
+<script src="/engcalcs/js/lpn-label-scene.js?v=<?=filemtime(__DIR__.'/js/lpn-label-scene.js')?>"></script>
+<script src="/engcalcs/js/lpn-placer-<?=$ecPlacer?>.js?v=<?=json_encode(filemtime(__DIR__ . '/js/lpn-placer-' . $ecPlacer . '.js'))?>"></script>
+<script>EngCalcs.lpnPlacerName = <?=json_encode($ecPlacer)?>;</script>
+<?php } ?>
 <script>
 <?php echoCookieScript(); ?>
 </script>
