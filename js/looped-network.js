@@ -23133,6 +23133,16 @@ var EngCalcs = EngCalcs || {};
 	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
 	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
 	// comes to round differently from the screen it was taken off.
+	//
+	// **THE ONE EXCEPTION: A CHOICE COLUMN.** This deliberately returns the RAW STORED WORD
+	// (`MIXED`, `2COMP`, `FIFO`, `LIFO`...) rather than its label, because every caller that reads a
+	// choice column feeds it straight to `input.value =` on a live `<select>` -- and a `<select>`
+	// matches by its `<option>`'s `value`, not by the words printed on it. That is correct for the
+	// SCREEN, where the matched option's own text is what the reader actually sees. The printed
+	// sheet has no `<option>` to do that matching (paneBuildPrintable() writes a plain `<td>`), so it
+	// must NOT call this function for a choice column -- see paneCellDisplayText() below, which is
+	// the one that reads as the screen reads (R-367, Tom, 2026-09-27: *"Mixing model prints a
+	// different value than appears on-screen"*).
 	// **WHICH OVERRIDABLE PROPERTY A COLUMN WRITES.** A literal for every column but the two
 	// coordinates, whose axis follows the kind of project and is therefore a function (paneColCoord).
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
@@ -23151,6 +23161,23 @@ var EngCalcs = EngCalcs || {};
 		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
+	}
+	// **WHAT THE READER ACTUALLY SEES, FOR A CELL WITH NO `<select>` UNDER IT TO SHOW IT FOR THEM**
+	// (R-367). paneCellText() is right for every caller that assigns to a live control's `.value`;
+	// this is for the one caller that is not one -- paneBuildPrintable()'s plain `<td>`. A choice
+	// column's label is read from the SAME `choices()` list the on-screen `<select>` was built from
+	// (paneColContentEm() already reads it this way to size the column), so the printed word can
+	// never disagree with the option the reader picked -- in whatever language is on screen, since
+	// `choices()` returns the translated label, not the stored EPANET token. Every other column
+	// reads exactly as paneCellText() already does.
+	function paneCellDisplayText(c, el) {
+		var v, choices, i;
+		if (!c.choices) { return paneCellText(c, el); }
+		v = c.get(el);
+		if (!panePresent(v)) { return ''; }
+		choices = c.choices(el);
+		for (i = 0; i < choices.length; i++) { if (choices[i][0] === v) { return choices[i][1]; } }
+		return String(v);
 	}
 	// **ONE PARSER FOR A TYPED CELL, A PASTED CELL AND A MULTI-PROPERTIES ROW.** Returns {ok, v}:
 	// the value c.set() should receive, or a refusal the caller can count. A number column keeps
@@ -25961,7 +25988,9 @@ var EngCalcs = EngCalcs || {};
 	// to go stale. It reads the spec, so it prints whatever the spec says -- the headings through
 	// paneHeadingText(), so the units on the paper are the units on the screen; the rows through
 	// paneTableRowsInOrder(), so the sort the reader chose is the order that prints; the cells
-	// through paneCellText(), which is also what fills them on screen.
+	// through paneCellDisplayText() (R-367), the one caller of paneCellText() that does not feed a
+	// live `<select>`'s own value matching -- so a choice column prints the label the screen shows,
+	// not the stored EPANET word underneath it.
 	//
 	// **A STATIC COPY, NOT THE LIVE TABLE.** Print rules that beat the live pane into a sheet of
 	// paper would be a second layout of the same table, maintained in CSS: it is a 260 px
@@ -26017,7 +26046,9 @@ var EngCalcs = EngCalcs || {};
 			paneCols(spec).forEach(function (c, i) {
 				var td = document.createElement('td');
 				td.className = paneCellClass(c, i);
-				td.textContent = paneCellText(c, el);
+				// paneCellDisplayText(), not paneCellText(): this <td> has no <select> under it to
+				// turn a choice column's stored word back into the label the screen shows (R-367).
+				td.textContent = paneCellDisplayText(c, el);
 				row.appendChild(td);
 			});
 			tbody.appendChild(row);
