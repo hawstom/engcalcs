@@ -1,0 +1,114 @@
+{
+  "sprint": "2026-09-28-delta",
+  "description": "Wave 0 of the 2026-09-28 lpn_ delta: 164 changed keys Tom has not ruled on, read adversarially (one Sonnet agent). 9 findings. The sprint launches when friction_check passes.",
+  "entries": [
+    {
+      "key": "lpn_help_icons",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"key\" is used elsewhere on this same page for a KEYBOARD shortcut (lpn_tool_key_hint: 'Shortcut: {key}'), but here it means a map LEGEND (a key to the icons, like a map key). A translator sees only the bare string 'Toolbar key' with no indication which sense applies, and the suite's own dominant usage of 'key' points the wrong way.",
+      "readings": [
+        "a legend/index explaining what each toolbar icon means (the intended reading, per the code comment)",
+        "a keyboard shortcut for the toolbar (the reading suggested by every other 'key' string on this page)"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_help_icons']='Toolbar legend, Key to the toolbar icons, What each toolbar icon means | avoid: a keyboard key or shortcut';"
+    },
+    {
+      "key": "lpn_georef_rotation",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "This is the <label> for a numeric input field (Looped-Network.php:480, next to a <input type=number>), but it is phrased as an imperative verb ('Turn ...') rather than a noun phrase. A translator following the verb form produces a command-style sentence ('Gire en sentido antihorario') that reads as an action/button, not as the name of a value field -- a different grammatical choice than a noun-phrase translation ('Rotación antihoraria') would give, and the two do not read the same in most target languages.",
+      "readings": [
+        "a noun-phrase field name: the amount of counterclockwise rotation to apply, in degrees (matches the tip and the adjacent number input)",
+        "an imperative instruction/command telling the reader to perform a turn now"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten as a noun label, \"Counterclockwise rotation (degrees)\"; it now waits in dev/new-english-keys.md for Tom's ruling."
+    },
+    {
+      "key": "lpn_settings_sym_all",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "The bare word 'All' is used as a sub-heading in the Settings box over controls that apply to both nodes and links (per the code comment: a third sub-group alongside node-only and link-only settings). A translator sees only 'All' with no surrounding sentence, and in a settings panel context 'All' commonly means a select-all / show-all-items control, not 'both categories at once'.",
+      "readings": [
+        "a sub-heading meaning 'settings that apply to both nodes and links' (the intended meaning)",
+        "a 'select all' or 'show all' action/filter control, as elsewhere in list/filter UIs"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';"
+    },
+    {
+      "key": "lpn_scenario_push_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'the properties whose labels are showing right now' names 'labels' with no further context. On this page 'label' is a defined term for the text drawn on the map next to an asset (Settings, Symbology, Labels), and the code confirms that meaning (pushBaseToScenarios scopes to properties currently selected as map labels) -- but a translator with only this sentence could just as easily read 'labels' as the ordinary UI sense (the text captions on form fields currently visible on screen), which is a different, unrelated set of properties.",
+      "readings": [
+        "the properties currently turned on as map labels in the Labels panel (correct, per the code)",
+        "the properties whose form-field captions happen to be visible in whatever panel is open right now"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields';"
+    },
+    {
+      "key": "lpn_labels_priority_node_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'the elevation or head more like neighboring nodes' is genuinely ambiguous about what 'like' compares. It could mean the node whose elevation/head VALUE is numerically closest to its neighbors' values (least of an outlier), or it could mean the node most similar in KIND/role to its neighbors. These are different comparisons and a translator has to pick one to render grammatically, since many languages cannot preserve English's vague 'like' without choosing.",
+      "readings": [
+        "the node whose elevation or head value is numerically closest to (least different from) its neighboring nodes' values",
+        "the node that most resembles its neighboring nodes in kind or role"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind';"
+    },
+    {
+      "key": "lpn_settings_sec_symbology",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Symbology\" is an uncommon GIS term of art (per the code comment, borrowed from QGIS/ArcGIS/Bentley) meaning the visual encoding of values as color and label. It is a false-friend risk: many languages have a similar-looking word for 'symbolism' (metaphorical/cultural meaning), which is a completely different concept, and a translator unfamiliar with GIS terminology could reach for that cognate instead of the GIS sense.",
+      "readings": [
+        "the GIS term of art: how values are drawn as color and label on the map (the intended meaning)",
+        "'symbolism' in the ordinary sense: the metaphorical or cultural meaning of a symbol"
+      ],
+      "disposition": "glossary",
+      "resolution": "glossary.json term \"symbology\" (GIS sense, avoid the \"symbolism\" cognate), wired to lpn in prefix_terms.inc.php."
+    },
+    {
+      "key": "lpn_find_op_gt",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'above' is the label for the mathematical greater-than operator in a Find/condition query (js/looped-network.js:17689, where the code itself lists 'greater than' as a recognized synonym -- evidence this exact ambiguity was already noticed once). The operator is used against any numeric property, including ones like elevation where 'above' also has an ordinary spatial meaning. A translator will plausibly render it as a spatial preposition rather than a comparison operator.",
+      "readings": [
+        "the comparison operator 'greater than' (correct, matches lpn_find_op_lt's counterpart 'below'/'less than')",
+        "a spatial/directional word meaning physically above, especially plausible for a property like elevation"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_gt']='greater than, more than, over, exceeding | avoid: spatially above, higher on the map';"
+    },
+    {
+      "key": "lpn_find_op_lt",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same issue as lpn_find_op_gt: 'below' labels the mathematical less-than operator (code lists 'less than' as a recognized synonym), but reads equally well as a spatial direction, especially for a property like elevation.",
+      "readings": [
+        "the comparison operator 'less than' (correct, pairs with lpn_find_op_gt's 'greater than')",
+        "a spatial/directional word meaning physically below"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_lt']='less than, under | avoid: spatially below, lower on the map';"
+    },
+    {
+      "key": "lpn_reaction_pipe_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'coefficent' is a misspelling of 'coefficient'. It is not a recognizable English word, so a non-native translator may not recognize it as the same term used correctly in every sibling reaction-tip key, and could translate it as an unrecognized/garbled term instead of the intended 'coefficient'.",
+      "readings": [
+        "the intended word 'coefficient', matching every sibling key",
+        "an unrecognized misspelling, possibly transliterated or left untranslated by a translator who does not recognize it"
+      ],
+      "disposition": "english",
+      "resolution": "Typo fixed: \"coefficent\" to \"coefficient\"."
+    }
+  ]
+}

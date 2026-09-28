@@ -1,9 +1,10 @@
 // LABEL BENCH: THE SCORER. One view's layout in, the rules' numbers out.
 //
 // N1, N3, N4 and N5 are breaks and must be zero (dev/label-placement-rules.md §2). A leader
-// crossing another leader is no longer a break (N2 is removed): it is a weighted crossing cost,
-// like the other crossings in Tom's §3.1 table. Everything is counted in view pixels, on the ink
-// contract.js derives.
+// crossing another leader is not one of them (there is no N2): it is a weighted crossing cost,
+// like the other crossings in Tom's §3 table. Everything else -- crossing cost, coverage, leader
+// length, churn, and the R5/R7/R9/R11 reported scores -- is REPORTED, never failing. Everything is
+// counted in view pixels, on the ink contract.js derives.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -177,8 +178,46 @@ function scoreView(scene, layout) {
 	const leaderLH = items.filter(function (it) { return it.leader; }).map(function (it) {
 		return C.polylineLength(it.leader) / (it.blockH || scene.text.rowHeightPx);
 	});
+
+	// ---- REPORTED, never failing: R5, R7 and R9 (dev/label-placement-rules.md §3) --------------
+	// R5: a stacked label's rows are justified to the side its leader arrives from (the leader's
+	// end is nearer the block's left edge -> align left; nearer the right edge -> align right).
+	// Only a label with more than one row can disagree (a one-row block has nothing to justify).
+	let r5Checked = 0, r5Mismatch = 0;
+	items.forEach(function (it) {
+		if (!it.leader || it.pl.rows.length < 2) { return; }
+		if ((it.pl.layout || it.req.layout) !== 'stack') { return; }
+		r5Checked++;
+		const end = it.leader[it.leader.length - 1];
+		const expected = (end[0] - it.bb.x0) <= (it.bb.x1 - end[0]) ? 'left' : 'right';
+		if ((it.pl.align || 'left') !== expected) { r5Mismatch++; }
+	});
+	// R7: a pipe label sits beside its pipe by default, not on it. Its own pipe is not a crossing
+	// cost (labelOnLink above skips it deliberately), so it needs its own reported count.
+	let r7Checked = 0, r7OnOwnPipe = 0;
+	items.forEach(function (it) {
+		if (it.req.kind !== 'link' || !it.owner.link) { return; }
+		r7Checked++;
+		const ownSegs = segsOf(it.owner.link.points);
+		if (ownSegs.some(function (g) { return boxesOnSeg(it.boxes, g[0], g[1]); })) { r7OnOwnPipe++; }
+	});
+	// R9: a pipe longer than the repeat spacing carries its label more than once. `repeatSpacingPx`
+	// is set by the bench (run.js), from the viewport, as dev/label-placement-rules.md §3.1 says.
+	let r9Should = 0, r9Has = 0;
+	const spacing = scene.text.repeatSpacingPx;
+	if (spacing > 0) {
+		items.forEach(function (it) {
+			if (it.req.kind !== 'link' || !it.owner.link) { return; }
+			if (C.polylineLength(it.owner.link.points) <= spacing) { return; }
+			r9Should++;
+			if (it.pl.repeats && it.pl.repeats.length) { r9Has++; }
+		});
+	}
+
 	return { breaks: breaks, crossings: crossings, counts: counts, cost: cost, labelsReq: scene.labels.length,
-		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH };
+		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH,
+		r5: { checked: r5Checked, mismatch: r5Mismatch }, r7: { checked: r7Checked, onOwnPipe: r7OnOwnPipe },
+		r9: { should: r9Should, has: r9Has } };
 }
 function intersectPoint(p, q, r, s) {
 	const d = (q[0] - p[0]) * (s[1] - r[1]) - (q[1] - p[1]) * (s[0] - r[0]);
@@ -187,11 +226,14 @@ function intersectPoint(p, q, r, s) {
 	return [p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])];
 }
 
-// **STABILITY BETWEEN TWO VIEWS OF ONE SET** (rule T1). A label MOVED if it was shown in both and
-// its text block sits at a different offset from its anchor (more than 1 px), or turned, or
-// re-aligned; or if it was shown and is now hidden. The move was FORCED if the old placement,
-// carried to the new view unchanged (same offset from the anchor), would now lie on a symbol, a
-// Text object, or a label of the new layout. A label that appears is not a move.
+// **CHURN BETWEEN TWO VIEWS OF ONE SET** (dev/label-placement-rules.md §5: "churn (a label that
+// moves between two views and shows nothing more for it)"; there is no stillness rule). A label
+// MOVED if it was shown in both and its text block sits at a different offset from its anchor
+// (more than 1 px), or turned, or re-aligned; or if it was shown and is now hidden. A label that
+// appears, or that moved but now shows MORE (more rows than before -- regrowing a dropped row on
+// zoom-in is never churn), is not churn. Of what is left, a move is CHURN unless it was FORCED:
+// the old placement, carried to the new view unchanged (same offset from the anchor), would now
+// lie on a symbol, a Text object, or a label of the new layout -- i.e. it fixed a break.
 function stability(sceneA, layoutA, sceneB, layoutB) {
 	const A = (layoutA && layoutA.labels) || {}, B = (layoutB && layoutB.labels) || {};
 	const reqA = {}, reqB = {};
@@ -201,7 +243,7 @@ function stability(sceneA, layoutA, sceneB, layoutB) {
 	const symBoxes = sceneB.nodes.map(function (n) { return C.rectToOBox(n.symbol); });
 	sceneB.links.forEach(function (l) { (l.symbols || []).forEach(function (b) { symBoxes.push(b); }); });
 	const textBoxes = sceneB.texts.map(function (t) { return t.box; });
-	let compared = 0, moved = 0, unforced = 0;
+	let compared = 0, moved = 0, churn = 0;
 	const list = [];
 	Object.keys(A).forEach(function (id) {
 		const a = A[id], b = B[id], ra = reqA[id], rb = reqB[id];
@@ -217,20 +259,45 @@ function stability(sceneA, layoutA, sceneB, layoutB) {
 		}
 		if (!isMove) { return; }
 		moved++;
-		// Would the OLD placement still have been legal here?
+		// Shows nothing more for it: same or fewer rows shown (a hidden label shows 0), not more.
+		// A move that regrows a dropped row, or shows a hidden label, is never churn.
+		const rowsA = a.rows.length, rowsB = (b && b.shown) ? b.rows.length : 0;
+		if (rowsB > rowsA) { return; }
+		// Would the OLD placement still have been legal here? If so, this move fixed no break.
 		const kept = Object.assign({}, a, { x: rb.anchor.x + (a.x - ra.anchor.x), y: rb.anchor.y + (a.y - ra.anchor.y), repeats: [] });
 		const keptReq = Object.assign({}, rb, { rows: ra.rows });
 		const boxes = C.placementBoxes(keptReq, kept, sceneB.text);
-		let forced = false;
+		let fixedABreak = false;
 		boxes.forEach(function (bx) {
-			if (forced) { return; }
-			if (symBoxes.some(function (s) { return C.boxesOverlap(bx, s); })) { forced = true; return; }
-			if (textBoxes.some(function (s) { return C.boxesOverlap(bx, s); })) { forced = true; return; }
-			if (newItems.some(function (it) { return it.id !== id && it.boxes.some(function (o) { return C.boxesOverlap(bx, o); }); })) { forced = true; }
+			if (fixedABreak) { return; }
+			if (symBoxes.some(function (s) { return C.boxesOverlap(bx, s); })) { fixedABreak = true; return; }
+			if (textBoxes.some(function (s) { return C.boxesOverlap(bx, s); })) { fixedABreak = true; return; }
+			if (newItems.some(function (it) { return it.id !== id && it.boxes.some(function (o) { return C.boxesOverlap(bx, o); }); })) { fixedABreak = true; }
 		});
-		if (!forced) { unforced++; list.push(id); }
+		if (!fixedABreak) { churn++; list.push(id); }
 	});
-	return { compared: compared, moved: moved, unforced: unforced, unforcedIds: list };
+	return { compared: compared, moved: moved, churn: churn, churnIds: list };
 }
 
-module.exports = { WEIGHTS, scoreView, stability, drawn };
+// **R11, ZOOM-IN ROW CHANGE.** Between two views of a set where the scale (view.s) increases, how
+// many rows of labels present in both views were REGAINED (shown now that were not, or more of
+// them) versus LOST (shown before that are not now, or fewer of them). Reported, never failing --
+// R11 says zooming in should free room and bring dropped properties and labels back; this is the
+// bench's honest measure of whether that happened, not a pass/fail line.
+function zoomRowChange(sceneA, layoutA, sceneB, layoutB) {
+	if (!(sceneB.view.s > sceneA.view.s)) { return null; }
+	const A = (layoutA && layoutA.labels) || {}, B = (layoutB && layoutB.labels) || {};
+	const reqA = {}, reqB = {};
+	sceneA.labels.forEach(function (r) { reqA[r.id] = r; });
+	sceneB.labels.forEach(function (r) { reqB[r.id] = r; });
+	let regained = 0, lost = 0;
+	Object.keys(reqA).forEach(function (id) {
+		if (!reqB[id]) { return; }
+		const a = A[id], b = B[id];
+		const rowsA = (a && a.shown) ? a.rows.length : 0, rowsB = (b && b.shown) ? b.rows.length : 0;
+		if (rowsB > rowsA) { regained += rowsB - rowsA; } else if (rowsA > rowsB) { lost += rowsA - rowsB; }
+	});
+	return { regained: regained, lost: lost };
+}
+
+module.exports = { WEIGHTS, scoreView, stability, zoomRowChange, drawn };

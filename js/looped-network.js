@@ -3992,7 +3992,18 @@ var EngCalcs = EngCalcs || {};
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
 			initQuality: true, tankCoeff: true, x: true, y: true,
-			sourceType: true, sourceQuality: true, sourcePattern: true },
+			sourceType: true, sourceQuality: true, sourcePattern: true,
+		// `demands` is a junction's WHOLE DEMAND BREAKDOWN -- every row's base, pattern and
+		// description -- as ONE property (R-369; Tom, 2026-09-28: *"Add a demand category in a
+		// scenario. It adds to Base. Bad."*). A category has no name to key an override by, only a
+		// position, so the list is overridden whole: the first edit of any part of the demand table
+		// inside a scenario copies the junction's effective breakdown into the override and edits
+		// the copy. Its Base storage is not `_demands` but `_demand` plus the fields named in
+		// LPN_DEMANDS_STORAGE below, so effective() and setProp() route it through
+		// ownDemandRows() / writeDemandRows() rather than the generic underscore rule.
+		// `demand` above stays: a scenario that only retyped row 0's base (every file saved before
+		// R-369) still means exactly that, and a `demands` override wins where both could apply.
+			demands: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
@@ -4038,6 +4049,12 @@ var EngCalcs = EngCalcs || {};
 	// The two overridable properties stored WITHOUT their underscore -- see the note above. Read by
 	// effective(), baseValue() and setProp(), which is every fork there is.
 	var LPN_COORD_PROP = { x: true, y: true };
+	// **WHERE BASE KEEPS A JUNCTION'S `demands`** (R-369): row 0 is `_demand` plus two of these
+	// fields, and the rest of the list is `extraDemands`. A plain write to any of them edits Base
+	// from inside a scenario, exactly as `el._diameter = v` would, so
+	// dev/scripts/scenario_seam_check.php PARSES this literal and refuses an unmarked write to any
+	// name in it. writeDemandRows() is the one door and ownDemandRows() the one read.
+	var LPN_DEMANDS_STORAGE = { demandPattern: true, demandCategory: true, extraDemands: true };
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
 	// this, so adding scenarios changes only what this function finds, not its callers.
@@ -4073,7 +4090,13 @@ var EngCalcs = EngCalcs || {};
 			if (oc && typeof oc[prop] === 'number') { return oc[prop]; }
 			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
 		}
+		// **A JUNCTION'S DEMAND BREAKDOWN IS ONE PROPERTY WITH A SPREAD-OUT STORAGE** (R-369): a
+		// fresh copy of the effective rows, never the stored array, so no reader can edit an
+		// override by holding what it was handed.
+		if (prop === 'demands') { return ownDemandRows(el); }
 		var ov = activeScenario().overrides[ovKey(el)], tid, t;
+		// Row 0's base IS the breakdown's first row once the scenario owns the whole list.
+		if (prop === 'demand' && ov && Array.isArray(ov.demands) && ov.demands.length) { return ov.demands[0].base; }
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
 		// **AN AUTO LENGTH IN A SCENARIO THAT MOVED AN END IS DERIVED, AND STORED NOWHERE** (Task
 		// 674) -- the same treatment the three-point pump fit gets, and for the same reason: the
@@ -4504,6 +4527,16 @@ var EngCalcs = EngCalcs || {};
 			writeNodeCoord(el, prop === 'y', undefined, value);
 			return;
 		}
+		// **THE DEMAND BREAKDOWN HAS ITS OWN DOOR** (R-369), in Base and in a scenario alike: see
+		// writeDemandRows(). And once a scenario owns the whole list, row 0's base is a row of it,
+		// so a `demand` write lands there rather than minting a second override beside it.
+		if (prop === 'demands' && elGroup(el) === 'node') { writeDemandRows(el, value); return; }
+		if (prop === 'demand' && !inBaseScenario() && demandOverrideRows(el)) {
+			var dr = ownDemandRows(el);
+			dr[0].base = value;
+			writeDemandRows(el, dr);
+			return;
+		}
 		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
 		el['_' + prop] = value;
 	}
@@ -4827,8 +4860,13 @@ var EngCalcs = EngCalcs || {};
 			// a breakdown: writing it would set the first category and leave the rest standing, so
 			// the junction would quietly draw the default PLUS its other categories. Excluded here
 			// rather than in either caller, which is also what keeps it out of their counts.
-			{ key: 'demand', group: 'node', field: 'demand', altField: 'demandActual', prop: 'demand', label: pc.lpn_field_base_demand || 'Base demand',
-				applies: function (n) { return !isFixedHeadNode(n) && !(n.extraDemands && n.extraDemands.length); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE BREAKDOWN ASKED IS THE ONE ON SCREEN** (R-369): hasDemandBreakdown() reads the
+			// active scenario's list, so a junction a scenario split into categories is refused
+			// there and a junction it has not is offered, whatever Base holds. `ovProps` is what
+			// the scenario push clears: a scenario's demand is either a row-0 override or the whole
+			// list, and pushing Base's demand must discard both.
+			{ key: 'demand', group: 'node', field: 'demand', altField: 'demandActual', prop: 'demand', ovProps: ['demand', 'demands'], label: pc.lpn_field_base_demand || 'Base demand',
+				applies: function (n) { return !isFixedHeadNode(n) && !hasDemandBreakdown(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **FIND AND REPLACE'S REASON FOR BEING HERE, NOT A STARTING VALUE'S** (Task 530). This
 			// list answers three questions, and a required fire flow answers two of them: what it is
 			// called and how it is written. It has no row in Settings > Starting values and no map
@@ -5045,7 +5083,9 @@ var EngCalcs = EngCalcs || {};
 			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
 			scopedKeys(s).forEach(function (k) {
 				active.forEach(function (spec) {
-					if (Object.prototype.hasOwnProperty.call(s.overrides[k], spec.prop)) { hits++; any = true; }
+					(spec.ovProps || [spec.prop]).forEach(function (p) {
+						if (Object.prototype.hasOwnProperty.call(s.overrides[k], p)) { hits++; any = true; }
+					});
 				});
 			});
 			if (any) { touched++; }
@@ -5063,7 +5103,9 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
 			scopedKeys(s).forEach(function (k) {
-				active.forEach(function (spec) { delete s.overrides[k][spec.prop]; });
+				active.forEach(function (spec) {
+					(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+				});
 				if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 			});
 		});
@@ -30909,6 +30951,10 @@ var EngCalcs = EngCalcs || {};
 			// The scenario the user is looking at, through the one resolver -- so an export from
 			// inside a scenario writes that scenario's numbers and not Base's.
 			effective: effective,
+			// **AND ITS OWN DEMAND LIST** (R-369), where the scenario holds one: the rows, or null
+			// for Base's. Separate from `effective` for the reason covOf() is -- the writer is handed
+			// the serialized document and keeps its own token-exact reading of Base's rows.
+			demandRows: function (nd) { return demandOverrideRows(nd); },
 			// **AND ITS OWN POSITIONS** (Task 674). Separate from `effective` because the exporter
 			// is handed the SERIALIZED document, whose coordinates are already absolute, while
 			// effective() adds the live origin -- see the note at covOf() in js/lpn-inp.js. Returns
@@ -31345,16 +31391,16 @@ var EngCalcs = EngCalcs || {};
 			// the junction here would put a name the file never wrote at this row into a field
 			// labelled as the file's.
 			if (n.desc) { j.desc = n.desc; }   // base-write: see the reservoir above
-			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
+			if (n.demandPattern) { j.demandPattern = n.demandPattern; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 			// **THE DEMAND CATEGORIES, ONE ROW EACH** (Task 468). Row 0 is the three fields above;
 			// these are the rest, in the file's order, each with its own token bag so a category's
 			// base comes back out as the characters it came in as. WRITTEN ONLY WHEN THERE ARE
 			// ANY -- a one-demand junction is the object it has always been, which is what keeps
 			// every existing project and every Net1/2/3 round trip unchanged.
-			if (n.demandCategory) { j.demandCategory = n.demandCategory; }
+			if (n.demandCategory) { j.demandCategory = n.demandCategory; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 			if (n.demandItemized) { j.demandItemized = true; }
 			if (n.extraDemands && n.extraDemands.length) {
-				j.extraDemands = n.extraDemands.map(function (d) {
+				j.extraDemands = n.extraDemands.map(function (d) {   // base-write: import builds Base, as above
 					var row = { base: inpFlow(d.base) };
 					if (d.pattern) { row.pattern = d.pattern; }
 					if (d.category) { row.category = d.category; }
@@ -32956,6 +33002,11 @@ var EngCalcs = EngCalcs || {};
 				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
 			});
 			(doc.customers || []).forEach(function (c) { rnd(c, 'demand', s); });
+			scenarios.forEach(function (sc) {
+				Object.keys(sc.overrides || {}).forEach(function (k) {
+					(sc.overrides[k].demands || []).forEach(function (d) { rnd(d, 'base', s); });
+				});
+			});
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { rnd(l, '_setting', s); }
 			});
@@ -39717,6 +39768,12 @@ var EngCalcs = EngCalcs || {};
 			doc.nodes.forEach(function (nd) { (nd.extraDemands || []).forEach(function (d) { conv(d, 'base'); }); });
 			(doc.customers || []).forEach(function (c) { conv(c, 'demand'); });
 			convOverrides('demand');
+			// A scenario's own demand list (R-369) is flows in the same unit, row by row.
+			scenarios.forEach(function (sc) {
+				Object.keys(sc.overrides || {}).forEach(function (key) {
+					(sc.overrides[key].demands || []).forEach(function (d) { conv(d, 'base'); });
+				});
+			});
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
 			});
@@ -44870,11 +44927,18 @@ var EngCalcs = EngCalcs || {};
 	// and nowhere else, which is the whole reason this is not two copies of a forEach.
 	function libRepointPattern(was, to) {
 		doc.nodes.forEach(function (n) {
-			if (n.demandPattern === was) { n.demandPattern = to; }
+			if (n.demandPattern === was) { n.demandPattern = to; }   // base-write: a pattern rename is document-wide; the scenario lists are repointed just below
 			if (n.headPattern === was) { n.headPattern = to; }
 			// A DEMAND CATEGORY IS A FIFTH ATTACHMENT POINT (Task 468), and it is the one that
 			// would have been missed: it is not a field on the node but a field on a row of a list.
 			(n.extraDemands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
+		});
+		// **AND A SCENARIO'S OWN DEMAND LIST** (R-369), which names patterns exactly as Base's rows
+		// do. The pattern is the document's, so a rename reaches every scenario at once.
+		scenarios.forEach(function (sc) {
+			Object.keys(sc.overrides || {}).forEach(function (k) {
+				(sc.overrides[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
+			});
 		});
 		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });
 		// **A CUSTOMER IS THE SIXTH, AND IT IS THE ONE A READER WOULD NOT THINK OF** (Task 247,
@@ -47454,6 +47518,48 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// **THE DEMAND TABLE'S ONE MARKER** (R-369). overrideMarker()'s shape and words, over the two
+	// properties a scenario can hold for this table: `demand` (row 0's base alone, as every file
+	// before R-369 has it) or `demands` (the whole list). Ticking records what is already showing
+	// -- the whole list where there is more than one row, row 0's base where there is one, which is
+	// exactly the override a tick recorded before -- and unticking clears both, so the junction
+	// follows Base's list again. The Base line names Base's own rows, added: `50 + 20 + 12.5`.
+	function demandOverrideMarker(fields, n) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!n || inBaseScenario() || !isOverridable(n, 'demand')) { return; }
+		var label = document.createElement('label'), box = document.createElement('input'),
+			text = document.createElement('span'),
+			on = hasOverride(n, 'demand') || hasOverride(n, 'demands');
+		label.className = 'lpn-ov-marker';
+		box.type = 'checkbox';
+		box.checked = on;
+		box.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (box.checked) {
+				if (hasDemandBreakdown(n)) { setProp(n, 'demands', ownDemandRows(n)); }
+				else { setOverride(n, 'demand', effective(n, 'demand')); }
+			} else {
+				clearOverride(n, 'demands');
+				clearOverride(n, 'demand');
+			}
+			afterPropertyEdit(n);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_scenario_override || 'Only in this scenario', pc.lpn_scenario_override_tip);
+		label.appendChild(box);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		if (on) {
+			var base = document.createElement('span'), parts = [baseValue(n, 'demand')];
+			(n.extraDemands || []).forEach(function (d) { parts.push(d.base); });
+			base.className = 'lpn-ov-base';
+			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
+				.replace('{value}', parts.map(function (v) { return formatPropValue(v); }).join(' + '));
+			label.appendChild(base);
+		}
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	// Completes an ordinary value edit. Ending a field helper at scheduleSolve() alone is a THIRD of
 	// the job: this also refreshes the audit halos and the "Custom values" count, and saves.
 	// Only when `ov` is present: a row with no overridable property (X, Y, a read-only result) has no
@@ -49098,22 +49204,23 @@ var EngCalcs = EngCalcs || {};
 	// EngCalcs.lpnDemandRows() are untouched. This is a presentation decision about the pane, which
 	// is exactly the freedom Tom reserved when he ruled the exporter writes `[DEMANDS]` itemized.
 	//
-	// **TWO THINGS ROW 0 STILL DOES THAT THE OTHERS DO NOT, and both are load-bearing:**
-	//   its base is written through setProp(), so a scenario override lands where it always did --
-	//     a category has no name to key an override by, only a position, which moves when a row
-	//     above it is deleted (dev/scenario-seam-repair.md with a subscript instead of a field);
-	//   deleting it PROMOTES the next row into it rather than removing a demand outright, because a
-	//     junction always has a demand, even a zero one. That is why there is a delete on every row
-	//     now: with all the rows in one table, a row you cannot remove is the anomaly, not a rule.
+	// **IN A SCENARIO THE WHOLE TABLE IS ONE OVERRIDE** (R-369): every cell, Add and every remove
+	// go through editDemandRows(), so the first edit copies the junction's list into the scenario
+	// and Base is never touched -- see demandOverrideRows(). Row 0's base alone still goes through
+	// setProp(n, 'demand'), so retyping only that keeps the single `demand` override it always was.
 	//
-	// A junction with ONE demand gets no table at all -- the plain Base demand and Demand pattern
-	// fields, exactly as before Task 468, which is nearly every junction and all of Net1/2/3.
+	// **DELETING ROW 0 PROMOTES THE NEXT ROW INTO IT** rather than removing a demand outright,
+	// because a junction always has a demand, even a zero one. That is why there is a delete on every
+	// row: with all the rows in one table, a row you cannot remove is the anomaly, not a rule.
 	//
 	// **NO REORDER CONTROL**, deliberately: the order is the file's own and nothing reads it -- the
 	// totals are additive (Tom, 2026-08-24) and the exporter writes the rows as they stand. A pair
 	// of arrows per row would be four more tap targets in a floating popup to permute a sum.
 	function demandCategoryFields(fields, n, nodeId) {
-		var pc = EngCalcs.pageConfig || {}, extras = n.extraDemands || [],
+		// **READ ONCE, AS THE SCENARIO ON SCREEN SEES IT** (R-369), and never written through: every
+		// edit below goes through editDemandRows(), which re-reads the list and writes it back
+		// through setProp(n, 'demands', ...) -- Base in Base, the scenario's own copy in a scenario.
+		var pc = EngCalcs.pageConfig || {}, rows = ownDemandRows(n),
 			table, thead, hrow, tbody, addBtn;
 		// **THE TABLE IS UNCONDITIONAL** (Task 553). It was drawn only where `extras.length`, so a
 		// one-demand junction -- nearly every junction, and every junction in Net1/2/3 -- met two
@@ -49144,57 +49251,52 @@ var EngCalcs = EngCalcs || {};
 			table.appendChild(thead);
 			table.appendChild(tbody);
 			fields.appendChild(table);
-			// **ROW 0 FIRST, READING AND WRITING THE JUNCTION'S OWN FIELDS.** The accessors are the
-			// only difference between it and a category row: `_demand` through setProp() so a
-			// scenario override still lands, `demandPattern` and `demandCategory` as plain writes.
+			// **ROW 0 FIRST.** Its base still goes through setProp(n, 'demand'), so a scenario that
+			// has only retyped it keeps the single `demand` override it always had; every other cell,
+			// and both kinds of remove, edit the whole list through editDemandRows() (R-369).
 			demandRowInto(tbody, n, 0, {
 				getBase: function () { return effective(n, 'demand'); },
 				setBase: function (v) { setProp(n, 'demand', v); },
-				getPattern: function () { return n.demandPattern; },
-				setPattern: function (v) { n.demandPattern = v || null; },
-				getCategory: function () { return n.demandCategory; },
-				setCategory: function (v) { n.demandCategory = v || null; },
-				// **DELETING ROW 0 PROMOTES ROW 1 INTO IT**, so the junction keeps a demand and the
-				// list simply gets shorter. Writing the base through setProp() keeps the promoted
-				// number on the same seam every other write to it uses.
+				getPattern: function () { return rows[0].pattern; },
+				setPattern: function (v) { editDemandRows(n, function (r) { r[0].pattern = v || null; }); },
+				getCategory: function () { return rows[0].category; },
+				setCategory: function (v) { editDemandRows(n, function (r) { r[0].category = v || null; }); },
 				// **DELETING ROW 0 PROMOTES ROW 1 INTO IT**, and where there is no row 1 the
-				// button is disabled instead (see `soleRow` below) -- a junction always has a
+				// button is absent instead (see `soleRow` below) -- a junction always has a
 				// demand, even a zero one, so the last row is not removable.
 				remove: function () {
-					var next = extras.shift();
-					setProp(n, 'demand', next.base);
-					n.demandPattern = next.pattern || null;
-					n.demandCategory = next.category || null;
-					if (!extras.length) { delete n.extraDemands; }
+					editDemandRows(n, function (r) {
+						r.shift();
+						r[0].pattern = r[0].pattern || null;
+						r[0].category = r[0].category || null;
+					});
 				},
-				soleRow: !extras.length
+				soleRow: rows.length < 2
 			});
-			extras.forEach(function (d, di) {
-				demandRowInto(tbody, n, di + 1, {
+			rows.slice(1).forEach(function (d, di) {
+				var at = di + 1;
+				demandRowInto(tbody, n, at, {
 					getBase: function () { return d.base; },
-					setBase: function (v) { d.base = v; },
+					setBase: function (v) { editDemandRows(n, function (r) { r[at].base = v; }); },
 					getPattern: function () { return d.pattern; },
-					setPattern: function (v) { d.pattern = v || null; },
+					setPattern: function (v) { editDemandRows(n, function (r) { r[at].pattern = v || null; }); },
 					getCategory: function () { return d.category; },
-					setCategory: function (v) { d.category = v || null; },
-					remove: function () {
-						extras.splice(di, 1);
-						if (!extras.length) { delete n.extraDemands; }
-					}
+					setCategory: function (v) { editDemandRows(n, function (r) { r[at].category = v || null; }); },
+					remove: function () { editDemandRows(n, function (r) { r.splice(at, 1); }); }
 				});
 			});
 		}
-		// **THE OVERRIDE MARKER FOLLOWS ROW 0, WHICH IS NOW INSIDE THE TABLE.** It is drawn under
-		// the table rather than in a cell: it is a checkbox with a sentence beside it and there is
-		// no column for that. Only row 0's base is overridable at all -- see the note above on why
-		// a category cannot key an override -- so one marker is the whole truth here.
+		// **ONE OVERRIDE MARKER FOR THE WHOLE TABLE**, drawn under it rather than in a cell: it is a
+		// checkbox with a sentence beside it and there is no column for that. The table is one
+		// property in a scenario (R-369) -- `demands`, or the older row-0-only `demand` -- so one
+		// marker is the whole truth here. See demandOverrideMarker().
 		//
 		// **UNCONDITIONAL SINCE TASK 553**, and that is a fix rather than a tidy-up: it used to be
 		// drawn only where there was a breakdown, because on a one-demand junction the plain Base
 		// demand field carried its own marker through unitNumberField()'s `{el, prop}`. That field
 		// is gone. Left as it was, a scenario override on the commonest junction in any network
 		// would have had nowhere to show itself.
-		overrideMarker(fields, n, 'demand');
+		demandOverrideMarker(fields, n);
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
@@ -49205,8 +49307,8 @@ var EngCalcs = EngCalcs || {};
 			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
 			// it with somebody else's number is the same mistake as filling in a blank reservoir
 			// head: it puts a number nobody typed into a field labelled as theirs.
-			if (!n.extraDemands) { n.extraDemands = []; }
-			n.extraDemands.push({ base: 0, pattern: null, category: null });
+			// Through the list's one door (R-369): in a scenario this is the scenario's row, not Base's.
+			editDemandRows(n, function (r) { r.push({ base: 0, pattern: null, category: null }); });
 			afterPropertyEdit(n);
 			refreshPopupIfOpen();
 		});
@@ -51323,27 +51425,93 @@ var EngCalcs = EngCalcs || {};
 	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
 	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
 	function demandMultiplier(n, t) {
-		return patternMultiplier(n.demandPattern || doc.defaultPattern, t);
+		return patternMultiplier(ownDemandPattern(n) || doc.defaultPattern, t);
 	}
 	// **A JUNCTION'S DEMANDS ARE A LIST** (Task 468), and this is the page's one door to it.
-	// EngCalcs.lpnDemandRows() owns the shape -- row 0 is `_demand`/`demandPattern`/`demandCategory`
-	// and `extraDemands` is the rest -- because the `.inp` writer needs exactly the same answer and
-	// two implementations of "where is row 0" is how a demand goes missing on export.
+	// EngCalcs.lpnDemandRows() owns the Base shape -- row 0 is `_demand`/`demandPattern`/
+	// `demandCategory` and `extraDemands` is the rest -- because the `.inp` writer needs exactly the
+	// same answer and two implementations of "where is row 0" is how a demand goes missing on export.
 	//
-	// **ROW 0'S BASE COMES THROUGH effective(), AND THE OTHERS DO NOT.** That is the settled answer
-	// to the per-category override question: an override is keyed by an element and a PROPERTY NAME
-	// (LPN_OVERRIDABLE, setProp), and a category has no name -- only a position, which moves the
-	// moment a row above it is deleted. A scenario that overrode "row 2" would silently follow
-	// whatever category later occupied that slot, which is the scenario-seam failure
-	// (dev/scenario-seam-repair.md) with a subscript instead of a field. So a scenario asks its
-	// "what if this junction draws more" question of the junction's demand, as it always has, and
-	// the breakdown is Base-document structure -- the same standing as `demandPattern` beside it.
-	// Returns the pre-Task-468 single row if js/lpn-inp.js failed to load, like every other helper here.
-	// Does this junction show a TABLE rather than the two plain fields? One demand is not a
-	// breakdown, however it is named -- a junction can carry a category with a single demand and is
-	// still the ordinary shape.
+	// **A SCENARIO OVERRIDES THE WHOLE LIST, AS ONE PROPERTY** (R-369; Tom, 2026-09-28: *"Add a
+	// demand category in a scenario. It adds to Base. Bad."*). An override is keyed by an element and
+	// a PROPERTY NAME, and a category has no name -- only a position, which moves the moment a row
+	// above it is deleted -- so a per-row override would silently follow whatever category later
+	// occupied its slot. The rejected alternative before this was to leave the breakdown Base-owned
+	// and override row 0's base alone; that is what let every other cell of the table, and the Add
+	// and remove buttons, write Base from inside a scenario. So the list is `demands`, overridden
+	// whole: the first edit of any part of it in a scenario copies the junction's effective rows
+	// into the override (ownDemandRows) and edits the copy (writeDemandRows). A scenario that only
+	// retyped row 0's base keeps its old `demand` override and means what it always meant.
+	//
+	// The stored override rows, or null. The live array: callers that hand rows onward copy them.
+	function demandOverrideRows(n) {
+		if (!n || inBaseScenario()) { return null; }
+		var ov = activeScenario().overrides[ovKey(n)];
+		return (ov && Array.isArray(ov.demands) && ov.demands.length) ? ov.demands : null;
+	}
+	// A row copied key for key, its token bag included, so a Base row copied into a scenario and
+	// never edited still writes its own characters back out (CLAUDE.md's token rule). JSON, because
+	// a row is plain data and an absent key must stay absent rather than become `undefined`.
+	function cloneDemandRow(d) { return JSON.parse(JSON.stringify(d || {})); }
+	// **THE JUNCTION'S OWN ROWS AS THE ACTIVE SCENARIO SEES THEM**, fresh copies, customers not
+	// included. Row 0 is built from the junction's own fields key for key -- an absent pattern stays
+	// absent -- so a Base edit written back through writeDemandRows() leaves every untouched field
+	// byte-identical. Its base comes through effective(), so a pre-R-369 `demand` override is
+	// carried into the copy the first time the rest of the list is edited.
+	function ownDemandRows(n) {
+		var ovr = demandOverrideRows(n), r0, rows;
+		if (ovr) { return ovr.map(cloneDemandRow); }
+		r0 = { base: effective(n, 'demand') };
+		if (n.demandPattern !== undefined) { r0.pattern = n.demandPattern; }
+		if (n.demandCategory !== undefined) { r0.category = n.demandCategory; }
+		if (n.tok && typeof n.tok._demand === 'string') { r0.tok = { base: n.tok._demand }; }
+		rows = [r0];
+		(n.extraDemands || []).forEach(function (d) { rows.push(cloneDemandRow(d)); });
+		return rows;
+	}
+	// Row 0's pattern as the active scenario sees it -- what demandMultiplier() and the model's
+	// `demandPattern` resolve against the project default.
+	function ownDemandPattern(n) {
+		var ovr = demandOverrideRows(n);
+		return ovr ? ovr[0].pattern : n.demandPattern;
+	}
+	// **THE ONE WRITE OF A JUNCTION'S DEMAND LIST**, reached through setProp(n, 'demands', rows).
+	// In a scenario it records the whole list as that scenario's override and drops a row-0-only
+	// `demand` override, which the list now contains; Base is not touched. In Base it writes only
+	// the fields that differ, row 0's base through setProp() like every other write to it, so an
+	// edit that changed one cell leaves the document byte-identical everywhere else.
+	function writeDemandRows(n, rows) {
+		var r0 = rows && rows[0] ? rows[0] : { base: 0 }, extras;
+		if (!inBaseScenario()) {
+			clearOverride(n, 'demand');
+			setOverride(n, 'demands', rows.map(function (r) {
+				var o = { base: r.base, pattern: r.pattern || null, category: r.category || null };
+				if (r.tok) { o.tok = cloneDemandRow(r.tok); }
+				return o;
+			}));
+			return;
+		}
+		if (r0.base !== n._demand) { setProp(n, 'demand', r0.base); }
+		if (r0.pattern !== n.demandPattern) { n.demandPattern = r0.pattern; }   // base-write: writeDemandRows() in Base, the breakdown's one door; a scenario returned above
+		if (r0.category !== n.demandCategory) { n.demandCategory = r0.category; }   // base-write: writeDemandRows() in Base, as above
+		extras = rows.slice(1).map(cloneDemandRow);
+		if (extras.length) { n.extraDemands = extras; }   // base-write: writeDemandRows() in Base, as above
+		else { delete n.extraDemands; }   // base-write: writeDemandRows() in Base, as above -- an empty list is not written back, so a removed last row leaves the junction the object it was
+	}
+	// Every edit the demand table makes: the effective list, changed, written back through the one
+	// door. Undo is the caller's single snapshot before this, so one edit is one step.
+	function editDemandRows(n, change) {
+		var rows = ownDemandRows(n);
+		change(rows);
+		setProp(n, 'demands', rows);
+	}
+	// Does this junction's demand have more than one row, in the scenario on screen? One demand is
+	// not a breakdown, however it is named -- a junction can carry a category with a single demand
+	// and is still the ordinary shape. The bulk demand writers refuse a breakdown (pushSpecList).
 	function hasDemandBreakdown(n) {
-		return !!(n && n.extraDemands && n.extraDemands.length);
+		if (!n) { return false; }
+		var ovr = demandOverrideRows(n);
+		return ovr ? ovr.length > 1 : !!(n.extraDemands && n.extraDemands.length);
 	}
 	// **AND THE CUSTOMERS LUMPED AT THIS JUNCTION ARE ROWS OF THE SAME LIST** (Task 247). Appended
 	// rather than merged: the total is ADDITIVE (Tom, 2026-08-24, *"468 is a sum of all the 247
@@ -51351,10 +51519,19 @@ var EngCalcs = EngCalcs || {};
 	// meter does ever rewrites a number the user typed here. One door, so the map label, the colour
 	// ramp, the Tables column, the popup's resolved Demand and the solver all pick a meter up
 	// without knowing what one is.
+	// A scenario's own list replaces Base's here, which is how every one of those readers sees it.
+	// Returns the pre-Task-468 single row if js/lpn-inp.js failed to load, like every other helper here.
 	function demandRowsOf(n, base) {
-		var own = EngCalcs.lpnDemandRows
-			? EngCalcs.lpnDemandRows(n, base)
-			: [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
+		var ovr = demandOverrideRows(n), own;
+		if (ovr) {
+			own = ovr.map(function (r) {
+				return { base: r.base, pattern: r.pattern || null, category: r.category || null, rec: r, key: 'base' };
+			});
+		} else {
+			own = EngCalcs.lpnDemandRows
+				? EngCalcs.lpnDemandRows(n, base)
+				: [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
+		}
 		return own.concat(customerRowsOf(n.id));
 	}
 	// **WHAT THE USER TYPED, ADDED UP** -- every category's base, unmultiplied. For the 99% of
@@ -51553,7 +51730,7 @@ var EngCalcs = EngCalcs || {};
 	// and Task 468's categories work will want it: a junction with categories resolves through the
 	// same door. Delete it if that turns out not to be true, but do not re-wire the popup to it.
 	function demandPatternActs(n) {
-		return !isFixedHeadNode(n) && !!(n.demandPattern || doc.defaultPattern);
+		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || doc.defaultPattern);
 	}
 	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
 	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
@@ -51647,7 +51824,7 @@ var EngCalcs = EngCalcs || {};
 					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
 					// the other and never both, or the multiplier would be applied twice.
 					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
-					demandPattern: n.demandPattern || doc.defaultPattern || null,
+					demandPattern: ownDemandPattern(n) || doc.defaultPattern || null,
 					// **AND THE WHOLE BREAKDOWN RIDES ALONG WITH THEM, for the same reason and only
 					// when there is one** (Task 468). An extended-period run has EPANET doing the
 					// multiplying, and two categories on two patterns are two daily shapes that
@@ -53205,7 +53382,7 @@ var EngCalcs = EngCalcs || {};
 	// (2026-08-25), so either label being on means the ring has something visible to explain. null
 	// means "no label shows this at all", and such an override rings unconditionally.
 	var LPN_OVERRIDE_LABEL_FIELD = {
-		node: { demand: ['demand', 'demandActual'], head: null, level: null, emitter: null, active: null },
+		node: { demand: ['demand', 'demandActual'], demands: ['demand', 'demandActual'], head: null, level: null, emitter: null, active: null },
 		link: { diameter: ['diameter'], roughness: ['roughness'], k: ['km'], length: ['length'], status: null, active: null }
 	};
 	function overrideIsDisplayed(el, prop) {
