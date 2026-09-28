@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 313 untranslated keys, of 2142 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 315 untranslated keys, of 2144 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';
   @@ NEEDS RULING
 
-## lpn_  (313, 2 to read @@ NEEDS RULING)
+## lpn_  (315, 4 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -672,6 +672,12 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_paste_no_position`**
   > Row {row}: a new node needs both {first} and {second}.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_paste_not_created_customer`**
+  > A Customer is served from a pipe and is not created by pasting rows here.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_not_created_text`**
+  > A Text object is placed on the map and is not created by pasting rows here.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_overflow`**
   > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
   _Ruled OK 2026-09-28._
@@ -1025,7 +1031,7 @@ is the one you meant. "The first one" is a complete answer.
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 8 unmerged branch(es).
+**0 still to read**, of 3 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1036,11 +1042,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/label-bench-r2 (`1071d1fa`) — adds no English strings
+### chore/rulings-0928 (`79f84ff5`) — adds no English strings
 
-### chore/label-rules-r2 (`1071d1fa`) — adds no English strings
+### chore/sprint-0928-delta (`79f84ff5`) — adds no English strings
 
-### chore/roadmap-0928 (`5169479d`) — adds no English strings
+### feat/fill-handle (`76716393`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -1054,10 +1060,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`12c0d10e`) — adds no English strings
+### feat/label-placer (`9bf41da6`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
 
-### feat/table-width (`16014e49`) — adds no English strings
+### feat/label-placer-c (`6dbd4e9c`) — adds no English strings
+
+### feat/label-placer-d (`7d99b54f`) — adds no English strings
+
+### feat/table-width (`7964a89d`) — adds no English strings

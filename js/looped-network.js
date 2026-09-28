@@ -22997,6 +22997,14 @@ var EngCalcs = EngCalcs || {};
 		// A column whose cell is a small language of its own (the Vertices list, Task 610) brings
 		// its own reader, so a typed cell, a pasted one and a created row all refuse it alike.
 		if (c.parse) { return c.parse(t); }
+		// **A CELL'S OWN PLAIN WORD ROUND-TRIPS** (Tom, 2026-09-28: pasting Net3's Tanks into a new
+		// project refused on "Not used is not a valid Mixing fraction"). paneCellText() prints the
+		// plain word -- "Not used", "Attached" -- wherever plainFor(el) is true, and a copy writes
+		// exactly what the cell shows; a paste has to accept that back rather than trying to read it
+		// as a number or a choice. The word carries no information of its own -- plainFor is asked
+		// again, per row, at write time (paneWriteCellText(), paneCreateFromPlan()) -- so it reads as
+		// blank here, same as an empty cell would.
+		if (c.plainWord && t !== '' && t === String(c.plainWord()).trim()) { return { ok: true, v: undefined }; }
 		if (c.bool) {
 			if (/^(1|true|yes|on|y|x|✓)$/i.test(t)) { return { ok: true, v: true }; }
 			if (t === '' || /^(0|false|no|off|n)$/i.test(t)) { return { ok: true, v: false }; }
@@ -23427,6 +23435,19 @@ var EngCalcs = EngCalcs || {};
 					if (e.preventDefault) { e.preventDefault(); }
 					panePasteAt(spec, cells, { append: true });
 				});
+			// **TEXT AND CUSTOMER OFFER NO PASTE-CREATES-ROWS ACTION** (paneCanCreate(): a Text is
+			// placed on the map and a Customer is served from a pipe, neither by typing an ID), so an
+			// empty one of these tables had NOTHING for a pasted block to land on and a paste onto it
+			// did nothing at all -- no refusal, no notice (Tom, 2026-09-28: "pasting Text table just
+			// does nothing"). The rule was already right; only the silence was a defect. The note now
+			// states the rule up front, exactly as a plain cell states the rule that made it plain,
+			// instead of a keystroke landing on nothing and looking broken.
+			} else if (!filterNote && spec.group === 'label') {
+				note.textContent += ' ' + (pc.lpn_pane_paste_not_created_text ||
+					'A Text object is placed on the map and is not created by pasting rows here.');
+			} else if (!filterNote && spec.group === 'customer') {
+				note.textContent += ' ' + (pc.lpn_pane_paste_not_created_customer ||
+					'A Customer is served from a pipe and is not created by pasting rows here.');
 			}
 			host.appendChild(note);
 			return;
@@ -24423,6 +24444,11 @@ var EngCalcs = EngCalcs || {};
 	// a number, so the caller can COUNT what it refused instead of discarding it in silence.
 	function paneWriteCellText(spec, c, el, text) {
 		var p;
+		// A cell that is plain FOR THIS ROW shows its plain word, and a paste that lands on it
+		// carrying that exact word back is the round trip a copy of this very cell produces -- not a
+		// stray write to refuse, a no-op to accept. See paneParseCellText()'s own comment.
+		if (c.plainWord && c.plainFor && c.plainFor(el) &&
+			String(text === null || text === undefined ? '' : text).trim() === String(c.plainWord()).trim()) { return true; }
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
 		p = paneParseCellText(c, text);
 		if (!p.ok) { return false; }

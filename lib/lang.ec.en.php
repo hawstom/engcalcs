@@ -906,6 +906,11 @@ $ec_lang['lpn_pane_paste_no_node']='Row {row}: node {id} does not exist yet. Pas
 $ec_lang['lpn_pane_paste_same_ends']='Row {row}: From and To are the same node.';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
+// Text and Customer offer no paste-creates-rows action (paneCanCreate()): a Text is placed on the
+// map and a Customer is served from a pipe, neither by typing an ID. Said on the empty table's own
+// note, so a paste onto it explains itself instead of doing nothing.
+$ec_lang['lpn_pane_paste_not_created_text']='A Text object is placed on the map and is not created by pasting rows here.';
+$ec_lang['lpn_pane_paste_not_created_customer']='A Customer is served from a pipe and is not created by pasting rows here.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
