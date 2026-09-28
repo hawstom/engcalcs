@@ -16,11 +16,13 @@
 //   4. MEND.  A label still hidden may evict one blocking neighbour, if that neighbour can go
 //      somewhere else, even with fewer rows (labels before properties).
 //
-// Free space is a uniform grid over the viewport holding every obstacle: node, pump and valve
-// symbols and Text objects (never covered), placed labels (never covered), pipes and leaders
-// (crossed at a cost, in Tom's order). A candidate is scored by what it covers and how far it
-// strays; candidates are tried cheapest-first and the search stops as soon as no cheaper one can
-// exist, which is what keeps a pan or zoom fast (R10).
+// FREE SPACE is modelled three ways, cheapest first: a raster of cells that some obstacle covers
+// completely (a candidate lying over one is certainly illegal), grids of the exact obstacles
+// (symbols and Text objects, which are never covered; pipes, arrows and callouts, which are
+// crossed at a cost; the labels and leaders placed so far), and, per label, the list of places
+// worth trying: the corners and sides of its symbol, the open sectors between its pipes, and
+// leaders of a few standard lengths. Candidates are tried cheapest-first and the search stops as
+// soon as no cheaper one can exist, which is what keeps a pan or zoom fast (R10).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -47,69 +49,61 @@ EngCalcs.lpnPlacerC = (function () {
 	var LDR_BASE = 0.35;       // having a leader at all
 	var LDR_PER_PX = 0.02;     // and each pixel of it
 	var PREV_BONUS = -1.6;     // staying where it was last view
-	var LEADER_LENS = [8, 18, 30, 46, 64];
+	var KEEP_MAX = 3.0;        // last view's spot is kept unless it now costs this much
+	var LEADER_LENS = [9, 22, 38, 58];
 	var HOOK = 8;              // the one standard short hook (clamped to text.hookMaxPx)
 	var GAP = 2;               // clear space between a label and its own symbol or pipe
 	var SYM_PAD = 1;           // clear space kept round every symbol and Text object
 	var LBL_TOL = 0.5;         // two labels may share this much (the row pitch carries leading)
-	var CELL = 36;
-	var MEND_BUDGET_MS = 12;
-	var KEEP_MAX = 3.0;         // last view's spot is kept unless it now costs this much
-	var GROW_TRIES = 60;        // growing looks only this far down its list: convenient space
+	var CELL = 36;             // the obstacle grids' cell, px
+	var RES = 3;               // the free-space raster's cell, px
+	var SHOW_TRIES = 120;      // a label looks this far down its list before giving up
+	var GROW_TRIES = 30;       // growing looks only this far: convenient space
+	var MEND_WORK = 1500;      // candidates MEND may judge in one view
 	var NAME = 'C (keep, show, grow, mend)';
 
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
+	var D2R = Math.PI / 180;
 
-	function now() {
-		return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-	}
-
-	// ---- geometry -------------------------------------------------------------------------
-	function obox(cx, cy, w, h, angle) {
-		var b = { cx: cx, cy: cy, w: w, h: h, angle: angle || 0 };
-		b.bb = obBB(b);
+	// ---- boxes: centred, turned `angle` degrees; the box is its own bounding box -----------
+	function newBox() {
+		var b = { cx: 0, cy: 0, w: 0, h: 0, angle: 0, ca: 1, sa: 0, x0: 0, y0: 0, x1: 0, y1: 0, bb: null };
+		b.bb = b;
 		return b;
 	}
-	function obBB(b) {
-		if (!b.angle) { return { x0: b.cx - b.w / 2, y0: b.cy - b.h / 2, x1: b.cx + b.w / 2, y1: b.cy + b.h / 2 }; }
-		var r = b.angle * Math.PI / 180, c = Math.abs(Math.cos(r)), s = Math.abs(Math.sin(r));
-		var ex = (b.w * c + b.h * s) / 2, ey = (b.w * s + b.h * c) / 2;
-		return { x0: b.cx - ex, y0: b.cy - ey, x1: b.cx + ex, y1: b.cy + ey };
+	function setBox(b, cx, cy, w, h, angle) {
+		b.cx = cx; b.cy = cy; b.w = w; b.h = h; b.angle = angle || 0;
+		if (!b.angle) {
+			b.ca = 1; b.sa = 0;
+			b.x0 = cx - w / 2; b.x1 = cx + w / 2; b.y0 = cy - h / 2; b.y1 = cy + h / 2;
+			return b;
+		}
+		var c = Math.cos(b.angle * D2R), s = Math.sin(b.angle * D2R), ac = Math.abs(c), as = Math.abs(s);
+		var ex = (w * ac + h * as) / 2, ey = (w * as + h * ac) / 2;
+		b.ca = c; b.sa = s; b.x0 = cx - ex; b.x1 = cx + ex; b.y0 = cy - ey; b.y1 = cy + ey;
+		return b;
 	}
+	function obox(cx, cy, w, h, angle) { return setBox(newBox(), cx, cy, w, h, angle); }
 	function inflate(b, by) { return obox(b.cx, b.cy, b.w + 2 * by, b.h + 2 * by, b.angle); }
 	function bbHit(a, b) { return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1; }
 	function segBB(s) {
-		return { x0: Math.min(s[0], s[2]), y0: Math.min(s[1], s[3]), x1: Math.max(s[0], s[2]), y1: Math.max(s[1], s[3]) };
+		return s.bb || (s.bb = { x0: Math.min(s[0], s[2]), y0: Math.min(s[1], s[3]), x1: Math.max(s[0], s[2]), y1: Math.max(s[1], s[3]) });
 	}
-	function cornersOf(b) {
-		if (b.cs) { return b.cs; }
-		var r = b.angle * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), hw = b.w / 2, hh = b.h / 2;
-		b.cs = [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].map(function (p) {
-			return [b.cx + p[0] * c - p[1] * s, b.cy + p[0] * s + p[1] * c];
-		});
-		return b.cs;
+	// Overlap of the two boxes' shadows on the axis (ux, uy).
+	function axisOverlap(a, b, ux, uy) {
+		var ra = a.w / 2 * Math.abs(a.ca * ux + a.sa * uy) + a.h / 2 * Math.abs(-a.sa * ux + a.ca * uy);
+		var rb = b.w / 2 * Math.abs(b.ca * ux + b.sa * uy) + b.h / 2 * Math.abs(-b.sa * ux + b.ca * uy);
+		var pa = a.cx * ux + a.cy * uy, pb = b.cx * ux + b.cy * uy;
+		return Math.min(pa + ra, pb + rb) - Math.max(pa - ra, pb - rb);
 	}
 	// Do two boxes overlap by more than `tol` on every separating axis?
 	function obOverlap(a, b, tol) {
 		if (!a.angle && !b.angle) {
-			return Math.min(a.bb.x1, b.bb.x1) - Math.max(a.bb.x0, b.bb.x0) > tol
-				&& Math.min(a.bb.y1, b.bb.y1) - Math.max(a.bb.y0, b.bb.y0) > tol;
+			return Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) > tol && Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) > tol;
 		}
-		if (!bbHit(a.bb, b.bb)) { return false; }
-		var A = cornersOf(a), B = cornersOf(b), qs = [a, b], k, j, i;
-		for (k = 0; k < 2; k++) {
-			var r = qs[k].angle * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
-			var axes = [[c, s], [-s, c]];
-			for (j = 0; j < 2; j++) {
-				var ax = axes[j], amin = Infinity, amax = -Infinity, bmin = Infinity, bmax = -Infinity, v;
-				for (i = 0; i < 4; i++) {
-					v = A[i][0] * ax[0] + A[i][1] * ax[1]; if (v < amin) { amin = v; } if (v > amax) { amax = v; }
-					v = B[i][0] * ax[0] + B[i][1] * ax[1]; if (v < bmin) { bmin = v; } if (v > bmax) { bmax = v; }
-				}
-				if (Math.min(amax, bmax) - Math.max(amin, bmin) <= tol) { return false; }
-			}
-		}
-		return true;
+		if (!bbHit(a, b)) { return false; }
+		return axisOverlap(a, b, a.ca, a.sa) > tol && axisOverlap(a, b, -a.sa, a.ca) > tol
+			&& axisOverlap(a, b, b.ca, b.sa) > tol && axisOverlap(a, b, -b.sa, b.ca) > tol;
 	}
 	// Does segment a-b pass through box `b` shrunk by `shrink` (negative grows it)?
 	function segHitsOB(ax, ay, bx, by, b, shrink) {
@@ -117,35 +111,40 @@ EngCalcs.lpnPlacerC = (function () {
 		if (hw <= 0 || hh <= 0) { return false; }
 		var px = ax - b.cx, py = ay - b.cy, qx = bx - b.cx, qy = by - b.cy, t;
 		if (b.angle) {
-			var r = b.angle * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+			var c = b.ca, s = b.sa;
 			t = px * c + py * s; py = -px * s + py * c; px = t;
 			t = qx * c + qy * s; qy = -qx * s + qy * c; qx = t;
 		}
-		var dx = qx - px, dy = qy - py, t0 = 0, t1 = 1;
-		var P = [-dx, dx, -dy, dy], Q = [px + hw, hw - px, py + hh, hh - py];
-		for (var i = 0; i < 4; i++) {
-			if (P[i] === 0) { if (Q[i] < 0) { return false; } continue; }
-			t = Q[i] / P[i];
-			if (P[i] < 0) { if (t > t1) { return false; } if (t > t0) { t0 = t; } } else { if (t < t0) { return false; } if (t < t1) { t1 = t; } }
+		var dx = qx - px, dy = qy - py, t0 = 0, t1 = 1, ta, tb;
+		if (dx === 0) { if (px <= -hw || px >= hw) { return false; } } else {
+			ta = (-hw - px) / dx; tb = (hw - px) / dx;
+			if (ta > tb) { t = ta; ta = tb; tb = t; }
+			if (ta > t0) { t0 = ta; } if (tb < t1) { t1 = tb; }
+			if (t0 >= t1) { return false; }
+		}
+		if (dy === 0) { if (py <= -hh || py >= hh) { return false; } } else {
+			ta = (-hh - py) / dy; tb = (hh - py) / dy;
+			if (ta > tb) { t = ta; ta = tb; tb = t; }
+			if (ta > t0) { t0 = ta; } if (tb < t1) { t1 = tb; }
 		}
 		return t0 < t1;
 	}
 	function orient(ax, ay, bx, by, cx, cy) { return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax); }
+	function near(x0, y0, x1, y1) { return Math.abs(x0 - x1) <= 1.5 && Math.abs(y0 - y1) <= 1.5; }
 	// A proper crossing of two segments; touching at an end point is not one.
 	function segsCross(s, t) {
 		var d1 = orient(t[0], t[1], t[2], t[3], s[0], s[1]), d2 = orient(t[0], t[1], t[2], t[3], s[2], s[3]);
+		if (!d1 || !d2 || (d1 > 0) === (d2 > 0)) { return false; }
 		var d3 = orient(s[0], s[1], s[2], s[3], t[0], t[1]), d4 = orient(s[0], s[1], s[2], s[3], t[2], t[3]);
-		if (!d1 || !d2 || !d3 || !d4) { return false; }
-		if ((d1 > 0) === (d2 > 0) || (d3 > 0) === (d4 > 0)) { return false; }
-		function near(x0, y0, x1, y1) { return Math.abs(x0 - x1) <= 1.5 && Math.abs(y0 - y1) <= 1.5; }
-		if (near(s[0], s[1], t[0], t[1]) || near(s[0], s[1], t[2], t[3]) || near(s[2], s[3], t[0], t[1]) || near(s[2], s[3], t[2], t[3])) { return false; }
-		return true;
+		if (!d3 || !d4 || (d3 > 0) === (d4 > 0)) { return false; }
+		return !(near(s[0], s[1], t[0], t[1]) || near(s[0], s[1], t[2], t[3]) || near(s[2], s[3], t[0], t[1]) || near(s[2], s[3], t[2], t[3]));
 	}
-	function crossPoint(s, t) {
+	// Distance from s's start to where s crosses t.
+	function crossDist(s, t) {
 		var d = (s[2] - s[0]) * (t[3] - t[1]) - (s[3] - s[1]) * (t[2] - t[0]);
-		if (!d) { return null; }
+		if (!d) { return Infinity; }
 		var u = ((t[0] - s[0]) * (t[3] - t[1]) - (t[1] - s[1]) * (t[2] - t[0])) / d;
-		return [s[0] + u * (s[2] - s[0]), s[1] + u * (s[3] - s[1])];
+		return Math.abs(u) * Math.hypot(s[2] - s[0], s[3] - s[1]);
 	}
 	// Clip a segment to a rectangle; null when it misses.
 	function clipSeg(s, r) {
@@ -159,13 +158,15 @@ EngCalcs.lpnPlacerC = (function () {
 		if (t0 > t1) { return null; }
 		return [s[0] + t0 * dx, s[1] + t0 * dy, s[0] + t1 * dx, s[1] + t1 * dy];
 	}
+	// A reading angle: text is never upside down.
 	function normAngle(a) {
 		while (a > 90) { a -= 180; }
 		while (a <= -90) { a += 180; }
 		return Math.round(a * 10) / 10;
 	}
+	function angDiff(a, b) { var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
 
-	// ---- the free-space model: a uniform grid of obstacles over the viewport ---------------
+	// ---- the exact obstacles: a uniform grid over the viewport -----------------------------
 	function Grid(bb, cell) {
 		this.x0 = bb.x0; this.y0 = bb.y0; this.cell = cell;
 		this.nx = Math.max(1, Math.ceil((bb.x1 - bb.x0) / cell));
@@ -173,31 +174,31 @@ EngCalcs.lpnPlacerC = (function () {
 		this.cells = [];
 		for (var i = 0; i < this.nx * this.ny; i++) { this.cells.push([]); }
 		this.stamp = 0;
+		this.rr = [0, 0, 0, 0];
 	}
 	Grid.prototype.range = function (bb) {
 		var i0 = Math.floor((bb.x0 - this.x0) / this.cell), i1 = Math.floor((bb.x1 - this.x0) / this.cell);
 		var j0 = Math.floor((bb.y0 - this.y0) / this.cell), j1 = Math.floor((bb.y1 - this.y0) / this.cell);
 		if (i1 < 0 || j1 < 0 || i0 >= this.nx || j0 >= this.ny) { return null; }
-		return [Math.max(0, i0), Math.min(this.nx - 1, i1), Math.max(0, j0), Math.min(this.ny - 1, j1)];
+		var r = this.rr;
+		r[0] = Math.max(0, i0); r[1] = Math.min(this.nx - 1, i1); r[2] = Math.max(0, j0); r[3] = Math.min(this.ny - 1, j1);
+		return r;
 	};
 	Grid.prototype.insert = function (it) {
 		var r = this.range(it.bb), i, j, idx = [];
 		if (!r) { it.cellIdx = idx; return; }
-		var n = (r[1] - r[0] + 1) * (r[3] - r[2] + 1);
-		if (it.s && n > 9) {
-			// A long segment: only the cells it runs through, sampled at a third of a cell.
-			var s = it.s, L = Math.hypot(s[2] - s[0], s[3] - s[1]), steps = Math.ceil(L / (this.cell / 3)), seen = {};
-			for (var k = 0; k <= steps; k++) {
-				var x = s[0] + (s[2] - s[0]) * k / steps, y = s[1] + (s[3] - s[1]) * k / steps;
-				var ci = Math.floor((x - this.x0) / this.cell), cj = Math.floor((y - this.y0) / this.cell);
-				for (var di = -1; di <= 1; di++) {
-					for (var dj = -1; dj <= 1; dj++) {
-						var ii = ci + di, jj = cj + dj;
-						if (ii < 0 || jj < 0 || ii >= this.nx || jj >= this.ny) { continue; }
-						var key = jj * this.nx + ii;
-						if (!seen[key]) { seen[key] = 1; idx.push(key); }
-					}
-				}
+		if (it.s && (r[1] - r[0] + 1) * (r[3] - r[2] + 1) > 4) {
+			// A long segment: only the cells it runs through (a grid walk, Amanatides and Woo).
+			var c = this.cell, sx = it.s[0] - this.x0, sy = it.s[1] - this.y0, ex = it.s[2] - this.x0, ey = it.s[3] - this.y0;
+			var ci = Math.floor(sx / c), cj = Math.floor(sy / c), ei = Math.floor(ex / c), ej = Math.floor(ey / c);
+			var dx = ex - sx, dy = ey - sy, stepI = dx > 0 ? 1 : -1, stepJ = dy > 0 ? 1 : -1;
+			var tMaxX = dx ? ((stepI > 0 ? (ci + 1) * c : ci * c) - sx) / dx : Infinity;
+			var tMaxY = dy ? ((stepJ > 0 ? (cj + 1) * c : cj * c) - sy) / dy : Infinity;
+			var tDX = dx ? c / Math.abs(dx) : Infinity, tDY = dy ? c / Math.abs(dy) : Infinity;
+			for (var guard = 0; guard < 4 * (this.nx + this.ny); guard++) {
+				if (ci >= 0 && cj >= 0 && ci < this.nx && cj < this.ny) { idx.push(cj * this.nx + ci); }
+				if (ci === ei && cj === ej) { break; }
+				if (tMaxX < tMaxY) { tMaxX += tDX; ci += stepI; } else { tMaxY += tDY; cj += stepJ; }
 			}
 		} else {
 			for (j = r[2]; j <= r[3]; j++) { for (i = r[0]; i <= r[1]; i++) { idx.push(j * this.nx + i); } }
@@ -229,24 +230,46 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		return out;
 	};
-	// Calls fn(item) once per item near bb; stops and returns true when fn does.
-	Grid.prototype.query = function (bb, fn) {
-		var r = this.range(bb);
-		if (!r) { return false; }
-		var st = ++this.stamp;
-		for (var j = r[2]; j <= r[3]; j++) {
-			for (var i = r[0]; i <= r[1]; i++) {
-				var arr = this.cells[j * this.nx + i];
-				for (var k = 0; k < arr.length; k++) {
-					var it = arr[k];
-					if (it.q === st) { continue; }
-					it.q = st;
-					if (fn(it)) { return true; }
-				}
+
+	// ---- the free-space raster: a quick "certainly taken" test before the exact one ---------
+	// A cell (RES px square) is marked while some obstacle covers ALL of it. A candidate box that
+	// wholly contains a marked cell overlaps that obstacle by at least RES px both ways, so it
+	// is certainly illegal; only a candidate that passes goes on to the exact geometry.
+	function Raster(bb, res) {
+		this.x0 = bb.x0; this.y0 = bb.y0; this.r = res;
+		this.nx = Math.max(1, Math.ceil((bb.x1 - bb.x0) / res));
+		this.ny = Math.max(1, Math.ceil((bb.y1 - bb.y0) / res));
+		this.a = new Uint16Array(this.nx * this.ny);
+	}
+	Raster.prototype.mark = function (b, d) {
+		var i, j, a = this.a, nx = this.nx, r = this.r;
+		if (!b.angle) {
+			var i0 = Math.max(0, Math.ceil((b.x0 - this.x0) / r)), i1 = Math.min(nx, Math.floor((b.x1 - this.x0) / r));
+			var j0 = Math.max(0, Math.ceil((b.y0 - this.y0) / r)), j1 = Math.min(this.ny, Math.floor((b.y1 - this.y0) / r));
+			for (j = j0; j < j1; j++) { for (i = i0; i < i1; i++) { a[j * nx + i] += d; } }
+			return;
+		}
+		var k0 = Math.max(0, Math.floor((b.x0 - this.x0) / r)), k1 = Math.min(nx - 1, Math.floor((b.x1 - this.x0) / r));
+		var m0 = Math.max(0, Math.floor((b.y0 - this.y0) / r)), m1 = Math.min(this.ny - 1, Math.floor((b.y1 - this.y0) / r));
+		for (j = m0; j <= m1; j++) {
+			for (i = k0; i <= k1; i++) {
+				var x = this.x0 + i * r, y = this.y0 + j * r;
+				if (inOB(x, y, b) && inOB(x + r, y, b) && inOB(x, y + r, b) && inOB(x + r, y + r, b)) { a[j * nx + i] += d; }
 			}
 		}
+	};
+	Raster.prototype.solidUnder = function (b) {
+		if (b.angle) { return false; }
+		var r = this.r, nx = this.nx, a = this.a;
+		var i0 = Math.max(0, Math.ceil((b.x0 - this.x0) / r)), i1 = Math.min(nx, Math.floor((b.x1 - this.x0) / r));
+		var j0 = Math.max(0, Math.ceil((b.y0 - this.y0) / r)), j1 = Math.min(this.ny, Math.floor((b.y1 - this.y0) / r));
+		for (var j = j0; j < j1; j++) { for (var i = i0; i < i1; i++) { if (a[j * nx + i]) { return true; } } }
 		return false;
 	};
+	function inOB(x, y, b) {
+		var dx = x - b.cx, dy = y - b.cy;
+		return Math.abs(dx * b.ca + dy * b.sa) <= b.w / 2 && Math.abs(-dx * b.sa + dy * b.ca) <= b.h / 2;
+	}
 
 	// ---- a pipe's polyline, walked by arc length -------------------------------------------
 	function polyOf(points) {
@@ -275,7 +298,7 @@ EngCalcs.lpnPlacerC = (function () {
 		return best;
 	}
 
-	// ---- one label's ink: one box per stacked row, one for a line (as contract.js draws it) --
+	// ---- one label's block --------------------------------------------------------------------
 	function blockDims(rows, layout, sepW) {
 		var w = 0, h = 0, i;
 		if (layout === 'line') {
@@ -286,22 +309,73 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		return { w: w, h: h };
 	}
-	function inkBoxes(rows, layout, align, x, y, angle, sepW) {
-		var d = blockDims(rows, layout, sepW), out = [];
-		var rad = (angle || 0) * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);
+
+	// ---- a CANDIDATE: one label's block, its ink and its leader. The search fills one reusable
+	// candidate per view (no garbage per try) and copies out only the ones worth keeping. -----
+	function newCand() {
+		return { rs: 0, rows: null, layout: 'stack', align: 'left', x: 0, y: 0, w: 0, h: 0, angle: 0, base: 0, spec: null,
+			s: undefined, side: 0, single: true, blk: newBox(), boxes: [], nb: 0,
+			segs: [[0, 0, 0, 0], [0, 0, 0, 0]], ns: 0, pts: [[0, 0], [0, 0], [0, 0]], np: 0, stat: undefined, cost: 0, reps: null };
+	}
+	// Fill c with the block of rowset rsI of label L at (x, y), and its ink: one box per stacked
+	// row (the staircase, so the ground beside a short row stays free), one for a line.
+	function fillBlock(st, L, c, rsI, layout, align, x, y, angle) {
+		var d = dims(st, L, rsI, layout), rows = L.rowsets[rsI];
+		c.rs = rsI; c.rows = rows; c.layout = layout; c.align = align; c.x = x; c.y = y; c.w = d.w; c.h = d.h;
+		c.angle = angle || 0; c.stat = undefined; c.s = undefined; c.side = 0; c.np = 0; c.ns = 0; c.reps = null;
 		var bcx = x + d.w / 2, bcy = y + d.h / 2;
-		function put(cx, cy, w, h) {
-			var dx = cx - bcx, dy = cy - bcy;
-			out.push(obox(bcx + dx * cos - dy * sin, bcy + dx * sin + dy * cos, w, h, angle || 0));
+		setBox(c.blk, bcx, bcy, d.w, d.h, c.angle);
+		c.single = layout === 'line' || rows.length === 1;
+		if (c.single) {
+			if (!c.boxes.length) { c.boxes.push(newBox()); }
+			setBox(c.boxes[0], bcx, bcy, d.w, d.h, c.angle);
+			c.nb = 1;
+			return c;
 		}
-		if (layout === 'line') { put(bcx, bcy, d.w, d.h); return out; }
-		var top = y;
+		var cos = Math.cos(c.angle * D2R), sin = Math.sin(c.angle * D2R), top = y;
 		for (var i = 0; i < rows.length; i++) {
-			var r = rows[i], left = align === 'right' ? x + d.w - r.w : (align === 'center' ? x + (d.w - r.w) / 2 : x);
-			put(left + r.w / 2, top + r.h / 2, r.w, r.h);
+			var r = L.rows[rows[i]], left = align === 'right' ? x + d.w - r.w : (align === 'center' ? x + (d.w - r.w) / 2 : x);
+			var dx = left + r.w / 2 - bcx, dy = top + r.h / 2 - bcy;
+			if (c.boxes.length <= i) { c.boxes.push(newBox()); }
+			setBox(c.boxes[i], bcx + dx * cos - dy * sin, bcy + dx * sin + dy * cos, r.w, r.h, c.angle);
 			top += r.h;
 		}
+		c.nb = rows.length;
+		return c;
+	}
+	function setLeader(c, n, ax, ay, bx, by, ex, ey) {
+		c.np = n;
+		c.pts[0][0] = ax; c.pts[0][1] = ay; c.pts[1][0] = bx; c.pts[1][1] = by;
+		if (n === 3) { c.pts[2][0] = ex; c.pts[2][1] = ey; }
+		c.ns = n - 1;
+		for (var i = 0; i < c.ns; i++) {
+			var s = c.segs[i];
+			s[0] = c.pts[i][0]; s[1] = c.pts[i][1]; s[2] = c.pts[i + 1][0]; s[3] = c.pts[i + 1][1];
+			s.bb = null; segBB(s);
+		}
+	}
+	// A kept copy of a candidate (the reusable one is overwritten by the next try).
+	function keep(c) {
+		var k = newCand(), i;
+		k.rs = c.rs; k.rows = c.rows; k.layout = c.layout; k.align = c.align; k.x = c.x; k.y = c.y; k.w = c.w; k.h = c.h;
+		k.angle = c.angle; k.base = c.base; k.spec = c.spec; k.s = c.s; k.side = c.side; k.single = c.single;
+		k.stat = c.stat; k.cost = c.cost;
+		setBox(k.blk, c.blk.cx, c.blk.cy, c.blk.w, c.blk.h, c.blk.angle);
+		for (i = 0; i < c.nb; i++) { k.boxes.push(obox(c.boxes[i].cx, c.boxes[i].cy, c.boxes[i].w, c.boxes[i].h, c.boxes[i].angle)); }
+		k.nb = c.nb;
+		if (c.np) { setLeader(k, c.np, c.pts[0][0], c.pts[0][1], c.pts[1][0], c.pts[1][1], c.pts[2][0], c.pts[2][1]); }
+		return k;
+	}
+	function leaderOf(c) {
+		if (!c.np) { return null; }
+		var out = [];
+		for (var i = 0; i < c.np; i++) { out.push([c.pts[i][0], c.pts[i][1]]); }
 		return out;
+	}
+	function dims(st, L, rsI, layout) {
+		var arr = L.dimC[layout === 'line' ? 1 : 0];
+		if (!arr[rsI]) { arr[rsI] = blockDims(L.rowsets[rsI].map(function (i) { return L.rows[i]; }), layout, st.text.separatorW); }
+		return arr[rsI];
 	}
 
 	// ---- direction preferences round a point label (y down: -45 degrees is north-east) -----
@@ -311,7 +385,6 @@ EngCalcs.lpnPlacerC = (function () {
 		[-157.5, 0.17], [135, 0.22], [157.5, 0.2], [-67.5, 0.12], [-90, 0.25], [-112.5, 0.2],
 		[67.5, 0.2], [90, 0.3], [112.5, 0.28]
 	];
-	function angDiff(a, b) { var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
 	function prefOf(deg) {
 		var best = Infinity, bd = Infinity;
 		for (var i = 0; i < PREF.length; i++) {
@@ -322,9 +395,9 @@ EngCalcs.lpnPlacerC = (function () {
 	}
 
 	// ---- the placer ------------------------------------------------------------------------
-	// ---- the placer ------------------------------------------------------------------------
 	function create() {
 		var dirCache = {};   // node id -> the directions of the pipes meeting there (H-b)
+		var specCache = {};  // label id -> its candidate specs (H-b)
 
 		function place(scene, opts) {
 			var prev = opts && opts.prev && opts.prev.layout && opts.prev.scene ? opts.prev : null;
@@ -339,22 +412,18 @@ EngCalcs.lpnPlacerC = (function () {
 
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
-				if (!L.prevPl || L.prevRs < 0) { return; }
-				var c = matPrev(st, L, L.prevRs);
-				if (!c) { return; }
-				var cost = evalCand(st, L, c, KEEP_MAX);
-				if (cost < KEEP_MAX) { c.cost = cost; commit(st, L, c); }
+				if (!L.prevPl || !fillPrev(st, L, L.prevRs, st.probe)) { return; }
+				var cost = judge(st, L, st.probe, KEEP_MAX);
+				if (cost < KEEP_MAX) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
 			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
-				if (L.cur) { return; }
-				var c = bestFor(st, L, L.rowsets.length - 1, Infinity);
-				if (c) { commit(st, L, c); }
+				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, Infinity, SHOW_TRIES)); }
 			});
 			// 3. GROW, in rounds.
 			grow(st, order);
 			// 4. MEND: a hidden label may evict one neighbour who can move.
-			if (mend(st, order, now() + MEND_BUDGET_MS)) { grow(st, order); }
+			if (mend(st, order)) { grow(st, order); }
 			// 5. Repeats along long pipes (R9), in whatever room is left.
 			for (i = 0; i < labels.length; i++) { if (labels[i].cur && labels[i].owner.t === 'link') { repeats(st, labels[i]); } }
 
@@ -362,7 +431,7 @@ EngCalcs.lpnPlacerC = (function () {
 			labels.forEach(function (L) {
 				var c = L.cur;
 				if (!c) { out[L.id] = { shown: false }; return; }
-				var pl = { shown: true, rows: c.rows.slice(), layout: c.layout, align: c.align, x: c.x, y: c.y, leader: c.leader };
+				var pl = { shown: true, rows: c.rows.slice(), layout: c.layout, align: c.align, x: c.x, y: c.y, leader: leaderOf(c) };
 				if (c.angle) { pl.angle = c.angle; }
 				if (c.reps && c.reps.length) { pl.repeats = c.reps; }
 				out[L.id] = pl;
@@ -381,13 +450,15 @@ EngCalcs.lpnPlacerC = (function () {
 			var vpbb = { x0: vp.x, y0: vp.y, x1: vp.x + vp.w, y1: vp.y + vp.h };
 			var gbb = { x0: vpbb.x0 - CELL, y0: vpbb.y0 - CELL, x1: vpbb.x1 + CELL, y1: vpbb.y1 + CELL };
 			var hg = new Grid(gbb, CELL), sg = new Grid(gbb, CELL), dg = new Grid(gbb, CELL);
+			var hr = new Raster(gbb, RES), dr = new Raster(gbb, RES);
 			var nodes = {}, links = {}, incident = {};
 			scene.nodes.forEach(function (n) {
 				nodes[n.id] = n;
 				var raw = obox(n.symbol.x + n.symbol.w / 2, n.symbol.y + n.symbol.h / 2, n.symbol.w, n.symbol.h, 0);
-				if (!bbHit(raw.bb, gbb)) { return; }
+				if (!bbHit(raw, gbb)) { return; }
 				var ob = inflate(raw, SYM_PAD);
-				hg.insert({ k: SYM, ob: ob, raw: raw, bb: ob.bb, own: n.id });
+				hg.insert({ k: SYM, ob: ob, raw: raw, bb: ob, own: n.id });
+				hr.mark(ob, 1);
 			});
 			scene.links.forEach(function (l) {
 				links[l.id] = l;
@@ -395,11 +466,11 @@ EngCalcs.lpnPlacerC = (function () {
 				(incident[l.to] = incident[l.to] || []).push(l);
 				(l.symbols || []).forEach(function (b) {
 					var ob = inflate(obox(b.cx, b.cy, b.w, b.h, b.angle), SYM_PAD);
-					if (bbHit(ob.bb, gbb)) { hg.insert({ k: LSYM, ob: ob, bb: ob.bb, own: l.id }); }
+					if (bbHit(ob, gbb)) { hg.insert({ k: LSYM, ob: ob, bb: ob, own: l.id }); hr.mark(ob, 1); }
 				});
 				(l.arrows || []).forEach(function (b) {
 					var ob = obox(b.cx, b.cy, b.w * 0.8, b.h * 0.8, b.angle);
-					if (bbHit(ob.bb, gbb)) { sg.insert({ k: ARROW, ob: ob, bb: ob.bb, own: l.id }); }
+					if (bbHit(ob, gbb)) { sg.insert({ k: ARROW, ob: ob, bb: ob, own: l.id }); }
 				});
 				for (var i = 1; i < l.points.length; i++) {
 					var s = clipSeg([l.points[i - 1][0], l.points[i - 1][1], l.points[i][0], l.points[i][1]], gbb);
@@ -408,7 +479,7 @@ EngCalcs.lpnPlacerC = (function () {
 			});
 			(scene.texts || []).forEach(function (t) {
 				var ob = inflate(obox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle), SYM_PAD);
-				if (bbHit(ob.bb, gbb)) { hg.insert({ k: TEXT, ob: ob, bb: ob.bb, own: t.id }); }
+				if (bbHit(ob, gbb)) { hg.insert({ k: TEXT, ob: ob, bb: ob, own: t.id }); hr.mark(ob, 1); }
 				var ld = t.leader;
 				if (ld && ld.length > 1) {
 					for (var i = 1; i < ld.length; i++) {
@@ -423,7 +494,8 @@ EngCalcs.lpnPlacerC = (function () {
 			var prevL = prev ? prev.layout.labels || {} : {}, prevReq = {};
 			if (prev) { prev.scene.labels.forEach(function (r) { prevReq[r.id] = r; }); }
 
-			var st = { scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, labels: [], byId: {}, buf: [], seen: [], seen2: [] };
+			var st = { scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, hr: hr, dr: dr, labels: [], byId: {},
+				buf: [], seen: [], seen2: [], probe: newCand(), work: 0 };
 			scene.labels.forEach(function (req) {
 				var L = mkLabel(st, req, nodes, links, incident, customers);
 				if (!L) { return; }
@@ -437,9 +509,8 @@ EngCalcs.lpnPlacerC = (function () {
 			});
 			// How crowded each label's home is: the most crowded are placed first.
 			st.labels.forEach(function (L) {
-				var a = L.anchor, n = 0, bb = { x0: a.x - 45, y0: a.y - 45, x1: a.x + 45, y1: a.y + 45 };
-				n = hg.collect(bb, st.buf).length + sg.collect(bb, st.buf).length;
-				L.dens = n;
+				var a = L.anchor, bb = { x0: a.x - 45, y0: a.y - 45, x1: a.x + 45, y1: a.y + 45 };
+				L.dens = hg.collect(bb, st.buf).length + sg.collect(bb, st.buf).length;
 			});
 			return st;
 		}
@@ -450,22 +521,22 @@ EngCalcs.lpnPlacerC = (function () {
 			var rows = req.rows || [];
 			if (!rows.length) { return null; }
 			var drop = (st.scene.dropOrder && st.scene.dropOrder[req.kind]) || [];
-			var keep = rows.map(function (r, i) { return i; }), rowsets = [keep.slice()];
+			var keepRows = rows.map(function (r, i) { return i; }), rowsets = [keepRows.slice()];
 			drop.forEach(function (f) {
-				var k = keep.filter(function (i) { return rows[i].field !== f; });
-				if (k.length && k.length < keep.length) { keep = k; rowsets.push(keep.slice()); }
+				var k = keepRows.filter(function (i) { return rows[i].field !== f; });
+				if (k.length && k.length < keepRows.length) { keepRows = k; rowsets.push(keepRows.slice()); }
 			});
 			var L = { id: req.id, req: req, kind: req.kind, rows: rows, rowsets: rowsets, anchor: req.anchor,
-				usual: req.layout === 'line' ? 'line' : 'stack', cur: null, items: [], dimC: [[], []], cc: [] };
+				usual: req.layout === 'line' ? 'line' : 'stack', cur: null, items: [], dimC: [[], []], sc: [] };
 			if (req.kind === 'link' && links[req.owner] && links[req.owner].points.length > 1) {
 				var lk = links[req.owner], poly = polyOf(lk.points);
-				var na = nearestOn(poly, req.anchor.x, req.anchor.y);
+				var na = nearestOn(poly, req.anchor.x, req.anchor.y), pa = pointAt(poly, na.s);
 				var pad = function (id) {
 					var n = nodes[id];
 					return n ? Math.max(n.symbol.w, n.symbol.h) / 2 + GAP + 1 : GAP;
 				};
-				L.owner = { t: 'link', linkId: lk.id, poly: poly, sA: na.s, pad0: pad(lk.from), pad1: pad(lk.to) };
-				L.specs = linkSpecs(L);
+				L.owner = { t: 'link', linkId: lk.id, poly: poly, sA: na.s, P: pa, pad0: pad(lk.from), pad1: pad(lk.to) };
+				L.specs = cachedSpecs(L, 'l' + Math.round(Math.atan2(pa.dy, pa.dx) * 90 / Math.PI), function () { return linkSpecs(L); });
 			} else {
 				var o;
 				if (req.kind === 'node' && nodes[req.owner]) {
@@ -478,9 +549,18 @@ EngCalcs.lpnPlacerC = (function () {
 					o = { t: 'pt', x: req.anchor.x, y: req.anchor.y, sw: 2, sh: 2 };
 				}
 				L.owner = o;
-				L.specs = pointSpecs(L, o.nodeId ? pipeDirs(o.nodeId, nodes, incident) : []);
+				var pd = o.nodeId ? pipeDirs(o.nodeId, nodes, incident) : [];
+				L.specs = cachedSpecs(L, 'n' + pd.map(Math.round).join(','), function () { return pointSpecs(L, pd); });
 			}
 			return L;
+		}
+		// A label's spec list depends only on the shape of the pipes at its owner, which a pan or
+		// zoom does not change: kept across views (H-b), rebuilt when the network changes (R13).
+		function cachedSpecs(L, key, make) {
+			key += L.usual;
+			var c = specCache[L.id];
+			if (!c || c.key !== key) { c = specCache[L.id] = { key: key, specs: make() }; }
+			return c.specs;
 		}
 		function rowsetMatching(L, rows, prevReq) {
 			// The rowset showing the same fields the previous view showed; else the richest that
@@ -525,25 +605,23 @@ EngCalcs.lpnPlacerC = (function () {
 			}
 			var specs = [];
 			dirs.forEach(function (deg) {
-				var r = deg * Math.PI / 180, ux = Math.cos(r), uy = Math.sin(r), pref = prefOf(deg);
-				var nearPipe = 180;
+				var ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R), pref = prefOf(deg), nearPipe = 180;
 				pipes.forEach(function (p) { nearPipe = Math.min(nearPipe, angDiff(p, deg)); });
 				['stack', 'line'].forEach(function (layout) {
 					var sh = layout === L.usual ? 0 : SHAPE;
 					specs.push({ t: 'adj', ux: ux, uy: uy, layout: layout, base: pref + sh });
 					LEADER_LENS.forEach(function (len) {
-						var along = nearPipe < 14 ? 0.8 : 0;
 						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout,
-							base: LDR_BASE + len * LDR_PER_PX + pref * 0.5 + along + sh });
+							base: LDR_BASE + len * LDR_PER_PX + pref * 0.5 + (nearPipe < 14 ? 0.8 : 0) + sh });
 					});
 				});
 			});
 			return finishSpecs(specs);
 		}
 		function linkSpecs(L) {
-			var o = L.owner, pa = pointAt(o.poly, o.sA), specs = [];
+			var pa = L.owner.P, specs = [];
 			var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), steep = Math.abs(ang) > 60 ? 0.35 : Math.abs(ang) / 200;
-			var nx = -pa.dy, ny = pa.dx;   // one normal of the pipe at its middle
+			var nx = -pa.dy, ny = pa.dx;   // a normal of the pipe at its middle
 			['line', 'stack'].forEach(function (layout) {
 				var sh = layout === L.usual ? 0 : SHAPE;
 				[0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
@@ -552,9 +630,8 @@ EngCalcs.lpnPlacerC = (function () {
 					});
 				});
 				for (var i = 0; i < 16; i++) {
-					var deg = i * 22.5 - 180, r = deg * Math.PI / 180, ux = Math.cos(r), uy = Math.sin(r);
-					var dn = ux * nx + uy * ny;
-					if (Math.abs(dn) < 0.5) { continue; }
+					var deg = i * 22.5 - 180, ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R);
+					if (Math.abs(ux * nx + uy * ny) < 0.5) { continue; }
 					var pref = prefOf(deg);
 					specs.push({ t: 'beside', ux: ux, uy: uy, layout: layout, base: 0.3 + pref * 0.5 + sh });
 					LEADER_LENS.forEach(function (len) {
@@ -570,164 +647,122 @@ EngCalcs.lpnPlacerC = (function () {
 			return specs;
 		}
 
-		// ---- materialising a spec for one rowset -------------------------------------------
-		function dims(st, L, rsI, layout) {
-			var arr = L.dimC[layout === 'line' ? 1 : 0];
-			if (!arr[rsI]) { arr[rsI] = blockDims(L.rowsets[rsI].map(function (i) { return L.rows[i]; }), layout, st.text.separatorW); }
-			return arr[rsI];
-		}
-		function mkCand(st, L, rsI, layout, align, x, y, angle, leader, base, spec) {
-			var d = dims(st, L, rsI, layout), rows = L.rowsets[rsI];
-			var blk = obox(x + d.w / 2, y + d.h / 2, d.w, d.h, angle || 0);
-			var segs = [];
-			if (leader) { for (var i = 1; i < leader.length; i++) { segs.push([leader[i - 1][0], leader[i - 1][1], leader[i][0], leader[i][1]]); } }
-			// A one-row or one-line block is its own ink; a stack of unequal rows is a staircase.
-			var single = layout === 'line' || rows.length === 1;
-			return { rs: rsI, rows: rows, layout: layout, align: align, x: x, y: y, angle: angle || 0, leader: leader,
-				segs: segs, blk: blk, bb: blk.bb, single: single, boxes: single ? [blk] : null, base: base, spec: spec, stat: undefined };
-		}
-		function boxesOf(st, L, c) {
-			if (!c.boxes) { c.boxes = inkBoxes(c.rows.map(function (i) { return L.rows[i]; }), c.layout, c.align, c.x, c.y, c.angle, st.text.separatorW); }
-			return c.boxes;
-		}
+		// ---- filling the candidate for one spec and rowset --------------------------------
 		function hookLen(st) { return Math.min(HOOK, st.text.hookMaxPx || HOOK); }
-		// A block hung from the leader's end E, on the side away from the leader (R5: the text is
-		// justified to the side the leader arrives from).
-		function hangFrom(st, L, rsI, layout, ex, ey, side, uy, d) {
-			var x = side > 0 ? ex : ex - d.w, y;
-			var rows = L.rowsets[rsI], first = L.rows[rows[0]].h, last = L.rows[rows[rows.length - 1]].h;
+		// A block hung from the leader's end (ex, ey), on the side away from the leader (R5: the
+		// text is justified to the side the leader arrives from). Straight, or with the one
+		// standard short hook when the leader climbs steeply (R6).
+		function hang(st, L, c, rsI, layout, sx, sy, hx, hy, ux, uy) {
+			var side = ux >= -1e-9 ? 1 : -1, d = dims(st, L, rsI, layout), ex = hx, ey = hy, hooked = Math.abs(uy) > 0.72;
+			if (hooked) { ex = hx + side * hookLen(st); }
+			var rows = L.rowsets[rsI], first = L.rows[rows[0]].h, last = L.rows[rows[rows.length - 1]].h, y;
 			if (layout === 'line') { y = ey - d.h / 2; } else if (uy < -0.35) { y = ey - d.h + last / 2; } else if (uy > 0.35) { y = ey - first / 2; } else { y = ey - d.h / 2; }
-			return { x: x, y: y, align: side > 0 ? 'left' : 'right' };
+			fillBlock(st, L, c, rsI, layout, side > 0 ? 'left' : 'right', side > 0 ? ex : ex - d.w, y, 0);
+			if (hooked) { setLeader(c, 3, sx, sy, hx, hy, ex, ey); } else { setLeader(c, 2, sx, sy, ex, ey); }
+			return true;
 		}
-		function leaderFrom(st, sx, sy, ux, uy, hx, hy, side) {
-			// Straight, or the one standard short hook when the leader climbs steeply.
-			if (Math.abs(uy) > 0.72) {
-				var ex = hx + side * hookLen(st);
-				return { pts: [[sx, sy], [hx, hy], [ex, hy]], ex: ex, ey: hy };
-			}
-			return { pts: [[sx, sy], [hx, hy]], ex: hx, ey: hy };
-		}
-		// The candidate for spec index si at rowset rsI, made once per view and kept.
-		function candAt(st, L, si, rsI) {
-			var arr = L.cc[rsI] || (L.cc[rsI] = []);
-			var c = arr[si];
-			if (c === undefined) { c = arr[si] = materialize(st, L, L.specs[si], rsI) || null; }
-			return c;
-		}
-		function materialize(st, L, spec, rsI) {
-			var d = dims(st, L, rsI, spec.layout), o = L.owner;
-			if (spec.layout !== L.usual && L.rowsets[rsI].length === 1) { return null; }   // the same block twice
-			if (o.t === 'link') { return matLink(st, L, spec, rsI, d); }
-			var ux = spec.ux, uy = spec.uy;
+		function fillSpec(st, L, spec, rsI, c) {
+			if (spec.layout !== L.usual && L.rowsets[rsI].length === 1) { return false; }   // the same block twice
+			var d = dims(st, L, rsI, spec.layout), o = L.owner, ux = spec.ux, uy = spec.uy;
+			c.base = spec.base; c.spec = spec;
+			if (o.t === 'link') { return fillLink(st, L, spec, rsI, c, d); }
 			if (spec.t === 'adj') {
 				// On the square ring round the symbol: its corners are the classic quadrant positions.
 				var m = Math.max(Math.abs(ux), Math.abs(uy)), qx = ux / m, qy = uy / m;
 				var cx = o.x + qx * (o.sw + GAP + d.w / 2), cy = o.y + qy * (o.sh + GAP + d.h / 2);
-				var align = ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center');
-				return mkCand(st, L, rsI, spec.layout, align, cx - d.w / 2, cy - d.h / 2, 0, null, spec.base, spec);
+				fillBlock(st, L, c, rsI, spec.layout, ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center'), cx - d.w / 2, cy - d.h / 2, 0);
+				return true;
 			}
-			var side = ux >= -1e-9 ? 1 : -1;
 			var rb = Math.min(Math.abs(ux) > 1e-9 ? o.sw / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? o.sh / Math.abs(uy) : Infinity);
 			var r0 = Math.min(o.sw, o.sh);
-			var hx = o.x + ux * (rb + spec.len), hy = o.y + uy * (rb + spec.len);
-			var ld = leaderFrom(st, o.x + ux * r0, o.y + uy * r0, ux, uy, hx, hy, side);
-			var hg = hangFrom(st, L, rsI, spec.layout, ld.ex, ld.ey, side, uy, d);
-			return mkCand(st, L, rsI, spec.layout, hg.align, hg.x, hg.y, 0, ld.pts, spec.base, spec);
+			return hang(st, L, c, rsI, spec.layout, o.x + ux * r0, o.y + uy * r0, o.x + ux * (rb + spec.len), o.y + uy * (rb + spec.len), ux, uy);
 		}
-		function matLink(st, L, spec, rsI, d) {
-			var o = L.owner, poly = o.poly;
+		function fillLink(st, L, spec, rsI, c, d) {
+			var o = L.owner, poly = o.poly, P = o.P;
 			if (spec.t === 'along') {
-				var step = 14 + d.w * 0.35, s = o.sA + spec.k * step;
-				if (s < 0 || s > poly.len) { return null; }
-				var pa = pointAt(poly, s), j = pa.seg, last = poly.pts.length - 2;
+				var step = 14 + d.w * 0.35, s0 = o.sA + spec.k * step, s = s0;
+				if (s < 0 || s > poly.len) { return false; }
+				var pa = spec.k ? pointAt(poly, s) : P, j = pa.seg, last = poly.pts.length - 2;
 				var lo = poly.cum[j] + (j === 0 ? o.pad0 : GAP) + d.w / 2, hi = poly.cum[j + 1] - (j === last ? o.pad1 : GAP) - d.w / 2;
-				if (lo > hi) { return null; }
+				if (lo > hi) { return false; }
 				if (s < lo || s > hi) {
-					if (spec.k === 0) { return null; }
+					if (spec.k === 0) { return false; }
 					s = Math.max(lo, Math.min(hi, s));
-					if (Math.abs(s - (o.sA + spec.k * step)) > step * 0.6) { return null; }
+					if (Math.abs(s - s0) > step * 0.6) { return false; }
 					pa = pointAt(poly, s);
 				}
-				var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), rad = ang * Math.PI / 180;
-				var nx = Math.sin(rad), ny = -Math.cos(rad), off = spec.side * (d.h / 2 + GAP + 0.5);
-				var cx = pa.x + nx * off, cy = pa.y + ny * off;
-				var c = mkCand(st, L, rsI, spec.layout, 'left', cx - d.w / 2, cy - d.h / 2, ang, null, spec.base, spec);
+				var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), off = spec.side * (d.h / 2 + GAP + 0.5);
+				var cx = pa.x + Math.sin(ang * D2R) * off, cy = pa.y - Math.cos(ang * D2R) * off;
+				fillBlock(st, L, c, rsI, spec.layout, 'left', cx - d.w / 2, cy - d.h / 2, ang);
 				c.s = s; c.side = spec.side;
-				return c;
+				return true;
 			}
-			var P = pointAt(poly, o.sA), ux = spec.ux, uy = spec.uy;
+			var ux = spec.ux, uy = spec.uy;
 			if (spec.t === 'beside') {
 				var qx = -P.dy, qy = P.dx, dn = ux * qx + uy * qy;
-				if (Math.abs(dn) < 0.45) { return null; }
-				var e = d.w / 2 * Math.abs(qx) + d.h / 2 * Math.abs(qy), t = (e + GAP + 1) / Math.abs(dn);
-				var bx = P.x + ux * t, by = P.y + uy * t;
-				var al = ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center');
-				return mkCand(st, L, rsI, spec.layout, al, bx - d.w / 2, by - d.h / 2, 0, null, spec.base, spec);
+				if (Math.abs(dn) < 0.45) { return false; }
+				var t = (d.w / 2 * Math.abs(qx) + d.h / 2 * Math.abs(qy) + GAP + 1) / Math.abs(dn);
+				fillBlock(st, L, c, rsI, spec.layout, ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center'), P.x + ux * t - d.w / 2, P.y + uy * t - d.h / 2, 0);
+				return true;
 			}
-			var side = ux >= -1e-9 ? 1 : -1;
-			var hx = P.x + ux * (spec.len + 4), hy = P.y + uy * (spec.len + 4);
-			var ld = leaderFrom(st, P.x, P.y, ux, uy, hx, hy, side);
-			var hg = hangFrom(st, L, rsI, spec.layout, ld.ex, ld.ey, side, uy, d);
-			return mkCand(st, L, rsI, spec.layout, hg.align, hg.x, hg.y, 0, ld.pts, spec.base, spec);
+			return hang(st, L, c, rsI, spec.layout, P.x, P.y, P.x + ux * (spec.len + 4), P.y + uy * (spec.len + 4), ux, uy);
 		}
 		// Last view's spot, carried by its offset from the anchor.
-		function matPrev(st, L, rsI) {
+		function fillPrev(st, L, rsI, c) {
 			var pp = L.prevPl, pr = L.prevReq, layout = pp.layout || pr.layout || L.usual;
-			if (layout !== 'stack' && layout !== 'line') { return null; }
+			if (rsI < 0 || (layout !== 'stack' && layout !== 'line')) { return false; }
 			var d = dims(st, L, rsI, layout), dp = blockDims(pp.rows.map(function (i) { return pr.rows[i]; }).filter(Boolean), layout, st.text.separatorW);
 			var ax = L.anchor.x, ay = L.anchor.y, px = pr.anchor.x, py = pr.anchor.y, align = pp.align || 'left';
-			var x, y, angle = pp.angle || 0;
+			var x, y, angle = pp.angle || 0, o = L.owner;
+			c.base = PREV_BONUS; c.spec = null;
 			if (angle) {
-				if (L.owner.t !== 'link') { return null; }
-				var pa = pointAt(L.owner.poly, L.owner.sA), a = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI);
-				if (angDiff(a, angle) > 3 && angDiff(a + 180, angle) > 3) { return null; }
+				if (o.t !== 'link') { return false; }
+				var a = normAngle(Math.atan2(o.P.dy, o.P.dx) * 180 / Math.PI);
+				if (angDiff(a, angle) > 3 && angDiff(a + 180, angle) > 3) { return false; }
 				var ccx = pp.x + dp.w / 2 - px, ccy = pp.y + dp.h / 2 - py;
-				x = ax + ccx - d.w / 2; y = ay + ccy - d.h / 2;
-				var c = mkCand(st, L, rsI, layout, align, x, y, angle, null, PREV_BONUS, { t: 'prev' });
-				var q = nearestOn(L.owner.poly, ax + ccx, ay + ccy);
-				c.s = q.s; c.side = ((ax + ccx - q.x) * Math.sin(angle * Math.PI / 180) - (ay + ccy - q.y) * Math.cos(angle * Math.PI / 180)) >= 0 ? 1 : -1;
-				return c;
+				fillBlock(st, L, c, rsI, layout, align, ax + ccx - d.w / 2, ay + ccy - d.h / 2, angle);
+				var q = nearestOn(o.poly, ax + ccx, ay + ccy);
+				c.s = q.s;
+				c.side = ((ax + ccx - q.x) * Math.sin(angle * D2R) - (ay + ccy - q.y) * Math.cos(angle * D2R)) >= 0 ? 1 : -1;
+				return true;
 			}
 			if (align === 'right') { x = ax + (pp.x - px) + dp.w - d.w; } else if (align === 'center') { x = ax + (pp.x - px) + dp.w / 2 - d.w / 2; } else { x = ax + (pp.x - px); }
-			var above = pp.y + dp.h / 2 < py - 2;
-			y = above ? ay + (pp.y - py) + dp.h - d.h : ay + (pp.y - py);
-			var leader = null;
+			// A block that hung above its anchor keeps its bottom edge; any other keeps its top.
+			y = pp.y + dp.h / 2 < py - 2 ? ay + (pp.y - py) + dp.h - d.h : ay + (pp.y - py);
+			fillBlock(st, L, c, rsI, layout, align, x, y, 0);
 			if (pp.leader && pp.leader.length >= 2) {
-				var pe = pp.leader[pp.leader.length - 1];
+				var pe = pp.leader[pp.leader.length - 1], half = L.rows[L.rowsets[rsI][0]].h / 2;
 				var ex = align === 'right' ? x + d.w : x;
-				var rows = L.rowsets[rsI], half = L.rows[rows[0]].h / 2;
 				var ey = Math.max(y + half, Math.min(y + d.h - half, ay + (pe[1] - py)));
-				var hx = ex, hy = ey;
-				if (pp.leader.length === 3) { hx = ex + (pp.leader[1][0] - pe[0]); }
-				var o = L.owner, sx, sy;
+				var hx = pp.leader.length === 3 ? ex + (pp.leader[1][0] - pe[0]) : ex, sx, sy;
 				if (o.t === 'link') {
 					var ps = pp.leader[0], qq = nearestOn(o.poly, ax + ps[0] - px, ay + ps[1] - py);
 					sx = qq.x; sy = qq.y;
 				} else {
-					var vx = hx - o.x, vy = hy - o.y, vl = Math.hypot(vx, vy) || 1, r0 = Math.min(o.sw, o.sh);
-					if (vl <= r0) { return null; }
+					var vx = hx - o.x, vy = ey - o.y, vl = Math.hypot(vx, vy) || 1, r0 = Math.min(o.sw, o.sh);
+					if (vl <= r0) { return false; }
 					sx = o.x + vx / vl * r0; sy = o.y + vy / vl * r0;
 				}
-				leader = pp.leader.length === 3 ? [[sx, sy], [hx, hy], [ex, ey]] : [[sx, sy], [ex, ey]];
-				if ((align === 'right' && sx < ex - 0.5) || (align !== 'right' && sx > ex + 0.5)) { return null; }
+				if ((align === 'right' && sx < ex - 0.5) || (align !== 'right' && sx > ex + 0.5)) { return false; }
+				if (pp.leader.length === 3) { setLeader(c, 3, sx, sy, hx, ey, ex, ey); } else { setLeader(c, 2, sx, sy, ex, ey); }
 			}
-			return mkCand(st, L, rsI, layout, align, x, y, 0, leader, PREV_BONUS, { t: 'prev' });
+			return true;
 		}
 		// A hand-placed label hangs at the user's point, on the side away from its owner, whole.
 		function handCand(st, L) {
 			var h = L.req.hand, o = L.owner, layout = L.usual, d = dims(st, L, 0, layout);
-			var ox = o.t === 'link' ? L.anchor.x : o.x;
-			var side = h.x >= ox ? 1 : -1;
+			var side = h.x >= (o.t === 'link' ? L.anchor.x : o.x) ? 1 : -1;
 			var rows = L.rowsets[0], first = L.rows[rows[0]].h, last = L.rows[rows[rows.length - 1]].h;
 			var ys = layout === 'line' ? [h.y - d.h / 2] : [h.y - first / 2, h.y - d.h / 2, h.y - d.h + last / 2];
-			var starts = leaderStarts(L, h), best = null, bestBad = Infinity;
+			var starts = leaderStarts(L, h), best = null, bestBad = Infinity, c = st.probe;
 			[side, -side].forEach(function (sd) {
 				ys.forEach(function (y) {
-					var x = sd > 0 ? h.x : h.x - d.w, al = sd > 0 ? 'left' : 'right';
 					starts.forEach(function (sp) {
-						var c = mkCand(st, L, 0, layout, al, x, y, 0, [[sp[0], sp[1]], [h.x, h.y]], 0, { t: 'hand' });
+						fillBlock(st, L, c, 0, layout, sd > 0 ? 'left' : 'right', sd > 0 ? h.x : h.x - d.w, y, 0);
+						setLeader(c, 2, sp[0], sp[1], h.x, h.y);
+						c.base = 0; c.spec = null;
 						var bad = hardCount(st, L, c) * 10 + (sd === side ? 0 : 1) + Math.hypot(sp[0] - h.x, sp[1] - h.y) / 1000;
-						if (bad < bestBad) { bestBad = bad; best = c; }
+						if (bad < bestBad) { bestBad = bad; best = keep(c); }
 					});
 				});
 			});
@@ -736,8 +771,8 @@ EngCalcs.lpnPlacerC = (function () {
 		function leaderStarts(L, h) {
 			var o = L.owner, out = [];
 			if (o.t === 'link') {
-				var q = nearestOn(o.poly, h.x, h.y), a = pointAt(o.poly, o.sA);
-				out.push([q.x, q.y], [a.x, a.y]);
+				var q = nearestOn(o.poly, h.x, h.y);
+				out.push([q.x, q.y], [o.P.x, o.P.y]);
 				for (var k = 1; k < 8; k++) { var p = pointAt(o.poly, o.poly.len * k / 8); out.push([p.x, p.y]); }
 			} else {
 				var vx = h.x - o.x, vy = h.y - o.y, vl = Math.hypot(vx, vy), r0 = Math.min(o.sw, o.sh);
@@ -746,54 +781,57 @@ EngCalcs.lpnPlacerC = (function () {
 			return out;
 		}
 		function hardCount(st, L, c) {
-			var n = 0, own = L.owner.nodeId, arr, k;
-			boxesOf(st, L, c).forEach(function (b) {
-				arr = st.hg.collect(b.bb, st.buf);
+			var n = 0, own = L.owner.nodeId, arr, i, k;
+			for (i = 0; i < c.nb; i++) {
+				var b = c.boxes[i];
+				arr = st.hg.collect(b, st.buf);
 				for (k = 0; k < arr.length; k++) { if (obOverlap(b, arr[k].ob, 0)) { n++; } }
-				arr = st.dg.collect(b.bb, st.buf);
+				arr = st.dg.collect(b, st.buf);
 				for (k = 0; k < arr.length; k++) { if (arr[k].k === LABEL && arr[k].own !== L.id && obOverlap(b, arr[k].ob, LBL_TOL)) { n++; } }
-			});
-			c.segs.forEach(function (s) {
-				arr = st.hg.collect(segBB(s), st.buf);
+			}
+			for (i = 0; i < c.ns; i++) {
+				var s = c.segs[i];
+				arr = st.hg.collect(s.bb, st.buf);
 				for (k = 0; k < arr.length; k++) { if (arr[k].k === SYM && arr[k].own !== own && segHitsOB(s[0], s[1], s[2], s[3], arr[k].raw, -0.5)) { n++; } }
-			});
+			}
 			return n;
 		}
 
-		// ---- judging one candidate: Infinity if it breaks a never-rule, else its cost -------
-		// Hard ink test against one grid's box obstacles: the whole block first, and a
-		// staircase's rows one by one only when the block hits something.
-		function boxHitsHard(b, arr, n, tolLabel, selfId) {
-			for (var k = 0; k < n; k++) {
-				var it = arr[k];
-				if (it.k === LABEL) { if (it.own !== selfId && obOverlap(b, it.ob, tolLabel)) { return true; } } else if (it.ob && it.k !== ARROW && obOverlap(b, it.ob, 0)) { return true; }
-			}
-			return false;
-		}
-		function inkHits(st, L, c, g) {
-			var arr = g.collect(c.blk.bb, st.buf), n = arr.length;
-			if (!n || !boxHitsHard(c.blk, arr, n, LBL_TOL, L.id)) { return false; }
+		// ---- judging a candidate: Infinity if it breaks a never-rule, else its cost ---------
+		// Does c's ink overlap a box obstacle in grid g? The raster answers "certainly" first;
+		// then the whole block is tried, and a staircase's rows one by one only when it hits.
+		function inkHits(st, L, c, g, ras) {
+			var i, k, arr, b;
+			for (i = 0; i < c.nb; i++) { if (ras.solidUnder(c.boxes[i])) { return true; } }
+			arr = g.collect(c.blk, st.buf);
+			if (!arr.length || !boxHitsAny(c.blk, arr, L.id)) { return false; }
 			if (c.single) { return true; }
-			var bs = boxesOf(st, L, c);
-			for (var i = 0; i < bs.length; i++) {
-				arr = g.collect(bs[i].bb, st.buf);
-				if (boxHitsHard(bs[i], arr, arr.length, LBL_TOL, L.id)) { return true; }
+			for (i = 0; i < c.nb; i++) {
+				b = c.boxes[i];
+				arr = g.collect(b, st.buf);
+				if (boxHitsAny(b, arr, L.id)) { return true; }
 			}
 			return false;
+			function boxHitsAny(bx, a, selfId) {
+				for (k = 0; k < a.length; k++) {
+					var it = a[k];
+					if (it.k === LABEL) { if (it.own !== selfId && obOverlap(bx, it.ob, LBL_TOL)) { return true; } } else if (it.k !== LEAD && obOverlap(bx, it.ob, 0)) { return true; }
+				}
+				return false;
+			}
 		}
-		// The part of a candidate's cost that depends only on the fixed map, worked out once.
+		// The part of a candidate's cost that depends only on the fixed map.
 		function staticCost(st, L, c) {
-			if (c.stat !== undefined) { return c.stat; }
-			var vp = st.vp, i, j, k, arr, it, s;
-			c.stat = Infinity;
-			if (c.bb.x0 < vp.x0 || c.bb.y0 < vp.y0 || c.bb.x1 > vp.x1 || c.bb.y1 > vp.y1) { return Infinity; }
-			if (inkHits(st, L, c, st.hg)) { return Infinity; }
+			var vp = st.vp, i, j, k, arr, it, s, b;
+			st.work++;
+			if (c.blk.x0 < vp.x0 || c.blk.y0 < vp.y0 || c.blk.x1 > vp.x1 || c.blk.y1 > vp.y1) { return Infinity; }
+			if (inkHits(st, L, c, st.hg, st.hr)) { return Infinity; }
 			var ownNode = L.owner.nodeId, ownLink = L.owner.linkId, cost = c.base;
 			// Leaders: never through another node's symbol (N3); through a pump, valve or Text
 			// object at a cost.
-			for (j = 0; j < c.segs.length; j++) {
+			for (j = 0; j < c.ns; j++) {
 				s = c.segs[j];
-				arr = st.hg.collect(segBB(s), st.buf);
+				arr = st.hg.collect(s.bb, st.buf);
 				for (k = 0; k < arr.length; k++) {
 					it = arr[k];
 					if (it.k === SYM) {
@@ -804,73 +842,70 @@ EngCalcs.lpnPlacerC = (function () {
 				}
 			}
 			// Ink on pipes, arrows and Text callouts.
-			arr = st.sg.collect(c.blk.bb, st.buf);
+			arr = st.sg.collect(c.blk, st.buf);
 			if (arr.length) {
-				var bs = boxesOf(st, L, c), seen = st.seen, own = false;
+				var seen = st.seen, own = false;
 				seen.length = 0;
-				for (i = 0; i < bs.length; i++) {
-					var bx = bs[i], a2 = i ? st.sg.collect(bx.bb, st.buf) : (bs.length === 1 ? arr : st.sg.collect(bx.bb, st.buf));
-					for (k = 0; k < a2.length; k++) {
-						it = a2[k];
+				for (i = 0; i < c.nb; i++) {
+					b = c.boxes[i];
+					if (c.nb > 1) { arr = st.sg.collect(b, st.buf); }
+					for (k = 0; k < arr.length; k++) {
+						it = arr[k];
 						if (it.k === ARROW) {
-							if (seen.indexOf(it) < 0 && obOverlap(bx, it.ob, 0.5)) { seen.push(it); cost += COST.LBL_ARROW; }
+							if (seen.indexOf(it) < 0 && obOverlap(b, it.ob, 0.5)) { seen.push(it); cost += COST.LBL_ARROW; }
 						} else if (it.own === ownLink) {
-							if (!own && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) { own = true; cost += COST.OWN_PIPE; }
-						} else if (seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
+							if (!own && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) { own = true; cost += COST.OWN_PIPE; }
+						} else if (seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) {
 							seen.push(it.own); cost += it.k === TLEAD ? COST.LBL_LDR : COST.LBL_PIPE;
 						}
 					}
 				}
 			}
 			// Leaders across pipes and Text callouts.
-			if (c.segs.length) {
+			if (c.ns) {
 				var xs = st.seen2, start = c.segs[0];
 				xs.length = 0;
-				for (j = 0; j < c.segs.length; j++) {
+				for (j = 0; j < c.ns; j++) {
 					s = c.segs[j];
-					arr = st.sg.collect(segBB(s), st.buf);
+					arr = st.sg.collect(s.bb, st.buf);
 					for (k = 0; k < arr.length; k++) {
 						it = arr[k];
 						if (it.k === ARROW || it.own === ownLink || xs.indexOf(it.own) >= 0 || !segsCross(s, it.s)) { continue; }
 						if (it.k === TLEAD) { xs.push(it.own); cost += COST.LDR_LDR; continue; }
-						var p = crossPoint(s, it.s);
-						if (!p || Math.hypot(p[0] - start[0], p[1] - start[1]) > 1.5) { xs.push(it.own); cost += COST.LDR_PIPE; }
+						if (j > 0 || crossDist(start, it.s) > 1.5) { xs.push(it.own); cost += COST.LDR_PIPE; }
 					}
 				}
 			}
-			c.stat = cost;
 			return cost;
 		}
-		function evalCand(st, L, c, bound) {
-			var id = L.id, g = st.dg, i, j, k, arr, it;
-			var cost = staticCost(st, L, c);
-			if (cost >= bound) { return Infinity; }
-			if (inkHits(st, L, c, g)) { return Infinity; }
+		// Everything else: the labels and leaders placed so far.
+		function dynCost(st, L, c, cost, bound) {
+			var id = L.id, g = st.dg, i, j, k, arr, it, b, s;
+			if (inkHits(st, L, c, g, st.dr)) { return Infinity; }
 			var seen = st.seen;
 			seen.length = 0;
-			arr = g.collect(c.blk.bb, st.buf);
+			arr = g.collect(c.blk, st.buf);
 			var anyLead = false;
 			for (k = 0; k < arr.length; k++) { if (arr[k].k === LEAD && arr[k].own !== id) { anyLead = true; break; } }
 			if (anyLead) {
-				var bs = boxesOf(st, L, c);
-				for (i = 0; i < bs.length; i++) {
-					var bx = bs[i];
-					arr = g.collect(bx.bb, st.buf);
+				for (i = 0; i < c.nb; i++) {
+					b = c.boxes[i];
+					arr = g.collect(b, st.buf);
 					for (k = 0; k < arr.length; k++) {
 						it = arr[k];
-						if (it.k === LEAD && it.own !== id && seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], bx, 1)) {
+						if (it.k === LEAD && it.own !== id && seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) {
 							seen.push(it.own); cost += COST.LBL_LDR;
 						}
 					}
 				}
 				if (cost >= bound) { return Infinity; }
 			}
-			if (c.segs.length) {
+			if (c.ns) {
 				var labs = st.seen2;
 				labs.length = 0; seen.length = 0;
-				for (j = 0; j < c.segs.length; j++) {
-					var s = c.segs[j];
-					arr = g.collect(segBB(s), st.buf);
+				for (j = 0; j < c.ns; j++) {
+					s = c.segs[j];
+					arr = g.collect(s.bb, st.buf);
 					for (k = 0; k < arr.length; k++) {
 						it = arr[k];
 						if (it.own === id) { continue; }
@@ -882,24 +917,34 @@ EngCalcs.lpnPlacerC = (function () {
 			}
 			return cost < bound ? cost : Infinity;
 		}
+		// Judge a whole candidate (its static part is kept on it).
+		function judge(st, L, c, bound) {
+			if (c.stat === undefined) { c.stat = staticCost(st, L, c); }
+			return c.stat < bound ? dynCost(st, L, c, c.stat, bound) : Infinity;
+		}
 
 		// The cheapest legal spot for label L showing rowset rsI, or null. Specs are tried in
 		// order of their own cost; once that alone reaches the best found, nothing cheaper is left.
+		// What a spec costs against the fixed map is remembered for the rest of the view.
 		function bestFor(st, L, rsI, bound, maxTries) {
-			var best = null, bestCost = bound, specs = L.specs, c, cost, i, tries = 0;
-			if (L.prevPl) {
-				c = matPrev(st, L, rsI);
-				if (c) { cost = evalCand(st, L, c, bestCost); if (cost < bestCost) { bestCost = cost; best = c; } }
+			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, sv;
+			if (L.prevPl && fillPrev(st, L, rsI, c)) {
+				cost = judge(st, L, c, bestCost);
+				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
 			}
+			var sc = L.sc[rsI];
+			if (!sc) { sc = L.sc[rsI] = new Float64Array(specs.length); sc.fill(NaN); }
 			for (i = 0; i < specs.length; i++) {
 				if (specs[i].base >= bestCost) { break; }
-				c = candAt(st, L, i, rsI);
-				if (!c) { continue; }
+				sv = sc[i];
+				if (sv >= bestCost) { continue; }            // known illegal, or too dear already
+				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
 				if (maxTries && ++tries > maxTries) { break; }
-				cost = evalCand(st, L, c, bestCost);
-				if (cost < bestCost) { bestCost = cost; best = c; }
+				if (sv !== sv) { sv = sc[i] = staticCost(st, L, c); if (sv >= bestCost) { continue; } }
+				c.stat = sv;
+				cost = dynCost(st, L, c, sv, bestCost);
+				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
 			}
-			if (best) { best.cost = bestCost; }
 			return best;
 		}
 
@@ -907,11 +952,15 @@ EngCalcs.lpnPlacerC = (function () {
 			uncommit(st, L);
 			if (!c) { return; }
 			L.cur = c;
-			boxesOf(st, L, c).forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.dg.insert(it); L.items.push(it); });
-			c.segs.forEach(function (s) { var it = { k: LEAD, s: s, bb: segBB(s), own: L.id }; st.dg.insert(it); L.items.push(it); });
+			for (var i = 0; i < c.nb; i++) { addInk(st, L, c.boxes[i]); }
+			for (i = 0; i < c.ns; i++) { var it = { k: LEAD, s: c.segs[i], bb: c.segs[i].bb, own: L.id }; st.dg.insert(it); L.items.push(it); }
+		}
+		function addInk(st, L, b) {
+			var it = { k: LABEL, ob: b, bb: b, own: L.id };
+			st.dg.insert(it); st.dr.mark(b, 1); L.items.push(it);
 		}
 		function uncommit(st, L) {
-			L.items.forEach(function (it) { st.dg.remove(it); });
+			L.items.forEach(function (it) { st.dg.remove(it); if (it.k === LABEL) { st.dr.mark(it.ob, -1); } });
 			L.items = []; L.cur = null;
 		}
 
@@ -926,7 +975,7 @@ EngCalcs.lpnPlacerC = (function () {
 					var L = order[i], c0 = L.cur;
 					if (!c0 || c0.rs === 0 || L.stuck) { continue; }
 					uncommit(st, L);
-					var cur = evalCand(st, L, c0, Infinity);
+					var cur = dynCost(st, L, c0, c0.stat === undefined ? (c0.stat = staticCost(st, L, c0)) : c0.stat, Infinity);
 					if (cur === Infinity) { cur = c0.cost || 0; }
 					var c = bestFor(st, L, c0.rs - 1, cur + ROW_GAIN, GROW_TRIES);
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
@@ -937,25 +986,29 @@ EngCalcs.lpnPlacerC = (function () {
 
 		// MEND: a hidden label looks for a spot blocked by exactly one movable label; if that one
 		// can go somewhere else (with fewer rows if it must), both are shown.
-		function mend(st, order, deadline) {
-			var any = false;
-			for (var i = 0; i < order.length; i++) {
-				if (now() > deadline) { break; }
+		function mend(st, order) {
+			var any = false, limit = st.work + MEND_WORK, c = st.probe;
+			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
 				if (L.cur) { continue; }
 				var rsI = L.rowsets.length - 1, tried = {};
-				for (var k = 0; k < L.specs.length && k < 80; k++) {
-					var c = candAt(st, L, k, rsI);
-					if (!c || staticCost(st, L, c) === Infinity) { continue; }
+				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
+				for (var k = 0; k < L.specs.length && k < 60 && st.work < limit; k++) {
+					if (sc[k] === Infinity || !fillSpec(st, L, L.specs[k], rsI, c)) { continue; }
+					if (sc[k] !== sc[k]) { sc[k] = staticCost(st, L, c); }
+					if (sc[k] === Infinity) { continue; }
+					c.stat = sc[k];
 					var bl = blocker(st, L, c);
 					if (!bl || tried[bl.id]) { continue; }
 					tried[bl.id] = 1;
-					var old = bl.cur;
+					var mine = keep(c), old = bl.cur;
 					uncommit(st, bl);
-					if (evalCand(st, L, c, Infinity) === Infinity) { commit(st, bl, old); continue; }
-					commit(st, L, c);
-					var moved = null;
-					for (var r = old.rs; r < bl.rowsets.length && !moved; r++) { moved = bestFor(st, bl, r, Infinity, 120); }
+					var cost = dynCost(st, L, mine, mine.stat, Infinity);
+					if (cost === Infinity) { commit(st, bl, old); continue; }
+					mine.cost = cost;
+					commit(st, L, mine);
+					var moved = bestFor(st, bl, old.rs, Infinity, 50);
+					if (!moved && old.rs < bl.rowsets.length - 1) { moved = bestFor(st, bl, bl.rowsets.length - 1, Infinity, 50); }
 					if (moved) { commit(st, bl, moved); bl.stuck = false; any = true; break; }
 					uncommit(st, L);
 					commit(st, bl, old);
@@ -965,18 +1018,19 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		// The one placed label (not hand-placed) whose ink alone keeps c from being legal, or null.
 		function blocker(st, L, c) {
-			var found = null, many = false;
-			boxesOf(st, L, c).forEach(function (b) {
-				st.dg.query(b.bb, function (it) {
+			var found = null, arr, k, i;
+			for (i = 0; i < c.nb; i++) {
+				var b = c.boxes[i];
+				arr = st.dg.collect(b, st.buf);
+				for (k = 0; k < arr.length; k++) {
+					var it = arr[k];
 					if (it.k === LABEL && it.own !== L.id && obOverlap(b, it.ob, LBL_TOL)) {
-						if (found && found !== it.own) { many = true; return true; }
+						if (found && found !== it.own) { return null; }
 						found = it.own;
 					}
-					return false;
-				});
-			});
-			if (many || !found) { return null; }
-			var B = st.byId[found];
+				}
+			}
+			var B = found ? st.byId[found] : null;
 			return B && !B.req.hand ? B : null;
 		}
 
@@ -986,7 +1040,7 @@ EngCalcs.lpnPlacerC = (function () {
 			var c = L.cur, o = L.owner, sp = st.text.repeatSpacingPx;
 			if (!c || o.t !== 'link' || !(sp > 0) || o.poly.len <= sp) { return; }
 			var n = Math.max(3, 2 * Math.round(o.poly.len / (2 * sp)) + 1), gap = o.poly.len / n;
-			var d = dims(st, L, c.rs, c.layout), reps = [];
+			var d = dims(st, L, c.rs, c.layout), reps = [], rc = st.probe;
 			var mainS = c.s !== undefined ? c.s : o.sA, sd0 = c.side || 1;
 			for (var k = 0; k < n; k++) {
 				var s0 = (k + 0.5) * gap;
@@ -998,11 +1052,12 @@ EngCalcs.lpnPlacerC = (function () {
 						var s = s0 + f * gap, pa = pointAt(o.poly, s), j = pa.seg, last = o.poly.pts.length - 2;
 						var lo = o.poly.cum[j] + (j === 0 ? o.pad0 : GAP) + d.w / 2, hi = o.poly.cum[j + 1] - (j === last ? o.pad1 : GAP) - d.w / 2;
 						if (s < lo || s > hi) { return; }
-						var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), rad = ang * Math.PI / 180;
-						var off = side * (d.h / 2 + GAP + 0.5), cx = pa.x + Math.sin(rad) * off, cy = pa.y - Math.cos(rad) * off;
-						var rc = mkCand(st, L, c.rs, c.layout, c.align, cx - d.w / 2, cy - d.h / 2, ang, null, 0, null);
-						if (evalCand(st, L, rc, 1.5) < 1.5) {
-							boxesOf(st, L, rc).forEach(function (b) { var it = { k: LABEL, ob: b, bb: b.bb, own: L.id }; st.dg.insert(it); L.items.push(it); });
+						var ang = normAngle(Math.atan2(pa.dy, pa.dx) * 180 / Math.PI), off = side * (d.h / 2 + GAP + 0.5);
+						var cx = pa.x + Math.sin(ang * D2R) * off, cy = pa.y - Math.cos(ang * D2R) * off;
+						fillBlock(st, L, rc, c.rs, c.layout, c.align, cx - d.w / 2, cy - d.h / 2, ang);
+						rc.base = 0;
+						if (judge(st, L, rc, 1.5) < 1.5) {
+							for (var i = 0; i < rc.nb; i++) { addInk(st, L, obox(rc.boxes[i].cx, rc.boxes[i].cy, rc.boxes[i].w, rc.boxes[i].h, rc.boxes[i].angle)); }
 							reps.push({ x: rc.x, y: rc.y, angle: ang });
 							done = true;
 						}
@@ -1012,10 +1067,10 @@ EngCalcs.lpnPlacerC = (function () {
 			c.reps = reps;
 		}
 
-		// H-b: the per-node pipe directions are the only thinking kept across views; opening a
-		// project starts them afresh.
+		// H-b: the per-node pipe directions and each label's list of places to try are the
+		// thinking kept across views; opening a project starts them afresh.
 		function idle(budgetMs, info) {
-			if (info && info.opening) { dirCache = {}; }
+			if (info && info.opening) { dirCache = {}; specCache = {}; }
 		}
 
 		return { name: NAME, place: place, idle: idle };
