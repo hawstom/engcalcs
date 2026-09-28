@@ -26076,11 +26076,62 @@ var EngCalcs = EngCalcs || {};
 	 * dev/browser-pass/specs/print.js.
 	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
+	// **MEASURED HEADROOM FOR A VALUE WITH NOWHERE TO WRAP** (R-366 follow-up, Perry's pre-review,
+	// 2026-09-28). `overflow-wrap: normal` on a print `td` (below) stops a mid-character break, but
+	// it does nothing about a value that is genuinely too wide for its column: forcing one to
+	// roughly twice its column's width showed it painting 133px into the NEXT column, unbroken --
+	// an overlap, which reads worse than the wrap it replaced. Two defenses, not one: this headroom
+	// so an ordinary, honestly-sized value never gets close to that edge, and `overflow-wrap:
+	// anywhere` restored below as the last resort for the value that still does not fit.
+	//
+	// **THE NUMBER, MEASURED WITH A REAL PRINT PASS, NOT ASSUMED.** Built the fixture's Longitude
+	// column, read the print table's OWN computed font-size, canvas-`measureText()`'d
+	// "-122.419415917969" at that exact size (the same technique paneColContentEm() already uses to
+	// size a column) as a PREDICTION, then read the ACTUAL painted glyph width back out of a real
+	// `page.pdf()` PDF with pdfjs-dist (`transform`/`width` per text run, points converted to CSS px
+	// at 96/72). Predicted vs. actual: Letter 57.92px vs 64.07px (10.6% short); A4 56.10px vs
+	// 62.40px (11.2% short). Consistent across both papers, so a real property of Chromium's PRINT
+	// rendering pass -- plausibly a different font instance behind the generic `sans-serif` family
+	// in the print/PDF export path than on screen -- not measurement noise. 1.12 gives that a small
+	// margin. The exact percentage is this machine's; a different platform's font substitution could
+	// need more or less, which is the other reason the wrap fallback still has to exist.
+	var PANE_PRINT_HEADROOM = 1.12;
+	// **A MEASURED MARGIN, NOT A COLUMN TYPE.** The first draft of this gave headroom only to `str`/
+	// `choices` columns (custom properties, Mixing model...) on the theory that a plain number is
+	// short and rounded and therefore safe. That theory is WRONG: `paneColCoord()`'s own X/Y columns
+	// are plain numbers (no `str`, no `choices`) and print through `paneNumText()`
+	// (`+v.toFixed(6)`), which keeps up to six decimal places -- a typed coordinate or an elevation
+	// with real precision behind it prints exactly as long an unbreakable token as a custom
+	// property does, and is exactly as unprotected by a space to wrap at. Numbers are not exempt.
+	// The right test is not what KIND of column this is, but whether THIS column, as actually
+	// printed, is running close enough to the edge that the measured shortfall above could reach it:
+	// take the column's own current margin (its screen-drawn width minus its widest unbreakable
+	// value's own content width -- the padding/border cushion the initial-width rule already gave
+	// it) and ask whether that margin is smaller than the shortfall's own share of that value.
+	// A typed "-122.123457" (11 characters, drawn to fit with only its ordinary padding to spare)
+	// fails that test and gets the headroom, exactly as "-122.419415917969" does; a rounded result
+	// like "3.28" or a plain "150" has the SAME fixed padding cushion sitting behind a far shorter
+	// value, so the shortfall's few-percent share of it never approaches that cushion and no
+	// headroom is added -- not because it is a number, but because it was never close to the edge.
+	function paneColPrintNeedsHeadroom(spec, c, colEm) {
+		var rows = paneTableRowsInOrder(spec), i, text, contentEm, margin;
+		for (i = 0; i < rows.length; i++) {
+			text = paneCellDisplayText(c, rows[i]);
+			if (!text || /\s/.test(text)) { continue; }   // a space is always a place left to wrap
+			contentEm = paneMeasureEm(text, false);
+			margin = colEm - contentEm;
+			if (margin < contentEm * (PANE_PRINT_HEADROOM - 1)) { return true; }
+		}
+		return false;
+	}
 	function panePrintWidths(spec, table) {
 		var cols = paneCols(spec), unit, ems, sum = 0, cg;
 		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
+		ems = ems.map(function (e, i) {
+			return paneColPrintNeedsHeadroom(spec, cols[i], e) ? Math.round(e * PANE_PRINT_HEADROOM * 100) / 100 : e;
+		});
 		ems.forEach(function (e) { sum += e; });
 		if (!(sum > 0)) { return null; }
 		// **EACH COLUMN ALSO CARRIES ITS 1px RULE, OUTSIDE THE SCALE.** On screen the grid is inset

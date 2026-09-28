@@ -1,25 +1,36 @@
-// **DOES A SINGLE-TOKEN VALUE THAT FITS ON SCREEN ALSO FIT ON PAPER?** (R-366, Tom, 2026-09-27:
-// *"Printing seems to always take a little more room than on-screen. Therefore a column whose
-// values fit fine on-screen may wrap in the print. This happened to Latitude, Longitude, and Date
-// installed (long value strings). Research how to avoid surprises like this and ensure that the
-// width decisions account for this if it's an unavoidable fact of browser printing."*)
+// **DOES A SINGLE-TOKEN VALUE THAT FITS ON SCREEN ALSO FIT ON PAPER -- AND DOES ONE THAT GENUINELY
+// DOESN'T FIT FAIL SAFELY?** (R-366, Tom, 2026-09-27: *"Printing seems to always take a little more
+// room than on-screen. Therefore a column whose values fit fine on-screen may wrap in the print.
+// This happened to Latitude, Longitude, and Date installed (long value strings). Research how to
+// avoid surprises like this and ensure that the width decisions account for this if it's an
+// unavoidable fact of browser printing."*; the pre-reviewer's follow-up, 2026-09-28, on the first
+// attempt at this fix: forcing a value to roughly twice its column's width made it paint 133px into
+// the NEXT column, unbroken -- a silent overlap, worse than the mid-word wrap it replaced.)
 //
-// **WHY A DATA CELL IS A DIFFERENT PROBLEM FROM A HEADING.** A heading is built by
-// paneHeadingDisplayText() with a soft hyphen at the ONE point paneWordSplitIndex() measured room
-// for (dev/lpn-spike/pane-heading-wrap-harness.js already covers that). A coordinate or a date a
-// user typed into a custom property has no such device and no space to wrap at either -- it is a
-// single, unbreakable token, sized on screen to the exact width of its own longest value. Printing
-// is a SEPARATE Chromium rendering pass from the screen the width was measured on (see the CSS
-// comment beside `.lpn-print-fixed th { overflow-wrap: anywhere }` in css/engcalcs.css for the
-// citations), so that width is not guaranteed to survive to the paper down to the sub-pixel -- and
-// `overflow-wrap: anywhere` used to apply to data cells too, so the first character that came up
-// short broke the whole token across two lines. The fix removed `anywhere` from `td` and left it at
-// its default (`normal`): an unbreakable token that is a hair too wide for its printed column now
-// overflows that cell by the same hair instead of being cut in half.
+// **TWO DEFENSES, CHECKED SEPARATELY.** A heading is built by paneHeadingDisplayText() with a soft
+// hyphen at the ONE point paneWordSplitIndex() measured room for
+// (dev/lpn-spike/pane-heading-wrap-harness.js already covers that). A coordinate, a date, or a
+// typed number with real decimal precision behind it (paneColCoord()'s own X/Y columns included --
+// they are plain numbers, not text, and print through paneNumText() up to six decimal places) has
+// no such device and no space to wrap at either: it is a single, unbreakable token, sized on screen
+// to the exact width of its own longest value. Printing is a SEPARATE Chromium rendering pass from
+// the screen the width was measured on (see the CSS comment beside `.lpn-print-fixed th, td {
+// overflow-wrap: anywhere }` in css/engcalcs.css for the citations and the measured numbers), so
+// that width is not guaranteed to survive to the paper down to the sub-pixel.
+//   1. panePrintWidths() now gives a column MEASURED HEADROOM (PANE_PRINT_HEADROOM,
+//      js/looped-network.js) when its own margin is smaller than that measured shortfall, so an
+//      HONESTLY-SIZED value should never come close to needing to wrap at all.
+//   2. `overflow-wrap: anywhere` is restored on print `td` as the LAST RESORT, so a value that
+//      genuinely does not fit -- a column dragged narrow and then typed or pasted into with
+//      something longer than it was ever sized for -- wraps inside its own column instead of
+//      overlapping its neighbour.
 //
 // This asserts, on a network whose junctions carry three long custom properties -- Latitude,
-// Longitude, Date installed, exactly the ones Tom named -- that EVERY row's value in those three
-// columns prints on ONE line, at both US Letter and A4, portrait, at Chromium's default margins.
+// Longitude, Date installed, exactly the ones Tom named -- plus one junction with a many-decimal X/Y
+// (a plain NUMERIC column, not text) -- that EVERY row's value in those columns prints on ONE line,
+// at both US Letter and A4, portrait, at Chromium's default margins (defense 1). It then forces one
+// value to roughly twice its column's width and asserts it wraps INSIDE its own column rather than
+// painting into the next one (defense 2, the pre-reviewer's own reproduction of the overlap).
 // Ordinary multi-word text is not this harness's concern (it is free to wrap at its own spaces, on
 // screen or on paper, as it always could).
 //
@@ -28,8 +39,9 @@
 // stored EPANET token underneath it -- see paneCellDisplayText() in js/looped-network.js.
 //
 // Fixture: dev/lpn-spike/pane-print-long-values.lwn (Net1 plus three custom properties + values on
-// every junction, none shorter than 15 characters, none containing a space; its one tank is set to
-// FIFO mixing for the R-367 check).
+// every junction, none shorter than 15 characters, none containing a space; junction 10's x/y are
+// also set to a many-decimal pair (-122.123456, 37.123456) for the numeric-column check; its one
+// tank is set to FIFO mixing for the R-367 check).
 //
 // **DO NOT PREFIX THIS WITH `flock`.** It launches Chromium itself and takes
 // /tmp/engcalcs-browser.lock by re-executing under flock, exactly as
@@ -68,8 +80,10 @@ const FIXTURE = path.join(__dirname, 'pane-print-long-values.lwn');
 // Printable width in CSS px at 96/in, less Chromium's default ~0.4in margin each side -- the same
 // two papers dev/browser-pass/specs/print.js measures against.
 const PAPERS = [{ name: 'Letter', w: Math.round((8.5 - 0.8) * 96) }, { name: 'A4', w: Math.round((8.27 - 0.8) * 96) }];
-// The three columns Tom named, by the custom-property keys the fixture defines them under.
-const COLS = ['custom_latitude', 'custom_longitude', 'custom_installed'];
+// The three columns Tom named, by the custom-property keys the fixture defines them under, plus
+// the built-in X/Y (a plain NUMERIC column, key `axis1`/`axis2`) for the "numbers are not exempt"
+// case: junction 10's x/y are set to a many-decimal pair in the fixture.
+const COLS = ['custom_latitude', 'custom_longitude', 'custom_installed', 'axis1', 'axis2'];
 
 let checks = 0, failures = 0;
 function ok(name, cond, extra) {
@@ -167,6 +181,50 @@ async function main() {
 				const wrapped = col.rows.filter((r) => r.lines > 1).map((r) => r.text);
 				ok(paper.name + ': every ' + c + ' value prints on one line', wrapped.length === 0, wrapped.join(', '));
 			});
+		}
+
+		// **DEFENSE 2: A VALUE THAT GENUINELY DOES NOT FIT WRAPS, IT DOES NOT OVERLAP THE NEXT
+		// COLUMN** -- the pre-reviewer's own reproduction, redone here so it cannot regress silently.
+		// Headroom (defense 1, just checked above) covers an honestly-sized value; this forces one
+		// roughly twice its column's own width -- past anything headroom is meant to absorb -- and
+		// reads back the actual PAINTED extent of its glyphs (Range.getClientRects(), not the cell's
+		// own box, which `overflow-wrap: anywhere` can legitimately make taller but never wider than)
+		// against the very first pixel of the next real column's own text.
+		await a.page.setViewportSize({ width: PAPERS[0].w, height: 1400 });
+		await a.page.evaluate(() => { window.print = function () {}; document.getElementById('lpn_pane_print').click(); });
+		await a.settle(250);
+		await a.page.emulateMedia({ media: 'print' });
+		await a.settle(150);
+		const overlap = await a.page.evaluate(() => {
+			const area = document.getElementById('lpn_print_area');
+			const table = area && area.querySelector('table');
+			if (!table) { return { error: 'no #lpn_print_area table' }; }
+			const heads = [...table.querySelectorAll('thead th')];
+			const lonIdx = heads.findIndex((h) => h.classList.contains('lpn-pane-col-custom_longitude'));
+			const dateIdx = heads.findIndex((h) => h.classList.contains('lpn-pane-col-custom_installed'));
+			if (lonIdx < 0 || dateIdx < 0) { return { error: 'columns not found' }; }
+			const row = table.querySelector('tbody tr');
+			const lonTd = row.children[lonIdx], dateTd = row.children[dateIdx];
+			// Deliberately unbreakable and roughly twice as wide as the column was ever sized for.
+			lonTd.textContent = '-122.41941591796987654321000999888777';
+			const r = document.createRange();
+			r.selectNodeContents(lonTd);
+			const glyphRects = [...r.getClientRects()];
+			const glyphRight = Math.max(...glyphRects.map((g) => g.right));
+			const dateRect = dateTd.getBoundingClientRect();
+			return {
+				lines: new Set(glyphRects.filter((g) => g.width > 0.5).map((g) => Math.round(g.top))).size,
+				overlapsNextColumn: glyphRight > dateRect.left,
+				overlapAmountPx: +(glyphRight - dateRect.left).toFixed(1)
+			};
+		});
+		await a.page.emulateMedia({ media: 'screen' });
+		if (overlap.error) {
+			ok('Letter: the overlong-value probe found its columns', false, overlap.error);
+		} else {
+			ok('Letter: an overlong value wraps rather than printing on one line', overlap.lines > 1, 'lines=' + overlap.lines);
+			ok('Letter: an overlong value does not paint into the next column', !overlap.overlapsNextColumn,
+				overlap.overlapAmountPx + 'px');
 		}
 
 		// **R-367, the same "print" button, a different disagreement**: a CHOICE column (the Tanks
