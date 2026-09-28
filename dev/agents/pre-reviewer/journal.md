@@ -2884,3 +2884,43 @@ column reads `hasSourceQuality()`, so this is contained to the one control R-350
 
 No further findings this round -- both R-349 and R-350 are what Tom asked for, measured rather than
 argued, in the harness, in Net3's byte-identical export, and in a real running Chrome.
+## 2026-09-27 — feat/table-width (head 615c514a)
+
+OBSERVED (real Chrome, headless, via dev/lpn-spike/browser-drive.js against a throwaway
+`php -S` on the worktree, `flock /tmp/engcalcs-browser.lock` around every run): the initial
+column-width rule (a)/(b) itself works as specified. Injected a long Description ("A very
+long pipe description...", ~95 chars) into Net3 pipe 20 and two new vertices into pipe 40,
+reloaded fresh (so `paneColInitialEm`'s cache saw the content at first render): Description
+column opened to 597.9px / clientWidth==scrollWidth (no clipping); an empty Description
+column elsewhere opened only to 48.4px, matching the heading-word-split floor for
+"Description" (11 chars, split). Net3 (92 junctions, 117 pipes, etc.) and
+Net3-Novato-CA-World.lwn both show ZERO overflowing cells (scrollWidth>clientWidth) across
+every populated table — no one-character-wide columns, the R-027 failure mode did not
+recur here. ID column centered on screen AND in the real print path (clicked
+`lpn_pane_print`, built `#lpn_print_area`, emulated print media): `text-align: center` on
+both th and td of `.lpn-pane-col-id`. Vertices cell reads `26.24/9.825|28.24/10.825` — no
+spaces, matches the build agent's claim and Tom's own suggested shape. Old flat
+`10/20/30/40` typed into a Vertices cell parses, and after a table refresh redisplays as
+`10/20|30/40` — backward compatibility CONFIRMED, not just claimed. No new localStorage
+key introduced (`git diff` shows only the pre-existing `LPN_PANECOLS_KEY` write).
+
+OBSERVED, SEVERITY HIGH: the CSS change from `.lpn-pane-tight` (dragged columns only) to
+plain `.lpn-pane-table thead th` (every column, always) makes ordinary undragged headings
+break mid-word by default, visibly ugly, in English and worse in German. Screenshotted
+both (see report). "Diameter (in)" renders as "Dia" / "mete" / "r (in)" on three lines;
+"Roughness, C" as "Roug" / "hness" / ", C"; German's "Löschwasserbedarf" (fire flow) breaks
+as "Löschwa" / "sserbedarf". The JS's own word-split-in-half heuristic (used only to
+compute the WIDTH floor) does not correspond to where the browser's `overflow-wrap:
+anywhere` actually breaks the rendered text, so even the "clean 50/50 split" the rule
+describes is not what appears on screen — this is a scope leak from "the ID column" (what
+Tom asked to try) to "every heading in every table, in every language", which nobody asked
+for and which is a visible regression from master's behavior (word-break was gated on
+`.lpn-pane-tight` there — confirmed by reading git history at `1701e62b` on master).
+
+Method note for a future review: `browser-pane-switch-probe.js`'s pattern (localStorage
+seed of `lpn_project_<key>`, `lpn_pane` for tab), then `.lpn-tab-name` click to select the
+adopted project tab, is the reusable recipe for driving Looped-Network.php from a probe
+script without a stub. Print path is a DIFFERENT DOM (`#lpn_print_area`, built by
+`printPaneTable()`) from the live pane — a screenshot or measurement of `#lpn_pane_pipes`
+under `Emulation.setEmulatedMedia({media:'print'})` measures nothing; you must click
+`lpn_pane_print` first to build the printable copy.

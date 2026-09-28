@@ -389,8 +389,10 @@ the block.
   §6 and `public_claim_check.php` govern it, and expect the completeness question first.
   **Plan: `dev/epanet-plus-plus-plan.md`** -- what each domain serves, the hero copy as a proposal,
   build steps, and questions only Tom can answer.
-  - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
-  - **Tasks 715 and 716 (Full and Status Report) come first** (Tom, 2026-09-25).
+  - **Ruled 2026-09-27 (R-361):** *"A for development. Release as B1 for A/B testing."* Option A,
+    a mirrored rebrand of LibreWaterNet's site, is built in `~/webdev/epanet-plus-plus.org` (local
+    repo, no remote yet); B1, the app itself at epanet-plus-plus.org/app/ with its own canonical, is
+    `feat/epanet-plus-plus`, held for release. Host steps: the plan, section 6.
 
 - 99|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
