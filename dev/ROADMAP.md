@@ -1670,8 +1670,12 @@ the block.
 - 75|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
-  keys"*, e.g. a Sally (symbology annotation label). A glossary.json term per element, cited by
-  every key that names it; translators map the coined name once per language.
+  keys"*, e.g. a Sally (symbology annotation label). Later the same day: *"a keywords table where
+  we are less concerned about what key you assign to each row as that they be unique and canonical"*
+  (dynamic asset annotation = Label, asset management key = Tag, asset notes = Description, user map
+  annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
+  Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
+  it with the existing `gloss:` tag.
 - 75|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
