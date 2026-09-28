@@ -29,6 +29,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var GAP = 1.5;          // clearance between a node symbol and text touching it
 	var PIPE_GAP = 3;       // clearance between a pipe and a label beside it
 	var CELL = 48;          // spatial grid cell, px
+	var PADX = 8, PADY = 3; // clearance between two different labels, so each reads as its own
 
 	// Worth, in one currency. A shown row is 10; the label itself (its ID) is 40, so every property
 	// row goes before any label does (G, R1). Costs follow Tom's order, worst first.
@@ -39,7 +40,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
 	var C_ALT_LAYOUT = 0.8;         // the label's other shape (line for a node, stack for a pipe)
-	var B_STICK = 3;                // staying where it was last view (no churn for nothing)
+	var B_STICK = 6;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
 
 	var DIRS = 8;
@@ -396,7 +397,8 @@ EngCalcs.lpnPlacerD = (function () {
 			// Hard: inside the view, clear of every symbol and Text object (N1, N5).
 			for (i = 0; i < nb; i++) {
 				b = boxes[i];
-				var hit = b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1;
+				// A repeat may lie off screen (it is still kept clear of everything).
+				var hit = !b.rep && (b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1);
 				if (!hit) {
 					if (!b.rot && !hand) { hit = rasterHit(b); } else {
 						q = hardG.query(b.x0, b.y0, b.x1, b.y1, qa);
@@ -531,16 +533,13 @@ EngCalcs.lpnPlacerD = (function () {
 			return cost;
 		}
 
-		// Pairwise: NaN when the two cannot both stand (N1), else the crossing cost between them.
-		function blocks(a, b) {
-			CNT.pair++;
-			if (a.bx1 - b.bx0 <= TOL || b.bx1 - a.bx0 <= TOL || a.by1 - b.by0 <= TOL || b.by1 - a.by0 <= TOL) { return false; }
-			for (var i = 0; i < a.boxes.length; i++) {
-				for (var j = 0; j < b.boxes.length; j++) { if (boxesOverlap(a.boxes[i], b.boxes[j], TOL)) { return true; } }
+		// Two different labels keep a clearance, so each reads as its own.
+		function padOverlap(a, b) {
+			if (!a.rot && !b.rot) {
+				return !(b.x1 - a.x0 <= -PADX || a.x1 - b.x0 <= -PADX || b.y1 - a.y0 <= -PADY || a.y1 - b.y0 <= -PADY);
 			}
-			return false;
+			return boxesOverlap(a, b, -PADY);
 		}
-		function pairCost(a, b) { return blocks(a, b) ? NaN : pairSoft(a, b); }
 		function pairSoft(a, b) {
 			var cost = 0;
 			if (a.x1 <= b.x0 || b.x1 <= a.x0 || a.y1 <= b.y0 || b.y1 <= a.y0) { return 0; }
@@ -626,12 +625,12 @@ EngCalcs.lpnPlacerD = (function () {
 			if (!c.boxes && !c.angle && !c.reps) {
 				// Unturned rows as plain rectangles: no ink is built for a candidate that is blocked.
 				var req = reqs[c.li], rows = c.lv.rows, line = c.layout === 'line';
-				q = dynB.query(c.x, c.y, c.x + c.w, c.y + c.h, qd);
+				q = dynB.query(c.x - PADX, c.y - PADY, c.x + c.w + PADX, c.y + c.h + PADY, qd);
 				for (n = 0; n < q.length; n++) {
 					it = q[n];
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
 					b = it.b;
-					if (b.x1 - c.x <= TOL || c.x + c.w - b.x0 <= TOL || b.y1 - c.y <= TOL || c.y + c.h - b.y0 <= TOL) { continue; }
+					if (b.x1 - c.x <= -PADX || c.x + c.w - b.x0 <= -PADX || b.y1 - c.y <= -PADY || c.y + c.h - b.y0 <= -PADY) { continue; }
 					var h1 = false;
 					for (i = 0, top = c.y; i < (line ? 1 : rows.length); i++) {
 						var rw = line ? c.w : req.rows[rows[i]].w, rh = line ? c.h : req.rows[rows[i]].h;
@@ -639,8 +638,8 @@ EngCalcs.lpnPlacerD = (function () {
 						var top0 = top;
 						top += rh;
 						CNT.pair++;
-						if (b.x1 - left <= TOL || left + rw - b.x0 <= TOL || b.y1 - top0 <= TOL || top - b.y0 <= TOL) { continue; }
-						if (b.rot && !boxesOverlap(mkBox(left + rw / 2, top0 + rh / 2, rw, rh, 0), b, TOL)) { continue; }
+						if (b.x1 - left <= -PADX || left + rw - b.x0 <= -PADX || b.y1 - top0 <= -PADY || top - b.y0 <= -PADY) { continue; }
+						if (b.rot && !boxesOverlap(mkBox(left + rw / 2, top0 + rh / 2, rw, rh, 0), b, -PADY)) { continue; }
 						c.bl = it.c; hit = h1 = true;
 						break;
 					}
@@ -651,14 +650,14 @@ EngCalcs.lpnPlacerD = (function () {
 				build(c);
 			} else {
 				if (!c.boxes) { build(c); }
-				q = dynB.query(c.bx0, c.by0, c.bx1, c.by1, qd);
+				q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd);
 				for (n = 0; n < q.length; n++) {
 					it = q[n];
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
 					b = it.b;
 					for (i = 0; i < c.boxes.length; i++) {
 						CNT.pair++;
-						if (boxesOverlap(c.boxes[i], b, TOL)) {
+						if (padOverlap(c.boxes[i], b)) {
 							c.bl = it.c; hit = true;
 							if (!blockers) { return NaN; }
 							blockers.push(it.li);
@@ -697,7 +696,8 @@ EngCalcs.lpnPlacerD = (function () {
 						if (nDyn > MAX_EVALS && best) { break; }
 						if (c.fx !== undefined && c.base - c.fx <= bs) { continue; }
 						var d = dynCostN(c, nb, null);
-						if (d === d && keyOf(c) - d > bs) { bs = c.base - c.fx - d; best = c; }
+						if (d !== d) { if (!L.hand) { continue; } d = HARD_HAND; }
+						if (keyOf(c) - d > bs) { bs = c.base - c.fx - d; best = c; }
 					}
 				}
 			}
@@ -786,14 +786,33 @@ EngCalcs.lpnPlacerD = (function () {
 			});
 		}
 
+		// The stretch of a pipe that is on screen, as arc lengths [a, b], or null.
+		function visibleSpan(pts, cum) {
+			var L = cum[cum.length - 1], a = Infinity, b = -Infinity, n = 64;
+			for (var i = 0; i <= n; i++) {
+				var P = pointAt(pts, cum, L * i / n);
+				if (P.x >= vp.x && P.x <= vp.x + vp.w && P.y >= vp.y && P.y <= vp.y + vp.h) { a = Math.min(a, L * i / n); b = Math.max(b, L * i / n); }
+			}
+			return a <= b ? [a, b] : null;
+		}
 		function genPipe(li, req, lv, list, tier) {
 			var link = linksById[req.owner], pts = link.points, cum = cumLengths(pts), Ltot = cum[cum.length - 1];
-			var long = spacing > 0 && Ltot > spacing, fr = [0.5], reps = null, k;
+			var long = spacing > 0 && Ltot > spacing, k, j;
+			// Home is the pipe's middle, or the middle of what is on screen when that is not.
+			var vis = visibleSpan(pts, cum), mid = Ltot / 2;
+			if (vis && (mid < vis[0] || mid > vis[1])) { mid = (vis[0] + vis[1]) / 2; }
+			// R9: a long pipe carries its label every `step` along it (step <= the repeat spacing),
+			// in one of two phases: centred on the pipe, or with a copy at the middle of the view.
+			var phases = [];
 			if (long) {
-				var n = Math.ceil(Ltot / spacing);
-				reps = [];
-				for (k = 0; k < n; k++) { reps.push((k + 0.5) / n); }
-				fr = reps.slice().sort(function (a, b) { return Math.abs(a - 0.5) - Math.abs(b - 0.5); });
+				var n = Math.ceil(Ltot / spacing), step = Ltot / n, ph = [];
+				for (k = 0; k < n; k++) { ph.push((k + 0.5) * step); }
+				phases.push(ph);
+				if (vis) {
+					var vm = (vis[0] + vis[1]) / 2, ph2 = [];
+					for (j = -n; j <= n; j++) { var at = vm + j * step; if (at >= 0.1 * step && at <= Ltot - 0.1 * step) { ph2.push(at); } }
+					if (ph2.length > 1) { phases.push(ph2); }
+				}
 			}
 			var layouts = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
 			if (req.layout === 'stack') { layouts.reverse(); }
@@ -801,7 +820,7 @@ EngCalcs.lpnPlacerD = (function () {
 				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0;
 				if (tier) {
 					// Out on a leader from the pipe's middle, when there is no room beside it.
-					var P = pointAt(pts, cum, Ltot / 2), nx = -P.uy, ny = P.ux, dirs = [];
+					var P = pointAt(pts, cum, mid), nx = -P.uy, ny = P.ux, dirs = [];
 					[-1, 1].forEach(function (s) {
 						[0, 40, -40].forEach(function (deg) {
 							var r = deg * Math.PI / 180, c = Math.cos(r), sn = Math.sin(r);
@@ -811,18 +830,15 @@ EngCalcs.lpnPlacerD = (function () {
 					genLeadered(li, { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 }, lv, layout, d, alt + 0.3, list, dirs);
 					return;
 				}
-				var ff = long ? fr : (Ltot > 2.2 * d.w ? [0.5, 0.33, 0.67, 0.2, 0.8] : (Ltot > 1.2 * d.w ? [0.5, 0.35, 0.65] : fr));
-				ff.forEach(function (f) {
-					var fpref = alt + 3 * Math.abs(f - 0.5);
+				function beside(at, pref, reps) {
 					for (var side = -1; side <= 1; side += 2) {
 						['along', 'level'].forEach(function (kind) {
-							var c = besidePipe(li, lv, layout, d, pts, cum, f * Ltot, side, kind, fpref, !long);
+							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref, !reps);
 							if (!c) { return; }
-							if (long) {
+							if (reps) {
 								var rr = [];
 								reps.forEach(function (g) {
-									if (g === f) { return; }
-									var r = besidePipe(li, lv, layout, d, pts, cum, g * Ltot, side, kind, 0);
+									var r = besidePipe(li, lv, layout, d, pts, cum, g, side, kind, 0);
 									if (r) { rr.push({ x: r.x, y: r.y, angle: r.angle }); }
 								});
 								c.reps = rr.length ? rr : null;
@@ -830,6 +846,21 @@ EngCalcs.lpnPlacerD = (function () {
 							list.push(c);
 						});
 					}
+				}
+				if (long) {
+					phases.forEach(function (ph) {
+						ph.forEach(function (at, i) {
+							var P = pointAt(pts, cum, at);
+							if (P.x < vp.x || P.x > vp.x + vp.w || P.y < vp.y || P.y > vp.y + vp.h) { return; }
+							beside(at, alt + 3 * Math.abs(at - mid) / Ltot, ph.filter(function (g, m) { return m !== i; }));
+						});
+					});
+					return;
+				}
+				var ff = Ltot > 2.2 * d.w ? [0, -0.17, 0.17, -0.3, 0.3] : (Ltot > 1.2 * d.w ? [0, -0.15, 0.15] : [0]);
+				ff.forEach(function (f) {
+					var at = mid + f * Ltot;
+					if (at >= 0 && at <= Ltot) { beside(at, alt + 3 * Math.abs(f), null); }
 				});
 			});
 		}
