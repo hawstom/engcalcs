@@ -485,3 +485,37 @@ today, it reuses `paneWriteCellText`/`setProp()`/`saveUndoSnapshot()` exactly as
 does (no new write path, no new scenario interaction, no new unit-handling rule), and it is the one
 candidate of the six the orchestrator named that is not already shipped or already poorly suited to
 this page.
+
+## New wishlist row — 2026-09-28, Task 738: Tables-pane filter should stay union'd with edited rows, not toggle standing/snapshot
+
+**Source:** Tom's Task 738 question and my journal entry the same date (full reasoning and OBSERVED/
+CITED citations there — `js/looped-network.js:22540-22554` for today's deliberate standing design,
+`:24921-24957` and `:47143-47170` for the two gesture traces, Excel AutoFilter's documented
+Reapply-only-on-demand behavior and QGIS's "Show Edited and New Features" filter mode as external
+precedent).
+
+**The ask:** when a Tables-pane row is edited such that it would now fail the standing filter it is
+shown under, keep it visible (union of "still matches" and "edited since the filter was last
+applied") instead of removing it immediately on commit. Reuse the existing "Filter in table" button
+as the deliberate reapply action (collapses the view to current matches only) and the existing "Show
+all" button as the full escape — no new toggle control.
+
+**Why I rank this over Tom's own proposed toggle:** a toggle asks the clerk to make (and remember)
+a per-filter decision before they know they need it — the first surprise still happens once, then
+the toggle is "discovered," same shape as every other opt-in safety net this seat has flagged
+before. The union rule removes the surprise unconditionally, costs no extra gesture in either of the
+two real workflows (bulk Ctrl+Enter fill, or row-by-row typing down a filtered column), and needs no
+new UI element — it reuses the two filter buttons already on screen for what they would otherwise be
+redundant with a toggle for.
+
+**Size:** small-to-medium. Needs a per-table "touched since filter" id set (precedented shape:
+`spec` already carries per-table view state, e.g. `spec.sel`) and a one-line OR into
+`paneTableElements()` (`js/looped-network.js:22590-22593`). I have not written or tested this; I am
+not the seat that sizes implementation, only the one naming the gesture cost that decides which shape
+to build.
+
+**Rank:** below Task 186's widening (row 1) and the market-researcher's import row — this is a
+smaller, single-behavior fix, not a structural gap in how volume entry reaches the page at all — but
+above small conveniences like the digit-key toolbar reorder, because it touches a feature (filtering)
+that is now a direct precondition of the highest-leverage batch action on the page (Ctrl+Enter fill),
+which just shipped.
