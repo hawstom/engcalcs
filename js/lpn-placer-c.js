@@ -59,8 +59,9 @@ EngCalcs.lpnPlacerC = (function () {
 	var RES = 3;               // the free-space raster's cell, px
 	var SHOW_MAX = 4.4;          // dearer than this, a label is better hidden
 	// How hard a pan or zoom may look: a label looks this far down its list before giving up,
-	// growing looks only this far (convenient space), and MEND judges at most this many spots.
-	var QUICK = { show: 120, grow: 30, mend: 1500, deadline: 0 };
+	// growing looks only this far (convenient space), and MEND and NUDGE judge at most this many
+	// spots each.
+	var QUICK = { show: 120, grow: 30, mend: 1500, nudge: 600, deadline: 0 };
 	var NAME = 'C (keep, show, grow, mend)';
 
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
@@ -450,7 +451,7 @@ EngCalcs.lpnPlacerC = (function () {
 			out = layout(last.scene, { scene: last.scene, layout: last.layout, again: true }, deep(deadline));
 			if (out) { ready = { fp: last.fp, layout: out }; }
 		}
-		function deep(deadline) { return { show: 400, grow: 90, mend: 8000, deadline: deadline }; }
+		function deep(deadline) { return { show: 400, grow: 90, mend: 8000, nudge: 8000, deadline: deadline }; }
 
 		// A cheap signature of everything a layout depends on: the view, the lettering, the
 		// labels and their rows, where every node is, and which layout the last view had (R13).
@@ -502,7 +503,12 @@ EngCalcs.lpnPlacerC = (function () {
 			// 3. GROW, in rounds.
 			grow(st, order);
 			// 4. MEND: a hidden label may evict one neighbour who can move.
-			if (mend(st, order)) { grow(st, order); }
+			var touched = [];
+			mend(st, order, touched);
+			// 4b. NUDGE (R2): a label that cannot grow may move one neighbour, rows and all, to
+			// other convenient space, if that gives it room for its next property.
+			nudge(st, order, touched);
+			grow(st, touched);
 			// 5. Repeats along long pipes (R9), in whatever room is left.
 			for (i = 0; i < labels.length; i++) { if (labels[i].cur && labels[i].owner.t === 'link') { repeats(st, labels[i]); } }
 
@@ -1074,7 +1080,7 @@ EngCalcs.lpnPlacerC = (function () {
 
 		// MEND: a hidden label looks for a spot blocked by exactly one movable label; if that one
 		// can go somewhere else (with fewer rows if it must), both are shown.
-		function mend(st, order) {
+		function mend(st, order, touched) {
 			var any = false, limit = st.work + st.effort.mend, c = st.probe;
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
@@ -1097,10 +1103,43 @@ EngCalcs.lpnPlacerC = (function () {
 					commit(st, L, mine);
 					var moved = bestFor(st, bl, old.rs, SHOW_MAX, 50);
 					if (!moved && old.rs < bl.rowsets.length - 1) { moved = bestFor(st, bl, bl.rowsets.length - 1, SHOW_MAX, 50); }
-					if (moved) { commit(st, bl, moved); bl.stuck = false; any = true; break; }
+					if (moved) { commit(st, bl, moved); touched.push(L, bl); any = true; break; }
 					uncommit(st, L);
 					commit(st, bl, old);
 				}
+			}
+			return any;
+		}
+		function nudge(st, order, touched) {
+			var any = false, limit = st.work + st.effort.nudge, c = st.probe;
+			for (var i = 0; i < order.length && st.work < limit; i++) {
+				var L = order[i], c0 = L.cur;
+				if (!c0 || c0.rs === 0) { continue; }
+				var rsI = c0.rs - 1, tried = {};
+				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
+				uncommit(st, L);
+				var done = false;
+				for (var k = 0; k < L.specs.length && k < 24 && st.work < limit && !done; k++) {
+					if (sc[k] === Infinity || !fillSpec(st, L, L.specs[k], rsI, c)) { continue; }
+					if (sc[k] !== sc[k]) { sc[k] = staticCost(st, L, c); }
+					if (sc[k] >= c0.cost + ROW_GAIN || sc[k] >= SHOW_MAX) { continue; }
+					c.stat = sc[k];
+					var bl = blocker(st, L, c);
+					if (!bl || tried[bl.id] || !bl.cur) { continue; }
+					tried[bl.id] = 1;
+					var mine = keep(c), old = bl.cur;
+					uncommit(st, bl);
+					var cost = dynCost(st, L, mine, mine.stat, Math.min(c0.cost + ROW_GAIN, SHOW_MAX));
+					if (cost === Infinity) { commit(st, bl, old); continue; }
+					mine.cost = cost;
+					commit(st, L, mine);
+					// The neighbour keeps every row it had, in space no dearer than a row is worth.
+					var moved = bestFor(st, bl, old.rs, Math.min((old.cost || 0) + ROW_GAIN / 2, SHOW_MAX), 40);
+					if (moved) { commit(st, bl, moved); touched.push(L); any = true; done = true; break; }
+					uncommit(st, L);
+					commit(st, bl, old);
+				}
+				if (!done) { commit(st, L, c0); }
 			}
 			return any;
 		}
