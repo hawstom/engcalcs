@@ -9,7 +9,7 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/ctrl-enter`,
-  `feat/table-width`, `feat/epanet-plus-plus` (held for RELEASE), `feat/label-placer` (the seam; merges
+  `feat/table-width`, `feat/label-placer` (the seam; merges
   with the chosen placer), and `feat/label-gang-search` (bench only now; delete once a placer lands).
   Builder branches `feat/label-placer-a` and `-b` never merge on their own.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
@@ -98,11 +98,11 @@ lines rather than appending corrections.
 
 ## STATE — 2026-09-28
 
-### Production: last known 83bf02d5 (pulled 2026-09-26). Master e2b5cab1 is ahead
+### Production = master 9c71d54f (Tom pulled 2026-09-28)
 
-Unpulled on master, each on his word or green tooling: the label rules, the label bench, the
-Select-mode hover highlight (his "Merge and delete"), the water tower icons ("We are gold"), Task 696
-closed, `dev/earliest-date.md`. Ask whether he has pulled before explaining what he sees. **R-348:
+Live now: the label rules and bench, the Select-mode hover highlight, the water tower icons,
+EPANET++ B1, Task 696 closed, `dev/earliest-date.md`. This handoff commit itself is NOT pushed: it
+was committed after the last suite run; push it with the next green master. **R-348:
 remind him to test symbology on dev once he pulls.**
 
 ### Label placement rebuild (Task 539) -- the live thread
@@ -131,13 +131,9 @@ remind him to test symbology on dev once he pulls.**
 
 - **8124 `feat/table-width`** 5ce78416 and **8123 `feat/ctrl-enter`** d6558eb4 -- unchanged since
   09-27; ctrl-enter needs only his merge word (Mary and Ida endorse).
-- **`feat/epanet-plus-plus`** 111b6243 -- he looked on 8127 ("lpn: Good"). Held until he says
-  "release". Then, in order: merge master in, suite, merge, push; he pulls engcalcs; he sets
-  ea-php83, makes the `engcalcs` symlink, adds the host to the Mapbox token; we push the landing
-  repo's release commit (swap the temporary `/app` 302 in its .htaccess for the rewrite, carry
-  cPanel's ea-php83 handler block in the tracked .htaccess as LWN does, point APP_URL in
-  tools/build.py at epanet-plus-plus.org/app/, sitemap via `generate_sitemap.php --host=`); he
-  pulls; we verify with the curls in the plan, section 6.
+- **EPANET++ B1 RELEASED 2026-09-28** on his "Release": master 196857a8, landing 5aa7d0e, both pulled
+  and verified live (app at epanet-plus-plus.org/app/ with its own canonical, satellite 200). Branch
+  deleted, port 8127 retired. Expect little A/B signal: about 3 app visitors a day across both doors.
 - **R-253** wording ruling (`lpn_convas_no_transform`), the one loose end of closed Task 696.
 
 ### EPANET++ is live (Option A), 2026-09-28
