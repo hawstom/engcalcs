@@ -14,6 +14,10 @@ for (let k = 0; k < 16; k++) { DIRS.push(k * Math.PI / 8); }
 const RINGS = [0.8, 1.6, 2.6, 4.0];   // leader lengths tried, in row heights
 const SIDES = [[1, 0], [-1, 0.15], [0, 1.5]];   // a pipe label above, below, or on its pipe: [side, cost]
 let tol = TOL;
+const DIRS8 = [];
+for (let k = 0; k < 8; k++) { DIRS8.push(k * Math.PI / 4); }
+const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used when it wins
+const LINK_OFF_PIPE = 0.8; // a pipe label that leaves its pipe for the horizontal
 const CS = 24;            // grid cell size, px
 const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
@@ -488,14 +492,22 @@ function run(scene, prev, gaps) {
 		if (f.cc[k]) { return f.cc[k]; }
 		const rows = f.subsets[k], rowPen = W.row * (f.R - rows.length), raw = [];
 		if (f.kind === 'link' && f.req.layout === 'line') { linkCandidates(f, rows, rowPen, raw); } else { pointCandidates(f, rows, rowPen, raw); }
+		for (let i = 0; i < raw.length; i++) { raw[i].k = k; }
 		raw.sort(function (a, b) { return a.base - b.base; });
 		f.cc[k] = raw;
 		return raw;
 	}
 	function pointCandidates(f, rows, rowPen, out) {
-		const req = f.req;
-		const sh = shape(f, rows, req.layout === 'line' ? 'line' : 'stack');
-		const s = f.sym, g = GAP, cx = f.pt[0], cy = f.pt[1];
+		const usual = f.req.layout === 'line' ? 'line' : 'stack';
+		around(f, shape(f, rows, usual), f.sym, rowPen, out, true);
+		// H1: the other shape too (a stack unwrapped to one line, or the reverse), a little dearer.
+		if (rows.length > 1) { around(f, shape(f, rows, usual === 'line' ? 'stack' : 'line'), f.sym, rowPen + ALT_SHAPE, out, false); }
+		return out;
+	}
+	// A label beside a point symbol, then out on leaders into open ground: the widest pipe gaps
+	// first, then the compass.
+	function around(f, sh, s, extra, out, full) {
+		const g = GAP, cx = f.pt[0], cy = f.pt[1];
 		const sx0 = s.x - g, sx1 = s.x + s.w + g, sy0 = s.y - g, sy1 = s.y + s.h + g;
 		const w = sh.w, H = sh.h;
 		const adj = [
@@ -511,24 +523,23 @@ function run(scene, prev, gaps) {
 			[sx0 - w, cy - H / 2, 'right', 0.45]
 		];
 		for (let i = 0; i < adj.length; i++) {
-			out.push({ x: adj[i][0], y: adj[i][1], align: adj[i][2], angle: 0, sh: sh, leader: null, base: rowPen + adj[i][3] });
+			out.push({ x: adj[i][0], y: adj[i][1], align: adj[i][2], angle: 0, sh: sh, leader: null, base: extra + adj[i][3] });
 		}
-		// Leaders out into open ground: the widest pipe gaps first, then the compass.
-		const rs = Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2;
+		const rs = Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 2;
 		const dirs = [];
 		const gl = f.node ? gaps[f.node.id] : null;
 		if (gl) { for (let i = 0; i < gl.length && i < 4; i++) { if (gl[i].width > 0.5) { dirs.push(gl[i].mid); } } }
-		for (let i = 0; i < DIRS.length; i++) { dirs.push(DIRS[i]); }
+		const D = full ? DIRS : DIRS8;
+		for (let i = 0; i < D.length; i++) { dirs.push(D[i]); }
 		for (let d = 0; d < dirs.length; d++) {
 			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
 			for (let r = 0; r < RINGS.length; r++) {
 				const dist = rOut + RINGS[r] * RH;
 				const px = cx + ux * dist, py = cy + uy * dist;
 				const L = [[cx + ux * rs, cy + uy * rs], [px, py]];
-				out.push(hang(sh, px, py, side, rowPen + distCost((dist - rs) / RH), L));
+				out.push(hang(sh, px, py, side, extra + distCost((dist - rs) / RH), L));
 			}
 		}
-		return out;
 	}
 	function linkCandidates(f, rows, rowPen, out) {
 		const sh = shape(f, rows, 'line');
@@ -558,23 +569,10 @@ function run(scene, prev, gaps) {
 				out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: ang, sh: sh, leader: null, base: rowPen + SIDES[sd][1] + pk });
 			}
 		}
-		// Horizontal, beside the anchor.
-		const hx0 = ax - 2, hy0 = ay - 2, hx1 = ax + 2, hy1 = ay + 2;
-		out.push({ x: hx1, y: hy0 - sh.h, align: 'left', angle: 0, sh: sh, leader: null, base: rowPen + 0.8 });
-		out.push({ x: hx0 - sh.w, y: hy0 - sh.h, align: 'left', angle: 0, sh: sh, leader: null, base: rowPen + 0.9 });
-		out.push({ x: hx1, y: hy1, align: 'left', angle: 0, sh: sh, leader: null, base: rowPen + 0.9 });
-		out.push({ x: hx0 - sh.w, y: hy1, align: 'left', angle: 0, sh: sh, leader: null, base: rowPen + 1.0 });
-		// Leaders from the anchor, out to either side and round the compass.
-		const dirs = [Math.atan2(ny, nx), Math.atan2(-ny, -nx)];
-		for (let i = 0; i < 8; i++) { dirs.push(i * Math.PI / 4); }
-		for (let d = 0; d < dirs.length; d++) {
-			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
-			for (let k = 0; k < RINGS.length; k++) {
-				const dist = 2 + RINGS[k] * RH;
-				const px = ax + ux * dist, py = ay + uy * dist;
-				out.push(hang(sh, px, py, side, rowPen + distCost(dist / RH) + 0.3, [[ax, ay], [px, py]]));
-			}
-		}
+		// Horizontal, beside the anchor or out on a leader from it; as one line or as a stack.
+		const pt = { x: ax, y: ay, w: 0, h: 0 };
+		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, false);
+		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, false); }
 		return out;
 	}
 
@@ -690,17 +688,25 @@ function run(scene, prev, gaps) {
 		return d;
 	}
 	// Growth for a held label: more rows on the same anchored edge and the same top (T1, S2).
-	function growHeld(f) {
+	function growHeld(f, any) {
 		const p = placed[f.li];
 		if (!p) { return; }
-		const c0 = p.cand;
-		if (c0.align === 'center' || c0.angle) { return; }
+		const c0 = p.cand, n0 = c0.sh.rows.length;
+		if (c0.align === 'center') { return; }
 		for (let k = 0; k < f.subsets.length; k++) {
 			const rows = f.subsets[k];
-			if (rows.length <= c0.sh.rows.length) { break; }
+			if (rows.length <= n0) { break; }
+			if (!any && rows.length > n0 + 1) { continue; }
 			if (!containsAll(rows, c0.sh.rows)) { continue; }
 			const sh = shape(f, rows, c0.sh.layout);
-			const c = { x: c0.align === 'right' ? c0.x + c0.sh.w - sh.w : c0.x, y: c0.y, align: c0.align, angle: 0, sh: sh,
+			let x = c0.align === 'right' ? c0.x + c0.sh.w - sh.w : c0.x, y = c0.y;
+			if (c0.angle) {
+				// A turned label keeps where its text starts, and grows along its pipe.
+				const r = c0.angle * Math.PI / 180, dw = (sh.w - c0.sh.w) / 2;
+				const cx = c0.x + c0.sh.w / 2 + dw * Math.cos(r), cy = c0.y + c0.sh.h / 2 + dw * Math.sin(r);
+				x = cx - sh.w / 2; y = cy - sh.h / 2;
+			}
+			const c = { x: x, y: y, align: c0.align, angle: c0.angle, sh: sh,
 				leader: c0.leader, base: W.row * (f.R - rows.length) + (c0.lead || 0), lead: c0.lead };
 			if (c.leader && !leaderTouches(c)) { continue; }
 			const cur = placed[f.li];
@@ -728,15 +734,20 @@ function run(scene, prev, gaps) {
 		const r = search(f, hideCost(f), min, min);
 		if (r) { commit(f, r.cand, r.cost); }
 	});
-	// Pass B: each label in turn looks for a better place with more rows, given the others.
-	for (let round = 0; round < 2; round++) {
+	// Pass B: rounds in which each label may take back one row (a better place for it, given
+	// the others), so the room is shared out fairly; then one round with no limit.
+	let maxSets = 1;
+	info.forEach(function (f) { if (f.subsets.length > maxSets) { maxSets = f.subsets.length; } });
+	for (let round = 0; round < maxSets; round++) {
+		const last = round === maxSets - 1;
 		info.forEach(function (f) {
 			if (kept[f.li] === 'hand') { return; }
-			if (kept[f.li] === 'held') { growHeld(f); return; }
-			const p = uncommit(f);
-			let cur = hideCost(f), curCand = null;
-			if (p) { cur = evalDyn(f, p.cand, p.cand.st, Infinity); curCand = p.cand; }
-			const r = search(f, cur, 0, f.subsets.length - 1);
+			if (kept[f.li] === 'held') { growHeld(f, last); return; }
+			const n = f.subsets.length, p = uncommit(f);
+			let cur = hideCost(f), curCand = null, curK = n;
+			if (p) { cur = evalDyn(f, p.cand, p.cand.st, Infinity); curCand = p.cand; curK = p.cand.k; }
+			const k0 = last ? 0 : Math.max(0, curK - 1), k1 = last ? n - 1 : Math.min(curK, n - 1);
+			const r = search(f, cur, k0, k1);
 			if (r) { commit(f, r.cand, r.cost); } else if (curCand) { commit(f, curCand, cur); }
 		});
 	}
