@@ -356,6 +356,10 @@ EngCalcs.lpnPlacerD = (function () {
 			return false;
 		}
 		function rasterHit(b) { return rasterRect(b.x0, b.y0, b.x1, b.y1); }
+		// Does anything fixed touch the extent of box b? (False: b is clear of all of it.)
+		function rasterTouched(b) {
+			return satSum(sat, Math.floor((b.x0 - vp.x) / RC), Math.floor((b.y0 - vp.y) / RC), Math.ceil((b.x1 - vp.x) / RC), Math.ceil((b.y1 - vp.y) / RC)) > 0;
+		}
 
 		var reqs = scene.labels, N = reqs.length;
 		var prev = opts && opts.prev, prevReq = {}, prevPl = (prev && prev.layout && prev.layout.labels) || {};
@@ -377,6 +381,7 @@ EngCalcs.lpnPlacerD = (function () {
 			this.x = x; this.y = y; this.w = w; this.h = h; this.angle = angle || 0; this.leader = leader;
 			this.reps = null; this.boxes = null; this.fx = undefined; this.ok = false; this.stick = false;
 			this.bl = null; this.items = null; this.st = 0; this.along = !!angle;
+			this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0;
 			this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
 			var len = 0;
 			if (leader) {
@@ -434,7 +439,7 @@ EngCalcs.lpnPlacerD = (function () {
 				// A repeat may lie off screen (it is still kept clear of everything).
 				var hit = !b.rep && (b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1);
 				if (!hit) {
-					if (!b.rot && !hand) { hit = rasterHit(b); } else {
+					if (!b.rot && !hand) { hit = rasterHit(b); } else if (!hand && !rasterTouched(b)) { hit = false; } else {
 						q = hardG.query(b.x0, b.y0, b.x1, b.y1, qa);
 						for (n = 0; n < q.length; n++) { if (boxesOverlap(b, q[n].b, TOL)) { hit = true; if (hand) { hard++; } else { break; } } }
 						if (hand) { hit = false; }
@@ -490,6 +495,18 @@ EngCalcs.lpnPlacerD = (function () {
 				top += rh;
 			}
 			return true;
+		}
+		// A lazy candidate (a pipe label along its pipe) is tested when first reached. Along a short
+		// pipe the near place meets the end symbols; it then stands half a row off instead.
+		function hardLazy(c) {
+			if (!c.lazy) { return true; }
+			c.lazy = false;
+			if (hardOK(c)) { c.ok = true; return true; }
+			var sh = rowH / 2 - PIPE_GAP;
+			c.x += c.nx * sh; c.y += c.ny * sh; c.base -= 0.3; c.boxes = null; c.fx = undefined;
+			if (hardOK(c)) { c.ok = true; return true; }
+			c.dead = true;
+			return false;
 		}
 		function hardOK(c) {
 			if (c.angle || c.reps) { var f = fixedCost(c, false); if (f === f) { c.fx = f; return true; } return false; }
@@ -622,7 +639,7 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			for (var i = 0; i < raw.length; i++) {
 				var c = raw[i];
-				if (L.hand) { c.fx = fixedCost(c, true); out.push(c); } else if (c.ok || hardOK(c)) { out.push(c); }
+				if (L.hand) { c.fx = fixedCost(c, true); out.push(c); } else if (c.ok || c.lazy || hardOK(c)) { out.push(c); }
 			}
 			out.sort(function (a, b) { return b.base - a.base; });
 			L.lists[key] = out;
@@ -815,6 +832,7 @@ EngCalcs.lpnPlacerD = (function () {
 						if (c.base <= bs) { break; }
 						if (nDyn > MAX_DYN && best) { break; }
 						if (c.fx !== undefined && c.base - c.fx <= bs) { continue; }
+						if (c.dead || (c.lazy && !hardLazy(c))) { continue; }
 						var d = dynCost(c, null);
 						if (d !== d) { if (!L.hand) { continue; } d = HARD_HAND; }
 						if (keyOf(c) - d > bs) { bs = c.base - c.fx - d; best = c; }
@@ -968,16 +986,8 @@ EngCalcs.lpnPlacerD = (function () {
 				function beside(at, pref, reps) {
 					for (var side = -1; side <= 1; side += 2) {
 						kinds.forEach(function (kind) {
-							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + (kind === 'level' ? notAlong : 0), !reps, 0);
+							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + (kind === 'level' ? notAlong : 0), !reps);
 							if (!c) { return; }
-							// Along a short pipe the near place meets the end symbols; stand further off.
-							if (kind === 'along' && !reps && !c.ok) {
-								if (hardOK(c)) { c.ok = true; } else {
-									c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + 0.3, true, rowH / 2);
-									if (!c || !(c.ok || hardOK(c))) { return; }
-									c.ok = true;
-								}
-							}
 							if (reps) {
 								var rr = [];
 								reps.forEach(function (g) {
@@ -1010,17 +1020,18 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		// A pipe label beside its pipe (R7): 'along' lies parallel to it, turned to read inside the
 		// reading window (R14); 'level' stays horizontal and stands just clear of the pipe's line.
-		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref, check, far) {
+		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref, check) {
 			var P = pointAt(pts, cum, s), nx = -P.uy * side, ny = P.ux * side;
 			var ang = readAngle(P.ux, P.uy);
 			var off, cx, cy, align = 'left', c;
 			var sidePref = ny < -0.1 ? 0 : (ny > 0.1 ? 0.15 : (nx > 0 ? 0.05 : 0.1));
 			if (kind === 'along') {
-				off = d.h / 2 + (far || PIPE_GAP);
+				off = d.h / 2 + PIPE_GAP;
 				cx = P.x + nx * off; cy = P.y + ny * off;
-				if (!ang && check && !blockFree(reqs[li], lv.rows, layout, d, 'left', cx - d.w / 2, cy - d.h / 2)) { return null; }
 				c = new Cand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null, pref + sidePref);
-				c.ok = !ang && !!check; c.along = true;
+				c.along = true; c.nx = nx; c.ny = ny;
+				// Tested only when the search reaches it (hardLazy); most never are.
+				c.lazy = !!check;
 				return c;
 			}
 			// Level on a level pipe is the same place as along it.
@@ -1149,6 +1160,7 @@ EngCalcs.lpnPlacerD = (function () {
 					var c = list[m];
 					if (c.base <= here) { break; }
 					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
+					if (c.dead || (c.lazy && !hardLazy(c))) { continue; }
 					if (lifted !== li) { lift(li); }
 					var bl = [], d = dynCost(c, null);
 					if (d === d) {
