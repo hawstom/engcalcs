@@ -1382,7 +1382,7 @@ $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
 $ec_lang['lpn_georef_scale_tip']='Calculated automatically. Edit to change. Type 1 to use a file\'s own numbers unchanged as ground distance, such as one with no coordinate system of its own.';
-$ec_lang['lpn_georef_rotation']='Turn counterclockwise (degrees)';
+$ec_lang['lpn_georef_rotation']='Counterclockwise rotation (degrees)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_georef_rotation_tip']='How far to rotate the whole model counterclockwise to align with the new coordinate system.';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
@@ -3328,7 +3328,7 @@ $ec_lang['lpn_reaction_wall']='Wall reaction coefficient';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall (see EPANET Help) used for every pipe with no entry. A negative number decays the chemical. Blank means no wall reaction.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_pipe_tip']='Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficent set for the whole network under Settings, Calculation, Quality.';
+$ec_lang['lpn_reaction_pipe_tip']='Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='Reaction coefficient';
