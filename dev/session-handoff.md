@@ -109,8 +109,8 @@ remind him to test symbology on dev once he pulls.**
 
 - Rules: `dev/label-placement-rules.md`, REVIEWED by him 2026-09-28 (N2 removed, N5 added, S3/S4/H1/W2
   in his words, builders get cost ORDER only). Page: https://claude.ai/artifact/HBdFNppA44NuwHjeKsi43N
-- Bench: `dev/lpn-spike/label-bench/` on master; judges-only secret tests in `judges/` (R-075 and his
-  two screenshots). Builders must never be told about `judges/`.
+- Bench: `dev/lpn-spike/label-bench/` on master; judges-only secret tests in `dev/lpn-spike/label-bench/judges/` (R-075 and his
+  two screenshots). Builders must never be told about `dev/lpn-spike/label-bench/judges/`.
 - Seam: `feat/label-placer` -- `?placer=<name>` on a DEBUG host hands node and link labels to
   `js/lpn-placer-<name>.js`. Green on master 78b36358.
 - Two clean-room builders finished 2026-09-28: `feat/label-placer-a` (js/lpn-placer-a.js) and
