@@ -44,7 +44,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// row goes before any label does (G, R1). Costs follow Tom's order, worst first.
 	var V_LABEL = 40, V_ROW = 10, V_ROW_ORDER = 0.5;
 	var C_LEADER_LEADER = 90, C_LABEL_LEADER = 80, C_LABEL_PIPE = 9, C_LEADER_PIPE = 2;
-	var C_LABEL_OWN_PIPE = 4;       // R7: beside its pipe, not on it
+	var C_LABEL_OWN_PIPE = 20;      // R7: beside its pipe, not on it
 	var C_ARROW = 0.8;              // text on a flow arrow (not scored; ugly)
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
@@ -537,9 +537,11 @@ EngCalcs.lpnPlacerD = (function () {
 					b = boxes[i];
 					if (it.t === 'arrow') {
 						if (boxesOverlap(b, it.b, TOL)) { cost += C_ARROW; break; }
+					} else if (it.link === ownLink && it.t === 'pipe') {
+						// R7: its own pipe, with a pixel to spare.
+						if (!b.rep && segHitsBox(it.ax, it.ay, it.bx, it.by, b, -1)) { own = true; break; }
 					} else if (segHitsBox(it.ax, it.ay, it.bx, it.by, b, 1.5)) {
 						if (it.t === 'tlead') { cost += C_LABEL_LEADER; break; }
-						if (it.link === ownLink) { if (!b.rep) { own = true; } break; }
 						if (!links) { links = {}; }
 						if (!links[it.link]) { links[it.link] = 1; cost += C_LABEL_PIPE; }
 						break;
