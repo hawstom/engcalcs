@@ -57,6 +57,7 @@ EngCalcs.lpnPlacerC = (function () {
 	var LBL_TOL = 0.5;         // two labels may share this much (the row pitch carries leading)
 	var CELL = 36;             // the obstacle grids' cell, px
 	var RES = 3;               // the free-space raster's cell, px
+	var SHOW_MAX = 4.4;          // dearer than this, a label is better hidden
 	var SHOW_TRIES = 120;      // a label looks this far down its list before giving up
 	var GROW_TRIES = 30;       // growing looks only this far: convenient space
 	var MEND_WORK = 1500;      // candidates MEND may judge in one view
@@ -223,8 +224,11 @@ EngCalcs.lpnPlacerC = (function () {
 			for (var i = r[0]; i <= r[1]; i++) {
 				var arr = this.cells[j * this.nx + i];
 				for (var k = 0; k < arr.length; k++) {
-					var it = arr[k];
-					if (it.q !== st) { it.q = st; out.push(it); }
+					var it = arr[k], b = it.bb;
+					if (it.q !== st) {
+						it.q = st;
+						if (b.x0 <= bb.x1 && bb.x0 <= b.x1 && b.y0 <= bb.y1 && bb.y0 <= b.y1) { out.push(it); }
+					}
 				}
 			}
 		}
@@ -413,12 +417,12 @@ EngCalcs.lpnPlacerC = (function () {
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
 				if (!L.prevPl || !fillPrev(st, L, L.prevRs, st.probe)) { return; }
-				var cost = judge(st, L, st.probe, KEEP_MAX);
-				if (cost < KEEP_MAX) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
+				var cost = judge(st, L, st.probe, KEEP_MAX + PREV_BONUS);
+				if (cost < KEEP_MAX + PREV_BONUS) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
 			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
-				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, Infinity, SHOW_TRIES)); }
+				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, SHOW_TRIES)); }
 			});
 			// 3. GROW, in rounds.
 			grow(st, order);
@@ -881,12 +885,17 @@ EngCalcs.lpnPlacerC = (function () {
 		// Everything else: the labels and leaders placed so far.
 		function dynCost(st, L, c, cost, bound) {
 			var id = L.id, g = st.dg, i, j, k, arr, it, b, s;
-			if (inkHits(st, L, c, g, st.dr)) { return Infinity; }
+			for (i = 0; i < c.nb; i++) { if (st.dr.solidUnder(c.boxes[i])) { return Infinity; } }
+			arr = g.collect(c.blk, st.buf);
+			var anyLead = false, anyLabel = false;
+			for (k = 0; k < arr.length; k++) {
+				it = arr[k];
+				if (it.own === id) { continue; }
+				if (it.k === LEAD) { anyLead = true; } else if (!anyLabel && obOverlap(c.blk, it.ob, LBL_TOL)) { anyLabel = true; }
+			}
+			if (anyLabel && (c.single || inkHits(st, L, c, g, st.dr))) { return Infinity; }
 			var seen = st.seen;
 			seen.length = 0;
-			arr = g.collect(c.blk, st.buf);
-			var anyLead = false;
-			for (k = 0; k < arr.length; k++) { if (arr[k].k === LEAD && arr[k].own !== id) { anyLead = true; break; } }
 			if (anyLead) {
 				for (i = 0; i < c.nb; i++) {
 					b = c.boxes[i];
@@ -929,7 +938,8 @@ EngCalcs.lpnPlacerC = (function () {
 		function bestFor(st, L, rsI, bound, maxTries) {
 			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, sv;
 			if (L.prevPl && fillPrev(st, L, rsI, c)) {
-				cost = judge(st, L, c, bestCost);
+				// Its bonus buys it preference, never the right to cost more than the bound.
+				cost = judge(st, L, c, Math.min(bestCost, bound + PREV_BONUS));
 				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
 			}
 			var sc = L.sc[rsI];
@@ -977,7 +987,7 @@ EngCalcs.lpnPlacerC = (function () {
 					uncommit(st, L);
 					var cur = dynCost(st, L, c0, c0.stat === undefined ? (c0.stat = staticCost(st, L, c0)) : c0.stat, Infinity);
 					if (cur === Infinity) { cur = c0.cost || 0; }
-					var c = bestFor(st, L, c0.rs - 1, cur + ROW_GAIN, GROW_TRIES);
+					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), GROW_TRIES);
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
@@ -1003,12 +1013,12 @@ EngCalcs.lpnPlacerC = (function () {
 					tried[bl.id] = 1;
 					var mine = keep(c), old = bl.cur;
 					uncommit(st, bl);
-					var cost = dynCost(st, L, mine, mine.stat, Infinity);
+					var cost = mine.stat < SHOW_MAX ? dynCost(st, L, mine, mine.stat, SHOW_MAX) : Infinity;
 					if (cost === Infinity) { commit(st, bl, old); continue; }
 					mine.cost = cost;
 					commit(st, L, mine);
-					var moved = bestFor(st, bl, old.rs, Infinity, 50);
-					if (!moved && old.rs < bl.rowsets.length - 1) { moved = bestFor(st, bl, bl.rowsets.length - 1, Infinity, 50); }
+					var moved = bestFor(st, bl, old.rs, SHOW_MAX, 50);
+					if (!moved && old.rs < bl.rowsets.length - 1) { moved = bestFor(st, bl, bl.rowsets.length - 1, SHOW_MAX, 50); }
 					if (moved) { commit(st, bl, moved); bl.stuck = false; any = true; break; }
 					uncommit(st, L);
 					commit(st, bl, old);
