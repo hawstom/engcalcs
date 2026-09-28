@@ -1947,8 +1947,8 @@ $ec_lang['lpn_lock_age_unknown']='لا يوجد سجل لمدة استخدامه
 // the row have to read the same way down the page, or the sentence a person is reading is about
 // a different button from the one their eye has landed on. Cancel is not described, because a
 // Cancel that needed a sentence would not be a Cancel.
-$ec_lang['lpn_lock_open_choices_ask']='"سؤال" يُخبر من فتح هذا الملف بأنك تريده، ولا يغيّر شيئاً آخر. "فتح للقراءة فقط" يتيح لك النظر إليه وتغيير أي شيء تريده، دون القدرة على الحفظ هنا. "كسر القفل" يتيح لك الحفظ فوق الملف؛ لا يُفقد عملهم غير المحفوظ، لكنهم لن يستطيعوا بعد الآن الحفظ هنا، وقد يضطر أحد إلى دمج الاثنين يدوياً.';
-$ec_lang['lpn_lock_ask']='سؤال';
+$ec_lang['lpn_lock_open_choices_ask']='"اسأل" يُخبر من فتح هذا الملف بأنك تريده، ولا يغيّر شيئاً آخر. "فتح للقراءة فقط" يتيح لك النظر إليه وتغيير أي شيء تريده، دون القدرة على الحفظ هنا. "كسر القفل" يتيح لك الحفظ فوق الملف؛ لا يُفقد عملهم غير المحفوظ، لكنهم لن يستطيعوا بعد الآن الحفظ هنا، وقد يضطر أحد إلى دمج الاثنين يدوياً.';
+$ec_lang['lpn_lock_ask']='اسأل';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
 $ec_lang['lpn_lock_ask_prompt']='من نقول إنه يسأل؟ الأحرف الأولى من اسمك مثالية. تُرسَل إلى من فتح الملف، وتُخزَّن فقط في هذا المتصفح.';

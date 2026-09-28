@@ -702,7 +702,7 @@ $ec_lang['lpn_field_meter_pattern_tip']='مصرف این مشترک در طول 
 $ec_lang['lpn_meter_pattern_unknown']='هیچ الگویی در این پروژه {id} نام ندارد، پس مشترک همان‌طور که بود باقی ماند.';
 $ec_lang['lpn_meter_placed']='مشترک {id} افزوده شد. توضیح و مصرف آن در جدول مشترک‌ها تایپ می‌شود، یا در حالت انتخاب روی آن بزنید تا جعبه‌اش باز شود.';
 $ec_lang['lpn_field_meter_pipe_tip']='المانی که این انشعاب به آن وصل است. برای تغییر آن، المان دیگری را اینجا یا در جدول مشترک‌ها تایپ کنید، یا نقطهٔ اتصال را به المان دیگری بکشید.';
-$ec_lang['lpn_field_meter_station']='ایستگاه در امتداد لوله (٪)';
+$ec_lang['lpn_field_meter_station']='موقعیت در امتداد لوله (٪)';
 $ec_lang['lpn_field_meter_station_tip']='انشعاب چقدر در امتداد لوله وصل می‌شود، به‌صورت درصدی از لوله از گرهٔ نخست آن تا گرهٔ دوم. 0 در یک انتها و 100 در انتهای دیگر است. دایرهٔ روی لوله همین کار را با اشاره‌گر انجام می‌دهد.';
 $ec_lang['lpn_field_meter_offset']='فاصله از لوله';
 $ec_lang['lpn_field_meter_offset_tip']='مثبت یعنی سمت راست لوله، نگاه‌کرده از گرهٔ نخست آن به‌سوی گرهٔ دوم. تایپ کردن مقداری اینجا می‌تواند مشترک را به سمت دیگر خط اصلی ببرد، و همیشه خط انشعاب را عمود بر خط اصلی می‌کند.';
@@ -778,7 +778,7 @@ $ec_lang['lpn_pane_paste_no_node']='ردیف {row}: گرهٔ {id} هنوز وج�
 $ec_lang['lpn_pane_paste_same_ends']='ردیف {row}: «از» و «به» یک گره هستند.';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='ردیف {row}: {text} یک {col} معتبر نیست.';
-$ec_lang['lpn_pane_filled']='{n} سلول پر شد. {skipped} تغییر نکرد.';
+$ec_lang['lpn_pane_filled']='{n} سلول رو به پایین پر شد. {skipped} تغییر نکرد.';
 $ec_lang['lpn_pane_filldown']='پر کردن رو به پایین';
 $ec_lang['lpn_pane_fill_none']='چیزی در این گزینش قابل پر کردن رو به پایین نیست.';
 $ec_lang['lpn_pane_ctrlenter_filled']='{n} سلول پر شد. {skipped} تغییر نکرد.';
