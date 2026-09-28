@@ -556,7 +556,7 @@
 			}
 
 			// ---- 1. hand-placed labels: hung where the user put them (N4) --------------------
-			const reqs = scene.labels;
+			const reqs = scene.labels.filter(function (r) { return r.rows && r.rows.length; });
 			const setsOf = {};
 			reqs.forEach(function (r) { setsOf[r.id] = rowSets(r); });
 			reqs.forEach(function (req) {
@@ -583,6 +583,17 @@
 					});
 				});
 				insert(req, chosen.c, chosen.ink, chosen.cost);
+			});
+
+			// Text is user-placed and never gives way: a Text label stands on its own anchor.
+			reqs.forEach(function (req) {
+				if (req.kind !== 'text' || req.hand) { return; }
+				const rows = req.rows.map(function (r, i) { return i; }), layout = req.layout === 'line' ? 'line' : 'stack';
+				const sz = sizeOf(req, rows, layout);
+				const c = { rows: rows, layout: layout, align: 'left', x: req.anchor.x - sz.w / 2, y: req.anchor.y - sz.h / 2,
+					w: sz.w, h: sz.h, angle: 0, leader: null, pref: 0 };
+				const ink = inkOf(req, c);
+				insert(req, c, ink, 0);
 			});
 
 			// ---- 2. labels shown in the previous view stay put while they can (T1) -----------
@@ -620,6 +631,7 @@
 					}
 					const ink = inkOf(req, c);
 					// Held still unless the new view puts it on a leader or a leader on it (§3 item 1).
+					// The view's edge cutting it is not a collision (T1): it holds still.
 					const cost = evaluate(req, c, ink, ownOf(req), false, KEEP_CAP);
 					if (cost === Infinity) { return; }
 					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
@@ -664,12 +676,11 @@
 				});
 			}
 
-			if (typeof process !== 'undefined' && process.env.PBDBG) { console.log(scene.id, 'table', !!table, 'kept', Object.keys(kept).length, 'seeded', seeded.length, 'left', reqs.filter(function (r) { return !placed[r.id]; }).length); }
 			// ---- 4. everyone else: first a place for each label at its smallest ------------------
-			// A label the table had to drop at this zoom stays dropped, unless it stands near the
-			// viewport's edge, where the table's crowd may be off screen now.
+			// A label the table had to drop at this zoom or closer in stays dropped, unless it stands
+			// near the viewport's edge, where the table's crowd may be off screen now.
 			const skip = {};
-			if (table) {
+			if (table && table.s >= scene.view.s * 0.995) {
 				reqs.forEach(function (r) {
 					const a = r.anchor;
 					if (table.hidden[r.id] === labelSig(r) && a.x > vx0 + EDGE && a.x < vx1 - EDGE && a.y > vy0 + EDGE && a.y < vy1 - EDGE) { skip[r.id] = 1; }
@@ -684,7 +695,10 @@
 				n += GH.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF) + GS.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF);
 				crowd[r.id] = n + (r.kind === 'link' ? 0.5 : 0);
 			});
-			order.sort(function (a, b) { return crowd[b.id] - crowd[a.id] || (a.id < b.id ? -1 : 1); });
+			// Customer labels give way first and easily: they go last.
+			order.sort(function (a, b) {
+				return ((a.kind === 'customer') - (b.kind === 'customer')) || crowd[b.id] - crowd[a.id] || (a.id < b.id ? -1 : 1);
+			});
 			order.forEach(function (req) {
 				const sets = setsOf[req.id];
 				const b = best(req, [sets[sets.length - 1]], true);
@@ -733,7 +747,7 @@
 			// ---- out -------------------------------------------------------------------------
 			// What this layout teaches the lookup table: each label's spot as an offset from its
 			// anchor, which holds at any pan of the same zoom.
-			const learned = { labels: {}, order: [], hidden: {} };
+			const learned = { labels: {}, order: [], hidden: {}, s: scene.view.s };
 			reqs.forEach(function (r) { if (!placed[r.id] && !r.hand) { learned.hidden[r.id] = labelSig(r); } });
 			const prio = reqs.filter(function (r) { return r.hand; }).map(function (r) { return r.id; })
 				.concat(Object.keys(kept), seeded, order.map(function (r) { return r.id; }));
@@ -861,7 +875,6 @@
 				const out = solve(synth(scene, f), fromView, null);
 				tables[k] = out.learned;
 				tables[k].from = fromView;
-				if (typeof process !== 'undefined' && process.env.PBDBG) { console.log('rung', k, (now() - t1).toFixed(0), 'ms', budgetMs); }
 				last = now() - t1;
 			}
 		}
