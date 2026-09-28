@@ -637,3 +637,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|715| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Full, every element at every time step.
 - 0|716| CLOSED 2026-09-26 with the feat/report merge on Tom's all-clear: Report, Status, what switched and when.
 - 0|708| CLOSED 2026-09-27: every property in every venue; audit, six fills, gaps 7 and 8 (coordinates and Text words in Find) merged with feat/find-coordinate on Tom's all-clear; `property_venue_check.php` holds it.
+- 0|696| CLOSED 2026-09-28: File, Convert as... shipped on master (feat/convert-as, feat/placement-wizard, both on his all-clear) with 688's units and rounding and 693's Length / read-only Map coordinates split. Left in the review queue, not here: R-253's wording ruling and R-172 (2), satellite after Convert as, not reproduced.

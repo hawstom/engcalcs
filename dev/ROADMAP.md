@@ -256,129 +256,6 @@ the block.
     deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
     says only "visits" would be worse than none.
 
-- 100|696| **File, Convert coordinates as: a working menu item, as a new project.**
-  **TOM HAS ASKED FOR THIS REPEATEDLY AND IT HAS NEVER HAD A TASK OF ITS OWN**, 2026-09-18: *"You
-  have reminded me about this goal, and I have asked you repeatedly about this goal, and yet I don't
-  find it in the road map. We need a working menu item to convert coordinates as a new project. We
-  should be able to finish this promptly."*
-  - **HE IS RIGHT AND THE CAUSE IS WHERE IT WAS FILED.** The design is complete and has been since
-    2026-09-15, but it lives as leg (f) of Task 667, whose title is *"Tom's reflections on saving,
-    locking and who can see your work"* -- so a search for the thing finds nothing and the index
-    shows a title about file locking. **A design buried under an unrelated title is a design nobody
-    can find, which is this file's own length rule working in reverse.** Extracted here; 667(f) now
-    points at this.
-  - **HIS DESIGN, IN HIS OWN WORDS AND IN THREE STEPS:** *"(1) the row becomes File, Convert
-    coordinates as...; (2) it offers a file picker OR makes a duplicate tab named `Copy of
-    {project_name}`; (3) the redesigned conversion wizard runs."*
-  - **"CONVERT" IS THE HONEST WORD AND THIS REVERSES WHAT THIS REPO HAD WRITTEN DOWN.** Tom: *"let's
-    not fool ourselves, conversion of all coordinates is happening."* He is right and the code agrees:
-    `georefWrite()` re-derives every stored point. **The rule we actually hold is never convert IN
-    PLACE**, and a Save-as does not -- the original file is untouched. That is why this belongs to the
-    **File, Save as...** family, beside Task 688's *Convert units as...*.
-  - **WHAT WE BUILT WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ CORRECTLY.** The shipped
-    row is `Open xy file on map…`, which opens a FILE; he wants a row that converts THIS project.
-    That is the whole of the redesign, and it is his diagnosis: *"we've been neglecting to use a
-    standard paradigm because our design is wrong."*
-  - **IT BELONGS ON `feat/xy-world-map`**, which now holds every piece of the coordinate work, and it
-    is the exception path there: `dev/tom-coordinate-vocabulary-2026-09-16.md` rules that converting
-    is *"no longer the default way to georeference"* -- the default is the Custom georeference wizard
-    that changes no coordinate at all. **This is the dabbler action, offered because we already built
-    and debugged the wizard, and not recommended in most situations.**
-  - **REOPENED BY TOM 2026-09-21: THE PARADIGM IS OBSOLETE AND THE WORDING IS NOT HIS.** *"Needs
-    some work on a feature branch with Branch review. Its paradigm is obsolete."*
-    - **(1) IT STARTS WITH COORDINATE SYSTEM SELECTION**, not with what it starts with now. And:
-      *"the wording of this is not what I carefully edited. You claimed to have found in transcripts
-      and documented my en edits about Projection and CRS, but I can't find them implemented
-      anywhere."* **GO AND FIND THOSE EDITS AND IMPLEMENT THEM, or say plainly that they cannot be
-      found** -- `dev/tom-coordinate-vocabulary-2026-09-16.md` is where they were recorded, and the
-      standing rulings there are that we no longer expose the word *projection*, and that
-      georeferencing means attaching the world map rather than converting a coordinate system.
-      Claiming to have documented his edits and then not implementing them is the failure to own
-      here.
-  - **HIS THIRD ROUND, 2026-09-22, AND POINT (3) IS THE ONE THAT MATTERS:** *"I completely missed
-    this until now, but this wizard is out of date with our current CRS paradigm. The first thing it
-    needs to do is ask what coordinate system we are going to. And I am vaguely recalling that we
-    possibly already worked on this. Do what you can or let me know if you want me to try to give you
-    detailed specs. I think we already went down this road. (a) Project and units (maybe this one menu
-    row as 'Convert as...' can handle both units and coordinates), (b) step 1 (if CRS changed),
-    (c) step 2 (if CRS changed)."* **So he is proposing ONE menu row, `Convert as...`, carrying both
-    the unit conversion of Task 688 and the coordinate conversion of this task**, with the placement
-    steps shown only when the CRS actually changed. That merges this task with 688 at the interface,
-    and the answer owed him is whether that is right.
-  - **AND TWO DEFECTS HE FOUND IN WHAT SHIPPED:** *"(1) In Step 1, a background image gets dragged
-    around with the map (then snaps back on release of drag) instead of always staying with the
-    project. (2) When I finished the Convert coordinates as... wizard on the Elm Street Center
-    example, the world map worked, but the satellite view didn't."*
-    - **(2) A PROJECT THAT ALREADY HAS A WORLD MAP ATTACHED ALREADY KNOWS WHERE IT IS.** His words:
-      *"If a project already has an attached World map (custom or unnamed georeference), the next
-      step (placement step 1) uses our current georeferencing. In fact, we could just convert the
-      project to their selected CRS without further question. But we step them through Steps 1 and 2
-      in case they want to make any changes."* So the steps stay, and they open ALREADY ANSWERED
-      from the existing attachment rather than asking again from nothing.
-  - **TOM MERGED 688 AND 693 INTO THIS ONE, 2026-09-23** (*"Combine: 693 and 688 with 696 as a
-    single wizard"*), and his shape for the merged row is: *"(a) Project and units (maybe this one
-    menu row as 'Convert as...' can handle both units and coordinates), (b) step 1 (if CRS changed),
-    (c) step 2 (if CRS changed)."* **So there is ONE menu row, `File, Convert as...`, and the
-    placement steps appear only when the coordinate system actually changed.** Units alone is then
-    the cheap path through the same door, which is what made the two separate rows look wrong to him.
-  - **AND THE DEFECT THAT PROMPTED IT, WHICH IS THE BUG TO FIX FIRST** (his words, 2026-09-23): the
-    wizard *"is out of date with our current CRS paradigm, because for a 'lat/lon' (EPSG?) project,
-    it exits with the message 'This project is already on lat/lon'"*. That refusal is
-    `mapgeoStart()`'s `lpn_georef_on_map`, and under his own settled vocabulary it is simply wrong:
-    lat/lon is EPSG:4326, one coordinate system among hundreds, so "you are already on lat/lon" is
-    not a reason to refuse to convert TO something else. **The first thing the wizard must ask is
-    which coordinate system we are going to.**
-  - **HE SUSPECTS HE MET THIS IN HIS OWN WORDING PASS** (*"I think I pressed the problem here in my
-    lang edits"*) -- and he did: `lpn_crs_unplaceable` and `lpn_crs_unplaceable_mark` are the two
-    keys he answered with *"Please explain to me what this is in response to."* Answer those when
-    this is built; they are the same paradigm gap seen from the string side.
-
-### ABSORBED: Task 688, File, Convert units as (his agreement on file)
-
-    Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
-    are done, we want to convert to SI for the community."* Put to him that this collides with a rule
-    he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
-    - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
-      knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
-      SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
-      the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
-      authority on the other side.
-    - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
-      There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
-      happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
-      does not: the original project is untouched and a new one is produced. So this row joins the
-      **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
-      and behave alike -- a file picker, or a duplicate tab named for the original.
-    - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
-      what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
-      the project because declarative storage makes a bare number meaningless without it. So a
-      conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
-    - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
-      `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
-      be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
-    - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
-      original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
-    - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
-
-### ABSORBED: Task 693, Separate Length and Map coordinates units
-
-    Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
-    Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
-    Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
-    is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
-    - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
-      project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
-      geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
-      unit, which need not be the one pipes are measured in.
-    - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
-      'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
-      an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
-      rest of this page treats a number it knows rather than one the user states.
-    - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
-      convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
-      DISPLAY of what the coordinate system already says, never an input that rewrites anything.
-    - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
-      Save-as side.
 - 100|697| **EPANET++ as a competing front door, on its own two domains.**
   Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
   called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
@@ -670,6 +547,8 @@ the block.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
 - 99|539| **Gang the neighbour labels so their leaders stop crossing.**
+  **REBUILD FROM RULES, 2026-09-28:** his couch interview chose two clean-room builders and a neutral
+  bench; the rules are `dev/label-placement-rules.md`, a draft awaiting his review. Build nothing first.
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
   `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
   write up** -- so the branch waits on his reading, not on more building.
@@ -1847,6 +1726,9 @@ the block.
   identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
   catches it; bring them current or retire the checks.
 
+- 50|735| **Honour `[TIMES] Statistic` instead of discarding it.** Mary, 2026-09-27: AVERAGED,
+  MINIMUM, MAXIMUM and RANGE are read and dropped (`js/lpn-inp.js:726`, `js/lpn-patterns.js:136`); a
+  file that sets one reports differently in EPANET. Her journal 2026-09-27; not a site-honesty defect.
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
