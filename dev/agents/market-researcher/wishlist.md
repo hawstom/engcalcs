@@ -506,4 +506,22 @@ reasoning and citations: journal entry 2026-09-26 (night), Q2.
   a stray newline character can't slip into the committed value first. Low effort, cheap to check
   with the existing `dev/lpn-spike/` harness style, worth doing before Tom's browser pass rather
   than after a report comes in from a LibreOffice-habituated tester.
+
+## 12. Before the label-placement paper claims novelty, do a real database search — web search is not enough
+
+2026-09-28, answering Tom's "how bad a fool am I" question (full sourcing in the journal entry this
+date). The open-web search I could run is enough to establish the SHAPE of the field (NP-hard since
+1991, dynamic-labeling branch optimizes selection-across-zoom not row-level degradation, multi-label-
+per-feature is itself under-studied per Kakoulis & Tollis 2006, no commercial GIS or water-network
+tool's public docs describe trying "show all, drop rows, restore on zoom in") — but it is not enough
+to certify "nobody has done the row-dropping mechanic," because web search under-indexes exactly the
+venues (GIS Science conference proceedings, cartography journals, Esri/Bentley internal engineering
+blogs) most likely to contain a prior attempt. **Recommendation: before "novel" appears in a paper
+draft, run one real pass through a citation database** (Google Scholar cited-by chains from Formann &
+Wagner 1991 and Christensen/Marks/Shieber 1995 forward, and ACM Digital Library / IEEE Xplore full-text
+search for "label" + "drop" + "restore" or "degrade") **rather than relying on this session's web
+search snippets.** Cost: a few hours, and it is the single thing standing between "I looked and found
+nothing" (what I have) and "there is nothing" (what a paper needs). Ranked here because it is cheap,
+directly requested by Tom, and the paper's strongest selling point (audacity that pays off) is exactly
+the claim most likely to be wrong if skipped.
 </content>

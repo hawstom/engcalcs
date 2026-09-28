@@ -10,6 +10,13 @@ from memory and are **not yet verified** — check each before it is quoted.
   forward to publishing."*
 - 2026-09-28: *"Publishing: I am 100% the student. We have to combine my tone and style with
   academic standards."*
+- 2026-09-28, why it may have legs: *"it seemed foolishly audacious to me from the outset as in
+  'Nobody tries to show all the labels. Don't do it, fool!' Maybe Mary can find out how bad a fool I
+  am or whether I am just a town boy unaware of the state of things where the cool kids play."*
+  Mary's answer, same day (`dev/agents/market-researcher/journal.md`): a genuine outlier against
+  the field's own founding retreat (prove it NP-hard, then drop labels), not proven impossible, and
+  apparently unattempted in the corner we occupy: several values per label, dropped row by row and
+  restored on zoom-in. Novelty is not certified until a real citation-database pass.
 - 2026-09-28, threats to validity: *"It's all Net3. Where's the infinite map?"*
 - 2026-09-28, prior work: *"Invoke game theory, evolutionary algorithm selection, and the case of
   the prisoner's dilemma and the tit for tat with forgiveness strategy."*

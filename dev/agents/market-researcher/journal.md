@@ -2259,3 +2259,104 @@ session — that is a housekeeping note, not a defect in anything published.
 
 — Mary
 </content>
+
+## 2026-09-28 — is "show all the labels" audacious, done, or impossible? (Task from Tom's paper-notes question)
+
+Tom's question, via `dev/paper-notes-label-placement.md`: is trying to place every requested
+label, with as many of its values as fit, on a live pannable/zoomable network map "foolishly
+audacious," already done well somewhere, or known-impossible. Verdict first: **it is genuinely
+unusual as a stated goal and not achieved as a shipped default anywhere I found, but "impossible"
+is the wrong word for what is actually a proven-hard optimization problem that the whole field
+responds to by giving up on completeness, not by proving completeness itself is unreachable** —
+Tom is a fool only in the sense that most of the field agreed decades ago to stop trying what he
+is trying, not in the sense that it can't be tried.
+
+**CITED, Formann & Wagner, "A packing problem with applications to lettering of maps," Proc. 7th
+ACM Symposium on Computational Geometry, pp. 281-288 (1991)**, and **CITED, Marks & Shieber (1991)
+/ Christensen, Marks & Shieber, "An empirical study of algorithms for point-feature label
+placement," ACM Transactions on Graphics 14(3), 1995** (https://dl.acm.org/doi/10.1145/212332.212334,
+PDF at https://www.eecs.harvard.edu/~shieber/Biblio/Papers/tog-final.pdf): both independently prove
+point-feature label placement (deciding whether N labels can ALL be placed without overlap) is
+NP-hard, and both papers' whole contribution is heuristics (simulated annealing, greedy, gradient
+descent) that accept dropping labels rather than solving the decision problem exactly. This is the
+field's founding move: "show every label" was posed and then abandoned as a target within the same
+papers that proved it hard, in 1991-1995, for STATIC maps. This is the strongest evidence for
+"audacious" — the standard response to the problem Tom is attacking was set 30+ years ago and it
+was retreat, not victory.
+
+**CITED, Kakoulis & Tollis, "Algorithms for the multiple label placement problem," Computational
+Geometry 35(3), pp. 143-161 (2006)**, https://www.sciencedirect.com/science/article/pii/S0925772106000344,
+PDF at https://core.ac.uk/download/pdf/82103495.pdf: explicitly notes that most labeling literature
+places one label per feature, and that "very little work has been directed towards positioning
+multiple labels per graphical feature" — i.e. our multi-row-per-node problem (ID, elevation,
+demand, pressure stacked at one node) is even less studied than the single-label problem the 1991
+papers attacked. This narrows "audacious" further: not just "show all labels" but "show all labels
+AND as many of their several fields as fit" sits in a corner of the literature nobody has worked
+hard.
+
+**CITED, Been, Daiches & Yap, "Dynamic map labeling," IEEE TVCG 12(5), 2006 (the "consistent
+dynamic map labeling" desiderata paper)**, and its 2014 sequel **Gemsa, Nöllenburg, Rutter,
+"Approximation Algorithms on Consistent Dynamic Map Labeling," https://link.springer.com/chapter/10.1007/978-3-319-08016-1_16**,
+plus **Gemsa, Nöllenburg, Rutter, "Sliding labels for dynamic point labeling," CCCG'11, pp. 205-210**
+(found via search, not yet PDF-verified — re-check before quoting in a paper): this is the branch
+closest to our zoom/pan problem (labels appearing/disappearing consistently across a continuous
+zoom range, "active ranges"), but its own framing is which labels are SHOWN or HIDDEN at each zoom,
+never all of them with degraded content — it optimizes selection and stability, not completeness.
+No paper found that treats "show 100% of labels, drop only ROWS within a label" as the frame our
+bench scores; the row-dropping design (drop properties before the label itself) appears to be ours
+alone in what I found. **This is a gap-in-the-literature finding (I looked and found nothing), not
+proof no one has done it.**
+
+**CITED, ArcGIS Pro documentation, "Force the placement of all labels in a label class"**
+(https://pro.arcgis.com/en/pro-app/latest/help/mapping/text/force-the-placement-of-all-labels-in-a-label-class.htm):
+Maplex has a literal "Never remove (place overlapping)" option that places every label even in
+conflict — this is the closest a shipping product comes to "show all labels," and it is presented
+as a caveated escape hatch ("use with caution... no guarantee the labels won't overlap"), not a
+default and not a values-fit-or-drop scheme. It does not restore/adapt on zoom (Pro isn't
+continuously zoom-driven the way a web map is) and it does not selectively drop VALUES within a
+label — it is whole-label-or-nothing, with the "or nothing" turned off. **CITED, QGIS PAL engine,
+"Show all labels (including colliding labels)"** (per Google Groups thread and QGIS docs,
+https://groups.google.com/g/australian-qgis-user-group/c/6VeOBLKs_7g,
+https://docs.qgis.org/3.10/en/docs/user_manual/style_library/label_settings.html): same shape —
+an opt-in override that accepts overlap rather than an algorithm that finds room. Neither product
+tries the "use available space, then drop by priority order, then restore on zoom" strategy our
+rules describe; both offer only "hide the loser" (default) or "show and let it collide" (opt-in).
+
+**Water-network tools, no finding either way, CITED as absence-of-evidence**: searched EPANET's
+own docs (https://usepa.github.io/EPANET2.2/7_map.html — its Notation/Map Options pages describe
+WHAT can be labeled, not HOW conflicts are resolved) and Bentley WaterGEMS/WaterCAD docs
+(https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-0E9E41B41B6E47B28DD6058E80B1C66A.html)
+and found no documented collision-resolution behavior at all for either — practitioner habit,
+per the docs and forum threads (Bentley Communities symbology threads),
+is apparently to turn multi-attribute annotation ON only at high zoom or for a filtered subset,
+and to read multi-value data from a FlexTable/attribute table instead of the map. I could not find
+a single water-hydraulics-specific source describing an automatic multi-label placement engine
+for a pipe network map; InfoWater, Synergi and KYPipe searches returned nothing on label placement
+at all (their docs are paywalled/behind product logins, not indexed). This is the strongest support
+for Tom's instinct in the domain that matters to him: the tools he competes with, as far as public
+documentation shows, do not attempt this and instead push the user toward the table.
+
+**Verdict, restated for the paper**: not impossible in the sense Tom should fear (NP-hardness is
+about EXACT optimality of the decision problem — "can all N labels be placed with zero overlap" —
+which is a different question from "can a good heuristic show almost all labels with priority-
+ordered value dropping," which is exactly what 1991-2020s heuristic literature exists to attempt
+and what ArcGIS/QGIS's opt-in overlap modes gesture at without really solving). It is audacious
+in that: (a) the founding papers of the field chose retreat (drop labels) over this fight three
+decades ago and the mainstream never revisited that choice for STATIC maps, (b) the dynamic/zoom
+branch of the field optimizes label SELECTION across zoom, not row-level degradation within a
+still-fully-present label, and (c) no domain-specific water-network tool's public documentation
+describes trying it at all. Where our result would sit: not a rediscovery (nobody file-and-forget
+solved this the same way), most plausibly INCREMENTAL on the label-placement literature generally
+(new heuristic in a hard-but-well-trodden problem family) but potentially NOVEL specifically on the
+row-level-value-dropping-with-restore-on-zoom-in mechanic, which I could not find precedent for
+anywhere, academic or commercial. That novelty claim needs a real literature search pass (a
+university-library database search, not web search snippets) before it goes in a paper — what I
+have here is "I looked on the open web and did not find it," which is real but weaker than a
+systematic review.
+
+**Not yet verified, flag before quoting**: the exact venue/page details for Gemsa/Nöllenburg/
+Rutter's CCCG'11 sliding-labels paper and the Been/Daiches/Yap original TVCG citation year came
+from search-engine summaries, not from opening the PDFs myself — re-fetch and confirm before either
+goes in front of a journal editor.
+
+— Mary
