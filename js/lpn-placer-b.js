@@ -561,29 +561,72 @@
 			reqs.forEach(function (r) { setsOf[r.id] = rowSets(r); });
 			reqs.forEach(function (req) {
 				if (!req.hand) { return; }
-				const own = ownOf(req), hx = req.hand.x, hy = req.hand.y;
+				const own = ownOf(req), hx = req.hand.x, hy = req.hand.y, hk = T.hookMaxPx;
 				const n = req.kind === 'node' ? nodeById[req.owner] : null;
-				let start = n ? [n.x, n.y] : [req.anchor.x, req.anchor.y];
+				const l = req.kind === 'link' ? linkById[req.owner] : null;
+				// Where the leader may start: the node's centre, or anywhere on the pipe (nearest the
+				// user's point first).
+				const starts = n ? [[n.x, n.y]] : (l ? pointsOnLink(l, hx, hy, req.anchor) : [[req.anchor.x, req.anchor.y]]);
 				const layout = req.layout === 'line' ? 'line' : 'stack';
-				let chosen = null;
+				let chosen = null, chosenBad = Infinity;
 				setsOf[req.id].some(function (rows) {
 					const sz = sizeOf(req, rows, layout), W = sz.w, H = sz.h, h0 = req.rows[rows[0]].h;
-					const east = hx >= start[0];
-					const opts = east
-						? [['left', hx, hy - h0 / 2], ['left', hx, hy], ['left', hx, hy - H], ['right', hx - W, hy - h0 / 2]]
-						: [['right', hx - W, hy - h0 / 2], ['right', hx - W, hy], ['right', hx - W, hy - H], ['left', hx, hy - h0 / 2]];
-					return opts.some(function (o) {
-						const c = { rows: rows, layout: layout, align: o[0], x: o[1], y: layout === 'line' ? hy - H / 2 : o[2], w: W, h: H,
-							angle: 0, leader: [start, [hx, hy]], pref: 0 };
-						const ink = inkOf(req, c);
-						const cost = evaluate(req, c, ink, own, false);
-						if (!chosen) { chosen = { c: c, ink: ink, cost: 0 }; }
-						if (cost !== Infinity) { chosen = { c: c, ink: ink, cost: cost }; return true; }
-						return false;
+					const ty = layout === 'line' ? hy - H / 2 : hy - h0 / 2;
+					return starts.some(function (st) {
+						const east = hx >= st[0];
+						// Text to the east of the user's point, or to the west; the hook, if used,
+						// comes in level from the side away from the text.
+						const shapes = [];
+						[east, !east].forEach(function (e) {
+							const atts = e ? [['left', hx, ty], ['left', hx, hy], ['left', hx, hy - H]]
+								: [['right', hx - W, ty], ['right', hx - W, hy], ['right', hx - W, hy - H]];
+							atts.forEach(function (a) { shapes.push({ a: a, L: [st, [hx, hy]] }); });
+							atts.forEach(function (a) { shapes.push({ a: a, L: [st, [e ? hx - hk : hx + hk, hy], [hx, hy]] }); });
+						});
+						return shapes.some(function (sh) {
+							const a = sh.a;
+							const c = { rows: rows, layout: layout, align: a[0], x: a[1], y: layout === 'line' ? hy - H / 2 : a[2], w: W, h: H,
+								angle: 0, leader: null, pref: 0 };
+							const ink = inkOf(req, c);
+							const labelCost = evaluate(req, c, ink, own, false);
+							const leadCost = leaderCost(req, sh.L, own, Infinity);
+							c.leader = sh.L;
+							const bad = (labelCost === Infinity ? 2 : 0) + (leadCost === Infinity ? 1 : 0);
+							if (bad < chosenBad) {
+								chosenBad = bad;
+								chosen = { c: c, ink: ink, cost: bad ? 0 : labelCost + leadCost };
+							}
+							return bad === 0;
+						});
 					});
 				});
 				insert(req, chosen.c, chosen.ink, chosen.cost);
 			});
+			function pointsOnLink(l, hx, hy, anchor) {
+				const P = l.points, out = [];
+				let bd = Infinity, bp = null;
+				for (let i = 1; i < P.length; i++) {
+					const a = P[i - 1], b = P[i], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
+					const t = L2 ? Math.max(0, Math.min(1, ((hx - a[0]) * vx + (hy - a[1]) * vy) / L2)) : 0;
+					const q = [a[0] + t * vx, a[1] + t * vy], d = Math.hypot(q[0] - hx, q[1] - hy);
+					if (d < bd) { bd = d; bp = q; }
+				}
+				if (bp) { out.push(bp); }
+				out.push([anchor.x, anchor.y]);
+				for (let i = 1; i < P.length; i++) {
+					for (let k = 1; k < 4; k++) {
+						const a = P[i - 1], b = P[i];
+						out.push([a[0] + (b[0] - a[0]) * k / 4, a[1] + (b[1] - a[1]) * k / 4]);
+					}
+				}
+				// Not from inside another element's symbol.
+				const clear = out.filter(function (q) {
+					const m = GH.gather(q[0] - 1, q[1] - 1, q[0] + 1, q[1] + 1, BUF);
+					for (let k = 0; k < m; k++) { if (BUF[k].t === 'sym') { return false; } }
+					return true;
+				});
+				return clear.length ? clear : out;
+			}
 
 			// Text is user-placed and never gives way: a Text label stands on its own anchor.
 			reqs.forEach(function (req) {
