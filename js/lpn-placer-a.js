@@ -912,7 +912,13 @@ function run(scene, prev, gaps, pool) {
 	// ---- 3. everything else: labels first, then properties ----
 	const free = info.filter(function (f) { return !kept[f.li]; });
 	const kindRank = { node: 0, text: 0, link: 1, customer: 2 };
-	free.sort(function (a, b) { return (kindRank[a.kind] || 0) - (kindRank[b.kind] || 0); });
+	free.forEach(function (f) {
+		const min = f.subsets.length - 1, l = cands(f, min, 0);
+		let c = 0;
+		for (let i = 0; i < l.length; i++) { if (l[i].st === undefined) { l[i].st = evalStatic(f, l[i], true); } if (l[i].st < l[i].base + 2) { c++; } }
+		f.room = c;
+	});
+	free.sort(function (a, b) { return a.room - b.room; });
 	// Pass A: every label in its smallest form, near home, so as many as possible get a place.
 	free.forEach(function (f) {
 		const min = f.subsets.length - 1;
