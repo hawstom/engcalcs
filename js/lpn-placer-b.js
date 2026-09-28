@@ -1,5 +1,41 @@
-// LPN LABEL PLACER B.
-// (write-up to follow)
+// LPN LABEL PLACER B: a pure function of one view (the label bench's contract), no DOM.
+//
+// APPROACH. First a map of the ground: every symbol, Text object and pipe goes into a hashed grid
+// (hard ground: symbols, Text, placed labels; soft ground: pipes and leaders). Then each label is
+// tried at a short list of spots, nearest home first: touching its symbol on the eight sides (the
+// open sides between its pipes preferred), then on short straight leaders in rings a few pixels
+// apart, toward the open gaps. A pipe label lies along its pipe, either side, sliding from the
+// middle; failing that it sits level on a short leader from the pipe. A spot that covers a symbol,
+// a Text object or a label is never taken; crossings are costed in the rules' order (leader on
+// leader, label on leader, label on pipe, leader on pipe) plus a small price per pixel of travel.
+// Hand-placed labels go first, hung at the user's point (the leader may start anywhere on the pipe
+// or use the one hook to miss a symbol). Customer labels go last.
+//
+// FREE SPACE AND DROPPING (S3, S4). Pass one gives every label a place at its smallest (the ID, or
+// the last property to go), crowded owners first, so labels outrank properties. Pass two lets each
+// label look again with more rows; a row is worth about one pipe crossing. A label whose best spot
+// still costs more than two pipe crossings is dropped rather than sent far away (four rings, about
+// two label heights, is the furthest it travels).
+//
+// HOLDING STILL (T1). A label shown in the last view keeps its pixel offset from its owner and its
+// rows, unless a symbol, Text, label, leader or a second pipe now lies under it. It may grow in place:
+// a stack from the edge it hangs on (left, or right when it hangs west, S2), a pipe label along its
+// pipe from the end that holds. Note: the bench counts a turned pipe label growing from its fixed
+// end as a move, since it compares unturned corners; on screen it does not move.
+//
+// IDLE TIME (T2, T3). The breathers build a per-zoom lookup table: the whole network (every label
+// ever requested, no viewport) laid out at a ladder of zooms a quarter-octave apart, each spot kept
+// as an offset from its anchor, which holds at any pan of that zoom. On opening, rungs nearest the
+// current zoom first; between views, the likeliest next zooms are rebuilt around what is on screen.
+// A view then only checks each cached spot and searches for the few that fail. The table is thrown
+// away when the network moves or is re-topologized, or the lettering or drop order changes; a label
+// whose own rows changed loses only its own entry.
+//
+// KNOWN WEAKNESSES. Greedy, not optimal: a label placed early can take a spot a later one needed.
+// Held labels do not relocate to show more rows, so a label that settled small on a crowded view
+// can stay small after zooming in. No wrapping (H1) and no hook on automatic leaders. A single rung
+// can overrun a short idle budget on a very large network. Without idle time, a first view of Net3
+// takes 50-150 ms.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
