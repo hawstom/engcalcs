@@ -70,22 +70,24 @@ finish inside the idle budget is thrown away.
 
 ## Numbers
 
-Bench, 2026-09-28, on a heavily loaded machine (load average 7 to 9 on 4 threads, so the
-milliseconds are pessimistic):
+Bench, 2026-09-28, on a heavily loaded machine (load average 7 to 9 on 4 threads while other
+sessions ran their checks, so the milliseconds are pessimistic and noisy; the same views took a
+third to a half of these times when the machine was quieter):
 
 ```
-placer C       N1 0  N3 0  N4 0  N5 0  inv 0   cost 134.5   rows 51%   labels 81%
-               leader median 1.5, p90 4.0, max 4.9   churn 82/1305
-               time per layout: median 64.9 ms, max 365.3 ms
-               R5 0/241, R7 0/996, R11 709 regained, 76 lost
+placer C       N1 0  N3 0  N4 0  N5 0  inv 0   cost 129.2   rows 49%   labels 79%
+               leader median 1.5, p90 3.1, max 3.9   churn 84/1271
+               time per layout: median 82.3 ms, max 305.1 ms
+               R5 0/203, R7 0/973, R11 693 regained, 73 lost
 master-replay  N1 1  N3 34  N4 4  N5 0   cost 88.0   rows 25%   labels 45%
                leader median 1.7, p90 3.0, max 5.9   churn 283/656
                time per layout: median 259.0 ms, max 455.8 ms
 ```
 
-It shows about twice the labels and twice the rows master does, with no breaks. Its crossing
-cost is higher in total because it draws twice as much; every crossing is a label or leader on a
-pipe, none a leader on a leader or a label on a leader.
+The first view of each set costs about 1 ms because `idle()` thought it out when the project
+opened. It shows nearly twice the labels and twice the rows master does, with no breaks. Its
+crossing cost is higher in total because it draws twice as much; every crossing is a label or
+leader on a pipe, none a leader on a leader or a label on a leader.
 
 ## What it does well
 
