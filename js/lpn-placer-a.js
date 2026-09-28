@@ -91,15 +91,6 @@ function segHitsBox(px, py, qx, qy, b, sh) {
 	return t1 - t0 > 1e-9;
 }
 function orient(ax, ay, bx, by, cx, cy) { return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax); }
-// Proper crossing; returns the crossing point or null. Shared end points (within 1.5) never cross.
-function segCross(px, py, qx, qy, rx, ry, sx, sy) {
-	const d1 = orient(rx, ry, sx, sy, px, py), d2 = orient(rx, ry, sx, sy, qx, qy);
-	if ((d1 > 0) === (d2 > 0) || d1 === 0 || d2 === 0) { return null; }
-	const d3 = orient(px, py, qx, qy, rx, ry), d4 = orient(px, py, qx, qy, sx, sy);
-	if ((d3 > 0) === (d4 > 0) || d3 === 0 || d4 === 0) { return null; }
-	const t = d1 / (d1 - d2);
-	return [px + t * (qx - px), py + t * (qy - py)];
-}
 function distSeg(px, py, a, b) {
 	const vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
 	let t = L2 ? ((px - a[0]) * vx + (py - a[1]) * vy) / L2 : 0;
@@ -882,7 +873,7 @@ function run(scene, prev, gaps, pool) {
 		return d;
 	}
 	// Growth for a held label: more rows on the same anchored edge and the same top (T1, S2).
-	function growHeld(f, any) {
+	function growHeld(f) {
 		const p = placed[f.li];
 		if (!p) { return; }
 		const c0 = p.cand, n0 = c0.sh.rows.length;
@@ -890,7 +881,7 @@ function run(scene, prev, gaps, pool) {
 		for (let k = 0; k < f.subsets.length; k++) {
 			const rows = f.subsets[k];
 			if (rows.length <= n0) { break; }
-			if (!any && rows.length > n0 + 1) { continue; }
+			if (rows.length > n0 + 1) { continue; }
 			if (!containsAll(rows, c0.sh.rows)) { continue; }
 			const sh = shape(f, rows, c0.sh.layout);
 			let x = c0.align === 'right' ? c0.x + c0.sh.w - sh.w : c0.x, y = c0.y;
@@ -929,19 +920,18 @@ function run(scene, prev, gaps, pool) {
 		if (r) { commit(f, r.cand, r.cost); }
 	});
 	// Pass B: rounds in which each label may take back one row (a better place for it, given
-	// the others), so the room is shared out fairly; then one round with no limit.
+	// the others), so the room is shared out fairly rather than to whoever asks first.
 	let maxSets = 1;
 	info.forEach(function (f) { if (f.subsets.length > maxSets) { maxSets = f.subsets.length; } });
 	for (let round = 0; round < maxSets; round++) {
-		const last = false;
 		info.forEach(function (f) {
 			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
-			if (kept[f.li] === 'held') { growHeld(f, last); return; }
+			if (kept[f.li] === 'held') { growHeld(f); return; }
 			const n = f.subsets.length, p = placed[f.li];
 			// A label with no place at all looks again only in the last round (little moves before it).
 			if (!p && round < maxSets - 1) { return; }
 			const curK = p ? p.cand.k : n;
-			const k0 = last ? 0 : Math.max(0, curK - 1), k1 = last ? n - 1 : Math.min(curK, n - 1);
+			const k0 = Math.max(0, curK - 1), k1 = Math.min(curK, n - 1);
 			const cur = p ? evalDyn(f, p.cand, p.cand.st, Infinity) : hideCost(f);
 			// Already holding every row this round allows, on clean ground, next to home: done.
 			if (p && p.cand.k === k0 && cur <= W.row * (f.R - f.subsets[k0].length) + 0.5) { p.cost = cur; return; }
