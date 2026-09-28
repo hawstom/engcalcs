@@ -169,10 +169,18 @@
 		return [x0 + t0 * dx, y0 + t0 * dy, x0 + t1 * dx, y0 + t1 * dy];
 	}
 
+	// A label's content as a number: its kind, shape, and every row's field, text and size.
 	function labelSig(req) {
-		let s = req.kind + req.layout;
-		for (let i = 0; i < req.rows.length; i++) { const r = req.rows[i]; s += '|' + r.field + '=' + r.text + '@' + r.w + 'x' + r.h; }
-		return s;
+		let h = 17;
+		function str(t) { for (let i = 0; i < t.length; i++) { h = (Math.imul(h, 31) + t.charCodeAt(i)) | 0; } h = (Math.imul(h, 31) + 124) | 0; }
+		str(req.kind); str(req.layout || '');
+		for (let i = 0; i < req.rows.length; i++) {
+			const r = req.rows[i];
+			str(r.field); str(r.text);
+			h = (Math.imul(h, 31) + Math.round(r.w * 100)) | 0;
+			h = (Math.imul(h, 31) + Math.round(r.h * 100)) | 0;
+		}
+		return h;
 	}
 
 	// ---- the placer -----------------------------------------------------------------------------
@@ -723,10 +731,17 @@
 			// A label the table had to drop at this zoom or closer in stays dropped, unless it stands
 			// near the viewport's edge, where the table's crowd may be off screen now.
 			const skip = {};
-			if (table && table.s >= scene.view.s * 0.995) {
+			// Closer in than the table, a label is skipped only if the last view could not show it either.
+			if (table) {
+				const closer = table.s < scene.view.s * 0.995;
+				const was = prev && prev.layout && prev.layout.labels;
+				const asked = {};
+				if (was) { prev.scene.labels.forEach(function (r) { asked[r.id] = 1; }); }
 				reqs.forEach(function (r) {
 					const a = r.anchor;
-					if (table.hidden[r.id] === labelSig(r) && a.x > vx0 + EDGE && a.x < vx1 - EDGE && a.y > vy0 + EDGE && a.y < vy1 - EDGE) { skip[r.id] = 1; }
+					if (table.hidden[r.id] !== labelSig(r)) { return; }
+					if (closer && !(was && asked[r.id] && !(was[r.id] && was[r.id].shown))) { return; }
+					if (a.x > vx0 + EDGE && a.x < vx1 - EDGE && a.y > vy0 + EDGE && a.y < vy1 - EDGE) { skip[r.id] = 1; }
 				});
 			}
 			const order = reqs.filter(function (r) { return !placed[r.id] && !skip[r.id]; });
@@ -832,7 +847,7 @@
 		// zooms, quarter-octave apart. A spot is stored as an offset from its label's anchor, which
 		// is the same at any pan of that zoom, so one table serves every view near its zoom.
 		const registry = {};     // label id -> {req, mx, my (model anchor), hx, hy (model hand)}
-		let tables = {}, tablesSig = null, baseS = null, lastScene = null, lastLayout = null;
+		let tables = {}, tablesSig = null, baseS = null, lastScene = null, lastLayout = null, rungMs = 0;
 		function remember(scene) {
 			const v = scene.view;
 			scene.labels.forEach(function (r) {
@@ -918,19 +933,26 @@
 			// Once a view is on screen, the rungs beside it are rebuilt around what it shows, so the
 			// next zoom finds the held labels and the table in agreement (T1 and T2 together).
 			const fromView = lastLayout && lastLayout.scene === scene ? lastLayout : null;
-			if (fromView) { want.splice(0, 1); want.sort(function (a, b) { return (Math.abs(a - k0) - (a > k0 ? 0.5 : 0)) - (Math.abs(b - k0) - (b > k0 ? 0.5 : 0)); }); }
-			let last = 0;
+			// The likeliest next views first: one notch in, twice as close, a little closer, one
+			// notch out, twice as far.
+			if (fromView) {
+				const first = [k0 + 1, k0 + 4, k0 + 2, k0 - 1, k0 - 4, k0 + 3];
+				want.splice(0, want.length);
+				first.forEach(function (k) { want.push(k); });
+				for (let d = 5; d <= 12; d++) { want.push(k0 + d); if (d <= 6) { want.push(k0 - d + 3); } }
+			}
+			// Never start a rung the budget cannot finish: the page must stay free for the user.
+			if (!rungMs) { rungMs = 0.4 * Object.keys(registry).length + 5; }
 			for (let i = 0; i < want.length; i++) {
 				const k = want[i];
 				if (tables[k] && (!fromView || tables[k].from === fromView)) { continue; }
-				const spent = now() - t0;
-				if (spent + Math.max(last, 5) * 1.5 > budgetMs) { break; }
+				if (now() - t0 + rungMs * 1.25 > budgetMs) { break; }
 				const t1 = now();
 				const f = baseS * Math.pow(2, k / 4) / scene.view.s;
 				const out = solve(synth(scene, f), fromView, null);
 				tables[k] = out.learned;
 				tables[k].from = fromView;
-				last = now() - t1;
+				rungMs = 0.5 * rungMs + 0.5 * (now() - t1);
 			}
 		}
 
