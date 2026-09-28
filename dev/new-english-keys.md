@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**30 still to read on master**, of 294 untranslated keys, of 2125 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**48 still to read on master**, of 312 untranslated keys, of 2141 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (294, 30 to read @@ NEEDS RULING)
+## lpn_  (312, 48 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -273,12 +273,30 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_inp_report_no_crs`**
   > EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…
   _Ruled OK 2026-09-25._
+- **`lpn_labels_col_show`**
+  > Show
+  @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
 - **`lpn_labels_customer_width_tip`**
   > Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.
   _Ruled OK 2026-09-26._
+- **`lpn_labels_init_status`**
+  > Initial status
+  @@ NEEDS RULING
+- **`lpn_labels_priority_customer_tip`**
+  > The order in which values are dropped from a customer label. The value numbered 1 is dropped first.
+  @@ NEEDS RULING
+- **`lpn_labels_show_tip`**
+  > The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.
+  @@ NEEDS RULING
+- **`lpn_labels_use_units`**
+  > Use units
+  @@ NEEDS RULING
+- **`lpn_labels_use_units_tip`**
+  > Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.
+  @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -633,6 +651,33 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_quality_diffusivity`**
+  > Relative diffusivity
+  @@ NEEDS RULING
+- **`lpn_quality_diffusivity_tip`**
+  > How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.
+  @@ NEEDS RULING
+- **`lpn_quality_mass_units`**
+  > Mass units
+  @@ NEEDS RULING
+- **`lpn_quality_mass_units_tip`**
+  > The mass half of the concentration unit, EPANET's own two choices.
+  @@ NEEDS RULING
+- **`lpn_quality_named_avg_concentration`**
+  > Average {chemical} concentration
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration`**
+  > {chemical} concentration
+  @@ NEEDS RULING
+- **`lpn_quality_tolerance`**
+  > Quality tolerance
+  @@ NEEDS RULING
+- **`lpn_quality_tolerance_tip`**
+  > How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.
+  @@ NEEDS RULING
+- **`lpn_quality_unit_ug`**
+  > µg/L
+  @@ NEEDS RULING
 - **`lpn_reports_full`**
   > Full
   _Ruled OK 2026-09-26._
@@ -660,6 +705,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_sym_customer`**
   > Customer
   _Ruled OK 2026-09-23._
+- **`lpn_settings_sym_link_colors`**
+  > Link colors
+  @@ NEEDS RULING
+- **`lpn_settings_sym_node_colors`**
+  > Node colors
+  @@ NEEDS RULING
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
   _Ruled OK 2026-09-23._
@@ -672,6 +723,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_settings_symbol_cap_tip`**
   > A junction stops growing on the ground once its diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out instead of growing on the ground. Reservoirs and tanks are the exception and keep their screen size at every zoom.
   _Ruled OK 2026-09-23._
+- **`lpn_source_type_none`**
+  > None
+  @@ NEEDS RULING
 - **`lpn_status_closed`**
   > {type} {id} closed
   _Ruled OK 2026-09-26._
@@ -914,7 +968,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**16 still to read**, of 19 new keys across 6 unmerged branch(es).
+**1 still to read**, of 4 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -925,9 +979,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-0927 (`cb4818e3`) — adds no English strings
+### feat/ctrl-enter (`d6558eb4`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/label-gang-search (`2b4a73a4`) — 3 new, all ruled
+- **`lpn_pane_ctrlenter_filled`**
+  > Filled {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -939,60 +997,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/quality-settings (`741c2d2b`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_quality_diffusivity`**
-  > Relative diffusivity
-  @@ NEEDS RULING
-- **`lpn_quality_diffusivity_tip`**
-  > How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.
-  @@ NEEDS RULING
-- **`lpn_quality_mass_units`**
-  > Mass units
-  @@ NEEDS RULING
-- **`lpn_quality_mass_units_tip`**
-  > The mass half of the concentration unit, EPANET's own two choices.
-  @@ NEEDS RULING
-- **`lpn_quality_named_concentration`**
-  > {chemical} concentration
-  @@ NEEDS RULING
-- **`lpn_quality_tolerance`**
-  > Quality tolerance
-  @@ NEEDS RULING
-- **`lpn_quality_tolerance_tip`**
-  > How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.
-  @@ NEEDS RULING
-- **`lpn_quality_unit_ug`**
-  > µg/L
-  @@ NEEDS RULING
-
-### feat/row-paste (`1631a562`) — adds no English strings
-
-### feat/symbology-label (`6074eaa6`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_labels_col_show`**
-  > Show
-  @@ NEEDS RULING
-- **`lpn_labels_init_status`**
-  > Initial status
-  @@ NEEDS RULING
-- **`lpn_labels_priority_customer_tip`**
-  > The order in which values are dropped from a customer label. The value numbered 1 is dropped first.
-  @@ NEEDS RULING
-- **`lpn_labels_show_tip`**
-  > The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.
-  @@ NEEDS RULING
-- **`lpn_labels_use_units`**
-  > Use units
-  @@ NEEDS RULING
-- **`lpn_labels_use_units_tip`**
-  > Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.
-  @@ NEEDS RULING
-- **`lpn_settings_sym_link_colors`**
-  > Link colors
-  @@ NEEDS RULING
-- **`lpn_settings_sym_node_colors`**
-  > Node colors
-  @@ NEEDS RULING
-
-### fix/placement-world-view (`929dcf08`) — adds no English strings
+### feat/quality-settings (`24aa4bfa`) — adds no English strings

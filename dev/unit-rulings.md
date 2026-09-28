@@ -133,9 +133,29 @@ back from it, and nowhere else.** If a third conversion site seems necessary, th
 
 ### `lpn_` only: a setting belongs to the PROJECT or to the BROWSER, never to both
 
-**A new project gets the hard-coded defaults, always. If you want otherwise, save a template or copy
-a project. Window furniture is not project data and follows the browser.** (Tom, 2026-09-04, closing
-Task 584 — his own position, adopted verbatim.)
+**SUPERSEDED 2026-09-27 (R-342).** Tom, 2026-09-04, closing Task 584, had ruled a new project
+always gets the hard-coded defaults: *"If you want otherwise, save a template or copy a project."*
+He revisited it once the Labels box grew enough settings to make the old answer feel like data
+loss: *"Things are more complicated now. A new project copies the open project where units are the
+same (not changed in the New Project wizard). Otherwise a new project gets built-in defaults. The
+party line is that new projects follow current project as much as they can."* **Window furniture is
+still not project data and still follows the browser** — that half of the 2026-09-04 ruling stands.
+
+**The rule now:** if the New Project wizard's units match the project it was opened from, the new
+project copies that project's WHOLE modelling settings — defaults, ID prefixes, colouring, labels,
+all of it (the friction method is its own separate exception, below, unrelated to units). If the
+wizard leaves any unit different, only
+the pieces actually CALIBRATED TO THAT CHANGED UNIT fall back to the built-in default — a "Use
+units" tick, a `settings.defaults` number typed in the old unit, the length-stated customer label
+visibility limit — never the whole object. Everything unit-independent (an ID prefix, a Show/Drop
+order, a colour ramp choice, an on/off toggle) still copies, because none of it is a number stated
+in a unit; a customized DECIMALS COUNT also still copies, riding on the SAME followUnitDecimals()
+rule an ordinary in-place unit change on an existing project already uses (an untouched count moves
+to the new unit's default, a customized one stays) — a new project does not answer that one
+question differently from an existing one. `resetUnitBearingDefaultsFor()` / `changedUnitSelectors()`
+in `js/looped-network.js`; `dev/lpn-spike/new-project-inherit-harness.js` covers both directions.
+"Save a template or copy a project" for anything beyond that answer is unaffected — a template is
+still a file, not a setting.
 
 - **MODELLING data belongs to the PROJECT** and rides in `serializeProject()`: units, friction
   method, new-asset defaults, ID prefixes, colouring, labels, quality. A project records its own

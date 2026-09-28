@@ -1072,24 +1072,27 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<section id="lpn_set_sec_visual" class="lpn-set-sec" data-set-sec="visual">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_symbology']?></h3>
 					<div class="lpn-set-secbody">
-						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
-						      // what is PRINTED beside it, which is one question and was two panels. Tom:
-						      // "Dissolve Color by value and put its items in Node symbology and Link
-						      // symbology." ?>
-						<?php // **WHAT IS PRINTED FIRST, THEN WHAT DECIDES THE COLOUR** (Tom, 2026-08-19:
-						      // move the "Color nodes by" control to sit after the label columns, and
-						      // "put a colour-ramp picker at the bottom of this group"). Each group is
-						      // now one complete answer to "how is this kind of element drawn", scheme
-						      // included -- which is why the ramp is stored per group; see
-						      // defaultSettings() in js/looped-network.js. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
+						<?php // **FIVE ENTRIES, LABELS AND COLOURS APART** (Tom, 2026-09-26, R-333: "Our lists are
+						      // getting long. I think the Settings index pane Symbology section can be
+						      // reworked to Node labels, Node colors, Link labels, Link colors, Customer.").
+						      // Each is its own sub-heading, so each is its own row in the index and its own
+						      // jump. The label entries reuse the Labels headings' own keys. Each kind's
+						      // colours still follow its labels (Tom, 2026-08-19: "put a colour-ramp picker
+						      // at the bottom of this group"), now as the next entry rather than the same one. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_labels_heading_node']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeColors"><?=$ec_lang['lpn_settings_sym_node_colors']?></div>
+						<div class="lpn-set-subbody">
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_labels_heading_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkColors"><?=$ec_lang['lpn_settings_sym_link_colors']?></div>
+						<div class="lpn-set-subbody">
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
 						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
@@ -2366,6 +2369,13 @@ EngCalcs.pageConfig = {
       // ROADMAP Task 322's survey material, and it is the reason this was found by hand. ?>
 	lpn_labels_col_drop: <?=json_encode($ec_lang['lpn_labels_col_drop'])?>,
 	lpn_labels_priority_link_tip: <?=json_encode($ec_lang['lpn_labels_priority_link_tip'])?>,
+	// R-326..R-334: the Show column, the Use units tick, the customer Drop tip, the Initial status row.
+	lpn_labels_col_show: <?=json_encode($ec_lang['lpn_labels_col_show'])?>,
+	lpn_labels_show_tip: <?=json_encode($ec_lang['lpn_labels_show_tip'])?>,
+	lpn_labels_priority_customer_tip: <?=json_encode($ec_lang['lpn_labels_priority_customer_tip'])?>,
+	lpn_labels_use_units: <?=json_encode($ec_lang['lpn_labels_use_units'])?>,
+	lpn_labels_use_units_tip: <?=json_encode($ec_lang['lpn_labels_use_units_tip'])?>,
+	lpn_labels_init_status: <?=json_encode($ec_lang['lpn_labels_init_status'])?>,
 	lpn_labels_priority_node_tip: <?=json_encode($ec_lang['lpn_labels_priority_node_tip'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
 	lpn_pump_curve_source: <?=json_encode($ec_lang['lpn_pump_curve_source'])?>,
@@ -2480,12 +2490,22 @@ EngCalcs.pageConfig = {
 	lpn_quality_needs_run: <?=json_encode($ec_lang['lpn_quality_needs_run'])?>,
 	lpn_quality_chemical_name: <?=json_encode($ec_lang['lpn_quality_chemical_name'])?>,
 	lpn_quality_chemical_name_tip: <?=json_encode($ec_lang['lpn_quality_chemical_name_tip'])?>,
+	lpn_quality_mass_units: <?=json_encode($ec_lang['lpn_quality_mass_units'])?>,
+	lpn_quality_mass_units_tip: <?=json_encode($ec_lang['lpn_quality_mass_units_tip'])?>,
+	lpn_quality_unit_ug: <?=json_encode($ec_lang['lpn_quality_unit_ug'])?>,
+	lpn_quality_tolerance: <?=json_encode($ec_lang['lpn_quality_tolerance'])?>,
+	lpn_quality_tolerance_tip: <?=json_encode($ec_lang['lpn_quality_tolerance_tip'])?>,
+	lpn_quality_diffusivity: <?=json_encode($ec_lang['lpn_quality_diffusivity'])?>,
+	lpn_quality_diffusivity_tip: <?=json_encode($ec_lang['lpn_quality_diffusivity_tip'])?>,
+	lpn_quality_named_concentration: <?=json_encode($ec_lang['lpn_quality_named_concentration'])?>,
+	lpn_quality_named_avg_concentration: <?=json_encode($ec_lang['lpn_quality_named_avg_concentration'])?>,
 	lpn_quality_initial: <?=json_encode($ec_lang['lpn_quality_initial'])?>,
 	lpn_quality_initial_tip: <?=json_encode($ec_lang['lpn_quality_initial_tip'])?>,
 	lpn_result_concentration: <?=json_encode($ec_lang['lpn_result_concentration'])?>,
 	lpn_result_concentration_tip: <?=json_encode($ec_lang['lpn_result_concentration_tip'])?>,
 	lpn_source_type: <?=json_encode($ec_lang['lpn_source_type'])?>,
 	lpn_source_type_tip: <?=json_encode($ec_lang['lpn_source_type_tip'])?>,
+	lpn_source_type_none: <?=json_encode($ec_lang['lpn_source_type_none'])?>,
 	lpn_source_type_concen: <?=json_encode($ec_lang['lpn_source_type_concen'])?>,
 	lpn_source_type_mass: <?=json_encode($ec_lang['lpn_source_type_mass'])?>,
 	lpn_source_type_setpoint: <?=json_encode($ec_lang['lpn_source_type_setpoint'])?>,

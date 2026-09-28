@@ -2469,6 +2469,206 @@ UNVERIFIED: did not visually confirm in an actual rendered Chrome tab that Zoom 
 the same view as master's, or that nothing looks worse on the map (labels, symbol sizes) --
 no browser session was opened this pass, only Node DOM-stub harnesses.
 
+# Perry review, feat/symbology-label R-326..R-334, 2026-09-27
+
+Served the worktree myself: `php -S` docroot = worktree's PARENT (not a symlink), `flock
+/tmp/engcalcs-browser.lock` held for every Chromium run, via dev/browser-pass's own
+lib/env.js+lib/session.js reused directly from ad hoc scripts (not through run.js). Killed the
+server after each script exited; confirmed no leftover `php -S` process at the end.
+
+OBSERVED (MISSED) -- the Decimals box in an OPEN Settings panel does not live-update on a unit
+change, though the underlying data does. Real Chrome: opened Settings > Link labels, Flow row
+read decimals "0" (gpm). Switched the Flow unit to MGD via the units strip, confirmed
+"Non-destructive" on the real reinterpretation dialog. The Decimals input for Flow, still on
+screen, stayed "0". Closing Settings and reopening it showed "3" -- the correct value per R-328's
+own worked example (gpm->MGD, 0->3) -- proving `followUnitDecimals()` ran correctly but
+`afterUnitChange()` (js/looped-network.js ~38439) never repaints the currently-open Labels list's
+decimals spinners, unlike the "Use units" After boxes, which DO live-refresh via the tracked
+`useUnitsBoxes` array in the same commit. A person testing R-328 by watching the panel while
+switching units -- the natural way to test it -- sees a stale, wrong-looking number.
+
+OBSERVED (MEDIUM, harness bug the branch introduced) -- dev/browser-pass/specs/labelcols.js
+throws when run against this branch: `git diff master...HEAD -- dev/browser-pass/specs/labelcols.js`
+shows the build agent added `lpn_labels_customer_fields` to `LISTS` and wrote an `isField` filter
+meant to skip the Customer list's trailing note/zoom-limit rows -- but the filter runs only
+*after* `rows.map()` has already dereferenced `row.children[0].textContent` on every row,
+including the note div (0 element children, text-node only), which throws
+`Cannot read properties of undefined`. Ran it myself: `flock /tmp/engcalcs-browser.lock node
+dev/browser-pass/run.js labelcols` -- 40/41 checks pass (Node and Link lists both get full
+pixel-alignment coverage), then the section throws and is counted as 0/1 sections completed. So
+the claim "six columns, pixel-aligned, on every list, in real Chrome" is verified for Node and
+Link but NOT for Customer -- nobody's automation actually finished checking Customer's heading
+alignment. I independently confirmed Customer's STRUCTURE by hand (6 rows: ID, Description, Tag,
+Base demand, Number of services, Demand; each row holds the right input count, e.g. 7 for a
+numeric row with a decimals spinner, 5 without) but did not re-derive the crashed spec's own
+sub-pixel alignment check for that list.
+
+OBSERVED (MEDIUM, leak, mostly pre-existing but now covers new fields) -- a new project inherits
+the PREVIOUS project's label customizations rather than Tom's table defaults, which CLAUDE.md's
+lpn_ settings section states as a rule ("A new project gets hard-coded defaults"). Real Chrome:
+unticked "Use units" for Length in one project (leaving its own After text), then called
+`a.newProject('us')` (File > New project > Blank project, the real menu path) -- the fresh
+project's own Length row opened with Use units UNTICKED, inheriting the previous project's
+choice rather than the CSV's US default (ticked). `git blame` traces `labelSettings =
+inheritedLabels` in `newProject()` to e4fc5c5ce, 2026-07-31 -- predates this branch, so the
+inheritance mechanism itself is not new. What this branch changes is scope: Use units and Show
+order are new fields inside the same `labelSettings` object that mechanism copies wholesale, so
+both now leak into every new project exactly like every older label setting already did. Worth a
+sentence to Tom either way: the rule in CLAUDE.md and the shipped behaviour disagree, and this
+branch is the one that just added two more things riding the disagreement.
+
+OBSERVED -- the Settings index keeps a sixth "All" entry (`lpn_set_sub_nodeLink`) beside Tom's
+five (R-333: "Node labels, Node colors, Link labels, Link colors, Customer"). Read via
+`page.evaluate` on the real rendered `#lpn_setbox_index` nav: entries are Node labels, Node
+colors, Link labels, Link colors, Customer, All, then Map and page's own group. Tom named five;
+this is a sixth. It holds the "both kinds at once" controls (from the code's own comment above
+the section), so it may be a deliberate, defensible carry-over rather than an oversight -- but he
+did not ask for it and should say whether it stays.
+
+CONFIRMED -- real touch tap (Playwright `hasTouch:true, isMobile:true`, 390x844, `.tap()` on a
+real element handle) on a Decimals box selects the ENTIRE value and is `type=text
+inputmode=numeric`: measured `selectionStart:0, selectionEnd:1` on a one-character "0" (R-330).
+Also confirmed `matchMedia('(pointer: coarse)').matches === true` under this emulation, so the
+touch code path is the one actually exercised.
+
+CONFIRMED -- "Use units" toggle, real Chrome, Link labels: Length row opens ticked, After box
+disabled, showing "'" (US) — matches dev/symbology-defaults.csv exactly (Before empty, After
+US=`'`). Switching the length unit ft->m (through the real reinterpretation dialog, Non-
+destructive) updates the still-ticked After box live to " m", disabled stays true. Diameter
+row same, in->mm live-updates to " mm". Unticking Length's Use units box makes the After box
+editable, keeps "'" as ordinary text, and a later unit change on a DIFFERENT untied row's own
+unit leaves that typed text alone.
+
+CONFIRMED -- Settings index has all five of Tom's named entries in his order (Node labels, Node
+colors, Link labels, Link colors, Customer) and each button's `data-sub`/`data-sec` jump lands
+within 60px of the pane's own top after a real click (measured `getBoundingClientRect()` before
+and after).
+
+CONFIRMED -- no em dash in any English string this branch's diff touches: `git diff
+master...HEAD -- lib/lang.ec.en.php | grep '—'` returns nothing.
+
+CONFIRMED -- re-ran dev/lpn-spike/symbology-table-harness.js myself (not trusting the build
+agent's own report): every section passes, including "every gallery example opens on the same
+table" for all 7 .lwn examples against dev/symbology-defaults.csv, "every showable property has a
+Show order and a Drop order" for node/link/customer under all three quality modes, and the touch
+number-box behaviour (6b) -- though 6b's jsdom version only checks the `inputmode`/class
+attributes exist, not an actual focus-then-select measurement, which is why I re-verified that
+part by hand in real Chrome above rather than trusting the jsdom pass alone.
+
+UNVERIFIABLE FROM HERE -- whether the 7 gallery examples LOOK sane once opened (label overlap,
+crowding, anything a person's eye catches that a position number would not) -- I did not open
+each example and look, only confirmed via the harness that the CSV's Show?/Before/After/decimals
+values are transcribed correctly into each file's effective label set.
+
+UNVERIFIABLE FROM HERE -- Tom's R-075 acceptance test (adding "12345678" to a node's ID must not
+move or hide any label) against this branch's node-ID-drops-early change (R-326 gives node ID its
+own Drop order of 2, very early — previously it likely could not be dropped by value at all,
+only a whole label could vanish). I did not have time this pass to reproduce the original R-075
+repro on Net3 and diff it against master's label positions/hidden count. This is the one item
+here closest in shape to the two 2026-09-19 failures this seat exists to catch (a change that
+explains itself as safe rather than being measured), and I did not get to measure it -- flag it
+to Tom directly rather than pass it through unverified.
+
+SPECULATION -- the labelcols.js crash and the Customer-list note-row's "0 element children, text
+node only" shape both predate this branch (the note div was built the same way before); what's
+new is only that this branch is the first to point the automated pixel-alignment spec AT the
+Customer list at all, so the pre-existing DOM shape and the new coverage collided for the first
+time here.
+
+---
+
+## 2026-09-27 — feat/quality-settings (R-321..R-324), head d945719a
+
+OBSERVED: `git merge-base dbbb2ce7 d75a944c` = `72b9086c` -- d75a944c's parent is NOT master's
+tip. Diffing `dbbb2ce7..d75a944c` directly (two divergent commits) prints an unrelated-looking
+CSS diff (placement-wizard drag bar, backdrop opacity var) that is an artifact of comparing
+across the fork point, not a real change on this branch. The honest diff is
+`dbbb2ce7..d945719a` (current head, master already merged in): 7 files, no CSS, exactly the
+Quality panel plus its harness and docs. Recorded so nobody re-panics over the same comparison.
+
+OBSERVED: `node dev/lpn-spike/quality-settings-harness.js` on this worktree -- all checks pass
+(order, tolerance/diffusivity box+export+engine-input, chemical/mass-units split+export,
+wall-unit-by-order in Settings/Library/Tables, SI length unit).
+
+OBSERVED, mutation test: copied the same harness onto a worktree of dbbb2ce7 (pre-fix) via
+`git worktree add --detach ... dbbb2ce7` -- it fails hard and early: parameter order reads
+`none,age,trace,chemical` (R-321's actual defect), then a `TypeError` on the tolerance box
+because it does not exist yet. The harness is not decoration.
+
+OBSERVED, node stub, SI + order 0 (a cell the shipped harness does not cover): wall coefficient
+unit reads "mg/m²/day" -- sensible, matches R-324(1)'s "mass/area/time" under SI.
+
+OBSERVED, node stub, Net1/Net2 unedited import -> export: `[OPTIONS]` block byte-identical
+including `Diffusivity 1.0` / `Tolerance 0.01` carried verbatim (not renormalized to `1`/`0.01`
+etc). Net3 (Trace) confirmed byte-identical via the existing
+`inp-roundtrip-net3-harness.js` (1229/1229 tokens). Editing Net2's mass unit after import
+(`Fluoride mg/L` -> `ug/L`) reaches the exported `.inp` as `Fluoride ug/L`; an untouched import
+still exports `Fluoride mg/L` unchanged.
+
+OBSERVED, real headless Chromium via `dev/browser-pass/lib/env.js` + `Session`, flock'd, at
+desktop width: Quality parameter select order is exactly None/Chemical/Trace/Age; the Chemical
+section shows rows in order Chemical, Mass units, Quality tolerance, Relative diffusivity, Bulk
+reaction coefficient, Wall reaction coefficient, Bulk/Tank/Wall reaction order, Limiting
+concentration, Roughness correlation -- Mass units dropdown is exactly `mg/L, µg/L`; Wall
+reaction order's tip reads Tom's R-324(2) sentence verbatim, char for char.
+
+OBSERVED, same session, ROW-SCOPED element selection (found the input inside the `.lpn-set-row`
+whose own label span reads "Chemical", not the first blank `input[type=text]` on the whole
+Settings box -- the box renders every section's fields at once, ~90 text inputs, so a
+loosely-scoped query silently grabs an unrelated field): typing "Chlorine" into the real
+Chemical name box and tabbing out persists `"chemical":"Chlorine mg/L"` to the saved project
+(localStorage), and afterward the Junctions Tables tab heading reads "Chlorine concentration
+(mg/L)" and Find's Junction-scope property list offers "Chlorine concentration" -- both R-323(3)
+claims CONFIRMED live in a browser, not just in the node harness.
+
+**A false alarm worth recording against my own method.** My first two passes at this used
+`document.querySelectorAll('#lpn_setbox_content input[type=text]')[0]`-style selection (first
+match by a placeholder filter) rather than row-scoped selection, and it silently edited some
+*other* settings field. That produced an apparent defect -- "the name box shows Chlorine but
+the Tables heading still says plain Concentration, and localStorage never gains a `chemical`
+key" -- reproduced identically across three independent scripts, which felt like confirmation.
+It was a bug in the harness, not the product: the loose selector never touched the real
+Chemical box at all. Row-scoped selection (found the row by its own label text, then the input
+inside that row) reversed the finding completely. Recorded because it is exactly the trap this
+seat exists to catch in someone else's work, and I nearly shipped it against my own.
+
+OBSERVED: no em dash in any of this branch's new English strings (`lib/lang.ec.en.php` diff
+`dbbb2ce7..d945719a`); every pre-existing em dash elsewhere in the file predates this branch.
+
+UNVERIFIED: the Quality panel's layout at phone width (360 px). The Settings toolbar button is
+not reachable at 360 px viewport in this headless setup -- `toolbarClick('Settings')` times out
+waiting for a visible "Settings" button, meaning it has gone into whatever overflow mechanism
+the toolbar uses below some breakpoint, which this session did not chase further. This is a
+property of the toolbar generally, not something this branch touches, but it means I could not
+personally look at the Quality section's row layout on a narrow screen. **A person should open
+Settings > Quality on an actual phone-width window (or a resized desktop browser) and confirm
+the rows read cleanly** -- row labels, the Mass units dropdown, and the two small text boxes.
+
+VERDICT
+
+R-321 (parameter order None/Chemical/Trace/Age): CONFIRMED, live browser + harness + mutation
+test.
+
+R-322 (Quality tolerance / Relative diffusivity boxes): CONFIRMED, live browser (rows present,
+EPANET's own names) + harness (blank-is-a-state export/engine-input behaviour, Net1's stated
+0.01/1.0 carried verbatim on import).
+
+R-323 (Mass units dropdown, chemical name optional, "{chemical} concentration" in
+Properties/Find/Tables): CONFIRMED for Mass units, Tables and Find, all in a live browser. Did
+not independently open the Properties popup on a node (ran out of budget after the false-alarm
+detour) -- UNVERIFIED FROM HERE specifically for the Properties popup row, though it reads off
+the same shared `qualityLabel()` function proven correct for Tables and Find, and the code
+comment names it as the same resolver.
+
+R-324 (wall coefficient unit follows wall reaction order; corrected tip text): CONFIRMED, live
+browser for the tip's exact wording, and harness + node-stub spot-check for the unit switch
+(ft/day, mg/ft²/day, µg/ft²/day, m/day, and the untested-by-the-shipped-harness mg/m²/day cell).
+
+No other findings. This is a well-built, well-tested branch; the one genuine gap is the phone
+layout, which nobody in this pass could reach.
+
+---
+
 # Perry review, feat/row-paste R-308..R-312, 2026-09-27
 
 Reviewed commit 1631a562 (round head, on branch head d7e6084b) against dev/tom-review-queue.md
@@ -2546,3 +2746,141 @@ lat/lon a person types or reads. I worked this out empirically (mercLat(-38.125)
 matching my own wrong test output to six figures) rather than reading a single comment that states
 it plainly; worth a doc note somewhere for the next person who tries to fabricate a label position
 by hand instead of loading a file, since it costs about the hour it cost me.
+
+---
+
+## feat/symbology-label R-346/R-347/R-342, 2026-09-27, 1701e62b
+
+CONFIRMED (R-346, OBSERVED, real Chrome via dev/browser-pass, labelcols spec, 69/69) -- Node
+labels, Link labels and Customer all read Bef./Aft. headings with Use units sitting after Aft.,
+in that order, on every row measured, including the ID row's spacer and the narrow-screen
+(<24rem) stacked layout Tom's "phone width" question was about. No leak into the fourth/fifth/
+sixth columns (Decimals/Show/Drop), which stayed exactly where R-326..R-331 put them.
+
+CONFIRMED (R-347, OBSERVED, real Chrome, ad-hoc script against the Settings box DOM, not a
+committed spec) -- a fresh US project: Link labels' Length row opens with "Use units" UNTICKED
+and its After box literally contains `'`; Diameter opens UNTICKED with `"`. A fresh SI project:
+both open TICKED (After box disabled, showing " m" / " mm"). Read the actual checkbox.checked and
+input.value off the live DOM, not the source. Matches Tom's words exactly: "Length and Diameter
+for US projects should have ' and ", not 'Use units' ticked."
+
+CONFIRMED (R-342, OBSERVED, real Chrome + the build agent's own node harness
+new-project-inherit-harness.js, 17/17) -- New Project with the SAME units as the open project:
+a hand-ticked Length "Use units" box (against its own US default of unticked) survived into the
+new project, live in Chrome, not just in the stub. New Project with Length's unit CHANGED (ft to
+m) while nothing else changed: the tick reset to the metre default (ticked) -- the narrow,
+per-field reset the build agent described, not a wipe of the whole project. The node harness
+additionally covers what I did not re-drive live (idPrefixes, decimals, customerMaxWidth,
+a Pressure-only change leaving Length untouched) and passed; I did not distrust it enough to
+re-drive all of it in a real browser given it exercises the same non-DOM object-copy code the
+DOM-level tick already confirmed behaves correctly.
+
+JUDGEMENT CALL, not a defect -- the build agent flagged its own reading of R-342 as narrower than
+a literal parse of "Otherwise a new project gets built-in defaults," which read alone could mean
+"if ANY unit differs, revert EVERYTHING to built-in, not just the changed unit's pieces." I think
+the shipped narrow reading is the better one: Tom's own closing sentence in the same message --
+"The party line is that new projects follow current project as much as they can" -- only makes
+sense under the narrow reading (an all-or-nothing wipe on the first mismatched unit is the
+opposite of "as much as they can," and would mean changing an unrelated family like Age units
+silently drops a person's ID prefixes and colour choices). But this is a genuine ambiguity in his
+own prose with real stakes (surprise data loss vs. surprise carryover), and only Tom can rule
+definitively which he meant -- worth him saying so explicitly rather than this holding as inferred.
+
+UNVERIFIABLE FROM HERE -- whether the rendered MAP label (not the Settings-box preview, which I
+did confirm) for Length/Diameter looks right by eye on an opened example. I tried to drive this
+in real Chrome (turn on the Length label, sample rendered label text on Net1-US and the SI Basic
+network example) and got empty samples both times -- my selector for the rendered label text was
+wrong, not a defect I can pin on the branch; I did not have time to find the right one this round.
+A person should open "Basic network, gpm (US)", turn on a pipe's Length in Settings > Link labels,
+and confirm the label on the map itself shows a plain number with a trailing `'`, then repeat with
+"Basic network, L/s (SI)" and confirm it shows " m".
+
+LEAK CHECK: labelUnitMark() is now the single source both labelTableDefaults() (which sets the
+tick) and labelUnitSuffix() (which decides what's printed) read, replacing two independent copies
+of the ft/in special case -- so the tick and the printed mark cannot drift out of sync with each
+other the way two separately-maintained conditionals could. resetUnitBearingDefaultsFor() is
+scoped to the three named defaults fields, the length-only customerMaxWidth, and useUnits rows
+whose OWN unit selector is in changedSelectors -- I read the loop and it does not touch decimals,
+show/drop order, colours, or any field outside LPN_LABEL_FIELD_UNIT, matching what CLAUDE.md and
+dev/unit-rulings.md now say.
+
+
+# Perry review, feat/quality-settings R-349/R-350, 2026-09-27 (commit 97a36cef)
+
+Reviewed 016576a4 ("R-349/R-350: link concentration everywhere a node has it; Source type
+disables blank") against R-349 ("Node labels settings, Find, and Table has it, but I don't see
+Concentration for Link or in Properties... incomplete execution") and R-350 ("Source type
+should default to none... disable if Source quality is blank").
+
+METHOD: ran dev/lpn-spike/quality-settings-harness.js (production functions via
+dev/lpn-spike/lpn-dom-stub.js, not stubs of the claim itself) -- CITED all-pass, then copied the
+same harness file to a worktree checked out at the immediate parent of the fix (d75a944c, one
+commit before 016576a4) and re-ran it there: it throws (`Cannot read properties of undefined
+(reading 'replace')`) partway through the R-349 section, proving the harness genuinely
+discriminates old from new code rather than passing on both. Ran dev/lpn-spike/inp-roundtrip-net3-
+harness.js and dev/lpn-spike/quality-net3-harness.js: Net3 unedited import->export is still 1229
+tokens, 1229 byte-identical, 0 different.
+
+Then drove REAL headless Chrome (dev/lpn-spike/browser-drive.js under flock
+/tmp/engcalcs-browser.lock, several throwaway scripts, not committed) through the actual production
+UI end to end on the shipped EPANET Net3 example: opened it from the real gallery card, opened
+Water > Settings > Quality, selected "A reactive chemical" in the real <select>, typed "Chlorine"
+in the real Chemical name <input>, pressed the real Calculate button
+(`#lpn_toolbar_run`), then:
+
+CONFIRMED live -- the Node AND Link Symbology "Color by" lists both read "Chlorine concentration"
+/ "Average Chlorine concentration" the instant the name was typed (this was already true for the
+node half; the link half is new and confirmed here too, since Tom's (3)(a) mentioned "Table" but
+this shows the coloring legend followed too).
+
+CONFIRMED live -- the real Pipes table (`#lpn_pane_pipes`, opened via the real `#lpn_pane_btn` and
+`#lpn_pane_tab_pipes` buttons) has a column headed exactly "Average Chlorine concentration (mg/L)",
+sitting beside "Reaction rate (mg/L/day)" as the build report claimed.
+
+CONFIRMED live -- real Find (`#lpn_find_popup`), scope set to "Pipe" via the actual <select>, "What
+to search" > Property lists "Average Chlorine concentration" as a choosable property -- the exact
+row R-349 said was missing.
+
+CONFIRMED live, and the sharpest check of the round -- used a real Find lookup (scope Pipe, ID
+contains "10") to select "Pipe 101", clicked its result row (a real `.click()` on the actual
+production row, not a synthetic hit-test guess), then dispatched a real PointerEvent
+pointerdown+pointerup at the map canvas's own screen centre (`#lpn_canvas`, centred there because
+Find's own `findGoTo()` recentres the view on the found element) to open the REAL Properties popup
+through the page's own click-handling code, not a function called directly. The popup's own
+`#lpn_popup_fields` now contains a `<label>` reading "Average Chlorine concentration (mg/L) ? 0.00"
+between "Status" and "Reaction rate" -- exactly the missing row. (Flow/velocity/quality all read
+0.00 because Net3's default has no Total run time set, which the box's own note says quality needs;
+that is a property of the network settings, not of this fix, and orthogonal to the venue question
+being checked.)
+
+CONFIRMED live -- R-350, on a real junction (Find scope Junction, "Junction 10", opened
+synchronously the same way a real node click does): BEFORE typing anything, the real Source type
+`<select>` in the popup is `.disabled === true` and reads value `""` (options list starts with
+"None"), while Source quality is blank -- exactly Tom's "disable if Source quality is blank... it's
+ignored if Source Quality is blank." Typed "1" into the real Source quality `<input>` and dispatched
+its own `change` event: the Source type select became enabled and read "CONCEN" (EPANET's own
+default), live. Cleared the Source quality input again: Source type went back to disabled/blank.
+Three real state transitions, all through the popup's own DOM and its own event listeners, none of
+it called directly.
+
+CONFIRMED at the harness level only, not independently reproduced live -- the SAME claim for a pump
+and a valve (Tables column, Find row, Properties popup row). The harness drives the identical
+`paneColLinkQuality()`/`linkQualityResultRow()`/`linkQualityLabel()` functions Chrome uses for a
+pipe, with no type-specific branch in that code path, so the risk of a pump/valve-only defect is
+low, but I did not click a pump or valve popup open in a live browser this round: my Find query for
+Net3's two real pump IDs ("10", "335", confirmed against the shipped .lwn's own JSON) returned
+"Nothing matched" for a query that should have matched "10" the same way the junction and pipe
+queries did, and I could not diagnose why inside this round's budget -- most likely my own test
+script rather than the product (the identical scope+property+condition+value recipe worked for
+Junction and Pipe moments earlier in the same session), but I did not prove that either way.
+UNVERIFIABLE FROM HERE: open a pump's Properties box in Net3 under a chemical run and read for an
+"Average {chemical} concentration" row between Status and the bottom of the box.
+
+LEAK CHECK: `paneColSourceType()`'s `choices(n)` only prepends the "None" option `when (n &&
+!hasSourceQuality(n))` -- so the same column definition never grows an extra option on a NODE that
+already has a stated source quality, and the harness's own check 6 confirms the Tables column and
+the popup select agree on both the disabled state and the option list for both cases. No other
+column reads `hasSourceQuality()`, so this is contained to the one control R-350 named.
+
+No further findings this round -- both R-349 and R-350 are what Tom asked for, measured rather than
+argued, in the harness, in Net3's byte-identical export, and in a real running Chrome.

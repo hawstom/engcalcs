@@ -2542,65 +2542,7 @@
 			"quality": false,
 			"rate": false
 		},
-		"decimals": {
-			"node": {
-				"demand": 2,
-				"demandActual": 2,
-				"head": 2,
-				"pressure": 2,
-				"elev": 2,
-				"quality": 1,
-				"initQuality": 2
-			},
-			"link": {
-				"diameter": 0,
-				"length": 2,
-				"roughness": 0,
-				"km": 2,
-				"flow": 2,
-				"velocity": 2,
-				"headloss": 2,
-				"gradient": 4,
-				"friction": 4,
-				"quality": 1,
-				"rate": 2
-			}
-		},
-		"prefix": {
-			"node": {},
-			"link": {}
-		},
-		"suffix": {
-			"node": {},
-			"link": {}
-		},
 		"separator": ", ",
-		"priority": {
-			"node": {
-				"quality": 7,
-				"initQuality": 6,
-				"demandActual": 5,
-				"demand": 4,
-				"pressure": 3,
-				"elev": 2,
-				"head": 1
-			},
-			"link": {
-				"rate": 13,
-				"quality": 12,
-				"status": 11,
-				"flow": 9,
-				"velocity": 8,
-				"headloss": 7,
-				"gradient": 6,
-				"friction": 6,
-				"diameter": 5,
-				"length": 4,
-				"roughness": 3,
-				"km": 2,
-				"id": 1
-			}
-		},
 		"markExtrema": true
 	},
 	"backdrop": null,

@@ -2076,3 +2076,76 @@ everything else above is this seat's own unit-magnitude arithmetic, not a third-
 and should be re-derived rather than quoted as an outside standard.
 
 — Mary
+## 2026-09-27 — Ctrl+Enter fill-selection (branch `feat/ctrl-enter`, Task 690, spec by Declan)
+
+Tom asked whether this convention exists outside the repo and whether Mary/Ida can endorse it
+before he implements. Scope: is Ctrl+Enter-fills-selection an established convention, does any
+tool our users touch bind it to something else, and would consulting engineers already know it.
+
+**CITED — Excel binds Ctrl+Enter to "fill every selected cell (including non-contiguous) with the
+value typed in the active cell," selection stays intact.** Confirmed by three independent
+descriptions: Excel Campus, "2 Ways to Use the Ctrl+Enter Keyboard Shortcut in Excel"
+(https://www.excelcampus.com/tips/ctrl-enter-shortcut/); My Online Training Hub, "7 Excel Ctrl
+Enter Shortcuts" (https://www.myonlinetraininghub.com/7-excel-ctrl-enter-shortcuts); Chandoo, "Use
+CTRL+Enter to Enter Same Data in to Multiple Cells in Excel"
+(https://chandoo.org/wp/how-to-enter-same-data-into-multiple-cells/). This is the exact gesture and
+outcome Declan's spec describes — select range, type into active cell, Ctrl+Enter, all cells fill,
+selection is not collapsed.
+
+**CITED — Google Sheets binds Ctrl+Enter (Cmd+Enter on Mac) to the identical behavior**, per
+support-community and how-to sources surfaced together
+(https://www.thebricks.com/resources/guide-how-to-enter-same-data-in-multiple-cells-in-google-sheets,
+corroborated by https://support.google.com/docs/thread/283387660). Same gesture, same non-collapse
+of selection, explicit note that it works even for a non-contiguous multi-select.
+
+**CITED — LibreOffice Calc does NOT match; it is a real collision, but a narrow one.** Multiple
+LibreOffice/OpenOffice sources agree Ctrl+Enter (Cmd+Enter on Mac) inserts a line break *inside a
+cell's text* while the text cursor is placed within that cell during in-cell edit — a paragraph
+break, ASCII LF — not a fill-selection command
+(https://ask.libreoffice.org/t/ctrl-enter-in-calc/33601;
+https://www.libreofficehelp.com/line-breaks-cell-libreoffice-office/). Filling a selection with one
+value in LibreOffice Calc instead goes through Sheet > Fill Cells, or Shift+Ctrl+Enter as an
+array-fill variant tied to the Input Line, not the plain Ctrl+Enter gesture. **The collision only
+bites while a cell is already in text-edit mode with the cursor placed mid-string** — it does not
+collide with "commit and move" from a cell that is merely selected/active but not being edited in
+that mid-string sense, which is the more common state a Ctrl+Enter press starts from. Declan's spec
+(`dev/task-690-ctrl-enter-spec.md:9-12`, OBSERVED) already commits any in-progress edit as step 1
+before doing anything else, which is the same shape Excel and Sheets use and sidesteps generating an
+literal newline character — but it is worth Declan or Ida confirming on a real keyboard that typing
+text then pressing Ctrl+Enter while the LPN table cell is still literally in edit-mode text-cursor
+state does not insert a line-break character into the committed text first, the way it would in
+Calc. This is the one place a LibreOffice-habituated user's fingers would produce a different
+result than they expect, even though it's a minority convention next to Excel/Sheets.
+
+**No finding either way for QGIS attribute table or Bentley WaterGEMS/WaterCAD FlexTables/EPANET.**
+Three searches each turned up official documentation pages (QGIS attribute-table manual, Bentley
+OpenFlows keyboard-shortcuts KB, WaterGEMS "Editing FlexTables" doc) with no mention of Ctrl+Enter
+in either direction — not "it does something else," genuinely absent from what surfaced. I could
+not fetch the Bentley KB shortcuts article's actual shortcut table (page loaded as JS-rendered
+shell) or find a QGIS shortcut reference that lists Ctrl+Enter at all. **Absence result, not a
+confirmed absence** — I did not have hands-on access to a live WaterGEMS/InfoWater/QGIS session to
+test the gesture directly, only public docs and search snippets.
+
+**On whether our users already know it: SPECULATION, not CITED.** Consulting engineers doing
+utility hydraulic modeling live in spreadsheets constantly (Excel for BOMs, cost estimates,
+model-input tables, and — per `CLAUDE.md`'s lpn_ section — this suite's own FlexTable-like tables
+and .inp import/export target the same audience that edits WaterGEMS FlexTables, which look and
+behave like grids). Excel fluency in that population is near-universal professional literacy, but I
+found no survey or study measuring Ctrl+Enter *specifically* (as opposed to Excel generally) among
+civil/environmental engineers — that's an inference from Excel's ubiquity in the profession, not a
+finding about the specific shortcut, and a future invocation should re-derive it rather than cite
+this paragraph as settled.
+
+**Verdict: endorse, with one narrow caveat, not a change to the spec.** Two of the three general
+spreadsheet tools our users are drilled on (Excel, Google Sheets) already bind this exact gesture to
+this exact behavior, and Declan's spec already matches their non-collapsing-selection detail rather
+than inventing a new interaction. The one real collision (LibreOffice Calc's mid-edit line-break)
+is narrow enough — a minority tool, and only in the specific sub-state of already being inside
+in-cell text edit — that I would not block the feature on it, but I'd ask Declan/Ida to verify by
+hand that committing-before-fill (spec step 1) fully absorbs that case rather than letting a stray
+newline slip into the committed value on some browser/OS combination. I found no evidence, for or
+against, in the hydraulic-modeling-specific tools (WaterGEMS, InfoWater, EPANET, QGIS) — this
+endorsement rests on the spreadsheet precedent, not a hydraulic-software one.
+
+— Mary
+</content>

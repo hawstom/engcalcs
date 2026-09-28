@@ -238,6 +238,23 @@ console.log('\n2b. AND OVER NUMERIC ROWS ALONE IT STILL PRICES TO THE ORIGINAL T
 	const les = L.linkEls();
 	const doc = L.getDoc();
 	L.labelSettings().link.status = false;
+	// Initial status (Tom's table, R-327) is the second row that prints a word, and "Use units"
+	// (R-331) puts a foot and an inch mark after Length and Diameter -- neither is a digit.
+	L.labelSettings().link.initStatus = false;
+	L.labelSettings().useUnits.link.length = false;
+	L.labelSettings().useUnits.link.diameter = false;
+	// **AND THE CONTENT THIS BOUND WAS MEASURED ON.** Tom's table (R-326..R-328, 2026-09-26) changed
+	// both the digits a link label prints and the order its rows are given up in, and the stub's
+	// per-character metrics misprice some subsets more than others (4.5% mean, 6.9% worst on his
+	// table against 1.1% on this one, with the arithmetic untouched). The bound is about the
+	// ARITHMETIC, so it is measured on the decimals and the drop column it was built against; the
+	// shipped table is priced in section 2 above, inside its wider fence.
+	Object.keys(L.labelSettings().decimals.link).forEach(function (k) {
+		if (k.indexOf(':') < 0) { L.labelSettings().decimals.link[k] = 2; }
+	});
+	Object.assign(L.labelSettings().decimals.link, { diameter: 0, roughness: 0, gradient: 4, friction: 4 });
+	Object.assign(L.labelSettings().priority.link, { status: 11, flow: 10, velocity: 9, headloss: 8,
+		gradient: 7, friction: 6, diameter: 5, length: 4, roughness: 3, km: 2, id: 1 });
 	L.refreshLabelText();
 	L.relayoutLabels();
 	let n = 0, worst = 0, sum = 0;

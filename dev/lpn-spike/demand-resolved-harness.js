@@ -245,7 +245,9 @@ console.log('\n--- label display, Tables pane, Properties editor ---');
 	const defs = L.nodeFieldDefs().map(f => f[0]);
 	ok('the Labels popover offers both', defs.indexOf('demand') >= 0 && defs.indexOf('demandActual') >= 0,
 		defs.join(', '));
-	ok('...with Demand above Base demand', defs.indexOf('demandActual') < defs.indexOf('demand'));
+	// Tom's table (dev/symbology-defaults.csv, R-334) lists the typed Base demand with the inputs
+	// and the resolved Demand with the results, so the list runs Base demand first.
+	ok('...in the order of Tom\'s table, Base demand before Demand', defs.indexOf('demand') < defs.indexOf('demandActual'));
 
 	const colour = L.colorFieldOptions('node').map(o => o[0]);
 	ok('colour-by-value offers both', colour.indexOf('demand') >= 0 && colour.indexOf('demandActual') >= 0,

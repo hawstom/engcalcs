@@ -215,6 +215,18 @@
             "words": "8119 row-paste: OK. Done. Close, merge and delete branch.",
             "context": "Said 2026-09-27 after his browser pass on port 8119, in the message that also carried his R-315/R-318 decisions.",
             "pin_note": "HE CLEARED IT AT 56ab0925 AND THE PIN IS LATER: the merge of master (placement-wizard, find-coordinate, R-306), one harness count conflict resolved. Nothing of the branch's own."
+        },
+        "feat/symbology-label": {
+            "head": "78b7ef98",
+            "date": "2026-09-27",
+            "words": "Branch seems good. No new problems.",
+            "context": "Said after his pass on port 8120, answering items 1-3 OK and R-342 with \"Only what depends\". Asked in the same session whether those words were his all-clear to merge and delete, he chose \"Yes, merge and delete\". His two peripheral notes (the mode-button outline after Esc, the vertices format in Tables) went to their own branches, fix/mode-focus and feat/table-width."
+        },
+        "feat/quality-settings": {
+            "head": "24aa4bfa",
+            "date": "2026-09-27",
+            "words": "1. OK. 2. OK. BTW, mouse cursor and selection are perfect. 3. OK.",
+            "context": "His pass on port 8121. Asked in the same session whether to merge and delete, he chose \"Yes, merge and delete\". His peripheral rules (4.1 initial column widths, 4.2 centred ID column) are built on feat/table-width, not here."
         }
     }
 }

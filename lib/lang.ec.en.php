@@ -2570,19 +2570,36 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priority';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first and is also the rightmost (last in English) on the label.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first, and the ID is never dropped. When only the ID and one value are left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
-$ec_lang['lpn_labels_col_before']='Before';
+$ec_lang['lpn_labels_col_before']='Bef.';
 $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time';
-$ec_lang['lpn_labels_col_after']='After';
+$ec_lang['lpn_labels_col_after']='Aft.';
 $ec_lang_syn['lpn_labels_col_after']='After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time';
 $ec_lang['lpn_labels_col_decimals']='Decimals';
+// ---- R-326..R-334 (2026-09-26): Show order, Use units, the customer Drop column, the new rows ----
+// "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
+// display first, but also may need to drop first."). As short as "Drop" and for the same reason:
+// it heads a box about three characters wide, and its tip carries the whole meaning.
+$ec_lang['lpn_labels_col_show']='Show';
+$ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.';
+$ec_lang['lpn_labels_priority_customer_tip']='The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
+// Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
+// It heads a narrow column and names each row's tick box.
+$ec_lang['lpn_labels_use_units']='Use units';
+$ec_lang['lpn_labels_use_units_tip']='Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.';
+// EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
+$ec_lang['lpn_labels_init_status']='Initial status';
+// The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
+// Customer"). The two label entries reuse lpn_labels_heading_node/_link.
+$ec_lang['lpn_settings_sym_node_colors']='Node colors';
+$ec_lang['lpn_settings_sym_link_colors']='Link colors';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';
 $ec_lang['lpn_backdrop_add']='Add';
@@ -3209,8 +3226,6 @@ $ec_lang['lpn_settings_sec_symbology']='Symbology';
 $ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
-$ec_lang['lpn_settings_sym_node']='Node';
-$ec_lang['lpn_settings_sym_link']='Link';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
@@ -3246,9 +3261,30 @@ $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as t
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
 // concentration is TEXT the document states beside the chemical name and is never converted, which
 // is why there is no unit family and no unit key here.
-$ec_lang['lpn_quality_chemical_name']='Chemical and units';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_chemical_name_tip']='Label for the chemical and its concentration units: for example, Chlorine mg/L. Not used in calculations, but be consistent.';
+// R-323: "Our interface is very clear that these don't matter to the calculations. But
+// explanation aside, our interface is arguably less friendly than EPANET because they have a
+// dropdown for Mass Units ... and they don't 'require' the chemical name." Split into a name (this
+// key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
+// and Mass Units fields; the name is optional, exactly as EPANET's own is.
+$ec_lang['lpn_quality_chemical_name']='Chemical';
+$ec_lang['lpn_quality_chemical_name_tip']='The chemical you are tracking, for example Chlorine. Leave it blank for EPANET\'s own default label, Chemical. Shown on your reports, but not used in the calculations.';
+$ec_lang['lpn_quality_mass_units']='Mass units';
+$ec_lang['lpn_quality_mass_units_tip']='The mass half of the concentration unit, EPANET\'s own two choices.';
+$ec_lang['lpn_quality_unit_ug']='µg/L';
+// R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
+// diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
+// and handed to the engine with no box to read or change them from; EPANET's own names and its own
+// defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
+$ec_lang['lpn_quality_tolerance']='Quality tolerance';
+$ec_lang['lpn_quality_tolerance_tip']='How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET\'s own default of 0.01.';
+$ec_lang['lpn_quality_diffusivity']='Relative diffusivity';
+$ec_lang['lpn_quality_diffusivity_tip']='How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET\'s own default of 1.0.';
+// R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
+// would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
+$ec_lang['lpn_quality_named_concentration']='{chemical} concentration';
+// R-349, the link half of R-323: linkQualityLabel()'s named-chemical case. A whole template
+// ("Average" is never glued to lpn_quality_named_concentration's own string at render time).
+$ec_lang['lpn_quality_named_avg_concentration']='Average {chemical} concentration';
 $ec_lang['lpn_quality_initial']='Initial quality';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Blank means 0.';
@@ -3263,6 +3299,9 @@ $ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at th
 $ec_lang['lpn_source_type']='Source type';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_source_type_tip']='What kind of chemical source dosing is applied here based on the Source Quality value? Concentration source uses the value as a concentration applied to the external inflow (reservoir or negative demand). Mass booster adds a fixed mass flow per minute to that entering the node from other points in the network. Setpoint booster ensures that the concentration leaving the node is no lower than the value. Flow-paced booster source adds a fixed concentration to that resulting from the mixing of all inflow to the node from other points in the network';
+// R-350: "Source type should default to none... it's ignored if Source Quality is blank." The
+// disabled state's own word, shown only while the box beside it carries no quality.
+$ec_lang['lpn_source_type_none']='None';
 $ec_lang['lpn_source_type_concen']='Concentration';
 $ec_lang['lpn_source_type_mass']='Mass booster';
 $ec_lang['lpn_source_type_setpoint']='Setpoint booster';
@@ -3324,7 +3363,9 @@ $ec_lang['lpn_reaction_order_tank']='Tank reaction order';
 $ec_lang['lpn_reaction_order_tank_tip']='The exponent the concentration is raised to for reaction in the water held in a tank, separate from the bulk reaction order so a tank can react on a different order from the pipes. Any real number is allowed, and 1 is the default. EPANET states it as ORDER TANK in a file and offers no box for it in its own interface.';
 $ec_lang['lpn_reaction_order_wall']='Wall reaction order';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_order_wall_tip']='1 means that wall reaction occurs according to the given coefficient(s). 0 means it does not. This is an on and off switch. Default value is 1.';
+// R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
+// dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
+$ec_lang['lpn_reaction_order_wall_tip']='1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.';
 $ec_lang['lpn_reaction_order_unstated']='Not stated';
 $ec_lang['lpn_reaction_order_zero']='0, zero order';
 $ec_lang['lpn_reaction_order_first']='1, first order';

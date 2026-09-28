@@ -465,3 +465,9 @@ is answered for the three that remain after the divorce; see item 5 series above
     (`js/looped-network.js:3843-3855`) so ordinary wizard-made blank geographic projects are not
     also repointed to Novato. Needs a `project.basemap` default too, or the geographic canvas shows
     nothing behind the grid. See journal, 2026-09-24 (R-208).
+(No new wishlist row from this review. Task 690's Ctrl+Enter adds no chrome and needs no follow-up
+from this seat. SPECULATION, low confidence: if a future review ever finds people using Ctrl+D or
+Ctrl+Enter in numbers worth measuring, the "Table keyboard shortcuts" Notes row could be promoted to
+a one-line hint that appears the FIRST time a person opens a multi-cell selection in this pane — but
+that is a new instrument, and Tom's own finding on the Hide-titles highlight is a reason to be
+skeptical it would work. Not proposing it now; no evidence it's needed.)

@@ -431,14 +431,17 @@ L.customerEdited(c2);
 		lines.map(l => l.field).join(',') === 'id,demand', lines.map(l => l.field).join(','));
 	ls.customer.demandActual = true;
 	lines = L.customerLabelLines(c1);
-	ok('3.6 Demand sits above Base demand, as it does on a junction',
-		lines.map(l => l.field).join(',') === 'id,demandActual,demand');
+	// In SHOW order (R-329), which Tom's table (dev/symbology-defaults.csv) runs ID, Base demand,
+	// then Demand -- the same order a junction's label now reads in.
+	ok('3.6 the rows print in Show order: ID, Base demand, Demand',
+		lines.map(l => l.field).join(',') === 'id,demand,demandActual', lines.map(l => l.field).join(','));
 	// **THE TWO IDENTITY STRINGS, WHICH ARE THE ROWS HE ASKED FOR** -- *"we may want only demand or
 	// only demand and description"*. An absent value prints nothing rather than an empty slot.
 	ls.customer.id = false; ls.customer.demandActual = false; ls.customer.desc = true;
 	c1.desc = 'Corner of Elm and Main';
 	ok('3.6b demand and description alone is expressible, which is the case he named',
-		L.customerLabelLines(c1).map(l => l.field).join(',') === 'demand,desc');
+		L.customerLabelLines(c1).map(l => l.field).join(',') === 'desc,demand',
+		L.customerLabelLines(c1).map(l => l.field).join(','));
 	c1.desc = '';
 	ok('3.6c ...and a customer with no description prints no empty slot for it',
 		L.customerLabelLines(c1).map(l => l.field).join(',') === 'demand');

@@ -329,8 +329,13 @@ Full record: `dev/unit-rulings.md` and `dev/unit-families.md`.
 - **`lpn_` settings belong to the PROJECT or the BROWSER, never both.** Modelling data (units,
   friction method, defaults, prefixes, colouring, labels) rides in `serializeProject()`; window
   furniture (`lpn_pane`, `lpn_rpane`, `lpn_setbox`, `lpn_findbox`, `lpn_ffbox`, `lpn_energybox`,
-  `lpn_cmpbox`, `lpn_reportbox`) is `localStorage` only. A new project gets hard-coded defaults.
-  **Never a "save current settings as default" button** — a template is a file.
+  `lpn_cmpbox`, `lpn_reportbox`) is `localStorage` only. **A new project follows the one it was
+  opened from as much as it can** (R-342): if the New Project wizard's units match the open
+  project's, the new one copies its whole modelling settings, labels included; if a unit differs,
+  only what is calibrated to that changed unit (a "Use units" tick, a typed `defaults` number, the
+  length-stated customer label limit) falls back to the built-in default, and everything
+  unit-independent still carries over. **Never a "save current settings as default" button** — a
+  template is a file.
 
 ---
 

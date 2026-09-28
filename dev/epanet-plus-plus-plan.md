@@ -77,14 +77,13 @@ affiliation question harder.
 
 ### Draft hero copy — PROPOSAL for Tom's ruling, not final
 
-**Headline:** EPANET++: scenarios, fire flow, and a network library, on the same engine EPA gave
-the world.
+**Headline:** EPANET++: scenarios, world map, fire flow, customers, custom properties, and asset libraries, given to the world on the same engine EPA gave the world.
 
-**Lede:** EPANET++ is a free, open-source water network editor built on the EPANET engine itself,
+**Lede:** EPANET++ is a free libre open-source water network editor built on the EPANET engine itself,
 the same solver the U.S. Environmental Protection Agency wrote and gave away, extended with
-scenarios, fire flow analysis, and a library of pumps and curves you can reuse across projects. It
+scenarios, world map, fire flow, customers, custom properties, and asset libraries you can import across projects. It
 is not EPANET, and it is not affiliated with or endorsed by the EPA; it is one of many tools built
-on public-domain software EPA released to everyone. We are still finding out what EPANET can do
+on public-domain software EPA released to everyone. [TGH: We (Mary) are doing dilligent research to find any gaps. I don't think it's most honest at this point to imply that we are not or that we don't know EPANET. If needed, let's keep asking Mary to double-check. I say we remove the net sentence.] We are still finding out what EPANET can do
 that we cannot, and we say so.
 
 **Call to action:** Open the network editor. (links to `https://librewaternet.org/app/`)
@@ -126,17 +125,17 @@ campaign needed; it is one more honestly labeled door.
 ## 5. Questions only Tom can answer
 
 1. **Option A or Option B1?** Recommend: **A now**; B1 is real `Canonical.lib.php` engineering and
-   should be its own task if wanted after seeing A live.
+   should be its own task if wanted after seeing A live. [TGH: A for development. Release as B1 for A/B testing.]
 2. **Does the landing page need to tell the visitor they are leaving an EPANET++-branded page for a
    LibreWaterNet-branded app?** Recommend: yes, one small line under the call to action ("opens in
-   LibreWaterNet, our network editor") — an unexplained brand switch reads as a broken link.
+   LibreWaterNet, our network editor") — an unexplained brand switch reads as a broken link. [TGH: No. Release as B1 for A/B testing.]
 3. **Is the paraphrased "still finding out what EPANET can do" sentence close enough to the
    sanctioned "infinite depth" quote, or does it need his exact wording?** Recommend: use his exact
    wording verbatim — positioning.md calls it "a positioning asset, not a disclaimer," and
-   paraphrase risks softening it.
+   paraphrase risks softening it. [TGH: The assessment is stale. See above.]
 4. **Does `epanet-js` get named anywhere on this site**, as `not-epanet.org` named it once as a
    licence credit? Recommend: not on the landing page — a one-screen hand-off, not a gratitude
-   page, and the page most resembling its name is the highest-risk place for that credit.
+   page, and the page most resembling its name is the highest-risk place for that credit. [TGH: OK.]
 5. **Should the site get its own claims ledger**, like `not-epanet.org`'s `CLAIMS.md`? Recommend:
-   yes, built alongside the site in step 3.
+   yes, built alongside the site in step 3. [TGH: OK. This is essentially identically a mirrored rebrand of LWN with EPANET comparison tweaks because we are more advanced now.]
 6. **Timing.** No longer a question: Tasks 715 and 716 closed 2026-09-26 with the feat/report merge.

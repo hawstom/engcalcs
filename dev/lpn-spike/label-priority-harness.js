@@ -28,6 +28,8 @@
 //      identical in the data.
 
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 const Geom = require(ROOT + 'js/lpn-geom.js').lpnGeom;
@@ -109,86 +111,57 @@ function dropOrderOf(map) {
 
 const def = L.defaultLabelSettings();
 
-// Tom, 2026-08-16, verbatim: "Link (drop last first): q flow, v velocity, H head loss, s gradient,
-// d diameter, C roughness, Km local losses" -- with `length` placed among the inputs before
-// roughness, and `id` LAST so it sheds first. The id rank reversed on 2026-08-16: it shipped as
-// never-shed on the Maplex key-number argument, and Tom overruled it because a link label lies along
-// its own pipe, so the drawing already says which pipe the numbers belong to.
-//
-// **THE PREFERENCE IS UNCHANGED BY TASK 445; ONLY THE NUMBERS ARE.** Tom's list still runs from the
-// value kept longest to the value shed first, so as a DROP order it reads backwards -- which is why
-// this literal is his list reversed rather than a new decision about which value matters.
-// **TASK 638 ADDED THREE ROWS AND REORDERED NONE OF HIS; TASK 652 ADDED A FOURTH THE SAME WAY.**
-// The friction factor goes with the results it is back-computed from, between the diameter and the
-// gradient; the status, the average quality and the REACTION RATE go ABOVE the whole of his list,
-// on the argument the node's quality row already won -- none of them is ever on unless somebody
-// switched the analysis on and asked for it by name, so none should give up its space to a value
-// that is on by default.
-eq(dropOrderOf(def.priority.link),
-	['id', 'km', 'roughness', 'length', 'diameter', 'friction', 'gradient', 'headloss', 'velocity',
-		'flow', 'status', 'quality', 'rate'],
-	'link drop order is Tom\'s list reversed, with Task 638\'s three slotted in');
+// **THE ORDER IS TOM'S TABLE NOW, READ FROM IT RATHER THAN RETYPED** (2026-09-26, R-334:
+// dev/symbology-defaults.csv). His 2026-08-16 lists ("Link (drop last first): q flow, v velocity, H
+// head loss, s gradient, d diameter, C roughness, Km local losses") are superseded by the table's
+// Drop order column, which also ranks the node ID (R-326: "Drop order is missing for Node ID").
+// symbology-table-harness.js holds every number; this file keeps the MEANING: which value goes
+// first and which is the last one standing, stated by name so a reversed comparator still fails.
+const CSV_DROP = { node: {}, link: {} };
+fs.readFileSync(path.join(ROOT, 'dev', 'symbology-defaults.csv'), 'utf8').split('\n').forEach(function (l) {
+	var c = l.replace(/\r$/, '').split('\t'), key = c[9], k;
+	if (!key || key === '-' || key === 'Key') { return; }
+	k = key.split(':');
+	if (CSV_DROP[k[0]]) { CSV_DROP[k[0]][k.slice(1).join(':')] = +c[8]; }
+});
+eq(dropOrderOf(def.priority.link), dropOrderOf(CSV_DROP.link), 'link drop order is Tom\'s table');
+eq(dropOrderOf(def.priority.node), dropOrderOf(CSV_DROP.node), 'node drop order is Tom\'s table');
 // Stated as meaning rather than as position, so it fails under the OLD sense instead of merely
 // sorting differently.
-ok(def.priority.link.id === Math.min.apply(null, Object.keys(def.priority.link).map(function (k) {
-	return def.priority.link[k];
-})), 'a link ID holds the LOWEST number, which is now what "shed first" means');
-// **HIS OWN LIST IS ASKED ABOUT ON ITS OWN**, so the claim he made -- the flow is the last of these
-// values standing -- is still tested rather than quietly widened by every field added after it.
-const TOM_LINK_FIELDS = ['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss',
-	'velocity', 'flow'];
-ok(def.priority.link.flow === Math.max.apply(null, TOM_LINK_FIELDS.map(function (k) {
-	return def.priority.link[k];
-})), 'and of the values he named, the flow holds the highest: the last one standing');
-ok(['status', 'quality', 'rate'].every(function (k) {
-	return TOM_LINK_FIELDS.every(function (t) { return def.priority.link[k] > def.priority.link[t]; });
-}), 'a status, an average quality and a reaction rate outrank all of them, being on only because they were asked for');
-
-// Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
-// for the same reason as the link list.
-// Demand joined the top of it on 2026-08-25, when Base demand and Demand became two fields: the
-// RESOLVED demand is the one worth the last space on a crowded drawing, and the base is recoverable
-// from it and the pattern.
-// Water quality joined the TOP of it on 2026-09-01. It is the one node field that is never on
-// unless somebody switched the analysis on and re-ran, so a field asked for by name is the last
-// to give up its space.
-// The starting concentration joined it under the quality row on 2026-09-13 (Task 638), on the same
-// argument: it is only ever on because the chemical analysis is.
-// Tank water depth (`level`) slotted in just above head on 2026-09-25 (Task 696): head is DERIVED
-// from elevation and depth, so it is still the first of the three to give up its space.
-eq(dropOrderOf(def.priority.node),
-	['head', 'level', 'elev', 'pressure', 'demand', 'demandActual', 'initQuality', 'quality'],
-	'node drop order is head, depth, elevation, pressure, base demand, demand, initial quality, water quality -- quality decides last and so wins');
+function lowest(map) { return dropOrderOf(map)[0]; }
+function highest(map) { var o = dropOrderOf(map); return o[o.length - 1]; }
+eq(lowest(def.priority.link), 'id', 'a link ID holds the LOWEST number, which is what "shed first" means');
+eq(highest(def.priority.link), 'flow', 'and the flow holds the highest: the last one standing');
+eq(lowest(def.priority.node), 'id', 'a node ID now sheds first too (R-326, R-329)');
+eq(highest(def.priority.node), 'pressure', 'and on a node the pressure is the last one standing');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,
 	'node and link priority maps are separate lists');
-ok(def.priority.node.id === undefined,
-	'a node ID carries no rank: an ID is never the reason one label beats another');
 
 
 // Every ranked field is a real field, and every numeric field is ranked. A rank on a field that
 // does not exist is invisible; a field with no rank is undefined in a comparator, which is not a
 // mild defect but a non-total order.
+// **A `field:mode` KEY NAMES ITS FIELD'S RANK IN ONE QUALITY MODE** (R-329: Tom's table ranks a
+// concentration, a source share and a water age differently); labelRank() reads it. So a ranked
+// key's BASE is what must be a real field, and a numeric field is ranked when it or one of its
+// modes carries a number.
+function baseField(k) { var i = k.indexOf(':'); return i < 0 ? k : k.slice(0, i); }
+function ranked(map, f) {
+	return typeof map[f] === 'number' || Object.keys(map).some(function (k) { return baseField(k) === f && typeof map[k] === 'number'; });
+}
 Object.keys(def.priority.node).forEach(function (k) {
-	ok(def.node[k] !== undefined, 'node priority ' + k + ' names a real label field');
+	ok(def.node[baseField(k)] !== undefined, 'node priority ' + k + ' names a real label field');
 });
 Object.keys(def.priority.link).forEach(function (k) {
-	ok(def.link[k] !== undefined, 'link priority ' + k + ' names a real label field');
+	ok(def.link[baseField(k)] !== undefined, 'link priority ' + k + ' names a real label field');
 });
-// **A `field:mode` KEY IS NOT A FIELD AND MUST NOT BE REQUIRED TO CARRY ITS OWN RANK.** `decimals`
-// gained `quality:trace` on 2026-09-21, a MODE-SPECIFIC override so a source share prints whole
-// (Tom: Source share Decimal = 0) while water age and concentration keep their tenth. It is still
-// the field `quality`, drawn in the same row, shed in the same order, and `qualityDecimalsKey()`
-// is its only reader -- so the rank that governs it is `quality`'s, and giving it a second rank
-// would be the non-total order this section exists to prevent, not a cure for one. The base name
-// is therefore what is looked up, and a key naming a base field that has no rank still FAILS.
-function baseField(k) { var i = k.indexOf(':'); return i < 0 ? k : k.slice(0, i); }
 Object.keys(def.decimals.node).forEach(function (k) {
-	ok(def.priority.node[baseField(k)] !== undefined, 'numeric node field ' + k + ' carries a rank');
+	ok(ranked(def.priority.node, baseField(k)), 'numeric node field ' + k + ' carries a rank');
 });
 Object.keys(def.decimals.link).forEach(function (k) {
-	ok(def.priority.link[baseField(k)] !== undefined, 'numeric link field ' + k + ' carries a rank');
+	ok(ranked(def.priority.link, baseField(k)), 'numeric link field ' + k + ' carries a rank');
 });
 // And the override is not allowed to name a mode nothing produces: `qualityDecimalsKey()` writes
 // exactly one such key, so a second one appearing here is a typo nobody would ever see on screen.

@@ -31,7 +31,8 @@ const L = loadLoopedNetwork(
 	"\t\trebuild: rebuildLabelsFields,\n" +
 	"\t\tcolW: function () { return LPN_LABEL_COL_W; },\n" +
 	"\t\taffixW: function () { return LPN_LABEL_AFFIX_W; },\n" +
-	"\t\tcolGap: function () { return LPN_LABEL_COL_GAP; } "
+	"\t\tcolGap: function () { return LPN_LABEL_COL_GAP; },\n" +
+	"\t\trowGap: function () { return LPN_LABEL_ROW_GAP; }, unitsW: function () { return LPN_LABEL_UNITS_W; } "
 );
 
 let fails = 0;
@@ -47,13 +48,13 @@ const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
 // makes the heading row's .85em harmless. An `em` here would re-create cause (2) above in silence.
 console.log('\n--- the column widths are absolute lengths, not relative ones ---');
 {
-	const w = [L.colW(), L.affixW()];
+	const w = [L.colW(), L.affixW(), L.unitsW()];
 	w.forEach((v) => ok('a declared width is in rem: ' + v, /^[0-9.]+rem$/.test(v)));
 	ok('the gap between the numeric columns is a fixed px: ' + L.colGap(),
 		/^[0-9.]+px$/.test(L.colGap()));
 	// The two containers are anchored so nothing inside them can inherit a surprise size.
-	ok('both field lists are anchored at 1rem in the stylesheet',
-		/#lpn_labels_node_fields,\s*\n?#lpn_labels_link_fields \{ font-size: 1rem; \}/.test(css));
+	ok('all three field lists are anchored at 1rem in the stylesheet',
+		/#lpn_labels_node_fields,\s*\n?#lpn_labels_link_fields,\s*\n?#lpn_labels_customer_fields \{ font-size: 1rem; \}/.test(css));
 }
 
 // ---- 1. what the stylesheet says a heading cell is --------------------------------------------
@@ -61,7 +62,7 @@ console.log('\n--- the column widths are absolute lengths, not relative ones ---
 // of the stylesheet rather than retyping them, so this harness cannot disagree with the shipped CSS.
 function importantWidths() {
 	const out = {};
-	const re = /((?:#lpn_labels_(?:node|link)_fields > div > span:nth-child\(\d\),?\s*)+)\{\s*width:\s*([0-9.]+rem)\s*!important;\s*\}/g;
+	const re = /((?:#lpn_labels_(?:node|link|customer)_fields > div > span:nth-child\(\d\),?\s*)+)\{\s*width:\s*([0-9.]+rem)\s*!important;\s*\}/g;
 	let m;
 	while ((m = re.exec(css))) {
 		[...m[1].matchAll(/nth-child\((\d)\)/g)].forEach((c) => { out[+c[1]] = m[2]; });
@@ -69,9 +70,10 @@ function importantWidths() {
 	return out;
 }
 const IMPORTANT = importantWidths();
-console.log('\n--- the stylesheet claims four columns, by index ---');
-ok('columns 2-5 all carry an !important width',
-	[2, 3, 4, 5].every((i) => IMPORTANT[i]),
+console.log('\n--- the stylesheet claims six columns, by index ---');
+// Before, After, Use units, Decimals, Show, Drop (R-326..R-331, reordered R-346).
+ok('columns 2-7 all carry an !important width',
+	[2, 3, 4, 5, 6, 7].every((i) => IMPORTANT[i]),
 	JSON.stringify(IMPORTANT));
 
 // ---- 2. build the real lists -------------------------------------------------------------------
@@ -91,7 +93,7 @@ function childWidth(child, idx) {
 }
 // Offsets of every column edge measured from the row's RIGHT edge, right to left. Alignment IS this
 // list: two rows line up exactly when their lists are equal.
-const GAP = 6;   // the rows' own `gap: 6px`, asserted equal for every row below
+const GAP = px(L.rowGap());   // the rows' own gap, asserted equal for every row below
 function columnEdges(row) {
 	const kids = row.children;
 	const edges = [];
@@ -111,16 +113,18 @@ function describe(edges) {
 	return edges.map((e) => e.right + '–' + e.left).join(' | ');
 }
 
-['node', 'link'].forEach(function (group) {
+['node', 'link', 'customer'].forEach(function (group) {
 	const box = byId['lpn_labels_' + group + '_fields'];
-	const rows = box.children;
+	// The heading row and the field rows. The customer list also carries a note and its zoom-limit
+	// row below the fields, which are not columns of anything.
+	const rows = box.children.filter((r, i) => i === 0 || (r.children[0] && r.children[0].tagName === 'LABEL'));
 	console.log('\n--- the ' + group + ' list: ' + rows.length + ' rows, the first being the headings ---');
 	ok('the list has a heading row and at least one field row', rows.length >= 2);
 
 	// THE THINGS THE MODEL HOLDS CONSTANT, ASSERTED. Every one of these is a way two rows could
 	// disagree without any width being wrong.
 	rows.forEach(function (r, i) {
-		ok('row ' + i + ' is a flex row with the same 6px gap', r.style.display === 'flex' && r.style.gap === '6px',
+		ok('row ' + i + ' is a flex row with the same ' + L.rowGap() + ' gap', r.style.display === 'flex' && r.style.gap === L.rowGap(),
 			r.style.display + ' / ' + r.style.gap);
 		ok('...with the same number of children as the heading row',
 			r.children.length === rows[0].children.length,
@@ -135,7 +139,7 @@ function describe(edges) {
 	// inline flex-shrink, so the stylesheet has to say it. Without it a narrow panel squeezes the
 	// boxes and leaves every heading standing to their right -- Task 435's defect by another route.
 	ok('the stylesheet pins the inputs against shrinking too',
-		/#lpn_labels_node_fields > div > input,\s*\n?#lpn_labels_link_fields > div > input \{ flex-shrink: 0; \}/.test(css));
+		/#lpn_labels_node_fields > div > input,\s*\n?#lpn_labels_link_fields > div > input,\s*\n?#lpn_labels_customer_fields > div > input \{ flex-shrink: 0; \}/.test(css));
 
 	// **THE ASSERTION THE WHOLE FILE IS FOR.**
 	const want = columnEdges(rows[0]);
@@ -155,9 +159,11 @@ function describe(edges) {
 		ok('the Before/After headings start where their text boxes start',
 			head[1].style.textAlign === 'start' && head[2].style.textAlign === 'start',
 			head[1].style.textAlign + ',' + head[2].style.textAlign);
-		ok('...and the two spinner headings are centred, like the digit under them',
-			head[3].style.textAlign === 'center' && head[4].style.textAlign === 'center',
-			head[3].style.textAlign + ',' + head[4].style.textAlign);
+		ok('...the Use units heading is centred over its tick',
+			head[3].style.textAlign === 'center', head[3].style.textAlign);
+		ok('...and the three spinner headings are centred, like the digit under them',
+			[4, 5, 6].every((k) => head[k].style.textAlign === 'center'),
+			[4, 5, 6].map((k) => head[k].style.textAlign).join(','));
 		ok('...with the spinners themselves centred by the stylesheet',
 			/#lpn_settings_box \.lpn-set-secbody input\.ec-spin \{ text-align: center; \}/.test(css));
 		const affix = rows[1].children[1];
@@ -168,10 +174,13 @@ function describe(edges) {
 	// columns are spacers. A spacer that carried the width and not the margin is how the columns
 	// came apart the first time, and it is checked above by the same equality -- this only makes
 	// sure such a row is actually in the list being checked.
-	if (group === 'node') {
+	// Since R-326 every ID row has a Show and a Drop spinner, so it holds Use units and Decimals open
+	// with spacers, in all three lists.
+	{
 		const idRow = rows.filter((r) => /ID/.test(r.children[0].textContent || ''))[0];
-		ok('the node ID row is present and reserves its two numeric columns with spacers',
-			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[4].tagName === 'SPAN',
+		ok('the ' + group + ' ID row is present and reserves Use units and Decimals with spacers',
+			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[3].children.length === 0 &&
+			idRow.children[4].tagName === 'SPAN',
 			idRow ? idRow.children.map((c) => c.tagName).join(',') : 'missing');
 	}
 });
