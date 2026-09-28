@@ -12,10 +12,15 @@
 
 const C = require('./contract.js');
 
-// Tom's weights, dev/label-placement-rules.md §3.1 (Q05).
-const WEIGHTS = {
-	labelOnText: 1, labelOnSymbol: 1, labelOnLabel: 1, leaderOnLeader: 0.9,
-	labelOnLeader: 0.7, labelOnLink: 0.3, leaderOnLink: 0.2, labelOnCustomer: 0
+// **THE COST IS COUNTED BY RANK, FROM THE ORDER ALONE** (dev/label-placement-rules.md §3, "Costs,
+// worst first"): each crossing costs its place in that order, 4 for the worst (leader on leader)
+// down to 1 for the least (leader on pipe), a label on a customer nothing. A break (a label on a
+// symbol, a label or a Text object, which N1 and N5 already fail) costs 5, above them all. These
+// are ranks, not anyone's judgement of how much worse one crossing is than the next; a caller
+// may pass its own `weights` to scoreView().
+const RANKS = {
+	labelOnText: 5, labelOnSymbol: 5, labelOnLabel: 5, leaderOnLeader: 4,
+	labelOnLeader: 3, labelOnLink: 2, leaderOnLink: 1, labelOnCustomer: 0
 };
 
 function ownersOf(scene) {
@@ -57,7 +62,8 @@ function drawn(scene, layout) {
 	return { items: out, invalid: invalid };
 }
 
-function scoreView(scene, layout) {
+function scoreView(scene, layout, opts) {
+	const W = (opts && opts.weights) || RANKS;
 	const d = drawn(scene, layout), items = d.items;
 	const breaks = { N1: [], N3: [], N4: [], N5: [], invalid: d.invalid };
 	const crossings = { leaderOnLeader: [] };
@@ -169,7 +175,7 @@ function scoreView(scene, layout) {
 		}
 	});
 	let cost = 0;
-	Object.keys(counts).forEach(function (k) { cost += counts[k] * WEIGHTS[k]; });
+	Object.keys(counts).forEach(function (k) { cost += counts[k] * W[k]; });
 
 	// ---- coverage and leaders --------------------------------------------------------------------
 	let rowsReq = 0, rowsShown = 0;
@@ -214,10 +220,119 @@ function scoreView(scene, layout) {
 		});
 	}
 
+	// R14: when there is space available, a pipe label the user's "Draw link labels along the link
+	// line" setting asks to lie along its pipe (req.along) is drawn along it. Of those shown: how
+	// many are, and of the rest, how many had an aligned spot beside their own pipe free in this
+	// very layout (alignedRoom()) -- the misses the rule is about. A hidden one is not counted here;
+	// dropping is R1's business.
+	let r14Asked = 0, r14Along = 0, r14MissedWithRoom = 0;
+	const r14Missed = [];
+	items.forEach(function (it) {
+		if (it.req.kind !== 'link' || !it.req.along || !it.owner.link) { return; }
+		r14Asked++;
+		if (alignedTo(scene, it.req, it.pl, it.owner.link)) { r14Along++; return; }
+		if (alignedRoom(scene, items, it.req, it.pl.rows, it.owner.link)) { r14MissedWithRoom++; r14Missed.push(it.id); }
+	});
+
 	return { breaks: breaks, crossings: crossings, counts: counts, cost: cost, labelsReq: scene.labels.length,
 		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH,
 		r5: { checked: r5Checked, mismatch: r5Mismatch }, r7: { checked: r7Checked, onOwnPipe: r7OnOwnPipe },
-		r9: { should: r9Should, has: r9Has } };
+		r9: { should: r9Should, has: r9Has },
+		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed } };
+}
+
+// ---- R14: along the pipe -------------------------------------------------------------------------
+const ALONG_TOL_DEG = 5;
+function readableWindow(scene) {
+	const w = scene.settings && scene.settings.readableAngleDeg;
+	return w && isFinite(w.min) && isFinite(w.max) ? w : { min: -110, max: 70 };
+}
+function norm180(a) { a = ((a % 360) + 360) % 360; return a > 180 ? a - 360 : a; }
+// The pipe's direction, in degrees on screen, at the segment nearest `p`.
+function pipeDirAt(link, p) {
+	let best = Infinity, dir = 0;
+	for (let i = 1; i < link.points.length; i++) {
+		const a = link.points[i - 1], b = link.points[i];
+		if (a[0] === b[0] && a[1] === b[1]) { continue; }
+		const d = C.distToSeg(p, a, b);
+		if (d < best) { best = d; dir = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; }
+	}
+	return dir;
+}
+// Is this placement drawn ALONG its pipe: turned to the pipe's direction where it sits (within
+// ALONG_TOL_DEG, either way round) and reading the right way up (scene.settings.readableAngleDeg)?
+function alignedTo(scene, req, pl, link) {
+	const bs = C.blockSize(req, pl, scene.text);
+	const a = norm180(+pl.angle || 0), dir = pipeDirAt(link, [pl.x + bs.w / 2, pl.y + bs.h / 2]);
+	let diff = Math.abs(((a - dir) % 180 + 180) % 180);
+	diff = Math.min(diff, 180 - diff);
+	const w = readableWindow(scene);
+	return diff <= ALONG_TOL_DEG && a > w.min - 1e-6 && a <= w.max + 1e-6;
+}
+// Was there room to draw it along its pipe? The same rows as one line, turned to the pipe and read
+// the right way up, BESIDE the pipe (its near edge half a row clear of the line), at the middle of
+// the pipe's on-screen length or up to three tenths either side of it, on either side of the pipe;
+// free of every symbol, every other shown label, every Text object and every other pipe, and on
+// screen. Returns the first such placement, or null.
+function alignedRoom(scene, items, req, rows, link) {
+	const vp = scene.viewport, text = scene.text, win = readableWindow(scene);
+	const pl0 = { shown: true, rows: rows, layout: 'line', align: 'center', x: 0, y: 0 };
+	const bs = C.blockSize(req, pl0, text);
+	if (!bs.rows.length) { return null; }
+	const inVp = function (p) { return p[0] >= vp.x && p[1] >= vp.y && p[0] <= vp.x + vp.w && p[1] <= vp.y + vp.h; };
+	// The on-screen stretch of the pipe, as arc-length stations.
+	const pts = link.points, segs = [];
+	let total = 0;
+	for (let i = 1; i < pts.length; i++) {
+		const L = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+		segs.push({ a: pts[i - 1], b: pts[i], s0: total, L: L });
+		total += L;
+	}
+	if (!total) { return null; }
+	function at(sArc) {
+		for (let i = 0; i < segs.length; i++) {
+			const g = segs[i];
+			if (sArc <= g.s0 + g.L || i === segs.length - 1) {
+				const t = g.L ? Math.max(0, Math.min(1, (sArc - g.s0) / g.L)) : 0;
+				return { p: [g.a[0] + t * (g.b[0] - g.a[0]), g.a[1] + t * (g.b[1] - g.a[1])],
+					dir: Math.atan2(g.b[1] - g.a[1], g.b[0] - g.a[0]) * 180 / Math.PI };
+			}
+		}
+		return null;
+	}
+	let on0 = Infinity, on1 = -Infinity;
+	for (let k = 0; k <= 40; k++) { const q = at(total * k / 40); if (q && inVp(q.p)) { on0 = Math.min(on0, k / 40); on1 = Math.max(on1, k / 40); } }
+	if (on0 > on1) { return null; }
+	const mid = (on0 + on1) / 2, span = on1 - on0;
+	const others = [];
+	items.forEach(function (it) { if (it.id !== req.id) { it.boxes.forEach(function (b) { others.push(b); }); } });
+	scene.nodes.forEach(function (n) { others.push(C.rectToOBox(n.symbol)); });
+	scene.links.forEach(function (l) { (l.symbols || []).forEach(function (b) { others.push(b); }); });
+	scene.texts.forEach(function (t) { others.push(t.box); });
+	const pipes = [];
+	scene.links.forEach(function (l) {
+		if (l.id === link.id) { return; }
+		for (let i = 1; i < l.points.length; i++) { pipes.push([l.points[i - 1], l.points[i]]); }
+	});
+	const gap = text.rowHeightPx / 2 + bs.h / 2;
+	const offs = [0, -0.1, 0.1, -0.2, 0.2, -0.3, 0.3];
+	for (let i = 0; i < offs.length; i++) {
+		const f = mid + offs[i] * span;
+		if (f < on0 || f > on1) { continue; }
+		const q = at(total * f);
+		let ang = norm180(q.dir);
+		if (!(ang > win.min && ang <= win.max)) { ang = norm180(ang + 180); }
+		const rad = ang * Math.PI / 180, nx = -Math.sin(rad), ny = Math.cos(rad);
+		for (let side = -1; side <= 1; side += 2) {
+			const cx = q.p[0] + side * gap * nx, cy = q.p[1] + side * gap * ny;
+			const box = { cx: cx, cy: cy, w: bs.w, h: bs.h, angle: ang };
+			if (!C.corners(box).every(inVp)) { continue; }
+			if (others.some(function (o) { return C.boxesOverlap(box, o); })) { continue; }
+			if (pipes.some(function (g) { return C.segHitsBox(g[0], g[1], box); })) { continue; }
+			return Object.assign({}, pl0, { x: cx - bs.w / 2, y: cy - bs.h / 2, angle: ang, leader: null });
+		}
+	}
+	return null;
 }
 function intersectPoint(p, q, r, s) {
 	const d = (q[0] - p[0]) * (s[1] - r[1]) - (q[1] - p[1]) * (s[0] - r[0]);
@@ -300,4 +415,4 @@ function zoomRowChange(sceneA, layoutA, sceneB, layoutB) {
 	return { regained: regained, lost: lost };
 }
 
-module.exports = { WEIGHTS, scoreView, stability, zoomRowChange, drawn };
+module.exports = { RANKS, scoreView, stability, zoomRowChange, drawn, alignedTo, alignedRoom };

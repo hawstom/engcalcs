@@ -12,6 +12,8 @@
 //      stands where the bench's trivial placer, run HERE on the scene the page built, says -- its
 //      anchor within 1 px and its drawn box within 1.5 px; no leader is drawn; nothing is placed
 //      while a pan is held, and a layout follows its release (rule T1).
+//   1b. R15: with the placer slowed, no frame shows a data label at a scale no layout was made for,
+//      nor a newly opened project's labels before their first layout; a small pan never hides them.
 //   2. The same page WITHOUT the parameter draws every label, leader and grab shape exactly as the
 //      tree before the seam did: attribute for attribute, against `git merge-base HEAD master`
 //      exported to a temp directory (LABEL_SEAM_BASE=<ref> overrides). Once this branch is merged
@@ -269,6 +271,13 @@ async function sectionPlacer(Session, browser, env) {
 		if (!live.last || !live.last.scene) { return; }
 		const scene = live.last.scene;
 		ok('the scene asks for labels', scene.labels.length > 10, scene.labels.length + ' labels requested');
+		// R14: the page hands a placer the user's "Draw link labels along the link line" setting
+		// (Net1 is saved with it on) and marks each pipe label it asks to lie along its pipe.
+		ok('the scene carries the alignment setting and marks the pipe labels it applies to',
+			!!(scene.settings && scene.settings.alignPipeLabels === true && scene.settings.readableAngleDeg)
+			&& scene.labels.some((r) => r.kind === 'link' && r.along === true)
+			&& scene.labels.every((r) => r.kind !== 'link' || r.along === !r.hand),
+			JSON.stringify(scene.settings) + '; ' + scene.labels.filter((r) => r.along).length + ' pipe labels along');
 		ok('rows are measured in the real font, not the stub\'s 6 px advance',
 			scene.labels.some((r) => r.rows.some((w) => w.text.length > 1 && Math.abs(w.w - w.text.length * 6 * scene.text.sizePx / 11) > 0.5)));
 		const want = trivial.place(scene).labels;
@@ -340,6 +349,98 @@ async function sectionPlacer(Session, browser, env) {
 		const stepAfter = await page.evaluate(() => EngCalcs.lpnPlacerLast.step);
 		ok('no layout while the pan is held (T1)', stepHeld === step0, 'step ' + step0 + ' -> ' + stepHeld);
 		ok('one layout once it settles', stepAfter === step0 + 1, 'step ' + stepHeld + ' -> ' + stepAfter);
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 1).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
+// ---- 1b. R15: no label is shown at a view no layout was made for --------------------------------
+// Tom, 2026-09-28: "when jumping into an untested (unfamiliar) view, hide the labels immediately
+// while you calculate positions instead of showing them in unconfirmed positions". The trivial
+// placer is slowed to SLOW_MS a layout so any frame drawn while one is pending is caught. A frame
+// recorder notes, on every animation frame: the map's scale, the scale of the last layout, and how
+// many node and link data labels are visible. Placer D's first layout of a project took ~0.5 s,
+// and until it came every label of the new project stood in one row across the lower screen
+// (2026-09-28, headless Chrome on 8133: 69 of Novato's labels at y = 792) -- which is what he saw.
+const SLOW_MS = 300;
+async function installRecorder(page, slowMs) {
+	await page.evaluate((ms) => {
+		const P = EngCalcs.lpnPlacers.trivial;
+		if (!P.__slowed) {
+			const fast = P.place;
+			P.place = function (scene, o) { const t = performance.now(); while (performance.now() - t < ms) { /* busy */ } return fast.call(this, scene, o); };
+			P.__slowed = true;
+		}
+		window.__r15 = [];
+		const g = () => document.querySelector('#lpn_canvas g');
+		function frame() {
+			const m = /scale\(([-0-9.e]+)\)/.exec((g() && g().getAttribute('transform')) || '');
+			let vis = 0;
+			document.querySelectorAll('#lpn_canvas text[data-nodelbl], #lpn_canvas text.lpn-lbl[data-linklbl]').forEach((t) => {
+				if (t.textContent && getComputedStyle(t).visibility !== 'hidden') { vis++; }
+			});
+			const L = EngCalcs.lpnPlacerLast;
+			window.__r15.push({ t: performance.now(), s: m ? +m[1] : null, laid: L && L.scene ? L.scene.view.s : null,
+				set: L && L.scene ? L.scene.set : null, step: L ? L.step : null, vis: vis, pending: !!EngCalcs.lpnPlacerPending });
+			window.__r15id = requestAnimationFrame(frame);
+		}
+		frame();
+	}, slowMs);
+}
+async function takeRecord(page) {
+	return page.evaluate(() => { cancelAnimationFrame(window.__r15id); const r = window.__r15; window.__r15 = []; return r; });
+}
+async function sectionPending(Session, browser, env) {
+	console.log('\n--- 1b. R15: labels hidden while a layout for an unfamiliar view is pending ---');
+	const a = await Session.open(browser, 'pending');
+	try {
+		const page = a.page;
+		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+		await page.goto(env.pageUrl('Looped-Network.php?ec_nolog=1&placer=trivial'), { waitUntil: 'load' });
+		await a.settle(400);
+		await a.answerTrainingPanel().catch(() => {});
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		// (a) Opening a project: no label of it is shown before its first layout.
+		await installRecorder(page, SLOW_MS);
+		const before = await page.evaluate(() => EngCalcs.lpnPlacerLast ? EngCalcs.lpnPlacerLast.scene.set : null);
+		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.settle(1200);
+		let rec = await takeRecord(page);
+		const opened = rec.filter((f) => f.set !== before && f.set !== null);
+		const early = rec.filter((f) => f.vis > 0 && (f.set === before || f.set === null));
+		ok('opening a project shows none of its labels before its first layout', opened.length > 0 && !early.length,
+			early.length ? early.length + ' frame(s), first with ' + early[0].vis + ' labels' : rec.length + ' frames, ' + opened.length + ' after the layout');
+		ok('and shows them once it is laid out', opened.length > 0 && opened[opened.length - 1].vis > 10, opened.length ? opened[opened.length - 1].vis + ' labels' : 'no layout');
+		// (b) A zoom: from the first frame at a new scale until the layout for it, nothing is shown.
+		const c = await page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
+		await installRecorder(page, SLOW_MS);
+		await page.mouse.move(c.x + c.w / 2, c.y + c.h / 2);
+		await page.mouse.wheel(0, -120);
+		await a.settle(1200);
+		rec = await takeRecord(page);
+		const stale = rec.filter((f) => f.vis > 0 && f.laid && f.s && Math.abs(f.s / f.laid - 1) > 0.005);
+		const zoomed = rec.filter((f) => f.laid && f.s && Math.abs(f.s / rec[0].s - 1) > 0.005);
+		ok('a zoom hides every data label until the layout for the new scale', zoomed.length > 0 && !stale.length,
+			stale.length ? stale.length + ' frame(s) showed labels at an unlaid scale, e.g. ' + JSON.stringify(stale[0]) : zoomed.length + ' frames at the new scale');
+		ok('and shows them again once laid out', rec.length > 0 && rec[rec.length - 1].vis > 10 && !rec[rec.length - 1].pending,
+			JSON.stringify(rec[rec.length - 1]));
+		// (c) An ordinary pan at the same scale never blanks them and never enters the pending state.
+		const vis0 = rec[rec.length - 1].vis;
+		await installRecorder(page, SLOW_MS);
+		const from = { x: c.x + 30, y: c.y + c.h - 40 };
+		await page.mouse.move(from.x, from.y);
+		await page.mouse.down();
+		for (let k = 1; k <= 10; k++) { await page.mouse.move(from.x + 8 * k, from.y - 3 * k); await page.waitForTimeout(30); }
+		await page.mouse.up();
+		await a.settle(1000);
+		rec = await takeRecord(page);
+		const blank = rec.filter((f) => f.vis < vis0 - 2 || f.pending);
+		ok('a small pan never hides the labels (R15 is not a blink on every move)', rec.length > 5 && !blank.length,
+			blank.length ? blank.length + ' frame(s), e.g. ' + JSON.stringify(blank[0]) : rec.length + ' frames, ' + vis0 + ' labels throughout');
+		// (d) R10: the hide is one class on the labels layer, so it costs a pan or zoom nothing.
+		const cls = await page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-placer-pending').length);
+		ok('the pending state is one class on the labels layer, cleared once laid out', cls === 0, cls + ' element(s) still carry it');
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 1).join(' | '));
 	} finally {
 		await a.close();
@@ -432,6 +533,7 @@ async function main() {
 		await env.startServer();
 		await devRefusals(env);
 		await sectionPlacer(Session, browser, env);
+		await sectionPending(Session, browser, env);
 		await sectionUnchanged(Session, browser, env);
 		env.stopServer();
 		delete process.env.APP_ENV;

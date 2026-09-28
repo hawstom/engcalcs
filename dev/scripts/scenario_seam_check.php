@@ -134,8 +134,47 @@ foreach ($lines as $i => $line) {
     }
 }
 
+// ---- 2b. The demand breakdown's spread-out storage (R-369) -------------------------------------
+//
+// `demands` is overridable as ONE property, but Base does not store it as `_demands`: row 0 is
+// `_demand` plus `demandPattern`/`demandCategory`, and the rest is `extraDemands`. So the rule
+// above, which looks for `x._prop =`, cannot see a write to any of it -- and that is exactly how
+// R-369 shipped: the demand table's Add button pushed onto `n.extraDemands` and its pattern and
+// description cells assigned `n.demandPattern`/`n.demandCategory`, so inside a scenario every one
+// of them edited Base. The field names are PARSED from LPN_DEMANDS_STORAGE, for the reason the
+// property list is. Caught: an assignment, a `delete`, and a mutating array call on the list.
+if (!preg_match('/var LPN_DEMANDS_STORAGE = \{([^}]*)\};/', $src, $dm)) {
+    fwrite(STDERR, "FAIL: could not find LPN_DEMANDS_STORAGE in js/looped-network.js.\n");
+    fwrite(STDERR, "It names where Base keeps a junction's demand list, and this check derives the fields it\n");
+    fwrite(STDERR, "guards from it. Fix the parse; do not hardcode the names.\n");
+    exit(1);
+}
+preg_match_all('/(\w+)\s*:\s*true/', $dm[1], $dfm);
+$dfields = array_values(array_unique($dfm[1]));
+if (count($dfields) < 2) {
+    fwrite(STDERR, "FAIL: parsed only " . count($dfields) . " field(s) from LPN_DEMANDS_STORAGE; the parse has drifted.\n");
+    exit(1);
+}
+$dalt = implode('|', array_map('preg_quote', $dfields));
+$dpatterns = [
+    '/(?<![\w.])[A-Za-z_$][\w$]*\.(' . $dalt . ')\s*=(?!=)/',
+    '/\bdelete\s+[A-Za-z_$][\w$.]*\.(' . $dalt . ')\b/',
+    '/\.(' . $dalt . ')\.(?:push|splice|shift|unshift|pop|sort|reverse)\s*\(/',
+];
+foreach ($lines as $i => $line) {
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $found = [];
+    foreach ($dpatterns as $dp) {
+        if (preg_match_all($dp, $line, $dh)) { $found = array_merge($found, $dh[0]); }
+    }
+    if (!$found) { continue; }
+    if (strpos($line, '// base-write:') !== false) { $approved += count($found); continue; }
+    foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
+}
+
 printf("Scenario write seam — %d group(s) (%s) and %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
     count($groups), implode(', ', $groups), count($props), implode(', ', $props));
+printf("  demand list stored as %s (LPN_DEMANDS_STORAGE)\n", implode(', ', $dfields));
 printf("  %d approved base-write(s), %d unmarked direct write(s)\n\n", $approved, count($bad));
 
 if ($bad) {
@@ -146,6 +185,8 @@ if ($bad) {
     echo "\nEach of these writes an overridable property WITHOUT going through setProp(). Inside a\n";
     echo "scenario that edits Base under every other scenario at once, silently -- the exact failure\n";
     echo "setProp()'s own comment predicts, and exactly what the valve popup did for five fields.\n\n";
+    echo "A demand-list field (" . implode(', ', $dfields) . ") goes through setProp(n, 'demands', rows)\n";
+    echo "-- editDemandRows() in the property popup -- which writes the scenario's own copy there.\n\n";
     echo "Either route it through setProp(el, prop, value), or -- if it genuinely must write Base\n";
     echo "(construction, import, the documented downstream push) -- mark it:\n\n";
     echo "    el._diameter = v;   // base-write: <why this one is Base and not an override>\n\n";

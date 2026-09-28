@@ -81,8 +81,8 @@
         "feat/epanet-plus-plus",
         "feat/water-tower",
         "feat/selection-preview",
-        "feat/ctrl-enter",
-        "feat/label-placer"
+        "feat/label-placer",
+        "feat/ctrl-enter"
     ],
     "feature_freeze": {
         "active": false,

@@ -509,10 +509,10 @@ console.log('\n--- patterns and scenarios ---');
 		L.resolvedDemand(J('J1')) + ' gpm');
 	L.libRenamePattern(pat, 'Pat2');
 
-	// **THE PER-CATEGORY OVERRIDE QUESTION, SETTLED.** An override is keyed by an element and a
-	// property NAME; a category has only a position, and a position moves when a row above it goes.
-	// So a scenario overrides the junction's demand -- row 0 -- exactly as it always has, and the
-	// breakdown is Base-document structure like the pattern beside it.
+	// **NO PER-CATEGORY OVERRIDE.** An override is keyed by an element and a property NAME; a
+	// category has only a position, and a position moves when a row above it goes. So a scenario
+	// overrides either row 0's base alone (`demand`, asserted here) or the whole list as one
+	// property (`demands`, R-369 -- dev/lpn-spike/scenario-demand-category-harness.js).
 	const j1 = J('J1');
 	L.createScenario('Peak hour');
 	const scn = L.getScenarios()[L.getScenarios().length - 1];

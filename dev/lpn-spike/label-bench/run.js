@@ -24,8 +24,8 @@ const path = require('path');
 const { scoreView, stability, zoomRowChange } = require('./score.js');
 
 // The crossing costs, worst to least (dev/label-placement-rules.md §3, "Costs, worst first").
-// Builders get the order only, not Tom's numbers (his ruling of 2026-09-28) -- the weights
-// themselves stay in score.js.
+// Builders get the order only (Tom's ruling of 2026-09-28): score.js counts each crossing by its
+// rank in this order, and no other numbers are in the bench.
 const CROSSING_ORDER = ['leader on leader', 'label on leader', 'label on pipe', 'leader on pipe',
 	'label on customer (free)'];
 
@@ -107,7 +107,7 @@ function printTable(results, log) {
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
-		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, zoomRegained: 0, zoomLost: 0 };
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
@@ -116,6 +116,7 @@ function printTable(results, log) {
 			T.ldr = T.ldr.concat(s.leaderLH); T.ms.push(st.ms);
 			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
 			T.r9s += s.r9.should; T.r9h += s.r9.has;
+			T.r14a += s.r14.asked; T.r14y += s.r14.along; T.r14m += s.r14.missedWithRoom;
 			const stab = st.stability;
 			if (stab) { T.moved += stab.moved; T.churn += stab.churn; T.compared += stab.compared; }
 			if (st.zoomIn) { T.zoomRegained += st.zoomIn.regained; T.zoomLost += st.zoomIn.lost; }
@@ -133,13 +134,16 @@ function printTable(results, log) {
 	log('time per layout: median ' + f1(quant(T.ms, 0.5)) + ' ms, max ' + f1(quant(T.ms, 1)) + ' ms, on ' + machine());
 	const idle = results.reduce(function (a, s) { return a + s.idleMs; }, 0);
 	if (idle) { log('idle hook time (not in the layout times): ' + idle.toFixed(0) + ' ms over ' + results.length + ' set(s)'); }
-	log('crossing costs, worst to least: ' + CROSSING_ORDER.join(', ') + ' (weights are judges-only)');
+	log('cost = each crossing counted by its rank, worst to least: ' + CROSSING_ORDER.join(', ')
+		+ ' (4, 3, 2, 1, 0; a label on a symbol, label or Text 5)');
 	log('leader length in label heights (the shown block\'s own height); churn = moved/compared'
 		+ ' between consecutive views, where the move showed nothing more and fixed no break (no stillness rule)');
 	log('REPORTED, never failing -- R5 leader-side align: ' + T.r5m + '/' + T.r5c + ' stacked+leadered labels not'
 		+ ' justified to their leader\'s side; R7 label-on-own-pipe: ' + T.r7o + '/' + T.r7c + ' shown pipe labels sit on'
 		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
-		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps');
+		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps;'
+		+ ' R14 along the pipe: ' + T.r14y + '/' + T.r14a + ' shown pipe labels the setting asks to lie along their pipe do,'
+		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to');
 	return T;
 }
 
@@ -165,6 +169,9 @@ function main() {
 				st.score.crossings.leaderOnLeader.forEach(function (m) {
 					console.log('  ' + st.id + ' leader on leader (cost, not a break): ' + m);
 				});
+				if (st.score.r14.missedIds.length) {
+					console.log('  ' + st.id + ' R14 not along its pipe, with room: ' + st.score.r14.missedIds.join(' '));
+				}
 				if (st.stability && st.stability.churnIds.length) {
 					console.log('  ' + st.id + ' churn: ' + st.stability.churnIds.join(' '));
 				}
