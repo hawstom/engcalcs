@@ -158,6 +158,7 @@ const EC_SCRIPTLESS_CHECKS = [
     // phrase of 'syntax' would have matched that row and reported the table as level while it
     // named two of the three languages actually checked.
     'shell syntax (all .sh)'     => 'shell',
+    'label bench selftest'       => 'label-bench/selftest-harness.js',
 ];
 
 if (defined('CHECK_TABLE_PARITY_LIB_ONLY')) {
