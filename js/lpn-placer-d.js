@@ -73,14 +73,14 @@ EngCalcs.lpnPlacerD = (function () {
 		if (Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) <= tol) { return false; }
 		if (!a.rot && !b.rot) { return true; }
 		var dx = b.cx - a.cx, dy = b.cy - a.cy;
-		var axes = [[a.c, a.s], [-a.s, a.c], [b.c, b.s], [-b.s, b.c]];
-		for (var i = 0; i < 4; i++) {
-			var ax = axes[i][0], ay = axes[i][1];
-			var ra = a.hw * Math.abs(ax * a.c + ay * a.s) + a.hh * Math.abs(-ax * a.s + ay * a.c);
-			var rb = b.hw * Math.abs(ax * b.c + ay * b.s) + b.hh * Math.abs(-ax * b.s + ay * b.c);
-			if (ra + rb - Math.abs(dx * ax + dy * ay) <= tol) { return false; }
-		}
-		return true;
+		return sepAxis(a, b, dx, dy, a.c, a.s, tol) && sepAxis(a, b, dx, dy, -a.s, a.c, tol) &&
+			sepAxis(a, b, dx, dy, b.c, b.s, tol) && sepAxis(a, b, dx, dy, -b.s, b.c, tol);
+	}
+	// Do the projections of a and b on the axis (ax, ay) overlap by more than tol?
+	function sepAxis(a, b, dx, dy, ax, ay, tol) {
+		var ra = a.hw * Math.abs(ax * a.c + ay * a.s) + a.hh * Math.abs(-ax * a.s + ay * a.c);
+		var rb = b.hw * Math.abs(ax * b.c + ay * b.s) + b.hh * Math.abs(-ax * b.s + ay * b.c);
+		return ra + rb - Math.abs(dx * ax + dy * ay) > tol;
 	}
 
 	// Does segment a-b pass through the inside of box b shrunk by `shrink` (negative grows it)?
@@ -95,15 +95,17 @@ EngCalcs.lpnPlacerD = (function () {
 			t = x0 * b.c + y0 * b.s; y0 = -x0 * b.s + y0 * b.c; x0 = t;
 			t = x1 * b.c + y1 * b.s; y1 = -x1 * b.s + y1 * b.c; x1 = t;
 		}
-		var dx = x1 - x0, dy = y1 - y0, t0 = 0, t1 = 1;
-		var P = [-dx, dx, -dy, dy], Q = [x0 + hw, hw - x0, y0 + hh, hh - y0];
-		for (var i = 0; i < 4; i++) {
-			if (P[i] === 0) { if (Q[i] <= 0) { return false; } continue; }
-			var r = Q[i] / P[i];
-			if (P[i] < 0) { if (r > t0) { t0 = r; } } else if (r < t1) { t1 = r; }
-			if (t0 >= t1) { return false; }
-		}
-		return t0 < t1;
+		// Liang-Barsky, one slab at a time.
+		var dx = x1 - x0, dy = y1 - y0;
+		CLIP[0] = 0; CLIP[1] = 1;
+		return clip(-dx, x0 + hw) && clip(dx, hw - x0) && clip(-dy, y0 + hh) && clip(dy, hh - y0) && CLIP[0] < CLIP[1];
+	}
+	var CLIP = [0, 1];
+	function clip(p, q) {
+		if (p === 0) { return q > 0; }
+		var r = q / p;
+		if (p < 0) { if (r > CLIP[0]) { CLIP[0] = r; } } else if (r < CLIP[1]) { CLIP[1] = r; }
+		return CLIP[0] < CLIP[1];
 	}
 
 	function orient(ax, ay, bx, by, cx, cy) { return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax); }
@@ -117,16 +119,17 @@ EngCalcs.lpnPlacerD = (function () {
 	}
 
 	// ---- a uniform grid over the view ------------------------------------------------------------
-	function Grid(vp) {
-		this.x0 = vp.x - CELL * 4; this.y0 = vp.y - CELL * 4;
-		this.nx = Math.ceil((vp.w + CELL * 8) / CELL); this.ny = Math.ceil((vp.h + CELL * 8) / CELL);
+	function Grid(vp, cell) {
+		this.cs = cell || CELL;
+		this.x0 = vp.x - this.cs * 4; this.y0 = vp.y - this.cs * 4;
+		this.nx = Math.ceil((vp.w + this.cs * 8) / this.cs); this.ny = Math.ceil((vp.h + this.cs * 8) / this.cs);
 		this.cells = new Array(this.nx * this.ny);
 		this.stamp = 0;
 	}
 	// Sets this.i0..j1 to the cells a box meets; false if none.
 	Grid.prototype.range = function (x0, y0, x1, y1) {
-		var i0 = Math.floor((x0 - this.x0) / CELL), i1 = Math.floor((x1 - this.x0) / CELL);
-		var j0 = Math.floor((y0 - this.y0) / CELL), j1 = Math.floor((y1 - this.y0) / CELL);
+		var cs = this.cs, i0 = Math.floor((x0 - this.x0) / cs), i1 = Math.floor((x1 - this.x0) / cs);
+		var j0 = Math.floor((y0 - this.y0) / cs), j1 = Math.floor((y1 - this.y0) / cs);
 		if (i1 < 0 || j1 < 0 || i0 >= this.nx || j0 >= this.ny || !(i1 >= i0 && j1 >= j0)) { return false; }
 		this.i0 = i0 < 0 ? 0 : i0; this.j0 = j0 < 0 ? 0 : j0;
 		this.i1 = i1 >= this.nx ? this.nx - 1 : i1; this.j1 = j1 >= this.ny ? this.ny - 1 : j1;
@@ -232,11 +235,31 @@ EngCalcs.lpnPlacerD = (function () {
 	}
 
 	// ---- the placer ------------------------------------------------------------------------------
+	// A placer instance per project. It keeps its raster buffers across views, and (hint H-b)
+	// uses a pause to lay out a view it has been shown but not yet asked for -- the project's
+	// opening view -- so that view costs nothing when it is asked for. The cache is keyed on the
+	// whole input, so any change to the network, the text or the settings misses it (R13).
 	function create() {
-		var mem = { occ: null, sat: null };   // raster buffers, reused across views
+		var mem = { occ: null, sat: null }, cache = null;
+		function keyOf(scene, opts) {
+			var p = opts && opts.prev;
+			return JSON.stringify(scene) + '|' + (p ? JSON.stringify(p.layout) : '');
+		}
 		return {
 			name: 'D (candidate search, ejection repair, sticky)',
-			place: function (scene, opts) { return place(scene, opts, mem); }
+			place: function (scene, opts) {
+				if (cache && cache.scene === scene) {
+					var k = keyOf(scene, opts);
+					if (k === cache.key) { var out = cache.out; cache = null; return out; }
+				}
+				cache = null;
+				return place(scene, opts, mem);
+			},
+			idle: function (budgetMs, info) {
+				if (!info || !info.opening || !info.scene || budgetMs < 500) { return; }
+				var scene = info.scene;
+				cache = { scene: scene, key: keyOf(scene, null), out: place(scene, null, mem) };
+			}
 		};
 	}
 
@@ -465,13 +488,17 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		function leaderFree(L, ownNode) {
 			for (var j = 1; j < L.length; j++) {
-				var ax = L[j - 1][0], ay = L[j - 1][1], bx = L[j][0], by = L[j][1];
-				var q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
-				for (var n = 0; n < q.length; n++) {
-					var it = q[n];
-					if (it.t === 'sym' ? it.node !== ownNode : it.t === 'text') {
-						if (segHitsBox(ax, ay, bx, by, it.b, -1)) { return false; }
-					}
+				if (!segFree(L[j - 1][0], L[j - 1][1], L[j][0], L[j][1], ownNode)) { return false; }
+			}
+			return true;
+		}
+		// A leader leg clear of every other node's symbol (N3) and every Text object.
+		function segFree(ax, ay, bx, by, ownNode) {
+			var q = hardG.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), qa);
+			for (var n = 0; n < q.length; n++) {
+				var it = q[n];
+				if (it.t === 'sym' ? it.node !== ownNode : it.t === 'text') {
+					if (segHitsBox(ax, ay, bx, by, it.b, -1)) { return false; }
 				}
 			}
 			return true;
@@ -596,7 +623,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// ---- the placed labels ----
 		// Two indexes of the seated labels: each whole label by its extent, leader included (for
 		// crossings), and each row box on its own (for the block test, the common case).
-		var cur = new Array(N), dyn = new Grid(vp), dynB = new Grid(vp);
+		var cur = new Array(N), dyn = new Grid(vp), dynB = new Grid(vp, 24);
 		function seat(li, c) {
 			var o = cur[li], i, b;
 			if (o) {
@@ -730,24 +757,24 @@ EngCalcs.lpnPlacerD = (function () {
 				var ux = dirSet[k][0], uy = dirSet[k][1];
 				for (var j = 0; j < DISTS.length; j++) {
 					var rr = o.r + DISTS[j] * rowH, px = o.x + ux * rr, py = o.y + uy * rr;
-					var row = uy < -0.2 ? d.mids.length - 1 : 0, x, al, L;
+					var sx = o.x + ux * o.r, sy = o.y + uy * o.r;   // on the symbol's edge
+					var row = uy < -0.2 ? d.mids.length - 1 : 0, x, al, legFree = null;
 					if (Math.abs(ux) >= 0.5) {
 						var right = ux > 0;
 						if (layout === 'line' && Math.abs(ux) < 0.7) { continue; }
 						al = right ? 'left' : 'right'; x = right ? px : px - d.w;
 						if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
-						L = leaderFrom(o, [[px, py]]);
-						if (!leaderFree(L, own)) { continue; }
-						var c = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, L, pref);
+						if (!segFree(sx, sy, px, py, own)) { continue; }
+						var c = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, [[sx, sy], [px, py]], pref);
 						c.ok = true; list.push(c);
 					} else if (hookLen > 0) {
 						for (var sd = -1; sd <= 1; sd += 2) {
 							var ex = px + sd * hookLen;
 							al = sd > 0 ? 'left' : 'right'; x = sd > 0 ? ex : ex - d.w;
 							if (!blockFree(req, lv.rows, layout, d, al, x, py - d.mids[row])) { continue; }
-							L = leaderFrom(o, [[px, py], [ex, py]]);
-							if (!leaderFree(L, own)) { continue; }
-							var c2 = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, L, pref + 0.1);
+							if (legFree === null) { legFree = segFree(sx, sy, px, py, own); }
+							if (!legFree || !segFree(px, py, ex, py, own)) { continue; }
+							var c2 = new Cand(li, lv, layout, al, x, py - d.mids[row], d.w, d.h, 0, [[sx, sy], [px, py], [ex, py]], pref + 0.1);
 							c2.ok = true; list.push(c2);
 						}
 					}
