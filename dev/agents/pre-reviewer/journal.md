@@ -3079,3 +3079,44 @@ whether the whole block reverts (my finding says it will not -- the anchor cell 
 value). (2) The same gesture inside a scenario, then switch back to Base and confirm elevation is
 untouched there. (3) Open a node's Properties box and press Ctrl+Enter in a text field, just to see
 nothing surprising happens.
+
+---
+
+
+## 2026-09-28 — feat/label-placer-c and feat/label-placer-d, pre-review before Tom's side-by-side
+
+OBSERVED (measured in real headless Chromium, `dev/browser-pass/node_modules/playwright-core`,
+own PHP servers per worktree under `flock /tmp/engcalcs-browser.lock`, harness kept at
+`/tmp/claude-1000/.../scratchpad/placer-check.js` and `debug3.js`/`debug5.js`):
+
+**Both branches' dev seam is dead on arrival.** `?placer=c` and `?placer=d` load the right
+script (`window.EngCalcs.lpnPlacerName` is set correctly, `debugMode` true, `lpnLabelScene`
+present) but `js/lpn-placer-c.js` and `js/lpn-placer-d.js` each register themselves as
+`EngCalcs.lpnPlacerC` / `EngCalcs.lpnPlacerD` (a scalar property), never as
+`EngCalcs.lpnPlacers['c']` / `['d']` (the lookup table `placerActive()` and `placerRuntime()`
+in `js/looped-network.js:53014-53025` actually read, and the way `js/lpn-placer-trivial.js`
+does it correctly). So `placerActive()` is false forever, `EngCalcs.lpnPlacerLast` never
+appears, and every label on screen with `?placer=c` or `?placer=d` is master's ordinary
+label pass — measured byte-identical label/leader counts (191/20 at one zoom, 155/35 at
+another, on Net3 and Net3-World) between the placer URL and the plain URL, on both branches.
+Confirmed root cause by patching the live page's in-memory object only (no file edits) —
+`EngCalcs.lpnPlacers = {c: EngCalcs.lpnPlacerC}` — after which `lpnPlacerLast` immediately
+starts advancing and the map visibly changes to a much denser, clearly different layout on
+both C and D. So the placers themselves do run and do draw something once wired; the bench
+numbers in `c-notes.md`/`d-notes.md` are plausible for the isolated modules — the bench
+(`dev/lpn-spike/label-bench/run.js`) `require()`s the file directly and never touches
+`EngCalcs.lpnPlacers`, so this bug is invisible to it and to both build agents' own reports,
+which is exactly the self-review blind spot this seat exists for.
+
+No console errors on either branch, with or without `?placer=`. `dismissGallery()`-before-open
+was my own harness bug on the first pass (closes the gallery before a card can be clicked);
+fixed by opening the first example from the gallery and subsequent ones via File > Open
+example.
+
+SPECULATION: not evaluated — whether C or D is the better placer once wired, since neither is
+reachable on the shipped branch as it stands. The PATCHED screenshots
+(`placer-shots/PATCHED-c-zoomin.png`, `PATCHED-d-zoomin.png`) are my own diagnostic hack, not
+representative of what ships (they still show master's "Zoom in to see labels" overlay drawn
+over the placer's own labels, which is a separate, likely cosmetic, seam gap between the
+placer's output and that overlay's own visibility gate — not investigated further since the
+registry bug is a prerequisite fix).

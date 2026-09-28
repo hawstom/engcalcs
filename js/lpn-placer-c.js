@@ -1233,3 +1233,7 @@ EngCalcs.lpnPlacerC = (function () {
 if (typeof module !== 'undefined' && module.exports) {
 	module.exports = EngCalcs.lpnPlacerC;
 }
+// The page's ?placer=c looks here (EngCalcs.lpnPlacers[name]); without this line the switch silently
+// shows today's labels.
+EngCalcs.lpnPlacers = EngCalcs.lpnPlacers || {};
+EngCalcs.lpnPlacers.c = EngCalcs.lpnPlacerC;
