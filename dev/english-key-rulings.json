@@ -163,8 +163,8 @@
         },
         "lpn_convas_no_transform": {
             "on": "{crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.",
-            "ruled": "2026-09-26",
-            "answer": "His own wording, 2026-09-26 (\"cannot be convert\" corrected to \"converted\")."
+            "ruled": "2026-09-28",
+            "answer": "OK."
         },
         "lpn_convas_none_tip": {
             "on": "Local coordinates in the length unit, with no world map for now.",
@@ -505,6 +505,11 @@
             "on": "{n} of {total} projections listed.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_crs_count_network": {
+            "on": "{n} of {total} coordinate systems cover this network.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
         },
         "lpn_crs_latlon_display": {
             "on": "WGS 84 (EPSG:4326)",
@@ -1404,8 +1409,8 @@
             "answer": "OK."
         },
         "lpn_file_convert_as_tip": {
-            "on": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.",
-            "ruled": "2026-09-25",
+            "on": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_file_import_survey": {
@@ -1733,6 +1738,11 @@
             "ruled": "2026-09-26",
             "answer": "OK."
         },
+        "lpn_geomap": {
+            "on": "georeferenced",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_georef_answered": {
             "on": "This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.",
             "ruled": "2026-09-25",
@@ -1873,6 +1883,11 @@
             "ruled": "2026-09-25",
             "answer": "Edited."
         },
+        "lpn_labels_col_show": {
+            "on": "Show",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_labels_customer_note": {
             "on": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
             "ruled": "2026-09-23",
@@ -1888,6 +1903,16 @@
             "ruled": "2026-09-26",
             "answer": "Edited."
         },
+        "lpn_labels_init_status": {
+            "on": "Initial status",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_labels_priority_customer_tip": {
+            "on": "The order in which values are dropped from a customer label. The value numbered 1 is dropped first.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_labels_restore": {
             "on": "Restore label defaults",
             "ruled": "2026-09-23",
@@ -1896,6 +1921,21 @@
         "lpn_labels_restore_tip": {
             "on": "Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.",
             "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_labels_show_tip": {
+            "on": "The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_labels_use_units": {
+            "on": "Use units",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_labels_use_units_tip": {
+            "on": "Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_library_curve_add": {
@@ -2581,13 +2621,23 @@
             "answer": "Edited."
         },
         "lpn_notes_6_def": {
-            "on": "<ul class=\"lpn-notes-keys\"><li><strong>Arrow keys</strong> Move the selection.</li><li><strong>Tab, Enter</strong> Move the selection after you type.</li><li><strong>Shift+Tab, Shift+Enter</strong> Move it backward.</li><li><strong>Shift+arrow keys</strong> Extend the selection.</li><li><strong>Ctrl+C</strong> Copy the selection.</li><li><strong>Ctrl+D</strong> Fill the selection down from its top row.</li><li><strong>Ctrl+A</strong> Select the whole table.</li><li><strong>Ctrl+Space</strong> Add the current column to the selection, or remove it.</li><li><strong>Delete</strong> Clear a cell.</li><li><strong>F2</strong> Open a cell to edit it.</li><li><strong>Esc</strong> Cancel an edit.</li><li><strong>Click a column heading</strong> Select that column.</li><li><strong>Ctrl+click, Shift+click a heading</strong> Add a column to the selection, or extend it.</li><li><strong>Drag a column heading</strong> Move that column, or the whole selection if it is part of one.</li><li><strong>Right-click a heading, or long-press it</strong> Hide the selected columns, or show a hidden one again.</li><li><strong>The ⋮ at the edge of a heading</strong> Sort, hide, show all, or manage columns.</li><li><strong>The arrow under the ⋮</strong> Reverse the sort.</li></ul>",
-            "ruled": "2026-09-26",
+            "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_notes_6_term": {
+            "on": "Table columns help",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_notes_7_def": {
+            "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_notes_7_term": {
             "on": "Table keyboard shortcuts",
-            "ruled": "2026-09-25",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_offscreen_intact": {
@@ -2596,8 +2646,8 @@
             "answer": "OK."
         },
         "lpn_pane_colmenu_tip": {
-            "on": "Sort, hide, or manage columns",
-            "ruled": "2026-09-26",
+            "on": "Hide or manage columns",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_pane_fill_none": {
@@ -2685,15 +2735,120 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_pane_paste_append": {
+            "on": "Paste as new rows at end of table",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_armed": {
+            "on": "Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_bad_cell": {
+            "on": "Row {row}: {text} is not a valid {col}.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_bad_id": {
+            "on": "Row {row}: the ID {id} has a space or a quotation mark in it.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_here": {
+            "on": "Click here and paste rows from a spreadsheet to add them.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_id_taken": {
+            "on": "Row {row}: the ID {id} is already in use.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_id_twice": {
+            "on": "Row {row}: the ID {id} is used twice in this paste.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_ids_differ": {
+            "on": "{n} IDs don't match. Paste anyway?",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_more": {
+            "on": "Rows with problems not shown here: {n}.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_ends": {
+            "on": "Row {row}: a new link needs a From node and a To node.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_id": {
+            "on": "Row {row}: a new row needs an ID.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_node": {
+            "on": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_position": {
+            "on": "Row {row}: a new node needs both {first} and {second}.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_pane_paste_note": {
             "on": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_overflow": {
+            "on": "This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_overflow_add": {
+            "on": "Add {extra} rows",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_overflow_bad": {
+            "on": "This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_overflow_fit": {
+            "on": "Paste only the {fit} that fit",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_refused": {
+            "on": "Nothing was pasted. {reasons}",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_same_ends": {
+            "on": "Row {row}: From and To are the same node.",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_pane_pasted": {
             "on": "Pasted {n} cells. {skipped} were not changed.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_pane_pasted_rows": {
+            "on": "Pasted {n} rows and added {created} of them to the network.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_pasted_rows_skipped": {
+            "on": "Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
         },
         "lpn_pane_show_all_cols": {
             "on": "Show all columns",
@@ -2853,6 +3008,16 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_quality_diffusivity": {
+            "on": "Relative diffusivity",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_quality_diffusivity_tip": {
+            "on": "How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_quality_initial": {
             "on": "Initial quality",
             "ruled": "2026-09-04"
@@ -2860,6 +3025,26 @@
         "lpn_quality_initial_tip": {
             "on": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.",
             "ruled": "2026-09-06",
+            "answer": "OK."
+        },
+        "lpn_quality_mass_units": {
+            "on": "Mass units",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_quality_mass_units_tip": {
+            "on": "The units half of the quality entry, EPANET's own two choices.",
+            "ruled": "2026-09-28",
+            "answer": "Edited"
+        },
+        "lpn_quality_named_avg_concentration": {
+            "on": "Average {chemical} concentration",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_quality_named_concentration": {
+            "on": "{chemical} concentration",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_quality_needs_run": {
@@ -2870,9 +3055,24 @@
             "on": "Nothing",
             "ruled": "2026-09-01"
         },
+        "lpn_quality_tolerance": {
+            "on": "Quality tolerance",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_quality_tolerance_tip": {
+            "on": "How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_quality_trace": {
             "on": "Source trace",
             "ruled": "2026-09-02"
+        },
+        "lpn_quality_unit_ug": {
+            "on": "µg/L",
+            "ruled": "2026-09-28",
+            "answer": "OK."
         },
         "lpn_reaction_bulk": {
             "on": "Bulk reaction coefficient",
@@ -3286,6 +3486,16 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_settings_sym_link_colors": {
+            "on": "Link colors",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_settings_sym_node_colors": {
+            "on": "Node colors",
+            "ruled": "2026-09-28",
+            "answer": "OK."
+        },
         "lpn_settings_symbol_cap": {
             "on": "Prevent nodes from scaling larger than",
             "ruled": "2026-09-23",
@@ -3378,6 +3588,11 @@
         "lpn_source_type_mass": {
             "on": "Mass booster",
             "ruled": "2026-09-05"
+        },
+        "lpn_source_type_none": {
+            "on": "None",
+            "ruled": "2026-09-28",
+            "answer": "OK."
         },
         "lpn_source_type_setpoint": {
             "on": "Setpoint booster",
@@ -4028,6 +4243,11 @@
         "lpn_wrong_tip": {
             "on": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
             "ruled": "2026-09-06",
+            "answer": "OK."
+        },
+        "lpn_xymap": {
+            "on": "local",
+            "ruled": "2026-09-28",
             "answer": "OK."
         },
         "lpn_zoom_in": {
