@@ -26,6 +26,7 @@ const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
 	row: 4,               // each value row given up
 	hide: 10,             // on top of the rows, for hiding the whole label
+	hideCustomer: 1,      // customer labels give way first and easily
 	lblPipe: 8,           // a label on a pipe
 	ldrPipe: 3,           // a leader across a pipe
 	lblLdr: 20,           // a label on a leader
@@ -778,7 +779,7 @@ function run(scene, prev, gaps, pool) {
 		}
 		return best ? { cand: best, cost: bestCost } : null;
 	}
-	function hideCost(f) { return W.row * f.R + W.hide; }
+	function hideCost(f) { return W.row * f.R + (f.kind === 'customer' ? W.hideCustomer : W.hide); }
 
 	// ---- 1. hand-placed labels: hung at the user's point, shown whatever happens (N4) ----
 	const kept = new Array(N);
@@ -911,14 +912,15 @@ function run(scene, prev, gaps, pool) {
 
 	// ---- 3. everything else: labels first, then properties ----
 	const free = info.filter(function (f) { return !kept[f.li]; });
-	const kindRank = { node: 0, text: 0, link: 1, customer: 2 };
+	// Customer labels give way first (they choose last); otherwise the most crowded choose first.
+	const kindRank = { text: -1, node: 0, link: 0, customer: 1 };
 	free.forEach(function (f) {
 		const min = f.subsets.length - 1, l = cands(f, min, 0);
 		let c = 0;
 		for (let i = 0; i < l.length; i++) { if (l[i].st === undefined) { l[i].st = evalStatic(f, l[i], true); } if (l[i].st < l[i].base + 2) { c++; } }
 		f.room = c;
 	});
-	free.sort(function (a, b) { return a.room - b.room; });
+	free.sort(function (a, b) { return (kindRank[a.kind] || 0) - (kindRank[b.kind] || 0) || a.room - b.room; });
 	// Pass A: every label in its smallest form, near home, so as many as possible get a place.
 	free.forEach(function (f) {
 		const min = f.subsets.length - 1;
