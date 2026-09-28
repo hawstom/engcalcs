@@ -278,9 +278,23 @@ console.log('\n--- nothing on the sheet is a control ---');
 			// The ID column is a go-to-the-map button on screen and plain text on paper; its TEXT
 			// is the same either way, which is the claim being made.
 			// A checkbox cell (Active, Bold) holds its answer in `checked`; the sheet prints it as 1 or 0.
+			// A SELECT cell's `.value` is the STORED word ("MIXED") -- that is what the DOM's own
+			// option-matching needs, not what the reader sees. What the reader sees, and what the
+			// printed sheet must equal (R-367), is the matching OPTION'S OWN TEXT ("Complete
+			// mixing") -- paneCellDisplayText()'s whole point. This stub does not simulate a real
+			// <select>'s value-to-selectedIndex resolution (only its purpose-built unit selects do),
+			// so the match is made by hand, against the same `<option>` children the real DOM would
+			// search.
+			// An UNSELECTED choice ('' -- "No pattern", "No curve selected"...) has always printed
+			// blank, on both sides of R-367: paneCellText() and paneCellDisplayText() both refuse it
+			// before ever reaching the choice list (`!panePresent(v)`), the same test every other
+			// empty cell on the sheet is held to. Only a REAL selection is looked up by label.
+			const selectedOption = (cell._tag === 'select' && cell.value !== '')
+				? (cell.children || []).filter((o) => o._tag === 'option').find((o) => o.value === cell.value)
+				: null;
 			const want = c.key === 'id' ? elId
 				: (cell._tag === 'input' ? (cell.type === 'checkbox' ? (cell.checked ? '1' : '0') : cell.value)
-					: (cell._tag === 'select' ? cell.value : cell.textContent));
+					: (cell._tag === 'select' ? (cell.value === '' ? '' : (selectedOption || {}).textContent) : cell.textContent));
 			const got = sheet.rows[r][i].text;
 			if (String(want) !== String(got)) { mismatch.push(`${elId}.${c.key}: ${want} != ${got}`); }
 		}));
