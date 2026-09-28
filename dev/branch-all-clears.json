@@ -233,6 +233,12 @@
             "date": "2026-09-28",
             "words": "Select mode highlights: Good. Done. Merge and delete.",
             "context": "His pass on port 8128 after Perry's READY pre-review (journal 2026-09-28). The branch is one commit; merged with master on the merge commit itself."
+        },
+        "feat/water-tower": {
+            "head": "6541f700",
+            "date": "2026-09-28",
+            "words": "We are gold. Publish it everywhere.",
+            "context": "His answer to round two of the roof shading (dev/icon-preview/roof-shading-2026-09-28b.html): cone-shaded roof, rim seam, catwalk lowered with its underside in shadow. Round one's picks stand: option 3 for About and 192, option 4 with bracing and rivets for 512. 'Everywhere' also went to the librewaternet.org and not-epanet.org favicons the same day; EPANET++ keeps its own E++ mark."
         }
     }
 }
