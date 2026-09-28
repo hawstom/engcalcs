@@ -148,11 +148,11 @@ report(tableIds.length >= 8, 'all eight tables are on the page', tableIds.map((t
 
 const sheets = {};
 tableIds.forEach((t) => { sheets[t.id] = copyTable(t.id); });
-report(sheets.tanks.sheet.indexOf(PC.lpn_pane_not_used || 'Not used') >= 0,
+report(sheets.tanks.sheet.indexOf(PC.lpn_pane_not_used) >= 0,
 	"Net3's own Tanks copy carries the plain word Not used, reproducing Tom's paste", JSON.stringify(sheets.tanks.sheet));
-report(sheets.valves.sheet.indexOf(PC.lpn_pane_not_used || 'Not used') >= 0,
+report(sheets.valves.sheet.indexOf(PC.lpn_pane_not_used) >= 0,
 	"the added valve's Km cell copies as Not used too (a TCV's minor loss is plain)");
-report(sheets.text.sheet.indexOf(PC.lpn_pane_text_attached || 'Attached') >= 0,
+report(sheets.text.sheet.indexOf(PC.lpn_pane_text_attached) >= 0,
 	'the anchored Text row copies its align/valign as Attached');
 
 // A byte-identical snapshot of the fully-built source, for the Text/Customers leg below -- it
@@ -175,7 +175,7 @@ L.setCurves(JSON.parse(JSON.stringify(sourceSaved.curves || [])));
 	report(res && res.prevented, `${tableId}: the paste is claimed`);
 	const gotIds = L.tableOrder(tableId);
 	report(gotIds.length === s.order.length, `${tableId}: every source row (${s.order.length}) was created`, String(gotIds.length));
-	report(L.notice().indexOf(PC.lpn_pane_paste_refused || 'Nothing was pasted') !== 0,
+	report(L.notice().indexOf(PC.lpn_pane_paste_refused) !== 0,
 		`${tableId}: the paste was not refused`, L.notice());
 	const bad = [], srcRows = s.sheet.split('\n');
 	gotIds.forEach((id, rIdx) => { compareRow(tableId, id, s.heads, (srcRows[rIdx] || '').split('\t'), bad); });
