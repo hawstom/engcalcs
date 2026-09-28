@@ -16468,6 +16468,43 @@ var EngCalcs = EngCalcs || {};
 		// Shift on bare canvas keeps what is there: clearing would make an accidental miss cost
 		// the whole selection, which is the one thing a modifier click exists to protect.
 	}
+	// ---- SELECTION PREVIEW: the hover highlight (Ida's wishlist item 1, dev/agents/interface-
+	// designer/wishlist.md, journal 2026-09-10) ----
+	// **ADDITIVE TO THE TASK 618 CURSOR**, which stays `default` over an object and over nothing on
+	// purpose (WYSIWYG hit areas). Nothing else on screen said what a click would select; this reads
+	// exactly the SAME dataset selectFromHit() reads, above, so the preview can never promise a hit
+	// a click would not make, and it marks the exact SAME element selectionMarkEl() marks, so hover
+	// and selection are one system rather than two rules that can drift apart.
+	function hoverTargetFromHit(t) {
+		var d = (t && t.dataset) || {};
+		if (d.node) { return { kind: 'node', id: d.node }; }
+		if (d.nodelbl !== undefined) { return { kind: 'node', id: d.nodelbl }; }
+		if (d.linklbl !== undefined) { return { kind: 'link', id: d.linklbl }; }
+		if (d.link !== undefined) { return { kind: 'link', id: d.link }; }
+		if (d.lbl !== undefined) { return { kind: 'label', id: d.lbl }; }
+		if (d.cust !== undefined) { return { kind: 'customer', id: d.cust }; }
+		if (d.custhandle !== undefined) { return { kind: 'customer', id: d.custhandle }; }
+		return null;
+	}
+	var hoverPreview = null;   // {kind, id} of the one element currently wearing .lpn-hover, or null
+	function paintHoverPreview(sel, on) {
+		var el = selectionMarkEl(sel);
+		if (el) { el.classList.toggle('lpn-hover', on); }
+	}
+	// **ONE WRITE SITE**, on the same argument setSelectionList() makes above: paint off the old,
+	// paint on the new, so a stale mark can never survive a target that no longer exists (an undo,
+	// a delete under the pointer).
+	function setHoverPreview(sel) {
+		if (sel && !selectionExists(sel)) { sel = null; }
+		if (hoverPreview && (!sel || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
+			paintHoverPreview(hoverPreview, false);
+		}
+		if (sel && (!hoverPreview || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
+			paintHoverPreview(sel, true);
+		}
+		hoverPreview = sel;
+	}
+	function clearHoverPreview() { setHoverPreview(null); }
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
 	// a selection still pointing at what they are working on.
@@ -24513,7 +24550,7 @@ var EngCalcs = EngCalcs || {};
 	// the old input type refused silently now has to be refused out loud. The cell goes back to
 	// what the document holds rather than writing NaN into a field of the user's, which nothing
 	// downstream could tell from a value they meant.
-	function paneCommitCell(input) {
+	function paneCommitCell(input, opts) {
 		var ctx = input && input._lpnCell, c, el, p, was;
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
@@ -24551,7 +24588,12 @@ var EngCalcs = EngCalcs || {};
 		// inside afterPropertyEdit() and updateNode() nest into it for free.
 		beginMapBoxHold();
 		try {
-		if (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
+		// **A CALLER THAT ALREADY TOOK THE ONE SNAPSHOT FOR A LARGER OPERATION SAYS SO** (Task 690,
+		// Ctrl+Enter): committing the anchor's in-progress edit is one write inside a broadcast that
+		// needs exactly one undo step for the whole thing, anchor included -- so `opts.noSnapshot`
+		// lets the caller take that single snapshot itself, before this write, rather than getting
+		// a second one here that would split Ctrl+Z into two presses.
+		if (!(opts && opts.noSnapshot) && !(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
 		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
@@ -25037,6 +25079,77 @@ var EngCalcs = EngCalcs || {};
 			.replace('{skipped}', String(refused)));
 		return true;
 	}
+	/**
+	 * **CTRL+ENTER FILLS A STANDING SELECTION WITH THE ACTIVE (ANCHOR) CELL'S VALUE, AND LEAVES THE
+	 * SELECTION STANDING** (Task 690), the binding Excel and Sheets both give the gesture. Unlike
+	 * Ctrl+D, which always reads the TOP row, this reads the ANCHOR cell (`box.ar`, `box.ac`) -- the
+	 * cell the selection was started from and the one just typed into -- so beginning a selection
+	 * anywhere still does the obvious thing.
+	 *
+	 * Every write goes through paneWriteCellText(), the same validated door paste and Ctrl+D use, so
+	 * a scenario override, a result/read-only refusal and the count of what was skipped are all
+	 * handled exactly as they are for those. **THE ID COLUMN IS SKIPPED BY NAME**, the same
+	 * precedent paneFillDown() and paneDeleteSelection() already set: broadcasting an id would ask
+	 * validateNewId() to refuse the same collision once per cell, an alert-storm already ruled out.
+	 *
+	 * **ONE saveUndoSnapshot() FOR THE WHOLE OPERATION, THE ANCHOR'S OWN COMMIT INCLUDED** (pre-review
+	 * finding on d0858ea8, real Chrome: typing into the anchor and pressing Ctrl+Enter took TWO
+	 * undo steps -- one Ctrl+Z restored only the broadcast cells and left the anchor's freshly typed
+	 * value standing until a second press). `pendingCommit` is the anchor's own `<input>` when it is
+	 * still mid-edit; committing it is one of the writes this single snapshot has to cover, so it is
+	 * taken FIRST, before that commit, and `paneCommitCell(pendingCommit, { noSnapshot: true })`
+	 * is told not to take its own -- the one place in this file that asks it not to. Taken only once
+	 * something in the box is actually settable -- an all-read-only box never broadcasts anything,
+	 * so the anchor's own edit (if any) still commits normally, with its own ordinary snapshot,
+	 * exactly as leaving the cell any other way would (a box with nothing settable must not push a
+	 * second, no-op snapshot on top of that).
+	 *
+	 * **THE SELECTION IS NOT COLLAPSED.** `spec.sel` is never touched here, and paneSelPaint() is
+	 * called again once the render settles, so the box the person had stays exactly as it was --
+	 * the one behavioral difference from ordinary Enter that makes this worth having.
+	 */
+	function paneCtrlEnterFill(spec, box, pendingCommit) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), pc = EngCalcs.pageConfig || {},
+			anchorEl = rows[box.ar], text, r, c, col, el, wrote = 0, refused = 0, any = false;
+		if (!anchorEl || !cols[box.ac]) { return false; }
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				if (r === box.ar && c === box.ac) { continue; }
+				col = cols[c];
+				if (col.key === 'id' || paneCellIsPlain(col, rows[r]) || !col.set) { continue; }
+				any = true;
+			}
+		}
+		if (!any) {
+			// Nothing to broadcast, but a pending edit on the anchor is still a real, ordinary
+			// commit -- it takes its own snapshot exactly as leaving the cell any other way would.
+			if (pendingCommit) { paneCommitCell(pendingCommit); }
+			return false;
+		}
+		saveUndoSnapshot();
+		if (pendingCommit) { paneCommitCell(pendingCommit, { noSnapshot: true }); }
+		text = paneCellText(cols[box.ac], anchorEl);
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				if (r === box.ar && c === box.ac) { continue; }
+				col = cols[c];
+				el = rows[r];
+				// **THE ID COLUMN IS COUNTED, NOT SILENTLY DROPPED**, unlike Ctrl+D: a broadcast that
+				// spans the id column still touched N cells the person selected, and {skipped} is
+				// where every one of those "not changed" cells is accounted for, id or read-only alike.
+				if (col.key === 'id') { refused++; continue; }
+				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		paneSelPaint(spec, paneTableRowsInOrder(spec), paneCols(spec));
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused)));
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -25102,6 +25215,19 @@ var EngCalcs = EngCalcs || {};
 		// this says so instead, on the same notice line every other "nothing to do" moment here uses.
 		if (jump && !editing && (key === 'd' || key === 'D')) {
 			if (!paneFillDown(spec)) {
+				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
+			}
+			return true;
+		}
+		// **CTRL+ENTER FILLS THE STANDING SELECTION** (Task 690), checked before the plain `Enter`
+		// case below and, unlike Ctrl+D, whether or not the active cell is still mid-edit -- the
+		// in-progress value is passed to paneCtrlEnterFill() as `pendingCommit`, which commits it as
+		// PART OF the fill's own single undo snapshot, rather than committed here first under its
+		// own separate one (that split a single Ctrl+Enter into two undo steps -- pre-review finding
+		// on d0858ea8). A box that is empty or a single cell has nothing to broadcast and falls
+		// through to ordinary Enter, unchanged, below.
+		if (jump && key === 'Enter' && box && (box.r1 > box.r0 || box.c1 > box.c0)) {
+			if (!paneCtrlEnterFill(spec, box, editing ? active : null)) {
 				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
 			}
 			return true;
@@ -27786,6 +27912,10 @@ var EngCalcs = EngCalcs || {};
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
+		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
+		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
+		// the pointermove listener that maintains it does no work outside 'select'.
+		if (mode === 'select' && newMode !== 'select') { clearHoverPreview(); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -38104,6 +38234,31 @@ var EngCalcs = EngCalcs || {};
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
 		svg.addEventListener('pointermove', function (e) {
 			profileDrawHover(e.clientX, e.clientY);
+		});
+
+		// **SELECTION PREVIEW** (Ida's wishlist item 1): the Select-mode hover highlight, driven by
+		// the SAME hit-test a click uses (`mapHitAt`), so it always shows exactly what a click would
+		// select. rAF-throttled to one update per frame, and it does no work at all outside 'select'
+		// mode, while a gesture is in progress (`drag`), or on a touch pointer, which has no hover to
+		// report and must never leave a highlight stuck after a tap.
+		var hoverPreviewRaf = null, hoverPreviewAt = null;
+		svg.addEventListener('pointermove', function (e) {
+			if (e.pointerType === 'touch') { return; }
+			if (mode !== 'select' || drag) { return; }
+			hoverPreviewAt = { x: e.clientX, y: e.clientY };
+			if (hoverPreviewRaf) { return; }
+			hoverPreviewRaf = requestAnimationFrame(function () {
+				hoverPreviewRaf = null;
+				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
+				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
+			});
+		});
+		// Leaving the canvas (or the window, or losing capture) is the one case a pointermove never
+		// fires to clear it -- same reasoning as every other "off means off" state on this map.
+		svg.addEventListener('pointerleave', function (e) {
+			if (e.pointerType === 'touch') { return; }
+			hoverPreviewAt = null;
+			clearHoverPreview();
 		});
 
 		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has

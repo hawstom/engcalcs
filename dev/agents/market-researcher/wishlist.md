@@ -489,6 +489,15 @@ the node's own value (no new solve) with the disclaimer text drafted in the jour
 reasoning and citations: journal entry 2026-09-26 (night), Q2.
 ## Added 2026-09-27
 
+- **Track the `[TIMES] Statistic` gap on the roadmap.** 2026-09-27, answering Task 697's pre-release
+  check: `js/lpn-inp.js:726-727` and `js/lpn-patterns.js:136-137` both say plainly that EPANET's
+  `[TIMES] Statistic` keyword (AVERAGED/MINIMUM/MAXIMUM/RANGE reporting mode over an extended-period
+  run) is read and discarded — a genuine, present-tense gap, not on `dev/ROADMAP.md` under any number
+  (grepped, zero hits). Low priority (this page already reports the raw instantaneous value, EPANET's
+  own default), but Tom's own stated reason for keeping the removed lede sentence off the page is that
+  diligent research is finding gaps and tracking them — this one fell through. Zero cost: a
+  three-line roadmap row, not mine to add. Full detail: journal, 2026-09-27 entry.
+
 - **Verify LibreOffice's mid-edit Ctrl+Enter collision by hand before shipping** (relates to Task
   690 / `feat/ctrl-enter`). CITED collision: LibreOffice Calc binds Ctrl+Enter, while the text
   cursor is placed inside a cell during in-cell edit, to inserting a line break

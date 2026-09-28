@@ -909,6 +909,7 @@ $ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
+$ec_lang['lpn_pane_ctrlenter_filled']='Filled {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_hide_col']='Hide this column';
 $ec_lang['lpn_pane_hide_cols']='Hide these columns';
 $ec_lang['lpn_pane_show_all_cols']='Show all columns';
@@ -2253,7 +2254,7 @@ $ec_lang['lpn_notes_6_term']='Table columns help';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -3269,7 +3270,7 @@ $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as t
 $ec_lang['lpn_quality_chemical_name']='Chemical';
 $ec_lang['lpn_quality_chemical_name_tip']='The chemical you are tracking, for example Chlorine. Leave it blank for EPANET\'s own default label, Chemical. Shown on your reports, but not used in the calculations.';
 $ec_lang['lpn_quality_mass_units']='Mass units';
-$ec_lang['lpn_quality_mass_units_tip']='The mass half of the concentration unit, EPANET\'s own two choices.';
+$ec_lang['lpn_quality_mass_units_tip']='The units half of the quality entry, EPANET\'s own two choices.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file

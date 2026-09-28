@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-362. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-369. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -87,204 +87,19 @@ judgement and does not belong to a script.
 ### feat/convert-as (8104)
 
 - [?] R-190 feat/convert-as | (the "These are already lat/lon" button) "I don't understand. I can't find the context. Give me more information." -- re-explained in the 2026-09-23c report; the handoff had conflated it with lpn_transform_georefed_btn
-  - [TGH: Sorry I still don't understand. Where is this?]
+  - [TGH: Give me a file and line number.]
+  - CC 2026-09-28: it no longer exists. It was `lpn_georef_asdeg_btn`, `lib/lang.ec.en.php` line 1230, in Map, World map, Attach, step 2; your R-219 (2026-09-24) retired it and commit 6778bae1 deleted it. What replaced it is the Ground distance tip, `lib/lang.ec.en.php:1383` ("Type 1 to use a file's own numbers unchanged"). Nothing to do unless you want the button back.
 
-### feat/table-editing (8105)
-
-- [x] R-193 feat/table-editing | "Autofill with the little square button is yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once implemented) where autofill is not offered, that would be nice." -- feat/table-editing fd604304: the square was decoration only; removed. Drag-to-fill is a separate build -- feat/table-editing merged 2026-09-26
-
-### feat/label-gang-search (8090)
+## feat/label-gang-search (8090)
 
 - [ ] R-200 feat/label-gang-search | "I edited the file. Still a lot is open."
 
 ## Round of 2026-09-24 -- MOD's test, his notes, and his pass over the six preview ports
 
-### MOD's first-use test (2026-09-23)
-
-- [x] R-202 -- | MOD could not find fire flow analysis; he clicked the map, then the toolbar, accidentally invoked New project, and found it under Water. His suggestion: "make the menus (tabs) a color that stands out like on a phone app ... and enlarged, icons too." TGH: "I'm kind of excited to see it either solid blue (very phone-like) or rounded blue outlined for every "button". It seems that the world has left the "menus" paradigm behind. Maybe Ida can comment on that." -- folded into Task 714 phase 1 (Ida: one button base and one accent colour for menu items and toolbar buttons, previewed on a branch). Build the preview branch? -- your go -- feat/menu-button a82d32f5 (port 8114), menus only, solid blue; ?menustyle=outline for the outlined one -- feat/menu-button merged 2026-09-26
-  - [TGH 2026-09-25: "I think Ida misunderstood. Every tester so far has been very slow to find the menus, **not the toolbars**. Promoting the menus and toolbar equally is counterproductive. Make me a preview branch, and lets try colors only for now. I lean toward a button look with our thematic blue rounded rectangles, but I leave it to you to surprise me."]
-- [x] R-208 -- | "The default Project1 tab has a path of frustration. If a user tries to attached the world map, it tells him that can't be done without any network. I think that the first-time experience needs to avoid that empty Project1 tab by funneling the user into either opening an example from the gallery or creating a new project ... Or we start the Project1 on WGS84 zoomed to our favorite place ... possibly the exact view we get when we send a search to Mapbox for Downtown Novato Center, Novato, CA." -- feat/first-project 8bfe1454 (port 8112): Project1 opens lat/lon at Downtown Novato with the world map OFF until you attach it (a first visit is not a request for OpenStreetMap tiles). Perry: nothing yet tells a first-time user the map can be attached -- merged, master 017ee4de
-
-### feat/convert-as (8104)
-
-- [x] R-219 feat/convert-as | R-190 answered: "We have "Ground distance per drawing unit" on Step 2 of Convert as... That can be set to 1 to use project coordinates. Ensure that both 'Import' and 'Convert as ...' state clearly that files with an EPSG coordinate system that simply needs to be referenced/located can be scaled 1:1 in Step 2 of the Convert as... wizard." -- feat/convert-as 0693cb6d: button and its two keys deleted; Import report and the Step 2 Ground distance tip carry the 1:1 note. New strings need your ruling -- merged, master 017ee4de
-  -  [TGH 2026-09-24: In the import report, change the coordinate system paragraph as follows: "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"]
-
-## Round of 2026-09-25 -- IOD's test, Net3 fire flow, and his pass over the ten branches
-
-### Real-world use (IOD, senior civil engineer; `dev/real-world-reviews.md`)
-
-- [x] R-230 -- | "He said we need to make migration from WaterCAD easy. This means interoperability. This means import WaterCAD files. This means to study the WaterCAD features and interface. Can Mary help with that. Do we need a dedicated WaterCAD expert, or would that be Sue from her previous job? Or is Sue a migrator from WaterCAD? What story do we need to tell, and is it even possible to do this without my buying WaterCAD or getting a demo or watching videos (hopefully not)?" -- Mary and Sue briefed 2026-09-25 -- Mary: dev/agents/market-researcher/watercad-migration.md; Sue: her journal. Both: no WaterCAD-expert seat; one WaterCAD-exported .inp from IOD is the next step
-
 ### Workflow
 
 - [ ] R-234 -- | "Note that this is the second time that you have listed several items under "On master (pushed; you pull when ready)", which is apparently wrong and meaningless. And it's knocking me off my feet."
 
-### feat/zoom-control (8103)
-
-- [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
-- [x] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass -- feat/zoom-control merged 2026-09-26
-
-### feat/convert-as (8104)
-
-- [x] R-237 feat/convert-as | "(1) All coordinate systems must have their unmodified names, and all coordinate systems must be available. (a) Currently WGS 84 (EPSG:4326) is missing from the options. (b) Currently WGS 84 / Pseudo-Mercator (EPSG:3857) has "(no map)" after its name, which I don't understand. (2) Tips at Convert as > Coordinate System > (a) EPSG coordinate system should stay as is, but with the string latitude/longitude removed. (b) Unnamed (local) georeference should stay as is, but end at "map attached." (c) Not georeferenced should stay as is, but add " for now" at the end. (3) The Geographic projection sub-box: (a) Box title should be "Coordinate system". Its tip is non-functional or empty. (b) Tip for Filter by map view should have "coordinate systems" replace "projections". (c) Projection name filter and its tip Should have "projection" replaced with "coordinate system". And let's remove the second sentence. (d) The message at the bottom is nonsense to me. End it after IOGP." -- feat/convert-as 47649c32, awaiting your pass -- merged, master 017ee4de
-- [x] R-238 feat/convert-as | "Units look good except that we really should fix our missing Water depth coverage instead of disabling Water depth here." -- feat/convert-as: tank Water depth is a label now; awaiting your pass -- merged, master 017ee4de
-
-### feat/table-editing (8105)
-
-- [x] R-239 feat/table-editing | "There is a troublesome conflict between clicking on a column heading text to sort and clicking on a column heading to select. Is there a better way we can do this? ... Is there a conventional glyph and gesture for sort, maybe including a hover revelation?" -- Ida asked -- feat/table-editing merged 2026-09-26
-- [x] R-240 feat/table-editing | "Add "Show all" to the heading right-click menu. Or maybe what we really need is a Manage columns command/box that has checkboxes for Show." -- feat/table-editing merged 2026-09-26
-- [x] R-241 feat/table-editing | "Sorry I can't get a column to drag. I think it's the right thing to have. What I think is wrong is the ability to select the heading text ... Maybe a three dots menu for sorting and hiding. Maybe a grab cursor somewhere for dragging. I honestly don't know." -- feat/table-editing merged 2026-09-26
-
-### feat/property-venue (8106)
-
-- [x] R-242 feat/property-venue | "I think what is simplest and closest to what we have is a simple "Filter in table" button with a tip 'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.' What's your advice on that? I think it implies that we filter all tables insofar as we can if "Everything" is selected." -- feat/property-venue b8733c5d, built as you proposed; awaiting your pass -- merged, master 017ee4de
-
-### feat/first-project (8112)
-
-- [x] R-243 feat/first-project | "Very bad. I hit escape on the gallery, add some nodes, and click Zoom to fit. Nothing appears ... Map, World map, Attach ... It doesn't work. Nothing appears ... this time I zoom a bit; a map appears at Novato, CA. But we need to have this visible on first load behind the gallery. I think we can suppress any disclosure at this time because it is a standard app request instead of a user request; what do you think?" -- feat/first-project f775f0a6: street map on at first load; privacy.php changed; landing page claim needs your ruling -- merged, master 017ee4de
-- [x] R-244 feat/first-project | "The status bar says "WGS 84 / Pseudo-Mercator (EPSG:3857), but the coordinates are lat/lon. Isn't that wrong? Isn't EPSG:3857 meters?" -- feat/first-project: WGS 84 (EPSG:4326) -- merged, master 017ee4de
-
-### Customer
-
-- [x] R-245 -- | "Red for node-connected Customers is a bad decision. Let's leave it black." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
-- [x] R-246 -- | "Do we have Customers not allowed to connect directly to nodes? I think it will be happier for users to see Customer connected to a node if that is the case instead of a link at station 0." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
-- [x] R-247 -- | "Customer symbols appear to be 0.2 * Junction size. It's too small. Let's try 0.25 * Junction size or raise it another `0.05 *` from where it is." -- feat/customer-node cd7640b1, awaiting your pass -- feat/customer-node merged 2026-09-26
-
-## Round of 2026-09-25, second pass -- his pass over the preview ports
-
-### Workflow
-
-- [x] R-248 -- | "You told me 'After you pull, run: ... git worktree remove ../../worktrees/...' That is partly misinformed since there is no such path at the production server, and there are no worktrees there. This bad advice has happened before. What can I do to prevent it? Am I giving you too much? As for the worktrees, of course you can clean them up on local dev." -- worktrees removed on local dev 2026-09-25; the handoff now says local housekeeping is never handed to him
-
-### feat/first-project (8112)
-
-- [x] R-249 feat/first-project | "On the gallery welcome, end it 'Or start here'. With that, we can close, merge, and delete the branch. Nice work." -- feat/first-project 8aa04872 -- merged, master 017ee4de
-- [x] R-250 -- | Decision: "Street map on at first load: Yes." -- landing pages and CLAUDE.md reworded to match -- street map on; librewaternet.org eef380e, not-epanet.org a058b5d, privacy.php and CLAUDE.md say so
-
-### feat/convert-as (8104)
-
-- [x] R-251 feat/convert-as | "For Water depth, initial default prefix can be 'Y='. With that, we can close, merge, and delete the branch. Nice work!" -- merged, master 017ee4de
-- [x] R-252 feat/convert-as | On lpn_convas_label_tip: "Did we prefill with a space? I believe that SI uses no space and US uses a space." -- the prefill is always one space. The SI Brochure and NIST SP 811 both put a space between number and unit symbol ("10 mm"), so one space is right for SI and US alike. Keep it?
-  - [TGH 2026-09-26: "OK." One space stays.]
-- [?] R-253 feat/convert-as | On lpn_convas_no_transform: "I need context. I don't know what this is trying to say, what was found, and what's the failure. What, specifically, is 'that coordinate system'?" -- it fires when a chosen EPSG system has no transform in this page's catalogue; reworded to name it: "This page has no coordinate transform for {crs}, ..." -- merged, awaiting your ruling
-
-### feat/table-editing (8105)
-
-- [x] R-254 feat/table-editing | "We aren't where we need to be yet, and I think we are still searching for a paradigm for the headings. Did Ida give any help? I envision (a) No selectable text; there is only one selection possible of and one cursor for a heading (except the vertical dots menu), and that is the entire cell. Instead, the only thing selectable is the text, and that's misleading since these are immutable headings analogous to a spreadsheet A, B, C, etc. (b) A menu glyph, likely three vertical dots or whatever you recommend, possibly with Ida's advice." -- feat/table-editing: whole cell is one target, click selects the column, ⋮ glyph opens the menu; awaiting your pass -- feat/table-editing merged 2026-09-26
-- [x] R-255 feat/table-editing | "We currently have a problem with a sort arrow in the middle of the cell conflicting with the heading text. I suppose that should go." -- feat/table-editing: mid-cell arrow removed -- feat/table-editing merged 2026-09-26
-- [x] R-256 feat/table-editing | "We currently have schizophrenia about sorting. Is it with a menu or by clicking on an arrow? I think that an arrow could be fine if we fixed (1)(a). I am not sure where the arrow would/should go. Maybe just below the menu." -- feat/table-editing: sort from the ⋮ menu; the sorted column shows an arrow under the ⋮ that reverses it -- feat/table-editing merged 2026-09-26
-- [x] R-257 feat/table-editing | "I like the Manage columns box, but it's not working very well. (a) It's sluggish, possibly because it waits for the table to respond in real time, where it could (should?) do nothing until OK. (b) I love it for Show/hide. But I am not sure it's the right solution for column order ... (i) Highlight a group of columns honoring Ctrl and Shift, then use move up, move down, move to beginning, and move to end buttons outside the list to move the entire selection. This is solid and efficient. (ii) Drag with mouse. This looks more cool, but is probably harder to program, and probably would make Declan less happy than (i)." -- feat/table-editing: Manage columns applies only on OK; select rows with Ctrl/Shift; Move up, Move down, Move to beginning, Move to end outside the list -- feat/table-editing merged 2026-09-26
-- [x] R-258 feat/table-editing | "Ctrl+Space on a cell works, but I can't figure out how it would be useful." -- kept: it is the keyboard way to do what clicking a heading now does (select the column, then Ctrl+C, Ctrl+D or hide), as in Excel and Google Sheets. Drop it?
-  - [TGH 2026-09-26: "Let's remove it and park it in our roadmap. 'More trouble to debug than the feature is worth.'" -- removed on feat/table-editing; parked as Task 730]
-- [x] R-259 feat/table-editing | "make the Print table PDF name more useful, like {project}-{table}.pdf" -- feat/table-editing: Print table suggests {project}-{table}.pdf -- feat/table-editing merged 2026-09-26
-
-### feat/property-venue (8106) -- his heading said feat/table-editing; the Find content is this branch
-
-- [x] R-260 feat/property-venue | "I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap." -- not reproduced on the merged code: Everything, ID, is empty finds only Text items on Net3-Novato. Which project was open? A retest after you pull would settle it
-  - [TGH 2026-09-26: "You are right. It found text 'LAKE' and 'RIVER'. My bad." -- they are Text items with no ID; nothing to fix]
-- [x] R-261 feat/property-venue | "It works! We can close, merge, and delete the branch. Nice work." -- merged, master 017ee4de
-- [x] R-262 feat/property-venue | On lpn_find_filter_none, rewritten to "This query doesn't apply to any table.": "Is this even possible?" -- yes, rarely: a typed query naming a node-only and a link-only property together fits no single table
-  - [TGH 2026-09-26: "OK."]
-
-### feat/zoom-control (8103)
-
-- [x] R-263 feat/zoom-control | "Some label placements cause Zoom to Fit to leave too much padding." [his screenshot: Novato, labels pulled out by leaders; about a third of the width wasted on each side] -- feat/zoom-control 43902998: one cause fixed (a fit that hid labels kept room for them); your exact screenshot not reproduced, see the report -- feat/zoom-control merged 2026-09-26
-- [x] R-264 feat/zoom-control | "A possibly related bug makes labels being dragged jump double distance (twice as far at the cursor location) at unpredictable locations as they are being dragged away. What's predictable is that the label is twice as far as the cursor. What's unpredictable is at what point they jump from being at the cursor to being twice as distant." -- feat/zoom-control 43902998: the dragged label leapt to 2.2x its leader; fixed -- feat/zoom-control merged 2026-09-26
-- [x] R-265 feat/zoom-control | "The + and - button tips both have their action repeated. Use this form: 'Zoom in. Shortcut: +'." -- feat/zoom-control 43902998: exactly your words -- feat/zoom-control merged 2026-09-26
-- [x] R-266 feat/zoom-control | "The zoom window can be very nice for some users. ... 'Don't zoom again after results' seems to work fine." -- nothing to build
-
-### feat/customer-node (8113)
-
-- [x] R-267 feat/customer-node | "Customer zindex is higher than Junction. Fix that. Make it just less than link?" -- feat/customer-node 105d9f68: customers draw under links and junctions; a click on the junction under a selected customer's grip opens the junction -- feat/customer-node merged 2026-09-26
-- [x] R-268 feat/customer-node | "We didn't account for vertices. If we are in the no-perp region outside a vertex, we need to connect at the vertex. And we need to allow dragging a customer to this region while intelligently tracking onto the vertex while appropriate. (Currently the Customer is banned/prohibited from this region.)" -- feat/customer-node 105d9f68: outside a bend the customer connects at the bend, and a drag tracks onto it and off again -- feat/customer-node merged 2026-09-26
-- [x] R-269 feat/customer-node | "At the risk of being boring, let's [set] the Text size and Symbol size=12 and the Link line thickness=4 for all example projects. This will be more usable for shoppers." -- feat/customer-node 105d9f68: all 7 examples -- feat/customer-node merged 2026-09-26
-- [x] R-270 feat/customer-node | "Change the language 'Link line thickness' to 'Link line width'." -- feat/customer-node 105d9f68 -- feat/customer-node merged 2026-09-26
-
-### feat/menu-button (8114)
-
-- [x] R-271 feat/menu-button | "I love the outlined version, and they are reminiscent of diazo prints (blueprints). I agree with leaving the toolbar black. I thought we were deprecating the tip 'Start with the menus...'." -- feat/menu-button eceab3ab: outlined only; the cue was already deleted on master and is gone from the branch after merging master -- feat/menu-button merged 2026-09-26
-
-### Fire flow
-
-- [x] R-272 -- | "Remember that I am testing locally almost always. I am not pulling to test. ... We can close, merge, and delete the branch." -- fix/fireflow-eps was already merged (f9ebf891); branch and worktree deleted 2026-09-25
-
-### WaterCAD and EPANET, his notes
-
-- [x] R-273 -- | WaterCAD: "File menu: Recents just above Exit." "We have three import items. It's probably time for an Import sub-menu." "Background layers: This seems like a GIS REST server offering." "One quality of life feature they have that we could add is a Junction and Pipe toolbar command that adds Junction, Pipe, Junction, Pipe, etc until escape." "I like the layered scenario alternatives paradigm ... What seems very welcoming is the set of pre-configured scenarios and the ironclad rule that you are always editing only the specific data layers (Alternatives) mapped to that Active Scenario." "I like change/revision tracking very cool." -- Tasks 718-723
-- [x] R-274 -- | EPANET: "Inset map: Correction, that is our task 146.09. Ensure that it includes the key words 'inset' and 'overview'." "Multi-species MSX: Add it priority 50. I don't understand it, but we can learn. Thank you, Mary!" -- 146.09 retitled "An inset overview map"; Task 717 at 50
-
-## Round of 2026-09-26 -- merges, and feat/table-editing's third and fourth passes
-
-- [x] R-275 -- | "8103 zoom-control: Merge", "8113 customer-node: Merge. Nice!", "8114 menu-button: Merge.", "8115 reports: Merge. Very nice. And the file name was good." -- merged; production 83bf02d5
-- [x] R-276 -- | "Can you copy the 'Zoom in to see labels' text from the ungeoreferenced Net3 to the lat/lon Net3? Remove the 'Zoom to see labels' text from the Net2 example." -- master 3a4bb054, fccaaa67
-- [x] R-277 feat/table-editing | "(1) The headings text is still acting like text ... (a) No hover shading, (b) No cursor change. (2) Sorting still feels schizophrenic. Either the dots or the arrow, not both ... Possibly the arrow and the menu can take up zero space and appear with 100% opacity over any heading text on hover. (3) ... remove the sort rows from the column menu. (4) Remove the itemized Show {column} rows ... Leave only Hide this, Show all, and Manage." -- feat/table-editing acdbe7f8, awaiting your pass -- master 893b7a3f
-- [x] R-278 feat/table-editing | "I still see special highlighting on the text." [his screenshot: a box round 'Longitude'] -- 410ddadc: the ring is on the whole cell -- master 893b7a3f
-- [x] R-279 feat/table-editing | "The shortcuts note is really good ... 'See Help, Notes for keyboard shortcuts.'" at the end of the table tab tips -- 410ddadc -- master 893b7a3f
-- [x] R-280 feat/table-editing | "Dragging a column: (1) This is unusably sluggish. (2) I lose the grab cursor ... so drag is blind. (3) The grab cursor is a pointer on the heading text." -- 410ddadc: a ghost follows the pointer, a marker shows the landing, the grabbing cursor holds page-wide; per-move cost measured at 0.02 ms, so the sluggish feel was the missing feedback -- master 893b7a3f
-- [x] R-281 feat/table-editing | "This is a long-haul feature. Spreadsheet editing is not a caprice." Stay the course: click selects, drag moves. -- recorded in the handoff
-- [x] R-283 feat/table-editing | "Put a little vertical space between the ellipsis menu and the sort arrow. You or Ida should know how to make it more pleasing." -- c28c6f3c: about 5 px of clear space, softer grey marks that turn blue on hover -- master 893b7a3f
-- [x] R-284 feat/table-editing | "Dragging: I like it! (1) Suppress the menu and sort arrow during dragging. (2) Sometimes mere clicking (tiny drag?) drags a column. Very startling. I think we need to wait for a "long click" for a drag or a move of at least 1/2 column width." -- c28c6f3c: every mark hidden mid-drag; a drag starts after half the column's width or a 450 ms hold -- master 893b7a3f
-- [x] R-285 feat/table-editing | (same comment, the threshold) -- Perry measured half-width at 288 px of silent travel on a widened Description column, 87-109 px on Net3's wider pipe columns. Keep half-width, or cap it (for example at 40 px)? -- "Yes. It's perfect. We are gold now." Kept; master 893b7a3f
-- [x] R-286 feat/table-editing | "I think that the menu and arrow are too eager to show. Can we make them show only when the cursor is directly over their area of the cell?" -- c28c6f3c: they show only over their own top-right corner; Perry notes nothing now hints that the corner does anything -- master 893b7a3f
-- [x] R-287 feat/table-editing | "(1) The heavy blue line is not meaningful at the left and right edge of the selection ... you can't drag a column to its own left or right edge; that is a do-nothing case. (2) If and only if you drag beyond the middle of the adjacent column, a blue line appears at the new insertion place." -- c28c6f3c, with R-289's dark line as the marker -- master 893b7a3f
-- [x] R-288 feat/table-editing | "Spreadsheets don't highlight cell contents in Navigation (Ready) mode. When I tab from cell to cell, the only indicator I should see is cell outline." -- c28c6f3c, checked on read-only and editable cells -- master 893b7a3f
-- [x] R-289 feat/table-editing | "(1) Turn an entire heading solid blue on select. (2) Drag a column (not heading) shaded outline (see Google Sheets). (3) Make a wide black or dark gray destination line on entire column (not heading) divider when middle of drag rectangle (not cursor) is between middle of two columns." -- c28c6f3c: solid #0b57d0 heading, grey whole-column ghost, 4 px dark-grey full-height line decided by the ghost's middle -- master 893b7a3f
-- [ ] R-290 feat/label-gang-search | (no new words; the master merge) -- c0104534: master's symbol-size rule and zoom-to-fit make this branch's own numbers worse (x2 Novato 72 labels give up a value, was 22; switching the crowding rule off gets 30 but a pass takes 8.3 s, not 0.8 s). Relax the crowding rule, accept slower passes, or rework?
-  - TGH 2026-09-26: "Merging master into it undid much of its gains: Is there anything we can do to figure out why this happened and fix it? What did master have that sabotaged us? Was the merge just inept? We can't proceed unmerged, so this must be dealt with." -- 091e58b9: the merge was clean; master's Novato example (text 12, fit 4% wider) and symbol cap caused it; graded rescue with work caps: 2x 72 -> 49, pass ~2.5 s vs ~2.0 s; seven limits re-baselined on master's drawing
-
-### Rulings recorded, nothing to build
-
-- File menu: "Convert as..." stays where it is ("The problem with putting it near open is that implies we are going to go get a file").
-- EPANET audit: "Make the reports roadmap tasks before EPANET++. I'd like to know the full list of what we are missing."
-- feat/label-limit, feat/offscreen-notice, feat/usage-report, feat/select-on-focus: "Close, merge, and delete branch."
-- Strings: "The selected junctions"; "{n} selected elements are not junctions, so they were not tested." -- "OK."
-
-## Round of 2026-09-26 (evening) -- table-editing and convert-as merged
-
-### Rulings recorded
-
-- feat/table-editing, merged at master 893b7a3f: "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete."
-- feat/convert-as, merged at master 2a2ffb7a: "Step 1 zoom is good. Image stays with the model on pan. ... Step 2 is good. Satellite is good. Done! Merge and delete."
-
-### Open
-
-- [x] R-291 feat/placement-wizard | "The background opacity of the background image happened to be 50%, and that made a huge difference in placing the project. This is a major quality of life enhancement. Can we force the opacity of any background image to no more than 50% during "World Map, Attach" and "File, Convert as"?" -- feat/placement-wizard merged 2026-09-26
-- [x] R-292 feat/placement-wizard | "It would be really nice if the wizard were draggable including up to the top of the page over the menus in case it's in the way." -- feat/placement-wizard merged 2026-09-26
-- [x] R-293 feat/placement-wizard | "File, Convert as should automatically filter EPSG CRSes for the displayed area or network extents. I am at Prescott Valley, AZ, but I see the full list of CRSes." -- feat/placement-wizard merged 2026-09-26
-- [x] R-294 feat/placement-wizard | "UTM, I am choosing 12N, not 10N, for Arizona." -- feat/placement-wizard merged 2026-09-26
-- [x] R-295 feat/placement-wizard | "Since I already had a World Map attached, shouldn't this Convert as wizard already know where I am and start me there?" -- feat/placement-wizard merged 2026-09-26
-- [x] R-296 fix/table-help | "Help, Notes, reorganize": his two tables, Table columns help (6 rows) and Table keyboard shortcuts (10 rows), implemented verbatim -- master f038eba5
-- [x] R-297 -- | Proposed `$ec_lang_syn` for lpn_geomap / lpn_xymap: "I need to see these in context. I don't know where "lat/lon" and "xy" are still used, and I am skeptical." -- context given in the 09-26 evening report
-- [x] R-298 feat/find-coordinate | Task 708 gap 7: "Should coordinates be in Find? I say yes. This is a freedom we need to give power users." -- feat/find-coordinate merged 2026-09-26
-- [x] R-299 feat/find-coordinate | Task 708 gap 8: "Should a Text's words be replaceable? Yes. Very much yes. ... I say that for now we stay with whole-field replace. No string replace within texts (partial replace)." -- feat/find-coordinate merged 2026-09-26
-- [x] R-300 feat/row-paste | "'Paste append' makes more sense because this really isn't a spreadsheet and empty rows are non-idiomatic." -- 79689882: Paste as new rows (menu arms, then Ctrl+V; Ctrl+Shift+V) -- merged 2026-09-27
-- [x] R-301 feat/row-paste | "Junctions and pipes can use same ID. Yes. J1 & P1 or 1 and 1." -- 69ebaaad: separate node and link namespaces; Find says "Junction 10" / "Pipe 10" when shared -- merged 2026-09-27
-- [x] R-302 feat/row-paste | "If a user pastes 100 at the top of 50 rows, do we just prompt, 'Add 50 rows?'" -- c011eb5b -- merged 2026-09-27
-- [x] R-303 feat/row-paste | "I think we should alert, '{n} IDs don't match. Paste anyway?'" -- 92012355, his wording -- merged 2026-09-27
-
-## Round of 2026-09-26 (night) -- his pass over 8117-8119 and 8090, EPANET likeness, Symbology
-
-### fix/label-columns
-
-- [x] R-304 fix/label-columns | "I'll have to trust your judgement on what to test. I don't hate longer runs at this time." "Merge this fix into the branches." -- master merged into all four branches 2026-09-26
-
-### feat/placement-wizard (8117)
-
-- [x] R-305 feat/placement-wizard | "Step 1 happily fades my image to 50%." "2. OK. 3. OK. 4. OK. Done. Close, merge, and delete branch."
-- [x] R-306 feat/placement-wizard | "The initial map view at Step 1 (i) is only a width sliver of the world map that shows most of Africa and Europe, but cuts of extreme east and west Africa. (ii) The n-s extent occupies only about half my screen map height." -- fix/placement-world-view 929dcf08: Step 1 fits the whole world to the map, not the drawing's box; master 58934db3
-
-### feat/find-coordinate (8118)
-
-- [x] R-307 feat/find-coordinate | "All good. Close, merge, and delete branch."
-
-### feat/row-paste (8119)
-
-- [x] R-308 feat/row-paste | "Text table needs its location coordinates." -- feat/row-paste 1631a562: Latitude/Longitude (or X/Y) after ID; an attached Text reads "Attached"; awaiting your pass -- merged 2026-09-27
-- [x] R-309 feat/row-paste | "'Paste as new rows' is not quite descriptive of 'Paste append'. How about 'Paste below table' or 'Paste as new rows after last' or 'Paste as new rows at end'? I really like the dashed line clarifying indicator." -- feat/row-paste 1631a562: "Paste as new rows at end of table" (your Help wording), dashed line untouched; awaiting your pass -- merged 2026-09-27
-- [x] R-310 feat/row-paste | "When I copy an entire table, the headings are included even though I didn't select the headings. Fix that." -- feat/row-paste 1631a562: a copy never carries the heading row now; awaiting your pass -- merged 2026-09-27
-- [x] R-311 feat/row-paste | "Add 'Ctrl+Shift+V | Paste as new rows at end of table' to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass -- merged 2026-09-27
-- [x] R-312 feat/row-paste | "Add 'Paste as new rows at end of table | Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V', to Help, Notes." -- feat/row-paste 1631a562, verbatim; awaiting your pass -- merged 2026-09-27
 
 ### feat/label-gang-search (8090)
 
@@ -296,59 +111,17 @@ judgement and does not belong to a script.
 - [x] R-318 feat/label-gang-search | **"For the permanent record, a label on a leader always reads as belonging to its node.** You have repeated the misconception about this many times, and it's important that you dispel it so that we are not working to false priorities. Long leaders are only unfavored because they are inefficient and extra ink, which generally is clutter in a weak way. But a stack of labels with long and parallel leaders can be very effective." -- feat/label-gang-search 0d45f03a: your ruling is in dev/lpn-rulings.md and CLAUDE.md; three comments corrected. Two rules to rule on: a crowding tie hides the LONGEST leader first (ink is now its only reason), and a leader may not pass through another node's symbol
 - [x] R-319 feat/label-gang-search | "It occurs to me that where there is infinite space east or west, we might want to recognize that infinity and leverage it by using single-line concatenation of properties." -- Task 734 at 50
 
-### EPANET likeness
-
-- [x] R-320 -- | MSX: "This is an extension, not base EPANET. We can provide this, but it's not a blocker for EPANET++." "I may be overly naive, but I don't see this as a big deal. The chemistry is solved, and the UI need be no more scary than Custom Properties. I think that in Settings, Quality we can have maybe a short list of Quality parameters with toggles plus an infinitely expandable list of parameters (Reactive chemicals?). But I don't know what I am talking about." -- recorded on Task 717
-- [x] R-321 -- | "I don't think we should change things in the EPANET UI without a reason (Mary's findings, for example)." "Quality parameter order: None, Chemical, Trace, Age" -- feat/quality-settings d75a944c: None, Chemical, Trace, Age; awaiting your pass
-- [x] R-322 -- | "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative diffusivity: I don't see this in our interface. Is it missing?" -- feat/quality-settings d75a944c: both were read and written but had no box; both added under Chemical, blank means EPANET's defaults (0.01, 1.0); awaiting your pass
-- [x] R-323 -- | "Chemical and Mass units: (1) We should say 'Mass units' if EPANET says that. (2) Our interface is very clear that these don't matter to the calculations. But explanation aside, our interface is arguably less friendly than EPANET because they have dropdown for Mass Units (however restrictive that is), and they don't 'require' the chemical name. (3) If EPANET doesn't offer a UI for the chemical name, what are we doing with it, if anything? We could put it in Properties, Find, and Tables as '{chemical} concentration', and that would be very cool. And maybe some agent planned to do that. But we are not doing it." -- feat/quality-settings d75a944c: "Mass units" dropdown (mg/L, µg/L); Chemical name optional; "{chemical} concentration" in Properties, Find, Tables and the legend; an edited name now reaches the exported file (it silently did not before); awaiting your pass
-- [x] R-324 -- | "I believe we have a mistake in our Wall reaction coefficient and Wall reaction order UI. (1) Wall reaction coefficient units vary according to Wall reaction order; when order is 0, coefficient is mass/area/time and when order is 1, coefficient is length/time. I guess we can dynamically change the label. (2) Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.'" -- feat/quality-settings d75a944c: unit follows the order (length/day at 1, mass/area/day at 0) in Settings, Library and Tables; your tip verbatim; awaiting your pass
-- [x] R-325 -- | Solver: "I think it would be fun and maybe wise, maybe Roadmap priority 50, for us to gradually, in phases, build out our native solver to do everything that the EPANET solver does. This way the math is less of a black box for us so that we have more fundamental understanding of the values we are handling." -- Task 733 at 50
-
-### Symbology
-
-- [x] R-326 -- | "Drop order is missing for Node ID and several Customer properties." -- feat/symbology-label 060abb3c: every row has Show and Drop, node ID and Customer included; awaiting your pass
-- [x] R-327 -- | "We may need a branch to work on intentionality and completeness for our symbology labels." "Initial defaults and all examples need to be consistent." -- feat/symbology-label 060abb3c: defaults and examples come from one table; a check fails if they drift; awaiting your pass
-- [x] R-328 -- | "For initial values and examples, we need an internal way to guess decimals based on the units factor. And/or we need our table of initial decimals to include at least the main US and SI units. We probably should ask Sue and Mary to review the initial decimals I am suggesting below." -- feat/symbology-label 060abb3c: decimals by displayed unit (your values, plus a 3-significant-figure guess for any other unit). Sue and Mary: SI elevation/head/pressure/depth at 3 decimals is too fine in metres of water (Sue: 1); Number of services should be 0/0 (applied, it is a count); head loss should not share elevation's decimals; reaction coefficients 2-3, not 1. Your ruling
-- [x] R-329 -- | "I don't like that ID needs to display first, but also may need to drop first. We have been using drop first as display last, which is efficient, but lazy. I suppose there is room for it even on my phone." -- feat/symbology-label 060abb3c: Show and Drop are separate columns on every row; ID is Show 1, Drop 2; awaiting your pass
-- [x] R-330 -- | "Scroll/spin decimals and orders integers: I notice that on my phone space is economized by showing decimals and order as text inputs. But when tapped, these should (a) highlight entirely like other inputs (I think they were skipped over because they are scroll/spin on the PC) and (b) they should open the scroll/spin interface if there is one. Use your judgement; I am only observing the deficiencies." -- feat/symbology-label 060abb3c: on a touch screen a tap selects the whole number and opens the digit keypad; phones have no spinner for a number box; awaiting your pass
-- [x] R-331 -- | "We need a code or a toggle to 'Use units' for the After string. It should put space and units in the After field and disable it." -- feat/symbology-label 060abb3c: a Use units tick box before After. Your table leaves After blank for Demand, Elevation, Pressure, Flow, Velocity, Head loss and others, so those start unticked. Should they start ticked?
-- [x] R-332 -- | "Does Mary find whether we need to include quality results (inherited directly from their node with disclaimer) for Customer Properties, Table, Find, and Symbology?" -- Mary: no. WaterGEMS' customer element carries no quality; a node's number copied to a customer reads like a tap sample and is not one. Not built
-- [x] R-333 -- | "Our lists are getting long. I think the Settings index pane Symbology section can be reworked to Node labels, Node colors, Link labels, Link colors, Customer." -- feat/symbology-label 060abb3c: Node labels, Node colors, Link labels, Link colors, Customer, and All kept last for Mark highest/lowest and Thematic map; awaiting your pass
-- [x] R-334 -- | "See dev/settings-symbology-defaults.csv. Rename if needed. I see that there is already a symbology-property-audit.md. Harmonize as needed." -- feat/symbology-label: committed as dev/symbology-defaults.csv, the audit doc points at it; Show? all 0 would show no labels, so the shipped ticks were kept; Net inflow has no property yet
-
-### Discussion
-
-- [x] R-335 -- | R-297 answered: "$ec_lang_syn: Yes. Write it." -- the 09-16 wording written
-- [x] R-336 -- | Task 697: "Which domain does Mary vote as canonical? I have been leaning toward -plus-plus since pp isn't immediately obvious, but can be a nice shortcut maybe." -- Mary votes epanet-plus-plus.org canonical (Notepad++ chose notepad-plus-plus.org; "pp" needs decoding), the other a 301
-- [x] R-337 -- | Orchestration: work from 100 down, Sonnet where appropriate, translation sprint when prudent, handoff for a /clear at the end.
-
 ## Round of 2026-09-27 -- his pass over 8119-8121 and 8090, and the open decisions
 
 ### Decisions
 
 - [ ] R-338 feat/label-gang-search | R-315: "There appears to be serious breakage afoot with no other explanation than 'Text and symbol sizes got bigger'. Can you do a deeper inquiry into what broke label placement, and why it now takes 5 times as long as before with apparently worse results?" -- feat/label-gang-search bff8a35a: causes found and fixed (see handoff); awaiting your pass
 - [ ] R-339 feat/label-gang-search | R-318: the longest leader hidden first on a crowding tie: "No." A leader may not pass through another node's symbol: "Yes." -- feat/label-gang-search 8ce9ce7c: tie rule removed (ties broken by element ID only), symbol rule kept; dev/lpn-rulings.md
-- [x] R-340 feat/symbology-label | R-328: "1 is ludicrous when US is 2. 3 is roughly analogous to 2 for US. I guess Sue is just guessing with no experience or intuition to draw on." ... "Keep all as is. They didn't show anything worth heeding." -- nothing to change
-- [x] R-341 feat/symbology-label | R-331: "No. Let's conserve space for users by leaving them unticked." -- nothing to change
-- [x] R-342 feat/symbology-label | New project inheritance: "Things are more complicated now. A new project copies the open project where units are the same (not changed in the New Project wizard). Otherwise a new project gets built-in defaults. The party line is that new projects follow current project as much as they can." -- feat/symbology-label 1701e62b: same units copies all; a changed unit resets only what is calibrated to it -- confirm that reading
-- [x] R-343 feat/symbology-label | The "All" index entry: "Yes." -- kept
-- [x] R-344 -- | R-336: epanet-plus-plus.org canonical, the other a redirect: "OK." -- recorded on Task 697; plan in dev/epanet-plus-plus-plan.md
 
-### feat/row-paste (8119)
-
-- [x] R-345 feat/row-paste | "OK. Done. Close, merge and delete branch." -- merged 2026-09-27
 
 ### feat/symbology-label (8120)
 
-- [x] R-346 feat/symbology-label | "(1) OK. (2) OK. But (a) change Before to 'Bef.' (b) Move Use units to after 'After'. (c) Change After to 'Aft.'" -- feat/symbology-label 1701e62b; awaiting your pass
-- [x] R-347 feat/symbology-label | "(3) Length and Diameter for US projects should have ' and \", not 'Use units' ticked. You may have intended to tick it for SI, since for US, I provided suffixes." -- feat/symbology-label 1701e62b: US unticked with ' and ", SI ticked; awaiting your pass
 - [ ] R-348 feat/symbology-label | "(6) Remind me to test on dev once this is merged and pushed. (7) It's a lot, and it's messy, but let's see if we can make it work."
-
-### feat/quality-settings (8121)
-
-- [x] R-349 feat/quality-settings | "(3) Mixed. (a) Node labels settings, Find, and Table has it, but I don't see Concentration for Link or in Properties. I think we have incomplete execution of the task." -- feat/quality-settings 016576a4; awaiting your pass
-- [x] R-350 feat/quality-settings | "(b) Peripheral issue: Source type should default to none. Maybe just disable if Source quality is blank, since that's what's really happening; it's ignored if Source Quality is blank." -- feat/quality-settings 016576a4; awaiting your pass
 
 ### feat/label-gang-search (8090)
 
@@ -356,13 +129,23 @@ judgement and does not belong to a script.
 
 ## Round of 2026-09-27b -- his pass over 8120, 8121, 8090, 8123 and Task 697
 
-- [x] R-352 feat/symbology-label | R-342: "I don't know what "Customer label width" means. But the answer is the first: "Only what depends"" -- the narrow reading stands, as built; "Branch seems good. No new problems." -- all-clear, merged 2026-09-27
-- [ ] R-353 -- | "Vertices mode with the toolbar then Esc leaves a heavy border/outline around the vertices button. I haven't seen that heavy border before. Maybe it's new. Maybe its intentional; I see it on all mode buttons now. Maybe it indicates "You last used this". I don't know, and it doesn't evoke for me any previous convention, so I perceive it as clutter or neglect." -- fix/mode-focus
-- [ ] R-354 -- | "Where did we get the N/E/N/E/N/E format for the vertices list in Tables? That is not very readable. Couldn't we do something different that's multi-lingual compatible? N E | N E | N E or N{n}E{e}N{n}E{e}N{n}E{e} or N{n}E{e} N{n}E{e} N{n}E{e} or something like that?" -- feat/table-width
-- [x] R-355 feat/quality-settings | "1. OK. 2. OK. BTW, mouse cursor and selection are perfect. I can barely see the pump symbols, but I can precisely pick them with my mouse cursor. 3. OK." -- all-clear, merged 2026-09-27
-- [ ] R-356 -- | "4.1. We need an audit of initial Table column widths. I am issuing a rule here. Set initial table column width to hold the greater (max) of (a) the known, present, current contents of the column not counting "No...." selectors or (b) the heading's longest word not counting units, with any word 8 characters or longer split into two parts for the purposes of this calculation. 4.2. Let's try making the ID column of every table centered horizontally; it's not printing beautifully yet. But the rest of the table with the aforementioned rules is beautiful." -- feat/table-width
-- [ ] R-357 feat/label-gang-search | On the three gaps held for a longer ID: "I reject this false dichotomy. There is infinite free space westward. No vertical space is needed for a longer id. Think or try harder. There are some flaws in our logic."
-- [ ] R-358 feat/label-gang-search | "Speed is noticeably better. But results are terrible. See images." (no images reached the session)
-- [ ] R-359 feat/label-gang-search | "The purpose of this branch is to rebuild our label placement system from the ground up with all constraints and strategies torn down and re-imagined in hopes of **improving speed** and **improving results**. We have devolved into a mud-wrestle with the status quo, and it is not likely to end well. Maybe we need to ask a couple of independent agents to build us a label placement system. Maybe we need to pause for a while and go metaphorically to plan mode. Let's sit on the couch and discuss this for a while to hone our priorities. Maybe you need to interview me at length before we proceed. ... (1) Use available space: Unused free space is very embarrassing; humans and all life don't do that; in real life, habitats get used. (2) Leaders are okay, but see rule 1: Leader length, even heroic leader length, is a legitimate and non-embarrassing solution to bona fide scarcity of space. As leaders grow longer, the imperative to make them parallel grows both naturally (keep them from crossing) and aesthetically (if they are almost parallel, maybe (weakly) they can be made exactly parallel). (3) Standardize labels, but see rule 1: Any given label can be single-line concatenated or multi-line as required to use available space." -- interview published this session
-- [ ] R-360 feat/ctrl-enter | "It works. But where did this come from other than from Declan? Can Mary and Ida endorse this feature? I don't want to implement it without wide endorsement." -- Mary and Ida both endorse (their journals, 2026-09-27)
-- [x] R-361 -- | Task 697: "I want A/B testing (Option B) on release. But we can start with Option A for in-house testing." "May say/Must not say: I agree." Hero copy and questions edited in dev/epanet-plus-plus-plan.md -- Option A site being built in ~/webdev/epanet-plus-plus.org
+- [ ] R-354 -- | "Where did we get the N/E/N/E/N/E format for the vertices list in Tables? That is not very readable. Couldn't we do something different that's multi-lingual compatible? N E | N E | N E or N{n}E{e}N{n}E{e}N{n}E{e} or N{n}E{e} N{n}E{e} N{n}E{e} or something like that?" -- feat/table-width 6f3ca7fa: n/e|n/e (a space would split a pasted cell into columns); the old form still pastes; awaiting your pass on 8124
+- [ ] R-356 -- | "4.1. We need an audit of initial Table column widths. I am issuing a rule here. Set initial table column width to hold the greater (max) of (a) the known, present, current contents of the column not counting "No...." selectors or (b) the heading's longest word not counting units, with any word 8 characters or longer split into two parts for the purposes of this calculation. 4.2. Let's try making the ID column of every table centered horizontally; it's not printing beautifully yet. But the rest of the table with the aforementioned rules is beautiful." -- feat/table-width 6f3ca7fa, your rule as written; awaiting your pass on 8124
+- [ ] R-357 feat/label-gang-search | On the three gaps held for a longer ID: "I reject this false dichotomy. There is infinite free space westward. No vertical space is needed for a longer id. Think or try harder. There are some flaws in our logic." -- written into dev/label-placement-rules.md (S2; the one goal), draft for his review
+- [ ] R-358 feat/label-gang-search | "Speed is noticeably better. But results are terrible. See images." (no images reached the session) -- images arrived 2026-09-27 (C:\Users\tomha\Desktop\2.PNG, 3.PNG), kept in dev/screenshots/ and described in dev/label-placement-rules.md §5 as secret tests
+- [ ] R-359 feat/label-gang-search | "The purpose of this branch is to rebuild our label placement system from the ground up with all constraints and strategies torn down and re-imagined in hopes of **improving speed** and **improving results**. We have devolved into a mud-wrestle with the status quo, and it is not likely to end well. Maybe we need to ask a couple of independent agents to build us a label placement system. Maybe we need to pause for a while and go metaphorically to plan mode. Let's sit on the couch and discuss this for a while to hone our priorities. Maybe you need to interview me at length before we proceed. ... (1) Use available space: Unused free space is very embarrassing; humans and all life don't do that; in real life, habitats get used. (2) Leaders are okay, but see rule 1: Leader length, even heroic leader length, is a legitimate and non-embarrassing solution to bona fide scarcity of space. As leaders grow longer, the imperative to make them parallel grows both naturally (keep them from crossing) and aesthetically (if they are almost parallel, maybe (weakly) they can be made exactly parallel). (3) Standardize labels, but see rule 1: Any given label can be single-line concatenated or multi-line as required to use available space." -- interview published this session -- written into dev/label-placement-rules.md (S2; the one goal), draft for his review
+- [ ] R-360 feat/ctrl-enter | "It works. But where did this come from other than from Declan? Can Mary and Ida endorse this feature? I don't want to implement it without wide endorsement." -- Mary and Ida both endorse (their journals, 2026-09-27): Excel and Google Sheets bind this exact gesture; nothing found in WaterGEMS/EPANET either way; merge?
+
+## Round of 2026-09-28 -- his pass over the two clean-room placers (8129 = A, 8130 = B)
+
+- [ ] R-362 feat/label-placer-a | "Didn't use leaders a lot. That may have been a good strategy. Liked unwrapping labels. That's a good habit and maybe a good new rule. Showed lots of pipe information and less property dropping. Frankly, it's so successful that it's a lot to look at. It fails to eventually add dropped link properties on zoom in. That's a failure. I guess we have to add that as a rule. Putting them off the view resets them. It tends to put link labels gratuitously on pipes. I think it saves time by not revisiting things. But the default is beside the pipe. We failed to give a rule for repeating pipe labels. We have to build our rule set. It didn't align labels to their leader, and that is an extremely basic rule of making a leader. [...] every settings change should work in a way that is aligned and justified to the leader side, but I am seeing something like center jutification. So we need to teach it in our rules. My attitude is that anything non-controversial, we should specify in our rules, but things like open sector or open box caching are experimental, and we don't share them or specify them. Overall, I think it has some solid ideas, and this can help us refine our specs, which is the best we could have hoped for. You may want to interview it about its main methods and any network real estate modeling." [his screenshot, local only: dev/screenshots/label-placer-2026-09-28-184-centred.png, node 184's label centred on its leader] -- interview sent 2026-09-28, answers in dev/label-placer-interview-a.md
+- [ ] R-363 feat/label-placer-b | "This also shows more pipe labels than I recall being in master. Also doesn't recover labels or properties on zoom in. We definitely need a rule for that. Doesn't align with pipes even when zoomed far in. Keeps what it had gratuitously long. Not embarrasing. Acceptable if it could eventually or occasionally reexamine things, like A. But lacks A's effective affinity for unwrapping. Aligns labels properly to their leader! Reluctanct to extend a leader to minimize property drops on a neighbor. And lacks A's propensity to unwrap, so this causes more properties to be dropped." -- interview sent 2026-09-28, answers in dev/label-placer-interview-b.md
+- [ ] R-364 -- | "I suggest that we improve our rules based on what we learned. A did well by unwrapping node labels, so that could be a hint. B did better at recovering on zoom in, so possibly less embarrassing. I'd like to test them more, but I am not sure whether we should instead edit our rules and hit the reset button hoping to capture magic again by evolution." -- recommended 2026-09-28: interview both, write the non-controversial lessons into the rules, then a fresh clean-room pair (round 2)
+
+
+## Round of 2026-09-28 -- his pass on 8124 and his merge word on 8123
+
+- [x] R-365 feat/ctrl-enter | "your all-clear to merge Ctrl+Enter: Approved." -- all-clear pinned in dev/branch-all-clears.json
+- [ ] R-366 feat/table-width | "Printing seems to always take a little more room than on-screen. Therefore a column whose values fit fine on-screen may wrap in the print. This happened to Latitude, Longitude, and Date installed (long value strings). Research how to avoid surprises like this and ensure that the width decisions account for this if it's an unavoidable fact of browser printing."
+- [ ] R-367 feat/table-width | "Mixing model prints a different value than appears on-screen. I am led to wonder, if the short terms are good enough for a printout, why they aren't good enough for the UI. And if they aren't good enough for the UI, are they good enough for the printout? And what is done in translations?"
+- [x] R-368 feat/table-width | "Everything else was nice."

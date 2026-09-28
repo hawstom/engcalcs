@@ -75,22 +75,17 @@ than EPANET" (the exact `LibreEPANET` trap).
 Put it on the first screen — "++" is a bolder typographic claim than "Not EPANET" and invites the
 affiliation question harder.
 
-### Draft hero copy — PROPOSAL for Tom's ruling, not final
+### Hero copy
 
-**Headline:** EPANET++: scenarios, world map, fire flow, customers, custom properties, and asset libraries, given to the world on the same engine EPA gave the world.
+The proposal that stood here is superseded. **The live wording is Tom's own** — read
+`~/webdev/epanet-plus-plus.org/index.html`, lines ~66-72 — made exact about the engine (OWA-EPANET
+2.3.5, Open Water Analytics' MIT-licensed continuation) on his instruction the same day it was
+drafted (2026-09-27: "Make it exact"). Do not edit a word of it without his ruling; do not
+re-propose it here.
 
-**Lede:** EPANET++ is a free libre open-source water network editor built on the EPANET engine itself,
-the same solver the U.S. Environmental Protection Agency wrote and gave away, extended with
-scenarios, world map, fire flow, customers, custom properties, and asset libraries you can import across projects. It
-is not EPANET, and it is not affiliated with or endorsed by the EPA; it is one of many tools built
-on public-domain software EPA released to everyone. [TGH: We (Mary) are doing dilligent research to find any gaps. I don't think it's most honest at this point to imply that we are not or that we don't know EPANET. If needed, let's keep asking Mary to double-check. I say we remove the net sentence.] We are still finding out what EPANET can do
-that we cannot, and we say so.
-
-**Call to action:** Open the network editor. (links to `https://librewaternet.org/app/`)
-
-Flags for Tom: the last lede sentence paraphrases the "infinite depth" honesty asset rather than
-quoting it verbatim — see Question 3 below. No phone/PC/third-party claims belong on a one-screen
-hand-off page, so none appear here.
+**Rejected, on his instruction, and not to be restored:** "We are still finding out what EPANET can
+do that we cannot, and we say so." — implied the suite might not yet know EPANET's gaps, when
+diligent research (Mary) was already underway to find them.
 
 ## 3. Fit with the mission and the sibling sites
 
@@ -139,3 +134,69 @@ campaign needed; it is one more honestly labeled door.
 5. **Should the site get its own claims ledger**, like `not-epanet.org`'s `CLAIMS.md`? Recommend:
    yes, built alongside the site in step 3. [TGH: OK. This is essentially identically a mirrored rebrand of LWN with EPANET comparison tweaks because we are more advanced now.]
 6. **Timing.** No longer a question: Tasks 715 and 716 closed 2026-09-26 with the feat/report merge.
+## 6. Option B1 as built (branch `feat/epanet-plus-plus`)
+
+**The declaration.** `ecCanonicalHostOrigins()` in `lib/Canonical.lib.php` is a whitelist keyed by
+page AND serving host: `Looped-Network.php` on `epanet-plus-plus.org` nominates
+`https://epanet-plus-plus.org`; on every other host it nominates `https://librewaternet.org` as
+before. The host key is `EC_CANONICAL_HOST` (`lib/config.inc.php`), which is the normalised Host
+only when `$ec_canonical_origins` already lists it and `''` otherwise, so a spoofed Host can select
+one of the declared answers or none. `epanet-plus-plus.org` joins `$ec_canonical_origins` answering
+`https://hawsedc.com`, so a calculator reached through that host's `/engcalcs/` symlink stays
+hawsedc.com's. All five readers follow it: canonical, 27 hreflang alternates and og:url (via
+`ec_canonical_url()`), og:image, and the script-path 301, which on this host goes to
+`epanet-plus-plus.org/app/`, never across.
+
+**The brand.** `ecAppBrands()` names each origin the app can nominate (`LibreWaterNet.org`,
+`EPANET++`) and its home page; `ecAppBrandName()`/`ecAppSiteUrl()` answer from the SAME
+canonical lookup, so name and canonical cannot disagree. Visible on this host: the About box name
+and its link, and Help > Welcome page, both go to `https://epanet-plus-plus.org/`. No language
+string names the brand, so no placeholder and no new keys were needed. Unchanged on purpose: the
+About box's Credits link (still `librewaternet.org/credits.html`, which exists), Help's screenshots
+row (`librewaternet.org/screenshots.html`), the `app` marker written into a saved file (still
+`https://librewaternet.org/app/`, the format's home), the page `<title>` (names no brand),
+`og:site_name` and the install name (both already say HawsEDC Calculators / EngCalcs on every host).
+
+**The sitemap.** `../sitemap.xml` is hawsedc.com's and is unchanged: it lists the map app once, at
+`librewaternet.org/app/`. The 27 epanet-plus-plus.org URLs belong in that host's own sitemap, in
+the landing-site repository: `php dev/scripts/generate_sitemap.php --host=epanet-plus-plus.org`
+prints them.
+
+**Guarded by** `dev/scripts/canonical_host_check.php` (renders the page per Host, including a
+spoofed one) and the per-host legs added to `canonical_origin_check.php`.
+
+### Host setup for Tom (cPanel account; docroot `~/addon_html/epanet-plus-plus.org`)
+
+1. **PHP version first.** MultiPHP Manager → set `epanet-plus-plus.org` to **ea-php83**. A new
+   domain defaults to ea-php56, on which every page 500s (`??` in `lib/config.inc.php`). cPanel
+   writes its handler block into the docroot `.htaccess`; leave that block alone.
+2. **The suite symlink**, exactly as librewaternet.org has it (check its target first):
+   ```
+   readlink ~/addon_html/librewaternet.org/engcalcs
+   ln -s "$(readlink ~/addon_html/librewaternet.org/engcalcs)" ~/addon_html/epanet-plus-plus.org/engcalcs
+   ```
+   It relies on `SymLinksIfOwnerMatch`, so it must be owned by the same account.
+3. **The rewrite**, in the docroot `.htaccess` (the landing-site repository owns that file, so it
+   goes in there, above cPanel's handler block). Same as librewaternet.org's:
+   ```
+   RewriteEngine On
+   RewriteRule ^app$ /app/ [R=301,L]
+   RewriteRule ^app/?$ /engcalcs/Looped-Network.php [L]
+   RedirectMatch 404 "/\.(?!well-known/)[^/]+/"
+   ```
+   **No `Options` line**: `Options -Indexes` needs `AllowOverride Options`, and where it is not
+   granted Apache 500s every request under the path. Never add a redirect on
+   `/engcalcs/Looped-Network.php` here; that loops (the PHP does it).
+4. **Mapbox token**: add `epanet-plus-plus.org` to the token's allowed URLs, or satellite and
+   Terrain-RGB return 403 on this host (street tiles and search are unaffected).
+5. **Search Console**: add `https://epanet-plus-plus.org` as its own property, and submit the
+   sitemap from step "The sitemap" above, served from that host.
+6. **Landing page link**: once B1 is live, the landing page's call to action should point at
+   `https://epanet-plus-plus.org/app/` (its own host), not `librewaternet.org/app/`.
+7. **Verify after pulling** the commit that carries this:
+   ```
+   curl -sI https://epanet-plus-plus.org/app | grep -i location          # -> /app/
+   curl -s  https://epanet-plus-plus.org/app/ | grep -o 'rel="canonical"[^>]*'
+   curl -sI https://epanet-plus-plus.org/engcalcs/Looped-Network.php | grep -i location
+                                                  # -> https://epanet-plus-plus.org/app/
+   ```

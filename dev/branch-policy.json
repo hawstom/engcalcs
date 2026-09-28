@@ -77,7 +77,11 @@
         "feat/row-paste",
         "feat/symbology-label",
         "feat/quality-settings",
-        "feat/table-width"
+        "feat/table-width",
+        "feat/epanet-plus-plus",
+        "feat/water-tower",
+        "feat/selection-preview",
+        "feat/ctrl-enter"
     ],
     "feature_freeze": {
         "active": false,

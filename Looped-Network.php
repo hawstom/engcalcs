@@ -10,7 +10,7 @@ require_once('lib/base.inc.php');
 $ec_app_move = ecCanonicalRedirectTarget(
 	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
 	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '',
-	EC_CANONICAL_HOST_DECLARED, CANONICAL_ORIGIN);
+	EC_CANONICAL_HOST_DECLARED, CANONICAL_ORIGIN, EC_CANONICAL_HOST);
 if ($ec_app_move !== null && (!isset($_SERVER['REQUEST_METHOD'])
 		|| $_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'HEAD')) {
 	header('Location: ' . $ec_app_move, true, 301);
@@ -1720,7 +1720,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
         // intended, and the cheapest answer to a reader doing the reasonable thing is to let it
         // work. New tab, `rel="noopener"`: About is a side-trip, and a reader who opened it to
         // find out what this is should not lose an open project to read more. ?>
-		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=EC_LWN_SITE_URL?>" target="_blank" rel="noopener">LibreWaterNet.org</a></h2>
+		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>" target="_blank" rel="noopener"><?=htmlspecialchars(ecAppBrandName(), ENT_QUOTES, 'UTF-8')?></a></h2>
 		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
@@ -1837,6 +1837,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_filled: <?=json_encode($ec_lang['lpn_pane_filled'])?>,
 	lpn_pane_filldown: <?=json_encode($ec_lang['lpn_pane_filldown'])?>,
 	lpn_pane_fill_none: <?=json_encode($ec_lang['lpn_pane_fill_none'])?>,
+	lpn_pane_ctrlenter_filled: <?=json_encode($ec_lang['lpn_pane_ctrlenter_filled'])?>,
 	lpn_pane_hide_col: <?=json_encode($ec_lang['lpn_pane_hide_col'])?>,
 	lpn_pane_hide_cols: <?=json_encode($ec_lang['lpn_pane_hide_cols'])?>,
 	lpn_pane_show_all_cols: <?=json_encode($ec_lang['lpn_pane_show_all_cols'])?>,
