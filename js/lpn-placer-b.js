@@ -11,6 +11,7 @@
 	const OV = 1.25;        // px of overlap we already call ink (the bench forgives 1.5, as leading)
 	const CELL = 32;        // spatial grid cell, px
 	const MARGIN = 400;     // px beyond the viewport that the real-estate map covers
+	const EDGE = 80;        // px: a label this near the viewport's edge is always looked at afresh
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
 	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
@@ -168,6 +169,12 @@
 		return [x0 + t0 * dx, y0 + t0 * dy, x0 + t1 * dx, y0 + t1 * dy];
 	}
 
+	function labelSig(req) {
+		let s = req.kind + req.layout;
+		for (let i = 0; i < req.rows.length; i++) { const r = req.rows[i]; s += '|' + r.field + '=' + r.text + '@' + r.w + 'x' + r.h; }
+		return s;
+	}
+
 	// ---- the placer -----------------------------------------------------------------------------
 	function create() {
 		// Zoom-invariant knowledge, keyed on the network's shape (T2, T3): per node, the directions
@@ -210,24 +217,16 @@
 			return gapCache;
 		}
 
-		function idle(budgetMs, ctx) {
-			if (ctx && ctx.scene) {
-				const byId = {};
-				ctx.scene.nodes.forEach(function (n) { byId[n.id] = n; });
-				gapsOf(ctx.scene, byId);
-			}
-		}
-
-		function place(scene, opts) {
-			const prev = opts && opts.prev;
-			const T = scene.text, VP = scene.viewport;
-			const vx0 = VP.x, vy0 = VP.y, vx1 = VP.x + VP.w, vy1 = VP.y + VP.h;
+		// ONE LAYOUT. `table` (optional) is a per-zoom lookup table of spots found in idle time;
+		// each is tried first and kept if it is still good here.
+		function solve(scene, prev, table) {
 			const nodeById = {}, linkById = {};
 			scene.nodes.forEach(function (n) { nodeById[n.id] = n; });
 			scene.links.forEach(function (l) { linkById[l.id] = l; });
 			const gaps = gapsOf(scene, nodeById);
 
-			const region = { x0: vx0 - MARGIN, y0: vy0 - MARGIN, x1: vx1 + MARGIN, y1: vy1 + MARGIN };
+			const V0 = scene.viewport;
+			const region = { x0: V0.x - MARGIN, y0: V0.y - MARGIN, x1: V0.x + V0.w + MARGIN, y1: V0.y + V0.h + MARGIN };
 			scene.labels.forEach(function (r) {
 				if (r.hand) {
 					region.x0 = Math.min(region.x0, r.hand.x - MARGIN); region.x1 = Math.max(region.x1, r.hand.x + MARGIN);
@@ -249,6 +248,8 @@
 				if (L) { for (let i = 1; i < L.length; i++) { GS.addSeg({ t: 'ldr', key: 'T:' + t.id, lid: 'T:' + t.id, p: L[i - 1], q: L[i] }); } }
 			});
 
+			const T = scene.text, VP = scene.viewport;
+			const vx0 = VP.x, vy0 = VP.y, vx1 = VP.x + VP.w, vy1 = VP.y + VP.h;
 			// ---- one label's geometry --------------------------------------------------------
 			function rowSets(req) {
 				const order = (scene.dropOrder && scene.dropOrder[req.kind]) || [];
@@ -495,7 +496,11 @@
 					const f = c.from;
 					let best = null, bd = Infinity;
 					ink.forEach(function (b) {
-						const p = nearestOnBox(b, f[0], f[1]), d = Math.hypot(p[0] - f[0], p[1] - f[1]);
+						const p = nearestOnBox(b, f[0], f[1]);
+						// Never meet a row square on its side: a short level leader there reads as a
+						// minus sign. Take the nearer corner of that side instead.
+						if (p[1] > b.y0 && p[1] < b.y1) { p[1] = (p[1] - b.y0 < b.y1 - p[1]) ? b.y0 : b.y1; }
+						const d = Math.hypot(p[0] - f[0], p[1] - f[1]);
 						if (d < bd) { bd = d; best = p; }
 					});
 					c = Object.assign({}, c, { leader: [[f[0], f[1]], best] });
@@ -630,8 +635,47 @@
 				});
 			}
 
-			// ---- 3. everyone else: first a place for each label at its smallest ------------------
-			const order = reqs.filter(function (r) { return !placed[r.id]; });
+			// ---- 3. the lookup table's spots, where they still hold (T2) -----------------------
+			const reqById = {};
+			reqs.forEach(function (r) { reqById[r.id] = r; });
+			const seeded = [];
+			if (table) {
+				table.order.forEach(function (id) {
+					const req = reqById[id], sd = table.labels[id];
+					if (!req || !sd || placed[id] || req.hand || sd.sig !== labelSig(req)) { return; }
+					const rows = [];
+					req.rows.forEach(function (r, i) { if (sd.fields.indexOf(r.field) >= 0) { rows.push(i); } });
+					if (rows.length !== sd.fields.length) { return; }
+					const sz = sizeOf(req, rows, sd.layout);
+					const ax = req.anchor.x, ay = req.anchor.y;
+					const c = { rows: rows, layout: sd.layout, align: sd.align, x: ax + sd.dx, y: ay + sd.dy, w: sz.w, h: sz.h,
+						angle: sd.angle, leader: null, pref: 0 };
+					if (sd.leader) {
+						c.leader = sd.leader.map(function (q) { return [ax + q[0], ay + q[1]]; });
+						const n = req.kind === 'node' ? nodeById[req.owner] : null;
+						if (n) { c.leader[0] = [n.x, n.y]; }
+					}
+					const ink = inkOf(req, c);
+					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
+					const cost = evaluate(req, c, ink, ownOf(req), true, LABEL_CAP);
+					if (cost === Infinity) { return; }
+					insert(req, c, ink, cost);
+					seeded.push(id);
+				});
+			}
+
+			if (typeof process !== 'undefined' && process.env.PBDBG) { console.log(scene.id, 'table', !!table, 'kept', Object.keys(kept).length, 'seeded', seeded.length, 'left', reqs.filter(function (r) { return !placed[r.id]; }).length); }
+			// ---- 4. everyone else: first a place for each label at its smallest ------------------
+			// A label the table had to drop at this zoom stays dropped, unless it stands near the
+			// viewport's edge, where the table's crowd may be off screen now.
+			const skip = {};
+			if (table) {
+				reqs.forEach(function (r) {
+					const a = r.anchor;
+					if (table.hidden[r.id] === labelSig(r) && a.x > vx0 + EDGE && a.x < vx1 - EDGE && a.y > vy0 + EDGE && a.y < vy1 - EDGE) { skip[r.id] = 1; }
+				});
+			}
+			const order = reqs.filter(function (r) { return !placed[r.id] && !skip[r.id]; });
 			// Hardest first: the owner with the most symbols and pipes around it.
 			const crowd = {};
 			order.forEach(function (r) {
@@ -647,7 +691,7 @@
 				if (b) { insert(req, b.c, b.ink, b.cost); }
 			});
 
-			// ---- 4. then grow: each shown label looks again with its whole row set -----------------
+			// ---- 5. then grow: each shown label looks again with its whole row set -----------------
 			order.forEach(function (req) {
 				const cur = placed[req.id];
 				if (!cur) { return; }
@@ -687,6 +731,21 @@
 			});
 
 			// ---- out -------------------------------------------------------------------------
+			// What this layout teaches the lookup table: each label's spot as an offset from its
+			// anchor, which holds at any pan of the same zoom.
+			const learned = { labels: {}, order: [], hidden: {} };
+			reqs.forEach(function (r) { if (!placed[r.id] && !r.hand) { learned.hidden[r.id] = labelSig(r); } });
+			const prio = reqs.filter(function (r) { return r.hand; }).map(function (r) { return r.id; })
+				.concat(Object.keys(kept), seeded, order.map(function (r) { return r.id; }));
+			prio.forEach(function (id) {
+				const p = placed[id], req = reqById[id];
+				if (!p || req.hand || learned.labels[id]) { return; }
+				const c = p.c, ax = req.anchor.x, ay = req.anchor.y;
+				learned.labels[id] = { sig: labelSig(req), fields: c.rows.map(function (i) { return req.rows[i].field; }),
+					layout: c.layout, align: c.align, angle: c.angle || 0, dx: c.x - ax, dy: c.y - ay,
+					leader: c.leader ? c.leader.map(function (q) { return [q[0] - ax, q[1] - ay]; }) : null };
+				learned.order.push(id);
+			});
 			const labels = {};
 			reqs.forEach(function (req) {
 				const p = placed[req.id];
@@ -696,7 +755,125 @@
 				if (c.angle) { o.angle = c.angle; }
 				labels[req.id] = o;
 			});
-			return { labels: labels };
+			return { labels: labels, learned: learned };
+		}
+
+		// ---- T2: the per-zoom lookup table, built during the breathers -------------------------
+		// A layout of the WHOLE network (every label ever requested, no viewport) at a ladder of
+		// zooms, quarter-octave apart. A spot is stored as an offset from its label's anchor, which
+		// is the same at any pan of that zoom, so one table serves every view near its zoom.
+		const registry = {};     // label id -> {req, mx, my (model anchor), hx, hy (model hand)}
+		let tables = {}, tablesSig = null, baseS = null, lastScene = null, lastLayout = null;
+		function remember(scene) {
+			const v = scene.view;
+			scene.labels.forEach(function (r) {
+				registry[r.id] = { req: r, mx: (r.anchor.x - v.tx) / v.s, my: (r.anchor.y - v.ty) / v.s,
+					hand: r.hand ? [(r.hand.x - v.tx) / v.s, (r.hand.y - v.ty) / v.s] : null };
+			});
+			const snap = netSnap(scene);
+			if (!sameNet(snap, tablesSig)) { tables = {}; baseS = v.s; }
+			tablesSig = snap;
+			lastScene = scene;
+		}
+		// T3: the network in model space, the lettering, the symbology. A label's own content is
+		// checked per label (labelSig), so an edited label loses only its own entry. Coordinates
+		// are compared with a tolerance, since a view rounds them to its own pixels.
+		function netSnap(scene) {
+			const v = scene.view, xs = [];
+			let topo = scene.text.sizePx + '|' + scene.text.separator + '|' + JSON.stringify(scene.dropOrder);
+			scene.nodes.forEach(function (n) { xs.push((n.x - v.tx) / v.s, (n.y - v.ty) / v.s); topo += '|' + n.id + ':' + n.type; });
+			scene.links.forEach(function (l) {
+				l.points.forEach(function (q) { xs.push((q[0] - v.tx) / v.s, (q[1] - v.ty) / v.s); });
+				topo += '|' + l.id + ':' + l.from + '>' + l.to + ':' + l.points.length + ':' + (l.symbols || []).length;
+			});
+			// A Text object hangs at a fixed pixel offset from its point, so its box is not in model
+			// space; its spots are checked against it at every view instead.
+			scene.texts.forEach(function (t) { topo += '|T' + t.id + ':' + t.text; });
+			return { topo: topo, xs: xs, tol: 0.05 / v.s };
+		}
+		function sameNet(a, b) {
+			if (!a || !b || a.topo !== b.topo || a.xs.length !== b.xs.length) { return false; }
+			const tol = Math.max(a.tol, b.tol);
+			for (let i = 0; i < a.xs.length; i++) { if (Math.abs(a.xs[i] - b.xs[i]) > tol) { return false; } }
+			return true;
+		}
+		function rungOf(s) { return Math.round(4 * Math.log(s / baseS) / Math.LN2); }
+		// The same network at another zoom, about the viewport centre.
+		function synth(scene, f) {
+			const VP = scene.viewport, cx = VP.x + VP.w / 2, cy = VP.y + VP.h / 2;
+			const v = scene.view, s2 = v.s * f, tx2 = (v.tx - cx) * f + cx, ty2 = (v.ty - cy) * f + cy;
+			function M(x, y) { return [cx + (x - cx) * f, cy + (y - cy) * f]; }
+			function grow(sz, lo, hi) { return Math.max(Math.min(sz, lo), Math.min(Math.max(sz, hi), sz * f)); }
+			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+			const nodes = scene.nodes.map(function (n) {
+				const q = M(n.x, n.y), w = grow(n.symbol.w, 3, 12), h = grow(n.symbol.h, 3, 12);
+				x0 = Math.min(x0, q[0]); y0 = Math.min(y0, q[1]); x1 = Math.max(x1, q[0]); y1 = Math.max(y1, q[1]);
+				return { id: n.id, type: n.type, x: q[0], y: q[1], symbol: { x: q[0] - w / 2, y: q[1] - h / 2, w: w, h: h } };
+			});
+			const links = scene.links.map(function (l) {
+				return { id: l.id, type: l.type, from: l.from, to: l.to,
+					points: l.points.map(function (q) { return M(q[0], q[1]); }),
+					symbols: (l.symbols || []).map(function (b) {
+						const q = M(b.cx, b.cy), w = grow(b.w, 9, 37);
+						return { cx: q[0], cy: q[1], w: w, h: w * b.h / b.w, angle: b.angle };
+					}), arrows: [] };
+			});
+			const texts = scene.texts.map(function (t) {
+				const q = M(t.box.cx, t.box.cy);
+				return { id: t.id, text: t.text, box: { cx: q[0], cy: q[1], w: t.box.w, h: t.box.h, angle: t.box.angle },
+					leader: t.leader ? t.leader.map(function (p) { return M(p[0], p[1]); }) : undefined };
+			});
+			const labels = Object.keys(registry).sort().map(function (id) {
+				const e = registry[id];
+				return { id: id, owner: e.req.owner, kind: e.req.kind, rows: e.req.rows, layout: e.req.layout,
+					anchor: { x: e.mx * s2 + tx2, y: e.my * s2 + ty2 },
+					hand: e.hand ? { x: e.hand[0] * s2 + tx2, y: e.hand[1] * s2 + ty2 } : null };
+			});
+			const pad = 150;
+			return { id: 'synth', viewport: { x: x0 - pad, y: y0 - pad, w: x1 - x0 + 2 * pad, h: y1 - y0 + 2 * pad },
+				view: { s: s2, tx: tx2, ty: ty2 }, text: scene.text, dropOrder: scene.dropOrder,
+				nodes: nodes, links: links, texts: texts, customers: scene.customers || [], labels: labels };
+		}
+		function now() { return typeof performance !== 'undefined' ? performance.now() : Date.now(); }
+		function idle(budgetMs, ctx) {
+			const t0 = now();
+			if (ctx && ctx.scene) { remember(ctx.scene); }
+			const scene = lastScene;
+			if (!scene) { return; }
+			const byId = {};
+			scene.nodes.forEach(function (n) { byId[n.id] = n; });
+			gapsOf(scene, byId);
+			// Rungs nearest the current zoom first; zooming in matters more than zooming out.
+			const k0 = rungOf(scene.view.s), want = [k0];
+			for (let d = 1; d <= 12; d++) { want.push(k0 + d); if (d <= 6) { want.push(k0 - d); } }
+			// Once a view is on screen, the rungs beside it are rebuilt around what it shows, so the
+			// next zoom finds the held labels and the table in agreement (T1 and T2 together).
+			const fromView = lastLayout && lastLayout.scene === scene ? lastLayout : null;
+			if (fromView) { want.splice(0, 1); want.sort(function (a, b) { return (Math.abs(a - k0) - (a > k0 ? 0.5 : 0)) - (Math.abs(b - k0) - (b > k0 ? 0.5 : 0)); }); }
+			let last = 0;
+			for (let i = 0; i < want.length; i++) {
+				const k = want[i];
+				if (tables[k] && (!fromView || tables[k].from === fromView)) { continue; }
+				const spent = now() - t0;
+				if (spent + Math.max(last, 5) * 1.5 > budgetMs) { break; }
+				const t1 = now();
+				const f = baseS * Math.pow(2, k / 4) / scene.view.s;
+				const out = solve(synth(scene, f), fromView, null);
+				tables[k] = out.learned;
+				tables[k].from = fromView;
+				if (typeof process !== 'undefined' && process.env.PBDBG) { console.log('rung', k, (now() - t1).toFixed(0), 'ms', budgetMs); }
+				last = now() - t1;
+			}
+		}
+
+		function place(scene, opts) {
+			const prev = opts && opts.prev;
+			remember(scene);
+			const table = tables[rungOf(scene.view.s)] || null;
+			// A table a whole rung away is still a good seed; a spot that no longer holds is re-searched.
+			const out = solve(scene, prev, table);
+			lastLayout = { scene: scene, layout: { labels: out.labels } };
+			return { labels: out.labels };
 		}
 
 		return { name: 'b (free-space first, grow in place)', place: place, idle: idle };
