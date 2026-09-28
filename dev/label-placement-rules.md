@@ -1,6 +1,6 @@
 # Label placement rules for the rebuild
 
-**Status: ROUND 2, Part A rewritten from Tom's markup of 2026-09-28** (`dev/label-placement-rules-v2-draft.md` retired into it). Round 1 was reviewed by him the same morning. Written from his interview answers of 2026-09-27
+**Status: ROUND 3, Part A as his round-2 markup of 2026-09-28, plus R14 and R15 from his browser pass the same day** (`dev/label-placement-rules-v2-draft.md` retired into it). Round 1 was reviewed by him the same morning. Written from his interview answers of 2026-09-27
 (the couch, https://claude.ai/artifact/PyZpPyHbpACHsu7fHVZEZJ, 13 answers) and his two instructions
 that followed it, then revised with his review of 2026-09-28. His answers, verbatim, are in §6.
 
@@ -53,12 +53,17 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
   to show more of what was requested.
 - **R9. A pipe longer than the repeat spacing carries its label more than once,** evenly along it.
   The spacing is `scene.text.repeatSpacingPx`, which the bench sets. (Master does this today.)
+- **R14. When there is space available, honor the setting about aligning labels to pipes.**
 
 #### Time and change
 
 - **R10. Placement never slows a pan or zoom while it's under way.**
 - **R11. When zooming in frees room, dropped properties and hidden labels come back.**
 - **R13. The layout always reflects the current network, text and settings.**
+- **R15. Avoid showing the user drastic shifts.** For example, when jumping into an untested
+  (unfamiliar) view, hide the labels immediately while you calculate positions instead of showing
+  them in unconfirmed positions while you calculate placements. This is to avoid showing the user
+  a drastic shift once you finish calculation.
 
 ### 4. Hints (may use or ignore)
 
@@ -82,6 +87,12 @@ prints the same scores: breaks of N1, N3, N4 and N5 (must be zero), crossing cos
 labels shown, leader length, churn (a label that moves between two views and shows nothing more
 for it), and time per layout.
 
+The setting R14 names is the user's "Draw link labels along the link line" (Settings, Symbology,
+Labels). A scene carries it as `scene.settings.alignPipeLabels`, with the reading window a turned
+label keeps to, and each pipe label it applies to says `along: true` (a label the user dragged opts
+out). R15's hiding and showing is the page's job, since a placer never touches the screen; a
+placer's part in it is to be quick.
+
 ---
 
 ## Part B: held back from the builders
@@ -96,8 +107,9 @@ become the bench, and it is deleted when the rebuild lands.
 **Secret tests the builders are not told about** (Q11 = C: *"a secret surprise test that we don't
 want them to build to"*):
 
-- **R-075, the 12345678 test.** Add 12345678 to the node ID prefix; nothing shown moves or hides
-  where free space exists within reach. Hint H-c (round 1's S2) is what should pass it.
+- **R-075, the 12345678 test.** Add 12345678 to the node ID prefix; nothing shown hides or loses
+  values where free space exists within reach. Moving to make room is allowed (his ruling of
+  2026-09-28, below). Hint H-c (round 1's S2) is one way to pass it.
 - **His two screenshots of 2026-09-27** (local only, in `dev/screenshots/`, which is not
   tracked):
   - `label-couch-2026-09-27-overwrite-185-183.png`: node 185's label written over node 183's,
@@ -109,8 +121,9 @@ want them to build to"*):
     west.
 
 **Tom's crossing weights**, 0 to 1 (Q05): label on Text 1, label on symbol or label 1, leader on
-leader 0.9, label on leader 0.7, label on link 0.3, leader on link 0.2, label on customer 0. The
-bench scores with these; builders see only the order (his ruling, 2026-09-28).
+leader 0.9, label on leader 0.7, label on link 0.3, leader on link 0.2, label on customer 0. They
+live in `dev/lpn-spike/label-bench/judges/weights.js`, and the judge reports the cost weighted with
+them; the public bench counts by rank, so builders see only the order (his ruling, 2026-09-28).
 
 **His ideas, remembered.** Quadrants, sectors, boxes, the per-zoom table and the ranked gap list now
 go to the builders in general terms (§4, H-d), on his suggestion of 2026-09-28. Held back still: `spot_prime` and
@@ -161,14 +174,50 @@ the new R1's order). T2 and S2 survive only as hints H-b and H-c.
 - **R8 stays a rule and unwrapping stays a hint (H-a)**: his *"Stay a hint."*
 - **R9, repeats: his words were** *"On master, pipe labels are repeated with a spacing of screen
   size (max of width or height) / 4."* **Master's code says otherwise**: `labelRepeatSpacing()` is
-  0.75 x the SHORTER side as a ceiling, so repeats land (0.375, 0.75] x min apart. The bench
-  passes the spacing as a number, so either is one line; **it is set to master's until he rules**,
-  since his sentence describes master.
+  0.75 x the SHORTER side as a ceiling, so repeats land (0.375, 0.75] x min apart. **He ruled
+  on 2026-09-28: *"Master."*** The spacing stays master's, 0.75 x the shorter side as a ceiling.
 - **"Ours, not given to the builders" kept the build order, interface and bench.** Read as: not
   given as RULES. A clean-room builder cannot build without the contract and the bench, so Part A
   §5 hands them over as the mechanics of the job, stated as such.
 - **Churn is still measured, never ruled.** The bench reports it (a move that shows more is not
   churn); nothing fails on it. His Task 680 and R-075 complaints stay in the secret tests.
+
+### Round 2 browser pass, 2026-09-28: R14, R15, and R-075 rewritten
+
+He looked at C (8132, `?placer=c`) and D (8133, `?placer=d`) on the real map. His words:
+
+- *"Our rules are getting better, and this is very fruitful."*
+- *"C ignores the setting to align pipe labels to pipes. But performance is good."*
+- *"D produces some transient strange behavior; labels at the bottom of the screen."*
+- *"Maybe we can add two rules: (a) When there is space available, honor the setting about
+  aligning labels to pipes. (b) Avoid showing the user drastic shifts. For example, when jumping
+  into an untested (unfamiliar) view, hide the labels immediately while you calculate positions
+  instead of showing them in unconfirmed positions while you calculate placements. This is to
+  avoid showing the user a drastic shift once you finish calculation."*
+- On R-075 (long IDs moved 67% of shown labels in C, 66% in D, 13% in master): *"The test is
+  faulty. Their behavior is gold. See if you can rewrite the test. And we should have a test for
+  link label alignment since that seems to be elusive with all four; actually that indicates a
+  rule flaw. Do we need to examine the rules again?"*
+- On the repeat spacing: *"Master."*
+
+**R14 and R15 are his (a) and (b)**, added to Part A §3 in his words, edited only to stand as rule
+sentences.
+
+**The rule flaw he suspected was real, and it was ours, not the builders'.** Neither Part A nor
+the contract ever told a placer the alignment setting existed: the scene carried no settings at
+all, a pipe label arrived as `layout: 'line'` with no angle, and R7 ("beside its pipe, not on it")
+read naturally as a level label beside the line. All four clean-room placers answered the brief
+they were given. Every bench scene is saved with the setting on. The scene now carries it
+(`scene.settings`, and `along` on each pipe label it applies to), Part A §5 names it, and the
+bench reports R14; the judges assert it (at most 5% of the pipe labels asked, drawn otherwise
+where an aligned spot beside the pipe was free; master misses none).
+
+**R-075 now measures what his original complaint named**: longer IDs must not hide a label or
+cut its values where free space exists within reach. A move is no longer a failure; the moves are
+reported only (`judges/README.md`).
+
+**Tom's crossing weights moved out of `score.js`** into `judges/weights.js`: the public bench now
+counts each crossing by its rank in the order, and the judge reports the weighted cost.
 
 ---
 

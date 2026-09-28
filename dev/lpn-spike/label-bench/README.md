@@ -28,10 +28,12 @@ placer that caches in model space); the lettering (row height, the separator a o
 joins rows with and its width, the longest allowed hook); the user's per-kind value **drop order**
 (first to go first; the ID row is never in it); **every** node (centre and symbol box) and link
 (polyline in view px, pump/valve symbol, flow arrows), on screen or not, since the model runs off
-the screen on every side; Text objects and customer symbols as fixed boxes; and the **labels
+the screen on every side; the user's label `settings` (whether pipe labels are drawn along their
+pipes, and the reading window a turned label keeps to); Text objects and customer symbols as fixed boxes; and the **labels
 requested** at this view (owner on screen): owner, kind (node, link, customer, text), anchor, rows
-(field, text, measured w and h), usual shape (a node label stacks, a pipe label is one line), and
-`hand`, the leader end point the user dragged it to, or null. `prev` is the previous view of the
+(field, text, measured w and h), usual shape (a node label stacks, a pipe label is one line),
+`hand`, the leader end point the user dragged it to, or null, and on a pipe label `along`, true
+when the setting asks it to lie along its pipe (R14). `prev` is the previous view of the
 same set and the layout you returned for it -- there is no rule that a label hold still, but `prev`
 is what lets a placer avoid churn (see "What is scored" below) if it wants to.
 
@@ -72,9 +74,9 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
   An **invalid** placement (a bent leader that is not the standard hook, one that does not start on
   its owner or reach its text) counts with them. A leader crossing another leader is not one of
   these breaks — it is the worst of the weighted crossing costs below (there is no N2).
-- **Weighted crossing cost**, worst to least: leader on leader, label on leader, label on pipe,
-  leader on pipe; a label on a customer costs nothing. (The scorer's own weights are in `score.js`
-  and `judges/README.md`; a builder is scored on the order, not the numbers.) A pipe label on its
+- **Crossing cost, by rank**, worst to least: leader on leader (4), label on leader (3), label on
+  pipe (2), leader on pipe (1); a label on a customer costs nothing. Each crossing counts its place
+  in that order and nothing more: the order is all the rules give (§3, "Costs, worst first"). A pipe label on its
   own pipe is not a crossing (it is reported separately, R7 below); a leader meeting pipes at its
   own start is not one either.
 - **Rows shown / rows requested; labels shown / labels requested.**
@@ -92,6 +94,12 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
 - **R7, reported**: of the shown pipe labels, how many sit on their own pipe rather than beside it.
 - **R9, reported**: of the shown pipe labels whose pipe is longer than `scene.text.repeatSpacingPx`,
   how many carry repeats (`placement.repeats`) versus how many should.
+- **R14, reported**: of the shown pipe labels the user's "Draw link labels along the link line"
+  setting asks to lie along their pipe (`along: true`), how many do (turned to the pipe where they
+  sit, within 5 degrees, and reading inside `scene.settings.readableAngleDeg`); and of the rest, how
+  many had room to: the same rows as one line, turned to the pipe and half a row clear of it, fitting
+  at or near the middle of the pipe's on-screen stretch on either side, over no symbol, label, Text
+  or other pipe, on screen (`alignedRoom()` in `score.js`).
 - **R11, reported**: across the zoom-in steps of a set (`view.s` increasing), rows regained (shown
   now that were not, or more of them) versus rows lost, summed over labels present in both views.
 - **Time per layout**, median and max, with the machine it ran on.

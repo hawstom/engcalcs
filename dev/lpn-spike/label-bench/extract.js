@@ -84,7 +84,8 @@ async function extractSet(set) {
 		"\t\tlinkLabelPos: linkLabelPos, nodeById: nodeById,\n" +
 		"\t\tpumpSymbolSize: pumpSymbolSize, effectiveFontSize: function () { return effectiveFontSize(); },\n" +
 		"\t\tlabelSeparator: labelSeparator, linkLabelAligned: linkLabelAligned,\n" +
-		"\t\tlabelRank: labelRank, linkLabelStations: linkLabelStations"
+		"\t\tlabelRank: labelRank, linkLabelStations: linkLabelStations,\n" +
+		"\t\tlabelFlipLeftOfVertical: labelFlipLeftOfVertical"
 	);
 	L.buildLayers();
 	L.setCanvas(CANVAS.w, CANVAS.h);

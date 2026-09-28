@@ -53211,7 +53211,7 @@ var EngCalcs = EngCalcs || {};
 			nodeEls: function () { return nodeEls; }, linkEls: function () { return linkEls; },
 			nodeAt: nodeAt, nodeRadius: nodeRadius, linkPointList: linkPointList,
 			linkLabelMid: function (l) { return linkLabelMid(l); }, pumpSymbolSize: pumpSymbolSize,
-			labelSeparator: labelSeparator
+			labelSeparator: labelSeparator, labelFlipLeftOfVertical: labelFlipLeftOfVertical
 		};
 	}
 	// Every row string measured in the REAL font, in view pixels, through the page's own tape

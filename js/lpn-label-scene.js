@@ -36,7 +36,7 @@
 	 *
 	 * host: { state(), getDoc(), settings(), labelSettings(), nodeEls(), linkEls(), nodeAt(n),
 	 *         nodeRadius(n), linkPointList(l), linkLabelMid(l), pumpSymbolSize(type),
-	 *         labelSeparator() }
+	 *         labelSeparator(), labelFlipLeftOfVertical()? }
 	 * opts: { id, set, step, source, canvas: {w, h}, measure(str) -> px, obs, zoom? }
 	 *   `obs` is an obstacle set shaped like the page's staticObstacles(): the Text objects are
 	 *   read off its boxes and segments that carry `textOwner`.
@@ -55,6 +55,8 @@
 		var inView = function (p) { return p.x >= 0 && p.y >= 0 && p.x <= CANVAS.w && p.y <= CANVAS.h; };
 		var nodeEls = host.nodeEls(), linkEls = host.linkEls(), obs = opts.obs;
 		var sep = host.labelSeparator();
+		var alignOn = !!settings.alignPipeLabels;
+		var flipDeg = typeof host.labelFlipLeftOfVertical === 'function' ? host.labelFlipLeftOfVertical() : 20;
 		var scene = {
 			id: opts.id, set: opts.set, step: opts.step, source: opts.source,
 			viewport: { x: 0, y: 0, w: CANVAS.w, h: CANVAS.h },
@@ -62,6 +64,13 @@
 			text: { sizePx: textPx, rowHeightPx: r2(rowH), separator: sep,
 				separatorW: r2(textW(sep)), hookMaxPx: r2(rowH) },
 			dropOrder: { node: dropOrder(ls, 'node'), link: dropOrder(ls, 'link'), customer: [] },
+			// **THE USER'S "DRAW LINK LABELS ALONG THE LINK LINE" SETTING** (Settings > Symbology >
+			// Labels; settings.alignPipeLabels), and the reading window a turned label must keep to:
+			// its reading direction, `angle` in the contract's sense, lies in (min, max] degrees, so
+			// no label reads upside down. The window is the page's own, from its "Label flip angle
+			// adjustment" setting. Each pipe label that should lie along its pipe says so itself
+			// (`along`), since a label the user dragged opts out.
+			settings: { alignPipeLabels: alignOn, readableAngleDeg: { min: -(90 + flipDeg), max: 90 - flipDeg } },
 			nodes: [], links: [], texts: [], customers: [], labels: []
 		};
 		if (opts.zoom) { scene.zoom = opts.zoom; }
@@ -140,7 +149,8 @@
 			if (!inView(anchor)) { return; }
 			var dragged = l.lx !== undefined;
 			var lab = { id: 'l:' + l.id, owner: String(l.id), kind: 'link', anchor: { x: anchor.x, y: anchor.y },
-				rows: rowsOf(le.allLines), layout: dragged ? 'stack' : 'line', hand: null };
+				rows: rowsOf(le.allLines), layout: dragged ? 'stack' : 'line', hand: null,
+				along: alignOn && !dragged };
 			if (dragged) {
 				var m = host.linkLabelMid(l);
 				lab.hand = V({ x: m.x + l.lx, y: m.y + (l.ly || 0) });
