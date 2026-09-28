@@ -56,7 +56,9 @@ A view is laid out in passes:
 8. **Repeats.** A pipe longer than the repeat spacing gets further copies spaced evenly along it
    wherever a copy fits beside the pipe (R9).
 
-A label is never bought with a leader crossing another leader or a label covering a leader:
+Two labels side by side keep a 4 px gap, so neighbouring rows never read as one word; stacked
+one above another they may touch, since the row pitch carries its own leading. A label is
+never bought with a leader crossing another leader or a label covering a leader:
 past a set cost the label is better hidden. Leaders are straight, or carry the one short
 horizontal hook when they climb steeply (R6); the text always hangs on the side the leader
 arrives from and is justified to it (R5).
@@ -89,6 +91,12 @@ opened. It shows nearly twice the labels and twice the rows master does, with no
 crossing cost is higher in total because it draws twice as much; every crossing is a label or
 leader on a pipe, none a leader on a leader or a label on a leader.
 
+Beyond the bench's own sets I ran it, with no breaks, on the Novato sequence played backwards
+(zooming out), on six pans of the Novato 2x view, and on two made-up scenes: a pipe far longer
+than the repeat spacing (it carried two copies) and a scene with customers, a Text object with a
+callout, a text-kind label, a label whose owner is missing, a zero-length pipe and hand-placed
+node and valve labels.
+
 ## What it does well
 
 - Shows most labels and about half of every requested row, even on the crowded Novato views,
@@ -102,7 +110,7 @@ leader on a pipe, none a leader on a leader or a label on a leader.
 ## What it does badly
 
 - Crowded views look busy. It takes "use available space" literally, and a dense cluster fills
-  with labels on leaders of up to about 60 px; a reader has to follow the red lines.
+  with labels on leaders of up to about 50 px; a reader has to follow the leaders.
 - Pipe labels often hang horizontally on a leader from the middle of the pipe when the pipe is
   too short for its label to lie along it. That keeps rows, but a leader that starts on a pipe
   looks much like one that starts on a node.
