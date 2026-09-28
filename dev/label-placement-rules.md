@@ -75,8 +75,11 @@ customer costs nothing. (Tom's weights are in Part B; builders get the order onl
 
 #### 3.3 Time
 
-- **T1. Never get in the way of the user's zooming and panning.** Hold every label still while the
-  view moves, until it is forced to move (a collision the new view creates). (Q08)
+- **T1. Never get in the way of the user's zooming and panning.** Do no placement work while a
+  pan or zoom gesture is under way. Once the view settles, the best layout for the new view wins:
+  there is no reward for a label staying where it was, and no penalty for a label moving to show
+  more. What is penalised is CHURN: a label that moves while nothing it depends on changed (view,
+  network, text), or that moves and gains nothing. (Q08, corrected 2026-09-28; see Part B.)
 - **T2. Think during the breathers.** Hard placement work waits for idle time, and what it finds
   is cached for later zooms: *"Found an excellent green meadow over those mountains!"* A few
   seconds of background work when a project opens is acceptable if it buys instant zooming
@@ -163,6 +166,18 @@ which each stops working (R-077); a per-node lookup table of good places across 
 (`dev/label-placement-goals.md` §2), held back on his ruling of 2026-09-28: *"I am discovering that
 long leaders naturally tend to align by not crossing and that short leaders don't gain a lot by
 snapping to those angles."*
+
+### T1 corrected, 2026-09-28
+
+Round 1's T1 read *"Hold every label still while the view moves, until it is forced to move"*, and
+the bench scored every move between zoom steps as "unforced". Both builders therefore refused to
+regrow dropped rows on zoom-in. Tom: *"There is no reward for holding still, is there? There is only
+a reward for being fast. [...] Did you mistakenly reward them for holding things still, and if so,
+what was the origin of that idea?"* The origin was the orchestrator's own Q08 option "Hold still
+until forced", recommended partly because it made a lookup table cheap; his answer had said *"hold
+until there is a breather [...] Think about placement during dead times"*. His real complaints
+(Task 680 labels jumping on a tab switch; R-075) are about moves that gain nothing, which is what
+T1 now penalises, and the bench must count the same thing.
 
 ### His review, 2026-09-28, verbatim
 

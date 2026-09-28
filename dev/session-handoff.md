@@ -131,9 +131,9 @@ remind him to test symbology on dev once he pulls.**
   jumping; leaving the view resets them; (3) a pipe label's default is BESIDE its pipe, not on it,
   and realigns with its pipe when room allows; (4) a rule for repeating pipe labels is MISSING --
   ask him for it; (5) unwrapping a node label to one line is a good habit where room allows (A);
-  (6) a leader may lengthen to save a neighbour's properties (B would not). (7) ASK HIM: once the view
-  settles, does stillness or fullness win? Builder A's interview says this one missing line cost it
-  the most (its T1 reading forbade regrowth). **Both interviews agree the BENCH shares the blame:** its
+  (6) a leader may lengthen to save a neighbour's properties (B would not). (7) ANSWERED 2026-09-28: fullness
+  wins once the view settles; there is no reward for stillness, only for speed. T1 is rewritten in
+  the rules (penalise churn, not movement); the bench's "unforced moves" must become churn too. **Both interviews agree the BENCH shares the blame:** its
   "unforced moves" counts a move that REGAINS rows as a fault, so both placers refused to regrow.
   Fix the metric (a move that shows more is not unforced) in the same round as the rules. Show him the rule
   diff before launching a fresh clean-room pair; the old pair's ports stay up for comparison.
