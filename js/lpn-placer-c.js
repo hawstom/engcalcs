@@ -55,6 +55,7 @@ EngCalcs.lpnPlacerC = (function () {
 	var GAP = 2.5;               // clear space between a label and its own symbol or pipe
 	var SYM_PAD = 0.5;           // clear space kept round every symbol and Text object
 	var LBL_TOL = 0.5;         // two labels may share this much (the row pitch carries leading)
+	var EDGE = 160;            // px from the view's edge where a pan can change what fits
 	var CELL = 36;             // the obstacle grids' cell, px
 	var RES = 3;               // the free-space raster's cell, px
 	var SHOW_MAX = 4.4;          // dearer than this, a label is better hidden
@@ -494,7 +495,7 @@ EngCalcs.lpnPlacerC = (function () {
 				if (!L.prevPl || !fillPrev(st, L, L.prevRs, st.probe)) { return; }
 				var cap = prev.again ? Infinity : KEEP_MAX + PREV_BONUS;
 				var cost = judge(st, L, st.probe, cap);
-				if (cost < cap) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
+				if (cost < cap) { st.probe.cost = cost; commit(st, L, keep(st.probe)); L.settled = L.panKept = st.pan && !L.nearEdge; }
 			});
 			// 1b. HOME (R1, R7): a kept label out on a leader, or out of its usual shape, goes
 			// back beside its owner as soon as there is room there for the same rows.
@@ -506,7 +507,8 @@ EngCalcs.lpnPlacerC = (function () {
 			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
-				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, effort.show)); }
+				if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { return; }
+				commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, effort.show));
 			});
 			// 3. GROW, in rounds.
 			grow(st, order);
@@ -587,7 +589,12 @@ EngCalcs.lpnPlacerC = (function () {
 			var prevL = prev ? prev.layout.labels || {} : {}, prevReq = {};
 			if (prev) { prev.scene.labels.forEach(function (r) { prevReq[r.id] = r; }); }
 
-			var st = { scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, hr: hr, dr: dr, labels: [], byId: {},
+			// A pure pan: the same scale and lettering, so everything keeps its shape and a label
+			// that could not show or grow last view cannot now either, unless the edge of the
+			// view was what stopped it.
+			var pan = !!prev && Math.abs(prev.scene.view.s - scene.view.s) <= 1e-9 * Math.abs(scene.view.s)
+				&& prev.scene.text.sizePx === text.sizePx && !prev.again;
+			var st = { pan: pan, scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, hr: hr, dr: dr, labels: [], byId: {},
 				buf: [], seen: [], seen2: [], probe: newCand(), work: 0 };
 			scene.labels.forEach(function (req) {
 				var L = mkLabel(st, req, nodes, links, incident, customers);
@@ -597,6 +604,9 @@ EngCalcs.lpnPlacerC = (function () {
 					L.prevPl = pp; L.prevReq = pr;
 					L.prevRs = rowsetMatching(L, pp.rows, pr);
 				}
+				L.prevHidden = !!(pr && !(pp && pp.shown));
+				var a = req.anchor;
+				L.nearEdge = a.x - vpbb.x0 < EDGE || vpbb.x1 - a.x < EDGE || a.y - vpbb.y0 < EDGE || vpbb.y1 - a.y < EDGE;
 				st.labels.push(L);
 				st.byId[L.id] = L;
 			});
@@ -1084,7 +1094,7 @@ EngCalcs.lpnPlacerC = (function () {
 		// bigger label costs no more than the property is worth. Space only shrinks as others
 		// grow, so a label that cannot grow this round is not asked again.
 		function grow(st, order) {
-			order.forEach(function (L) { L.stuck = false; });
+			order.forEach(function (L) { L.stuck = !!L.settled; L.settled = false; });
 			for (var round = 0; round < 8; round++) {
 				var changed = false;
 				for (var i = 0; i < order.length; i++) {
@@ -1106,7 +1116,7 @@ EngCalcs.lpnPlacerC = (function () {
 			var any = false, limit = st.work + st.effort.mend, c = st.probe;
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
-				if (L.cur) { continue; }
+				if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { continue; }
 				var rsI = L.rowsets.length - 1, tried = {};
 				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
 				for (var k = 0; k < L.specs.length && k < 60 && st.work < limit; k++) {
@@ -1136,7 +1146,7 @@ EngCalcs.lpnPlacerC = (function () {
 			var any = false, limit = st.work + st.effort.nudge, c = st.probe;
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i], c0 = L.cur;
-				if (!c0 || c0.rs === 0) { continue; }
+				if (!c0 || c0.rs === 0 || L.panKept) { continue; }
 				var rsI = c0.rs - 1, tried = {};
 				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
 				uncommit(st, L);
