@@ -48,6 +48,17 @@ placer may have `idle(budgetMs, {scene, opening})`: the bench calls it before th
 set (3000 ms budget, the project opening) and between views (250 ms). Idle time is reported
 separately and is not in the layout times.
 
+**On the real map (a development host only)**: save the placer as `js/lpn-placer-<name>.js`
+(`<name>` in `[a-z0-9-]`) and open `Looped-Network.php?placer=<name>`. The file must export the
+module for node (`module.exports`, so `run.js --placer js/lpn-placer-<name>.js` takes the same
+file) and register it for the page as `EngCalcs.lpnPlacers['<name>'] = module`, in plain browser
+JavaScript with no `require`; `js/lpn-placer-trivial.js` is the pattern to copy. The page builds
+each scene with the same function `extract.js` uses (`js/lpn-label-scene.js`), measuring rows in
+the real font, and draws the answer with the app's own labels and leaders. It calls `place()`
+once a pan or zoom has settled, never during one; `idle()` from `requestIdleCallback` after each
+layout (3000 ms in all after a project's first, `opening: true`; 250 ms after the others); and
+`create()` again whenever another project is opened.
+
 ## What is scored
 
 On the ink `contract.js` derives (one box per row of a stack, so the ground beside a short row

@@ -51,6 +51,7 @@ async function extractSet(set) {
 	const stub = require('../lpn-dom-stub.js');
 	const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet } = stub;
 	const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
+	const Scene = require(ROOT + 'js/lpn-label-scene.js');
 	// The last obstacle set runLabelCollisionAvoidance() handed its ring pass: by then the Text
 	// boxes, their callout lines and every stationed (aligned) pipe label are on it.
 	let lastObs = null;
@@ -116,18 +117,6 @@ async function extractSet(set) {
 	function textW(s) { return s.length ? s.length * CHAR_W * textPx / BASE_FS : 0; }
 	const rowH = textPx * 1.2;
 
-	// The user's drop order per kind: lowest Drop number first; a field with none goes first of all
-	// (linkFieldRank()'s rule). ID is never in it -- it is the label.
-	function dropOrder(group) {
-		const pr = (ls.priority && ls.priority[group]) || {};
-		return Object.keys(ls[group] || {}).filter(function (f) { return ls[group][f] && f !== 'id'; })
-			.sort(function (a, b) {
-				const ra = typeof pr[a] === 'number' ? pr[a] : -Infinity;
-				const rb = typeof pr[b] === 'number' ? pr[b] : -Infinity;
-				return ra - rb || (a < b ? -1 : 1);
-			});
-	}
-
 	function views() {
 		if (set.views === 'saved') {
 			return [{ tag: 'open', v: savedView }];
@@ -158,76 +147,23 @@ async function extractSet(set) {
 		const t0 = process.hrtime.bigint();
 		L.refreshLabelText();
 		const masterMs = Number(process.hrtime.bigint() - t0) / 1e6;
-		const st = L.state(), s = st.s, tx = st.tx, ty = st.ty;
-		const V = function (p) { return { x: r2(p.x * s + tx), y: r2(p.y * s + ty) }; };
-		const inView = function (p) { return p.x >= 0 && p.y >= 0 && p.x <= CANVAS.w && p.y <= CANVAS.h; };
-		const fsWorld = L.effectiveFontSize();
-		const nodeEls = L.nodeEls(), linkEls = L.linkEls(), labelEls = L.labelEls();
-		const scene = {
+		// **THE SCENE IS BUILT BY THE ONE FUNCTION THE PAGE ALSO USES** (js/lpn-label-scene.js):
+		// the live ?placer= switch in js/looped-network.js builds its scenes with it too, so the
+		// bench and the browser cannot come to different ideas of what a scene is. Only the text
+		// measurement and the obstacle set are this file's own.
+		const built = Scene.buildScene(L, {
 			id: set.id + '@' + vw.tag, set: set.id, step: steps.length, source: set.file,
-			viewport: { x: 0, y: 0, w: CANVAS.w, h: CANVAS.h },
-			view: { s: s, tx: tx, ty: ty, note: 'view px = model * s + t (model = the app draw frame, y down)' },
-			text: { sizePx: textPx, rowHeightPx: r2(rowH), separator: L.labelSeparator(),
-				separatorW: r2(textW(L.labelSeparator())), hookMaxPx: r2(rowH) },
-			dropOrder: { node: dropOrder('node'), link: dropOrder('link'), customer: [] },
-			nodes: [], links: [], texts: [], customers: [], labels: []
-		};
-		if (vw.mult) { scene.zoom = vw.mult; }
+			canvas: CANVAS, measure: textW, obs: lastObs, zoom: vw.mult
+		});
+		const scene = built.scene, V = built.V;
+		const st = L.state(), s = st.s;
+		const fsWorld = L.effectiveFontSize();
+		const nodeEls = L.nodeEls(), linkEls = L.linkEls();
+		const reqs = {};
+		scene.labels.forEach(function (lab) { reqs[lab.id] = lab; });
 
-		doc.nodes.forEach(function (n) {
-			const p = V(L.nodeAt(n)), r = L.nodeRadius(n) * s;
-			scene.nodes.push({ id: String(n.id), type: n.type, x: p.x, y: p.y,
-				symbol: { x: r2(p.x - r), y: r2(p.y - r), w: r2(2 * r), h: r2(2 * r) } });
-		});
-		doc.links.forEach(function (l) {
-			const pts = L.linkPointList(l).map(V);
-			const rec = { id: String(l.id), type: l.type, from: String(l.from), to: String(l.to),
-				points: pts.map(function (p) { return [p.x, p.y]; }), symbols: [], arrows: [] };
-			if (l.type === 'pump' || l.type === 'valve') {
-				// positionPumpSymbol(): centred between the END nodes, turned to the from->to line.
-				const a = pts[0], b = pts[pts.length - 1], sz = L.pumpSymbolSize(l.type) * s;
-				rec.symbols.push({ cx: r2((a.x + b.x) / 2), cy: r2((a.y + b.y) / 2), w: r2(sz), h: r2(sz),
-					angle: r2(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI) });
-			}
-			const le = linkEls[l.id];
-			(le && le.arrows || []).forEach(function (ar) {
-				if (ar.style.display === 'none') { return; }
-				const m = /translate\(([-0-9.e]+),([-0-9.e]+)\) rotate\(([-0-9.e]+)\) scale\(([-0-9.e]+)\)/
-					.exec(ar.getAttribute('transform') || '');
-				if (!m) { return; }
-				const c = V({ x: +m[1], y: +m[2] }), k = +m[4] * s;
-				rec.arrows.push({ cx: c.x, cy: c.y, w: r2(1.6 * k), h: r2(1.6 * k), angle: r2(+m[3]) });
-			});
-			scene.links.push(rec);
-		});
-		// Text objects: fixed boxes (oriented) and their callout lines, off the obstacle set the
-		// pass itself used (staticObstacles() pushes them in doc.labels order).
-		const textBoxes = [], textLeaders = {};
-		((lastObs && lastObs.boxes) || []).forEach(function (b) {
-			if (b.kind === 'label' && b.textOwner !== undefined) { textBoxes.push(b); }
-		});
-		((lastObs && lastObs.segments) || []).forEach(function (g) {
-			if (g.kind === 'leader' && g.textOwner !== undefined) { textLeaders[g.textOwner] = g; }
-		});
-		textBoxes.forEach(function (b) {
-			const lb = doc.labels.find(function (x) { return x.id === b.textOwner; }) || {};
-			const c = V({ x: b.cx, y: b.cy }), g = textLeaders[b.textOwner];
-			const t = { id: String(b.textOwner), text: String(lb.text || ''),
-				box: { cx: c.x, cy: c.y, w: r2(b.w * s), h: r2(b.h * s), angle: r2(b.a || 0) } };
-			if (g) {
-				const a = V({ x: g.ax, y: g.ay }), e = V({ x: g.bx, y: g.by });
-				t.leader = [[a.x, a.y], [e.x, e.y]];
-			}
-			scene.texts.push(t);
-		});
-
-		// ---- labels requested, and what master drew for each -----------------------------------
+		// ---- what master drew for each label requested -----------------------------------------
 		const out = {};
-		function rowsOf(lines) {
-			return (lines || []).map(function (ln) {
-				return { field: ln.field || 'id', text: String(ln.text), w: r2(textW(String(ln.text))), h: r2(rowH) };
-			});
-		}
 		function shownIdx(all, shown) {
 			const used = {};
 			return (shown || []).map(function (ln) {
@@ -251,18 +187,9 @@ async function extractSet(set) {
 		function shown(h) { return !!h && !!h.text && h.text.style.visibility !== 'hidden'; }
 
 		doc.nodes.forEach(function (n) {
-			const ne = nodeEls[n.id];
-			if (!ne || !ne.allLines || !ne.allLines.length) { return; }
-			const anchor = V(L.nodeAt(n));
-			if (!inView(anchor)) { return; }
-			const rows = rowsOf(ne.allLines), id = 'n:' + n.id;
-			const lab = { id: id, owner: String(n.id), kind: 'node', anchor: anchor, rows: rows,
-				layout: 'stack', hand: null };
-			if (n.lx !== undefined) {
-				const b = L.nodeAt(n);
-				lab.hand = V({ x: b.x + n.lx, y: b.y + (n.ly || 0) });
-			}
-			scene.labels.push(lab);
+			const ne = nodeEls[n.id], id = 'n:' + n.id, lab = reqs[id];
+			if (!lab) { return; }
+			const rows = lab.rows;
 			if (!shown(ne)) { out[id] = { shown: false }; return; }
 			const idx = shownIdx(rows, ne.lines);
 			const end = V(L.nodeLabelPos(n)), W = Math.max.apply(null, idx.map(function (i) { return rows[i].w; }).concat([0]));
@@ -278,18 +205,9 @@ async function extractSet(set) {
 			(stationBoxes[b.linkOwner] = stationBoxes[b.linkOwner] || []).push(b);
 		});
 		doc.links.forEach(function (l) {
-			const le = linkEls[l.id];
-			if (!le || !le.allLines || !le.allLines.length) { return; }
-			const anchor = V(L.linkLabelMid(l));
-			if (!inView(anchor)) { return; }
-			const rows = rowsOf(le.allLines), id = 'l:' + l.id, dragged = l.lx !== undefined;
-			const lab = { id: id, owner: String(l.id), kind: 'link', anchor: { x: anchor.x, y: anchor.y },
-				rows: rows, layout: dragged ? 'stack' : 'line', hand: null };
-			if (dragged) {
-				const m = L.linkLabelMid(l);
-				lab.hand = V({ x: m.x + l.lx, y: m.y + (l.ly || 0) });
-			}
-			scene.labels.push(lab);
+			const le = linkEls[l.id], id = 'l:' + l.id, lab = reqs[id];
+			if (!lab) { return; }
+			const rows = lab.rows, dragged = l.lx !== undefined;
 			if (!shown(le)) { out[id] = { shown: false }; return; }
 			const idx = shownIdx(rows, le.lines), boxes = stationBoxes[l.id];
 			const lineW = idx.reduce(function (a, i) { return a + rows[i].w; }, 0) + Math.max(0, idx.length - 1) * textW(L.labelSeparator());
