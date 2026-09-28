@@ -49,6 +49,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
 	var C_ALT_LAYOUT = 0.8;         // the label's other shape (line for a node, stack for a pipe)
+	var C_NOT_ALONG = 6;            // R14: a pipe label the setting turns, drawn level (under a row)
 	var B_KEEP = 6;                 // keeping last view's rows on a zoom-in (R11)
 	var B_STICK = 6;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
@@ -375,7 +376,7 @@ EngCalcs.lpnPlacerD = (function () {
 			this.li = li; this.lv = lv; this.layout = layout; this.align = align;
 			this.x = x; this.y = y; this.w = w; this.h = h; this.angle = angle || 0; this.leader = leader;
 			this.reps = null; this.boxes = null; this.fx = undefined; this.ok = false; this.stick = false;
-			this.bl = null; this.items = null; this.st = 0;
+			this.bl = null; this.items = null; this.st = 0; this.along = !!angle;
 			this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
 			var len = 0;
 			if (leader) {
@@ -625,7 +626,10 @@ EngCalcs.lpnPlacerD = (function () {
 			L.lists[key] = out;
 			return out;
 		}
-		function tierMax(li, k, t) { var lv = lab[li].levels[k]; return lv.value + keepBonus(li, lv) + (t ? -TIER1_PEN : B_STICK); }
+		function tierMax(li, k, t) {
+			var lv = lab[li].levels[k];
+			return lv.value + keepBonus(li, lv) + (t ? -TIER1_PEN - (wantsAlong(reqs[li]) ? C_NOT_ALONG : 0) : B_STICK);
+		}
 
 		// ---- the placed labels ----
 		// Two indexes of the seated labels: each whole label by its extent, leader included (for
@@ -732,6 +736,19 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 
 		// ---- candidate generation ----
+		// R14: the user's "Draw link labels along the link line", and the reading window a turned
+		// label keeps to (an angle a is readable when min < a <= max).
+		var settings = scene.settings || {}, alignOn = settings.alignPipeLabels !== false;
+		var win = settings.readableAngleDeg && isFinite(settings.readableAngleDeg.min) && isFinite(settings.readableAngleDeg.max)
+			? settings.readableAngleDeg : { min: -90, max: 90 };
+		function wantsAlong(req) { return req.kind === 'link' && alignOn && !!req.along; }
+		// The readable angle of text along direction (ux, uy), in degrees.
+		function readAngle(ux, uy) {
+			var a = Math.atan2(uy, ux) * 180 / Math.PI;
+			if (!(a > win.min && a <= win.max)) { a = a > 0 ? a - 180 : a + 180; }
+			if (!(a > win.min && a <= win.max)) { a = a > 0 ? a - 180 : a + 180; }
+			return Math.abs(a) < 0.5 ? 0 : a;
+		}
 		function ownerPoint(req) {
 			var n = req.kind === 'node' ? nodesById[req.owner] : null;
 			if (n) { return { x: n.x, y: n.y, hw: n.symbol.w / 2, hh: n.symbol.h / 2, r: Math.min(n.symbol.w, n.symbol.h) / 2 }; }
@@ -824,10 +841,9 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		function genPipe(li, req, lv, list, tier) {
 			var link = linksById[req.owner], pts = link.points, cum = cumLengths(pts), Ltot = cum[cum.length - 1];
-			var long = spacing > 0 && Ltot > spacing, k, j;
-			// Home is the pipe's middle, or the middle of what is on screen when that is not.
-			var vis = visibleSpan(pts, cum), mid = Ltot / 2;
-			if (vis && (mid < vis[0] || mid > vis[1])) { mid = (vis[0] + vis[1]) / 2; }
+			var long = spacing > 0 && Ltot > spacing, k, j, along = wantsAlong(req), notAlong = along ? C_NOT_ALONG : 0;
+			// Home is the middle of the pipe's on-screen stretch (its middle, when all of it shows).
+			var vis = visibleSpan(pts, cum), mid = vis ? (vis[0] + vis[1]) / 2 : Ltot / 2, span = vis ? vis[1] - vis[0] : Ltot;
 			// R9: a long pipe carries its label every `step` along it (step <= the repeat spacing),
 			// in one of two phases: centred on the pipe, or with a copy at the middle of the view.
 			var phases = [];
@@ -836,13 +852,13 @@ EngCalcs.lpnPlacerD = (function () {
 				for (k = 0; k < n; k++) { ph.push((k + 0.5) * step); }
 				phases.push(ph);
 				if (vis) {
-					var vm = (vis[0] + vis[1]) / 2, ph2 = [];
-					for (j = -n; j <= n; j++) { var at = vm + j * step; if (at >= 0.1 * step && at <= Ltot - 0.1 * step) { ph2.push(at); } }
+					var ph2 = [];
+					for (j = -n; j <= n; j++) { var at = mid + j * step; if (at >= 0.1 * step && at <= Ltot - 0.1 * step) { ph2.push(at); } }
 					if (ph2.length > 1) { phases.push(ph2); }
 				}
 			}
 			var layouts = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
-			if (req.layout === 'stack') { layouts.reverse(); }
+			if (req.layout === 'stack' && !along) { layouts.reverse(); }
 			layouts.forEach(function (layout, li2) {
 				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0;
 				if (tier) {
@@ -854,14 +870,24 @@ EngCalcs.lpnPlacerD = (function () {
 							dirs.push([s * (nx * c - ny * sn), s * (nx * sn + ny * c)]);
 						});
 					});
-					genLeadered(li, { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 }, lv, layout, d, alt + 0.3, list, dirs);
+					genLeadered(li, { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 }, lv, layout, d, alt + 0.3 + notAlong, list, dirs);
 					return;
 				}
+				// R14: where the setting asks for it, text lies along the pipe; level is the fallback.
+				var kinds = along && layout === 'line' ? ['along', 'level'] : ['level'];
 				function beside(at, pref, reps) {
 					for (var side = -1; side <= 1; side += 2) {
-						['along', 'level'].forEach(function (kind) {
-							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref, !reps);
+						kinds.forEach(function (kind) {
+							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + (kind === 'level' ? notAlong : 0), !reps, 0);
 							if (!c) { return; }
+							// Along a short pipe the near place meets the end symbols; stand further off.
+							if (kind === 'along' && !reps && !c.ok) {
+								if (hardOK(c)) { c.ok = true; } else {
+									c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + 0.3, true, rowH / 2);
+									if (!c || !(c.ok || hardOK(c))) { return; }
+									c.ok = true;
+								}
+							}
 							if (reps) {
 								var rr = [];
 								reps.forEach(function (g) {
@@ -884,35 +910,36 @@ EngCalcs.lpnPlacerD = (function () {
 					});
 					return;
 				}
-				var ff = Ltot > 2.2 * d.w ? [0, -0.17, 0.17, -0.3, 0.3] : (Ltot > 1.2 * d.w ? [0, -0.15, 0.15] : [0]);
+				// The middle of the on-screen stretch, then up to three tenths of it either way.
+				var ff = span > 0.6 * d.w ? [0, -0.1, 0.1, -0.2, 0.2, -0.3, 0.3] : [0, -0.15, 0.15];
 				ff.forEach(function (f) {
-					var at = mid + f * Ltot;
-					if (at >= 0 && at <= Ltot) { beside(at, alt + 3 * Math.abs(f), null); }
+					var at = mid + f * span;
+					if (at >= 0 && at <= Ltot) { beside(at, alt + 2 * Math.abs(f), null); }
 				});
 			});
 		}
-		// A pipe label beside its pipe (R7): 'along' lies parallel to it, 'level' stays horizontal
-		// and stands just clear of the pipe's line.
-		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref, check) {
+		// A pipe label beside its pipe (R7): 'along' lies parallel to it, turned to read inside the
+		// reading window (R14); 'level' stays horizontal and stands just clear of the pipe's line.
+		function besidePipe(li, lv, layout, d, pts, cum, s, side, kind, pref, check, far) {
 			var P = pointAt(pts, cum, s), nx = -P.uy * side, ny = P.ux * side;
-			var ang = Math.atan2(P.uy, P.ux) * 180 / Math.PI;
-			if (ang > 90) { ang -= 180; } else if (ang <= -90) { ang += 180; }
-			if (Math.abs(ang) < 0.5) { ang = 0; }
-			var off, cx, cy, align = 'left';
+			var ang = readAngle(P.ux, P.uy);
+			var off, cx, cy, align = 'left', c;
 			var sidePref = ny < -0.1 ? 0 : (ny > 0.1 ? 0.15 : (nx > 0 ? 0.05 : 0.1));
 			if (kind === 'along') {
-				if (layout !== 'line' || ang === 0 || Math.abs(ang) > 70) { return null; }
-				off = d.h / 2 + PIPE_GAP;
+				off = d.h / 2 + (far || PIPE_GAP);
 				cx = P.x + nx * off; cy = P.y + ny * off;
-				return new Cand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null,
-					pref + sidePref + (Math.abs(ang) > 45 ? 0.5 : 0));
+				if (!ang && check && !blockFree(reqs[li], lv.rows, layout, d, 'left', cx - d.w / 2, cy - d.h / 2)) { return null; }
+				c = new Cand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null, pref + sidePref);
+				c.ok = !ang && !!check; c.along = true;
+				return c;
 			}
+			// Level on a level pipe is the same place as along it.
+			if (!ang && layout === 'line' && wantsAlong(reqs[li])) { return null; }
 			off = d.w / 2 * Math.abs(nx) + d.h / 2 * Math.abs(ny) + PIPE_GAP;
 			cx = P.x + nx * off; cy = P.y + ny * off;
 			if (layout === 'stack') { align = nx > 0.3 ? 'left' : (nx < -0.3 ? 'right' : 'center'); }
 			if (check && !blockFree(reqs[li], lv.rows, layout, d, align, cx - d.w / 2, cy - d.h / 2)) { return null; }
-			var c = new Cand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null,
-				pref + sidePref + (Math.abs(ang) <= 45 && ang !== 0 ? 0.3 : 0));
+			c = new Cand(li, lv, layout, align, cx - d.w / 2, cy - d.h / 2, d.w, d.h, 0, null, pref + sidePref);
 			c.ok = !!check;
 			return c;
 		}
@@ -996,7 +1023,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// Every label first, as small as it comes (G: properties go before labels) ...
 		order.forEach(function (li) { seat(li, bestFor(li, true).c); });
 		// ... then each grows into the room around it.
-		order.forEach(function (li) { var b = bestFor(li); if (b.c && b.w > worthNow(li) + 1e-6) { seat(li, b.c); } });
+		order.forEach(function (li) { var h = worthNow(li), b = bestFor(li, false, h + 1e-6); if (b.c) { seat(li, b.c); } });
 
 		// ---- 3. repair: show more of each short-changed label, moving at most two neighbours ----
 		function levelOf(li) { return cur[li] ? lab[li].levels.indexOf(cur[li].lv) : lab[li].levels.length; }
@@ -1009,9 +1036,11 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			return tot;
 		}
+		// A pipe label drawn level where the setting asks for it along its pipe (R14).
+		function notAlong(li) { return !!cur[li] && wantsAlong(reqs[li]) && !cur[li].along; }
 		function tryUpgrade(li) {
 			var cl = levelOf(li), here = worthNow(li);
-			for (var kt = 0; kt < 2 * cl; kt++) {
+			for (var kt = 0; kt < 2 * cl + (notAlong(li) ? 1 : 0); kt++) {
 				var k = kt >> 1;
 				if (tierMax(li, k, kt & 1) <= here) { continue; }
 				var list = ensure(li, k, kt & 1), tried = 0;
@@ -1049,13 +1078,13 @@ EngCalcs.lpnPlacerD = (function () {
 			return false;
 		}
 		for (var pass = 0; pass < PASSES; pass++) {
-			var todo = order.filter(function (li) { return levelOf(li) > 0; });
+			var todo = order.filter(function (li) { return levelOf(li) > 0 || notAlong(li); });
 			todo.sort(function (a, b) { return (cur[a] ? 1 : 0) - (cur[b] ? 1 : 0) || levelOf(b) - levelOf(a) || a - b; });
 			var changed = false;
 			for (i = 0; i < todo.length; i++) { if (tryUpgrade(todo[i])) { changed = true; } }
 			// ---- 4. polish: every label re-seats itself if that is worth more ----
 			for (i = 0; i < order.length; i++) {
-				var lj = order[i], here = worthNow(lj), b = bestFor(lj);
+				var lj = order[i], here = worthNow(lj), b = bestFor(lj, false, here + 1e-6);
 				if (b.c && b.c !== cur[lj] && b.w > here + 1e-6) { seat(lj, b.c); changed = true; }
 			}
 			if (!changed || nDyn > MAX_DYN) { break; }
