@@ -35,6 +35,9 @@ const PC = global.EngCalcs.pageConfig;
 // the harness's own text, not the page's -- it happens to read like lpn_ex_elm_street_title, which
 // is why dev/scripts/harness_wording_check.php declares this one line an exception.
 const PROJECT_NAME = 'Elm Street Center';
+// U+00AD (soft hyphen), spelled rather than typed literally -- an invisible character sitting in
+// the source as a raw byte is one a future edit could delete without anyone seeing it happen.
+const SHY_RE = new RegExp(String.fromCharCode(173), 'g');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -95,7 +98,11 @@ const L = loadLoopedNetwork(
 	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
 	"\t\ttableCells: function (id) { return paneTableById(id).cells; },\n" +
 	// paneCols(), never `spec.cols` -- a column may stand down; see pane-harness.js.
-	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
+	// paneHeadingDisplayText(), not paneHeadingText(): this section's whole claim is that the sheet
+	// and the screen show the IDENTICAL heading, soft hyphen (Tom's initial-width rule, 2026-09-27)
+	// included, and paneHeadingText() is the hyphen-free string kept for exact-match lookups
+	// elsewhere (Find, the "..." menu, this same harness's own `at()` below).
+	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingDisplayText); },\n" +
 	"\t\tpaneCols: paneCols,\n" +
 	"\t\theadCells: function (id) { return paneTableById(id).headCells; },\n" +
 	"\t\tsetUserWidth: function (id, key, em) { paneSetColWidth(paneTableById(id), key, em); },\n" +
@@ -238,7 +245,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 	// The values themselves, stated. j2 was given a demand of 50 and an elevation of 10; both are
 	// number INPUTS on screen, and both have to be readable on paper.
 	const s = sheetOf('junctions');
-	const head = s.headings, order = L.tableOrder('junctions');
+	// A soft hyphen (Tom's initial-width rule, 2026-09-27) may sit inside a long heading word now,
+	// so this lookup-by-English-prefix strips it first -- it is finding a COLUMN, not asserting
+	// the heading's exact text, which section 3 above already does.
+	const head = s.headings.map((h) => h.replace(SHY_RE, '')), order = L.tableOrder('junctions');
 	const rowFor = (id) => s.rows[order.indexOf(id)];
 	const at = (id, h) => rowFor(id)[head.findIndex((x) => x.indexOf(h) === 0)].text;
 	report(at(j2.id, 'Demand') === '50', 'a typed demand prints as its number', at(j2.id, 'Demand'));
@@ -248,7 +258,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 	// A RESULT rounds the way the screen rounds it. 3.14159 is on the document; 3.14 is what both
 	// the cell and the sheet must say.
 	L.renderTable('pipes');
-	const ps = sheetOf('pipes'), pHead = ps.headings;
+	const ps = sheetOf('pipes'), pHead = ps.headings.map((h) => h.replace(SHY_RE, ''));
 	const pRow = ps.rows[L.tableOrder('pipes').indexOf(p1.id)];
 	const vAt = pHead.findIndex((x) => x.indexOf('Velocity') === 0);
 	// 1 m/s solved is 3.28084 ft/s displayed, and 3.28 printed. Stated as a number rather than as

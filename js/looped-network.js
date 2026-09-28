@@ -22638,18 +22638,81 @@ var EngCalcs = EngCalcs || {};
 	// UNDRAGGED, in the current network -- it is not the drag floor above (paneColFloorEm(), a
 	// fraction of the heading word, meant only to stop a dragged column from shrinking to one
 	// letter per line). One canvas-measured `em` cache serves both halves of the rule.
+	//
+	// **A DETACHED PROBE ANSWERS FOR THE HEADING'S REAL FONT** (Perry's real-Chrome pass, reported
+	// by Tom, 2026-09-27: headings broke mid-word on plain short words -- "Tag", "Closed" -- nowhere
+	// near the 8-character split threshold, because the ESTIMATE that set the column's width was
+	// too narrow to hold them on one line). The first build guessed the heading's font as the pane
+	// body's own font at a flat 0.9 -- a number with no source, and wrong on both counts: the
+	// heading (`.lpn-pane-sort`) is BOLD, and its size already comes from `.lpn-pane-table`'s own
+	// `font-size: .9em` rule cascading through the real stylesheet, so re-applying 0.9 in JS shrank
+	// it twice. A `<table class="lpn-pane-table"><thead><tr><th><button class="lpn-pane-sort">`
+	// kept in the DOM (so the cascade actually reaches it) but never shown answers
+	// `getComputedStyle` with the true font AND the `<th>`'s own padding, in one place, built once.
+	var panePaneProbe = null;
+	function panePaneProbeEls() {
+		var table, thead, tr, th, btn;
+		if (panePaneProbe) { return panePaneProbe; }
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			thead = document.createElement('thead'); tr = document.createElement('tr');
+			th = document.createElement('th'); btn = document.createElement('button');
+			btn.className = 'lpn-pane-sort';
+			th.appendChild(btn); tr.appendChild(th); thead.appendChild(tr); table.appendChild(thead);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;' +
+				'pointer-events:none;';
+			(document.getElementById('lpn_pane_body') || document.body || document.documentElement)
+				.appendChild(table);
+			panePaneProbe = { th: th, btn: btn };
+		} catch (e) { panePaneProbe = null; }
+		return panePaneProbe;
+	}
+	// The heading's real font (bold, its actual cascaded size, its actual family) -- null where
+	// there is no real DOM to ask, which is the Node harnesses' signal to fall back to the
+	// per-character estimate below exactly as before.
+	function paneHeadFont() {
+		var probe = panePaneProbeEls(), cs;
+		if (!probe) { return null; }
+		try {
+			cs = window.getComputedStyle(probe.btn);
+			return (parseFloat(cs.fontSize) > 0)
+				? { px: parseFloat(cs.fontSize), family: cs.fontFamily, weight: cs.fontWeight, style: cs.fontStyle }
+				: null;
+		} catch (e) { return null; }
+	}
+	// **THE PAD IS THE `<th>`'s OWN, READ FROM THE SAME PROBE** -- `th, td { padding: 1px 6px 1px
+	// 0 }` in css/engcalcs.css, converted to em against whichever font is in play so it still
+	// follows the reader's own text size. NEVER the sort arrow or the "..." menu: both are
+	// `position: absolute` (see that rule's own comment) and reserve no layout width of their own.
+	// 0.3 remains the answer with no real DOM to measure against, matching every harness written
+	// before this fix.
+	function panePadEm(px) {
+		var probe = panePaneProbeEls(), cs, pad;
+		if (!probe || !(px > 0)) { return 0.3; }
+		try {
+			cs = window.getComputedStyle(probe.th);
+			pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+			return pad > 0 ? Math.round((pad / px) * 1000) / 1000 + 0.06 : 0.3;
+		} catch (e) { return 0.3; }
+	}
 	var paneMeasureEmCache = {};
-	function paneMeasureEm(text, bold) {
-		var key = (bold ? 'b:' : 'r:') + text, ctx, host, px, cs, w = 0;
+	function paneMeasureEm(text, heading) {
+		var key = (heading ? 'h:' : 'c:') + text, ctx, host, px, family, cs, w = 0, hf;
 		if (Object.prototype.hasOwnProperty.call(paneMeasureEmCache, key)) { return paneMeasureEmCache[key]; }
 		try {
 			ctx = document.createElement('canvas').getContext('2d');
-			host = document.getElementById('lpn_pane_body') || document.body;
-			cs = window.getComputedStyle(host);
-			px = parseFloat(cs.fontSize) * 0.9;
-			if (ctx && px > 0) {
-				ctx.font = (bold ? 'bold ' : '') + px + 'px ' + cs.fontFamily;
-				w = ctx.measureText(text).width / px;
+			if (ctx) {
+				if (heading) { hf = paneHeadFont(); }
+				if (hf) {
+					px = hf.px; family = hf.family;
+					ctx.font = hf.style + ' ' + hf.weight + ' ' + px + 'px ' + family;
+				} else {
+					host = document.getElementById('lpn_pane_body') || document.body;
+					cs = window.getComputedStyle(host);
+					px = parseFloat(cs.fontSize);
+					ctx.font = (heading ? 'bold ' : '') + px + 'px ' + cs.fontFamily;
+				}
+				if (px > 0) { w = ctx.measureText(text).width / px; }
 			}
 		} catch (e) { w = 0; }
 		if (!(w > 0)) { w = String(text || '').length * 0.62; }
@@ -22663,23 +22726,37 @@ var EngCalcs = EngCalcs || {};
 		return (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key);
 	}
 	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word of 8 or more characters is cut in half
-	// (the longer half first, for an odd length) and only the wider of the two halves counts --
-	// not the whole word. A shorter word is measured whole. This is what lets the heading-wrap CSS
-	// rule (css/engcalcs.css, the th rule beside `.lpn-pane-tight`) actually narrow the column: the
-	// browser's own min-content floor is the LONGEST UNBROKEN RUN in the heading, so the column
-	// cannot go below this number once the heading is free to wrap.
-	function paneWordSplitEm(word, bold) {
-		var mid, a, b;
-		if (word.length < 8) { return paneMeasureEm(word, bold); }
-		mid = Math.ceil(word.length / 2);
+	// (the longer half first, for an odd length); nothing shorter is split at all. Returns the
+	// split INDEX (or -1 for "do not split"), the one number both the width calculation below and
+	// paneHeadingDisplayText()'s soft hyphen read, so the rendered break can never land anywhere
+	// but where the width was measured to allow it.
+	function paneWordSplitIndex(word) {
+		return word.length >= 8 ? Math.ceil(word.length / 2) : -1;
+	}
+	// This is what lets the heading actually narrow past its longest whole word: the browser's own
+	// min-content floor is the longest UNBROKEN run in the heading, and paneHeadingDisplayText()'s
+	// soft hyphen is what makes that run the HALF this measures, not the whole word.
+	function paneWordSplitEm(word, heading) {
+		var mid = paneWordSplitIndex(word), a, b;
+		if (mid < 0) { return paneMeasureEm(word, heading); }
 		a = word.slice(0, mid); b = word.slice(mid);
-		return Math.max(paneMeasureEm(a, bold), paneMeasureEm(b, bold));
+		return Math.max(paneMeasureEm(a, heading), paneMeasureEm(b, heading));
 	}
 	function paneHeadingInitEm(c) {
 		var words = paneHeadingLabelOnly(c).replace(/[▲▼]/g, '').split(/\s+/).filter(Boolean),
 			best = 0;
 		words.forEach(function (w) { best = Math.max(best, paneWordSplitEm(w, true)); });
 		return best;
+	}
+	// The content font's real size -- the same host paneMeasureEm() reads content against, asked
+	// once here rather than duplicated, for the pad calculation below.
+	function paneContentFontPx() {
+		var host, cs;
+		try {
+			host = document.getElementById('lpn_pane_body') || document.body;
+			cs = window.getComputedStyle(host);
+			return parseFloat(cs.fontSize) || 0;
+		} catch (e) { return 0; }
 	}
 	// **Rule (a): "the known, present, current contents of the column"** -- so a table with no
 	// pumps yet cannot know a pump's own price and this is 0 for it, leaving the heading (b) to
@@ -22718,14 +22795,21 @@ var EngCalcs = EngCalcs || {};
 	// every cell built would be O(columns x rows^2); renderPaneTable() clears this cache (alongside
 	// `spec.cells`) whenever it rebuilds the table, and a live refill (typing, a solve) never calls
 	// this at all, because the rule is about the INITIAL width, not a width that chases every
-	// keystroke. +0.3em is padding for the box the number or text sits in, not part of either half
-	// of the rule.
+	// keystroke. The pad is the CELL'S OWN padding (panePadEm()), read against whichever side of
+	// the max() actually won -- the heading's bold, `.9em`-scaled font if rule (b) did, the plain
+	// content font if rule (a) did -- so the number added is never a guess about either.
 	function paneColInitialEm(spec, c) {
-		var v;
+		var v, contentEm, headingEm, hf;
 		if (!spec.initEmCache) { spec.initEmCache = {}; }
 		if (Object.prototype.hasOwnProperty.call(spec.initEmCache, c.key)) { return spec.initEmCache[c.key]; }
-		v = Math.max(paneColContentEm(c, paneTableRowsInOrder(spec)), paneHeadingInitEm(c));
-		v = v > 0 ? Math.round((v + 0.3) * 100) / 100 : 0;
+		contentEm = paneColContentEm(c, paneTableRowsInOrder(spec));
+		headingEm = paneHeadingInitEm(c);
+		v = Math.max(contentEm, headingEm);
+		if (v > 0) {
+			if (headingEm >= contentEm) { hf = paneHeadFont(); v += panePadEm(hf ? hf.px : 0); }
+			else { v += panePadEm(paneContentFontPx()); }
+			v = Math.round(v * 100) / 100;
+		}
 		spec.initEmCache[c.key] = v;
 		return v;
 	}
@@ -23359,6 +23443,30 @@ var EngCalcs = EngCalcs || {};
 			t = c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
 		return t ? text + ' (' + t + ')' : text;
 	}
+	// **THE ONE PLACE A SOFT HYPHEN IS EVER WRITTEN**, and it is never written into
+	// paneHeadingText() itself: that string is compared against elsewhere (Find and replace's own
+	// heading match, the pane's "..." menu, aria-label, every harness that pins a heading's exact
+	// wording), and an invisible U+00AD in the middle of it would make every one of those a
+	// silent near-miss. This is DISPLAY ONLY -- the text a heading's own `<button>` (screen) or
+	// `<th>` (print) actually shows -- and it hyphenates the label at the SAME index
+	// paneWordSplitIndex() used to size the column, on the SAME words (never the unit in
+	// parens): the browser's own line breaker treats U+00AD as a legal, and the ONLY, place to
+	// break that word, with a visible hyphen if it does (Perry's real-Chrome pass, 2026-09-27: a
+	// column that could not hold a heading on one line was breaking it anywhere the glyphs
+	// happened to run out of room, not at the calculation's own split).
+	// U+00AD (soft hyphen), spelled as a code point rather than typed literally: an invisible
+	// character sitting in the source as a raw byte is one a future edit could delete without
+	// anyone seeing it happen.
+	var PANE_SHY = String.fromCharCode(173);
+	function paneHeadingDisplayText(c) {
+		var text = paneHeadingLabelOnly(c).split(/(\s+)/).map(function (tok) {
+				var mid = /\s/.test(tok) ? -1 : paneWordSplitIndex(tok);
+				return mid < 0 ? tok : tok.slice(0, mid) + PANE_SHY + tok.slice(mid);
+			}).join(''),
+			u = c.unit ? c.unit() : '',
+			t = c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
+		return t ? text + ' (' + t + ')' : text;
+	}
 	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
 	// of those, and a solve is what happens 300 ms after every keystroke -- so a rebuild on every one
@@ -23511,7 +23619,7 @@ var EngCalcs = EngCalcs || {};
 			// `<th>`'s own uniform pointer. Every glyph that used to compete with this text for
 			// room -- the "..." menu and the sort arrow -- now overlays it, at zero layout cost; see
 			// their own comments below for why no space is reserved for either any more.
-			b.appendChild(document.createTextNode(paneHeadingText(c)));
+			b.appendChild(document.createTextNode(paneHeadingDisplayText(c)));
 			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
 			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
 			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
@@ -25772,7 +25880,7 @@ var EngCalcs = EngCalcs || {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th');
 			th.className = paneCellClass(c, i);
-			th.textContent = paneHeadingText(c);
+			th.textContent = paneHeadingDisplayText(c);
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);

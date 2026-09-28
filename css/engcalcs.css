@@ -2465,15 +2465,18 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    Truncation is then the browser's own: an over-long option or value is clipped by its control.
    THIS IS A TRIAL AND HE SAID SO. If it reads badly in public, the thing to change is these three
    lines, not the drag.
-   **NO LONGER ONLY ON `.lpn-pane-tight` (a dragged column)** (Tom's initial-width rule,
-   2026-09-27: an undragged column's own initial width is now the greater of its content and its
-   heading's longest word, with an 8-character-or-longer word split in half and only the longer
-   half counted -- js/looped-network.js's paneHeadingInitEm()). That floor only holds if the
-   heading is free to break the word it was measured on; without wrap-anywhere here, the browser's
-   own min-content rule (the paragraph above) forces the column back open to the FULL unsplit
-   word, which is exactly the defect the split rule exists to avoid. */
-.lpn-pane-table thead th,
-.lpn-pane-table thead th .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
+   **BACK TO ONLY `.lpn-pane-tight` (a dragged column)** (Perry's real-Chrome pass on Tom's
+   initial-width rule, 2026-09-27: widened to every heading for one build, which let the browser
+   break EVERY word wherever it liked to fit a too-narrow estimate -- "Tag", "Closed", short words
+   nowhere near the 8-character split threshold, broke too). Two separate fixes replace that one
+   line: the width estimate itself is now measured against the heading's REAL font (see
+   paneHeadFont() in js/looped-network.js), so an undragged column should no longer need to break
+   at all; and where an 8+ letter word IS split, paneHeadingDisplayText() writes a soft hyphen
+   (U+00AD) at the exact split point, which the browser treats as a legal break point on its own,
+   with no `anywhere`/`break-word` needed. A DRAGGED column still gets both, because the reader
+   chose that width and a heading that cannot shrink to fit it is the worse failure. */
+.lpn-pane-table thead th.lpn-pane-tight,
+.lpn-pane-table thead th.lpn-pane-tight .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
 .lpn-pane-table tbody td select {
 	/* NO 7em FALLBACK HERE, and that is deliberate: an unset custom property with no fallback
 	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
