@@ -278,7 +278,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// warms the engine up on a stand-in view built from the real network, so the first zoom's
 	// layout does not also pay for compiling the placer. The kept layout is keyed on the whole
 	// input, so any change to the network, the text or the settings misses it (R13).
-	var warmRuns = 0, WARM_SIZES = [12, 30, 60, 100];
+	var warmRuns = 0, WARM_SIZES = [12, 30, 60, 60, 90, 90, 90], POOL_AHEAD = 24000;
 	function create() {
 		var mem = { occ: null, sat: null }, cache = null;
 		function inputKey(scene, opts) {
@@ -302,6 +302,11 @@ EngCalcs.lpnPlacerD = (function () {
 					var ws = warmScene(info.scene, WARM_SIZES[warmRuns++]);
 					if (!ws) { warmRuns = WARM_SIZES.length; break; }
 					place(ws, null, mem);
+				}
+				// And the candidate pool is grown ahead of a dense view, a slice at a time.
+				var pool = mem.pool || (mem.pool = []);
+				while (pool.length < POOL_AHEAD && now() - t0 < budgetMs) {
+					for (var k = 0; k < 2000; k++) { pool.push(new Cand()); }
 				}
 			}
 		};
