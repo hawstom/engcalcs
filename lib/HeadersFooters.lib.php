@@ -175,7 +175,7 @@ if (preg_match('/^[A-Za-z0-9-]+$/', $og_page)) {
 // per-page declaration (ecCanonicalOrigins()): the map application is on librewaternet.org and
 // everything else on hawsedc.com. The image file itself exists under /engcalcs/ on both hosts.
 $og_image = ecCanonicalOrigin(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
-	CANONICAL_ORIGIN) . '/engcalcs/' . $og_card;
+	CANONICAL_ORIGIN, EC_CANONICAL_HOST) . '/engcalcs/' . $og_card;
 ?>
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="<?=htmlspecialchars(strip_tags((string)$ec_lang['menu_brand']), ENT_QUOTES, 'UTF-8')?>" />
@@ -318,7 +318,9 @@ if ($type === "EngCalcsApp") :
 	}
 ?>
 EngCalcs.languages = <?=json_encode($ec_app_langs, JSON_UNESCAPED_UNICODE)?>;
-EngCalcs.lwnSiteUrl = <?=json_encode(EC_LWN_SITE_URL)?>;
+<?php // The app's HOME, which is the brand's (Task 697): epanet-plus-plus.org/ on that host,
+      // librewaternet.org/ everywhere else. Read by Help > Welcome page. ?>
+EngCalcs.lwnSiteUrl = <?=json_encode(ecAppSiteUrl())?>;
 <?php // **WHERE THE SUITE'S OWN PAGES LIVE, BECAUSE A RELATIVE ONE IS WRONG AT /app/** (Tom,
       // 2026-09-12: *"Help, Fix and Privacy Notice, Terms of use, this is a broken link"*). The
       // app's Help menu opened 'privacy.php', 'terms.php', 'contact.php' and 'Install.php'

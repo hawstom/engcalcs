@@ -340,7 +340,9 @@ function ec_canonical_url($lang = null) {
     // and the map application is LibreWaterNet's. CANONICAL_ORIGIN is the host whitelist's answer
     // and is the FALLBACK; a page naming its own in ecCanonicalOrigins() wins on every host. This
     // one function feeds canonical, all 27 hreflang alternates and og:url, so they cannot disagree.
-    return ecCanonicalOrigin($script, CANONICAL_ORIGIN) . $path . '?lang=' . $lang;
+    // EC_CANONICAL_HOST lets a page declared per host (ecCanonicalHostOrigins(), Task 697) answer
+    // for the host serving it: the map application on epanet-plus-plus.org nominates itself there.
+    return ecCanonicalOrigin($script, CANONICAL_ORIGIN, EC_CANONICAL_HOST) . $path . '?lang=' . $lang;
 }
 
 $clanguage=chooseLanguage($all_language_settings);

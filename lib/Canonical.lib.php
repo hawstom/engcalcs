@@ -99,19 +99,92 @@ function ecCanonicalOrigins() {
 }
 
 /**
- * The canonical ORIGIN for a script: its declared one, or the host's whitelisted one.
+ * Pages that nominate a DIFFERENT origin on one particular serving host, keyed page => host.
  *
- * @param string $scriptName  $_SERVER['SCRIPT_NAME'], a '/engcalcs/<page>' path, or a bare filename.
- * @param string $hostOrigin  CANONICAL_ORIGIN -- the whitelist's answer for the host being served.
- * @return string             absolute origin, no trailing slash.
+ * **TWO FRONT DOORS FOR ONE TOOL, EACH RANKABLE ON ITS OWN** (Task 697, Tom 2026-09-27: *"A for
+ * development. Release as B1 for A/B testing."*). The map application is served at
+ * librewaternet.org/app/ and at epanet-plus-plus.org/app/, and each address nominates ITSELF. That
+ * is not the split ecCanonicalOrigins() warns about: there, one page on one host nominated a
+ * weaker copy. Here each host is a separately named product front door and says so; what must
+ * never happen is a host nominating ANOTHER host's copy by accident, or a host nobody declared
+ * getting an answer of its own.
+ *
+ * **STILL A DECLARATION, NEVER AN INFERENCE.** The host key is the normalised serving host
+ * (lowercase, no port, no `www.`), and it is consulted only after lib/config.inc.php has matched
+ * it against its own $ec_canonical_origins whitelist -- EC_CANONICAL_HOST is '' for any host not
+ * listed there. So a spoofed Host header selects, at most, one of the answers written below; an
+ * unknown host falls through to ecCanonicalOrigins() and gets librewaternet.org exactly as before.
+ * canonical_origin_check.php holds every host key here to be a whitelisted host.
+ *
+ * The same five readers follow it -- canonical, 27 hreflang alternates, og:url, og:image, and the
+ * sitemap -- because all of them go through ecCanonicalOrigin().
+ *
+ * @return array<string,array<string,string>> page filename => (serving host => absolute origin).
  */
-function ecCanonicalOrigin($scriptName, $hostOrigin) {
+function ecCanonicalHostOrigins() {
+    return array(
+        'Looped-Network.php' => array(
+            'epanet-plus-plus.org' => 'https://epanet-plus-plus.org',
+        ),
+    );
+}
+
+/**
+ * The canonical ORIGIN for a script: its host-specific one, its declared one, or the host's
+ * whitelisted one, in that order.
+ *
+ * @param string $scriptName   $_SERVER['SCRIPT_NAME'], a '/engcalcs/<page>' path, or a bare filename.
+ * @param string $hostOrigin   CANONICAL_ORIGIN -- the whitelist's answer for the host being served.
+ * @param string $servingHost  EC_CANONICAL_HOST -- the normalised host, already matched against
+ *                             the whitelist, or '' (outside a request, or an undeclared host).
+ * @return string              absolute origin, no trailing slash.
+ */
+function ecCanonicalOrigin($scriptName, $hostOrigin, $servingHost = '') {
     $path = (string)$scriptName;
     if ($path === '') { $path = '/engcalcs/index.php'; }
-    $declared = ecCanonicalOrigins();
     $page = basename($path);
+    $byHost = ecCanonicalHostOrigins();
+    $host = (string)$servingHost;
+    if ($host !== '' && isset($byHost[$page][$host])) { return $byHost[$page][$host]; }
+    $declared = ecCanonicalOrigins();
     if (isset($declared[$page])) { return $declared[$page]; }
     return (string)$hostOrigin;
+}
+
+/**
+ * The name and home a page presents itself under, keyed by the ORIGIN it nominates.
+ *
+ * **THE BRAND FOLLOWS THE CANONICAL, SO THE TWO CANNOT DISAGREE** (Task 697). A page that
+ * nominates https://epanet-plus-plus.org is the EPANET++ front door and says EPANET++; one that
+ * nominates https://librewaternet.org says LibreWaterNet.org. Keying the name on the same answer
+ * ecCanonicalOrigin() gives means there is one whitelist, not two, and a spoofed host can no more
+ * choose a brand than it can choose a canonical.
+ *
+ * `site` is where the name links (the About box's name, Help > Welcome page): that origin's
+ * landing page, which is a separate static repository on each host.
+ *
+ * @return array<string,array{name:string,site:string}> absolute origin => brand.
+ */
+function ecAppBrands() {
+    return array(
+        'https://librewaternet.org'    => array('name' => 'LibreWaterNet.org', 'site' => 'https://librewaternet.org/'),
+        'https://epanet-plus-plus.org' => array('name' => 'EPANET++',          'site' => 'https://epanet-plus-plus.org/'),
+    );
+}
+
+/**
+ * The brand a page presents on the host serving it, or null for a page that has none (every
+ * calculator: they are HawsEDC's, and their chrome says so without this).
+ *
+ * @param string $scriptName   $_SERVER['SCRIPT_NAME'].
+ * @param string $hostOrigin   CANONICAL_ORIGIN.
+ * @param string $servingHost  EC_CANONICAL_HOST.
+ * @return array{name:string,site:string}|null
+ */
+function ecAppBrand($scriptName, $hostOrigin, $servingHost = '') {
+    $brands = ecAppBrands();
+    $origin = ecCanonicalOrigin($scriptName, $hostOrigin, $servingHost);
+    return isset($brands[$origin]) ? $brands[$origin] : null;
 }
 
 /**
@@ -139,9 +212,10 @@ function ecCanonicalOrigin($scriptName, $hostOrigin) {
  * @param string $requestUri    $_SERVER['REQUEST_URI'], query string and all.
  * @param bool   $hostDeclared  EC_CANONICAL_HOST_DECLARED.
  * @param string $origin        CANONICAL_ORIGIN -- the fallback; a page declaring its own wins.
+ * @param string $servingHost   EC_CANONICAL_HOST.
  * @return string|null          absolute URL to 301 to, or null to serve the page.
  */
-function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $origin) {
+function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $origin, $servingHost = '') {
     if (!$hostDeclared) { return null; }
     $script = (string)$scriptName;
     $pretty = ecCanonicalPath($script);
@@ -159,7 +233,9 @@ function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $ori
     // straight through would move a visitor to hawsedc.com/app/ -- an address that does not exist,
     // because /app/ is a rewrite librewaternet.org alone carries. A redirect is the one reader here
     // that MOVES somebody, so getting this from the declaration rather than the host is not tidiness.
-    return ecCanonicalOrigin($script, $origin) . $pretty . $query;
+    // And on a host with its own declared origin (ecCanonicalHostOrigins()) the move stays on that
+    // host: epanet-plus-plus.org's script path goes to epanet-plus-plus.org/app/, never across.
+    return ecCanonicalOrigin($script, $origin, $servingHost) . $pretty . $query;
 }
 
 /**

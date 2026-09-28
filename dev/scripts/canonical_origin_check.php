@@ -34,10 +34,18 @@
  *   7. EC_LWN_ORIGIN in lib/config.inc.php is the SAME STRING ecCanonicalOrigins() declares for
  *      Looped-Network.php. config.inc.php is loaded before Canonical.lib.php and cannot require it,
  *      so librewaternet.org is written in two files; this leg is what makes it one fact.
- *   8. The three readers actually go through the declaration: ec_canonical_url() (which feeds the
+ *   8. The readers actually go through the declaration: ec_canonical_url() (which feeds the
  *      canonical, all 27 hreflang alternates and og:url), echoHTMLHead()'s og:image, and the
  *      sitemap generator all call ecCanonicalOrigin(). Without this the declaration is decoration
  *      and every page silently nominates whichever host answered -- the exact eleven-day defect.
+ *
+ * AND THE PER-HOST HALF, added 2026-09-27 for Task 697 (B1, two front doors to the map application):
+ *   9. ecCanonicalHostOrigins() names only real pages and only hosts $ec_canonical_origins
+ *      whitelists, and each host nominates ITSELF.
+ *  10. Every origin the map application can nominate has a brand in ecAppBrands(), homed at that
+ *      origin's root, and config.inc.php's LibreWaterNet fallback is the same string.
+ *  11. EC_CANONICAL_HOST is gated on the whitelist, and every runtime reader passes it.
+ * What the rendered page actually says on each host is canonical_host_check.php's.
  *
  * Blocking. A finding here is never cosmetic.
  */
@@ -139,6 +147,89 @@ if (preg_match("/define\('EC_LWN_ORIGIN',\s*'([^']*)'\)/", $config, $lwn)) {
       . "        which is the calculators' origin and no longer LibreWaterNet's.");
 }
 
+// ---- THE PER-HOST HALF (Task 697, B1) ------------------------------------------------------
+// A page may nominate a different origin on ONE named host -- the map application on
+// epanet-plus-plus.org. Each host key must be a host $ec_canonical_origins already whitelists:
+// config.inc.php hands ecCanonicalOrigin() only a whitelisted host (EC_CANONICAL_HOST), so a key
+// that is not one would be dead, and a check that allowed it would be inviting the next editor to
+// "fix" that by passing the raw Host header through.
+preg_match_all("/'([^']+)'\s*=>\s*'https:/", $body, $hk);
+$whitelistHosts = $hk[1];
+if (!function_exists('ecCanonicalHostOrigins')) {
+    bad("lib/Canonical.lib.php has no ecCanonicalHostOrigins(). The per-host declaration is where\n"
+      . "        epanet-plus-plus.org/app/ nominates itself; without it that front door nominates\n"
+      . "        librewaternet.org and cannot rank on its own.");
+} else {
+    $brands = function_exists('ecAppBrands') ? ecAppBrands() : array();
+    foreach (ecCanonicalHostOrigins() as $page => $byHost) {
+        if (!in_array($page, $pageFiles, true)) {
+            bad("ecCanonicalHostOrigins() declares '$page', which is not a page in the repository root.");
+        }
+        if (!is_array($byHost)) { bad("ecCanonicalHostOrigins()['$page'] is not a host => origin array."); continue; }
+        foreach ($byHost as $h => $o) {
+            if (!in_array($h, $whitelistHosts, true)) {
+                bad("ecCanonicalHostOrigins()['$page'] names host '$h', which lib/config.inc.php's\n"
+                  . "        \$ec_canonical_origins does not whitelist -- so EC_CANONICAL_HOST can never be '$h'\n"
+                  . "        and this declaration never fires. Add the host there (bare, lowercase, no www).");
+            }
+            if (strpos($o, 'https://') !== 0 || substr($o, -1) === '/' || substr_count($o, '/') !== 2) {
+                bad("ecCanonicalHostOrigins()['$page']['$h'] is '$o'. A canonical origin is https, has no\n"
+                  . "        path and no trailing slash.");
+            }
+            if ($o !== 'https://' . $h) {
+                bad("ecCanonicalHostOrigins()['$page']['$h'] is '$o'. A per-host declaration exists so a\n"
+                  . "        host can nominate ITSELF; pointing one host at another is the split this file exists\n"
+                  . "        to prevent, and belongs in ecCanonicalOrigins() if it is ever wanted.");
+            }
+        }
+    }
+    // The brand follows the canonical: every origin the map application can nominate has a name.
+    $appOrigins = array();
+    if (isset($declared['Looped-Network.php'])) { $appOrigins[] = $declared['Looped-Network.php']; }
+    $hostDecl = ecCanonicalHostOrigins();
+    if (isset($hostDecl['Looped-Network.php'])) { $appOrigins = array_merge($appOrigins, array_values($hostDecl['Looped-Network.php'])); }
+    foreach ($appOrigins as $o) {
+        if (!isset($brands[$o])) {
+            bad("Looped-Network.php can nominate '$o' but ecAppBrands() gives that origin no name, so\n"
+              . "        the About box on that host would fall back to LibreWaterNet.org under another\n"
+              . "        domain's canonical.");
+        } elseif ($brands[$o]['site'] !== $o . '/') {
+            bad("ecAppBrands()['$o']['site'] is '{$brands[$o]['site']}'. A brand's home is its own origin's root.");
+        }
+    }
+}
+// EC_CANONICAL_HOST must be gated on the whitelist, never the raw Host header. The fallback may be
+// '' or a DEBUG_MODE-only dev alias (Task 697 follow-up, epanet-plus-plus.localhost) -- but that
+// alias variable must itself come only from a whitelisted host, checked separately below.
+if (!preg_match('/define\(\'EC_CANONICAL_HOST\',\s*EC_CANONICAL_HOST_DECLARED\s*\?\s*\$ec_canonical_host\s*:\s*\$ec_canonical_dev_alias\)/', $config)) {
+    bad("lib/config.inc.php does not define EC_CANONICAL_HOST as\n"
+      . "        EC_CANONICAL_HOST_DECLARED ? \$ec_canonical_host : \$ec_canonical_dev_alias. It is the\n"
+      . "        key the per-host declaration is looked up by, and must be '' (or a whitelisted dev\n"
+      . "        alias) for every host the whitelist does not name.");
+}
+// The dev alias must be gated on DEBUG_MODE, or a *.localhost Host header would pick one in
+// production too.
+if (!preg_match('/if\s*\(DEBUG_MODE\s*&&\s*substr\(\$ec_canonical_host,\s*-10\)\s*===\s*\'\.localhost\'\)/', $config)) {
+    bad("lib/config.inc.php's \$ec_canonical_dev_alias is not gated on DEBUG_MODE, so a\n"
+      . "        *.localhost Host header would pick an alias in production too.");
+}
+// And it must be gated on whitelist membership, or an arbitrary '<anything>.localhost' would pick
+// an arbitrary alias in development.
+if (!preg_match('/foreach\s*\(\$ec_canonical_origins as \$ec_canonical_dev_key/', $config)) {
+    bad("lib/config.inc.php's \$ec_canonical_dev_alias is not matched against\n"
+      . "        \$ec_canonical_origins, so an arbitrary *.localhost Host header could pick an\n"
+      . "        arbitrary alias in development.");
+}
+// The fallback brand in config.inc.php is the same string ecAppBrands() gives librewaternet.org.
+if (preg_match("/'name'\s*=>\s*'([^']*)',\s*'site'\s*=>\s*EC_LWN_SITE_URL/", $config, $fb)
+    && isset($lwn[1]) && function_exists('ecAppBrands')) {
+    $b = ecAppBrands();
+    if (!isset($b[$lwn[1]]) || $b[$lwn[1]]['name'] !== $fb[1]) {
+        bad("ecAppBrandCurrent()'s fallback name '{$fb[1]}' is not the name ecAppBrands() gives\n"
+          . "        EC_LWN_ORIGIN. They are one fact written twice; keep them one string.");
+    }
+}
+
 // The readers. A declaration nothing consults is decoration, and that is exactly how every page
 // came to nominate one host for eleven days.
 $readers = array(
@@ -153,6 +244,21 @@ foreach ($readers as $rel => $what) {
           . "        ignores the per-page declaration and emits whichever origin the host resolved to.");
     }
 }
+// The runtime readers must also pass the SERVING HOST, or the per-host declaration is silently
+// ignored and epanet-plus-plus.org/app/ nominates librewaternet.org -- the argument defaults to ''.
+// The sitemap runs outside a request and deliberately passes none: see generate_sitemap.php.
+$hostReaders = array(
+    'lib/Language.lib.php'       => 'ec_canonical_url() (canonical, 27 hreflang alternates, og:url)',
+    'lib/HeadersFooters.lib.php' => 'og:image',
+    'Looped-Network.php'         => 'the script-path redirect to /app/',
+);
+foreach ($hostReaders as $rel => $what) {
+    $src = is_file($root . '/' . $rel) ? (string)file_get_contents($root . '/' . $rel) : '';
+    if (!preg_match('/ecCanonical(Origin|RedirectTarget)\((?:[^;]*?)EC_CANONICAL_HOST\)/s', $src)) {
+        bad("$rel never passes EC_CANONICAL_HOST to ecCanonicalOrigin()/ecCanonicalRedirectTarget(),\n"
+          . "        so $what ignores ecCanonicalHostOrigins() and every host gets the default answer.");
+    }
+}
 
 if ($fail) {
     echo "\nFAIL: $fail canonical-origin problem" . ($fail === 1 ? '' : 's') . "\n";
@@ -163,5 +269,6 @@ $hosts = count($values);
 $pp = count($declared);
 echo "PASS: canonical origin is a whitelist of $hosts host"
    . ($hosts === 1 ? '' : 's') . ", every value a literal https origin, with $pp per-page override"
-   . ($pp === 1 ? '' : 's') . " declared and read by all three readers.\n";
+   . ($pp === 1 ? '' : 's') . " and " . count(ecCanonicalHostOrigins(), COUNT_RECURSIVE) - count(ecCanonicalHostOrigins())
+   . " per-host override(s) declared and read by every reader.\n";
 exit(0);
