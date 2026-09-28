@@ -72,19 +72,25 @@ finish inside the idle budget is thrown away.
 
 ## Numbers
 
-Bench, 2026-09-28, on a heavily loaded machine (load average 7 to 9 on 4 threads while other
-sessions ran their checks, so the milliseconds are pessimistic and noisy; the same views took a
-third to a half of these times when the machine was quieter):
+Bench, round 3, 2026-09-28, on a loaded machine (load average 5 to 7 on 4 threads while other
+sessions ran their checks; the milliseconds are noisy from run to run):
 
 ```
-placer C       N1 0  N3 0  N4 0  N5 0  inv 0   cost 129.2   rows 49%   labels 79%
-               leader median 1.5, p90 3.1, max 3.9   churn 84/1271
-               time per layout: median 82.3 ms, max 305.1 ms
-               R5 0/203, R7 0/973, R11 693 regained, 73 lost
-master-replay  N1 1  N3 34  N4 4  N5 0   cost 88.0   rows 25%   labels 45%
-               leader median 1.7, p90 3.0, max 5.9   churn 283/656
-               time per layout: median 259.0 ms, max 455.8 ms
+placer C       N1 0  N3 0  N4 0  N5 0  inv 0   cost 825   rows 50%   labels 79%
+               leader median 1.3, p90 3.3, max 3.9   churn 121/1262
+               time per layout: median 40.3 ms, max 138.0 ms
+               R5 0/272, R7 0/992, R11 746 regained, 74 lost
+               R14 462/991 along their pipe; 71 of the rest had room (round 2: 168/972, 300)
 ```
+
+Round 3 made the user's "Draw link labels along the link line" setting count (R14): aligned
+spots first, within the scene's reading window; a label may stand off and overhang a pipe shorter
+than itself; a kept level label turns to its pipe when room frees; a level spot carries a penalty
+that ranks it behind the aligned ones but never costs a label or a property; with the setting off
+nothing is turned. On the page (Net1, Net2; open, zooms, pans) every layout had zero breaks and no
+page errors, 4 to 34 ms per layout. One thing to watch: on Net2 the share of pipe labels along
+their pipe falls as you zoom in (35 of 39 at open, about 21 later), because labels that gain a
+second property often find room for it only level. See `dev/label-placer-interview-c.md` §8.
 
 The first view of each set costs about 1 ms because `idle()` thought it out when the project
 opened. It shows nearly twice the labels and twice the rows master does, with no breaks. Its
