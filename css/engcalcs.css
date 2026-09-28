@@ -2341,6 +2341,21 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
    the pane's edge, and the same one-undo-step guarantee Ctrl+D already gives, none of which the
    dot's CSS-only mark carries. Rather than leave a mark that promises a drag it cannot do, it is
    gone; Ctrl+D and the menu are the affordance until dragging is built as its own piece of work. */
+/* **THE FILL HANDLE, BUILT** (Task 690's drag half). `position: relative` on the one cell carrying
+   it, so the handle can be positioned within it without moving any other cell. `touch-action: none`
+   keeps a finger drag on it from also scrolling the pane. Placed logically
+   (`inset-inline-end`/`inset-block-end`), so an RTL reader's handle sits at the corner their own
+   language calls trailing, not literally bottom-right. */
+.lpn-pane-table tbody td.lpn-pane-fillcorner { position: relative; }
+.lpn-pane-fillhandle {
+	position: absolute; inset-inline-end: -1px; inset-block-end: -1px; width: 6px; height: 6px;
+	background: #0645ad; border: 1px solid #fff; box-sizing: border-box; cursor: crosshair;
+	touch-action: none; z-index: 3;
+}
+/* The dashed preview of where a drag would land, painted only on cells NOT already part of the
+   source being copied from -- an outline rather than a wash, so it never reads as a second, live
+   selection while the drag is still a proposal. */
+.lpn-pane-table tbody td.lpn-pane-fillrange { outline: 1px dashed #0645ad; outline-offset: -1px; }
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }

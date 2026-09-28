@@ -23948,6 +23948,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		spec.painted = now;
 		paneHeadSelPaint(spec);
+		paneFillHandlePaint(spec, rows, cols, box);
 	}
 	function paneTdByPaintKey(tds, key) {
 		var cut = key.indexOf('\u0000'), id = key.slice(0, cut), col = key.slice(cut + 1);
@@ -24917,6 +24918,238 @@ var EngCalcs = EngCalcs || {};
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
+	}
+	/**
+	 * **THE FILL HANDLE -- DRAG-TO-FILL** (Task 690's drag half; Ctrl+D and Ctrl+Enter above are its
+	 * keyboard half, both already shipped). Tom, on the CSS-only dot this replaces (fd604304):
+	 * *"Autofill with the little square button is yet to come? At the moment it's non-functioning
+	 * and non-clickable. If it were gone (once implemented) where autofill is not offered, that
+	 * would be nice."* The dot was removed rather than wired up; this is that separate build.
+	 *
+	 * **SHOWN ONLY WHERE FILL IS OFFERED** -- the same rule Ctrl+D and Ctrl+Enter already use: the
+	 * id column and every read-only/result cell are never settable, so a selection that holds
+	 * nothing else gets no handle at all. `paneFillBoxHasSettable()` is the one predicate all three
+	 * gestures could share; it is asked here on the whole box, not only the corner cell, because the
+	 * corner itself may be a result column while a settable one sits beside it in the same range.
+	 */
+	function paneFillBoxHasSettable(rows, cols, box) {
+		var r, c, col;
+		if (!box) { return false; }
+		for (c = box.c0; c <= box.c1; c++) {
+			col = cols[c];
+			if (!col || col.key === 'id' || !col.set) { continue; }
+			for (r = box.r0; r <= box.r1; r++) {
+				if (!paneCellIsPlain(col, rows[r])) { return true; }
+			}
+		}
+		return false;
+	}
+	/**
+	 * **REBUILT EVERY TIME THE SELECTION IS REPAINTED**, the same place `.lpn-pane-sel`/`.lpn-pane-
+	 * cur` are washed -- so the handle tracks the box through every arrow key, click and drag with no
+	 * listener of its own to keep in sync, and a rebuild that drops the old `<td>`s drops the old
+	 * handle with them for free. A drag already in progress owns the corner until it ends: repainting
+	 * it out from under the pointer (an edit elsewhere landing mid-drag, say) would tear down the
+	 * pointer capture the drag depends on.
+	 */
+	function paneFillHandlePaint(spec, rows, cols, box) {
+		var td;
+		if (spec._fillCornerTd) { spec._fillCornerTd.classList.remove('lpn-pane-fillcorner'); spec._fillCornerTd = null; }
+		if (spec._fillHandleEl && spec._fillHandleEl.parentNode) {
+			spec._fillHandleEl.parentNode.removeChild(spec._fillHandleEl);
+		}
+		spec._fillHandleEl = null;
+		if (spec._fillDrag) { return; }
+		if (!paneFillBoxHasSettable(rows, cols, box)) { return; }
+		td = spec.tds[rows[box.r1].id] && spec.tds[rows[box.r1].id][cols[box.c1].key];
+		if (!td) { return; }
+		td.classList.add('lpn-pane-fillcorner');
+		spec._fillCornerTd = td;
+		spec._fillHandleEl = paneFillHandleMake(spec);
+		td.appendChild(spec._fillHandleEl);
+	}
+	// **ONE DIRECTION AT A TIME, WHICHEVER THE POINTER MOVED FURTHER** -- the spreadsheet convention.
+	// The candidate cell is compared against each of the box's four edges; whichever axis has moved
+	// further past its edge wins, and the OTHER axis is pinned to the source box's own span, so a
+	// drag that wanders diagonally still reads as a clean row or column extension, never a corner.
+	function paneFillTargetBox(box, r, c, nRows, nCols) {
+		var rowExtDown, rowExtUp, colExtRight, colExtLeft, rowExt, colExt;
+		r = Math.max(0, Math.min(nRows - 1, r));
+		c = Math.max(0, Math.min(nCols - 1, c));
+		rowExtDown = Math.max(0, r - box.r1); rowExtUp = Math.max(0, box.r0 - r);
+		colExtRight = Math.max(0, c - box.c1); colExtLeft = Math.max(0, box.c0 - c);
+		rowExt = Math.max(rowExtDown, rowExtUp); colExt = Math.max(colExtRight, colExtLeft);
+		if (!rowExt && !colExt) { return null; }
+		if (rowExt >= colExt) { return { r0: Math.min(box.r0, r), r1: Math.max(box.r1, r), c0: box.c0, c1: box.c1 }; }
+		return { r0: box.r0, r1: box.r1, c0: Math.min(box.c0, c), c1: Math.max(box.c1, c) };
+	}
+	// The dashed preview, painted and washed the same way `paneSelPaint()` washes `.lpn-pane-sel` --
+	// only what changed between one pointermove and the next, never the whole box re-drawn from
+	// scratch. The SOURCE cells are never marked: they are not being written to, only read from.
+	function paneFillHandlePreviewPaint(spec, rows, cols, srcBox, target) {
+		var was = spec._fillPreview || {}, now = {}, r, c, key, td;
+		if (target) {
+			for (r = target.r0; r <= target.r1; r++) {
+				for (c = target.c0; c <= target.c1; c++) {
+					if (r >= srcBox.r0 && r <= srcBox.r1 && c >= srcBox.c0 && c <= srcBox.c1) { continue; }
+					if (!rows[r] || !cols[c]) { continue; }
+					now[rows[r].id + '\u0000' + cols[c].key] = true;
+				}
+			}
+		}
+		for (key in was) {
+			if (Object.prototype.hasOwnProperty.call(was, key) && !now[key]) {
+				td = paneTdByPaintKey(spec.tds, key);
+				if (td) { td.classList.remove('lpn-pane-fillrange'); }
+			}
+		}
+		for (key in now) {
+			if (Object.prototype.hasOwnProperty.call(now, key) && !was[key]) {
+				td = paneTdByPaintKey(spec.tds, key);
+				if (td) { td.classList.add('lpn-pane-fillrange'); }
+			}
+		}
+		spec._fillPreview = now;
+	}
+	// **THE GESTURE, KEPT SEPARATE FROM THE POINTER THAT DRIVES IT.** These three read and write only
+	// row/column INDICES against a snapshot of the table taken at the moment the drag began, so a
+	// harness (or a future second input method) can drive the whole gesture without a browser under
+	// it, exactly as `selectBox()` already lets the Ctrl+Enter harness set up a selection without a
+	// mouse. The DOM wiring below (`paneFillHandleMake()`) is the only part of this that touches an
+	// event.
+	function paneFillHandleBegin(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), box = paneSelBox(spec, rows, cols);
+		if (!paneFillBoxHasSettable(rows, cols, box)) { return false; }
+		spec._fillDrag = { rows: rows, cols: cols, box: box, target: null };
+		return true;
+	}
+	function paneFillHandleMoveToIndex(spec, r, c) {
+		var d = spec._fillDrag;
+		if (!d) { return; }
+		d.target = paneFillTargetBox(d.box, r, c, d.rows.length, d.cols.length);
+		paneFillHandlePreviewPaint(spec, d.rows, d.cols, d.box, d.target);
+	}
+	// `commit` false is Esc, a lost capture, or a release with no extension dragged out -- all three
+	// are a plain cancel: the preview is washed and nothing is written or undone-for.
+	function paneFillHandleEnd(spec, commit) {
+		var d = spec._fillDrag, rows, cols, did = false;
+		if (!d) { return false; }
+		paneFillHandlePreviewPaint(spec, d.rows, d.cols, d.box, null);
+		spec._fillDrag = null;
+		if (commit && d.target) { did = paneFillHandleCommit(spec, d.rows, d.cols, d.box, d.target); }
+		if (!did) {
+			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+			paneSelPaint(spec, rows, cols);
+		}
+		return did;
+	}
+	/**
+	 * **THE SOURCE BLOCK'S PATTERN, TILED -- NEVER A SERIES.** A drag never auto-increments: an id
+	 * column dragged down would collide with itself on every row past the first, the identical
+	 * alert-storm Ctrl+D and Ctrl+Enter both already declined to raise, so it is skipped by name, the
+	 * same precedent. Every OTHER settable cell in the target reads back from the source block at the
+	 * matching offset, wrapped with `%` across the source's own width/height -- a 2-row source dragged
+	 * down five rows repeats ABABA, exactly as Excel and Sheets tile a pattern wider or taller than
+	 * one cell.
+	 *
+	 * **ONE `saveUndoSnapshot()` FOR THE WHOLE DRAG**, taken only once something in the target is
+	 * actually settable -- the same no-op guard `paneFillDown()` and `paneCtrlEnterFill()` both keep.
+	 * Every write goes through `paneWriteCellText()`, the same validated door paste, Ctrl+D and
+	 * Ctrl+Enter all use, so a scenario override and a unit-bearing cell's literal token are handled
+	 * exactly as they are for those.
+	 *
+	 * **THE SELECTION AFTERWARD IS THE UNION** -- source plus the newly filled range, in one
+	 * rectangle -- which is also what `target` already is by construction (`paneFillTargetBox()`
+	 * always contains the source box it extended).
+	 */
+	function paneFillHandleCommit(spec, rows, cols, srcBox, target) {
+		var pc = EngCalcs.pageConfig || {}, srcRowsN = srcBox.r1 - srcBox.r0 + 1, srcColsN = srcBox.c1 - srcBox.c0 + 1,
+			rowExtend = (target.c0 === srcBox.c0 && target.c1 === srcBox.c1),
+			r, c, col, el, pr, pc2, text, wrote = 0, refused = 0, any = false;
+		function inSrc(rr, cc) { return rr >= srcBox.r0 && rr <= srcBox.r1 && cc >= srcBox.c0 && cc <= srcBox.c1; }
+		for (r = target.r0; r <= target.r1; r++) {
+			for (c = target.c0; c <= target.c1; c++) {
+				if (inSrc(r, c)) { continue; }
+				col = cols[c];
+				if (col.key === 'id' || paneCellIsPlain(col, rows[r]) || !col.set) { continue; }
+				any = true;
+			}
+		}
+		if (!any) { return false; }
+		saveUndoSnapshot();
+		for (r = target.r0; r <= target.r1; r++) {
+			for (c = target.c0; c <= target.c1; c++) {
+				if (inSrc(r, c)) { continue; }
+				col = cols[c]; el = rows[r];
+				if (col.key === 'id') { refused++; continue; }
+				pr = rowExtend ? (((r - srcBox.r0) % srcRowsN) + srcRowsN) % srcRowsN : (r - srcBox.r0);
+				pc2 = rowExtend ? (c - srcBox.c0) : (((c - srcBox.c0) % srcColsN) + srcColsN) % srcColsN;
+				text = paneCellText(cols[srcBox.c0 + pc2], rows[srcBox.r0 + pr]);
+				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		spec.sel = { aId: rows[target.r0].id, aKey: cols[target.c0].key,
+			fId: rows[target.r1].id, fKey: cols[target.c1].key };
+		renderPaneTable(spec);
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused)));
+		return true;
+	}
+	/**
+	 * **THE ONLY PART OF THIS THAT TOUCHES AN EVENT.** Pointer events, not mouse -- one code path for
+	 * mouse, pen and touch, with pointer capture so a fast drag that leaves the handle keeps filling
+	 * instead of stopping dead, the same idiom the pane's own resize grip already uses. Hit-testing
+	 * goes through `document.elementFromPoint()` rather than `e.target`, because capture retargets
+	 * every later pointer event straight back to the handle itself -- exactly the reason the map's own
+	 * drags already read `elementFromPoint()` instead of trusting the event.
+	 *
+	 * **`mousedown` IS STOPPED SEPARATELY FROM `pointerdown`.** A real click dispatches both for the
+	 * same press, and it is the TABLE's `mousedown` listener -- not this one -- that would otherwise
+	 * read the press as the start of an ordinary selection-drag and collapse the range the handle is
+	 * standing on.
+	 */
+	function paneFillHandleMake(spec) {
+		var handle = document.createElement('div'), moveFn, upFn, cancelFn, lostFn, escFn;
+		handle.className = 'lpn-pane-fillhandle';
+		handle.setAttribute('aria-hidden', 'true');
+		handle.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+		function detach() {
+			handle.removeEventListener('pointermove', moveFn);
+			handle.removeEventListener('pointerup', upFn);
+			handle.removeEventListener('pointercancel', cancelFn);
+			handle.removeEventListener('lostpointercapture', lostFn);
+			document.removeEventListener('keydown', escFn, true);
+		}
+		function hitIndex(e) {
+			var el = document.elementFromPoint(e.clientX, e.clientY), td = paneTdOfEvent(spec, el), d = spec._fillDrag;
+			if (!td || !d) { return null; }
+			return { r: paneIndexOfId(d.rows, td._lpnPaneId), c: paneIndexOfKey(d.cols, td._lpnPaneKey) };
+		}
+		moveFn = function (e) {
+			var at = hitIndex(e);
+			if (at && at.r >= 0 && at.c >= 0) { paneFillHandleMoveToIndex(spec, at.r, at.c); }
+			e.preventDefault();
+		};
+		upFn = function (e) { detach(); paneFillHandleEnd(spec, true); e.preventDefault(); };
+		cancelFn = function () { detach(); paneFillHandleEnd(spec, false); };
+		lostFn = function () { detach(); paneFillHandleEnd(spec, false); };
+		escFn = function (e) { if (e && (e.key === 'Escape' || e.key === 'Esc')) { detach(); paneFillHandleEnd(spec, false); } };
+		handle.addEventListener('pointerdown', function (e) {
+			if (typeof e.button === 'number' && e.button !== 0) { return; }
+			if (!paneFillHandleBegin(spec)) { return; }
+			try { if (handle.setPointerCapture) { handle.setPointerCapture(e.pointerId); } } catch (err) { /* drag without capture */ }
+			handle.addEventListener('pointermove', moveFn);
+			handle.addEventListener('pointerup', upFn);
+			handle.addEventListener('pointercancel', cancelFn);
+			handle.addEventListener('lostpointercapture', lostFn);
+			document.addEventListener('keydown', escFn, true);
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		return handle;
 	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
