@@ -12,12 +12,13 @@ const GAP = 1.5;          // clearance between a symbol and a label beside it
 const DIRS = [];          // the compass, 16 ways
 for (let k = 0; k < 16; k++) { DIRS.push(k * Math.PI / 8); }
 const RINGS = [0.8, 1.6, 2.6, 4.0];   // leader lengths tried, in row heights
+const RINGS_ALT = [0.8, 1.8];         // and for the other shape, which is lazier
 const SIDES = [[1, 0], [-1, 0.15], [0, 1.5]];   // a pipe label above, below, or on its pipe: [side, cost]
 let tol = TOL;
 const DIRS8 = [];
 for (let k = 0; k < 8; k++) { DIRS8.push(k * Math.PI / 4); }
 const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used when it wins
-const LINK_OFF_PIPE = 0.8; // a pipe label that leaves its pipe for the horizontal
+const LINK_OFF_PIPE = 2; // a pipe label that leaves its pipe for the horizontal
 const CS = 24;            // grid cell size, px
 const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
@@ -123,7 +124,24 @@ function Grid(vp) {
 	this.stamp = 1;
 	this.buf = [];
 	this.r = [0, 0, 0, 0];
+	this.all = [[], [], []];
+	this.touch = new Int32Array(n);
+	this.tick = 0;
 }
+// Records that something changed over a rectangle (for the "has anything near me moved?" test).
+Grid.prototype.mark = function (x0, y0, x1, y1) {
+	const r = this.range(x0, y0, x1, y1);
+	if (!r) { return; }
+	const t = this.tick;
+	for (let j = r[2]; j <= r[3]; j++) { for (let i = r[0]; i <= r[1]; i++) { this.touch[j * this.nx + i] = t; } }
+};
+Grid.prototype.lastTouch = function (bb) {
+	const r = this.range(bb[0], bb[1], bb[2], bb[3]);
+	if (!r) { return 0; }
+	let m = 0;
+	for (let j = r[2]; j <= r[3]; j++) { for (let i = r[0]; i <= r[1]; i++) { const v = this.touch[j * this.nx + i]; if (v > m) { m = v; } } }
+	return m;
+};
 Grid.prototype.range = function (x0, y0, x1, y1) {
 	let i0 = Math.floor((x0 - this.x0) / CS), i1 = Math.floor((x1 - this.x0) / CS);
 	let j0 = Math.floor((y0 - this.y0) / CS), j1 = Math.floor((y1 - this.y0) / CS);
@@ -134,12 +152,14 @@ Grid.prototype.range = function (x0, y0, x1, y1) {
 	return r;
 };
 Grid.prototype.addBox = function (item) {
+	this.all[0].push(item);
 	const b = item.box, r = this.range(b.x0, b.y0, b.x1, b.y1), L = this.L[0];
 	if (!r) { return; }
 	for (let j = r[2]; j <= r[3]; j++) { for (let i = r[0]; i <= r[1]; i++) { const k = j * this.nx + i; (L[k] || (L[k] = [])).push(item); } }
 };
 // A segment goes into exactly the cells it passes through (row band by row band).
 Grid.prototype.addSeg = function (layer, item) {
+	this.all[layer].push(item);
 	const L = this.L[layer];
 	let ax = item.ax, ay = item.ay, bx = item.bx, by = item.by;
 	if (ay > by) { let t = ax; ax = bx; bx = t; t = ay; ay = by; by = t; }
@@ -194,6 +214,70 @@ Grid.prototype.query = function (layer, x0, y0, x1, y1, fn) {
 		}
 	}
 	return false;
+};
+
+// ---- the free-space raster: the static real estate at 2 px, as summed-area tables, so that
+// "is this rectangle clear?" costs four reads ------------------------------------------------
+const RR = 2, RMARGIN = 48;
+function Raster(vp, G) {
+	const ox = vp.x - RMARGIN, oy = vp.y - RMARGIN;
+	const nx = Math.ceil((vp.w + 2 * RMARGIN) / RR), ny = Math.ceil((vp.h + 2 * RMARGIN) / RR);
+	this.ox = ox; this.oy = oy; this.nx = nx; this.ny = ny;
+	const hard = new Uint8Array(nx * ny), pipe = new Uint8Array(nx * ny), tldr = new Uint8Array(nx * ny);
+	const self = this;
+	function markRect(a, x0, y0, x1, y1) {
+		let i0 = Math.floor((x0 - ox) / RR), i1 = Math.floor((x1 - ox) / RR), j0 = Math.floor((y0 - oy) / RR), j1 = Math.floor((y1 - oy) / RR);
+		if (i1 < 0 || j1 < 0 || i0 >= nx || j0 >= ny) { return; }
+		if (i0 < 0) { i0 = 0; } if (j0 < 0) { j0 = 0; } if (i1 >= nx) { i1 = nx - 1; } if (j1 >= ny) { j1 = ny - 1; }
+		for (let j = j0; j <= j1; j++) { for (let i = i0; i <= i1; i++) { a[j * nx + i] = 1; } }
+	}
+	function markSeg(a, x0, y0, x1, y1) {
+		const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(1, Math.ceil(len / 0.5));
+		for (let k = 0; k <= n; k++) {
+			const x = x0 + (x1 - x0) * k / n, y = y0 + (y1 - y0) * k / n;
+			const i = Math.floor((x - ox) / RR), j = Math.floor((y - oy) / RR);
+			if (i >= 0 && j >= 0 && i < nx && j < ny) { a[j * nx + i] = 1; }
+		}
+	}
+	const X0 = ox, Y0 = oy, X1 = ox + nx * RR, Y1 = oy + ny * RR;
+	function clipSeg(it) {
+		// Liang-Barsky clip to the raster, so a long off-screen pipe costs nothing.
+		let t0 = 0, t1 = 1;
+		const dx = it.bx - it.ax, dy = it.by - it.ay;
+		const P = [-dx, dx, -dy, dy], Q = [it.ax - X0, X1 - it.ax, it.ay - Y0, Y1 - it.ay];
+		for (let i = 0; i < 4; i++) {
+			if (P[i] === 0) { if (Q[i] < 0) { return null; } continue; }
+			const t = Q[i] / P[i];
+			if (P[i] < 0) { if (t > t1) { return null; } if (t > t0) { t0 = t; } } else { if (t < t0) { return null; } if (t < t1) { t1 = t; } }
+		}
+		return [it.ax + t0 * dx, it.ay + t0 * dy, it.ax + t1 * dx, it.ay + t1 * dy];
+	}
+	G.all[0].forEach(function (it) { const b = it.box; markRect(hard, b.x0, b.y0, b.x1, b.y1); });
+	G.all[1].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(pipe, c[0], c[1], c[2], c[3]); } });
+	G.all[2].forEach(function (it) { const c = clipSeg(it); if (c) { markSeg(tldr, c[0], c[1], c[2], c[3]); } });
+	this.hard = sat(hard); this.pipe = sat(pipe); this.tldr = sat(tldr);
+	function sat(a) {
+		const W1 = nx + 1, S = new Int32Array(W1 * (ny + 1));
+		for (let j = 0; j < ny; j++) {
+			let row = 0;
+			for (let i = 0; i < nx; i++) { row += a[j * nx + i]; S[(j + 1) * W1 + i + 1] = S[j * W1 + i + 1] + row; }
+		}
+		return S;
+	}
+	void self;
+}
+Raster.prototype.covers = function (bb) {
+	return bb[0] >= this.ox && bb[1] >= this.oy && bb[2] < this.ox + this.nx * RR && bb[3] < this.oy + this.ny * RR;
+};
+// Marked cells meeting the rectangle (cells it only touches at an edge count too).
+Raster.prototype.sum = function (S, x0, y0, x1, y1) {
+	if (x1 < x0 || y1 < y0) { return 0; }
+	const nx = this.nx, ny = this.ny, W1 = nx + 1;
+	let i0 = Math.floor((x0 - this.ox) / RR), i1 = Math.floor((x1 - this.ox) / RR) + 1;
+	let j0 = Math.floor((y0 - this.oy) / RR), j1 = Math.floor((y1 - this.oy) / RR) + 1;
+	if (i0 < 0) { i0 = 0; } if (j0 < 0) { j0 = 0; } if (i1 > nx) { i1 = nx; } if (j1 > ny) { j1 = ny; }
+	if (i1 <= i0 || j1 <= j0) { return 0; }
+	return S[j1 * W1 + i1] - S[j0 * W1 + i1] - S[j1 * W1 + i0] + S[j0 * W1 + i0];
 };
 
 // ---- the placer ------------------------------------------------------------------------------
@@ -264,6 +348,7 @@ function run(scene, prev, gaps) {
 			for (let i = 1; i < L.length; i++) { G.addSeg(2, { ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1], ld: id, lab: -1 }); }
 		}
 	});
+	const Rs = new Raster(vp, G);
 	const custBox = {};
 	(scene.customers || []).forEach(function (c) { custBox[c.id] = c.box; });
 
@@ -273,7 +358,7 @@ function run(scene, prev, gaps) {
 
 	// ---- per-label facts ----
 	const info = reqs.map(function (req, li) {
-		const f = { req: req, li: li, kind: req.kind, pt: null, sym: null, link: null, node: null, cc: [] };
+		const f = { req: req, li: li, kind: req.kind, pt: null, sym: null, link: null, node: null, cc: [], lc: new Map(), lg: new Map(), tick: -1, k0: 0, k1: -1, region: null };
 		if (req.kind === 'node' && nodes[req.owner]) {
 			f.node = nodes[req.owner]; f.pt = [f.node.x, f.node.y]; f.sym = f.node.symbol;
 		} else if (req.kind === 'link' && links[req.owner]) {
@@ -351,56 +436,72 @@ function run(scene, prev, gaps) {
 	// STATIC: against the network and the Text (the same in every pass, so worked out once per
 	// candidate). Infinity when a never-rule would break.
 	function evalStatic(f, cand, needInView) {
-		let cost = cand.base;
+		if (needInView && !cand.angle && (cand.x < vp.x + 1 || cand.y < vp.y + 1 || cand.x + cand.sh.w > vp.x + vp.w - 1 || cand.y + cand.sh.h > vp.y + vp.h - 1)) { return Infinity; }
 		const boxes = boxesFor(cand), bb = cand.bb || (cand.bb = aabbOf(boxes));
-		const ownLink = f.link ? f.link._i : -1, ownNode = f.node ? f.node.id : null;
 		if (needInView && (bb[0] < vp.x + 1 || bb[1] < vp.y + 1 || bb[2] > vp.x + vp.w - 1 || bb[3] > vp.y + vp.h - 1)) { return Infinity; }
-		const buf = G.buf;
-		let n = G.collect(0, bb[0], bb[1], bb[2], bb[3]);
-		for (let i = 0; i < n; i++) {
-			const it = buf[i];
-			for (let j = 0; j < boxes.length; j++) { if (boxesOverlap(boxes[j], it.box)) { return Infinity; } }
+		let cost = cand.base;
+		if (cand.leader) {
+			let lc = f.lc.get(cand.lk);
+			if (lc === undefined) { lc = leaderStatic(f, cand.leader); f.lc.set(cand.lk, lc); }
+			if (lc === Infinity) { return Infinity; }
+			cost += lc;
+		}
+		const ownLink = f.link ? f.link._i : -1, buf = G.buf, fast = !cand.angle && Rs.covers(bb);
+		// Hard: a symbol or Text under the ink. The raster answers "certainly clear" at once.
+		for (let j = 0; j < boxes.length; j++) {
+			const b = boxes[j];
+			if (fast && Rs.sum(Rs.hard, b.x0 + tol / 2, b.y0 + tol / 2, b.x1 - tol / 2, b.y1 - tol / 2) === 0) { continue; }
+			const n = G.collect(0, b.x0, b.y0, b.x1, b.y1);
+			for (let i = 0; i < n; i++) { if (boxesOverlap(b, buf[i].box)) { return Infinity; } }
 		}
 		const es = ++evalStamp;
-		const L = cand.leader;
-		if (L) {
-			const sx = L[0][0], sy = L[0][1];
-			for (let s = 1; s < L.length; s++) {
-				const px = L[s - 1][0], py = L[s - 1][1], qx = L[s][0], qy = L[s][1];
-				const x0 = Math.min(px, qx), x1 = Math.max(px, qx), y0 = Math.min(py, qy), y1 = Math.max(py, qy);
-				n = G.collect(0, x0, y0, x1, y1);
-				for (let i = 0; i < n; i++) {
-					const it = buf[i];
-					if (it.sym) {
-						if (!(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
-					} else if (segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 1; }
-				}
-				n = G.collect(1, x0, y0, x1, y1);
-				for (let i = 0; i < n; i++) {
-					const it = buf[i];
-					if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
-					const t = segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by);
-					if (t >= 0 && Math.hypot(px + t * (qx - px) - sx, py + t * (qy - py) - sy) > 1) { linkSeen[it.link] = es; cost += W.ldrPipe; }
-				}
-				n = G.collect(2, x0, y0, x1, y1);
-				for (let i = 0; i < n; i++) {
-					const it = buf[i];
-					if (ldrSeen[it.ld] === es) { continue; }
-					if (segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by) >= 0) { ldrSeen[it.ld] = es; cost += W.ldrLdr; }
-				}
+		if (!fast || Rs.sum(Rs.pipe, bb[0], bb[1], bb[2], bb[3]) > 0) {
+			const n = G.collect(1, bb[0], bb[1], bb[2], bb[3]);
+			for (let i = 0; i < n; i++) {
+				const it = buf[i];
+				if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
+				if (anyBoxHitsSeg(boxes, it)) { linkSeen[it.link] = es; cost += W.lblPipe; }
 			}
 		}
-		n = G.collect(1, bb[0], bb[1], bb[2], bb[3]);
-		for (let i = 0; i < n; i++) {
-			const it = buf[i];
-			if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
-			if (anyBoxHitsSeg(boxes, it)) { linkSeen[it.link] = es; cost += W.lblPipe; }
+		if (!fast || Rs.sum(Rs.tldr, bb[0], bb[1], bb[2], bb[3]) > 0) {
+			const n = G.collect(2, bb[0], bb[1], bb[2], bb[3]);
+			for (let i = 0; i < n; i++) {
+				const it = buf[i];
+				if (ldrSeen[it.ld] === es) { continue; }
+				if (anyBoxHitsSeg(boxes, it)) { ldrSeen[it.ld] = es; cost += W.lblLdr; }
+			}
 		}
-		n = G.collect(2, bb[0], bb[1], bb[2], bb[3]);
-		for (let i = 0; i < n; i++) {
-			const it = buf[i];
-			if (ldrSeen[it.ld] === es) { continue; }
-			if (anyBoxHitsSeg(boxes, it)) { ldrSeen[it.ld] = es; cost += W.lblLdr; }
+		return cost;
+	}
+	// A leader's own static cost; the same for every shape and row set hung on it, so it is
+	// worked out once per label and direction.
+	function leaderStatic(f, L) {
+		let cost = 0;
+		const ownLink = f.link ? f.link._i : -1, ownNode = f.node ? f.node.id : null, buf = G.buf;
+		const es = ++evalStamp, sx = L[0][0], sy = L[0][1];
+		for (let s = 1; s < L.length; s++) {
+			const px = L[s - 1][0], py = L[s - 1][1], qx = L[s][0], qy = L[s][1];
+			const x0 = Math.min(px, qx), x1 = Math.max(px, qx), y0 = Math.min(py, qy), y1 = Math.max(py, qy);
+			let n = G.collect(0, x0, y0, x1, y1);
+			for (let i = 0; i < n; i++) {
+				const it = buf[i];
+				if (it.sym) {
+					if (!(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
+				} else if (segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 1; }
+			}
+			n = G.collect(1, x0, y0, x1, y1);
+			for (let i = 0; i < n; i++) {
+				const it = buf[i];
+				if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
+				const t = segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by);
+				if (t >= 0 && Math.hypot(px + t * (qx - px) - sx, py + t * (qy - py) - sy) > 1) { linkSeen[it.link] = es; cost += W.ldrPipe; }
+			}
+			n = G.collect(2, x0, y0, x1, y1);
+			for (let i = 0; i < n; i++) {
+				const it = buf[i];
+				if (ldrSeen[it.ld] === es) { continue; }
+				if (segCrossT(px, py, qx, qy, it.ax, it.ay, it.bx, it.by) >= 0) { ldrSeen[it.ld] = es; cost += W.ldrLdr; }
+			}
 		}
 		return cost;
 	}
@@ -453,12 +554,14 @@ function run(scene, prev, gaps) {
 	const placed = new Array(N);      // {cand, cost, items}
 	function commit(f, cand, cost) {
 		const items = [];
-		boxesFor(cand).forEach(function (b) { const it = { box: b, lab: f.li }; D.addBox(it); items.push(it); });
+		D.tick++;
+		boxesFor(cand).forEach(function (b) { const it = { box: b, lab: f.li }; D.addBox(it); items.push(it); D.mark(b.x0, b.y0, b.x1, b.y1); });
 		if (cand.leader) {
 			const id = ldrSeq++, L = cand.leader;
 			for (let i = 1; i < L.length; i++) {
 				const it = { ax: L[i - 1][0], ay: L[i - 1][1], bx: L[i][0], by: L[i][1], ld: id, lab: f.li };
 				D.addSeg(2, it); items.push(it);
+				D.mark(Math.min(it.ax, it.bx), Math.min(it.ay, it.by), Math.max(it.ax, it.bx), Math.max(it.ay, it.by));
 			}
 		}
 		placed[f.li] = { cand: cand, cost: cost, items: items };
@@ -466,7 +569,11 @@ function run(scene, prev, gaps) {
 	function uncommit(f) {
 		const p = placed[f.li];
 		if (!p) { return null; }
-		p.items.forEach(function (it) { it.dead = true; });
+		D.tick++;
+		p.items.forEach(function (it) {
+			it.dead = true;
+			if (it.box) { D.mark(it.box.x0, it.box.y0, it.box.x1, it.box.y1); } else { D.mark(Math.min(it.ax, it.bx), Math.min(it.ay, it.by), Math.max(it.ax, it.bx), Math.max(it.ay, it.by)); }
+		});
 		placed[f.li] = null;
 		return p;
 	}
@@ -499,14 +606,14 @@ function run(scene, prev, gaps) {
 	}
 	function pointCandidates(f, rows, rowPen, out) {
 		const usual = f.req.layout === 'line' ? 'line' : 'stack';
-		around(f, shape(f, rows, usual), f.sym, rowPen, out, true);
+		around(f, shape(f, rows, usual), f.sym, rowPen, out, DIRS, RINGS);
 		// H1: the other shape too (a stack unwrapped to one line, or the reverse), a little dearer.
-		if (rows.length > 1) { around(f, shape(f, rows, usual === 'line' ? 'stack' : 'line'), f.sym, rowPen + ALT_SHAPE, out, false); }
+		if (rows.length > 1) { around(f, shape(f, rows, usual === 'line' ? 'stack' : 'line'), f.sym, rowPen + ALT_SHAPE, out, DIRS8, RINGS_ALT); }
 		return out;
 	}
 	// A label beside a point symbol, then out on leaders into open ground: the widest pipe gaps
 	// first, then the compass.
-	function around(f, sh, s, extra, out, full) {
+	function around(f, sh, s, extra, out, D, RG) {
 		const g = GAP, cx = f.pt[0], cy = f.pt[1];
 		const sx0 = s.x - g, sx1 = s.x + s.w + g, sy0 = s.y - g, sy1 = s.y + s.h + g;
 		const w = sh.w, H = sh.h;
@@ -529,15 +636,26 @@ function run(scene, prev, gaps) {
 		const dirs = [];
 		const gl = f.node ? gaps[f.node.id] : null;
 		if (gl) { for (let i = 0; i < gl.length && i < 4; i++) { if (gl[i].width > 0.5) { dirs.push(gl[i].mid); } } }
-		const D = full ? DIRS : DIRS8;
 		for (let i = 0; i < D.length; i++) { dirs.push(D[i]); }
 		for (let d = 0; d < dirs.length; d++) {
 			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
-			for (let r = 0; r < RINGS.length; r++) {
-				const dist = rOut + RINGS[r] * RH;
+			for (let r = 0; r < RG.length; r++) {
+				const dist = rOut + RG[r] * RH;
 				const px = cx + ux * dist, py = cy + uy * dist;
-				const L = [[cx + ux * rs, cy + uy * rs], [px, py]];
-				out.push(hang(sh, px, py, side, extra + distCost((dist - rs) / RH), L));
+				// One leader serves every shape and row set hung on it: judged once, kept.
+				const lk = Math.round(dirs[d] * 1e4) * 64 + Math.round(RG[r] * 10);
+				let L = f.lg.get(lk);
+				if (L === undefined) {
+					L = [[cx + ux * rs, cy + uy * rs], [px, py]];
+					const lc = leaderStatic(f, L);
+					f.lc.set(lk, lc);
+					if (lc === Infinity) { L = null; }
+					f.lg.set(lk, L);
+				}
+				if (L === null) { continue; }
+				const c = hang(sh, px, py, side, extra + distCost((dist - rs) / RH), L);
+				c.lk = lk;
+				out.push(c);
 			}
 		}
 	}
@@ -571,8 +689,8 @@ function run(scene, prev, gaps) {
 		}
 		// Horizontal, beside the anchor or out on a leader from it; as one line or as a stack.
 		const pt = { x: ax, y: ay, w: 0, h: 0 };
-		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, false);
-		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, false); }
+		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS);
+		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT); }
 		return out;
 	}
 
@@ -743,13 +861,29 @@ function run(scene, prev, gaps) {
 		info.forEach(function (f) {
 			if (kept[f.li] === 'hand') { return; }
 			if (kept[f.li] === 'held') { growHeld(f, last); return; }
-			const n = f.subsets.length, p = uncommit(f);
-			let cur = hideCost(f), curCand = null, curK = n;
-			if (p) { cur = evalDyn(f, p.cand, p.cand.st, Infinity); curCand = p.cand; curK = p.cand.k; }
+			const n = f.subsets.length, p = placed[f.li];
+			const curK = p ? p.cand.k : n;
 			const k0 = last ? 0 : Math.max(0, curK - 1), k1 = last ? n - 1 : Math.min(curK, n - 1);
+			// Nothing near it has changed since it last looked over these row sets: nothing new to find.
+			if (f.tick >= 0 && k0 >= f.k0 && k1 <= f.k1 && D.lastTouch(regionOf(f)) <= f.tick) { return; }
+			f.tick = D.tick; f.k0 = k0; f.k1 = k1;
+			const cur = p ? evalDyn(f, p.cand, p.cand.st, Infinity) : hideCost(f);
 			const r = search(f, cur, k0, k1);
-			if (r) { commit(f, r.cand, r.cost); } else if (curCand) { commit(f, curCand, cur); }
+			if (r && (!p || r.cand !== p.cand)) {
+				if (p) { uncommit(f); }
+				commit(f, r.cand, r.cost);
+				f.tick = D.tick;
+			} else if (p) { p.cost = cur; }
 		});
+	}
+	function regionOf(f) {
+		if (f.region) { return f.region; }
+		const R = f.req.rows;
+		let wLine = 0, hStack = 0, wMax = 0;
+		for (let i = 0; i < R.length; i++) { wLine += R[i].w + T.separatorW; hStack += R[i].h; wMax = Math.max(wMax, R[i].w); }
+		const r = Math.max(f.sym.w, f.sym.h) / 2 + 4 + RINGS[RINGS.length - 1] * RH + 1.5 * Math.max(wLine, wMax) + hStack;
+		f.region = [f.pt[0] - r, f.pt[1] - r, f.pt[0] + r, f.pt[1] + r];
+		return f.region;
 	}
 
 	// ---- out ----
