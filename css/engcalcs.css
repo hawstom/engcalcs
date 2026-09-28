@@ -2345,10 +2345,11 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
    it, so the handle can be positioned within it without moving any other cell. `touch-action: none`
    keeps a finger drag on it from also scrolling the pane. Placed logically
    (`inset-inline-end`/`inset-block-end`), so an RTL reader's handle sits at the corner their own
-   language calls trailing, not literally bottom-right. */
+   language calls trailing, not literally bottom-right. Flush (0, not -1px): the cell clips with
+   `overflow: hidden`, and a pre-review measured the outer pixel row and column cut off. */
 .lpn-pane-table tbody td.lpn-pane-fillcorner { position: relative; }
 .lpn-pane-fillhandle {
-	position: absolute; inset-inline-end: -1px; inset-block-end: -1px; width: 6px; height: 6px;
+	position: absolute; inset-inline-end: 0; inset-block-end: 0; width: 6px; height: 6px;
 	background: #0645ad; border: 1px solid #fff; box-sizing: border-box; cursor: crosshair;
 	touch-action: none; z-index: 3;
 }
