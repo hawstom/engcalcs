@@ -3435,3 +3435,62 @@ already shows doesn't work on a person who isn't looking at that row.
 
 Provenance: OBSERVED for all diff claims above; SPECULATION for the Excel/Sheets citation strength and
 for the analogy to the menu-bar case; no external CITED source verified in this session.
+
+---
+
+## 2026-09-28 — Task 738: the vanishing row (Find/Filter-in-table, standing vs. transient)
+
+Tom asked whether the filter's live re-evaluation should be a toggle-able "Filter actively" state
+next to the Filter in table button, so a row edited out of compliance can be kept (snapshot) or
+dropped (standing) at will.
+
+OBSERVED (`js/looped-network.js:22559-22593`): the filter is already standing/live by construction,
+not by accident. `paneFilters` stores the query as TEXT per table id; `paneTableElements()` calls
+`paneFilterKeys()` → `findSelectByQuery(q)` fresh on every read, so an edit that moves a value out
+of the query's range removes the row the next time that table redraws — no separate "re-apply"
+step exists to skip. This is the SAME shape of decision CLAUDE.md already rules on for Calculate
+results (`dev/lpn-rulings.md:14-20`, quoted in CLAUDE.md's `lpn_` section): *"Recalculate OFF means
+a snapshot, never hide or delete... Stale results stay on screen until Calculate or a deliberate
+Clear."* The filter took the opposite answer to the identical question and nobody argued it either
+way — Task 597's comments (`js/looped-network.js:18946-18974`) discuss WHICH tables a compound
+query reaches, never whether a match, once shown, should survive an edit that breaks it.
+
+OBSERVED (`js/looped-network.js:22550-22554`, `:23356-23380`): there is already a per-table
+visible cue, and it already sits in the right place. `paneFilterBanner()` renders a line ABOVE the
+rows — "Filtered by {q}. Showing {n} of {all}." — plus a "Show all" clear button, every time the
+table is drawn. The comment at 22550-54 states the reasoning that got this right the first time:
+a filtered table "SAYS what it is filtered by... above the rows, with the way out beside it,"
+because a view that hides rows silently is the whole risk. That is the correct instrument — state
+of a per-object property shown ON the object, not on a control somewhere else — and Tom's proposed
+toggle would abandon it for no gain.
+
+**Reading:** the vanish is not really a "which mode" bug, it is a "no warning at the moment of
+loss" bug. The banner already tells you AFTER the fact that you're seeing 3 of 12; it never marks
+the row that just left. A toggle next to the Filter in table button does not fix that — it sits far
+from the row, and by Tom's own proposal it "sleeps on close" of the Find box, i.e., it goes out of
+view at exactly the time (continued editing, Find box closed) a stray edit would cause the silent
+vanish he is complaining about. Putting the state on a distant, foldable control is the identical
+hierarchy mistake as the menu bar this seat was hired over: the fact that matters is displaced from
+the place the reader is looking when it becomes true.
+
+**Recommendation (ranked #1 in wishlist):** no new toggle, no new control. Change the FILTER
+ITSELF to snapshot-by-default, matching the Recalculate convention already in force for this exact
+page: an edit that breaks a match keeps the row visible (dimmed or otherwise marked, reusing
+whatever visual language Verdict/marker rows already use — CLAUDE.md's "leads with ✓ or ⚠" is the
+wrong symbol here but the same "the row itself carries the fact" instinct is right) until the query
+is re-run — clicking Filter in table again, or the existing "Show all" control, which could gain a
+sibling "Refresh filter" action. This costs zero new controls and zero new translated strings if the
+existing banner text is reused/extended; it costs one small behavior change in `paneFilterKeys()`
+(a filter list that was already computed once, retained, and re-diffed rather than recomputed fresh
+every redraw) plus a row-level "no longer matches" mark, which is the only genuinely new pixel.
+
+If Tom still wants an escape hatch for "no, I want it to actually vanish, ruthlessly, live" — that
+control belongs on the SAME banner, not the button, worded as a per-table property exactly like the
+filter query itself already is (`paneFilters[id]`), because the filter's liveness is a fact about
+THAT filter, not a global session setting, and a compound query can reach several tables at once
+(`applyTableFilter()`, `js/looped-network.js:19056-19071|`) that a single button-side toggle could
+not speak for individually.
+
+Provenance: OBSERVED for all code citations above. SPECULATION for the "reuse Verdict-style marker
+language" suggestion — no existing dimmed/no-longer-matches row style was found in this codebase to
+point to; this is my own inference from the suite's marker-string convention, not a found precedent.

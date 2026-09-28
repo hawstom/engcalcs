@@ -45,7 +45,7 @@ define('REPO_ROOT', realpath(__DIR__ . '/../..'));
 // The vocabulary, straight from CLAUDE.md's tag table. A value outside this list is a finding all by
 // itself: tags are shorthand that resolve to a full instruction defined in one place, so prose in
 // the slot means the instruction was never written down and the translator is guessing at it.
-const LAYOUT_VALUES = ['column heading', 'unit token', 'nav item', 'button'];
+const LAYOUT_VALUES = ['column heading', 'unit token', 'nav item', 'button', 'sub-heading'];
 const KNOWN_TAGS    = ['layout', 'avoid', 'symbol', 'gloss', 'runtime'];
 
 exit(main($argv));

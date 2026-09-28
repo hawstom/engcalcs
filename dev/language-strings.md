@@ -390,6 +390,7 @@ Commentary uses this tag vocabulary (`tag: value`, `; `-separated; some are bare
 | `layout` | `unit token` | Renders inside a narrow units selector; keep the token as short as the language allows. |
 | `layout` | `nav item` | Renders as a top-level item in a HORIZONTAL BAR, competing for width with every sibling; prefer the shortest synonym. **A row inside a pull-down is NOT a nav item** — a pop-up sizes to its own widest row and competes with nothing. |
 | `layout` | `button` | A button label competing for width with siblings; short and imperative. |
+| `layout` | `sub-heading` | A heading over a group of controls, not a command or an option; a noun phrase, never an imperative. |
 | `avoid` | *(wrong sense)* | Must not be read or translated in the named sense. |
 | `symbol` | *(flag)* | Contains a variable symbol; keep every letter and subscript exactly as in English in every language, including RTL. Subscripted names are symbols, not words. |
 | `gloss` | *(term)* | Defer to that `glossary.json` term; do not restate it inline. |

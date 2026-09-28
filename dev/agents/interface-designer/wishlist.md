@@ -471,3 +471,14 @@ Ctrl+Enter in numbers worth measuring, the "Table keyboard shortcuts" Notes row 
 a one-line hint that appears the FIRST time a person opens a multi-cell selection in this pane — but
 that is a new instrument, and Tom's own finding on the Hide-titles highlight is a reason to be
 skeptical it would work. Not proposing it now; no evidence it's needed.)
+
+48. **Make the Tables-pane filter a snapshot-by-default, like Recalculate, instead of adding a
+    toggle beside the Filter in table button.** An edited row that no longer matches should stay
+    visible, marked, until the filter is re-applied or cleared — not vanish silently, and not gain
+    a second always-live/snapshot control off in the Find box that sleeps on close. The existing
+    per-table banner (`paneFilterBanner()`, `js/looped-network.js:23363-23380`) is already the
+    right place for filter state; extend it rather than add chrome beside the button. Zero new
+    controls if the existing "Show all" button gains a "Refresh filter" sibling; one small behavior
+    change in `paneFilterKeys()`/`paneTableElements()` to retain rather than recompute the match
+    set on every redraw, plus a "no longer matches" row mark (visual language TBD, no precedent
+    found in this codebase). See journal, 2026-09-28 (Task 738).
