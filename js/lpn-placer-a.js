@@ -24,8 +24,8 @@ const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
 	row: 4,               // each value row given up
 	hide: 10,             // on top of the rows, for hiding the whole label
-	lblPipe: 3,           // a label on a pipe
-	ldrPipe: 2,           // a leader across a pipe
+	lblPipe: 8,           // a label on a pipe
+	ldrPipe: 3,           // a leader across a pipe
 	lblLdr: 20,           // a label on a leader
 	ldrLdr: 24,           // a leader across a leader
 	lblTextLdr: 20
@@ -886,7 +886,7 @@ function run(scene, prev, gaps) {
 		const sh = shape(f, rows, pl.layout || f.req.layout);
 		const leader = pl.leader ? pl.leader.map(function (p) { return [p[0] + dx, p[1] + dy]; }) : null;
 		if (leader && f.link && distToLink(leader[0], f.link) > 0.8) { return null; }
-		if (leader && f.node && Math.hypot(leader[0][0] - f.pt[0], leader[0][1] - f.pt[1]) > Math.max(f.sym.w, f.sym.h) / 2) { return null; }
+		if (leader && f.node && Math.hypot(leader[0][0] - f.pt[0], leader[0][1] - f.pt[1]) > Math.max(f.sym.w, f.sym.h) / 2 + 0.9) { return null; }
 		const lead = leader ? distCost(Math.hypot(leader[1][0] - leader[0][0], leader[1][1] - leader[0][1]) / RH) : 0;
 		return { x: pl.x + dx, y: pl.y + dy, align: pl.align || 'left', angle: pl.angle || 0, sh: sh, leader: leader,
 			base: W.row * (f.R - rows.length) + lead, lead: lead };
@@ -901,7 +901,7 @@ function run(scene, prev, gaps) {
 		const p = placed[f.li];
 		if (!p) { return; }
 		const c0 = p.cand, n0 = c0.sh.rows.length;
-		if (c0.align === 'center') { return; }
+		if (c0.align === 'center' || c0.angle) { return; }
 		for (let k = 0; k < f.subsets.length; k++) {
 			const rows = f.subsets[k];
 			if (rows.length <= n0) { break; }
