@@ -496,6 +496,14 @@ EngCalcs.lpnPlacerC = (function () {
 				var cost = judge(st, L, st.probe, cap);
 				if (cost < cap) { st.probe.cost = cost; commit(st, L, keep(st.probe)); }
 			});
+			// 1b. HOME (R1, R7): a kept label out on a leader, or out of its usual shape, goes
+			// back beside its owner as soon as there is room there for the same rows.
+			order.forEach(function (L) {
+				var c0 = L.cur;
+				if (!c0 || (!c0.ns && c0.layout === L.usual)) { return; }
+				uncommit(st, L);
+				commit(st, L, bestFor(st, L, c0.rs, c0.cost - PREV_BONUS, 40, true) || c0);
+			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
 				if (!L.cur) { commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, effort.show)); }
@@ -616,12 +624,12 @@ EngCalcs.lpnPlacerC = (function () {
 				usual: req.layout === 'line' ? 'line' : 'stack', cur: null, items: [], dimC: [[], []], sc: [] };
 			if (req.kind === 'link' && links[req.owner] && links[req.owner].points.length > 1) {
 				var lk = links[req.owner], poly = polyOf(lk.points);
-				var na = nearestOn(poly, req.anchor.x, req.anchor.y), pa = pointAt(poly, na.s);
+				var pa = pointAt(poly, homeArc(poly, nearestOn(poly, req.anchor.x, req.anchor.y).s, st.vp));
 				var pad = function (id) {
 					var n = nodes[id];
 					return n ? Math.max(n.symbol.w, n.symbol.h) / 2 + GAP + 1 : GAP;
 				};
-				L.owner = { t: 'link', linkId: lk.id, poly: poly, sA: na.s, P: pa, pad0: pad(lk.from), pad1: pad(lk.to) };
+				L.owner = { t: 'link', linkId: lk.id, poly: poly, sA: pa.s, P: pa, pad0: pad(lk.from), pad1: pad(lk.to) };
 				L.specs = cachedSpecs(L, 'l' + Math.round(Math.atan2(pa.dy, pa.dx) * 90 / Math.PI), function () { return linkSpecs(L); });
 			} else {
 				var o;
@@ -639,6 +647,19 @@ EngCalcs.lpnPlacerC = (function () {
 				L.specs = cachedSpecs(L, 'n' + pd.map(Math.round).join(','), function () { return pointSpecs(L, pd); });
 			}
 			return L;
+		}
+		// Where along its pipe a pipe label is at home: the middle of the pipe (its anchor) when
+		// that is well inside the view, else the middle of the longest stretch of the pipe that is.
+		function homeArc(poly, sMid, vp) {
+			var m = 12, r = { x0: vp.x0 + m, y0: vp.y0 + m, x1: vp.x1 - m, y1: vp.y1 - m }, best = null, p = poly.pts;
+			for (var j = 1; j < p.length; j++) {
+				var seg = [p[j - 1][0], p[j - 1][1], p[j][0], p[j][1]], cl = clipSeg(seg, r), L = poly.cum[j] - poly.cum[j - 1];
+				if (!cl || !L) { continue; }
+				var a = poly.cum[j - 1] + Math.hypot(cl[0] - seg[0], cl[1] - seg[1]), b = poly.cum[j - 1] + Math.hypot(cl[2] - seg[0], cl[3] - seg[1]);
+				if (sMid >= a && sMid <= b) { return sMid; }
+				if (best && Math.abs(best[1] - a) < 0.01) { best[1] = b; } else if (!best || b - a > best[1] - best[0]) { best = [a, b]; }
+			}
+			return best ? (best[0] + best[1]) / 2 : sMid;
 		}
 		// A label's spec list depends only on the shape of the pipes at its owner, which a pan or
 		// zoom does not change: kept across views (H-b), rebuilt when the network changes (R13).
@@ -1018,9 +1039,9 @@ EngCalcs.lpnPlacerC = (function () {
 		// The cheapest legal spot for label L showing rowset rsI, or null. Specs are tried in
 		// order of their own cost; once that alone reaches the best found, nothing cheaper is left.
 		// What a spec costs against the fixed map is remembered for the rest of the view.
-		function bestFor(st, L, rsI, bound, maxTries) {
+		function bestFor(st, L, rsI, bound, maxTries, homeOnly) {
 			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, sv;
-			if (L.prevPl && fillPrev(st, L, rsI, c)) {
+			if (L.prevPl && !homeOnly && fillPrev(st, L, rsI, c)) {
 				// Its bonus buys it preference, never the right to cost more than the bound.
 				cost = judge(st, L, c, Math.min(bestCost, bound + PREV_BONUS));
 				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
@@ -1032,6 +1053,7 @@ EngCalcs.lpnPlacerC = (function () {
 				if (st.effort.deadline && (i & 31) === 31 && now() > st.effort.deadline) { st.late = true; break; }
 				sv = sc[i];
 				if (sv >= bestCost) { continue; }            // known illegal, or too dear already
+				if (homeOnly && (specs[i].t === 'ldr' || specs[i].layout !== L.usual)) { continue; }
 				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
 				if (maxTries && ++tries > maxTries) { break; }
 				if (sv !== sv) { sv = sc[i] = staticCost(st, L, c); if (sv >= bestCost) { continue; } }
