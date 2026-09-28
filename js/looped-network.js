@@ -369,6 +369,7 @@ var EngCalcs = EngCalcs || {};
 	// buildNodeEls(), updateNode() and refreshLabelText().
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
+		if (placerActive()) { placerRedrawOne('n:' + id, ne); return; }   // dev only, ?placer=
 		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, through
 		// the same visibility seam a too-short link label uses. `visibility` rather than `display`:
 		// the element keeps its box, so nothing downstream re-measures what is merely invisible.
@@ -1371,6 +1372,7 @@ var EngCalcs = EngCalcs || {};
 	// is how many copies of a label a long pipe carries.
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
+		if (placerActive()) { placerRedrawOne('l:' + id, le, id); return; }   // dev only, ?placer=
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
 		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
@@ -5808,6 +5810,8 @@ var EngCalcs = EngCalcs || {};
 		// While it is DETACHED it must not move on the screen at all, which takes an equal and
 		// opposite transform on its own group, and a re-derivation once the gesture settles.
 		georefDetachTick();
+		// A contract placer (dev only, ?placer=) waits for the view to settle: rule T1.
+		if (placerActive()) { placerViewMoved(); }
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
@@ -52891,6 +52895,277 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { applyScenarioMarks(n); });
 		doc.links.forEach(function (l) { applyScenarioMarks(l); });
 	}
+	// ---- DEV ONLY: A CONTRACT PLACER DRIVES THE DATA LABELS (?placer=<name>) --------------------
+	//
+	// **THE SEAM FOR THE LABEL REBUILD** (dev/label-placement-rules.md). Two clean-room placers are
+	// written to the label bench's contract -- a pure function of one view, no DOM
+	// (dev/lpn-spike/label-bench/README.md, "The contract") -- and Tom compares them on the real map.
+	// On a development host, `?placer=<name>` makes Looped-Network.php load js/lpn-label-scene.js and
+	// js/lpn-placer-<name>.js; from then on every node and link data label is placed by that
+	// function and by nothing in this file. Without the parameter, and always in production,
+	// placerActive() is false and not one line below runs.
+	//
+	//   - THE SCENE is EngCalcs.lpnLabelScene.buildScene(), the one the bench's extract.js also
+	//     builds its scene files with, fed this page's own text measurement in the real font.
+	//   - THE LAYOUT is drawn with the labels' own <text>, leader <line> and grab shape, so it looks
+	//     like the app. The one standard hook is a second <line> cloned from the leader.
+	//   - T1: place() never runs while a pan or pinch is in the hand. Every view change arms a
+	//     settle; the zoom path's own debounced relayout (reshedNow()) is the settle for a wheel.
+	//   - T2: after each layout, idle(budget, {scene, opening}) is called from requestIdleCallback
+	//     until a budget is spent: 3000 ms after a project's first layout (opening: true), 250 ms
+	//     after every later one. A gesture ends the chain.
+	//   - `prev` is the previous scene and layout of the same project; opening another project
+	//     calls create() again and starts from null.
+	var placerRt = null, placerSettleTimer = null, placerIdleHandle = null;
+	var PLACER_SETTLE_MS = 150, PLACER_IDLE_OPENING_MS = 3000, PLACER_IDLE_VIEW_MS = 250;
+	// Where the first row's BASELINE sits below the top of the block a placer states, in ems: the
+	// bench's row box is the line pitch (1.2 em) and this is the arithmetic extract.js reads the
+	// shipped page's layout back with (top = baseline - 0.85 em), so the two frames agree.
+	var PLACER_BASELINE_EM = 0.85;
+	function placerActive() {
+		var E = EngCalcs;
+		return !!(svg && E.debugMode && E.lpnPlacerName && E.lpnPlacers && E.lpnPlacers[E.lpnPlacerName]
+			&& E.lpnLabelScene);
+	}
+	function placerGestureActive() { return !!(drag && (drag.type === 'pan' || drag.type === 'pinch')); }
+	function placerRuntime() {
+		var key = String(library.openId || '');
+		if (placerRt && placerRt.project === key) { return placerRt; }
+		placerIdleStop();
+		var mod = EngCalcs.lpnPlacers[EngCalcs.lpnPlacerName];
+		placerRt = { project: key, placer: typeof mod.create === 'function' ? mod.create() : mod,
+			prev: null, placed: {}, step: 0, opening: true };
+		return placerRt;
+	}
+	// The accessor object buildScene() reads the page through: the same names extract.js injects.
+	function placerHost() {
+		return {
+			state: function () { return state; }, getDoc: function () { return doc; },
+			settings: function () { return settings; }, labelSettings: function () { return labelSettings; },
+			nodeEls: function () { return nodeEls; }, linkEls: function () { return linkEls; },
+			nodeAt: nodeAt, nodeRadius: nodeRadius, linkPointList: linkPointList,
+			linkLabelMid: function (l) { return linkLabelMid(l); }, pumpSymbolSize: pumpSymbolSize,
+			labelSeparator: labelSeparator
+		};
+	}
+	// Every row string measured in the REAL font, in view pixels, through the page's own tape
+	// measure and its cache: all probes written, then all read, so the batch costs one layout.
+	// **THE ADVANCE, getComputedTextLength(), AS noteRowWidths() READS A ROW** -- not getBBox(),
+	// whose ink box drops a separator's blank space and the side bearings, so a one-line pipe label
+	// summed from its rows came out several pixels short of what is drawn.
+	function placerMeasureAll() {
+		var fsW = effectiveFontSize(), s = state.s || 1, out = {}, probes = [];
+		function want(str) {
+			if (!str || out[str] !== undefined) { return; }
+			out[str] = 0;
+			var p = annotationEl('text', { 'class': 'lpn-lbl lpn-placer-probe', style: 'font-size:' + fsW + 'px;visibility:hidden' }, labelsLayer);
+			p.textContent = str;
+			probes.push({ el: p, str: str });
+		}
+		// A SEPARATOR IS MEASURED BETWEEN TWO LETTERS: a text of blank space alone is collapsed
+		// to nothing and measures 0, while between two values it is drawn at its full width.
+		var sep = labelSeparator(), sepPair = 'x' + sep + 'x';
+		want('xx'); want(sepPair);
+		[nodeEls, linkEls].forEach(function (els) {
+			Object.keys(els).forEach(function (id) {
+				(els[id].allLines || []).forEach(function (ln) { want(String(ln.text)); });
+			});
+		});
+		probes.forEach(function (pr) {
+			var w = 0;
+			try { w = measuredTextWidth(pr.el, pr.str, fsW, function () { return pr.el.getComputedTextLength(); }); } catch (err) { w = 0; }
+			out[pr.str] = w * s;
+		});
+		probes.forEach(function (pr) { pr.el.remove(); });
+		if (sep) { out[sep] = Math.max(0, (out[sepPair] || 0) - (out.xx || 0)); }
+		return out;
+	}
+	// One placement, from view pixels at the view it was made for into WORLD units, which is what
+	// the labels are drawn in: a pan or a zoom then carries it with the map until the next layout.
+	function placerToWorld(req, pl, scene) {
+		var s = state.s || 1, tx = state.tx, ty = state.ty, sep = scene.text.separatorW;
+		var idx = (pl.rows || []).filter(function (i) { return req.rows[i]; }),
+			layout = pl.layout || req.layout, rs = idx.map(function (i) { return req.rows[i]; }), w, h;
+		if (layout === 'line') {
+			w = rs.reduce(function (a, r) { return a + r.w; }, 0) + Math.max(0, rs.length - 1) * sep;
+			h = Math.max.apply(null, rs.map(function (r) { return r.h; }).concat([0]));
+		} else {
+			w = Math.max.apply(null, rs.map(function (r) { return r.w; }).concat([0]));
+			h = rs.reduce(function (a, r) { return a + r.h; }, 0);
+		}
+		return { rows: idx, layout: layout, align: pl.align || 'left', angle: +pl.angle || 0,
+			x: (pl.x - tx) / s, y: (pl.y - ty) / s, w: w / s, h: h / s,
+			leader: Array.isArray(pl.leader) && pl.leader.length >= 2 ? pl.leader.map(function (p) {
+				return [(p[0] - tx) / s, (p[1] - ty) / s];
+			}) : null };
+	}
+	// The three halves of drawing one label, split so a whole layout writes every label, then
+	// measures every label, then positions every label: one forced layout for the lot.
+	function placerWrite(holder, p, linkId) {
+		var all = holder.allLines || [], lines = p.rows.map(function (i) { return all[i]; }).filter(Boolean);
+		var rows = composeRows(lines, p.layout === 'stack');
+		setMultilineText(holder.text, p.x, rows);
+		holder.text.style.fontSize = effectiveFontSize() + 'px';
+		holder.lines = lines;
+		holder.lineCount = rows.length;
+		if (linkId !== undefined) {
+			ensureLabelRepeats(holder, 0, linkId);   // one copy: a repeat is the placer's to state
+			holder.rows = rows;
+			holder.rowsSeq = (holder.rowsSeq || 0) + 1;
+		}
+	}
+	function placerPosition(holder, p) {
+		var t = holder.text, fs = effectiveFontSize();
+		var anchor = p.align === 'right' ? 'end' : (p.align === 'center' ? 'middle' : 'start'),
+			ax = p.align === 'right' ? p.x + p.w : (p.align === 'center' ? p.x + p.w / 2 : p.x);
+		t.setAttribute('text-anchor', anchor);
+		if (p.angle) {
+			t.setAttribute('transform', 'rotate(' + p.angle + ' ' + (p.x + p.w / 2) + ' ' + (p.y + p.h / 2) + ')');
+		} else { t.removeAttribute('transform'); }
+		repositionMultilineText(t, ax, p.y + fs * PLACER_BASELINE_EM);
+		setLabelAssemblyHidden(holder, false);
+		placerLeader(holder, p.leader);
+	}
+	function placerLeader(holder, L) {
+		var ld = holder.leader, hook = holder.placerHook;
+		if (!ld) { return; }
+		if (!L) {
+			ld.style.display = 'none';
+			if (hook) { hook.style.display = 'none'; }
+			return;
+		}
+		ld.style.display = '';
+		ld.setAttribute('x1', L[0][0]); ld.setAttribute('y1', L[0][1]);
+		ld.setAttribute('x2', L[1][0]); ld.setAttribute('y2', L[1][1]);
+		if (L.length < 3) { if (hook) { hook.style.display = 'none'; } return; }
+		if (!hook) {
+			hook = holder.placerHook = ld.cloneNode(false);
+			ld.parentNode.insertBefore(hook, ld.nextSibling);
+		}
+		hook.style.display = '';
+		hook.style.visibility = ld.style.visibility;
+		hook.setAttribute('x1', L[1][0]); hook.setAttribute('y1', L[1][1]);
+		hook.setAttribute('x2', L[2][0]); hook.setAttribute('y2', L[2][1]);
+	}
+	function placerHide(holder) {
+		setLabelAssemblyHidden(holder, true);
+		if (holder.leader) { holder.leader.style.display = 'none'; }
+		if (holder.placerHook) { holder.placerHook.style.display = 'none'; }
+	}
+	// Every node and link label: its placement, or hidden. An owner off the screen was not asked
+	// about, so it is hidden too -- nobody can see it, and the next layout asks again.
+	function placerDrawAll() {
+		var jobs = [], placed = placerRt ? placerRt.placed : {};
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (!ne) { return; }
+			var p = placed['n:' + n.id];
+			if (!p || ne.empty) { placerHide(ne); return; }
+			jobs.push({ h: ne, p: p });
+			placerWrite(ne, p);
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (!le) { return; }
+			var p = placed['l:' + l.id];
+			if (!p || le.empty) { ensureLabelRepeats(le, 0, l.id); placerHide(le); return; }
+			jobs.push({ h: le, p: p });
+			placerWrite(le, p, l.id);
+		});
+		jobs.forEach(function (j) { measureLabelWidths(j.h); });
+		jobs.forEach(function (j) { placerPosition(j.h, j.p); });
+	}
+	// One label again from the layout already made -- for the paths that lay out a single label
+	// (a content edit, a label drag frame, an element built). No placement yet means hidden.
+	function placerRedrawOne(key, holder, linkId) {
+		var p = placerRt && placerRt.placed[key];
+		if (!p || holder.empty) {
+			if (linkId !== undefined) { ensureLabelRepeats(holder, 0, linkId); }
+			placerHide(holder);
+			return;
+		}
+		placerWrite(holder, p, linkId);
+		measureLabelWidths(holder);
+		placerPosition(holder, p);
+	}
+	// relayoutLabels() hands over here when a placer is active. T1: never inside a pan or a pinch.
+	function placerRelayout() {
+		if (placerSettleTimer) { clearTimeout(placerSettleTimer); placerSettleTimer = null; }
+		if (placerGestureActive()) { placerScheduleSettle(); return; }
+		placerIdleStop();
+		var rt = placerRuntime(), name = EngCalcs.lpnPlacerName, scene, res, t0, ms, obs;
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			obs = staticObstacles();
+			var widths = placerMeasureAll();
+			scene = EngCalcs.lpnLabelScene.buildScene(placerHost(), {
+				id: rt.project + '@' + rt.step, set: rt.project, step: rt.step, source: rt.project,
+				canvas: { w: svg.clientWidth, h: svg.clientHeight }, obs: obs,
+				measure: function (str) { return widths[str] !== undefined ? widths[str] : 0; }
+			}).scene;
+			t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+			try {
+				res = rt.placer.place(scene, { prev: rt.prev }) || {};
+			} catch (err) {
+				if (typeof console !== 'undefined') { console.error('label placer "' + name + '" threw', err); }
+				res = null;
+			}
+			ms = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - t0;
+			if (res) {
+				var labels = res.labels || {};
+				rt.placed = {};
+				scene.labels.forEach(function (req) {
+					var pl = labels[req.id];
+					if (pl && pl.shown) { rt.placed[req.id] = placerToWorld(req, pl, scene); }
+				});
+				rt.prev = { scene: scene, layout: res };
+				rt.step++;
+				placerDrawAll();
+			}
+			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			layoutCustomerLabels(obs);
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		// What the last layout was, for dev/lpn-spike/label-placer-seam-harness.js and a console.
+		EngCalcs.lpnPlacerLast = { name: name, scene: scene, layout: res, ms: ms, step: rt.step };
+		if (res) { placerIdleStart(rt, scene); }
+	}
+	// Every pan and zoom arrives at setTransform(), which calls this: the idle chain stops (T1, the
+	// view is moving) and a settle is armed, re-armed for as long as a pan or pinch is in the hand.
+	function placerViewMoved() {
+		placerIdleStop();
+		placerScheduleSettle();
+	}
+	function placerScheduleSettle() {
+		if (placerSettleTimer) { clearTimeout(placerSettleTimer); }
+		placerSettleTimer = setTimeout(function () {
+			placerSettleTimer = null;
+			if (placerGestureActive()) { placerScheduleSettle(); return; }
+			relayoutLabels();
+		}, PLACER_SETTLE_MS);
+	}
+	function placerIdleStop() {
+		if (placerIdleHandle !== null && typeof cancelIdleCallback === 'function') { cancelIdleCallback(placerIdleHandle); }
+		placerIdleHandle = null;
+	}
+	function placerIdleStart(rt, scene) {
+		if (typeof rt.placer.idle !== 'function' || typeof requestIdleCallback !== 'function') { return; }
+		var opening = rt.opening, left = opening ? PLACER_IDLE_OPENING_MS : PLACER_IDLE_VIEW_MS;
+		rt.opening = false;
+		function tick(deadline) {
+			placerIdleHandle = null;
+			if (placerRt !== rt || placerGestureActive()) { return; }
+			var budget = Math.min(left, deadline.timeRemaining());
+			if (budget >= 1) {
+				var t0 = performance.now();
+				try { rt.placer.idle(budget, { scene: scene, opening: opening }); } catch (err) {
+					if (typeof console !== 'undefined') { console.error('label placer idle() threw', err); }
+					return;
+				}
+				left -= Math.max(1, performance.now() - t0);
+			}
+			if (left > 0) { placerIdleHandle = requestIdleCallback(tick); }
+		}
+		placerIdleHandle = requestIdleCallback(tick);
+	}
 	// The layout half of refreshLabelText(), without rebuilding any text. Split out so a DRAG can
 	// call it on every frame: moving one label changes what every other label collides with, but
 	// none of the NUMBERS change while dragging. Safe to call repeatedly because the collision pass
@@ -52942,6 +53217,8 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		lastLayoutScale = state.s;
+		// A contract placer (dev only, ?placer=) owns every node and link label; see placerActive().
+		if (placerActive()) { placerRelayout(); return; }
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
