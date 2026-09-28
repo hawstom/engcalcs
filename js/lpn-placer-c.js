@@ -839,20 +839,44 @@ EngCalcs.lpnPlacerC = (function () {
 				return false;
 			}
 		}
+		// The bounding box of a candidate's block and leader together: one grid query each.
+		function ubbOf(c) {
+			var u = c.ubb || (c.ubb = { x0: 0, y0: 0, x1: 0, y1: 0 }), b = c.blk;
+			u.x0 = b.x0; u.y0 = b.y0; u.x1 = b.x1; u.y1 = b.y1;
+			for (var j = 0; j < c.ns; j++) {
+				var q = c.segs[j].bb;
+				if (q.x0 < u.x0) { u.x0 = q.x0; } if (q.y0 < u.y0) { u.y0 = q.y0; }
+				if (q.x1 > u.x1) { u.x1 = q.x1; } if (q.y1 > u.y1) { u.y1 = q.y1; }
+			}
+			return u;
+		}
+		function inkOn(c, ob, tol) {
+			if (!bbHit(c.blk, ob) || !obOverlap(c.blk, ob, tol)) { return false; }
+			if (c.single) { return true; }
+			for (var i = 0; i < c.nb; i++) { if (obOverlap(c.boxes[i], ob, tol)) { return true; } }
+			return false;
+		}
+		function inkOnSeg(c, s) {
+			if (!(s.bb.x0 <= c.blk.x1 && c.blk.x0 <= s.bb.x1 && s.bb.y0 <= c.blk.y1 && c.blk.y0 <= s.bb.y1)) { return false; }
+			for (var i = 0; i < c.nb; i++) { if (segHitsOB(s[0], s[1], s[2], s[3], c.boxes[i], 1)) { return true; } }
+			return false;
+		}
 		// The part of a candidate's cost that depends only on the fixed map.
 		function staticCost(st, L, c) {
-			var vp = st.vp, i, j, k, arr, it, s, b;
+			var vp = st.vp, i, j, k, arr, it, s;
 			st.work++;
 			if (c.blk.x0 < vp.x0 || c.blk.y0 < vp.y0 || c.blk.x1 > vp.x1 || c.blk.y1 > vp.y1) { return Infinity; }
-			if (inkHits(st, L, c, st.hg, st.hr)) { return Infinity; }
-			var ownNode = L.owner.nodeId, ownLink = L.owner.linkId, cost = c.base;
-			// Leaders: never through another node's symbol (N3); through a pump, valve or Text
-			// object at a cost.
-			for (j = 0; j < c.ns; j++) {
-				s = c.segs[j];
-				arr = st.hg.collect(s.bb, st.buf);
-				for (k = 0; k < arr.length; k++) {
-					it = arr[k];
+			for (i = 0; i < c.nb; i++) { if (st.hr.solidUnder(c.boxes[i])) { return Infinity; } }
+			var ownNode = L.owner.nodeId, ownLink = L.owner.linkId, cost = c.base, u = ubbOf(c);
+			// Symbols and Text objects: never under the ink (N1, N5), never a node's symbol under
+			// a leader (N3); a pump, valve or Text object under a leader at a cost.
+			arr = st.hg.collect(u, st.buf);
+			for (k = 0; k < arr.length; k++) {
+				it = arr[k];
+				if (inkOn(c, it.ob, 0)) { return Infinity; }
+				for (j = 0; j < c.ns; j++) {
+					s = c.segs[j];
+					if (!bbHit(s.bb, it.ob)) { continue; }
 					if (it.k === SYM) {
 						if (it.own !== ownNode && segHitsOB(s[0], s[1], s[2], s[3], it.raw, -0.5)) { return Infinity; }
 					} else if (segHitsOB(s[0], s[1], s[2], s[3], it.ob, 0)) {
@@ -860,39 +884,27 @@ EngCalcs.lpnPlacerC = (function () {
 					}
 				}
 			}
-			// Ink on pipes, arrows and Text callouts.
-			arr = st.sg.collect(c.blk, st.buf);
+			// Pipes, arrows and Text callouts: under the ink, and across the leader.
+			arr = st.sg.collect(u, st.buf);
 			if (arr.length) {
-				var seen = st.seen, own = false;
-				seen.length = 0;
-				for (i = 0; i < c.nb; i++) {
-					b = c.boxes[i];
-					if (c.nb > 1) { arr = st.sg.collect(b, st.buf); }
-					for (k = 0; k < arr.length; k++) {
-						it = arr[k];
-						if (it.k === ARROW) {
-							if (seen.indexOf(it) < 0 && obOverlap(b, it.ob, 0.5)) { seen.push(it); cost += COST.LBL_ARROW; }
-						} else if (it.own === ownLink) {
-							if (!own && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) { own = true; cost += COST.OWN_PIPE; }
-						} else if (seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) {
-							seen.push(it.own); cost += it.k === TLEAD ? COST.LBL_LDR : COST.LBL_PIPE;
-						}
+				var seen = st.seen, xs = st.seen2, own = false, start = c.segs[0];
+				seen.length = 0; xs.length = 0;
+				for (k = 0; k < arr.length; k++) {
+					it = arr[k];
+					if (it.k === ARROW) {
+						if (inkOn(c, it.ob, 0.5)) { cost += COST.LBL_ARROW; }
+						continue;
 					}
-				}
-			}
-			// Leaders across pipes and Text callouts.
-			if (c.ns) {
-				var xs = st.seen2, start = c.segs[0];
-				xs.length = 0;
-				for (j = 0; j < c.ns; j++) {
-					s = c.segs[j];
-					arr = st.sg.collect(s.bb, st.buf);
-					for (k = 0; k < arr.length; k++) {
-						it = arr[k];
-						if (it.k === ARROW || it.own === ownLink || xs.indexOf(it.own) >= 0) { continue; }
+					if (it.own === ownLink) {
+						if (!own && inkOnSeg(c, it.s)) { own = true; cost += COST.OWN_PIPE; }
+						continue;
+					}
+					if (seen.indexOf(it.own) < 0 && inkOnSeg(c, it.s)) { seen.push(it.own); cost += it.k === TLEAD ? COST.LBL_LDR : COST.LBL_PIPE; }
+					for (j = 0; j < c.ns; j++) {
+						s = c.segs[j];
+						if (xs.indexOf(it.own) >= 0 || !bbHit(s.bb, it.bb)) { continue; }
 						if (it.k === TLEAD) { if (leadersTouch(s, it.s)) { xs.push(it.own); cost += COST.LDR_LDR; } continue; }
-						if (!segsCross(s, it.s)) { continue; }
-						if (j > 0 || crossDist(start, it.s) > 1.5) { xs.push(it.own); cost += COST.LDR_PIPE; }
+						if (segsCross(s, it.s) && (j > 0 || crossDist(start, it.s) > 1.5)) { xs.push(it.own); cost += COST.LDR_PIPE; }
 					}
 				}
 			}
@@ -900,43 +912,28 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		// Everything else: the labels and leaders placed so far.
 		function dynCost(st, L, c, cost, bound) {
-			var id = L.id, g = st.dg, i, j, k, arr, it, b, s;
+			var id = L.id, i, j, k, arr, it, s;
 			for (i = 0; i < c.nb; i++) { if (st.dr.solidUnder(c.boxes[i])) { return Infinity; } }
-			arr = g.collect(c.blk, st.buf);
-			var anyLead = false, anyLabel = false;
+			arr = st.dg.collect(ubbOf(c), st.buf);
 			for (k = 0; k < arr.length; k++) {
 				it = arr[k];
+				if (it.k === LABEL && it.own !== id && inkOn(c, it.ob, LBL_TOL)) { return Infinity; }
+			}
+			var seen = st.seen, labs = st.seen2;
+			seen.length = 0; labs.length = 0;
+			for (k = 0; k < arr.length && cost < bound; k++) {
+				it = arr[k];
 				if (it.own === id) { continue; }
-				if (it.k === LEAD) { anyLead = true; } else if (!anyLabel && obOverlap(c.blk, it.ob, LBL_TOL)) { anyLabel = true; }
-			}
-			if (anyLabel && (c.single || inkHits(st, L, c, g, st.dr))) { return Infinity; }
-			var seen = st.seen;
-			seen.length = 0;
-			if (anyLead) {
-				for (i = 0; i < c.nb; i++) {
-					b = c.boxes[i];
-					arr = g.collect(b, st.buf);
-					for (k = 0; k < arr.length; k++) {
-						it = arr[k];
-						if (it.k === LEAD && it.own !== id && seen.indexOf(it.own) < 0 && segHitsOB(it.s[0], it.s[1], it.s[2], it.s[3], b, 1)) {
-							seen.push(it.own); cost += COST.LBL_LDR;
-						}
+				if (it.k === LEAD) {
+					if (seen.indexOf(it.own) < 0 && inkOnSeg(c, it.s)) { seen.push(it.own); cost += COST.LBL_LDR; }
+					for (j = 0; j < c.ns; j++) {
+						s = c.segs[j];
+						if (labs.indexOf(it) < 0 && bbHit(s.bb, { x0: it.bb.x0 - 2, y0: it.bb.y0 - 2, x1: it.bb.x1 + 2, y1: it.bb.y1 + 2 }) && leadersTouch(s, it.s)) { labs.push(it); cost += COST.LDR_LDR; }
 					}
-				}
-				if (cost >= bound) { return Infinity; }
-			}
-			if (c.ns) {
-				var labs = st.seen2;
-				labs.length = 0; seen.length = 0;
-				for (j = 0; j < c.ns; j++) {
-					s = c.segs[j];
-					arr = g.collect(s.bb, st.buf);
-					for (k = 0; k < arr.length; k++) {
-						it = arr[k];
-						if (it.own === id) { continue; }
-						if (it.k === LABEL) {
-							if (labs.indexOf(it.own) < 0 && segHitsOB(s[0], s[1], s[2], s[3], it.ob, 1)) { labs.push(it.own); cost += COST.LBL_LDR; }
-						} else if (seen.indexOf(it.own) < 0 && leadersTouch(s, it.s)) { seen.push(it.own); cost += COST.LDR_LDR; }
+				} else {
+					for (j = 0; j < c.ns; j++) {
+						s = c.segs[j];
+						if (labs.indexOf(it.own) < 0 && bbHit(s.bb, it.ob) && segHitsOB(s[0], s[1], s[2], s[3], it.ob, 1)) { labs.push(it.own); cost += COST.LBL_LDR; }
 					}
 				}
 			}
