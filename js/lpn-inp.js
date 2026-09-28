@@ -2371,6 +2371,8 @@
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
 	 *         .coordOverride(id)    {x, y} the ACTIVE SCENARIO moved this node to, or null
+	 *         .demandRows(node)     the ACTIVE SCENARIO's own demand list for this junction
+	 *                               ([{base, pattern, category, tok?}]), or null for the document's
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
 	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
 	 *         .title                [TITLE] text; default doc.project.name
@@ -2397,6 +2399,9 @@
 		 * in, so it goes straight into the row.
 		 */
 		var covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; };
+		// A scenario that owns a junction's whole demand list (R-369) hands it over here; null is
+		// the document's own rows, read by EngCalcs.lpnDemandRows() exactly as before.
+		var ovRowsOf = typeof opts.demandRows === 'function' ? opts.demandRows : function () { return null; };
 		var movedByScenario = [];
 		function isActive(el) {
 			var a = eff(el, 'active');
@@ -2603,12 +2608,18 @@
 				// what the junction says plus what its customers say, in one direction, with
 				// nothing the user typed rewritten by a symbol placed somewhere else.
 				var crows = custByNode[nd.id] || [];
-				var drows = EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0).concat(crows);
+				var ovRows = ovRowsOf(nd);
+				var drows = (ovRows
+					? ovRows.map(function (r) {
+						return { base: r.base, pattern: r.pattern || null, category: r.category || null, rec: r, key: 'base' };
+					})
+					: EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0)).concat(crows);
 				// **A JUNCTION WITH CUSTOMERS IS ITEMIZED WHETHER OR NOT IT WAS BEFORE**, because
 				// the [JUNCTIONS] demand column can hold exactly one number and there are now at
 				// least two. A junction with NO customers is untouched by this, which is what
 				// keeps every Net1/2/3 token identical (dev/lpn-spike/inp-export-harness.js).
-				if (EngCalcs.lpnDemandItemized(nd) || crows.length) {
+				if (EngCalcs.lpnDemandItemized(nd) || crows.length ||
+						(ovRows && (ovRows.length > 1 || ovRows[0].category))) {
 					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]) + descOf(nd));
 					for (j = 0; j < drows.length; j++) {
 						// The CATEGORY is a trailing comment, not a column -- see the reader's note
@@ -2624,8 +2635,8 @@
 				} else {
 					junctions.push(row([nd.id,
 						n(cHead, nd, 'elev', nd.elev || 0),
-						n(cFlow, nd, '_demand', drows[0].base || 0)].concat(
-						nd.demandPattern ? [String(nd.demandPattern)] : [])) + descOf(nd));
+						n(cFlow, drows[0].rec, drows[0].key, drows[0].base || 0)].concat(
+						drows[0].pattern ? [String(drows[0].pattern)] : [])) + descOf(nd));
 				}
 				var em = eff(nd, 'emitter');
 				if (em > 0) {

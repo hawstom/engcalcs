@@ -21,17 +21,29 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { scoreView, stability } = require('./score.js');
+const { scoreView, stability, zoomRowChange } = require('./score.js');
 
-// The crossing costs, worst to least (dev/label-placement-rules.md §3.1). Builders get the order
-// only, not Tom's numbers (his ruling of 2026-09-28) -- the weights themselves stay in score.js.
+// The crossing costs, worst to least (dev/label-placement-rules.md §3, "Costs, worst first").
+// Builders get the order only, not Tom's numbers (his ruling of 2026-09-28) -- the weights
+// themselves stay in score.js.
 const CROSSING_ORDER = ['leader on leader', 'label on leader', 'label on pipe', 'leader on pipe',
 	'label on customer (free)'];
+
+// R9's repeat spacing is set here, from the viewport, per dev/label-placement-rules.md §3.1: master's
+// own value is 0.75 x the shorter side of the visible map. The bench's scenes are all one fixed
+// canvas (1400x900), so this is one number for every scene -- filled in at load time rather than by
+// re-running extract.js's headless browser pass, which regenerating the committed scenes only for a
+// derived, constant field would not be worth.
+function withRepeatSpacing(scene) {
+	scene.text.repeatSpacingPx = 0.75 * Math.min(scene.viewport.w, scene.viewport.h);
+	return scene;
+}
 
 function loadSets(dir, only) {
 	return fs.readdirSync(dir).filter(function (f) { return /\.json$/.test(f); }).sort()
 		.map(function (f) { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); })
-		.filter(function (s) { return !only || only.indexOf(s.id) >= 0; });
+		.filter(function (s) { return !only || only.indexOf(s.id) >= 0; })
+		.map(function (s) { s.steps.forEach(withRepeatSpacing); return s; });
 }
 function loadPlacer(p) {
 	const mod = typeof p === 'string' ? require(path.resolve(p)) : p;
@@ -60,7 +72,10 @@ function runBench(placerPath, sets, opts) {
 			const ms = (layout && typeof layout.recordedMs === 'number') ? layout.recordedMs : nowMs() - t0;
 			const sc = scoreView(scene, layout);
 			const step = { id: scene.id, ms: ms, score: sc, layout: layout };
-			if (prev) { step.stability = stability(prev.scene, prev.layout, scene, layout); }
+			if (prev) {
+				step.stability = stability(prev.scene, prev.layout, scene, layout);
+				step.zoomIn = zoomRowChange(prev.scene, prev.layout, scene, layout);
+			}
 			rec.steps.push(step);
 			prev = { scene: scene, layout: layout };
 		});
@@ -88,34 +103,43 @@ function machine() {
 function printTable(results, log) {
 	log = log || console.log;
 	const cols = [['scene', 24, true], ['N1', 4], ['N3', 4], ['N4', 4], ['N5', 4], ['inv', 4], ['cost', 8],
-		['rows', 12], ['labels', 12], ['ldr med', 8], ['p90', 6], ['max', 6], ['unforced', 10], ['ms', 7]];
+		['rows', 12], ['labels', 12], ['ldr med', 8], ['p90', 6], ['max', 6], ['churn', 8], ['ms', 7]];
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
-		ldr: [], moved: 0, unforced: 0, compared: 0, ms: [] };
+		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
 			T.N1 += b.N1.length; T.N3 += b.N3.length; T.N4 += b.N4.length; T.N5 += b.N5.length; T.invalid += b.invalid.length;
 			T.cost += s.cost; T.rowsR += s.rowsReq; T.rowsS += s.rowsShown; T.labR += s.labelsReq; T.labS += s.labelsShown;
 			T.ldr = T.ldr.concat(s.leaderLH); T.ms.push(st.ms);
+			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
+			T.r9s += s.r9.should; T.r9h += s.r9.has;
 			const stab = st.stability;
-			if (stab) { T.moved += stab.moved; T.unforced += stab.unforced; T.compared += stab.compared; }
+			if (stab) { T.moved += stab.moved; T.churn += stab.churn; T.compared += stab.compared; }
+			if (st.zoomIn) { T.zoomRegained += st.zoomIn.regained; T.zoomLost += st.zoomIn.lost; }
 			log([pad(st.id, 24, true), pad(b.N1.length, 4), pad(b.N3.length, 4), pad(b.N4.length, 4), pad(b.N5.length, 4),
 				pad(b.invalid.length, 4), pad(s.cost.toFixed(1), 8),
 				pad(s.rowsShown + '/' + s.rowsReq, 12), pad(s.labelsShown + '/' + s.labelsReq, 12),
 				pad(f1(quant(s.leaderLH, 0.5)), 8), pad(f1(quant(s.leaderLH, 0.9)), 6), pad(f1(quant(s.leaderLH, 1)), 6),
-				pad(stab ? stab.unforced + '/' + stab.compared : '', 10), pad(st.ms.toFixed(1), 7)].join(' '));
+				pad(stab ? stab.churn + '/' + stab.compared : '', 8), pad(st.ms.toFixed(1), 7)].join(' '));
 		});
 	});
 	log([pad('TOTAL', 24, true), pad(T.N1, 4), pad(T.N3, 4), pad(T.N4, 4), pad(T.N5, 4), pad(T.invalid, 4),
 		pad(T.cost.toFixed(1), 8), pad(pct(T.rowsS, T.rowsR), 12), pad(pct(T.labS, T.labR), 12),
 		pad(f1(quant(T.ldr, 0.5)), 8), pad(f1(quant(T.ldr, 0.9)), 6), pad(f1(quant(T.ldr, 1)), 6),
-		pad(T.unforced + '/' + T.compared, 10), pad('', 7)].join(' '));
+		pad(T.churn + '/' + T.compared, 8), pad('', 7)].join(' '));
 	log('time per layout: median ' + f1(quant(T.ms, 0.5)) + ' ms, max ' + f1(quant(T.ms, 1)) + ' ms, on ' + machine());
 	const idle = results.reduce(function (a, s) { return a + s.idleMs; }, 0);
 	if (idle) { log('idle hook time (not in the layout times): ' + idle.toFixed(0) + ' ms over ' + results.length + ' set(s)'); }
 	log('crossing costs, worst to least: ' + CROSSING_ORDER.join(', ') + ' (weights are judges-only)');
-	log('leader length in label heights (the shown block\'s own height); unforced = moved/compared between consecutive views');
+	log('leader length in label heights (the shown block\'s own height); churn = moved/compared'
+		+ ' between consecutive views, where the move showed nothing more and fixed no break (no stillness rule)');
+	log('REPORTED, never failing -- R5 leader-side align: ' + T.r5m + '/' + T.r5c + ' stacked+leadered labels not'
+		+ ' justified to their leader\'s side; R7 label-on-own-pipe: ' + T.r7o + '/' + T.r7c + ' shown pipe labels sit on'
+		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
+		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps');
 	return T;
 }
 
@@ -141,8 +165,8 @@ function main() {
 				st.score.crossings.leaderOnLeader.forEach(function (m) {
 					console.log('  ' + st.id + ' leader on leader (cost, not a break): ' + m);
 				});
-				if (st.stability && st.stability.unforcedIds.length) {
-					console.log('  ' + st.id + ' moved unforced: ' + st.stability.unforcedIds.join(' '));
+				if (st.stability && st.stability.churnIds.length) {
+					console.log('  ' + st.id + ' churn: ' + st.stability.churnIds.join(' '));
 				}
 			});
 		});

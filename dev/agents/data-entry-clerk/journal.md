@@ -1586,3 +1586,90 @@ written into the repo — I was told not to write into the live tree this sessio
 → append to `dev/agents/data-entry-clerk/journal.md`.
 
 — Declan
+
+## Fourteenth invocation, 2026-09-27 — re-verifying Task 690 against master, and the next piece
+
+**Re-verification, all OBSERVED against `js/looped-network.js` on master, checked 2026-09-27** (not
+trusted from an earlier invocation's memory, since the orchestrator named several branches merged
+since my last count):
+
+- **Rectangular multi-cell selection, across rows AND columns, already ships.** `paneSelBox()`
+  (`:23556`) holds an anchor/focus pair and returns a rectangle; `paneSelSet()` (`:23570`) is the
+  writer, called with `extend=true` from Shift+Arrow inside `paneHandleKey()` (`:24568`, the
+  `ext = !!(e && e.shiftKey)` line near the top) and from a Shift+click/drag in `paneWireTable()`.
+  Ctrl+A selects the whole table (`:24676`). This closes three of the orchestrator's six named
+  candidates before any build starts.
+- **Ctrl+D fill-down already ships.** `paneFillDown()` (`:24536`), bound at `:24697` in
+  `paneHandleKey()` under `jump && (key === 'd' || key === 'D')`, intercepted BEFORE the browser's
+  own bookmark-editor binding (Tom, undated in that comment block: *"Ctrl+D on Pipes.From or To
+  opens the browser Bookmark editing... I did not know about Ctrl+D."*). It skips the ID column by
+  name, refuses a plain/read-only/computed cell the same way a keystroke would, and takes one undo
+  snapshot only when at least one settable column is in range. Documented in
+  `lib/lang.ec.en.php:2256` (`lpn_notes_7_def`), which I read as of this session and is the
+  authoritative list of what is shipped: Arrow keys, Tab/Enter, Shift+Tab/Shift+Enter,
+  Shift+arrow, Ctrl+C, Ctrl+D, Ctrl+A, Ctrl+Shift+V, Delete, F2, Esc. **No Ctrl+Enter, no fill-
+  right, no series fill are listed, and I found none in the handler.**
+- **Copy-one-cell-and-paste-into-a-selection already tiles the value across the whole selection**,
+  which covers most of what a naive "Ctrl+Enter" request is actually for. `panePasteAt()`
+  (`:24395`) computes `nRows`/`nCols` from `Math.max(box size, srcRows/srcCols)` and reads
+  `line[cIdx % srcCols]` / `cells[r % srcRows]` — a 1x1 clipboard against an N-cell selection wraps
+  by modulo, i.e. repeats. So "set roughness=100 for these 40 selected pipes" is already: type once,
+  Ctrl+C, select the 40, Ctrl+V. Four gestures, not one per row.
+- **A genuine, small, real gap: Tab and Enter always COLLAPSE a standing multi-cell selection to
+  the next single cell, they never cycle within it.** `paneHandleKey()`'s Enter branch
+  (`:24707`, `else if (key === 'Enter') { at = { r: r + (ext ? -1 : 1), c: c }; ext = false; }`)
+  hard-codes `ext = false` regardless of whether a box was already standing; the same happens on
+  focus change generally, in the `focusin` listener inside `paneWireTable()`
+  (`paneSelSet(spec, rows, cols, r, c, false)` — extend always false there too, guarded only by
+  the internal `_selMoving` flag our own code sets during a programmatic move, never by a
+  user-standing selection). Tab is not handled in `paneHandleKey()` at all (no `key === 'Tab'`
+  branch anywhere in that function — confirmed by grep), so it falls through to the browser's
+  native tab order, which then fires the same collapsing `focusin`. **Excel and Sheets do the
+  opposite: with a range pre-selected, typing into the active cell and pressing Enter or Tab moves
+  the active cell WITHIN the selection (down, then wrapping to the top of the next column) and
+  keeps the whole range highlighted** — this is well known Excel/Sheets behavior, not something I
+  am sourcing from a written spec this session; treat that one clause as **SPECULATION on precise
+  wrap semantics**, though the collapse-vs-persist fact on THIS page is OBSERVED, not guessed.
+- **Consequence for the clerk**: to use Ctrl+D or paste-tiling on a range, the range has to be
+  (re-)selected AFTER the value that seeds it is already committed in the model — you cannot select
+  the target rows first, type once into the top cell, and hit Ctrl+D or Ctrl+Enter in one pass,
+  because typing-then-Enter (the natural way to finish a value) already destroyed the selection.
+  This is a ONE-TIME cost per fill operation (reselect once), not a per-row cost — smaller in scale
+  than anything Task 610 or the paste-create work touched, but real and matches exactly the
+  orchestrator's own candidate "Ctrl+Enter to write one value into a whole selection," which is the
+  smallest genuinely-missing piece of the six candidates named.
+- I did not find a column-scoped Find and replace distinct from the page's general Find and replace
+  (`toggleFindPopup()` / `runReplacePreview()`, `:19798` / `:19474`) — that tool already operates on
+  a named property across the network or a filtered set, which is a different (and already
+  adequate) door onto the same need; I am not recommending it be duplicated inside the Tables pane.
+- Series fill (`J1, J2, J3...`) does not exist and I am ranking it last of the six candidates: it
+  only pays off on the rare row where a clerk is inventing IDs rather than copying them off a plan
+  set, and this page's own ID-collision handling (`validateNewId()`, cited in earlier invocations)
+  makes an auto-increment feel unsafe to build quickly — it would need its own collision story
+  before it saves anyone anything.
+
+**My ranking of the six named candidates, from this seat, today:**
+1. **Ctrl+Enter — write the active cell's value into every cell of a standing selection, without
+   collapsing it.** Smallest build, closes the one real gap identified above, and is the one
+   candidate that is not already covered by Ctrl+D or paste-tiling.
+2. Fill-right — real but low value on THIS page specifically: unlike a spreadsheet of undifferentiated
+   numbers, adjacent columns here are almost always different quantities (ID, length, diameter,
+   roughness), so "same value across a row" is a rare ask compared to "same value down a column,"
+   which Ctrl+D already serves.
+3. Series fill — real in general spreadsheet practice, weak fit here for the reason above (ID
+   collision risk, rare workflow on a plan-set-driven entry).
+4. Fill handle drag — explicitly out of scope this round; Tom's own words, "a separate build."
+5/6. Multi-cell rectangular selection and Find-and-replace-inside-a-column — already shipped /
+   already adequately served; no build needed.
+
+**Build spec for the top pick, Ctrl+Enter fill-into-selection**, given to the orchestrator this
+session (see report) and not written into the repo per the mid-task instruction to leave
+`/home/haws/webdev/hawsedc.com/engcalcs` untouched while a check suite runs there. The full spec is
+in this journal entry's companion report and in
+`/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/f64d0617-4ce8-4891-9895-1b26faec6024/scratchpad/declan-ctrl-enter-spec.md`.
+
+**What I did NOT do this session:** drive a real browser (none available), or verify Excel's own
+wrap-at-column-end semantics against a primary source — flagged SPECULATION above rather than
+CITED.
+
+— Declan

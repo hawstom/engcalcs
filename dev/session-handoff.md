@@ -8,8 +8,10 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/label-gang-search`,
-  `feat/ctrl-enter`, `feat/table-width`, `feat/epanet-plus-plus`, `feat/water-tower`.
+- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/table-width`,
+  `feat/fill-handle`, `feat/label-placer` (the seam; merges with the chosen placer), and
+  `feat/label-gang-search` (bench only now; delete once a placer lands). Builder branches
+  `feat/label-placer-a`, `-b`, `-c`, `-d` never merge on their own.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -94,51 +96,94 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-27 (night)
+## STATE — 2026-09-28 (evening)
 
-### Production is 83bf02d5 (Tom pulled 2026-09-26). Master 1a458e62 is ahead of it
+### Production = master 9c71d54f (Tom pulled 2026-09-28 morning)
 
-Unpulled on master: everything listed 09-27 evening, plus today symbology-label and quality-settings
-(his all-clears), the mode-button Esc fix (R-353) and a harness fix. **R-348: remind him to test
+Master is ahead, pushed through 3f7e7bae, with 329bf07a (R-369) and this handoff merged after it:
+Ctrl+Enter (Task 690), his 49 English rulings harvested, label rules round 2 + bench round 2,
+Wave 0 of the next sprint, roadmap closures 610/645/648/679, R-369. **R-348: remind him to test
 symbology on dev once he pulls.**
+
+### Label placement rebuild (Task 539) -- the live thread
+
+- Rules: `dev/label-placement-rules.md`. **Round 2 Part A (§1-§5) is his markup of 2026-09-28**, word
+  for word; Part B records what he deleted (S3, W2, no-churn R12) and why they stay deleted.
+  Page from round 1: https://claude.ai/artifact/HBdFNppA44NuwHjeKsi43N
+- Bench round 2 (on master): churn replaces "unforced" (a move that shows more is not churn), plus
+  reported R5/R7/R9/R11 scores. Judges' secret tests in `dev/lpn-spike/label-bench/judges/`; builders
+  must never be told about them. **The bench's `score.js` carries his numeric crossing weights and
+  was on the builders' reading list**, so "order only" leaked in both rounds. Move the weights into
+  `dev/lpn-spike/label-bench/judges/` before any round 3.
+- Round 2 pair, built from Part A only: **C (8132, `?placer=c`)** 79% labels / 49% values, 0 breaks,
+  no leader-on-leader; **D (8133, `?placer=d`)** 77% / 54%, 0 breaks, crossing cost below master's.
+  Master 45% / 25%. Both pass his two screenshot tests; **both FAIL R-075 again** (long IDs move 67% C,
+  66% D; round 1 61%/52%; master 13%). Without a stillness rule nothing asks them to hold, so R-075
+  is now a question for him: is it a rule he wants in Part A, or stays secret?
+- Perry found and we fixed, before he looks: both placer files never registered in
+  `EngCalcs.lpnPlacers`, so `?placer=` silently showed master's labels (the bench cannot see this;
+  the seam harness now fails such a file); and a hard wheel flick froze the map ~27 s (every notch
+  ran a layout; seam a5131fc4 defers to the settle; worst freeze now 0.3-0.6 s).
+- **Next: his side-by-side of C and D** (8132/8133; round 1 still on 8129/8130), then the choice, then
+  the winner is wired in (undo its `EC_UNREFERENCED_MODULES` line) and merged with the seam.
 
 ### Awaiting his browser pass or ruling
 
-- **8124 `feat/table-width`** (R-354, R-356) -- his width rule, centred ID, vertices `n/e|n/e`.
-  5ce78416. Perry found headings breaking mid-word anywhere; fixed (real font measurement, a soft
-  hyphen at the rule's own split, `anywhere` back to dragged columns only). Green; not cleared.
-- **8123 `feat/ctrl-enter`** d6558eb4 -- he asked for endorsement; Mary and Ida both endorse
-  (their journals 2026-09-27). Needs his merge word.
-- **`feat/epanet-plus-plus`** 1ca95ff5 (Task 697 B1, no preview port: the brand shows only on
-  that Host) -- the app served as EPANET++ at epanet-plus-plus.org/app/, own canonical. Green.
-  Held for RELEASE, per his "A for development. Release as B1." Host steps in the plan §6.
-- **8126 EPANET++ landing site** (Option A), `~/webdev/epanet-plus-plus.org` and
-  `~/webdev/epanetpp.org`: new local repos, NO GitHub remote yet (ask him). Every claim needs his
-  reading; the agent's list of claims beyond his hero copy is in the 09-27 report.
-- **`feat/water-tower`** (Tasks 679/648/645): a comparison page, `larger-tower-2026-09-27.html`
-  in the branch's own icon-preview folder, at
-  `~/webdev/worktrees/feat-water-tower/engcalcs/dev/icon-preview/larger-tower-2026-09-27.html`
-  (not web-served; open the file). Nothing shipped changes until he picks.
-- **Label placement (R-357..R-359): the branch is PAUSED for the interview**
-  https://claude.ai/artifact/PyZpPyHbpACHsu7fHVZEZJ -- read answers with ArtifactData list
-  `answers`, write them into a scope doc, then build per his Q01 answer. Do NOT keep repairing
-  feat/label-gang-search. His images never arrived (R-358).
+- **8124 `feat/table-width`** f57dedf5: R-366 (measured ~11% print shortfall, headroom only on
+  columns at risk, numeric ones included; wrap kept as the fallback so nothing overlaps) and R-367
+  (print read EPANET's stored word, FIFO, instead of the label, in every language: a bug, fixed).
+  Perry READY.
+- **8131 `feat/fill-handle`** 76716393 (+433b86f4): drag-to-fill in the tables. Perry READY with real
+  mouse and touch; up/left drags and filtered tables were proven only in the stub harness.
+- **2 English strings** (Ctrl+Enter): `lpn_pane_ctrlenter_filled` "Filled {n} cells. {skipped} were
+  not changed." and the new Ctrl+Enter row in `lpn_notes_7_def`.
+- **6 `$ec_lang_syn` proposals from Wave 0** (`dev/english-friction/2026-09-28-delta.json`, each entry's
+  `resolution` holds the exact line). AI may not write them without his written yes. **The sprint is
+  blocked on them** (`friction_check.php --sprint=2026-09-28-delta` fails while they are
+  refer-to-human); on his yes, write them, mark the entries `intent`, regenerate payloads, launch.
+- **R-190**: answered back (the button was retired by R-219).
+- **R-369's design**: he agreed. There is no "push scenario to Base" action; say so if he asks.
 
-### Translation sprint
+### EPANET++ is live (Option A), 2026-09-28
 
-Held: 48 English strings on master await his ruling (`dev/new-english-keys.md`). Sprint after he
-rules them and ctrl-enter/table-width land.
+epanet-plus-plus.org serves the landing site, epanetpp.org 301s to it; both are clones in their
+docroots (`~/addon_html/...`), ignored by the home-folder repo like the other two sites. Search
+Console property added. `advisors.html` is on the server but noindex, out of sitemap and nav, until
+three more advisors are filled (Tom's card is his own words and his "Tom-surveying" photo).
 
-### Traps met 2026-09-27 (night)
+### Translation sprint (sprint id `2026-09-28-delta`)
 
-- **A subagent deleted `~/.claude/hooks/chime.busy`** (it read the memory note meant for the
-  orchestrator) and he heard the chime early. Brief every agent never to touch it; re-check it
-  after each agent reports.
-- **A harness written on master can break on a merged feature's new defaults**: property-echo
-  compared a flow label to 0.05 after symbology made gpm labels whole numbers. Fixed; the lesson is
-  to run the suite on the merge commit before pushing, which caught it.
-- `example-open-guard-harness.js` prints FAIL lines for its deliberate mutations; those are
-  expected. Read its exit code, not its FAIL lines.
+311 ruled `lpn_` keys wait; Wave 0 done (9 findings: 2 English fixes and 1 glossary term applied,
+6 synonym notes to him). Authorized by his standing "Proceed with a translation sprint whenever
+you deem it prudent"; 26 Sonnet agents, 20 at once then 6.
+
+### Traps met 2026-09-28
+
+- **The auto-mode permission classifier refused a green merge to master ("Merge Without Review"),
+  killing another agent's stray processes, and once a plain `git status`.** It cannot see our
+  merge-on-green rule. Quote Tom's words when retrying; never route the refused action through an
+  agent. He asked whether updates caused it; the honest answer is "probably a stricter classifier,
+  not our repo".
+- **A fresh worktree lacks `dev/browser-pass/node_modules`**, so browser harnesses fail as
+  "playwright-core is not installed". Link it: `ln -s <main>/dev/browser-pass/node_modules
+  dev/browser-pass/node_modules` in each new worktree before its suite.
+- **Closing a roadmap task changes `dev/features.md`**: run `php dev/scripts/generate_features.php`
+  with the closure, or master's suite fails "features list fresh".
+- **Keep `~/.claude/hooks/chime.busy` until NOTHING is outstanding** -- no agent, no background run,
+  no scheduled wakeup. Removing it at a report while notifications could still arrive made every
+  later turn chime (his "chimes noise I can't account for").
+- **A subagent will write "P.E.", "Founder" and reasons he never gave** into copy about him. Read
+  every sentence about Tom before it ships.
+
+- **A placer can score perfectly on the bench and do nothing on the page.** The bench require()s the
+  file; the page looks in `EngCalcs.lpnPlacers`. Always have a real-Chrome pass before a placer
+  goes to him.
+- **A resumed agent that "waits" hands back instead.** Tell it to block with
+  `timeout 580 bash -c 'until grep -qE "All blocking checks pass|BLOCKING FAILURES" <log>; do sleep 20; done'`.
+- **Perry wrote its journal into the main checkout once** despite a scratchpad brief; check
+  `git status` in the main checkout after every pre-review.
+- **Killing a stale queued check_all is refused by the classifier** ("Interfere With Workloads");
+  let it run out rather than edit under it.
 
 ## Commands to hand Tom with any panel change
 

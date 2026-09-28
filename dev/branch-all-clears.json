@@ -233,6 +233,24 @@
             "date": "2026-09-28",
             "words": "Select mode highlights: Good. Done. Merge and delete.",
             "context": "His pass on port 8128 after Perry's READY pre-review (journal 2026-09-28). The branch is one commit; merged with master on the merge commit itself."
+        },
+        "feat/water-tower": {
+            "head": "6541f700",
+            "date": "2026-09-28",
+            "words": "We are gold. Publish it everywhere.",
+            "context": "His answer to round two of the roof shading (dev/icon-preview/roof-shading-2026-09-28b.html): cone-shaded roof, rim seam, catwalk lowered with its underside in shadow. Round one's picks stand: option 3 for About and 192, option 4 with bracing and rivets for 512. 'Everywhere' also went to the librewaternet.org and not-epanet.org favicons the same day; EPANET++ keeps its own E++ mark."
+        },
+        "feat/epanet-plus-plus": {
+            "head": "a2e9fb6c",
+            "date": "2026-09-28",
+            "words": "1. Your word \"release\": Release",
+            "context": "After his look on port 8127 (\"lpn: Good\") and with his host steps done the same message: ea-php83 set, the engcalcs symlink made, the Mapbox token allowing epanet-plus-plus.org. Pinned to a2e9fb6c, the branch after master was merged in for the release; the content he saw is 111b6243 plus master."
+        },
+        "feat/ctrl-enter": {
+            "head": "d6558eb4",
+            "date": "2026-09-28",
+            "words": "your all-clear to merge Ctrl+Enter: Approved.",
+            "context": "His answer to the request for his merge word on port 8123, which had sat unchanged at d6558eb4 since 2026-09-27 with Mary's and Ida's endorsement and Perry's pre-review. Pinned to the head he saw; master is merged in on the merge commit itself."
         }
     }
 }

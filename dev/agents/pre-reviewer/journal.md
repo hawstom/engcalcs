@@ -2993,3 +2993,245 @@ branch for the merge-approval mechanism and touches nothing else.
 Verdict: READY for Tom's browser pass, with two things worth his own five minutes rather than mine:
 the contrast/visibility question above, and a deliberate hover-then-Properties-dialog check to see
 whether he notices any stray mark (I found none, but did not exhaust every dialog-opening path).
+
+## 2026-09-27 -- Task 690, feat/ctrl-enter (d0858ea8), Declan's Ctrl+Enter spec
+
+MUTATION-TESTED (OBSERVED): dev/lpn-spike/pane-ctrlenter-harness.js is not decorative. Loaded the
+pre-fix commit's js/looped-network.js (fc862fa5) through the harness's own dom-stub `mutate` hook
+and re-ran the anchor-broadcast assertion: the keystroke is still claimed (`preventDefault()`
+fires) but only the anchor row carries the typed value -- rows 0-3 stay at their old demand while
+row 4 (the anchor) reads 99. The harness's own assertions go red on old code, not just green on
+new. 54/54 on the current tree.
+
+CONFIRMED (real Chrome, `dev/browser-pass/lib/{env,session}.js` served from this worktree) --
+multi-row single-column fill: selected a 3-row Elevation block on Net1's Junctions table, typed
+555 into the anchor, Ctrl+Enter: all 3 rows read 555, notice read "Filled 2 cells. 0 were not
+changed.", selection markup (`lpn-pane-sel` on all 3 cells) stayed standing after the fill -- not
+collapsed to one cell.
+
+CONFIRMED -- ID column in the block: selected ID..Elevation (7 columns x 3 rows), typed into the
+Elevation anchor, Ctrl+Enter: the ID column's 3 values were byte-identical before and after,
+Elevation filled, notice counted skips correctly.
+
+CONFIRMED -- a computed column in the block: selected Elevation..Pressure (spans Head, Pressure),
+anchor at Elevation, typed 654, Ctrl+Enter: Elevation filled to 654 in all 3 rows; Pressure NEVER
+showed the literal broadcast text "654" -- it changed to new, differently-valued numbers because
+the model legitimately recalculated pressure from the new elevations (Recalculate is on by
+default), which is correct behavior, not the column being overwritten.
+
+CONFIRMED -- mid-edit gesture (Tom's own scenario: type without pressing Enter first): selected a
+4-row Elevation block, re-clicked the anchor cell (already inside the standing selection) to
+re-enter edit mode, confirmed the selection markup survived the re-click (still 4 selected cells,
+not 1), typed 808, Ctrl+Enter: all 4 rows read 808. The re-click does not collapse the range.
+
+CONFIRMED -- single-cell selection behaves as plain Enter: typed 42 into a lone selected cell,
+Ctrl+Enter committed it (42), no broadcast, no extra notice.
+
+NOT CONFIRMED -- acceptance test 5 / the spec's own words ("Undo after a multi-row Ctrl+Enter
+restores all filled cells to their pre-fill values in one Ctrl+Z, not N"). Reproduced in real
+Chrome: select 3 rows, type 555 into the anchor (a real keystroke through the UI, not
+`L.setCell()`), Ctrl+Enter fills all 3 to 555, then ONE Ctrl+Z restores only rows 1-2 to their
+original values (710, 700) and LEAVES the anchor row at 555 -- a SECOND Ctrl+Z is required to put
+the anchor back to 710. This is the anchor's own edit-commit taking its own undo snapshot,
+separate from the "one saveUndoSnapshot() for the whole operation" the spec calls for in step 5 --
+Ctrl+Enter's step 1 ("commit it first ... via paneCommitCell(active)") pushes its own snapshot
+before the broadcast's snapshot goes on, so the stack ends up two deep instead of one. THE
+HARNESS DOES NOT SEE THIS: `pane-ctrlenter-harness.js`'s test 1 and test 5 both pre-load the
+anchor's value with `L.setCell()` (a direct model write) BEFORE selecting the range, never
+exercising `paneCommitCell()` on a value the person actually just typed -- so the harness's "one
+saveUndoSnapshot()" claim is true of the broadcast alone and silent about the realistic gesture
+that types into the cell first. This is the same shape as R-054/R-027: the harness checked what
+the code intended to do, on an input shaped to avoid the one path where it does something else.
+A person doing exactly what Declan's spec describes -- type into the anchor, then Ctrl+Enter --
+will find one Ctrl+Z does not fully undo the fill.
+
+CONFIRMED (with a caveat) -- inside a scenario: created "Scenario X" via the scenario button's
+menu, filled a 3-row Elevation block to 271 there (all 3 rows read 271, as expected for an
+override). Could NOT cleanly confirm "base does not move" from the browser in this pass -- my own
+selector for switching back to Base matched the wrong control ("Base demand (gpm)" column header,
+a false positive on `textContent.indexOf('Base') === 0`), so that specific browser check is
+UNVERIFIABLE FROM HERE in this run; a person should click the Scenario control, choose Base by
+name, and confirm Elevation still reads 710/710/700. The claim itself is not in doubt on other
+grounds: the node-level harness's mutation-tested "BASE DOES NOT MOVE" check (test 6, `hasOverride`
+and `baseValue` read directly against the document) already passes against the real production
+functions.
+
+CONFIRMED -- no shortcut collision found: Ctrl+Enter inside the Find and replace query box left its
+typed text unchanged and fired no page error. Did not find a Properties/Settings text box to try
+Ctrl+Enter in during this pass (UNVERIFIABLE FROM HERE) -- a person should open a node's Properties
+box, click into a text field there (e.g. Description), press Ctrl+Enter, and confirm nothing
+happens beyond what a plain Enter would do.
+
+CONFIRMED -- Help, Notes shortcuts table gained the row verbatim: `lpn_notes_7_def` (en) now reads
+"Ctrl+Enter | Fill the selection with the active cell's value." alongside the existing rows.
+
+UNVERIFIABLE FROM HERE -- how the selection LOOKS. I read computed CSS off the selected cells
+(`background-color: rgb(232, 240, 254)`, a light blue fill on every selected cell, `outline: solid`
+only on the current/anchor cell) which matches the Google Sheets convention Declan's spec cites and
+does not obviously conflict with R-288/R-289's rulings (those were about TEXT highlighting inside
+one cell and heading colour, not a multi-cell range fill) -- but I did not put a screenshot in
+front of a human eye. A person should glance at the filled block and confirm the light-blue wash
+reads as "still selected," not as leftover text-highlight.
+
+Click-list for Tom's own browser pass, in order of what would cost him the most: (1) On Junctions,
+select 3 cells in one column, type a value, Ctrl+Enter, then press Ctrl+Z exactly once and check
+whether the whole block reverts (my finding says it will not -- the anchor cell will keep the new
+value). (2) The same gesture inside a scenario, then switch back to Base and confirm elevation is
+untouched there. (3) Open a node's Properties box and press Ctrl+Enter in a text field, just to see
+nothing surprising happens.
+
+---
+
+# Pre-review round 2 — feat/label-placer-c (ca49c985) and feat/label-placer-d (c7a002fb)
+
+Re-run of the pass the registration bug blocked last time. Same harness
+(`placer-check.js`, unpatched this time — the fix is in the branches, not in my test),
+plus two extra diagnostic scripts (`debug-trace2.js`, `deep-zoom.js`) written to chase one
+new finding below. All runs in real headless Chromium, own `php -S` per worktree, under
+`flock /tmp/engcalcs-browser.lock`. No repo file touched; both worktrees left clean
+(`git status --porcelain` empty in both, checked again at the end).
+
+## VERDICT: READY, with one finding Tom should know about first
+
+The registration fix works: `?placer=c` and `?placer=d` now really drive the labels, on
+both branches, on both examples, confirmed by more than reading code — I watched the
+page's own layout counter (`EngCalcs.lpnPlacerLast.step`) advance and the label/leader
+counts on screen change to numbers that differ from the plain page's, on every gesture I
+tried. No console errors anywhere, on either branch, in about a dozen separate runs. This
+part is ready for Tom's side-by-side.
+
+**The one thing to flag before he starts:** a rapid, large zoom change (the kind a mouse
+wheel spun fast, or two-finger scroll flicked hard, produces) can freeze the map for
+roughly 25-30 seconds before the labels catch up, on BOTH branches, by almost the same
+amount. It is not a hang forever and it never threw an error — it always finished — but a
+30-second freeze on an ordinary zoom gesture is exactly what the branches' own rule (labels
+must never slow a pan or zoom) forbids, and it is bad enough that Tom could easily mistake
+it for the page being broken mid-comparison. See "The 27-second stall" below.
+
+## Confirming the fix, measured
+
+Loaded `?placer=c` and `?placer=d` and checked `window.EngCalcs.lpnPlacerLast` (the page's
+own record of what it last laid out):
+
+- Opening Net3 (XY) and zooming in: label/leader counts came back **92 labels / 26 leaders**
+  on C and **93 labels / 38 leaders** on D, against the plain page's **191 labels / 20
+  leaders** at the identical zoom. Different numbers, different pictures — the placers are
+  really driving the map now, not the old code.
+- The layout counter advanced on every ordinary gesture (a single zoom notch, a pan) within
+  well under half a second in the normal case. Example single-notch timings on Net3-World,
+  placer C: 101, 169, 54, 110 ms; placer D similar. Panning was near-instant (0-200 ms) on
+  both.
+- Zero console errors and zero page errors across every run in this pass.
+
+## The 27-second stall — measured, reproducible, shared by both branches
+
+Dispatching 15 wheel notches in one quick burst (still a legitimate zoom gesture — a hard
+flick of a real wheel or trackpad does this) and then zooming out again the same way, I
+timed the gap between one recorded layout and the next:
+
+```
+Placer C: step 4 at 5.0s, step 5 at 32.2s  -> a 27.1-second gap
+Placer D: step 4 at 4.7s, step 5 at 31.4s  -> a 26.7-second gap
+```
+
+Same shape, same order of magnitude, on the SAME gesture (zoom-out after a zoom-in and a
+pan), on both branches independently — which points at something the two placers share
+(most likely the scene-building/obstacle step common to both, `staticObstacles()` /
+`EngCalcs.lpnLabelScene.buildScene()` in `js/looped-network.js`, which both placer files
+call through the same seam) rather than a defect in either placer's own logic. I did not
+chase the exact line — that is a job for whoever owns the shared seam code, not something I
+should fix here — but the fact that it is nearly identical in size and shape on both
+branches is worth telling them, since it means fixing it once likely fixes it for both.
+
+Single, smaller zoom gestures (one notch at a time) never showed this — I checked five
+individual zoom-out notches right after the same 15-in zoom and each settled in well under
+a second. So the trap is specifically a **large, fast** zoom change, and it is a real risk
+for Tom's side-by-side: if he spins the wheel hard to get from the fit view to a working
+zoom (which is a natural thing to do on a dense network like Novato), he may sit looking at
+a frozen map for half a minute on either branch and reasonably think it has crashed.
+
+## Rules check by eye, screenshots at matched views
+
+Screenshots saved to
+`/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1aec7119-b2fa-42e6-880b-d63f8e2721db/scratchpad/placer-shots/round2/`
+— `deep-master-*`, `deep-c-*`, `deep-d-*` at four matched views of Net3-Novato-CA-World
+(a mid zoom "z20", a closer "z35", a deep "z50", the same deep view after a pan "z50-pan",
+and back out "z0-back"), plus the earlier `master2-*` / `c-r2-*` / `d-r2-*` sets at a
+shallower zoom on both Net3 and Net3-World.
+
+At the `z20` view (a genuinely dense, comparable intersection near downtown Novato),
+by eye:
+
+- **No label sits on top of a symbol, another label, or a Text object** in either C's or
+  D's screenshot, as far as the resolution lets me tell. I did not do a pixel-exact overlap
+  check (see "what I could not check").
+- **No leader visibly threads through a node symbol that is not its own**, in the views I
+  captured.
+- **Justification looks right on both**: text sits on the side the leader arrives from, not
+  centred, on every leadered label I could read.
+- **Pipe labels sit beside their pipe, not on it, on both** — a clear improvement over
+  master's own screenshot at the same view, where at least one pipe label ("155, Q=379,
+  V=1.1") reads as sitting directly on the pipe line itself.
+- **I did not see two leaders crossing each other** on either branch in these views.
+- **Labels stay close to their own node** on both — shorter leaders than master's, which in
+  the same view sends a couple of labels a long way from their nodes with long thin
+  leaders.
+
+**What visibly tells C and D apart, plainest description first:** **C stacks a label's
+rows vertically under its ID, the way master already does** — Base demand, Elevation,
+Head, Pressure each on their own line. **D frequently puts everything on one long single
+line instead** — one node's whole label reads left-to-right as "147, Qb=9, Z=18.50,
+H=151.20, P=57.53" — which is more compact vertically but makes for a noticeably wider,
+harder-to-scan label when several rows are shown. D also underlines negative values (a
+convention master and C don't use). The `z20` screenshots
+(`deep-master-z20.png`, `deep-c-z20.png`, `deep-d-z20.png`) are the clearest single view for
+seeing this side by side — same intersection, three different label styles.
+
+## Dropped values returning on zoom-in (R11)
+
+Sequence: zoom in 15, pan, zoom out 15, zoom in 15 again — should return close to the
+original zoomed-in view.
+
+- Placer C: 92 labels/26 leaders on the first zoom-in, **146 labels/33 leaders** on the
+  return zoom-in — more shown, not fewer.
+- Placer D: 93/38 on the first zoom-in, **148/49** on the return.
+
+Both recover at least as much as they started with; neither loses ground. That is the
+right direction for R11 (values come back on zoom-in), though because the "return" pass
+consistently showed MORE than the original rather than the same amount, this is measuring
+"does it recover", not "does it reproduce the exact same layout twice" — I did not check
+byte-for-byte layout stability between two identical views.
+
+## What I could not check
+
+- **Whether any label truly overlaps a symbol or another label at the pixel level.** I read
+  screenshots by eye; I did not run a geometric overlap check against the DOM boxes for
+  this pass (the placers' own bench claims zero N1/N3/N4/N5 breaks, and now that the
+  registration bug is fixed, that bench and the live page are running the identical
+  function — but "identical function, same inputs" is an inference, not something I
+  independently measured on the live page this round).
+- **How the 27-second stall actually feels** to a person dragging a real mouse wheel rather
+  than my synthetic burst of WheelEvents — a real gesture may or may not reach the same
+  code path the same way. Tom should try a hard, fast zoom on both branches himself before
+  trusting the comparison is smooth.
+- **Hand-placed labels overlapping each other** — D's own build notes say two hand-placed
+  labels dropped on top of each other still overlap (neither may move); I did not
+  reproduce or check this.
+- **Whether the "Zoom in to see labels" banner** that still appears over some of these
+  dense views is appropriate — it appears identically on master, C, and D at the same
+  zoom, so it is not something either placer introduced, and it is outside this branch's
+  scope.
+
+## Files
+
+- Screenshots: `.../scratchpad/placer-shots/round2/` (see filenames above)
+- Harness: `.../scratchpad/placer-check.js` (updated this round: longer settle timeouts,
+  visibility-filtered label/leader counts, `zoomHintShowing()` helper)
+- Diagnostics used to find and confirm the stall: `.../scratchpad/debug-trace2.js`,
+  `.../scratchpad/deep-zoom.js`
+- Root-cause pointer for the stall (not fixed, not further isolated): the scene-building
+  seam both placers share, called from `js/looped-network.js`'s `placerRelayout()`
+  (`staticObstacles()` and `EngCalcs.lpnLabelScene.buildScene()`), identical on both
+  branches.
+- No repo file edited on either worktree; `git status --porcelain` empty on both,
+  re-checked after this pass.

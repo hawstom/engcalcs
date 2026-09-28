@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**48 still to read on master**, of 312 untranslated keys, of 2141 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 313 untranslated keys, of 2142 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,11 +21,65 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (6 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
 
-## lpn_  (312, 48 to read @@ NEEDS RULING)
+### from sprint 2026-09-28-delta
+
+- **`lpn_find_op_gt`**
+  > above
+  *The finding:* 'above' is the label for the mathematical greater-than operator in a Find/condition query (js/looped-network.js:17689, where the code itself lists 'greater than' as a recognized synonym -- evidence this exact ambiguity was already noticed once). The operator is used against any numeric property, including ones like elevation where 'above' also has an ordinary spatial meaning. A translator will plausibly render it as a spatial preposition rather than a comparison operator.
+  1. the comparison operator 'greater than' (correct, matches lpn_find_op_lt's counterpart 'below'/'less than')
+  2. a spatial/directional word meaning physically above, especially plausible for a property like elevation
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_gt']='greater than, more than, over, exceeding | avoid: spatially above, higher on the map';
+  @@ NEEDS RULING
+- **`lpn_find_op_lt`**
+  > below
+  *The finding:* Same issue as lpn_find_op_gt: 'below' labels the mathematical less-than operator (code lists 'less than' as a recognized synonym), but reads equally well as a spatial direction, especially for a property like elevation.
+  1. the comparison operator 'less than' (correct, pairs with lpn_find_op_gt's 'greater than')
+  2. a spatial/directional word meaning physically below
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_lt']='less than, under | avoid: spatially below, lower on the map';
+  @@ NEEDS RULING
+- **`lpn_help_icons`**
+  > Toolbar key
+  *The finding:* "key" is used elsewhere on this same page for a KEYBOARD shortcut (lpn_tool_key_hint: 'Shortcut: {key}'), but here it means a map LEGEND (a key to the icons, like a map key). A translator sees only the bare string 'Toolbar key' with no indication which sense applies, and the suite's own dominant usage of 'key' points the wrong way.
+  1. a legend/index explaining what each toolbar icon means (the intended reading, per the code comment)
+  2. a keyboard shortcut for the toolbar (the reading suggested by every other 'key' string on this page)
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_help_icons']='Toolbar legend, Key to the toolbar icons, What each toolbar icon means | avoid: a keyboard key or shortcut';
+  @@ NEEDS RULING
+- **`lpn_labels_priority_node_tip`**
+  > The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
+  *The finding:* 'the elevation or head more like neighboring nodes' is genuinely ambiguous about what 'like' compares. It could mean the node whose elevation/head VALUE is numerically closest to its neighbors' values (least of an outlier), or it could mean the node most similar in KIND/role to its neighbors. These are different comparisons and a translator has to pick one to render grammatically, since many languages cannot preserve English's vague 'like' without choosing.
+  1. the node whose elevation or head value is numerically closest to (least different from) its neighboring nodes' values
+  2. the node that most resembles its neighboring nodes in kind or role
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind';
+  @@ NEEDS RULING
+- **`lpn_scenario_push_tip`**
+  > Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.
+  *The finding:* 'the properties whose labels are showing right now' names 'labels' with no further context. On this page 'label' is a defined term for the text drawn on the map next to an asset (Settings, Symbology, Labels), and the code confirms that meaning (pushBaseToScenarios scopes to properties currently selected as map labels) -- but a translator with only this sentence could just as easily read 'labels' as the ordinary UI sense (the text captions on form fields currently visible on screen), which is a different, unrelated set of properties.
+  1. the properties currently turned on as map labels in the Labels panel (correct, per the code)
+  2. the properties whose form-field captions happen to be visible in whatever panel is open right now
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields';
+  @@ NEEDS RULING
+- **`lpn_settings_sym_all`**
+  > All
+  *The finding:* The bare word 'All' is used as a sub-heading in the Settings box over controls that apply to both nodes and links (per the code comment: a third sub-group alongside node-only and link-only settings). A translator sees only 'All' with no surrounding sentence, and in a settings panel context 'All' commonly means a select-all / show-all-items control, not 'both categories at once'.
+  1. a sub-heading meaning 'settings that apply to both nodes and links' (the intended meaning)
+  2. a 'select all' or 'show all' action/filter control, as elsewhere in list/filter UIs
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';
+  @@ NEEDS RULING
+
+## lpn_  (313, 2 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -53,7 +107,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled 2026-09-26: OK. Did we prefill with a space? I believe that SI uses no space and US uses a space._
 - **`lpn_convas_no_transform`**
   > {crs} is one of the few listed coordinate systems without usable projection information, so it cannot be converted to or from. Nothing was converted.
-  _Ruled 2026-09-26: His own wording, 2026-09-26 ("cannot be convert" corrected to "converted")._
+  _Ruled OK 2026-09-28._
 - **`lpn_convas_none_tip`**
   > Local coordinates in the length unit, with no world map for now.
   _Ruled OK 2026-09-26._
@@ -95,7 +149,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_crs_count_network`**
   > {n} of {total} coordinate systems cover this network.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_crs_unnamed`**
   > unnamed
   _Ruled OK 2026-09-23._
@@ -212,7 +266,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-25._
 - **`lpn_file_convert_as_tip`**
   > Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_file_import_survey`**
   > Import surveyed points…
   _Ruled OK 2026-09-23._
@@ -260,7 +314,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_geomap`**
   > georeferenced
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
@@ -275,7 +329,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-25._
 - **`lpn_labels_col_show`**
   > Show
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_labels_customer_note`**
   > A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.
   _Ruled OK 2026-09-23._
@@ -284,19 +338,19 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-26._
 - **`lpn_labels_init_status`**
   > Initial status
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_labels_priority_customer_tip`**
   > The order in which values are dropped from a customer label. The value numbered 1 is dropped first.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_labels_show_tip`**
   > The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_labels_use_units`**
   > Use units
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_labels_use_units_tip`**
   > Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_library_import`**
   > Import libraries…
   _Ruled OK 2026-09-23._
@@ -518,21 +572,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_notes_6_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_notes_6_term`**
   > Table columns help
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_notes_7_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell's value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_notes_7_term`**
   > Table keyboard shortcuts
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_offscreen_intact`**
   > Your network is intact.
   _Ruled OK 2026-09-25._
 - **`lpn_pane_colmenu_tip`**
   > Hide or manage columns
+  _Ruled OK 2026-09-28._
+- **`lpn_pane_ctrlenter_filled`**
+  > Filled {n} cells. {skipped} were not changed.
   @@ NEEDS RULING
 - **`lpn_pane_fill_none`**
   > Nothing in this selection can be filled down.
@@ -578,67 +635,67 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_pane_paste_append`**
   > Paste as new rows at end of table
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_armed`**
   > Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_bad_cell`**
   > Row {row}: {text} is not a valid {col}.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_bad_id`**
   > Row {row}: the ID {id} has a space or a quotation mark in it.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_here`**
   > Click here and paste rows from a spreadsheet to add them.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_id_taken`**
   > Row {row}: the ID {id} is already in use.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_id_twice`**
   > Row {row}: the ID {id} is used twice in this paste.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_ids_differ`**
   > {n} IDs don't match. Paste anyway?
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_more`**
   > Rows with problems not shown here: {n}.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_no_ends`**
   > Row {row}: a new link needs a From node and a To node.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_no_id`**
   > Row {row}: a new row needs an ID.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_no_node`**
   > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_no_position`**
   > Row {row}: a new node needs both {first} and {second}.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_overflow`**
   > This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_overflow_add`**
   > Add {extra} rows
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_overflow_bad`**
   > This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_overflow_fit`**
   > Paste only the {fit} that fit
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_refused`**
   > Nothing was pasted. {reasons}
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_paste_same_ends`**
   > Row {row}: From and To are the same node.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_pasted_rows`**
   > Pasted {n} rows and added {created} of them to the network.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_pasted_rows_skipped`**
   > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_pane_show_all_cols`**
   > Show all columns
   _Ruled OK 2026-09-26._
@@ -653,31 +710,31 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_quality_diffusivity`**
   > Relative diffusivity
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_diffusivity_tip`**
   > How readily the chemical spreads through water, relative to chlorine. Blank uses EPANET's own default of 1.0.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_mass_units`**
   > Mass units
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_mass_units_tip`**
-  > The mass half of the concentration unit, EPANET's own two choices.
-  @@ NEEDS RULING
+  > The units half of the quality entry, EPANET's own two choices.
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_named_avg_concentration`**
   > Average {chemical} concentration
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_named_concentration`**
   > {chemical} concentration
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_tolerance`**
   > Quality tolerance
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_tolerance_tip`**
   > How much two adjoining parcels of water may differ in concentration before EPANET treats them as one. Blank uses EPANET's own default of 0.01.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_quality_unit_ug`**
   > µg/L
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_reports_full`**
   > Full
   _Ruled OK 2026-09-26._
@@ -707,10 +764,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_settings_sym_link_colors`**
   > Link colors
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_settings_sym_node_colors`**
   > Node colors
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_settings_symbol_cap`**
   > Prevent nodes from scaling larger than
   _Ruled OK 2026-09-23._
@@ -725,7 +782,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-23._
 - **`lpn_source_type_none`**
   > None
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_status_closed`**
   > {type} {id} closed
   _Ruled OK 2026-09-26._
@@ -950,7 +1007,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-25._
 - **`lpn_xymap`**
   > local
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-28._
 - **`lpn_zoom_in`**
   > Zoom in
   _Ruled OK 2026-09-25._
@@ -968,7 +1025,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**1 still to read**, of 4 new keys across 3 unmerged branch(es).
+**0 still to read**, of 3 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -979,11 +1036,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/ctrl-enter (`d6558eb4`) — 1 new, 1 to read @@ NEEDS RULING
+### chore/label-bench-r2 (`1071d1fa`) — adds no English strings
 
-- **`lpn_pane_ctrlenter_filled`**
-  > Filled {n} cells. {skipped} were not changed.
-  @@ NEEDS RULING
+### chore/label-rules-r2 (`1071d1fa`) — adds no English strings
+
+### chore/roadmap-0928 (`5169479d`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -997,4 +1054,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/quality-settings (`24aa4bfa`) — adds no English strings
+### feat/label-placer (`12c0d10e`) — adds no English strings
+
+### feat/label-placer-a (`3483bfd6`) — adds no English strings
+
+### feat/label-placer-b (`c5905432`) — adds no English strings
+
+### feat/table-width (`16014e49`) — adds no English strings

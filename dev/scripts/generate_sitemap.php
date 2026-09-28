@@ -3,6 +3,7 @@
  * Generate the sitemap (ROADMAP Task 149).
  *
  * Usage:  php dev/scripts/generate_sitemap.php [--stdout]
+ *         php dev/scripts/generate_sitemap.php --host=epanet-plus-plus.org   (that host's own URLs)
  *
  * Writes to the parent-site root, which is OUTSIDE this repository
  * (/var/www/cnm/public_html/hawsedc/sitemap.xml -- see ROADMAP Task 151 on why the parent site's
@@ -111,6 +112,37 @@ foreach ($parentPages as $p) {
           . "    <lastmod>$today</lastmod>\n  </url>\n";
 }
 
+// --- One HOST's own front doors (Task 697, B1) ------------------------------------------------
+// **THIS FILE'S SITEMAP IS hawsedc.com's, AND IT LISTS EACH PAGE ONCE, AT ITS HOST-INDEPENDENT
+// ANSWER** -- which for the map application stays https://librewaternet.org/app/. A page that
+// nominates a different origin on one named host (ecCanonicalHostOrigins()) is NOT listed here
+// under that host: epanet-plus-plus.org is its own Search Console property, and a URL of it in
+// hawsedc.com's sitemap is cross-submission that needs both verified by one owner. Its addresses
+// belong in the sitemap that host serves, which is the landing site's repository. `--host=<host>`
+// prints exactly those URLs, as a complete urlset, for pasting there; it never writes a file.
+$onlyHost = '';
+foreach ($argv as $arg) { if (strpos($arg, '--host=') === 0) { $onlyHost = strtolower(substr($arg, 7)); } }
+if ($onlyHost !== '') {
+    $byHost = ecCanonicalHostOrigins();
+    $hx  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $hx .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $hn = 0;
+    foreach ($pages as $file) {
+        if (!isset($byHost[$file][$onlyHost])) { continue; }
+        $path = ecCanonicalPath('/engcalcs/' . $file);
+        foreach ($languages as $lang) {
+            $hx .= "  <url>\n    <loc>" . htmlspecialchars(ecCanonicalOrigin('/engcalcs/' . $file, $origin, $onlyHost)
+                 . $path . '?lang=' . $lang, ENT_XML1) . "</loc>\n"
+                 . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n  </url>\n";
+            $hn++;
+        }
+    }
+    $hx .= "</urlset>\n";
+    if ($hn === 0) { fwrite(STDERR, "No page declares its own origin on '$onlyHost' (ecCanonicalHostOrigins()).\n"); exit(1); }
+    echo $hx;
+    exit(0);
+}
+
 $count = count($parentPages);
 foreach ($pages as $file) {
     // Match ec_canonical_url() exactly: the pretty URL, the /index.php collapse, AND the per-page
@@ -167,6 +199,12 @@ if ($lwnPages) {
     echo "  That is CROSS-SUBMISSION: Google honours another host's URLs in this sitemap only when\n";
     echo "  both properties are verified by the same owner, so librewaternet.org must stay a\n";
     echo "  verified property in Search Console alongside hawsedc.com.\n";
+}
+foreach (ecCanonicalHostOrigins() as $hp => $hosts) {
+    foreach ($hosts as $h => $ho) {
+        echo "  NOT listed here: $hp as $ho (its own front door on $h). Its URLs go in that host's own\n";
+        echo "  sitemap:  php dev/scripts/generate_sitemap.php --host=$h > <that repo>/sitemap.xml\n";
+    }
 }
 echo "  robots.txt at each host needs the line:  Sitemap: $parentOrigin/sitemap.xml\n";
 echo "  and the sitemap should be re-submitted in Google Search Console after this move.\n";

@@ -7,23 +7,21 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**106 open tasks.** Next (100): 2 · Soon (75): 22 · Someday (50): 42 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 6
+**103 open tasks.** Next (100): 2 · Soon (75): 20 · Someday (50): 43 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
 
 ## 100 — Next (2)
 
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
 
-## 99 — Priority 99 (6)
+## 99 — Priority 99 (4)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 676 — Watch the sites, and send a derived weekly report.
-- Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 
-## 75 — Soon (22)
+## 75 — Soon (20)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -38,8 +36,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 637 — A Graph button on the Properties box.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
-- Task 645 — The app icon's legs are leggier than the favicon's.
-- Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
@@ -48,7 +44,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 718 — File menu: Recents just above Exit, and an Import submenu.
 - ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
 
-## 50 — Someday (42)
+## 50 — Someday (43)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -92,6 +88,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
+- Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 
 ## 25 — Maybe (15)
 
@@ -137,5 +134,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-96 of 106 titles are within 4–12 words. `!` marks the rest;
+93 of 103 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

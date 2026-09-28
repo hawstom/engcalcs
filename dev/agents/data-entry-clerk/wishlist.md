@@ -447,3 +447,41 @@ into a network that already exists"; Task 610 answers "how do I get 400 junction
 without a canvas click each" — the larger of the two numbers by a wide margin, and untouched by this
 round of fixes. Said to Tom directly, in those words, so the honest ranking does not read as
 downplaying real work he just shipped.
+
+## UPDATE 2026-09-27 to item 1: Task 610 (paste creates rows) is reported merged today — re-verify next session, and a new item 0 for Task 690's next piece
+
+**Not independently re-verified this session** (the orchestrator's brief states row-paste/Task 610
+merged today, `feat/row-paste`; I did not diff it against my own spec myself) — flagging as
+SPECULATION-pending-confirmation, not re-ranking item 1 off the top until a future invocation reads
+the merged code and checks it against `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md`
+and my own `declan-610-spec.md` ask (ID-collision-between-two-pasted-rows, From/To ordering,
+per-type required columns, the post-paste notice wording). If it holds up, item 1 closes and this
+list's top slot opens for whatever is below it.
+
+## 0. Task 690's next piece, by my own count today: Ctrl+Enter fills a standing multi-cell
+selection without collapsing it
+
+**OBSERVED, checked 2026-09-27** (journal, fourteenth invocation, has the full re-verification):
+rectangular multi-cell selection, Ctrl+D fill-down, and paste-tiling (copy one cell, paste into a
+larger selection) are ALL already shipped on master — three of the six candidates the orchestrator
+asked me to weigh needed no build at all. Fill handle drag is explicitly parked as a separate build
+(Tom's own words). Series fill and fill-right are real spreadsheet conventions but fit this page
+poorly (ID-collision risk for series fill; adjacent columns here are different quantities, not
+repeats, for fill-right) — ranked last of the six, not recommended next.
+
+**What is left, and it is small:** Tab and Enter always collapse a standing selection to the next
+single cell rather than cycling within it (Excel/Sheets keep the range highlighted). The
+consequence is a one-time reselect-after-typing cost per fill operation, not a per-row cost — real,
+but smaller than anything Task 610 touches. **Ctrl+Enter — write the anchor cell's now-committed
+value into every settable cell of the standing selection, keeping the selection — closes this gap
+without touching Tab/Enter's existing navigation behavior at all**, and is a small, well-scoped
+build: full spec written to the scratchpad this session, not the live tree (per the mid-task instruction
+not to write there): `declan-ctrl-enter-spec.md`, destined for `dev/task-690-ctrl-enter-spec.md`
+once the orchestrator commits it.
+
+**Ranking: below item 1/Task 610 while its merge is unconfirmed by this seat, above everything else
+on this list that touches the Tables pane** — it is the cheapest remaining Task 690 piece I can see
+today, it reuses `paneWriteCellText`/`setProp()`/`saveUndoSnapshot()` exactly as Ctrl+D already
+does (no new write path, no new scenario interaction, no new unit-handling rule), and it is the one
+candidate of the six the orchestrator named that is not already shipped or already poorly suited to
+this page.

@@ -205,3 +205,22 @@ actually moved, so the ordinary case is two hash lookups.
 
 **The lesson is the one this file keeps finding: a write seam protects what is written THROUGH it,
 never what is DERIVED from it.** Ask what else a property feeds.
+
+---
+
+# The fourth seam: a property stored under other names (R-369)
+
+2026-09-28. Tom: *"Add a demand category in a scenario. It adds to Base. Bad."* Only row 0's base
+went through `setProp()`; the Add button, both removes, every pattern and description cell and every
+later row's base wrote `extraDemands` / `demandPattern` / `demandCategory` directly, so inside a
+scenario they edited Base. The check was blind because it looks for `x._prop =`, and none of those
+fields is an underscored overridable property.
+
+**The fix:** the whole list is one overridable property, `demands`. `ownDemandRows()` is the one
+read, `writeDemandRows()` (via `setProp(n, 'demands', rows)`) the one write; the first edit in a
+scenario copies the effective list into the override. A pre-R-369 `demand` override still means row
+0's base. **The rejected alternative** is a per-row override: a row has a position, not a name.
+
+**The check now parses `LPN_DEMANDS_STORAGE`** and refuses an unmarked assignment, `delete`, or
+mutating array call on those fields. Run against the pre-fix source it names all eight popup writes.
+Harness: `dev/lpn-spike/scenario-demand-category-harness.js`.
