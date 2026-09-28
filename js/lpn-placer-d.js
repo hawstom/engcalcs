@@ -75,7 +75,7 @@ EngCalcs.lpnPlacerD = (function () {
 		this.bl = null; this.items = null; this.st = 0; this.along = false;
 		this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0; this.base = 0;
 		this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
-		this.lb2 = null; this.lb3 = null; this.bbuf = null;
+		this.lb2 = null; this.lb3 = null; this.bbuf = null; this.far = false;
 	}
 
 	// ---- boxes and segments --------------------------------------------------------------------
@@ -455,7 +455,7 @@ EngCalcs.lpnPlacerD = (function () {
 			c.x = x; c.y = y; c.w = w; c.h = h; c.angle = angle || 0; c.leader = null;
 			c.reps = null; c.boxes = null; c.fx = NaN; c.ok = false;
 			c.bl = null; c.items = null; c.st = 0; c.along = !!angle;
-			c.lazy = false; c.dead = false; c.nx = 0; c.ny = 0;
+			c.lazy = false; c.dead = false; c.nx = 0; c.ny = 0; c.far = false;
 			c.base = lv.value - pref + keepBonus(li, lv);
 			if (leader) { setLeader(c, leader); }
 			return c;
@@ -595,6 +595,7 @@ EngCalcs.lpnPlacerD = (function () {
 			if (!c.lazy) { return true; }
 			c.lazy = false;
 			if (hardOK(c)) { c.ok = true; return true; }
+			if (c.far) { c.dead = true; return false; }
 			var sh = rowH / 2 - PIPE_GAP;
 			c.x += c.nx * sh; c.y += c.ny * sh; c.base -= 0.3; c.boxes = null; c.fx = NaN;
 			if (hardOK(c)) { c.ok = true; return true; }
@@ -1082,6 +1083,12 @@ EngCalcs.lpnPlacerD = (function () {
 						kinds.forEach(function (kind) {
 							var c = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + (kind === 'level' ? notAlong : 0), !reps);
 							if (!c) { return; }
+							if (kind === 'along' && !reps) {
+								// The same, standing half a row off (clear of a neighbour hugging the pipe).
+								var f2 = besidePipe(li, lv, layout, d, pts, cum, at, side, kind, pref + 0.3, true), sh = rowH / 2 - PIPE_GAP;
+								f2.x += f2.nx * sh; f2.y += f2.ny * sh; f2.far = true;
+								list.push(f2);
+							}
 							if (reps) {
 								var rr = [];
 								reps.forEach(function (g) {
