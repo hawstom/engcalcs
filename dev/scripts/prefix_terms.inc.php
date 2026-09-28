@@ -67,7 +67,7 @@ function prefixToTermNames(): array
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',
             'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
-            'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex', 'symbology',
+            'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex', 'symbology', 'customer',
             // 'world file' added 2026-08-13 (Task 297): it appears in five of that sprint's nine new
             // keys, and its 'world' is a coordinate space, not the planet -- a false friend nothing
             // else would have guarded against.
