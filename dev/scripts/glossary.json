@@ -4007,6 +4007,13 @@
                 "zh": "投影"
             },
             "source": "harvested"
+        },
+        "97": {
+            "term": "symbology",
+            "context": "The GIS sense, as in QGIS and ArcGIS: how data is shown on the map by colour, size and label. It names a Settings section covering colour by value and the labels. NOT 'symbolism' (hidden, cultural or figurative meaning), which is a false friend in many languages. Use the word your language's GIS software uses for this settings section.",
+            "translation_notes": "[2026-09-28, Wave 0 of the 2026-09-28-delta sprint] Created from a Wave 0 finding on lpn_settings_sec_symbology. No renderings recorded yet; the sprint's write-back fills them.",
+            "translations": {},
+            "source": "wave0"
         }
     }
 }

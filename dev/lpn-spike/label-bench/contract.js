@@ -20,10 +20,12 @@
  * @property {number} step                  index of this view within its set
  * @property {Rect}   viewport              the visible canvas; the model runs off it on every side
  * @property {{s:number, tx:number, ty:number}} view   view px = model * s + t, for a placer that
- *          caches in model space across zooms (rule T2). Everything else is already in view px.
+ *          caches in model space across zooms (H-b: hard thinking may be cached across zooms).
+ *          Everything else is already in view px.
  * @property {{sizePx:number, rowHeightPx:number, separator:string, separatorW:number,
- *            hookMaxPx:number}} text   the lettering: row height, the separator a one-line
- *          label joins its rows with (and its measured width), and the longest allowed hook
+ *            hookMaxPx:number, repeatSpacingPx:number}} text   the lettering: row height, the
+ *          separator a one-line label joins its rows with (and its measured width), the longest
+ *          allowed hook, and the spacing a pipe longer than it repeats its label along (R9)
  * @property {{node:string[], link:string[], customer:string[]}} dropOrder   the user's per-kind
  *          value drop order, FIRST TO GO first. A row whose `field` is not listed ('id') is the
  *          label itself and is never dropped.
@@ -46,7 +48,7 @@
  * @property {Array<{field:string, text:string, w:number, h:number}>} rows   in display order,
  *          each measured
  * @property {'stack'|'line'} layout        its usual shape: a node label stacks, a pipe label is
- *          one line (rule H1). A placer may choose the other and says so in its output.
+ *          one line. A placer may choose the other (H-a) and says so in its output.
  * @property {Pt|null} hand                 the leader end point the USER dragged it to, or null.
  *          A hand-placed label must stay attached there and must be shown (N4).
  *
@@ -54,8 +56,9 @@
  * @property {boolean} shown
  * @property {number[]} rows                indices into LabelReq.rows that are shown, ascending
  * @property {'stack'|'line'} [layout]      default: the label's own
- * @property {'left'|'right'|'center'} [align]   how rows of different widths line up in a stack
- *          (S2: a label hanging west of its node is right-aligned and grows west). Default left.
+ * @property {'left'|'right'|'center'} [align]   how rows of different widths line up in a stack,
+ *          justified to the side its leader arrives from (R5: a label hanging west of its node,
+ *          with its leader arriving from the east, is right-aligned and grows west). Default left.
  * @property {number} x                     top-left of the UNTURNED text block
  * @property {number} y
  * @property {number} [angle]               degrees, turned about the block's centre (a pipe label
@@ -71,7 +74,7 @@
  * @property {string} name
  * @property {function(Scene, {prev:{scene:Scene, layout:Object}|null}):{labels:Object<string,Placement>}} place
  * @property {function(number, {scene:Scene, opening:boolean}):void} [idle]   called between views
- *          with a time budget in ms, so a placer can think during the breathers and cache (T2)
+ *          with a time budget in ms, so a placer can think during the breathers and cache (H-b)
  * A module exports either a Placer or {create: () => Placer}; create() is called once per scene
  * set (one project opened), so a cache cannot leak between projects.
  */
