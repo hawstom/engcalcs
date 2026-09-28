@@ -8,15 +8,17 @@
 
 	// ---- tunables ------------------------------------------------------------------------------
 	const GAP = 2;          // px between a symbol and a label that touches it
-	const OV = 0.5;         // px of overlap we already call ink (the bench forgives 1.5)
+	const OV = 1.25;        // px of overlap we already call ink (the bench forgives 1.5, as leading)
 	const CELL = 32;        // spatial grid cell, px
 	const MARGIN = 400;     // px beyond the viewport that the real-estate map covers
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
-	const W_LDR_LDR = 0.9, W_LAB_LDR = 0.7, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
-	const ROW_VALUE = 0.45;     // one more property row is worth this much crossing cost
-	const LABEL_CAP = 1.25;     // a label whose best spot costs more than this is dropped
+	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
+	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
+	const LABEL_CAP = 1.0;      // a label whose best spot costs more than this is dropped
+	const KEEP_CAP = 1.0;       // a label held from the last view is let go above this cost
 	const RING_STEP = 7;        // px between leader rings
-	const RING_MAX = 5;         // rings tried (S3: drop rather than travel)
+	const RING_MAX = 4;         // rings tried (S3: drop rather than travel)
+	const RING_DIRS = 12;       // directions tried on each ring
 	const RING_COST = 0.12;     // base cost of hanging on a leader
 	const RING_PER_PX = 0.006;  // cost per px of travel
 
@@ -98,10 +100,13 @@
 			}
 		}
 	};
-	Grid.prototype.addBox = function (it) { this.addBB(it, it.box.x0, it.box.y0, it.box.x1, it.box.y1); };
+	Grid.prototype.addBox = function (it) {
+		it.x0 = it.box.x0; it.y0 = it.box.y0; it.x1 = it.box.x1; it.y1 = it.box.y1;
+		this.addBB(it, it.box.x0, it.box.y0, it.box.x1, it.box.y1); };
 	// A segment goes in cell by cell (the bounding box of each sub-step no longer than a cell).
 	Grid.prototype.addSeg = function (it) {
 		const p = it.p, q = it.q, R = this.region;
+		it.x0 = Math.min(p[0], q[0]); it.y0 = Math.min(p[1], q[1]); it.x1 = Math.max(p[0], q[0]); it.y1 = Math.max(p[1], q[1]);
 		// Clip to the region first; a pipe on an 8x zoom can run for thousands of px.
 		const c = clip(p[0], p[1], q[0], q[1], R);
 		if (!c) { return; }
@@ -123,13 +128,32 @@
 				if (!a) { continue; }
 				for (let m = 0; m < a.length; m++) {
 					const it = a[m];
-					if (it.dead || it.q === q) { continue; }
-					it.q = q;
+					if (it.dead || it.qs === q) { continue; }
+					it.qs = q;
 					if (fn(it)) { return true; }
 				}
 			}
 		}
 		return false;
+	};
+	Grid.prototype.gather = function (x0, y0, x1, y1, buf) {
+		const q = ++this.q;
+		let n = 0;
+		const i0 = Math.floor(x0 / CELL), i1 = Math.floor(x1 / CELL), j0 = Math.floor(y0 / CELL), j1 = Math.floor(y1 / CELL);
+		for (let i = i0; i <= i1; i++) {
+			for (let j = j0; j <= j1; j++) {
+				const a = this.cells.get(this.key(i, j));
+				if (!a) { continue; }
+				for (let m = 0; m < a.length; m++) {
+					const it = a[m];
+					if (it.dead || it.qs === q) { continue; }
+					it.qs = q;
+					if (it.x1 !== undefined && (it.x1 < x0 || it.x0 > x1 || it.y1 < y0 || it.y0 > y1)) { continue; }
+					buf[n++] = it;
+				}
+			}
+		}
+		return n;
 	};
 	function clip(x0, y0, x1, y1, R) {
 		let t0 = 0, t1 = 1;
@@ -210,19 +234,19 @@
 					region.y0 = Math.min(region.y0, r.hand.y - MARGIN); region.y1 = Math.max(region.y1, r.hand.y + MARGIN);
 				}
 			});
-			const G = new Grid(region);
+			const GH = new Grid(region), GS = new Grid(region);   // hard ground, soft ground
 			// Static ground: node symbols, pump and valve symbols, Text objects and their callouts, pipes.
-			scene.nodes.forEach(function (n) { G.addBox({ t: 'sym', node: n.id, box: rectBox(n.symbol) }); });
+			scene.nodes.forEach(function (n) { GH.addBox({ t: 'sym', node: n.id, lid: null, box: rectBox(n.symbol) }); });
 			scene.links.forEach(function (l) {
-				(l.symbols || []).forEach(function (b) { G.addBox({ t: 'sym', node: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
+				(l.symbols || []).forEach(function (b) { GH.addBox({ t: 'sym', node: null, lid: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
 				for (let i = 1; i < l.points.length; i++) {
-					G.addSeg({ t: 'seg', link: l.id, from: l.from, to: l.to, p: l.points[i - 1], q: l.points[i] });
+					GS.addSeg({ t: 'seg', key: 'L' + l.id, link: l.id, from: l.from, to: l.to, lid: null, p: l.points[i - 1], q: l.points[i] });
 				}
 			});
 			scene.texts.forEach(function (t) {
-				G.addBox({ t: 'text', box: mkBox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle) });
+				GH.addBox({ t: 'text', lid: null, box: mkBox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle) });
 				const L = t.leader;
-				if (L) { for (let i = 1; i < L.length; i++) { G.addSeg({ t: 'ldr', lid: 'T:' + t.id, p: L[i - 1], q: L[i] }); } }
+				if (L) { for (let i = 1; i < L.length; i++) { GS.addSeg({ t: 'ldr', key: 'T:' + t.id, lid: 'T:' + t.id, p: L[i - 1], q: L[i] }); } }
 			});
 
 			// ---- one label's geometry --------------------------------------------------------
@@ -266,8 +290,10 @@
 			}
 
 			// ---- evaluation of one candidate against the map ---------------------------------
-			// Returns Infinity for a hard break, else the soft crossing cost.
-			function evaluate(req, c, ink, own, strictView) {
+			// Returns Infinity for a hard break (or a soft cost over `limit`), else the soft cost.
+			const BUF = [];
+			function evaluate(req, c, ink, own, strictView, limit) {
+				if (limit === undefined) { limit = Infinity; }
 				let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
 				for (let k = 0; k < ink.length; k++) {
 					const b = ink[k];
@@ -275,60 +301,79 @@
 				}
 				if (strictView && (x0 < vx0 || y0 < vy0 || x1 > vx1 || y1 > vy1)) { return Infinity; }
 				if (x0 < region.x0 || y0 < region.y0 || x1 > region.x1 || y1 > region.y1) { return Infinity; }
-				let cost = 0, bad = false;
-				const seenLink = {}, seenLdr = {};
-				G.each(x0, y0, x1, y1, function (it) {
-					const t = it.t;
-					if (t === 'sym' || t === 'text' || t === 'lab') {
-						if (t === 'lab' && it.lid === req.id) { return false; }
-						for (let k = 0; k < ink.length; k++) { if (boxHit(ink[k], it.box)) { bad = true; return true; } }
-					} else if (t === 'seg') {
-						if (it.link === own.link || seenLink[it.link]) { return false; }
-						for (let k = 0; k < ink.length; k++) {
-							if (segBox(it.p[0], it.p[1], it.q[0], it.q[1], ink[k], 1.0)) { seenLink[it.link] = 1; cost += W_LAB_PIPE; break; }
-						}
-					} else if (t === 'ldr') {
-						if (it.lid === req.id || seenLdr[it.lid]) { return false; }
-						for (let k = 0; k < ink.length; k++) {
-							if (segBox(it.p[0], it.p[1], it.q[0], it.q[1], ink[k], 1.0)) { seenLdr[it.lid] = 1; cost += W_LAB_LDR; break; }
+				// Hard first: symbols, Text, other labels.
+				let n = GH.gather(x0, y0, x1, y1, BUF);
+				for (let m = 0; m < n; m++) {
+					const it = BUF[m];
+					if (it.lid === req.id) { continue; }
+					for (let k = 0; k < ink.length; k++) { if (boxHit(ink[k], it.box)) { return Infinity; } }
+				}
+				let cost = 0;
+				// The leader: N3 is hard, crossings cost.
+				if (c.leader) {
+					cost = leaderCost(req, c.leader, own, limit);
+					if (cost > limit) { return Infinity; }
+				}
+				n = GS.gather(x0, y0, x1, y1, BUF);
+				const seen = SEEN; seen.length = 0;
+				for (let m = 0; m < n; m++) {
+					const it = BUF[m];
+					let w;
+					if (it.t === 'seg') {
+						if (it.link === own.link) { continue; }
+						w = W_LAB_PIPE;
+					} else {
+						if (it.lid === req.id) { continue; }
+						w = W_LAB_LDR;
+					}
+					const key = it.key;
+					if (seen.indexOf(key) >= 0) { continue; }
+					for (let k = 0; k < ink.length; k++) {
+						if (segBox(it.p[0], it.p[1], it.q[0], it.q[1], ink[k], 1.0)) {
+							seen.push(key); cost += w;
+							if (cost > limit) { return Infinity; }
+							break;
 						}
 					}
-					return false;
-				});
-				if (bad) { return Infinity; }
-				if (c.leader) {
-					const lc = leaderCost(req, c.leader, own);
-					if (lc === Infinity) { return Infinity; }
-					cost += lc;
 				}
 				return cost;
 			}
-			function leaderCost(req, L, own) {
-				let cost = 0, bad = false;
-				const seenLink = {}, seenLdr = {}, seenLab = {};
+			const SEEN = [], SEEN2 = [], BUF2 = [];
+			function leaderCost(req, L, own, limit) {
+				let cost = 0;
+				const seen = SEEN2; seen.length = 0;
 				for (let s = 1; s < L.length; s++) {
 					const p = L[s - 1], q = L[s];
-					if (bad) { break; }
-					G.each(Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1]), function (it) {
-						const t = it.t;
-						if (t === 'sym') {
-							if (own.node !== undefined && it.node === own.node) { return false; }
-							if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { bad = true; return true; }
-						} else if (t === 'seg') {
-							if (it.link === own.link || seenLink[it.link]) { return false; }
-							if (own.node !== undefined && (it.from === own.node || it.to === own.node)) { return false; }
-							if (segCross(p, q, it.p, it.q)) { seenLink[it.link] = 1; cost += W_LDR_PIPE; }
-						} else if (t === 'ldr') {
-							if (it.lid === req.id || seenLdr[it.lid]) { return false; }
-							if (segCross(p, q, it.p, it.q)) { seenLdr[it.lid] = 1; cost += W_LDR_LDR; }
-						} else if (t === 'lab') {
-							if (it.lid === req.id || seenLab[it.lid]) { return false; }
-							if (segBox(p[0], p[1], q[0], q[1], it.box, 1.0)) { seenLab[it.lid] = 1; cost += W_LAB_LDR; }
+					const x0 = Math.min(p[0], q[0]), y0 = Math.min(p[1], q[1]), x1 = Math.max(p[0], q[0]), y1 = Math.max(p[1], q[1]);
+					let n = GH.gather(x0, y0, x1, y1, BUF2);
+					for (let m = 0; m < n; m++) {
+						const it = BUF2[m];
+						if (it.t === 'sym') {
+							if (own.node !== undefined && it.node === own.node) { continue; }
+							if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { return Infinity; }
+						} else if (it.t === 'lab') {
+							if (it.lid === req.id || seen.indexOf(it.key) >= 0) { continue; }
+							if (segBox(p[0], p[1], q[0], q[1], it.box, 1.0)) { seen.push(it.key); cost += W_LAB_LDR; }
 						}
-						return false;
-					});
+					}
+					n = GS.gather(x0, y0, x1, y1, BUF2);
+					for (let m = 0; m < n; m++) {
+						const it = BUF2[m];
+						let w;
+						if (it.t === 'seg') {
+							if (it.link === own.link) { continue; }
+							if (own.node !== undefined && (it.from === own.node || it.to === own.node)) { continue; }
+							w = W_LDR_PIPE;
+						} else {
+							if (it.lid === req.id) { continue; }
+							w = W_LDR_LDR;
+						}
+						if (seen.indexOf(it.key) >= 0) { continue; }
+						if (segCross(p, q, it.p, it.q)) { seen.push(it.key); cost += w; }
+					}
+					if (cost > limit) { return Infinity; }
 				}
-				return bad ? Infinity : cost;
+				return cost;
 			}
 
 			// ---- candidates ------------------------------------------------------------------
@@ -370,8 +415,8 @@
 				// Leader rings, 16 directions, the open ones first.
 				const hx = W / 2 + rw + GAP, hy = H / 2 + rh + GAP;
 				for (let k = 1; k <= RING_MAX; k++) {
-					for (let d = 0; d < 16; d++) {
-						const ang = d * Math.PI / 8, ux = Math.cos(ang), uy = Math.sin(ang);
+					for (let d = 0; d < RING_DIRS; d++) {
+						const ang = d * 2 * Math.PI / RING_DIRS, ux = Math.cos(ang), uy = Math.sin(ang);
 						const t = Math.min(Math.abs(ux) > 1e-9 ? hx / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? hy / Math.abs(uy) : Infinity);
 						const dist = k * RING_STEP + 2;
 						const cx = nx + ux * (t + dist), cy = ny + uy * (t + dist);
@@ -462,11 +507,11 @@
 			const placed = {};   // id -> {c, ink, items, cost}
 			function insert(req, c, ink, cost) {
 				const items = [];
-				ink.forEach(function (b) { const it = { t: 'lab', lid: req.id, box: b }; G.addBox(it); items.push(it); });
+				ink.forEach(function (b) { const it = { t: 'lab', key: req.id, lid: req.id, box: b }; GH.addBox(it); items.push(it); });
 				if (c.leader) {
 					for (let s = 1; s < c.leader.length; s++) {
-						const it = { t: 'ldr', lid: req.id, p: c.leader[s - 1], q: c.leader[s] };
-						G.addSeg(it); items.push(it);
+						const it = { t: 'ldr', key: 'D:' + req.id, lid: req.id, p: c.leader[s - 1], q: c.leader[s] };
+						GS.addSeg(it); items.push(it);
 					}
 				}
 				placed[req.id] = { c: c, ink: ink, items: items, cost: cost };
@@ -491,9 +536,12 @@
 					for (let k = 0; k < cs.length; k++) {
 						const c0 = cs[k];
 						if (c0.pref - ROW_VALUE * rows.length >= bestS) { break; }
+						if (!c0.angle && (c0.x < vx0 || c0.y < vy0 || c0.x + c0.w > vx1 || c0.y + c0.h > vy1)) { continue; }
 						const r = realize(req, c0);
-						const cost = evaluate(req, r.c, r.ink, own, true);
-						if (cost === Infinity || (capped && cost + r.c.pref > LABEL_CAP)) { continue; }
+						let lim = bestS - (r.c.pref - ROW_VALUE * rows.length);
+						if (capped) { lim = Math.min(lim, LABEL_CAP - r.c.pref); }
+						const cost = evaluate(req, r.c, r.ink, own, true, lim);
+						if (cost === Infinity) { continue; }
 						const s = score(r.c, cost);
 						if (s < bestS) { bestS = s; bestC = r.c; bestInk = r.ink; bestCost = cost; }
 						if (cost === 0) { break; } // sorted by pref: nothing later in this set beats it
@@ -566,7 +614,8 @@
 						if (n) { c.leader[0] = [n.x, n.y]; }
 					}
 					const ink = inkOf(req, c);
-					const cost = evaluate(req, c, ink, ownOf(req), false);
+					// Held still unless the new view puts it on a leader or a leader on it (§3 item 1).
+					const cost = evaluate(req, c, ink, ownOf(req), false, KEEP_CAP);
 					if (cost === Infinity) { return; }
 					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
 					insert(req, c, ink, cost);
@@ -588,7 +637,7 @@
 			order.forEach(function (r) {
 				let n = 0;
 				const a = r.anchor;
-				G.each(a.x - 30, a.y - 30, a.x + 30, a.y + 30, function (it) { if (it.t !== 'text') { n++; } return false; });
+				n += GH.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF) + GS.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF);
 				crowd[r.id] = n + (r.kind === 'link' ? 0.5 : 0);
 			});
 			order.sort(function (a, b) { return crowd[b.id] - crowd[a.id] || (a.id < b.id ? -1 : 1); });
@@ -605,7 +654,7 @@
 				const sets = setsOf[req.id];
 				if (sets.length < 2) { return; }
 				remove(req.id);
-				const b = best(req, sets, true);
+				const b = best(req, sets.slice(0, -1), true);
 				const curS = score(cur.c, cur.cost);
 				if (b && b.s < curS - 1e-9) {
 					insert(req, b.c, b.ink, b.cost);
