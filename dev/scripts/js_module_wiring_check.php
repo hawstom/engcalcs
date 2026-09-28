@@ -63,7 +63,10 @@ const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootst
  * Modules no page loads with a `<script>` tag, and why that is right. Empty today: every
  * `js/*.js` in this repo is on at least one page.
  */
-const EC_UNREFERENCED_MODULES = [];
+const EC_UNREFERENCED_MODULES = [
+    'lpn-placer-b.js' => 'label placer B, a bake-off entry run only by dev/lpn-spike/label-bench/; '
+                       . 'it gets a <script> tag if Tom picks it.',
+];
 
 /**
  * Modules `Looped-Network.php` loads before the editor that the SHARED stub deliberately does not
