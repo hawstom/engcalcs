@@ -271,6 +271,13 @@ async function sectionPlacer(Session, browser, env) {
 		if (!live.last || !live.last.scene) { return; }
 		const scene = live.last.scene;
 		ok('the scene asks for labels', scene.labels.length > 10, scene.labels.length + ' labels requested');
+		// R14: the page hands a placer the user's "Draw link labels along the link line" setting
+		// (Net1 is saved with it on) and marks each pipe label it asks to lie along its pipe.
+		ok('the scene carries the alignment setting and marks the pipe labels it applies to',
+			!!(scene.settings && scene.settings.alignPipeLabels === true && scene.settings.readableAngleDeg)
+			&& scene.labels.some((r) => r.kind === 'link' && r.along === true)
+			&& scene.labels.every((r) => r.kind !== 'link' || r.along === !r.hand),
+			JSON.stringify(scene.settings) + '; ' + scene.labels.filter((r) => r.along).length + ' pipe labels along');
 		ok('rows are measured in the real font, not the stub\'s 6 px advance',
 			scene.labels.some((r) => r.rows.some((w) => w.text.length > 1 && Math.abs(w.w - w.text.length * 6 * scene.text.sizePx / 11) > 0.5)));
 		const want = trivial.place(scene).labels;
