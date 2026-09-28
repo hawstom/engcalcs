@@ -2148,4 +2148,114 @@ against, in the hydraulic-modeling-specific tools (WaterGEMS, InfoWater, EPANET,
 endorsement rests on the spreadsheet precedent, not a hydraulic-software one.
 
 — Mary
+
+## 2026-09-27 — Task 697 pre-release check: does the removal of "we are still finding out" hold up?
+
+Tom's ruling, quoted exactly (per the orchestrator, from `epanet-plus-plus.org/index.html`'s own
+comment): *"We (Mary) are doing dilligent research to find any gaps. I don't think it's most honest
+at this point to imply that we are not or that we don't know EPANET. If needed, let's keep asking
+Mary to double-check."* This entry is that double-check, dated today, re-verified against the code
+rather than trusting the 2026-09-24 audit's OBSERVED lines (per this seat's own decay rule).
+
+### 1. What changed in the code since the last audit (`epanet-gap-audit.md`, 2026-09-24)
+
+**The two top-ranked gaps from that audit are now built.** OBSERVED, checked today:
+`dev/roadmap-closed-ids.md:637-638` — *"0|715| CLOSED 2026-09-26 with the feat/report merge... Report,
+Full, every element at every time step"* and *"0|716| CLOSED 2026-09-26... Report, Status, what
+switched and when."* In code: `js/looped-network.js:54882` (`---- THE STATUS REPORT AND THE FULL
+REPORT (ROADMAP Tasks 716, 715) ----`), `:54935` `statusReportEvents()`, `:55065-55095`
+`fullReportRows()`/`fullReportColHeading()`. `features.html:147` — *"The EPANET run report, including
+every element at every time step and what switched, and when"* — is therefore an accurate, current
+claim, not aspirational; it shipped one day before this session.
+
+### 2. Fresh full sweep, today, against EPANET's own scope
+
+Re-grepped `js/lpn-*.js` and `js/looped-network.js` directly (not trusting the prior session's line
+numbers) for: every named `.inp` section, water quality (age/trace/chemical/reactions/mixing),
+emitters, demand categories, energy, calibration, contour/graphs, MSX, and every `[OPTIONS]`/`[TIMES]`/
+`[REPORT]` keyword.
+
+**Confirmed still HAVE, re-verified today (OBSERVED):** `[EMITTERS]` (`js/lpn-epanet.js:704`,
+`js/lpn-net.js:400-401`), `[MIXING]` with all four models (`js/lpn-epanet.js:584-596`, comment names
+2COMP/FIFO/LIFO/MIXED), `[DEMANDS]` multiple categories with the replace-not-add semantics
+(`js/looped-network.js:865-894`, `:2594-2615`), `[STATUS]` overrides (`js/lpn-inp.js:1206-1241`),
+`[REACTIONS]`/`[SOURCES]`/`[QUALITY]` (`js/lpn-epanet.js` per 2026-09-24 audit, re-confirmed today),
+`[RULES]` (`js/lpn-rules.js`), all seven `[TIMES]` keywords the page itself defines
+(`js/lpn-patterns.js:155-186`: Duration, Hydraulic/Pattern/Report Timestep, Pattern/Report Start,
+Start ClockTime, plus Quality Timestep read-only), `Unbalanced`/`CHECKFREQ`/`MAXCHECK`/`DAMPLIMIT`/
+`Diffusivity`/`Tolerance`/`Specific Gravity`/`Viscosity`/`Emitter Exponent`/`Demand Multiplier`
+(`js/lpn-inp.js:518-564,1657-1674`).
+
+**One new, small, genuine gap found today that the 2026-09-24 audit did not list:** the `[TIMES]`
+**`Statistic`** keyword (EPANET's AVERAGED/MINIMUM/MAXIMUM/RANGE reporting mode, which changes what
+a reported timestep's value MEANS over an extended-period run) is explicitly read-and-discarded.
+OBSERVED, today: `js/lpn-inp.js:726-727` — *"Quality Timestep, Report Start's siblings and Statistic
+all land here and are skipped: nothing on this page reads them"* — and `js/lpn-patterns.js:136-137`,
+independently, in the newer time-settings module: *"Water-quality timestep and the reporting
+statistic are NOT here: nothing on this page reads them, and a field nobody reads is a field that
+goes stale."* (Correction to my own reading in-session: Quality Timestep IS read elsewhere, into
+`times.qualityStep`, per `js/lpn-patterns.js:178-184` — the `lpn-inp.js` comment is stale on that one
+word; `Statistic` is the part of that sentence still true.) **This is a genuine, present-tense gap,
+not on `dev/ROADMAP.md` under any number I could find** (grepped "Statistic", zero hits in ROADMAP).
+Low-stakes: it only matters to a user who wants EPANET's non-default reporting mode, and this suite's
+Report Timestep already reports the raw instantaneous value, which is EPANET's own default too.
+
+**Reconfirmed MISSING, unchanged since 2026-09-24, all re-grepped today with zero hits in
+`js/lpn-*.js`/`js/looped-network.js`:** Calibration data/report (ROADMAP Task 601, still open,
+priority 75), EPANET `.PRO` profile import (Task 604, open, 75), contour/frequency-distribution/
+system-flow-balance plots (Task 600, open, 75), an overview/locator inset for panning, multiple
+document windows (answered differently, by browser tabs).
+
+**Multi-species reactive transport (MSX): confirmed absent, and confirmed to be a DIFFERENT PROGRAM,
+not a feature of EPANET's own desktop GUI.** OBSERVED: zero hits for `msx` anywhere in `js/lpn-*.js`
+today. CITED: EPANET-MSX is a separate executable and toolkit, maintained by OWA/EPA
+(`github.com/OpenWaterAnalytics/epanet-msx`), not bundled into EPANET 2.2/2.3's own GUI — EPA's own
+Science Inventory record calls it *"EPANET Multi-Species Extension Software"* distinct from EPANET
+itself (cfpub.epa.gov/si/si_public_record_report.cfm, dirEntryId=218488). **This actually narrows the
+gap, not widens it**: "EPANET does not have this either, in the sense the question was asked" is the
+honest sentence, not "EPANET has MSX and we don't" — worth knowing precisely if anyone is ever tempted
+to name MSX in public copy, in either direction.
+
+### 3. Reading every sentence on the site against this list
+
+Read `index.html`, `features.html`, `disclosures.html`, `CLAIMS.md` in full today. **I did not find a
+single sentence that the gap list above makes false.** The site's own structure already does the work
+Tom's removed sentence used to do, in two places that are still standing:
+
+- `disclosures.html` item 3, verbatim, unchanged: *"We do not publish a completeness claim against
+  EPANET, and nothing on this site should be read as one... If you find something EPANET does that
+  EPANET++ does not, that is a report we want."*
+- `CLAIMS.md` §10, "Claims deliberately not made": *"Any statement that EPANET++ does everything
+  EPANET does... Any statement that EPANET lacks a feature EPANET++ has."*
+
+Neither of those is a claim of ignorance ("we don't know EPANET") — both are a standing invitation to
+be corrected, which is compatible with Tom's stated posture ("doing diligent research," not "we don't
+know"). The headline and lede (`index.html:71-72`) list only additions ("scenarios, world map, fire
+flow, customers, custom properties, and asset libraries") and never assert or imply totality; the
+`features.html` list is captioned *"This list is long and detailed, but incomplete"* (`features.html:
+56`), which is the opposite of a completeness claim.
+
+**The one place a reasonable engineer's misreading risk is structural rather than sentence-level, and
+it is not new information — this seat's own wishlist item 0a already named it:** the "++" itself is a
+superset-reading convention (C++), and that risk does not go away because one sentence was removed —
+it was never carried by that sentence in the first place; it is carried by `disclosures.html` item 3
+and `CLAIMS.md` §10 doing the actual work. Removing the sentence removes a hedge that was redundant
+with two other standing hedges, not the only hedge in place.
+
+### 4. Verdict for Tom, plain words
+
+**Yes, honest to release as written.** I read every sentence on the front page, the feature list, the
+disclosures page, and the claims ledger against a fresh, re-verified list of what EPANET can do that
+this suite cannot (calibration reports, importing a `.PRO` profile list, three of EPANET's plot types,
+one obscure reporting-mode option, and multi-species chemistry — which turns out to be a separate EPA
+program, not part of EPANET's own desktop application). None of those gaps is claimed away anywhere on
+the site; the site already says, in its own words, that it makes no claim to completeness and wants
+to hear about anything it is missing. The sentence Tom removed was doing the same job two sentences
+still on the site already do, so removing it does not create a false impression — the site was not
+relying on that one sentence alone to stay honest. The single smallest thing worth doing, not a
+wording change: add the `[TIMES] Statistic` gap found today to `dev/ROADMAP.md` as a tracked item (it
+currently is not), so "diligent research" stays true of the tracker, not just of this one-time
+session — that is a housekeeping note, not a defect in anything published.
+
+— Mary
 </content>

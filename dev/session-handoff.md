@@ -8,10 +8,11 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Four branches may not merge without Tom's all-clear** (in `protected` in
-  `dev/branch-policy.json`; `feature_freeze` is OFF): `feat/symbology-label`, `feat/quality-settings`,
-  `feat/label-gang-search`, `feat/ctrl-enter`.
-- **Every one of them fails `payload freshness` and only that**, by design: agents never
+- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/ctrl-enter`,
+  `feat/table-width`, `feat/epanet-plus-plus` (held for RELEASE), `feat/label-placer` (the seam; merges
+  with the chosen placer), and `feat/label-gang-search` (bench only now; delete once a placer lands).
+  Builder branches `feat/label-placer-a` and `-b` never merge on their own.
+- **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
   mid-build, so pin to the final head and say so in `pin_note`.
@@ -95,61 +96,78 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-27 (evening)
+## STATE — 2026-09-28
 
-### Production is 83bf02d5 (Tom pulled 2026-09-26). Master 3bc9c4a8 is ahead of it
+### Production: last known 83bf02d5 (pulled 2026-09-26). Master e2b5cab1 is ahead
 
-Unpulled on master: table-editing, convert-as, table-help, the two error_log fixes,
-placement-wizard, find-coordinate, R-306 world view, and today row-paste (his all-clear) and the
-R-171 harness extension. R-348: remind him to test symbology on dev once it merges and he pulls.
+Unpulled on master, each on his word or green tooling: the label rules, the label bench, the
+Select-mode hover highlight (his "Merge and delete"), the water tower icons ("We are gold"), Task 696
+closed, `dev/earliest-date.md`. Ask whether he has pulled before explaining what he sees. **R-348:
+remind him to test symbology on dev once he pulls.**
 
-### Awaiting his browser pass (each green but payload freshness; each Perry-reviewed; pushed)
+### Label placement rebuild (Task 539) -- the live thread
 
-- **8120 `feat/symbology-label`** 78b7ef98 -- R-346 Bef./Aft./Use units order, R-347 US Length
-  and Diameter `'` `"` unticked (SI ticked), R-342 new project inherits. OPEN QUESTION: the build read
-  "otherwise built-in defaults" narrowly -- a changed unit resets only what is calibrated to it
-  (Use units ticks, typed defaults, customer label width); prefixes, colouring, Show/Drop still carry.
-  CLAUDE.md and dev/unit-rulings.md already say so; revert both if he rules the literal reading.
-- **8121 `feat/quality-settings`** 24aa4bfa -- R-349 link concentration in Tables, Find,
-  Properties; R-350 Source type None and disabled while Source quality is blank. Perry could not open
-  a pump's Properties box (his Find for pump IDs came back empty; probably scope). Keys:
-  lpn_quality_named_avg_concentration, lpn_source_type_none.
-- **8090 `feat/label-gang-search`** 8b31a907 -- R-338/R-351: gang repair cost (6.9 s of 9.3 s)
-  and the slide step (a quarter of the LABEL height, not a text row) found and fixed; 3-7x faster,
-  no gaps at his zoom, still 3-5x master at crowded views. R-339 done. OPEN: three gaps at 1.75x are
-  the R-075 ID reserve (R-075 vs R-351, his ruling). Full account: dev/label-placement-algorithms.md 22.
-- **8123 `feat/ctrl-enter`** d6558eb4 (NEW PORT, needs the Apache reload) -- Task 690: Ctrl+Enter
-  fills a selection with the active cell's value, one undo. Declan's spec
-  dev/task-690-ctrl-enter-spec.md. Key: lpn_pane_ctrlenter_filled, and a Help, Notes row.
+- Rules: `dev/label-placement-rules.md`, REVIEWED by him 2026-09-28 (N2 removed, N5 added, S3/S4/H1/W2
+  in his words, builders get cost ORDER only). Page: https://claude.ai/artifact/HBdFNppA44NuwHjeKsi43N
+- Bench: `dev/lpn-spike/label-bench/` on master; judges-only secret tests in `judges/` (R-075 and his
+  two screenshots). Builders must never be told about `judges/`.
+- Seam: `feat/label-placer` -- `?placer=<name>` on a DEBUG host hands node and link labels to
+  `js/lpn-placer-<name>.js`. Green on master 78b36358.
+- Two clean-room builders finished 2026-09-28: `feat/label-placer-a` (js/lpn-placer-a.js) and
+  `-b`. Both zero never-rule breaks on all 15 views (master: 39). A: 82% labels, 48% values,
+  50 ms median, 3 unforced moves of 1316. B: 76% / 42%, 6 ms median, 46 of 1208, shorter leaders.
+  **Both FAIL R-075**: long IDs move 61% (A) and 52% (B) of shown labels, master 13%. Both pass all 10
+  screenshot assertions.
+- **His open decision:** how to feed the R-075 failure back without revealing the test (his Q11:
+  builders build to "use convenient available space effectively"). Then his side-by-side look:
+  **8129 = A, 8130 = B**, each with the seam merged in; the URL needs `?placer=a` / `?placer=b`
+  (without it the port shows today's labels). Both ports need his Apache reload (commands below).
+- Known flaws, from the builders: A hides ~18% at fit in dense cores, turned pipe labels never grow,
+  never uses the hook. B never relocates a label that settled small, no wrapping, no hook, and a
+  hand point INSIDE a symbol still breaks N1/N3 (not in the bench scenes: add such a scene).
+  Both declared their file bench-only in `EC_UNREFERENCED_MODULES`; the winner needs that undone.
 
-**Merge order, for the seams:** symbology-label first (label-order functions shared with
-label-gang; its concentration row reads quality's `qualityLabel()`), then merge master into
-quality-settings and label-gang and run their harnesses before each goes.
+### Awaiting his browser pass or ruling
 
-### Open with him
+- **8124 `feat/table-width`** 5ce78416 and **8123 `feat/ctrl-enter`** d6558eb4 -- unchanged since
+  09-27; ctrl-enter needs only his merge word (Mary and Ida endorse).
+- **`feat/epanet-plus-plus`** 111b6243 -- he looked on 8127 ("lpn: Good"). Held until he says
+  "release". Then, in order: merge master in, suite, merge, push; he pulls engcalcs; he sets
+  ea-php83, makes the `engcalcs` symlink, adds the host to the Mapbox token; we push the landing
+  repo's release commit (swap the temporary `/app` 302 in its .htaccess for the rewrite, carry
+  cPanel's ea-php83 handler block in the tracked .htaccess as LWN does, point APP_URL in
+  tools/build.py at epanet-plus-plus.org/app/, sitemap via `generate_sitemap.php --host=`); he
+  pulls; we verify with the curls in the plan, section 6.
+- **R-253** wording ruling (`lpn_convas_no_transform`), the one loose end of closed Task 696.
 
-- Task 697 plan: dev/epanet-plus-plus-plan.md, five questions (Option A landing page recommended).
-- R-235 (WaterCAD sample .inp from IOD).
-- The hardware box for more agents: nothing was saved in any transcript here; answered from scratch.
+### EPANET++ is live (Option A), 2026-09-28
+
+epanet-plus-plus.org serves the landing site, epanetpp.org 301s to it; both are clones in their
+docroots (`~/addon_html/...`), ignored by the home-folder repo like the other two sites. Search
+Console property added. `advisors.html` is on the server but noindex, out of sitemap and nav, until
+three more advisors are filled (Tom's card is his own words and his "Tom-surveying" photo).
 
 ### Translation sprint
 
-Not launched. Wait until the four branches merge (all change English), then one sprint covers
-them with table-editing, placement-wizard and row-paste (already on master).
+Held: 48 English strings on master await his ruling (`dev/new-english-keys.md`).
 
-### Traps met 2026-09-27
+### Traps met 2026-09-28
 
-- **The chime marker is `~/.claude/hooks/chime.busy`, not a folder inside the repo.** Touch it before
-  any background work; a marker older than 12 hours is ignored.
-- **Build agents hand back while their check_all is still queued.** Read the log yourself before
-  calling a branch green.
-- **Load flakes, green alone:** `label-drag-fit-harness.js` (the fit lands on the label threshold),
-  `time-harness.js` ("frames come back without pressing Run").
-- **Never let a consulting agent write into the main checkout while its suite runs**; brief it to
-  write to the scratchpad.
-- **A fresh worktree has no `dev/browser-pass/node_modules`**; symlink it from the main checkout.
-  Give each agent a unique scratchpad log name. `example-open-guard-harness.js` fails 2 of 18
-  under load and passes alone.
+- **The auto-mode permission classifier refused a green merge to master ("Merge Without Review"),
+  killing another agent's stray processes, and once a plain `git status`.** It cannot see our
+  merge-on-green rule. Quote Tom's words when retrying; never route the refused action through an
+  agent. He asked whether updates caused it; the honest answer is "probably a stricter classifier,
+  not our repo".
+- **A fresh worktree lacks `dev/browser-pass/node_modules`**, so browser harnesses fail as
+  "playwright-core is not installed". Link it: `ln -s <main>/dev/browser-pass/node_modules
+  dev/browser-pass/node_modules` in each new worktree before its suite.
+- **Closing a roadmap task changes `dev/features.md`**: run `php dev/scripts/generate_features.php`
+  with the closure, or master's suite fails "features list fresh".
+- **Keep `~/.claude/hooks/chime.busy` until NOTHING is outstanding** -- no agent, no background run,
+  no scheduled wakeup. Removing it at a report while notifications could still arrive made every
+  later turn chime (his "chimes noise I can't account for").
+- **A subagent will write "P.E.", "Founder" and reasons he never gave** into copy about him. Read
+  every sentence about Tom before it ships.
 
 ## Commands to hand Tom with any panel change
 
