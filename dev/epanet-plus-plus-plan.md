@@ -75,22 +75,17 @@ than EPANET" (the exact `LibreEPANET` trap).
 Put it on the first screen — "++" is a bolder typographic claim than "Not EPANET" and invites the
 affiliation question harder.
 
-### Draft hero copy — PROPOSAL for Tom's ruling, not final
+### Hero copy
 
-**Headline:** EPANET++: scenarios, world map, fire flow, customers, custom properties, and asset libraries, given to the world on the same engine EPA gave the world.
+The proposal that stood here is superseded. **The live wording is Tom's own** — read
+`~/webdev/epanet-plus-plus.org/index.html`, lines ~66-72 — made exact about the engine (OWA-EPANET
+2.3.5, Open Water Analytics' MIT-licensed continuation) on his instruction the same day it was
+drafted (2026-09-27: "Make it exact"). Do not edit a word of it without his ruling; do not
+re-propose it here.
 
-**Lede:** EPANET++ is a free libre open-source water network editor built on the EPANET engine itself,
-the same solver the U.S. Environmental Protection Agency wrote and gave away, extended with
-scenarios, world map, fire flow, customers, custom properties, and asset libraries you can import across projects. It
-is not EPANET, and it is not affiliated with or endorsed by the EPA; it is one of many tools built
-on public-domain software EPA released to everyone. [TGH: We (Mary) are doing dilligent research to find any gaps. I don't think it's most honest at this point to imply that we are not or that we don't know EPANET. If needed, let's keep asking Mary to double-check. I say we remove the net sentence.] We are still finding out what EPANET can do
-that we cannot, and we say so.
-
-**Call to action:** Open the network editor. (links to `https://librewaternet.org/app/`)
-
-Flags for Tom: the last lede sentence paraphrases the "infinite depth" honesty asset rather than
-quoting it verbatim — see Question 3 below. No phone/PC/third-party claims belong on a one-screen
-hand-off page, so none appear here.
+**Rejected, on his instruction, and not to be restored:** "We are still finding out what EPANET can
+do that we cannot, and we say so." — implied the suite might not yet know EPANET's gaps, when
+diligent research (Mary) was already underway to find them.
 
 ## 3. Fit with the mission and the sibling sites
 
