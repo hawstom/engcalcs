@@ -46,7 +46,7 @@ EngCalcs.lpnPlacerC = (function () {
 	};
 	var ROW_GAIN = 3.2;        // one more property is worth this much crossing
 	var ALONG_TRIES = 16;      // spots along the pipe a quick search judges, apart from the level ones
-	var LEVEL = 3.2;           // (halved) a level pipe label where the user asked for it along its pipe (R14)
+	var LEVEL = 6;             // (halved) a level pipe label where the user asked for it along its pipe (R14)
 	var SHAPE = 1.8;           // a label not in its usual shape (R1: wholeness goes after nearness)
 	var LDR_BASE = 0.35;       // having a leader at all
 	var LDR_PER_PX = 0.02;     // and each pixel of it
@@ -65,7 +65,7 @@ EngCalcs.lpnPlacerC = (function () {
 	// How hard a pan or zoom may look: a label looks this far down its list before giving up,
 	// growing looks only this far (convenient space), and MEND and NUDGE judge at most this many
 	// spots each.
-	var QUICK = { show: 120, grow: 30, mend: 1500, nudge: 600, deadline: 0 };
+	var QUICK = { show: 120, grow: 50, mend: 2000, nudge: 600, deadline: 0 };
 	var NAME = 'C (keep, show, grow, mend)';
 
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
@@ -314,8 +314,24 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		var i0 = Math.max(0, Math.ceil((b.x0 - this.x0) / r)), i1 = Math.min(nx, Math.floor((b.x1 - this.x0) / r));
 		var j0 = Math.max(0, Math.ceil((b.y0 - this.y0) / r)), j1 = Math.min(this.ny, Math.floor((b.y1 - this.y0) / r));
+		if (i0 >= i1 || j0 >= j1) { return false; }
+		var S = this.sat;
+		if (S) {
+			var w = nx + 1;
+			return S[j1 * w + i1] - S[j0 * w + i1] - S[j1 * w + i0] + S[j0 * w + i0] > 0;
+		}
 		for (j = j0; j < j1; j++) { for (i = i0; i < i1; i++) { if (a[j * nx + i]) { return true; } } }
 		return false;
+	};
+	// Freeze a raster that will not change again this view: a summed-area table answers
+	// solidUnder() for a level box in four reads.
+	Raster.prototype.freeze = function () {
+		var nx = this.nx, ny = this.ny, w = nx + 1, a = this.a, S = new Int32Array(w * (ny + 1));
+		for (var j = 0; j < ny; j++) {
+			var run = 0;
+			for (var i = 0; i < nx; i++) { run += a[j * nx + i] ? 1 : 0; S[(j + 1) * w + i + 1] = S[j * w + i + 1] + run; }
+		}
+		this.sat = S;
 	};
 	function inOB(x, y, b) {
 		var dx = x - b.cx, dy = y - b.cy;
@@ -617,6 +633,7 @@ EngCalcs.lpnPlacerC = (function () {
 					}
 				}
 			});
+			hr.freeze();
 			var customers = {};
 			(scene.customers || []).forEach(function (c) { customers[c.id] = c; });
 
@@ -1094,10 +1111,10 @@ EngCalcs.lpnPlacerC = (function () {
 		// order of their own cost; once that alone reaches the best found, nothing cheaper is left.
 		// What a spec costs against the fixed map is remembered for the rest of the view.
 		function bestFor(st, L, rsI, bound, maxTries, homeOnly) {
-			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, alongTries = 0, sv;
+			var best = null, bestCost = bound + (L.along ? LEVEL / 2 : 0), specs = L.specs, c = st.probe, cost, i, tries = 0, alongTries = 0, sv;
 			if (L.prevPl && !homeOnly && fillPrev(st, L, rsI, c)) {
 				// Its bonus buys it preference, never the right to cost more than the bound.
-				cost = judge(st, L, c, Math.min(bestCost, bound + PREV_BONUS));
+				cost = judge(st, L, c, bound + PREV_BONUS);
 				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
 			}
 			var sc = L.sc[rsI];
@@ -1106,20 +1123,26 @@ EngCalcs.lpnPlacerC = (function () {
 				if (specs[i].base >= bestCost) { break; }
 				if (st.effort.deadline && (i & 31) === 31 && now() > st.effort.deadline) { st.late = true; break; }
 				sv = sc[i];
-				if (sv >= bestCost) { continue; }            // known illegal, or too dear already
-				if (homeOnly && (homeOnly === 'along' ? specs[i].t !== 'along' : (specs[i].t === 'ldr' || specs[i].layout !== L.usual))) { continue; }
-				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
+				// A level spot for a label asked along its pipe carries the LEVEL penalty in its
+				// cost, which ranks it behind a spot along the pipe but never bars it: the bound is
+				// raised by as much for it. A spot along the pipe keeps to the bound itself.
+				var along = specs[i].t === 'along', lim = along ? Math.min(bestCost, bound) : bestCost;
+				if (sv >= lim) { continue; }            // known illegal, or too dear already
+				if (homeOnly && (homeOnly === 'along' ? !along : (specs[i].t === 'ldr' || specs[i].layout !== L.usual))) { continue; }
 				// Spots along the pipe are counted apart, so trying them never uses up the level ones.
-				if (specs[i].t === 'along') { if (maxTries && ++alongTries > ALONG_TRIES) { continue; } }
-				else if (maxTries && ++tries > maxTries) { break; }
-				if (sv !== sv) { sv = sc[i] = staticCost(st, L, c); if (sv >= bestCost) { continue; } }
+				if (along && maxTries && alongTries >= ALONG_TRIES) { continue; }
+				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
+				if (along) { alongTries++; } else if (maxTries && ++tries > maxTries) { break; }
+				if (sv !== sv) { sv = sc[i] = staticCost(st, L, c); if (sv >= lim) { continue; } }
 				c.stat = sv;
-				cost = dynCost(st, L, c, sv, bestCost);
-				if (cost < bestCost) { bestCost = cost; c.cost = cost; best = keep(c); }
+				cost = dynCost(st, L, c, sv, lim);
+				if (cost < lim) { bestCost = cost; c.cost = cost; best = keep(c); }
 			}
 			return best;
 		}
 
+		// The LEVEL penalty a spot carries in its cost, for bounds that must not count it.
+		function pen(L, spec) { return L.along && spec && spec.t !== 'along' ? LEVEL / 2 : 0; }
 		// Is a level block already along its pipe (a pipe level on screen, within 5 degrees)?
 		function alignedNow(L, c) {
 			var q = nearestOn(L.owner.poly, c.blk.cx, c.blk.cy), p = pointAt(L.owner.poly, q.s);
@@ -1157,8 +1180,10 @@ EngCalcs.lpnPlacerC = (function () {
 					if (cur === Infinity) { cur = c0.cost || 0; }
 					// A label asked along its pipe may grow into a level spot at no loss for being level:
 					// the setting chooses between spots, it never costs a property (R14 yields to G).
-					var lv = L.along ? LEVEL / 2 : 0;
-					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN + lv, Math.max(cur, SHOW_MAX + lv)), st.effort.grow);
+					// What the spot is worth, without the bonus for staying put or the LEVEL penalty: a
+					// kept label may grow as freely as a new one.
+					cur -= pen(L, c0.spec) + (c0.spec ? 0 : Math.min(0, c0.base));
+					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), st.effort.grow);
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
@@ -1184,7 +1209,8 @@ EngCalcs.lpnPlacerC = (function () {
 					tried[bl.id] = 1;
 					var mine = keep(c), old = bl.cur;
 					uncommit(st, bl);
-					var cost = mine.stat < SHOW_MAX ? dynCost(st, L, mine, mine.stat, SHOW_MAX) : Infinity;
+					var cap = SHOW_MAX + pen(L, mine.spec);
+					var cost = mine.stat < cap ? dynCost(st, L, mine, mine.stat, cap) : Infinity;
 					if (cost === Infinity) { commit(st, bl, old); continue; }
 					mine.cost = cost;
 					commit(st, L, mine);
@@ -1209,14 +1235,15 @@ EngCalcs.lpnPlacerC = (function () {
 				for (var k = 0; k < L.specs.length && k < 24 && st.work < limit && !done; k++) {
 					if (sc[k] === Infinity || !fillSpec(st, L, L.specs[k], rsI, c)) { continue; }
 					if (sc[k] !== sc[k]) { sc[k] = staticCost(st, L, c); }
-					if (sc[k] >= c0.cost + ROW_GAIN || sc[k] >= SHOW_MAX) { continue; }
+					var pk = pen(L, L.specs[k]) - pen(L, c0.spec);
+					if (sc[k] >= c0.cost + ROW_GAIN + pk || sc[k] >= SHOW_MAX + pk) { continue; }
 					c.stat = sc[k];
 					var bl = blocker(st, L, c);
 					if (!bl || tried[bl.id] || !bl.cur) { continue; }
 					tried[bl.id] = 1;
 					var mine = keep(c), old = bl.cur;
 					uncommit(st, bl);
-					var cost = dynCost(st, L, mine, mine.stat, Math.min(c0.cost + ROW_GAIN, SHOW_MAX));
+					var cost = dynCost(st, L, mine, mine.stat, Math.min(c0.cost + ROW_GAIN, SHOW_MAX) + pk);
 					if (cost === Infinity) { commit(st, bl, old); continue; }
 					mine.cost = cost;
 					commit(st, L, mine);
