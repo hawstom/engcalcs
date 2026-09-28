@@ -1726,6 +1726,9 @@ the block.
   identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
   catches it; bring them current or retire the checks.
 
+- 50|735| **Honour `[TIMES] Statistic` instead of discarding it.** Mary, 2026-09-27: AVERAGED,
+  MINIMUM, MAXIMUM and RANGE are read and dropped (`js/lpn-inp.js:726`, `js/lpn-patterns.js:136`); a
+  file that sets one reports differently in EPANET. Her journal 2026-09-27; not a site-honesty defect.
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
