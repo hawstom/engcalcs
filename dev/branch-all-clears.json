@@ -227,6 +227,12 @@
             "date": "2026-09-27",
             "words": "1. OK. 2. OK. BTW, mouse cursor and selection are perfect. 3. OK.",
             "context": "His pass on port 8121. Asked in the same session whether to merge and delete, he chose \"Yes, merge and delete\". His peripheral rules (4.1 initial column widths, 4.2 centred ID column) are built on feat/table-width, not here."
+        },
+        "feat/selection-preview": {
+            "head": "25a3cf2a",
+            "date": "2026-09-28",
+            "words": "Select mode highlights: Good. Done. Merge and delete.",
+            "context": "His pass on port 8128 after Perry's READY pre-review (journal 2026-09-28). The branch is one commit; merged with master on the merge commit itself."
         }
     }
 }

@@ -1,8 +1,8 @@
 # Label placement rules for the rebuild
 
-**Status: DRAFT FOR TOM'S REVIEW, 2026-09-28.** Written from his interview answers of 2026-09-27
+**Status: REVIEWED BY TOM 2026-09-28; his edits applied the same day.** Written from his interview answers of 2026-09-27
 (the couch, https://claude.ai/artifact/PyZpPyHbpACHsu7fHVZEZJ, 13 answers) and his two instructions
-that followed it. Nothing is built from this until he has read it. His answers, verbatim, are in §6.
+that followed it, then revised with his review of 2026-09-28. His answers, verbatim, are in §6.
 
 Part A (§1-§4) is what the two builders receive. Part B (§5-§6) is held back from them on his
 ruling (Q11, Q12) and is for him and for the judges.
@@ -28,11 +28,14 @@ is biological; it is real."*
 
 A layout that breaks one of these is wrong, however good its other numbers.
 
-- **N1. No label overwrites a symbol, another label, or a Text object.**
-- **N2. No leader crosses another leader.**
+- **N1. No label overwrites a symbol or another label.**
 - **N3. No leader passes through another node's symbol.** (Ruled before, R-339.)
 - **N4. A label that the user placed by hand stays where the user put it**, and is never hidden by
   an automatic pass. A leader the user dragged passes through its stored end point.
+- **N5. No label overwrites a Text object.**
+
+(There is no N2. A leader crossing another leader is a heavy cost, not a ban: Tom, 2026-09-28,
+*"Let's remove N2."*)
 
 ### 3. What good looks like, in order
 
@@ -43,19 +46,12 @@ After the rules above, in this order (Tom, Q02):
 3. **Use the space nearby well.** If a label cannot find good space near home cheaply, drop things
    rather than send it far away.
 
-#### 3.1 Costs of what may cross what
+#### 3.1 What may cross what, worst first
 
-Tom's weights, 0 (harmless) to 1 (never), Q05:
-
-| Crossing | Cost |
-|---|---|
-| Label on Text | 1 (never; N1) |
-| Label on symbol or label | 1 (never; N1) |
-| Leader on leader | 0.9 (never; N2, see question 1 in §4) |
-| Label on leader | 0.7 |
-| Label on link (pipe) | 0.3 |
-| Leader on link (pipe) | 0.2 |
-| Label on customer | 0 |
+After the never-rules, crossings cost something, from worst to least: a leader crossing another
+leader (very confusing); a label on a leader; a label on a pipe; a leader on a pipe. A label on a
+customer costs nothing. (Tom's weights are in Part B; builders get the order only, his ruling of
+2026-09-28.)
 
 #### 3.2 Space
 
@@ -68,13 +64,14 @@ Tom's weights, 0 (harmless) to 1 (never), Q05:
   shared edge: when the open ground is to the west, the column is right-aligned on a shared east
   edge, and every row grows west into the empty ground. No space is held in reserve for growth
   that points into open ground. (Tom's rule (a), 2026-09-27.)
-- **S3. Beyond reach, drop rather than travel.** The model has no edge: a network runs off the
-  screen in every direction, so zooming out never frees unlimited room, and a long "heroic" leader
-  to a distant margin solves nothing there. Expect more full labels as the view zooms in, and
-  shed readily as it zooms out. (Q09)
-- **S4. When space truly runs out, give up in this order:** the whole label near its node; the
-  whole label on a longer leader, within reach; a value dropped (by the user's drop order); the
-  label hidden. (Q09 confirms the order already ruled in R-164/R-165.)
+- **S3. If there is no attractive space further away, drop rather than travel.** If the network
+  runs off the screen, zooming out doesn't free unlimited room and a heroic leader solves nothing;
+  fit all in the available space or drop properties and possibly labels. Expect more full labels
+  as you zoom in. (Tom's wording, 2026-09-28.)
+- **S4. When space runs out, give up in this order:** give up on wholeness and proximity to home
+  node; give up on wholeness even on a longer leader at an attractive open space; give up on
+  showing more than a single property as determined by drop order; give up on showing the label
+  at all. (Tom's wording, 2026-09-28.)
 
 #### 3.3 Time
 
@@ -89,9 +86,9 @@ Tom's weights, 0 (harmless) to 1 (never), Q05:
 
 #### 3.4 Shape
 
-- **H1. Each kind of label starts in its usual shape** (a node label stacked, a pipe label along
-  its pipe). A label may wrap or unwrap if that uses space better, and is rewarded for it, but it
-  is lazy: it usually keeps the default. (Q07)
+- **H1. Each kind of label starts in its usual shape.** It may wrap or unwrap to use space better
+  and is rewarded for it, but it is lazy and usually doesn't because that takes time. (Tom's
+  wording, 2026-09-28.)
 - **H2. Leaders are straight.** One standard hook, the same short shape for every leader, is
   allowed if it helps. No shape invented for one label. (Q06)
 
@@ -100,17 +97,31 @@ Tom's weights, 0 (harmless) to 1 (never), Q05:
 - **One system for node labels and pipe labels, built first**: a map of the network's real
   estate (where things are, where the free space is), which both use. Customer labels and Text
   are built after, and may read the same map. (Q10)
-- **Who gives way:** customer labels yield first. Text objects are the user's own and yield last,
-  if at all. (Q10)
+- **Who gives way:** customer labels give way first and easily. Text is user-placed and never
+  gives way. (Tom's wording, 2026-09-28.)
 - **The interface you build to is a pure function**, with no page and no DOM: the network, the
   symbols, each label's rows and sizes, and the view go in; each label's position, its shown
   rows and its leader come out. The bench (§4.1) calls it exactly that way. `js/lpn-collide.js`
   on master is an example of that style, not a design to copy.
 
+#### 4.0 Ideas you may use or ignore
+
+Offered in general terms on Tom's suggestion (2026-09-28); none is required, and a better idea wins.
+
+- The industry-standard nearby positions around a point: the quadrants beside it, tried in a
+  preferred order.
+- Open sectors: the directions around a node that nothing occupies.
+- A box model of open space: the free ground near a node described as rectangles a label could
+  stand in.
+- A per-zoom lookup table: what a node's best spot is at each of a range of zooms, found once and
+  reused.
+- A ranked gap list: for each node, the angular gaps between the pipes leaving it, widest first.
+  The widest gap is usually the most open direction for its label.
+
 #### 4.1 The bench
 
-Every candidate runs the same scenes and prints the same scores: breaks of N1-N4 (must be zero),
-the §3.1 crossing cost, values shown, labels shown, leader length, how far labels move between two
+Every candidate runs the same scenes and prints the same scores: breaks of N1, N3, N4 and N5 (must be zero),
+the crossing cost (Tom's weights, Part B), values shown, labels shown, leader length, how far labels move between two
 zooms, and time per layout on a named machine. Scenes include EPA Net1, Net2 and Net3, and Net3 on
 the world map near Novato at several zooms with three properties per node.
 
@@ -140,23 +151,31 @@ want them to build to"*):
     Breaks S1 and S3; S2 says the column should hang on its east edge and use the ground to the
     west.
 
-**His ideas, remembered, not given to the builders** (Q12: *"Maybe we shouldn't show them to the
-builders. But we should remember them."*): quadrants, sectors and boxes; `spot_prime` and
+**Tom's crossing weights**, 0 to 1 (Q05): label on Text 1, label on symbol or label 1, leader on
+leader 0.9, label on leader 0.7, label on link 0.3, leader on link 0.2, label on customer 0. The
+bench scores with these; builders see only the order (his ruling, 2026-09-28).
+
+**His ideas, remembered.** Quadrants, sectors, boxes, the per-zoom table and the ranked gap list now
+go to the builders in general terms (§4.0), on his suggestion of 2026-09-28. Held back still: `spot_prime` and
 `box_est` (`dev/label-placement-algorithms.md` §9b-§9d); the four corner positions and the zoom at
 which each stops working (R-077); a per-node lookup table of good places across a range of zooms
 (R-076); the ranked list of gaps between a node's pipes (R-079); leader angles on a 15-degree grid
-(`dev/label-placement-goals.md` §2). If a builder reinvents one of these unprompted, that is
-evidence for it.
+(`dev/label-placement-goals.md` §2), held back on his ruling of 2026-09-28: *"I am discovering that
+long leaders naturally tend to align by not crossing and that short leaders don't gain a lot by
+snapping to those angles."*
 
-### Questions for Tom
+### His review, 2026-09-28, verbatim
 
-1. **Leader on leader: never, or 0.9?** Q02 lists "no crossing leaders" as unbreakable; Q05 gives
-   it 0.9. This draft reads it as never (N2), with 0.9 only as how badly the bench scores a layout
-   that breaks it. Right?
-2. **The 15-degree leader angles**: yours from 2026-08-16 (*"we don't check oddball angles, so we
-   don't look ugly"*). Give it to the builders as a rule, or hold it back as an idea?
-3. **Should the builders see Part A §3.1's numbers**, or only the order? The numbers are yours and
-   make the judging fair; they also invite building to the score.
+1. Leader on leader: *"Let's remove N2."*
+2. The 15-degree angles: *"Hold it back as an idea. I am discovering that long leaders naturally
+   tend to align by not crossing and that short leaders don't gain a lot by snapping to those
+   angles."*
+3. Numbers or order: *"Only the order, I think."*
+4. What I got wrong: *"To be honest, your attempt makes me despair. Keep trying."* Then his
+   rewrites of N5, S3, S4, H1 and W2, applied above word for word, and: *"We could try giving the
+   builders some of our ideas in a general way as prompts (industry standard nearby quadrants, open
+   sectors, box model of open spaces, a per-zoom lookup table, the ranked gap list (I don't know
+   what this is. Will they?))"* -- the ranked gap list is explained in §4.0.
 
 ---
 

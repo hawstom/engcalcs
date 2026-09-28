@@ -122,7 +122,7 @@ judgement and does not belong to a script.
 
 ### feat/zoom-control (8103)
 
-- [?] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report
+- [x] R-235 feat/zoom-control | "Zooming keeps a half-drawn Zoom Window box: I don't know what this means." -- explained back in the 2026-09-25 report -- his reply 2026-09-28: "Approved."
 - [x] R-236 feat/zoom-control | "Zoom to fit pressed before results arrive runs once more when they land: I think this is what I forbade." -- being removed -- feat/zoom-control dc1fa5a9, awaiting your pass -- feat/zoom-control merged 2026-09-26
 
 ### feat/convert-as (8104)

@@ -2924,3 +2924,72 @@ script without a stub. Print path is a DIFFERENT DOM (`#lpn_print_area`, built b
 `printPaneTable()`) from the live pane — a screenshot or measurement of `#lpn_pane_pipes`
 under `Emulation.setEmulatedMedia({media:'print'})` measures nothing; you must click
 `lpn_pane_print` first to build the printable copy.
+
+## 2026-09-28 — feat/selection-preview (head 25a3cf2a)
+
+OBSERVED, node harness (`node dev/lpn-spike/selection-preview-harness.js`, re-run myself, not
+trusting the builder's report): all 30 assertions pass -- hit-agreement with click for node/link/
+label, silence outside Select mode and on touch, no hover on bare canvas, clearing on pointerleave
+and on a mode switch, selected-beats-hovered CSS priority for node/link/label/customer, zero label
+passes, rAF-throttling and silence during `drag`.
+
+OBSERVED, real headless Chrome against the branch's own served preview (port 8128, confirmed by
+`curl`ing `css/engcalcs.css` and finding `.lpn-hover` there before trusting the port), via
+`dev/lpn-spike/browser-drive.js` under `flock /tmp/engcalcs-browser.lock`, real toolbar buttons
+(`#lpn_toolbar button[data-tool="..."]`) and real `PointerEvent`s, never a function called
+directly:
+
+- **Net1** and **Net3-Novato-CA-World.lwn** (a real geographic project, OSM tiles loaded): hovering
+  a junction, a tank, a reservoir, a pipe, a pump, a node label, a link label and a Text object all
+  set `.lpn-hover` on exactly the element a click then selects (compared class-for-class), on
+  both projects. `.lpn-hover` never appears over empty canvas, and CDP screenshot capture confirms
+  the classes are real DOM state, not a stub artifact.
+- Leaving the canvas (`pointerleave`) clears it: confirmed present after hover, absent after.
+  A `touch`-typed `PointerEvent` never sets `.lpn-hover`, confirmed on the same node a mouse
+  hover just marked.
+- **Switching mode away from Select clears it**, confirmed against the REAL toolbar buttons
+  (`data-tool="delete"` and `data-tool="vertices"`), not the language-key strings I first
+  mistook for DOM ids: hover set (count 1) before the click, gone (count 0) immediately after,
+  for both Delete and Vertices.
+- Opening a real Properties popup (clicking the hovered element) leaves the popup's own class atop
+  the map and the underlying `.lpn-hover` class is masked by `.lpn-selected` (same element, CSS
+  priority) rather than removed by the click -- **harmless here because it is the same element**,
+  but technically the class is not cleared just because a dialog opened; only the next pointer
+  move (or leave) clears it. Low severity: I found no path where this produces a visible stray
+  mark, but I did not try every dialog-opening route (menu-triggered Properties on an item other
+  than the one last hovered).
+- **Customer/meter and Valve**: NOT independently confirmed live. No shipped example carries a
+  valve link. Adding a customer via the real toolbar (`add-meter`, two presses) worked, but its
+  drawn circle is ~2px and physically covered by an overlapping node/pipe hit target at every
+  point I tried, so my synthetic click kept hitting the node instead of the meter -- a z-order
+  property of the app (customers draw below pipes, Tom's own design), not something I could
+  attribute to hover specifically. The harness itself does exercise the customer/meter CSS-priority
+  case (PASS), and `hoverTargetFromHit()` (the diff) branches on `d.cust`/`d.custhandle` with the
+  identical shape as the node/link branches -- no per-kind special-casing exists in the code to
+  leak from, which is the strongest evidence available short of a live click landing cleanly on
+  one.
+- Pan/zoom: dispatched a `wheel` event and a pointer drag on empty ground after hovering a node;
+  the hover class stayed on the same (correct) element in both cases with no follow-up
+  `pointermove` -- expected, since the class travels with the element through the SVG transform
+  exactly as `.lpn-selected` does, not a leak.
+
+UNVERIFIABLE FROM HERE: **the actual on-screen contrast** -- is the grey (`#78909e`) ring
+visibly present against the pipe/node's own drawn color at a normal, not-zoomed-in view, and does
+it read as clearly WEAKER than the blue (`#1976d2`) selected ring, the way Ida's brief asked?
+A CDP screenshot I captured did not show it plainly at the page's default resolution -- Tom
+should hover a junction and a pipe on his own screen and say whether he can tell hover from
+"nothing" and hover from "selected" without squinting. Also unverified: dark/OS dark-mode
+rendering of the map canvas itself (the repo's only `prefers-color-scheme: dark` rule touches the
+example gallery card, not the map, so the hover color is unthemed either way -- worth Tom
+confirming it still reads on his own OS theme). Also unverified: whether a native browser tooltip
+or a label-drag handle visually fights the hover ring in a real mouse session (I found no CSS or
+JS collision reading the diff, but this needs an actual cursor).
+
+No LEAK found: `hoverTargetFromHit()` reads the identical dataset branches `selectFromHit()`
+already used; the CSS `:not(.lpn-selected)` guard is present on every one of the five hover rules
+added (node, link-halo, label, meter). `dev/branch-policy.json`'s one-line addition only lists the
+branch for the merge-approval mechanism and touches nothing else.
+
+Verdict: READY for Tom's browser pass, with two things worth his own five minutes rather than mine:
+the contrast/visibility question above, and a deliberate hover-then-Properties-dialog check to see
+whether he notices any stray mark (I found none, but did not exhaust every dialog-opening path).
