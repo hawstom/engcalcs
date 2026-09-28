@@ -45,7 +45,8 @@ EngCalcs.lpnPlacerC = (function () {
 		OWN_PIPE: 3.5    // a pipe label on its own pipe (R7: beside it, not on it)
 	};
 	var ROW_GAIN = 3.2;        // one more property is worth this much crossing
-	var LEVEL = 2.4;           // (halved) a level pipe label where the user asked for it along its pipe (R14)
+	var ALONG_TRIES = 16;      // spots along the pipe a quick search judges, apart from the level ones
+	var LEVEL = 3.2;           // (halved) a level pipe label where the user asked for it along its pipe (R14)
 	var SHAPE = 1.8;           // a label not in its usual shape (R1: wholeness goes after nearness)
 	var LDR_BASE = 0.35;       // having a leader at all
 	var LDR_PER_PX = 0.02;     // and each pixel of it
@@ -299,11 +300,21 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 	};
 	Raster.prototype.solidUnder = function (b) {
-		if (b.angle) { return false; }
-		var r = this.r, nx = this.nx, a = this.a;
+		var r = this.r, nx = this.nx, a = this.a, i, j;
+		if (b.angle) {
+			// A turned box: the cells round points on its long centre line that lie wholly inside
+			// it (a cell's diagonal from the edges), every RES px along it.
+			var dg = r * 1.5, half = b.w / 2 - dg;
+			if (b.h / 2 < dg || half < 0) { return false; }
+			for (var t = -half; t <= half; t += r) {
+				i = Math.floor((b.cx + t * b.ca - this.x0) / r); j = Math.floor((b.cy + t * b.sa - this.y0) / r);
+				if (i >= 0 && j >= 0 && i < nx && j < this.ny && a[j * nx + i]) { return true; }
+			}
+			return false;
+		}
 		var i0 = Math.max(0, Math.ceil((b.x0 - this.x0) / r)), i1 = Math.min(nx, Math.floor((b.x1 - this.x0) / r));
 		var j0 = Math.max(0, Math.ceil((b.y0 - this.y0) / r)), j1 = Math.min(this.ny, Math.floor((b.y1 - this.y0) / r));
-		for (var j = j0; j < j1; j++) { for (var i = i0; i < i1; i++) { if (a[j * nx + i]) { return true; } } }
+		for (j = j0; j < j1; j++) { for (i = i0; i < i1; i++) { if (a[j * nx + i]) { return true; } } }
 		return false;
 	};
 	function inOB(x, y, b) {
@@ -519,9 +530,13 @@ EngCalcs.lpnPlacerC = (function () {
 			// back beside its owner as soon as there is room there for the same rows.
 			order.forEach(function (L) {
 				var c0 = L.cur;
-				if (!c0 || (!c0.ns && c0.layout === L.usual)) { return; }
+				if (!c0) { return; }
+				// R14: a pipe label the user asked for along its pipe, kept level, turns to its pipe
+				// as soon as there is room beside it for the same rows.
+				var level = L.along && !c0.angle && !L.panKept && !alignedNow(L, c0);
+				if (!c0.ns && c0.layout === L.usual && !level) { return; }
 				uncommit(st, L);
-				commit(st, L, bestFor(st, L, c0.rs, c0.cost - PREV_BONUS, 40, true) || c0);
+				commit(st, L, bestFor(st, L, c0.rs, c0.cost - PREV_BONUS + (level ? LEVEL / 2 : 0), 40, level ? 'along' : true) || c0);
 			});
 			// 2. SHOW: everything else, with the label itself only.
 			order.forEach(function (L) {
@@ -766,7 +781,7 @@ EngCalcs.lpnPlacerC = (function () {
 				[0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
 					if (layout !== 'line' || !L.along) { return; }
 					[1, -1].forEach(function (side) {
-						[0, 1].forEach(function (far) {
+						(Math.abs(k) <= 3 ? [0, 1] : [0]).forEach(function (far) {
 							specs.push({ t: 'along', k: k, side: side, far: far, layout: layout,
 								base: steep + Math.abs(k) * 0.12 + (side < 0 ? 0.04 : 0) + far * 0.15 + sh });
 						});
@@ -1079,7 +1094,7 @@ EngCalcs.lpnPlacerC = (function () {
 		// order of their own cost; once that alone reaches the best found, nothing cheaper is left.
 		// What a spec costs against the fixed map is remembered for the rest of the view.
 		function bestFor(st, L, rsI, bound, maxTries, homeOnly) {
-			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, sv;
+			var best = null, bestCost = bound, specs = L.specs, c = st.probe, cost, i, tries = 0, alongTries = 0, sv;
 			if (L.prevPl && !homeOnly && fillPrev(st, L, rsI, c)) {
 				// Its bonus buys it preference, never the right to cost more than the bound.
 				cost = judge(st, L, c, Math.min(bestCost, bound + PREV_BONUS));
@@ -1092,9 +1107,11 @@ EngCalcs.lpnPlacerC = (function () {
 				if (st.effort.deadline && (i & 31) === 31 && now() > st.effort.deadline) { st.late = true; break; }
 				sv = sc[i];
 				if (sv >= bestCost) { continue; }            // known illegal, or too dear already
-				if (homeOnly && (specs[i].t === 'ldr' || specs[i].layout !== L.usual)) { continue; }
+				if (homeOnly && (homeOnly === 'along' ? specs[i].t !== 'along' : (specs[i].t === 'ldr' || specs[i].layout !== L.usual))) { continue; }
 				if (!fillSpec(st, L, specs[i], rsI, c)) { sc[i] = Infinity; continue; }
-				if (maxTries && ++tries > maxTries) { break; }
+				// Spots along the pipe are counted apart, so trying them never uses up the level ones.
+				if (specs[i].t === 'along') { if (maxTries && ++alongTries > ALONG_TRIES) { continue; } }
+				else if (maxTries && ++tries > maxTries) { break; }
 				if (sv !== sv) { sv = sc[i] = staticCost(st, L, c); if (sv >= bestCost) { continue; } }
 				c.stat = sv;
 				cost = dynCost(st, L, c, sv, bestCost);
@@ -1103,6 +1120,12 @@ EngCalcs.lpnPlacerC = (function () {
 			return best;
 		}
 
+		// Is a level block already along its pipe (a pipe level on screen, within 5 degrees)?
+		function alignedNow(L, c) {
+			var q = nearestOn(L.owner.poly, c.blk.cx, c.blk.cy), p = pointAt(L.owner.poly, q.s);
+			var a = Math.abs(Math.atan2(p.dy, p.dx) * 180 / Math.PI) % 180;
+			return Math.min(a, 180 - a) <= 4;
+		}
 		function commit(st, L, c) {
 			uncommit(st, L);
 			if (!c) { return; }
@@ -1132,7 +1155,10 @@ EngCalcs.lpnPlacerC = (function () {
 					uncommit(st, L);
 					var cur = dynCost(st, L, c0, c0.stat === undefined ? (c0.stat = staticCost(st, L, c0)) : c0.stat, Infinity);
 					if (cur === Infinity) { cur = c0.cost || 0; }
-					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), st.effort.grow);
+					// A label asked along its pipe may grow into a level spot at no loss for being level:
+					// the setting chooses between spots, it never costs a property (R14 yields to G).
+					var lv = L.along ? LEVEL / 2 : 0;
+					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN + lv, Math.max(cur, SHOW_MAX + lv)), st.effort.grow);
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
