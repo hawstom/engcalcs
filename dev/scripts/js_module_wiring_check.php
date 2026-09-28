@@ -60,8 +60,7 @@ const EC_LPN_EDITOR = 'looped-network.js';
 const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootstrap.js'];
 
 /**
- * Modules no page loads with a `<script>` tag, and why that is right. Empty today: every
- * `js/*.js` in this repo is on at least one page.
+ * Modules no page loads with a `<script>` tag, and why that is right.
  */
 const EC_UNREFERENCED_MODULES = [
     'lpn-placer-c.js' => 'bake-off label placer; run by the label bench until Tom picks one to wire in',
