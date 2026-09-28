@@ -59,7 +59,11 @@ each scene with the same function `extract.js` uses (`js/lpn-label-scene.js`), m
 the real font, and draws the answer with the app's own labels and leaders. It calls `place()`
 once a pan or zoom has settled, never during one; `idle()` from `requestIdleCallback` after each
 layout (3000 ms in all after a project's first, `opening: true`; 250 ms after the others); and
-`create()` again whenever another project is opened.
+`create()` again whenever another project is opened. R15 is the page's part: from the moment the
+view reaches a scale the last layout was not made for (a zoom, a newly opened project) it hides
+every node and link label, and shows them again when `place()` has answered, so no label is seen
+in an unconfirmed position. A pan at the same scale hides nothing. A slow `place()` is therefore a
+longer blank after each zoom, which is what R10 asks you to keep short.
 
 ## What is scored
 
@@ -141,46 +145,46 @@ Every scene here shares one fixed 1400x900 canvas, so this is one number (675) f
   whole `refreshLabelText()` (content and layout) on the node stub, which overstates placement
   alone. Re-run `extract.js` whenever master's placement changes.
 
-## Baseline, round 2, 2026-09-28
+## Baseline, round 3, 2026-09-28
 
 `node dev/lpn-spike/label-bench/run.js --placer dev/lpn-spike/label-bench/placers/master-replay.js`,
-on Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz, 4 threads, 12 GB, linux 6.18.33.2-microsoft-standard-WSL2, node v24.16.0:
+on Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz, 4 threads, 12 GB, linux 6.18.33.2-microsoft-standard-WSL2, node v24.16.0.
+The cost column counts each crossing by its rank (see "What is scored"):
 
 ```
 scene                      N1   N3   N4   N5  inv     cost         rows       labels  ldr med    p90    max    churn      ms
 net1@open                   0    0    3    0    0      0.0        76/78        24/24      2.2    4.6    4.6             41.7
-net2@open                   0    0    0    0    0      0.2      107/263        47/76      2.2    2.9    2.9            134.0
-net3@open                   0    3    1    0    0      8.9      135/615       85/216      1.6    2.8    2.8            386.7
-novato-seq@1x               0    1    0    0    0      4.0       60/734       54/216      1.7    1.7    1.7            217.4
-novato-seq@1.25x            0    2    0    0    0      6.8       80/734       70/216      2.2    2.2    2.2    38/54   271.7
-novato-seq@1.5x             0    6    0    0    0      8.3      121/734       82/216      1.5    2.6    5.9    42/70   454.0
-novato-seq@1.75x            0    3    0    0    0      9.5      145/713       94/209      1.7    3.0    3.0    51/78   335.9
-novato-seq@2x               0    5    0    0    0      9.3      159/683       95/199      2.0    3.4    3.4    53/87   455.8
-novato-seq@2.5x             0    4    0    0    0      8.6      190/622       99/181      2.5    4.3    4.5    37/85   317.9
-novato-seq@3x               0    0    0    0    0      6.9      203/536       85/156      1.4    2.5    5.0    24/83   249.6
-novato-seq@4x               0    2    0    0    0      4.4      184/400       71/117      1.4    2.5    2.9     9/60   268.1
-novato-zoom@fit             0    1    0    0    0      3.7       60/734       54/216      1.7    1.7    1.7            207.2
-novato-zoom@2x              1    5    0    0    0     10.6      181/734      106/216      2.0    3.4    3.4    15/54   221.7
-novato-zoom@4x              0    2    0    0    0      5.0      253/459       91/134      1.4    2.5    2.9    11/58   259.0
-novato-zoom@8x              0    0    0    0    0      1.8      126/174        40/51      1.0    1.3    2.4     3/27   245.1
-TOTAL                       1   34    4    0    0     88.0          25%          45%      1.7    3.0    5.9  283/656
-time per layout: median 259.0 ms, max 455.8 ms
-REPORTED, never failing -- R5 leader-side align: 0/141 stacked+leadered labels not justified to their
-leader's side; R7 label-on-own-pipe: 0/221 shown pipe labels sit on their own pipe; R9 repeats: 0/0
-pipes longer than the repeat spacing carry repeats; R11 zoom-in row change: 684 regained, 63 lost
+net2@open                   0    0    0    0    0      1.0      107/263        47/76      2.2    2.9    2.9            134.0
+net3@open                   0    3    1    0    0     57.0      135/615       85/216      1.6    2.8    2.8            386.7
+novato-seq@1x               0    1    0    0    0     25.0       60/734       54/216      1.7    1.7    1.7            217.4
+novato-seq@1.25x            0    2    0    0    0     44.0       80/734       70/216      2.2    2.2    2.2    38/54   271.7
+novato-seq@1.5x             0    6    0    0    0     52.0      121/734       82/216      1.5    2.6    5.9    42/70   454.0
+novato-seq@1.75x            0    3    0    0    0     62.0      145/713       94/209      1.7    3.0    3.0    51/78   335.9
+novato-seq@2x               0    5    0    0    0     60.0      159/683       95/199      2.0    3.4    3.4    53/87   455.8
+novato-seq@2.5x             0    4    0    0    0     55.0      190/622       99/181      2.5    4.3    4.5    37/85   317.9
+novato-seq@3x               0    0    0    0    0     45.0      203/536       85/156      1.4    2.5    5.0    24/83   249.6
+novato-seq@4x               0    2    0    0    0     28.0      184/400       71/117      1.4    2.5    2.9     9/60   268.1
+novato-zoom@fit             0    1    0    0    0     23.0       60/734       54/216      1.7    1.7    1.7            207.2
+novato-zoom@2x              1    5    0    0    0     67.0      181/734      106/216      2.0    3.4    3.4    15/54   221.7
+novato-zoom@4x              0    2    0    0    0     32.0      253/459       91/134      1.4    2.5    2.9    11/58   259.0
+novato-zoom@8x              0    0    0    0    0     12.0      126/174        40/51      1.0    1.3    2.4     3/27   245.1
+TOTAL                       1   34    4    0    0    563.0          25%          45%      1.7    3.0    5.9  283/656        
+REPORTED, never failing -- R5 leader-side align: 0/141 stacked+leadered labels not justified to
+their leader's side; R7 label-on-own-pipe: 0/221 shown pipe labels sit on their own pipe; R9
+repeats: 0/0 pipes longer than the repeat spacing carry repeats; R11 zoom-in row change: 684
+regained, 63 lost, across zoom-in steps; R14 along the pipe: 220/220 shown pipe labels the setting
+asks to lie along their pipe do, and 0 of the rest had room beside their pipe to
 ```
 
-Master's own placer holds T1-style stillness (round 1's rule): churn is down from round 1's
-unforced count of 444/656 to 283/656 on the same layouts, entirely because regrowing a dropped row
-on zoom-in is no longer counted against it -- the rest of its behaviour is unchanged (round 1's N1,
-N3, N4, N5, cost and coverage numbers above are identical to round 2's).
+Every scene is saved with "Draw link labels along the link line" on, and master draws every pipe
+label it shows along its pipe (R14 220/220).
 
 `node dev/lpn-spike/label-bench/run.js --placer dev/lpn-spike/label-bench/placers/trivial.js`, same
 machine — every N1 break is a whole pipe label run over its node, exactly what `trivial.js` is for:
 
 ```
-TOTAL                    16825    0    0   57    0  18461.2         100%         100%        -      -      -    3/1695      
-time per layout: median 0.3 ms, max 3.8 ms
+TOTAL                    16825    0    0   57    0  94938.0         100%         100%        -      -      -   3/1695        
+time per layout: median 0.3 ms, max 1.5 ms
 BREAKS: 16882 (N1, N3, N4, N5 and invalid placements must be zero)
 ```
 
