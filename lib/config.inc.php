@@ -290,12 +290,40 @@ define('CANONICAL_ORIGIN', isset($ec_canonical_origins[$ec_canonical_host])
 // not in the array above, and a redirect that could not tell them apart from hawsedc.com would
 // send every developer to production. ecCanonicalRedirectTarget() is gated on this.
 define('EC_CANONICAL_HOST_DECLARED', isset($ec_canonical_origins[$ec_canonical_host]));
+// **A DEVELOPMENT-ONLY ALIAS, so Tom can look at a per-host front door without a hosts-file edit
+// and without risking the redirect it is not live yet for** (Task 697 follow-up, 2026-09-27:
+// "How/where do I look at it?"). Chrome resolves any `*.localhost` name to 127.0.0.1 on its own.
+// So in DEBUG_MODE only, a Host of `<declared-host>.localhost` (e.g. `epanet-plus-plus.localhost`)
+// is looked up as `<declared-host>` for EC_CANONICAL_HOST alone -- never for
+// EC_CANONICAL_HOST_DECLARED above, which was already computed from the RAW host and stays false
+// here. That separation is the whole point: ecCanonicalRedirectTarget() is gated on
+// EC_CANONICAL_HOST_DECLARED, so the alias can make the brand/canonical answer as
+// epanet-plus-plus.org without ever tripping the script-path 301 to a domain that does not exist
+// yet. **Matched by LEADING LABEL, not exact key**, because 'epanet-plus-plus.localhost' strips to
+// 'epanet-plus-plus', and the whitelisted host is 'epanet-plus-plus.org' -- a bare second-level
+// name with no TLD is not a Host a browser can be handed, so the alias has to be that label plus
+// whatever TLD the whitelist already declared, not a second copy of it written here. Still gated
+// to a whitelisted key, so a Host of `anything-i-want.localhost` gets nothing, not an arbitrary
+// answer. In production (DEBUG_MODE false) this block does not run and the alias does not exist.
+$ec_canonical_dev_alias = '';
+if (DEBUG_MODE && substr($ec_canonical_host, -10) === '.localhost') {
+    $ec_canonical_dev_label = substr($ec_canonical_host, 0, -10);
+    foreach ($ec_canonical_origins as $ec_canonical_dev_key => $ec_canonical_dev_ignored) {
+        if ($ec_canonical_dev_key === $ec_canonical_dev_label
+            || strpos($ec_canonical_dev_key, $ec_canonical_dev_label . '.') === 0) {
+            $ec_canonical_dev_alias = $ec_canonical_dev_key;
+            break;
+        }
+    }
+}
 // **THE SERVING HOST, BUT ONLY ONE WE DECLARED** (Task 697). ecCanonicalHostOrigins() lets one
 // page nominate a different origin on one named host, and this is the key it is looked up by. It
-// is '' for every host not in the array above, so a forged Host header never reaches that lookup
-// at all -- it can select one of our declared answers or none, never introduce one.
-define('EC_CANONICAL_HOST', EC_CANONICAL_HOST_DECLARED ? $ec_canonical_host : '');
-unset($ec_canonical_host, $ec_colon);
+// is '' for every host not in the array above (or the dev alias of one, above), so a forged Host
+// header never reaches that lookup at all -- it can select one of our declared answers or none,
+// never introduce one.
+define('EC_CANONICAL_HOST', EC_CANONICAL_HOST_DECLARED ? $ec_canonical_host : $ec_canonical_dev_alias);
+unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_label,
+    $ec_canonical_dev_key, $ec_canonical_dev_ignored);
 
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename

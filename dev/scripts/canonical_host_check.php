@@ -37,9 +37,10 @@ function hc_ok($cond, $what, $detail = '') {
     echo "  FAIL  $what" . ($detail !== '' ? "\n        $detail" : '') . "\n";
 }
 
-function hc_render($page, $host) {
+function hc_render($page, $host, $appEnv = '') {
     global $root;
-    $cmd = 'php ' . escapeshellarg($root . '/dev/scripts/render_page.php') . ' ' . escapeshellarg($page)
+    $prefix = $appEnv !== '' ? 'APP_ENV=' . escapeshellarg($appEnv) . ' ' : '';
+    $cmd = $prefix . 'php ' . escapeshellarg($root . '/dev/scripts/render_page.php') . ' ' . escapeshellarg($page)
          . ' ' . escapeshellarg('--host=' . $host) . ' 2>/dev/null';
     return (string)shell_exec($cmd);
 }
@@ -84,6 +85,48 @@ foreach ($cases as $host => $want) {
     // The other brand must not leak onto this host's page as a visible name.
     $other = $brand === 'EPANET++' ? '>LibreWaterNet.org<' : '>EPANET++<';
     hc_ok(strpos($html, $other) === false, "$tag: never shows the other front door's name '$other'");
+}
+
+// 3b. THE DEV-ONLY *.localhost ALIAS (Task 697 follow-up, Tom: "How/where do I look at it?").
+// Chrome resolves any *.localhost name to 127.0.0.1 with no hosts-file edit, so in development a
+// Host of epanet-plus-plus.localhost must get the EPANET++ brand and canonical exactly as
+// epanet-plus-plus.org does -- and, critically, WITHOUT the script-path redirect, because
+// epanet-plus-plus.org/app/ is not live yet and that 301 would strand him on a domain that
+// doesn't answer.
+$devHtml = hc_render('Looped-Network.php', 'epanet-plus-plus.localhost', 'development');
+if (strlen($devHtml) < 10000) {
+    hc_ok(false, "Looped-Network.php on Host: epanet-plus-plus.localhost (development) rendered nothing ("
+        . strlen($devHtml) . ' bytes)');
+} else {
+    $canon = preg_match('/<link rel="canonical" href="([^"]*)"/', $devHtml, $m) ? $m[1] : '';
+    hc_ok($canon === 'https://epanet-plus-plus.org/app/?lang=en',
+        'epanet-plus-plus.localhost (development): canonical is the EPANET++ front door', "got '$canon'");
+    $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $devHtml, $m) ? $m : array('', '', '');
+    hc_ok(html_entity_decode($about[2]) === 'EPANET++',
+        'epanet-plus-plus.localhost (development): About box says EPANET++', "got '{$about[2]}'");
+    hc_ok(strpos($devHtml, 'http-equiv="refresh"') === false
+        && strpos($devHtml, "Location:") === false,
+        'epanet-plus-plus.localhost (development): page body carries no redirect marker');
+}
+// The header check that matters most: no Location, verified with a real request further down by
+// the shell harness -- here, purely, via ecCanonicalRedirectTarget() with the host UNDECLARED
+// (as EC_CANONICAL_HOST_DECLARED must be for this alias -- see lib/config.inc.php).
+hc_ok(ecCanonicalRedirectTarget('/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', false, 'https://hawsedc.com', 'epanet-plus-plus.org') === null,
+    'the dev alias host is UNDECLARED, so the script-path redirect never fires for it');
+
+// 3c. With development OFF, the same *.localhost name is undeclared and gets nothing -- it must
+// never leak the EPANET++ brand outside DEBUG_MODE, and never on production.
+$prodHtml = hc_render('Looped-Network.php', 'epanet-plus-plus.localhost');
+if (strlen($prodHtml) < 10000) {
+    hc_ok(false, 'Looped-Network.php on Host: epanet-plus-plus.localhost (no APP_ENV) rendered nothing ('
+        . strlen($prodHtml) . ' bytes)');
+} else {
+    $canon = preg_match('/<link rel="canonical" href="([^"]*)"/', $prodHtml, $m) ? $m[1] : '';
+    hc_ok($canon === 'https://librewaternet.org/app/?lang=en',
+        'epanet-plus-plus.localhost (no development): falls through to librewaternet.org', "got '$canon'");
+    $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $prodHtml, $m) ? $m : array('', '', '');
+    hc_ok(html_entity_decode($about[2]) === 'LibreWaterNet.org',
+        'epanet-plus-plus.localhost (no development): never shows EPANET++', "got '{$about[2]}'");
 }
 
 // 4. A calculator on the new host is still hawsedc.com's.

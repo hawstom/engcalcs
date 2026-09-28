@@ -198,11 +198,27 @@ if (!function_exists('ecCanonicalHostOrigins')) {
         }
     }
 }
-// EC_CANONICAL_HOST must be gated on the whitelist, never the raw Host header.
-if (!preg_match('/define\(\'EC_CANONICAL_HOST\',\s*EC_CANONICAL_HOST_DECLARED\s*\?\s*\$ec_canonical_host\s*:\s*\'\'\)/', $config)) {
+// EC_CANONICAL_HOST must be gated on the whitelist, never the raw Host header. The fallback may be
+// '' or a DEBUG_MODE-only dev alias (Task 697 follow-up, epanet-plus-plus.localhost) -- but that
+// alias variable must itself come only from a whitelisted host, checked separately below.
+if (!preg_match('/define\(\'EC_CANONICAL_HOST\',\s*EC_CANONICAL_HOST_DECLARED\s*\?\s*\$ec_canonical_host\s*:\s*\$ec_canonical_dev_alias\)/', $config)) {
     bad("lib/config.inc.php does not define EC_CANONICAL_HOST as\n"
-      . "        EC_CANONICAL_HOST_DECLARED ? \$ec_canonical_host : ''. It is the key the per-host\n"
-      . "        declaration is looked up by, and must be '' for every host the whitelist does not name.");
+      . "        EC_CANONICAL_HOST_DECLARED ? \$ec_canonical_host : \$ec_canonical_dev_alias. It is the\n"
+      . "        key the per-host declaration is looked up by, and must be '' (or a whitelisted dev\n"
+      . "        alias) for every host the whitelist does not name.");
+}
+// The dev alias must be gated on DEBUG_MODE, or a *.localhost Host header would pick one in
+// production too.
+if (!preg_match('/if\s*\(DEBUG_MODE\s*&&\s*substr\(\$ec_canonical_host,\s*-10\)\s*===\s*\'\.localhost\'\)/', $config)) {
+    bad("lib/config.inc.php's \$ec_canonical_dev_alias is not gated on DEBUG_MODE, so a\n"
+      . "        *.localhost Host header would pick an alias in production too.");
+}
+// And it must be gated on whitelist membership, or an arbitrary '<anything>.localhost' would pick
+// an arbitrary alias in development.
+if (!preg_match('/foreach\s*\(\$ec_canonical_origins as \$ec_canonical_dev_key/', $config)) {
+    bad("lib/config.inc.php's \$ec_canonical_dev_alias is not matched against\n"
+      . "        \$ec_canonical_origins, so an arbitrary *.localhost Host header could pick an\n"
+      . "        arbitrary alias in development.");
 }
 // The fallback brand in config.inc.php is the same string ecAppBrands() gives librewaternet.org.
 if (preg_match("/'name'\s*=>\s*'([^']*)',\s*'site'\s*=>\s*EC_LWN_SITE_URL/", $config, $fb)
