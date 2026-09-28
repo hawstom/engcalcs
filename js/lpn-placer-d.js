@@ -646,7 +646,8 @@ EngCalcs.lpnPlacerD = (function () {
 		if (!mem.lt || mem.lt.length !== LW * LH) { mem.lt = new Int16Array(LW * LH); mem.lc = new Int16Array(LW * LH); } else { mem.lt.fill(0); mem.lc.fill(0); }
 		var lt = mem.lt, lc = mem.lc;
 		function stamp(b, sgn) {
-			var fx0 = (b.x0 - PADX - vp.x) / LC, fx1 = (b.x1 + PADX - vp.x) / LC, fy0 = (b.y0 - PADY - vp.y) / LC, fy1 = (b.y1 + PADY - vp.y) / LC, i, j, r;
+			var py = b.rot ? PADX : PADY;   // a turned row's clearance, measured on its own axes, is wider
+			var fx0 = (b.x0 - PADX - vp.x) / LC, fx1 = (b.x1 + PADX - vp.x) / LC, fy0 = (b.y0 - py - vp.y) / LC, fy1 = (b.y1 + py - vp.y) / LC, i, j, r;
 			var i0 = Math.max(0, Math.floor(fx0)), i1 = Math.min(LW, Math.ceil(fx1)), j0 = Math.max(0, Math.floor(fy0)), j1 = Math.min(LH, Math.ceil(fy1));
 			for (j = j0; j < j1; j++) { r = j * LW; for (i = i0; i < i1; i++) { lt[r + i] += sgn; } }
 			if (b.rot) { return; }
@@ -662,12 +663,48 @@ EngCalcs.lpnPlacerD = (function () {
 			for (j = j0; j < j1; j++) { r = j * LW; for (i = i0; i < i1; i++) { if (lt[r + i]) { return -1; } } }
 			return 0;
 		}
+		// A label weighing its own alternatives is LIFTED out of the raster (its seat stays in the
+		// grids, which skip it by name).
+		var lifted = -1, liftedC = null;
+		function lift(li) {
+			unlift();
+			var o = cur[li];
+			if (!o) { return; }
+			for (var i = 0; i < o.items.length; i++) { stamp(o.items[i].b, -1); }
+			lifted = li; liftedC = o;
+		}
+		function unlift() {
+			if (lifted < 0) { return; }
+			if (cur[lifted] === liftedC) { for (var i = 0; i < liftedC.items.length; i++) { stamp(liftedC.items[i].b, 1); } }
+			lifted = -1; liftedC = null;
+		}
+		// The same for a turned box: blocked if a cell wholly inside it is CORE; clear if no cell
+		// its extent touches has TOUCH.
+		var CELL_R = LC * Math.SQRT1_2;
+		function boxRaster(b) {
+			var i0 = Math.max(0, Math.floor((b.x0 - vp.x) / LC)), i1 = Math.min(LW, Math.ceil((b.x1 - vp.x) / LC));
+			var j0 = Math.max(0, Math.floor((b.y0 - vp.y) / LC)), j1 = Math.min(LH, Math.ceil((b.y1 - vp.y) / LC));
+			var hw = b.hw - CELL_R, hh = b.hh - CELL_R, touched = false, i, j, r;
+			for (j = j0; j < j1; j++) {
+				r = j * LW;
+				var py = vp.y + (j + 0.5) * LC - b.cy;
+				for (i = i0; i < i1; i++) {
+					if (!lt[r + i]) { continue; }
+					touched = true;
+					if (!lc[r + i] || hw <= 0 || hh <= 0) { continue; }
+					var px = vp.x + (i + 0.5) * LC - b.cx;
+					if (Math.abs(px * b.c + py * b.s) <= hw && Math.abs(-px * b.s + py * b.c) <= hh) { return 1; }
+				}
+			}
+			return touched ? -1 : 0;
+		}
 		function seat(li, c) {
-			var o = cur[li], i, b;
+			var o = cur[li], i, b, wasLifted = li === lifted && o === liftedC;
 			if (o) {
 				dyn.remove(o, o.x0, o.y0, o.x1, o.y1);
-				for (i = 0; i < o.items.length; i++) { b = o.items[i].b; dynB.remove(o.items[i], b.x0, b.y0, b.x1, b.y1); stamp(b, -1); }
+				for (i = 0; i < o.items.length; i++) { b = o.items[i].b; dynB.remove(o.items[i], b.x0, b.y0, b.x1, b.y1); if (!wasLifted) { stamp(b, -1); } }
 			}
+			if (li === lifted) { lifted = -1; liftedC = null; }
 			cur[li] = c;
 			if (c) {
 				if (!c.boxes) { build(c); }
@@ -690,7 +727,7 @@ EngCalcs.lpnPlacerD = (function () {
 				var req = reqs[c.li], rows = c.lv.rows, line = c.layout === 'line';
 				// The raster decides most rows, unless the label's own seat is near (it is in the raster).
 				var own = cur[c.li];
-				if (!blockers && (!own || own.bx0 - 2 * PADX >= c.x + c.w || own.bx1 + 2 * PADX <= c.x || own.by0 - 2 * PADY >= c.y + c.h || own.by1 + 2 * PADY <= c.y)) {
+				if (!blockers && (!own || c.li === lifted || own.bx0 - 2 * PADX >= c.x + c.w || own.bx1 + 2 * PADX <= c.x || own.by0 - 2 * PADY >= c.y + c.h || own.by1 + 2 * PADY <= c.y)) {
 					var undecided = false;
 					for (i = 0, top = c.y; i < (line ? 1 : rows.length); i++) {
 						var rw0 = line ? c.w : req.rows[rows[i]].w, rh0 = line ? c.h : req.rows[rows[i]].h;
@@ -726,7 +763,16 @@ EngCalcs.lpnPlacerD = (function () {
 				build(c);
 			} else {
 				if (!c.boxes) { build(c); }
-				q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd);
+				var own2 = cur[c.li], und = true;
+				if (!blockers && (!own2 || c.li === lifted || own2.bx0 - 2 * PADX >= c.bx1 || own2.bx1 + 2 * PADX <= c.bx0 || own2.by0 - 2 * PADX >= c.by1 || own2.by1 + 2 * PADX <= c.by0)) {
+					und = false;
+					for (i = 0; i < c.boxes.length; i++) {
+						var bv = boxRaster(c.boxes[i]);
+						if (bv === 1) { return NaN; }
+						if (bv === -1) { und = true; }
+					}
+				}
+				if (und) { q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd); } else { q = qd; q.length = 0; }
 				for (n = 0; n < q.length; n++) {
 					it = q[n];
 					if (it.li === c.li || (blockers && blockers.indexOf(it.li) >= 0)) { continue; }
@@ -758,6 +804,7 @@ EngCalcs.lpnPlacerD = (function () {
 		function bestFor(li, k0, k1, floor) {
 			var L = lab[li], best = null, bs = L.hand ? -Infinity : 0;
 			if (floor !== undefined && floor > bs) { bs = floor; }
+			lift(li);
 			for (var k = Math.max(0, k0); k <= k1 && k < L.levels.length; k++) {
 				if (tierMax(li, k, 0) <= bs) { break; }
 				for (var t = 0; t < NT; t++) {
@@ -774,6 +821,7 @@ EngCalcs.lpnPlacerD = (function () {
 					}
 				}
 			}
+			unlift();
 			return { c: best, w: best ? bs : 0 };
 		}
 
@@ -1089,7 +1137,8 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		// A pipe label drawn level where the setting asks for it along its pipe (R14).
 		function notAlong(li) { return !!cur[li] && wantsAlong(reqs[li]) && !cur[li].along; }
-		function tryUpgrade(li) {
+		function tryUpgrade(li) { var r = upgrade(li); unlift(); return r; }
+		function upgrade(li) {
 			var cl = levelOf(li), here = worthNow(li);
 			// One more row than it shows (or, for a pipe label drawn level, the same rows along it).
 			for (var kt = Math.max(0, NT * (cl - 1)); kt < NT * cl + (notAlong(li) ? 1 : 0); kt++) {
@@ -1100,13 +1149,15 @@ EngCalcs.lpnPlacerD = (function () {
 					var c = list[m];
 					if (c.base <= here) { break; }
 					if (c.fx !== undefined && c.base - c.fx <= here) { continue; }
-					var bl = [], d = dynCost(c, bl);
+					if (lifted !== li) { lift(li); }
+					var bl = [], d = dynCost(c, null);
 					if (d === d) {
 						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
 						continue;
 					}
 					if (keyOf(c) <= here) { continue; }
 					tried++;
+					d = dynCost(c, bl);
 					if (bl.length > 2 || bl.some(function (b) { return lab[b].hand; })) { continue; }
 					if (nDyn > MAX_DYN) { return false; }
 					var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
