@@ -204,7 +204,7 @@ Grid.prototype.query = function (layer, x0, y0, x1, y1, fn) {
 
 // ---- the free-space raster: the static real estate at 2 px, as summed-area tables, so that
 // "is this rectangle clear?" costs four reads ------------------------------------------------
-const RR = 2, RMARGIN = 48;
+const RR = 3, RMARGIN = 48;
 function Raster(vp, G, pool) {
 	const ox = vp.x - RMARGIN, oy = vp.y - RMARGIN;
 	const nx = Math.ceil((vp.w + 2 * RMARGIN) / RR), ny = Math.ceil((vp.h + 2 * RMARGIN) / RR);
@@ -938,9 +938,13 @@ function run(scene, prev, gaps, pool) {
 			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
 			if (kept[f.li] === 'held') { growHeld(f, last); return; }
 			const n = f.subsets.length, p = placed[f.li];
+			// A label with no place at all looks again only in the last round (little moves before it).
+			if (!p && round < maxSets - 1) { return; }
 			const curK = p ? p.cand.k : n;
 			const k0 = last ? 0 : Math.max(0, curK - 1), k1 = last ? n - 1 : Math.min(curK, n - 1);
 			const cur = p ? evalDyn(f, p.cand, p.cand.st, Infinity) : hideCost(f);
+			// Already holding every row this round allows, on clean ground, next to home: done.
+			if (p && p.cand.k === k0 && cur <= W.row * (f.R - f.subsets[k0].length) + 0.5) { p.cost = cur; return; }
 			const r = search(f, cur, k0, k1);
 			if (r && (!p || r.cand !== p.cand)) {
 				if (p) { uncommit(f); }
