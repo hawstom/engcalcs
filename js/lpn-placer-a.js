@@ -1,4 +1,40 @@
-// LABEL PLACER A. (write-up to come)
+// LABEL PLACER A: free space first, near home first, drop before travel.
+//
+// APPROACH. Before any label is placed, the view's real estate is mapped: every symbol, Text object,
+// pipe and Text callout goes into a 24 px bucket grid (exact tests) and a 3 px raster with
+// summed-area tables ("is this rectangle clear?" in four reads). Each label then gets candidate
+// places in tiers: tier 0 touches home (the eight Imhof positions and two centred ones beside a node;
+// above, below or on its own pipe for a pipe label); tiers 1-4 hang it on a straight leader, one
+// ring further out each (0.8 to 4 row heights), in the widest gaps between the node's pipes first
+// and then round the compass. A tier is only built when a search could still afford it, so a label
+// with room at home never generates a leader. Cost = rows given up + leader length (rising faster
+// than linearly) + crossings in Tom's order (leader on leader > label on leader > label on pipe >
+// leader on pipe); a never-rule break is not a cost, it removes the candidate.
+// Order: hand-placed labels hang at the user's point (N4); labels shown in the last view are held
+// (T1); then every other label takes its SMALLEST form (ID, or one row) near home, the most crowded
+// choosing first, customers last; then rounds in which each label may take back one row, so room is
+// shared out fairly. Dropping follows the user's drop order (S4); a stack may unwrap to one line, or
+// a pipe label wrap to a stack, at a small extra cost (H1).
+//
+// FREE SPACE. The raster and the gap list decide where leaders are even tried; a leader whose path
+// crosses a symbol, or whose landing core is already covered, is judged once and skipped for every
+// shape and row set. Open ground far from home is not chased: the leader cost makes dropping a row
+// cheaper than a walk past about three row heights (S3).
+//
+// ZOOMING. A label shown in the last view is carried at the same pixel offset from its anchor and
+// kept if it is still legal (it breaks no never-rule), before anything new is placed; it may only
+// grow downward/away from its anchored edge, one row per round (S2). It moves only when forced.
+//
+// IDLE. Kept per network: each node's ranked gap list (angles do not change with zoom). When the
+// project opens, one throwaway rehearsal of the opening view warms the engine. Buffers (raster,
+// grids) are reused from view to view. There is no per-zoom layout cache: the next view cannot be
+// predicted from the bench's idle hook, and I did not want to report a cached answer as a layout time.
+//
+// STILL DOES BADLY. Greedy plus local rounds, no global search, so dense cores at the fit view still
+// hide about a fifth of the labels. A turned pipe label never grows while zooming in (growing would
+// move its text start); an unwrapped one-line node label on a leader can read like a table beside the
+// network. The standard hook is never used. A hand point on the label's own symbol cannot satisfy
+// both N1 and N4; N4 wins. Leader checks dominate the time on 200-label views.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -119,6 +155,19 @@ function Grid(vp) {
 	this.buf = [];
 	this.r = [0, 0, 0, 0];
 	this.all = [[], [], []];
+}
+// A grid kept on the placer and emptied for the next view, so a layout makes little garbage.
+function gridFor(pool, key, vp) {
+	const g = pool[key];
+	if (g && g.vx === vp.x && g.vy === vp.y && g.vw === vp.w && g.vh === vp.h) {
+		for (let k = 0; k < 3; k++) { const L = g.L[k]; for (let i = 0; i < L.length; i++) { if (L[i] !== null && L[i].length) { L[i].length = 0; } } }
+		g.all = [[], [], []];
+		return g;
+	}
+	const n = new Grid(vp);
+	n.vx = vp.x; n.vy = vp.y; n.vw = vp.w; n.vh = vp.h;
+	pool[key] = n;
+	return n;
 }
 Grid.prototype.range = function (x0, y0, x1, y1) {
 	let i0 = Math.floor((x0 - this.x0) / CS), i1 = Math.floor((x1 - this.x0) / CS);
@@ -332,8 +381,8 @@ function createPlacer() {
 
 function run(scene, prev, gaps, pool) {
 	const vp = scene.viewport, T = scene.text, RH = T.rowHeightPx;
-	const G = new Grid(vp);   // static real estate: symbols, Text, pipes, Text callouts
-	const D = new Grid(vp);   // what this pass has placed: label ink and label leaders
+	const G = gridFor(pool, 'G', vp);   // static real estate: symbols, Text, pipes, Text callouts
+	const D = gridFor(pool, 'D', vp);   // what this pass has placed: label ink and label leaders
 	const nodes = {}, links = {};
 	scene.nodes.forEach(function (n) { nodes[n.id] = n; });
 	scene.links.forEach(function (l, i) { links[l.id] = l; l._i = i; });
@@ -966,5 +1015,6 @@ function run(scene, prev, gaps, pool) {
 const shared = createPlacer();
 const mod = { name: shared.name, create: createPlacer, place: shared.place, idle: shared.idle };
 if (typeof module !== 'undefined' && module.exports) { module.exports = mod; }
-if (root && root.EngCalcs) { root.EngCalcs.lpnPlacers = root.EngCalcs.lpnPlacers || {}; root.EngCalcs.lpnPlacers.a = mod; }
+const EC = typeof EngCalcs !== 'undefined' ? EngCalcs : (root && root.EngCalcs);   // eslint-disable-line no-undef
+if (EC) { EC.lpnPlacers = EC.lpnPlacers || {}; EC.lpnPlacers.a = mod; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
