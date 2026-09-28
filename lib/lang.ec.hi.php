@@ -1668,7 +1668,7 @@ $ec_lang['lpn_new_coordsys_tip']='अपने नेटवर्क की न�
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
 // keeping a second copy that could drift from Convert as's own wording of the same thing.
 $ec_lang['lpn_new_coordsys_local']='स्थानीय, योजनाबद्ध, या कस्टम';
-$ec_lang['lpn_new_coordsys_local_tip']='जियोरेफ़रेंस नहीं किया गया। अपनी खुद की पृष्ठभूमि छवि जोड़ें या कोई न जोड़ें।';
+$ec_lang['lpn_new_coordsys_local_tip']='भू-संदर्भित नहीं। अपनी खुद की पृष्ठभूमि छवि जोड़ें या कोई न जोड़ें।';
 // ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -1714,7 +1714,7 @@ $ec_lang['lpn_crs_unplaceable']='{crs} उन कुछ सूचीबद्ध
 // point, a scale and a turn -- and no register has a name or a number for it, so the strip says
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='अनाम';
-$ec_lang['lpn_crs_none']='जियोरेफ़रेंस नहीं किया गया';
+$ec_lang['lpn_crs_none']='भू-संदर्भित नहीं';
 // **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218/2026-09-25: Tom
 // asked for WGS 84 (EPSG:4326) as an ordinary catalogue entry, so this now reads that entry
 // (`crsDisplayName()` in js/looped-network.js) instead of carrying its own wording -- the register's

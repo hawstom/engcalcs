@@ -1109,7 +1109,7 @@ $ec_lang['lpn_basemap_satellite_show']='הצג תצלומי לוויין';
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
 // these two: they are the ONE rendering of each project kind that every other string naming it must
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
-$ec_lang['lpn_geomap']='גיאוגרפי';
+$ec_lang['lpn_geomap']='בעל ייחוס גיאוגרפי';
 $ec_lang['lpn_xymap']='מקומי';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
@@ -1668,7 +1668,7 @@ $ec_lang['lpn_new_coordsys_tip']='בחרו את מערכת הקואורדינט�
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
 // keeping a second copy that could drift from Convert as's own wording of the same thing.
 $ec_lang['lpn_new_coordsys_local']='מקומית, סכמטית, או מותאמת אישית';
-$ec_lang['lpn_new_coordsys_local_tip']='ללא הפניה גאוגרפית. צרפו תמונת רקע משלכם, או ללא תמונה כלל.';
+$ec_lang['lpn_new_coordsys_local_tip']='ללא ייחוס גיאוגרפי. צרפו תמונת רקע משלכם, או ללא תמונה כלל.';
 // ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -1714,7 +1714,7 @@ $ec_lang['lpn_crs_unplaceable']='{crs} היא אחת ממעט מערכות הק�
 // point, a scale and a turn -- and no register has a name or a number for it, so the strip says
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='ללא שם';
-$ec_lang['lpn_crs_none']='ללא הפניה גאוגרפית';
+$ec_lang['lpn_crs_none']='ללא ייחוס גיאוגרפי';
 // **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218/2026-09-25: Tom
 // asked for WGS 84 (EPSG:4326) as an ordinary catalogue entry, so this now reads that entry
 // (`crsDisplayName()` in js/looped-network.js) instead of carrying its own wording -- the register's

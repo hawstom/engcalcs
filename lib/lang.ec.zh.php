@@ -1109,7 +1109,7 @@ $ec_lang['lpn_basemap_satellite_show']='显示卫星影像';
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
 // these two: they are the ONE rendering of each project kind that every other string naming it must
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
-$ec_lang['lpn_geomap']='经纬度';
+$ec_lang['lpn_geomap']='配准';
 $ec_lang['lpn_xymap']='本地';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
@@ -1668,7 +1668,7 @@ $ec_lang['lpn_new_coordsys_tip']='选择您管网的坐标系。此选择是永�
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
 // keeping a second copy that could drift from Convert as's own wording of the same thing.
 $ec_lang['lpn_new_coordsys_local']='本地、示意性或自定义';
-$ec_lang['lpn_new_coordsys_local_tip']='不带地理参照。可附加您自己的背景图片，或不附加任何图片。';
+$ec_lang['lpn_new_coordsys_local_tip']='未配准。可附加您自己的背景图片，或不附加任何图片。';
 // ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -1714,7 +1714,7 @@ $ec_lang['lpn_crs_unplaceable']='{crs} 是所列坐标系中少数没有可用�
 // point, a scale and a turn -- and no register has a name or a number for it, so the strip says
 // that it has one and that it is nobody's. Lower case: it is not a proper name.
 $ec_lang['lpn_crs_unnamed']='未命名';
-$ec_lang['lpn_crs_none']='不带地理参照';
+$ec_lang['lpn_crs_none']='未配准';
 // **THE ONE PLACE THIS PAGE NAMES A lat/lon PROJECT'S COORDINATE SYSTEM** (R-218/2026-09-25: Tom
 // asked for WGS 84 (EPSG:4326) as an ordinary catalogue entry, so this now reads that entry
 // (`crsDisplayName()` in js/looped-network.js) instead of carrying its own wording -- the register's

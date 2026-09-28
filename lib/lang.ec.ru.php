@@ -1109,8 +1109,8 @@ $ec_lang['lpn_basemap_satellite_show']='Показать спутниковые 
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
 // these two: they are the ONE rendering of each project kind that every other string naming it must
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
-$ec_lang['lpn_geomap']='широта/долгота';
-$ec_lang['lpn_xymap']='xy';
+$ec_lang['lpn_geomap']='с географической привязкой';
+$ec_lang['lpn_xymap']='локальный';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
 $ec_lang['lpn_file_convert_as']='Преобразовать как…';
@@ -1149,7 +1149,7 @@ $ec_lang['lpn_file_convert_as_tip']='Копирует этот проект на
 // Task 696: a project that already knows where it is (lat/lon, an EPSG coordinate system, or an
 // attached world map) opens the placement steps already answered. Tom's own sentence for this case
 // from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
-$ec_lang['lpn_georef_answered']='Этот проект уже привязан к местности, поэтому сеть уже на карте и ничего не было перемещено. Проверьте, что она находится в нужном месте, затем нажмите кнопку «Поместить модель сюда» и кнопку «Сохранить это положение».';
+$ec_lang['lpn_georef_answered']='Этот проект уже имеет географическую привязку, поэтому сеть уже на карте и ничего не было перемещено. Проверьте, что она находится в нужном месте, затем нажмите кнопку «Поместить модель сюда» и кнопку «Сохранить это положение».';
 $ec_lang['lpn_georef_intro']='Размещение модели состоит из двух шагов. Шаг 1 — быстрый: модель остаётся на месте, а вы перемещаете карту под ней, пока ваш участок не окажется под моделью примерно нужного размера. Поворота пока нет. Шаг 2 — точный: вы перетаскиваете, изменяете размер и поворачиваете саму модель. Изначально ваш проект находится на карте всего мира, поэтому сначала найдите своё место, затем нажмите кнопку «Поместить модель сюда».';
 $ec_lang['lpn_georef_adjust']='Модель теперь привязана к местности, поэтому она перемещается вместе с картой. Перетащите модель, чтобы переместить её, перетащите угол, чтобы изменить размер, перетащите круглый маркер над моделью, чтобы повернуть её. Либо введите расстояние на местности и угол поворота ниже.';
 $ec_lang['lpn_georef_step1']='Шаг 1 из 2 — быстро';
@@ -1789,7 +1789,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Текстовые подписи ра�
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
-$ec_lang['lpn_inp_report_no_crs']='Файлы EPANET не содержат системы координат, поэтому этот файл изначально не будет привязан к местности. Чтобы разместить его на мировой карте, используйте «Карта» → «Мировая карта…». Чтобы преобразовать его координаты, используйте «Файл» → «Преобразовать как…».';
+$ec_lang['lpn_inp_report_no_crs']='Файлы EPANET не содержат системы координат, поэтому этот файл изначально не будет иметь географической привязки. Чтобы разместить его на мировой карте, используйте «Карта» → «Мировая карта…». Чтобы преобразовать его координаты, используйте «Файл» → «Преобразовать как…».';
 $ec_lang['lpn_inp_report_lead']='Эта страница использует не всё, что умеет EPANET, но ничего из вашего файла не отбрасывается. Ниже показано, что хранит ваш файл и что эта страница сохраняет без использования, а также что изменилось при считывании файла:';
 $ec_lang['lpn_inp_drop_headloss']='Этот файл не использует формулу Хазена-Вильямса. Эта страница рассчитывает по формуле Хазена-Вильямса, поэтому числа шероховатости труб были сохранены точно как в файле, но результаты здесь не будут совпадать с результатами в EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='Эти баки не имеют вертикальных прямых стенок: файл задаёт их форму в виде кривой. Кривая сохраняется в окне «Библиотеки», бак по-прежнему ссылается на неё, и расчёт с продолжённым периодом наполняет и опорожняет бак по графику, который задаёт эта кривая. Для одного момента времени результат одинаков в обоих случаях, потому что уровень воды — это значение, заданное файлом. Диаметр, записанный в файле, сохраняется рядом с кривой и используется для отрисовки и расчёта бака без кривой.';
@@ -3833,7 +3833,7 @@ $ec_lang['lpn_ff_err_unknown']='Нет ответа. Сообщённый код
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Импорт точек съёмки…';
-$ec_lang['lpn_file_import_survey_tip']='Считывает список точек съёмки из текстового файла и создаёт один узел в каждой точке, используя настройки новых элементов для всего, что файл не указывает. Трубы не рисуются, и ни одна строка никогда не отбрасывается без указания причины. Использует систему координат, которую этот проект уже использует, привязан он к местности или нет.';
+$ec_lang['lpn_file_import_survey_tip']='Считывает список точек съёмки из текстового файла и создаёт один узел в каждой точке, используя настройки новых элементов для всего, что файл не указывает. Трубы не рисуются, и ни одна строка никогда не отбрасывается без указания причины. Использует систему координат, которую этот проект уже использует, есть у него географическая привязка или нет.';
 $ec_lang['lpn_survey_read_error']='Не удалось прочитать этот файл с вашего диска.';
 $ec_lang['lpn_survey_cancelled']='Ничего не создано и ничего не изменено.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The

@@ -1667,7 +1667,7 @@ $ec_lang['lpn_new_coordsys_tip']='د خپلې شبکې همغږۍ سیسټم و�
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
 // keeping a second copy that could drift from Convert as's own wording of the same thing.
-$ec_lang['lpn_new_coordsys_local']='ځايي، شمیتیک، یا دودیز';
+$ec_lang['lpn_new_coordsys_local']='ځایی، شمیتیک، یا دودیز';
 $ec_lang['lpn_new_coordsys_local_tip']='جغرافیایي پته نلري. خپله شاليد انځور یا هیڅ یو ونښلوئ.';
 // ---- THE COORDINATE SYSTEM BOX -----------------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the

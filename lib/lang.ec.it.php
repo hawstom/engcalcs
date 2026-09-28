@@ -1109,8 +1109,8 @@ $ec_lang['lpn_basemap_satellite_show']='Mostra immagini satellitari';
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
 // these two: they are the ONE rendering of each project kind that every other string naming it must
 // agree with, inside each language, and dev/scripts/mode_name_check.php reads them for exactly that.
-$ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='xy';
+$ec_lang['lpn_geomap']='georeferenziato';
+$ec_lang['lpn_xymap']='locale';
 // **ONE ROW FOR UNITS AND COORDINATES** (Task 696, Tom 2026-09-23: *"Combine: 693 and 688 with 696
 // as a single wizard"*). The placement steps follow only when the coordinate system changes.
 $ec_lang['lpn_file_convert_as']='Converti come…';
