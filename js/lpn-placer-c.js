@@ -1057,7 +1057,12 @@ EngCalcs.lpnPlacerC = (function () {
 						continue;
 					}
 					if (it.own === ownLink) {
-						if (!own && inkOnSeg(c, it.s)) { own = true; cost += COST.OWN_PIPE; }
+						if (!own && inkOnSeg(c, it.s)) {
+							// A label turned along its pipe, or hung on a leader from it, is there to lie
+							// beside it (R7, R14), never back across it.
+							if (c.angle || c.ns) { return Infinity; }
+							own = true; cost += COST.OWN_PIPE;
+						}
 						continue;
 					}
 					if (seen.indexOf(it.own) < 0 && inkOnSeg(c, it.s)) { seen.push(it.own); cost += it.k === TLEAD ? COST.LBL_LDR : COST.LBL_PIPE; }
