@@ -1443,7 +1443,6 @@ $ec_lang['lpn_ff_residual_tip']='Tekanan yang harus tetap dipertahankan simpul s
 $ec_lang['lpn_ff_design']='Pemeriksaan desain (dampak pada sistem)';
 $ec_lang['lpn_ff_design_tip']='Pertanyaan terpisah dari apakah simpul dapat menyalurkan debit tersebut: dengan debit itu diambil di sana, apakah ada hal lain yang turun di bawah tekanan minimumnya atau melampaui batas kecepatannya? Memilih untuk memeriksanya tidak memerlukan perhitungan tambahan.';
 $ec_lang['lpn_ff_design_off']='Jangan periksa';
-$ec_lang['lpn_ff_design_nodes']='Semua simpul lainnya';
 $ec_lang['lpn_ff_design_all']='Semua simpul lainnya dan semua pipa';
 $ec_lang['lpn_ff_minpressure']='Tekanan terendah yang diizinkan di tempat lain';
 $ec_lang['lpn_ff_minpressure_tip']='Simpul yang turun di bawah nilai ini saat simpul lain sedang mengambil debit kebakarannya akan dilaporkan sebagai masalah desain.';

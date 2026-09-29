@@ -1454,7 +1454,6 @@ $ec_lang['lpn_ff_residual_tip']='Düğümün, yangın debisini sağlarken hâlâ
 $ec_lang['lpn_ff_design']='Tasarım kontrolü (sistem üzerindeki etki)';
 $ec_lang['lpn_ff_design_tip']='Düğümün debiyi sağlayıp sağlayamayacağından ayrı bir soru: orada o debi çekilirken başka bir şey asgari basıncının altına düşer mi veya hız sınırını aşar mı? Bunu kontrol etmeyi seçmek ek bir hesaplamaya mal olmaz.';
 $ec_lang['lpn_ff_design_off']='Kontrol etme';
-$ec_lang['lpn_ff_design_nodes']='Diğer tüm düğümler';
 $ec_lang['lpn_ff_design_all']='Diğer tüm düğümler ve tüm borular';
 $ec_lang['lpn_ff_minpressure']='Başka yerde izin verilen en düşük basınç';
 $ec_lang['lpn_ff_minpressure_tip']='Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir.';

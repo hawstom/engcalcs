@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 315 untranslated keys, of 2144 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 321 untranslated keys, of 2149 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';
   @@ NEEDS RULING
 
-## lpn_  (315, 2 to read @@ NEEDS RULING)
+## lpn_  (321, 8 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -189,6 +189,12 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_ff_clear`**
   > Clear rings
   _Ruled OK 2026-09-23._
+- **`lpn_ff_design_no_selection`**
+  > The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.
+  @@ NEEDS RULING
+- **`lpn_ff_design_selected`**
+  > The selected junctions and their pipes
+  @@ NEEDS RULING
 - **`lpn_ff_skipped`**
   > {n} selected elements are not junctions, so they were not tested.
   _Ruled OK 2026-09-26._
@@ -288,6 +294,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_find_filter_summary`**
   > Filtered by {q}. {rows}.
   _Ruled OK 2026-09-26._
+- **`lpn_find_shift_hint`**
+  > Shift+click one to add it to the map selection or take it out.
+  @@ NEEDS RULING
 - **`lpn_full_col_id`**
   > ID
   _Ruled OK 2026-09-26._
@@ -324,6 +333,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_georef_answered`**
   > This project is already georeferenced, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Put the model here button and the Keep this placement button.
   _Ruled OK 2026-09-25._
+- **`lpn_goto_on_map`**
+  > Go to on map
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
@@ -702,6 +714,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_pasted_rows_skipped`**
   > Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_select_on_map`**
+  > Select on map
+  @@ NEEDS RULING
 - **`lpn_pane_show_all_cols`**
   > Show all columns
   _Ruled OK 2026-09-26._
@@ -714,6 +729,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_pane_unselect_on_map`**
+  > Unselect on map
+  @@ NEEDS RULING
 - **`lpn_quality_diffusivity`**
   > Relative diffusivity
   _Ruled OK 2026-09-28._
@@ -1031,7 +1049,7 @@ is the one you meant. "The first one" is a complete answer.
 
 # Strings waiting on a branch
 
-**4 still to read**, of 7 new keys across 13 unmerged branch(es).
+**16 still to read**, of 19 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1042,11 +1060,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/rulings-0928 (`d86fb43e`) — adds no English strings
+### chore/rulings-0928 (`536c69ee`) — adds no English strings
 
 ### chore/sprint-0928-delta (`fd4d265b`) — adds no English strings
-
-### feat/fill-handle (`76716393`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -1060,34 +1076,70 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`15130ff5`) — adds no English strings
+### feat/label-placer (`a74b3558`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
 
-### feat/label-placer-c (`ed634b08`) — adds no English strings
+### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
-### feat/label-placer-d (`992b7373`) — adds no English strings
+### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/table-width (`68a15561`) — adds no English strings
+### feat/selection-set (`5fe5c2a7`) — adds no English strings
 
 ### fix/example-guard-harness (`b0cdf8d3`) — adds no English strings
 
-### fix/table-paste (`c8c13d63`) — 2 new, 2 to read @@ NEEDS RULING
+### fix/table-paste (`da7e63bc`) — 8 new, 8 to read @@ NEEDS RULING
 
-- **`lpn_pane_paste_not_created_customer`**
-  > A Customer is served from a pipe and is not created by pasting rows here.
+- **`lpn_field_text_anchor`**
+  > Attached to
   @@ NEEDS RULING
-- **`lpn_pane_paste_not_created_text`**
-  > A Text object is placed on the map and is not created by pasting rows here.
+- **`lpn_pane_paste_customer_no_position`**
+  > Row {row}: a new Customer needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_customer_node_no_pipe`**
+  > Row {row}: node {id} has no pipe for a Customer to attach to.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_anchor`**
+  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_node`**
+  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_ref`**
+  > Row {row}: a new Customer needs a connected pipe or node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_pipe`**
+  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_text_no_position`**
+  > Row {row}: a new Text needs both {first} and {second}.
   @@ NEEDS RULING
 
-### fix/tables-legend (`a1248181`) — 2 new, 2 to read @@ NEEDS RULING
+### fix/tables-legend (`001893a9`) — 8 new, 8 to read @@ NEEDS RULING
 
-- **`lpn_pane_paste_not_created_customer`**
-  > A Customer is served from a pipe and is not created by pasting rows here.
+- **`lpn_field_text_anchor`**
+  > Attached to
   @@ NEEDS RULING
-- **`lpn_pane_paste_not_created_text`**
-  > A Text object is placed on the map and is not created by pasting rows here.
+- **`lpn_pane_paste_customer_no_position`**
+  > Row {row}: a new Customer needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_customer_node_no_pipe`**
+  > Row {row}: node {id} has no pipe for a Customer to attach to.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_anchor`**
+  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_node`**
+  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_ref`**
+  > Row {row}: a new Customer needs a connected pipe or node.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_pipe`**
+  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_text_no_position`**
+  > Row {row}: a new Text needs both {first} and {second}.
   @@ NEEDS RULING

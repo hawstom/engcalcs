@@ -16427,6 +16427,9 @@ var EngCalcs = EngCalcs || {};
 	// on an element that has stopped being selected, which is the failure a second write site
 	// would produce and which nothing on screen would explain.
 	function setSelectionList(list) {
+		// Any change to the subject retires the go-to mark: the element somebody went to is either
+		// now selected (and wears the stronger mark) or is no longer what they are looking at.
+		setLocated(null);
 		selections.forEach(function (s) { paintSelection(s, false); });
 		selections = (list || []).filter(function (s) {
 			return s && s.kind && s.id && selectionExists(s);
@@ -16443,7 +16446,31 @@ var EngCalcs = EngCalcs || {};
 		// the one place the subject is written. Anywhere else and there would be a path by which a
 		// handle is left on a pipe whose meter is no longer selected.
 		refreshCustomerHandle();
+		// **THE TABLES SAY WHICH ROWS ARE SELECTED ON THE MAP** (Tom, 2026-09-28: *"Maybe in
+		// Tables we can have a heavy bar/border at the start of the row if the asset is selected
+		// on the map."*). Written here, the one place the subject is written, so no path can leave
+		// a bar on a row whose element has stopped being selected.
+		paneMarkMapSelAll();
 	}
+	// ---- THE GO-TO MARK (Tom, 2026-09-28, "Preparing to make videos") ----
+	// *"Trying to build a selection set for fire flow ... In Tables, if I go to a Junction, it
+	// selects it, destroying my selection set. In Find, if I go to a Junction, it selects it,
+	// destroying my selection set."* So going to an element never replaces a selection: when
+	// something is already selected, the element gone to wears this mark instead -- view state,
+	// exactly like the selection, on the same one element selectionMarkEl() names, and retired by
+	// the next go-to or the next change to the selection. With NOTHING selected there is no set to
+	// destroy, and a go-to still selects, so "find J412 and edit it" is one step as it always was.
+	var locatedRef = null;
+	function paintLocated(on) {
+		var el2 = selectionMarkEl(locatedRef);
+		if (el2 && el2.classList) { el2.classList[on ? 'add' : 'remove']('lpn-located'); }
+	}
+	function setLocated(kind, id) {
+		paintLocated(false);
+		locatedRef = (kind && id) ? { kind: kind, id: id } : null;
+		paintLocated(true);
+	}
+	function locatedElementRef() { return locatedRef ? { kind: locatedRef.kind, id: locatedRef.id } : null; }
 	function setSelection(kind, id) {
 		setSelectionList((kind && id) ? [{ kind: kind, id: id }] : []);
 	}
@@ -16469,7 +16496,12 @@ var EngCalcs = EngCalcs || {};
 	// buildDom() throws every element away and builds new ones, which carry no classes -- so the
 	// mark has to be re-applied, and a selection naming something the rebuild no longer contains
 	// (an undo of an Add, a project opened in this tab) has to go.
-	function refreshSelection() { setSelectionList(selections); }
+	function refreshSelection() {
+		var keep = locatedRef;
+		setSelectionList(selections);
+		// A rebuild is not a change of subject, so the go-to mark comes back on the new element.
+		if (keep && selectionExists(keep)) { setLocated(keep.kind, keep.id); }
+	}
 	// THE ONE PLACE A HIT ELEMENT BECOMES A SUBJECT. Every drawn thing on this map belongs to an
 	// element, and the parts are selected as the whole: a node's own data label IS that node, a
 	// pipe's label and its vertex handles ARE that pipe. Anything else -- bare canvas, the backdrop
@@ -18243,10 +18275,43 @@ var EngCalcs = EngCalcs || {};
 			: (group === 'link' ? linkById(id)
 			: (group === 'customer' ? customerById(id) : labelById(id))), p, v;
 		if (!el) { return; }
-		setSelection(group, id);
+		// **A GO-TO NEVER REPLACES A SELECTION** (Tom, 2026-09-28; see setLocated()). Nothing
+		// selected: select it, as before. Something selected: leave the set alone and mark this one.
+		// Only elements that still exist count: a stale entry (an undo, a reset) is no set.
+		if (!selections.some(selectionExists)) { setSelection(group, id); } else { setLocated(group, id); }
 		p = findPointOf({ group: group, el: el });
 		v = currentView();
 		if (p && v) { applyView({ cx: p.x, cy: p.y, s: findScaleFor(group, el, v) }); }
+	}
+	// **ZOOM & SELECT, FOR ONE ROW OR MANY** (Tom, 2026-09-28: *"we need a right-click option to
+	// Select (unselect) on map. Maybe we could just have Select (and zoom) that zooms only if there
+	// is a single selected."*). The elements are ADDED to the selection, never swapped in for it,
+	// and the view goes to them: one is framed the way a go-to frames it, several are fitted.
+	// `list` is [{group, id}].
+	function selectAndZoomTo(list) {
+		var refs = [], pts = [], box = null, pad, v, el, p;
+		(list || []).forEach(function (t) {
+			el = t.group === 'node' ? nodeById(t.id) : (t.group === 'link' ? linkById(t.id)
+				: (t.group === 'customer' ? customerById(t.id) : labelById(t.id)));
+			if (!el) { return; }
+			refs.push({ kind: t.group, id: t.id });
+			p = findPointOf({ group: t.group, el: el });
+			if (p) { pts.push({ p: p, group: t.group, el: el }); }
+		});
+		if (!refs.length) { return; }
+		addToSelection(refs);
+		v = currentView();
+		if (!pts.length || !v) { return; }
+		pts.forEach(function (q) {
+			box = box ? { x1: Math.min(box.x1, q.p.x), y1: Math.min(box.y1, q.p.y), x2: Math.max(box.x2, q.p.x), y2: Math.max(box.y2, q.p.y) }
+				: { x1: q.p.x, y1: q.p.y, x2: q.p.x, y2: q.p.y };
+		});
+		if (pts.length === 1 || !(zoomWindowScale(box) > 0)) {
+			applyView({ cx: pts[0].p.x, cy: pts[0].p.y, s: findScaleFor(pts[0].group, pts[0].el, v) });
+			return;
+		}
+		pad = 0.1 * Math.max(box.x2 - box.x1, box.y2 - box.y1);
+		zoomToBox({ x1: box.x1 - pad, y1: box.y1 - pad, x2: box.x2 + pad, y2: box.y2 + pad });
 	}
 	function findFmt(v) {
 		if (typeof v !== 'number') { return String(v); }
@@ -19136,13 +19201,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One result, as a row you can click. Extracted so the top of the range and the bottom of it are
 	// built by the same code -- two copies would be two chances for one end to stop being clickable.
-	// **AN ID SHARED BY A NODE AND A LINK SAYS WHICH ONE IT IS** (Tom, 2026-09-26: junctions and
-	// pipes may share an ID, as in EPANET). Junction 10 and pipe 10 would otherwise be two rows
-	// reading "10"; each gets the element's own noun, the one the run report already uses. An ID
-	// only one element answers to stays bare, as it always was.
+	// **EVERY ROW SAYS WHAT IT IS** (Tom, 2026-09-28: *"some of Net3's junctions are listed as
+	// Junction n, and others are listed as n. I can't see any reason for this."*). The reason was
+	// that the noun appeared only when a pipe shared the junction's ID (Tom, 2026-09-26: junctions
+	// and pipes may share an ID, as in EPANET) -- a rule nobody reading the list could see. Now
+	// every node, link and customer row carries its own noun, the one the run report already
+	// uses, so Junction 10 and Pipe 10 still read apart and no row is ever bare.
 	function findRowId(c) {
-		var other = c.group === 'node' ? linkById(c.el.id) : c.group === 'link' ? nodeById(c.el.id) : null;
-		return other ? reportTypeNoun(c.group, c.el.type) + ' ' + c.el.id : c.el.id;
+		var pc = EngCalcs.pageConfig || {};
+		if (c.group === 'node' || c.group === 'link') { return reportTypeNoun(c.group, c.el.type) + ' ' + c.el.id; }
+		if (c.group === 'customer') { return (pc.lpn_tool_add_meter || 'Customer') + ' ' + c.el.id; }
+		return c.el.id;
 	}
 	function findResultRow(c) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('button'),
@@ -19178,7 +19247,22 @@ var EngCalcs = EngCalcs || {};
 		// `lpn_find_adjacent` -- "Connected" -- was DELETED from all 27 language files with it
 		// (Tom, 2026-08-27: *"Remove the keys."*). It named a feature that is gone, so it was debt
 		// rather than lost content; the wording is in git if the pane ever comes back.
-		row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
+		// **SHIFT+CLICK OR CTRL+CLICK PUTS IT IN THE SELECTION, OR TAKES IT OUT** (Tom, 2026-09-28:
+		// *"I tried holding down Shift while clicking on Find results. Maybe we can do that."*) --
+		// the map's own modified click, so a selection set can be built and corrected from a list
+		// without going anywhere. A plain click still goes to the element (findGoTo(), which never
+		// replaces a selection). The row wears the same bar a Tables row does while it is selected.
+		row.className = 'lpn-find-row';
+		row.addEventListener('click', function (e) {
+			if (e && (e.shiftKey || e.ctrlKey || e.metaKey)) {
+				if (e.preventDefault) { e.preventDefault(); }
+				toggleInSelection(c.group, c.el.id);
+				return;
+			}
+			findGoTo(c.group, c.el.id);
+		});
+		row._lpnFindRef = { kind: c.group, id: c.el.id };
+		if (isSelected(c.group, c.el.id)) { row.className += ' lpn-mapsel'; }
 		return row;
 	}
 	// Whether a search has been pressed at all, so an empty panel can be silent while an empty
@@ -19218,6 +19302,11 @@ var EngCalcs = EngCalcs || {};
 		head.style.margin = '6px 0 2px';
 		head.textContent = String(pc.lpn_find_count || '{n} found. Click one to go to it.')
 			.replace('{n}', String(findResults.length));
+		box.appendChild(head);
+		// Its own line rather than a second sentence in the count, which is a ruled string.
+		head = document.createElement('div');
+		head.className = 'lpn-find-hint';
+		head.textContent = pc.lpn_find_shift_hint || 'Shift+click one to add it to the map selection or take it out.';
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
@@ -24079,6 +24168,7 @@ var EngCalcs = EngCalcs || {};
 		// here, which is also why there is nothing to unhook: they die with the table they are on.
 		paneWireTable(spec, table);
 		paneSelPaint(spec, rows, paneCols(spec));
+		paneMarkMapSel(spec);
 		// A column that left with a hide, or simply is not on THIS table, cannot still be selected.
 		if (spec.headSel && spec.headSel.length) {
 			(function () {
@@ -24232,7 +24322,10 @@ var EngCalcs = EngCalcs || {};
 				btn = document.createElement('button');
 				btn.type = 'button';
 				btn.className = 'lpn-pane-goto ec-help';
-				btn.title = pc.lpn_pane_goto_tip || 'Zoom & select';
+				// **GO TO, NOT ZOOM & SELECT** (Tom, 2026-09-28): the pin goes to the element and
+				// never replaces the map's selection (findGoTo()); selecting is the right-click
+				// menu's Select on map and Zoom & select, so the pin's tip no longer claims it.
+				btn.title = pc.lpn_goto_on_map || 'Go to on map';
 				btn.setAttribute('aria-label', btn.title + ' ' + el.id);
 				if (EngCalcs.iconEl) { btn.appendChild(EngCalcs.iconEl('pin')); }
 				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
@@ -26031,11 +26124,100 @@ var EngCalcs = EngCalcs || {};
 		// fires, whether the press kept the existing range or collapsed it to the cell under the
 		// pointer -- so the menu only has to read paneSelBox() as it stands.
 		table.addEventListener('contextmenu', function (e) {
-			var td = paneTdOfEvent(spec, e.target);
+			var td = paneTdOfEvent(spec, e.target), kb;
 			if (!td) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
-			paneOpenContextMenu(spec, e.clientX || 0, e.clientY || 0, td);
+			// The Menu key or Shift+F10 already opened it from the keydown below; the browser's
+			// own contextmenu that follows the same key must not open a second one.
+			if (paneCtxKeyAt && Date.now() - paneCtxKeyAt < 500) { return; }
+			// A contextmenu with no pointer position came from the keyboard.
+			kb = e.button !== 2 && !e.clientX && !e.clientY;
+			paneOpenContextMenuAt(spec, td, kb ? null : { x: e.clientX || 0, y: e.clientY || 0 });
 		});
+		// **THE MENU IS KEYBOARD-REACHABLE** (Tom, 2026-09-28, the Select on map commands): the
+		// Menu key or Shift+F10 on a cell opens it under that cell with its first item focused.
+		table.addEventListener('keydown', function (e) {
+			var td;
+			if (!e || !(e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey))) { return; }
+			td = paneTdOfEvent(spec, e.target);
+			if (!td) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			paneCtxKeyAt = Date.now();
+			paneOpenContextMenuAt(spec, td, null);
+		});
+	}
+	var paneCtxKeyAt = 0;
+	// Opens the cell menu at the pointer, or -- from the keyboard, `at` null -- under the cell,
+	// focused, so Up/Down/Enter work at once and Escape hands focus back to the cell.
+	function paneOpenContextMenuAt(spec, td, at) {
+		var r = !at && td.getBoundingClientRect ? td.getBoundingClientRect() : null, first;
+		paneCtxReturnFocus = at ? null : activeElementSafe();
+		paneOpenContextMenu(spec, at ? at.x : (r ? r.left : 0), at ? at.y : (r ? r.bottom : 0), td);
+		if (!at && paneCtxMenuEl) {
+			first = paneCtxMenuEl.children && paneCtxMenuEl.children[0];
+			if (first && first.focus) { first.focus(); }
+		}
+	}
+	var paneCtxReturnFocus = null;
+	// Up/Down/Home/End walk the menu's items; Escape closes it (the document handler) and puts the
+	// caret back where the keyboard opened it from.
+	function paneCtxMenuKey(e) {
+		var items = paneCtxMenuEl ? Array.prototype.slice.call(paneCtxMenuEl.children || []) : [],
+			i = items.indexOf(activeElementSafe()), key = e && e.key, n = items.length, back;
+		if (!n) { return; }
+		if (key === 'ArrowDown' || key === 'Down') { i = (i + 1) % n; }
+		else if (key === 'ArrowUp' || key === 'Up') { i = (i - 1 + n) % n; }
+		else if (key === 'Home') { i = 0; }
+		else if (key === 'End') { i = n - 1; }
+		else if (key === 'Escape' || key === 'Esc' || key === 'Tab') {
+			back = paneCtxReturnFocus;
+			paneCloseContextMenu();
+			if (back && back.focus) { try { back.focus(); } catch (err) { /* gone with a rebuild */ } }
+			if (e.preventDefault) { e.preventDefault(); }
+			if (e.stopPropagation) { e.stopPropagation(); }
+			return;
+		} else { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		if (items[i] && items[i].focus) { items[i].focus(); }
+	}
+	// ---- THE BAR AT THE START OF A ROW WHOSE ELEMENT IS SELECTED ON THE MAP ----
+	// (Tom, 2026-09-28: *"Maybe in Tables we can have a heavy bar/border at the start of the row if
+	// the asset is selected on the map."*) A class on the <tr>; the stylesheet draws it as an inset
+	// shadow on the row's first cell, so it takes no width from any column. Called from
+	// setSelectionList() -- every change of subject -- and from renderPaneTable() on a rebuild.
+	// A class is written only when it changes, so a refill of an unchanged table lays out nothing.
+	function paneMapSelLookup() {
+		var on = {};
+		selections.forEach(function (s) { on[s.kind + '\u0000' + s.id] = true; });
+		return on;
+	}
+	function paneMarkMapSel(spec, lookup) {
+		var on = lookup || paneMapSelLookup();
+		if (!spec || !spec.tds) { return; }
+		Object.keys(spec.tds).forEach(function (id) {
+			var tds = spec.tds[id], k, td = null, tr, want;
+			for (k in tds) { if (Object.prototype.hasOwnProperty.call(tds, k)) { td = tds[k]; break; } }
+			tr = td && td.parentNode;
+			if (!tr || !tr.classList) { return; }
+			want = !!on[spec.group + '\u0000' + id];
+			if (tr.classList.contains('lpn-mapsel') !== want) { tr.classList.toggle('lpn-mapsel', want); }
+		});
+	}
+	function paneMarkMapSelAll() {
+		var lookup = paneMapSelLookup(), box, kids;
+		if (paneTablesCache) { paneTablesCache.forEach(function (spec) { paneMarkMapSel(spec, lookup); }); }
+		// The Find list's rows wear the same bar, so a set built by Shift+click shows itself there.
+		box = typeof document === 'object' && document.getElementById ? document.getElementById('lpn_find_results') : null;
+		if (!box) { return; }
+		(function walk(n) {
+			kids = n.children || [];
+			Array.prototype.slice.call(kids).forEach(function (c) {
+				if (c._lpnFindRef && c.classList) {
+					var want = !!lookup[c._lpnFindRef.kind + '\u0000' + c._lpnFindRef.id];
+					if (c.classList.contains('lpn-mapsel') !== want) { c.classList.toggle('lpn-mapsel', want); }
+				} else { walk(c); }
+			});
+		}(box));
 	}
 	// The open menu, at most one at a time -- a second right-click anywhere replaces it rather
 	// than stacking a second one behind the first.
@@ -26162,7 +26344,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneOpenContextMenu(spec, x, y, td) {
 		var pc = EngCalcs.pageConfig || {}, rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), menu, mk, aim;
+			box = paneSelBox(spec, rows, cols), menu, mk, aim, targets;
 		paneCloseContextMenu();
 		if (!box) { return; }
 		menu = document.createElement('div');
@@ -26170,6 +26352,7 @@ var EngCalcs = EngCalcs || {};
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
+		menu.addEventListener('keydown', paneCtxMenuKey);
 		// **THE ACCELERATOR IS WRITTEN NEXT TO ITS ROW, THE WAY A DESKTOP MENU DOES** (Tom: *"It
 		// would be nice to have this documented somewhere somehow. I confess that I did not know
 		// about Ctrl+D."*). Only the two rows that are also a keyboard shortcut carry one -- Delete
@@ -26210,9 +26393,30 @@ var EngCalcs = EngCalcs || {};
 			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); }, 'Ctrl+Shift+V');
 		}
 		aim = paneCtxTarget(spec, td, rows, box);
-		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () {
-			findGoTo(aim.group, aim.id);
-		});
+		// **SELECT ON MAP, UNSELECT ON MAP, AND ZOOM & SELECT** (Tom, 2026-09-28: *"In Table, we
+		// need a right-click option to Select (unselect) on map. Maybe we could just have Select
+		// (and zoom) that zooms only if there is a single selected. But it may be better to have
+		// separate commands."*). Separate commands, acting on every row of the range -- one row
+		// means `aim`, which is the element a support column names when the pointer is on one.
+		// Each ADDS TO or TAKES FROM the map's selection and never replaces it, which is the whole
+		// of his selection-set complaint. Select and Unselect are offered only when they would do
+		// something, the same rule Fill down follows.
+		targets = box.r1 > box.r0
+			? rows.slice(box.r0, box.r1 + 1).map(function (el) { return { group: spec.group, id: el.id }; })
+			: [aim];
+		if (targets.some(function (t) { return !isSelected(t.group, t.id); })) {
+			mk(pc.lpn_pane_select_on_map || 'Select on map', function () {
+				addToSelection(targets.map(function (t) { return { kind: t.group, id: t.id }; }));
+			});
+		}
+		if (targets.some(function (t) { return isSelected(t.group, t.id); })) {
+			mk(pc.lpn_pane_unselect_on_map || 'Unselect on map', function () {
+				setSelectionList(selections.filter(function (s) {
+					return !targets.some(function (t) { return t.group === s.kind && t.id === s.id; });
+				}));
+			});
+		}
+		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); });
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
@@ -54742,15 +54946,19 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN.** Three values,
-		// in this page's own vocabulary rather than EPANET's or Innovyze's, and the middle one
-		// exists because a system with thousands of pipes may want the pressures without the
-		// velocities.
+		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
+		// SELECTED** (Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
+		// value, every other junction without the pipes, went: a blank velocity box already turns
+		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
+		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
+		// junctions selected on the map and the pipes that meet them, which is how a master-plan
+		// appendix scopes it (Sue's and Mary's journals, same day). ffDesignScope() maps the retired
+		// value, should anything still carry it, to All.
 		boxes.design = ffSelect([
 			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['nodes', pc.lpn_ff_design_nodes || 'All other junctions'],
-			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes']
-		], ask.design);
+			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes'],
+			['selected', pc.lpn_ff_design_selected || 'The selected junctions and their pipes']
+		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
 
@@ -54925,7 +55133,34 @@ var EngCalcs = EngCalcs || {};
 	// water is the more serious of the two. Within a kind it is the lowest pressure, or the highest
 	// velocity.
 	function ffCriticalText(rec) {
-		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, text, j, e;
+		var parts = ffCriticalParts(rec);
+		return parts.plain !== undefined ? parts.plain : parts.before + parts.idText + parts.after;
+	}
+	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
+	// flow analysis, can every node have a hyperlink to go to it?"*).
+	function ffCriticalCell(row, rec) {
+		var parts = ffCriticalParts(rec), td;
+		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
+		td = ffCell(row, parts.before);
+		ffGotoLink(td, parts.kind, parts.id, parts.idText);
+		td.appendChild(document.createTextNode(parts.after));
+		return td;
+	}
+	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
+	// a Tables pin (findGoTo(), which never replaces a selection being built). A button dressed as
+	// a link, because Tom asked for a hyperlink and a reader expects one to be clickable text.
+	function ffGotoLink(parent, group, id, text) {
+		var pc = EngCalcs.pageConfig || {}, b = document.createElement('button');
+		b.type = 'button';
+		b.className = 'lpn-ff-goto';
+		b.textContent = text;
+		b.title = pc.lpn_goto_on_map || 'Go to on map';
+		b.addEventListener('click', function () { findGoTo(group, id); });
+		parent.appendChild(b);
+		return b;
+	}
+	function ffCriticalParts(rec) {
+		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, tpl, value, at, after, j, e;
 		// **NOT CHECKED AND NOTHING FOUND ARE DIFFERENT FACTS AND USED TO DRAW IDENTICALLY.**
 		// (Found 2026-09-02 from Tom's question about which cells a design row should blank.) A
 		// dash here meant *we looked and found nothing*, which is good news, AND *we never looked*,
@@ -54938,7 +55173,7 @@ var EngCalcs = EngCalcs || {};
 		// the design readings at the required flow `whether or not the junction passes`, and its own
 		// comment beside that line says the opposite and is wrong. All six junctions in
 		// dev/lpn-spike/fireflow-box-harness.js carry effects, two of them failing.
-		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
+		if (!rec.effects) { return { plain: pc.lpn_ff_not_checked || 'Not checked' }; }
 		for (j = 0; j < rec.effects.nodes.length; j++) {
 			e = rec.effects.nodes[j];
 			if (!worst || e.pressure < worst.pressure) { worst = e; kind = 'node'; }
@@ -54949,20 +55184,21 @@ var EngCalcs = EngCalcs || {};
 				if (!worst || e.velocity > worst.velocity) { worst = e; kind = 'link'; }
 			}
 		}
-		if (!worst) { return FF_DASH; }
-		text = kind === 'node'
-			? (pc.lpn_ff_affect_node || '{id} drops to {pressure}')
-				.replace('{id}', labelPrefixFor('node', 'id') + worst.id)
+		if (!worst) { return { plain: FF_DASH }; }
+		// The template is split at {id} so the id can be drawn as a link; the words either side are
+		// exactly the words the plain text has, in whatever order the language puts them.
+		tpl = kind === 'node'
+			? String(pc.lpn_ff_affect_node || '{id} drops to {pressure}')
 				.replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
-			: (pc.lpn_ff_affect_link || '{id} reaches {velocity}')
-				.replace('{id}', labelPrefixFor('link', 'id') + worst.id)
+			: String(pc.lpn_ff_affect_link || '{id} reaches {velocity}')
 				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
+		value = labelPrefixFor(kind, 'id') + worst.id;
+		at = tpl.indexOf('{id}');
 		total = rec.effects.nodes.length + rec.effects.links.length;
 		extra = total - 1;
-		if (extra > 0) {
-			text += ' ' + (pc.lpn_ff_more || 'and {n} more affected').replace('{n}', String(extra));
-		}
-		return text;
+		after = extra > 0 ? ' ' + (pc.lpn_ff_more || 'and {n} more affected').replace('{n}', String(extra)) : '';
+		if (at < 0) { return { plain: tpl + after }; }
+		return { before: tpl.slice(0, at), idText: value, after: tpl.slice(at + 4) + after, kind: kind, id: worst.id };
 	}
 	// **WHICH CRITERION THE JUNCTION BROKE**, which is as far as we can honestly go towards the
 	// competitor's "Design constraint". Two of their columns have no answer in this result set and
@@ -54987,6 +55223,56 @@ var EngCalcs = EngCalcs || {};
 		var td = ffEl('td', cls || null, text, row);
 		return td;
 	}
+	// **EVERY COLUMN SORTS FROM ITS HEADING** (Tom, 2026-09-28: *"Sort Fire flow analysis
+	// columns."*). The Tables pane's own arrow and rule (sortPaneTable(): the same column flips, a
+	// new one starts ascending), on this table's records rather than its cells, so a number sorts
+	// as a number and not as the text it is printed as. A cell with no value -- a dash, an answer
+	// that could not be found -- goes LAST in both directions, because a blank is not the smallest
+	// or the largest of anything. `null` is the reading order ffSorted() gives, until a heading is
+	// clicked. Kept for the page load, like the criteria in the boxes above it.
+	var ffSortState = { col: null, dir: 1 };
+	function ffSortKey(rec, col) {
+		switch (col) {
+		case 0: return rec.id;
+		case 1: return rec.staticPressure;
+		case 2: return rec.required;
+		case 3: return rec.pressureAtRequired;
+		case 4: return rec.available;
+		case 5: return rec.residualAt;
+		case 6: return rec.effects ? ffCriticalText(rec) : undefined;
+		case 7: return rec.effects ? ffLimitText(rec) : undefined;
+		case 8: return rec.solves;
+		case 9: return ffModesText(rec);
+		}
+		return undefined;
+	}
+	function ffBlank(v) {
+		return v === undefined || v === null || v === '' || v === FF_DASH || (typeof v === 'number' && !isFinite(v));
+	}
+	function ffSortResults(results) {
+		var base = ffSorted(results), col = ffSortState.col, dir = ffSortState.dir;
+		if (col === null) { return base; }
+		return base.map(function (r, i) { return { r: r, i: i, k: ffSortKey(r, col) }; }).sort(function (a, b) {
+			var ab = ffBlank(a.k), bb = ffBlank(b.k), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof a.k === 'number' && typeof b.k === 'number') ? a.k - b.k
+				: String(a.k).localeCompare(String(b.k), undefined, { numeric: true });
+			return c ? dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	function ffSortBy(col) {
+		ffSortState = { col: col, dir: ffSortState.col === col ? -ffSortState.dir : 1 };
+		rebuildFireFlowReport();
+		// The report is rebuilt, so the arrow the keyboard was on is a new element: put the focus
+		// back on this column's arrow rather than dropping it to the page.
+		var host = document.getElementById('lpn_ff_report'), btn = null;
+		(function walk(n) {
+			Array.prototype.slice.call((n && n.children) || []).forEach(function (c) {
+				if (c._lpnFfSortCol === col) { btn = c; } else if (!btn) { walk(c); }
+			});
+		}(host));
+		if (btn && btn.focus) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
+	}
 	function ffTable(parent, headings) {
 		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
 		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
@@ -55000,11 +55286,27 @@ var EngCalcs = EngCalcs || {};
 		// *"I'd like to check against the literature and disclose the meaning of Static Pressure.
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
-		headings.forEach(function (h) {
-			var text = h, tip = null, th;
+		headings.forEach(function (h, i) {
+			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = ffSortState.col === i;
 			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
-			th = ffEl('th', null, text, hr);
+			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
+			// The pane's arrow, in the pane's words: shown on the sorted column, and on any other
+			// under the pointer or the keyboard. A click anywhere on the heading sorts too.
+			arrow = document.createElement('button');
+			arrow.type = 'button';
+			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
+				(on && ffSortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
+			arrow._lpnFfSortCol = i;
+			arrow.addEventListener('click', function (ev) {
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				ffSortBy(i);
+			});
+			th.appendChild(arrow);
+			th.setAttribute('aria-sort', on ? (ffSortState.dir < 0 ? 'descending' : 'ascending') : 'none');
+			th.addEventListener('click', function () { ffSortBy(i); });
 		});
 		return ffEl('tbody', null, null, table);
 	}
@@ -55076,7 +55378,7 @@ var EngCalcs = EngCalcs || {};
 		}
 
 		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
-		sorted = ffSorted(set.results);
+		sorted = ffSortResults(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		// **THE ORDER IS THE ORDER A PERSON READS THE ANSWER IN** (Tom, 2026-09-02, once the
 		// terminology stopped fighting him: *"Now that the terminology is recognizable, more of my
@@ -55107,13 +55409,13 @@ var EngCalcs = EngCalcs || {};
 			// the Settings.Label prefix for Node IDs"*). Every id drawn on the map goes through
 			// labelPrefixFor(), so an id printed here without it is the same element under a second
 			// name -- and this table exists to send somebody to those elements.
-			ffCell(tr, labelPrefixFor('node', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, ''), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
 			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCell(tr, ffCriticalText(rec));
+			ffCriticalCell(tr, rec);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
@@ -55225,6 +55527,33 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi = null;
 	}
 
+	// The design check's scope, with the retired 'nodes' (every other junction, no pipes) read as
+	// 'all' (Tom, 2026-09-28). Nothing stores this value -- `fireFlowAsk` lives for one page load -- so the
+	// mapping is a guard, not a migration: an unknown value is never allowed to mean "do not check".
+	function ffDesignScope(v) {
+		return (v === 'off' || v === 'selected') ? v : 'all';
+	}
+	// **SELECTED: THE JUNCTIONS SELECTED ON THE MAP AND THE PIPES THAT MEET THEM**. A
+	// pipe selected on its own counts too, since selecting it says as plainly as anything can that
+	// its velocity is wanted. Read from the model the run solves, so an inactive element, which is
+	// not in the model, is not checked. Whatever else is selected (a tank, a Text) is not a place
+	// the check can be applied and is left out.
+	function ffDesignSelectedSet(model) {
+		var nodeIn = {}, linkIn = {}, nodes = [], links = [], junctionIds = {}, linkIds = {};
+		model.nodes.forEach(function (n) { if (n.type === 'junction') { junctionIds[n.id] = true; } });
+		model.links.forEach(function (l) { linkIds[l.id] = true; });
+		selections.forEach(function (s) {
+			if (s.kind === 'node' && junctionIds[s.id] && !nodeIn[s.id]) {
+				nodeIn[s.id] = true; nodes.push(s.id);
+				(incidentLinks[s.id] || []).forEach(function (lid) {
+					if (linkIds[lid] && !linkIn[lid]) { linkIn[lid] = true; links.push(lid); }
+				});
+			} else if (s.kind === 'link' && linkIds[s.id] && !linkIn[s.id]) {
+				linkIn[s.id] = true; links.push(s.id);
+			}
+		});
+		return { nodes: nodes, links: links };
+	}
 	// ---- the run --------------------------------------------------------------------------------
 	function runFireFlowSweep() {
 		var pc = EngCalcs.pageConfig || {},
@@ -55279,11 +55608,20 @@ var EngCalcs = EngCalcs || {};
 		model = assembleModel();
 		fireFlowAtFrame(model);
 		engine = engineFor(model);
-		if (ask.design !== 'off') {
+		if (ffDesignScope(ask.design) === 'selected') {
+			design = ffDesignSelectedSet(model);
+			if (!design.nodes.length && !design.links.length) {
+				setNotice(pc.lpn_ff_design_no_selection ||
+					'The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.');
+				return;
+			}
+			design.minPressure = minPressure > 0 ? minPressure : 0;
+			design.maxVelocity = maxVelocity > 0 ? maxVelocity : Infinity;
+		} else if (ffDesignScope(ask.design) !== 'off') {
 			design = {
 				nodes: model.nodes.filter(function (n) { return n.type === 'junction'; })
 					.map(function (n) { return n.id; }),
-				links: ask.design === 'all' ? model.links.map(function (l) { return l.id; }) : [],
+				links: model.links.map(function (l) { return l.id; }),
 				minPressure: minPressure > 0 ? minPressure : 0,
 				maxVelocity: maxVelocity > 0 ? maxVelocity : Infinity
 			};

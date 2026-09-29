@@ -1442,7 +1442,6 @@ $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o men
 $ec_lang['lpn_ff_design']='Verificare de proiectare (efect asupra sistemului)';
 $ec_lang['lpn_ff_design_tip']='O întrebare separată de dacă joncțiunea poate livra debitul: cu acel debit preluat acolo, scade altceva sub presiunea sa minimă sau depășește limita sa de viteză? Alegerea de a verifica aceasta nu costă niciun calcul suplimentar.';
 $ec_lang['lpn_ff_design_off']='Nu verifica';
-$ec_lang['lpn_ff_design_nodes']='Toate celelalte joncțiuni';
 $ec_lang['lpn_ff_design_all']='Toate celelalte joncțiuni și toate conductele';
 $ec_lang['lpn_ff_minpressure']='Cea mai mică presiune permisă în altă parte';
 $ec_lang['lpn_ff_minpressure_tip']='O joncțiune care scade sub aceasta în timp ce alta își preia debitul de incendiu este raportată ca o problemă de proiectare.';

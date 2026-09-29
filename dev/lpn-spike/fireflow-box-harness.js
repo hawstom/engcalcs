@@ -373,7 +373,9 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	// Mutation-proved: removing the prefix from the row id left this assertion passing.
 	const firstCells = rowFirstCells(byId.lpn_ff_report);
 	ok('the tested junction id carries the node label prefix, in its OWN cell',
-		set.results.every(function (r) { return firstCells.indexOf('NODE-' + r.id) >= 0; }),
+		// The id is a go-to link now (Tom, 2026-09-28), and this stub's textContent repeats a
+		// child's text, so the cell is read by its first word.
+		set.results.every(function (r) { return firstCells.map(function (t) { return t.split(' ')[0]; }).indexOf('NODE-' + r.id) >= 0; }),
 		JSON.stringify(firstCells.slice(0, 4)));
 	ok('...and a drawdown id carries it too, since that cell exists to send you to that element',
 		pulled.length === 0 || pulled.every(function (r) {

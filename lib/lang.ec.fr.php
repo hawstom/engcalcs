@@ -1443,7 +1443,6 @@ $ec_lang['lpn_ff_residual_tip']='La pression que la jonction doit encore mainten
 $ec_lang['lpn_ff_design']='Vérification de conception (effet sur le réseau)';
 $ec_lang['lpn_ff_design_tip']='Une question distincte de la capacité de la jonction à fournir le débit : avec ce débit prélevé là, est-ce qu\'autre chose descend sous sa pression minimale ou dépasse sa limite de vitesse ? Choisir de le vérifier ne coûte aucun calcul supplémentaire.';
 $ec_lang['lpn_ff_design_off']='Ne pas vérifier';
-$ec_lang['lpn_ff_design_nodes']='Toutes les autres jonctions';
 $ec_lang['lpn_ff_design_all']='Toutes les autres jonctions et toutes les conduites';
 $ec_lang['lpn_ff_minpressure']='Pression minimale admise ailleurs';
 $ec_lang['lpn_ff_minpressure_tip']='Une jonction qui descend sous cette valeur pendant qu\'une autre prélève son débit d\'incendie est signalée comme un problème de conception.';

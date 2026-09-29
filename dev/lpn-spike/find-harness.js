@@ -67,7 +67,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn findOpDefs().map(function (o) { return o[0]; }); },\n" +
 	"\t\topLabels: function (scope, prop) { findState.scope = scope; findState.prop = prop;\n" +
 	"\t\t\treturn findOpDefs().map(function (o) { return o[1]; }); },\n" +
-	"\t\tgoTo: findGoTo, selectedRef: selectedRef,\n" +
+	"\t\tgoTo: findGoTo, selectedRef: selectedRef, locatedRef: locatedElementRef,\n" +
 	"\t\tcontextLength: function (group, id) { var e = group === 'node' ? nodeById(id) : linkById(id);\n" +
 	"\t\t\treturn findContextLength(group, e); },\n" +
 
@@ -838,7 +838,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8');
 	const rows = [];
 	walk(L.resultsBox(), function (el) { if (el._tag === 'button') { rows.push(el.textContent); } });
-	ok('a compound result row is the id and nothing invented', rows.length === 1 && rows[0].trim() === ra.id,
+	ok('a compound result row is the noun and id and nothing invented', rows.length === 1 && rows[0].trim() === global.EngCalcs.pageConfig.lpn_tool_add_pipe + ' ' + ra.id,
 		JSON.stringify(rows));
 }
 
@@ -1289,12 +1289,19 @@ console.log('\n--- the Find box comes back where it was left ---');
 	const PCw = global.EngCalcs.pageConfig;
 	ok('junction 10 and pipe 10 are told apart by their own nouns',
 		texts.indexOf(PCw.lpn_tool_add_junction + ' 10') >= 0 && texts.indexOf(PCw.lpn_tool_add_pipe + ' 10') >= 0, JSON.stringify(texts));
-	ok('...and an ID only one element has stays bare', texts.indexOf('20') >= 0, JSON.stringify(texts));
+	// Tom, 2026-09-28: a noun on some rows and not others read as a rule he could not see, so
+	// every row now names its kind -- an ID only one element has included.
+	ok('...and an ID only one element has names its kind too (no bare row)', texts.indexOf(PCw.lpn_tool_add_pipe + ' 20') >= 0 && texts.indexOf('20') < 0, JSON.stringify(texts));
 	const jRow = btns[texts.indexOf(PCw.lpn_tool_add_junction + ' 10')], pRow = btns[texts.indexOf(PCw.lpn_tool_add_pipe + ' 10')];
 	jRow._listeners.click.forEach((f) => f({}));
 	ok('clicking the Junction 10 row selects junction 10', JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'node', id: '10' }), JSON.stringify(L.selectedRef()));
 	pRow._listeners.click.forEach((f) => f({}));
-	ok('clicking the Pipe 10 row selects pipe 10', JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'link', id: '10' }), JSON.stringify(L.selectedRef()));
+	// Tom, 2026-09-28: going to an element never replaces a selection. Junction 10 is selected, so
+	// the Pipe 10 row goes to the pipe and marks it, and junction 10 stays the selection.
+	ok('clicking the Pipe 10 row goes to pipe 10 without replacing the selection',
+		JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'node', id: '10' }) &&
+		JSON.stringify(L.locatedRef()) === JSON.stringify({ kind: 'link', id: '10' }),
+		JSON.stringify([L.selectedRef(), L.locatedRef()]));
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

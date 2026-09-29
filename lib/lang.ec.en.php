@@ -1461,6 +1461,9 @@ $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Zoom & select';
+$ec_lang['lpn_goto_on_map']='Go to on map';
+$ec_lang['lpn_pane_select_on_map']='Select on map';
+$ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
@@ -1599,6 +1602,7 @@ $ec_lang['lpn_find_op_lt']='below';
 $ec_lang['lpn_find_op_empty']='empty';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
+$ec_lang['lpn_find_shift_hint']='Shift+click one to add it to the map selection or take it out.';
 $ec_lang['lpn_find_none']='Nothing matched.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -3901,8 +3905,9 @@ $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.';
 $ec_lang['lpn_ff_design_off']='Do not check';
-$ec_lang['lpn_ff_design_nodes']='All other junctions';
 $ec_lang['lpn_ff_design_all']='All other junctions and all pipes';
+$ec_lang['lpn_ff_design_selected']='The selected junctions and their pipes';
+$ec_lang['lpn_ff_design_no_selection']='The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';

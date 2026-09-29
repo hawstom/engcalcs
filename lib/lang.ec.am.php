@@ -1445,7 +1445,6 @@ $ec_lang['lpn_ff_residual_tip']='የእሳት ፍሰቱን እያደረሰ መ�
 $ec_lang['lpn_ff_design']='የንድፍ ምርመራ (በስርዓቱ ላይ ያለው ተጽዕኖ)';
 $ec_lang['lpn_ff_design_tip']='መገናኛው ፍሰቱን ማድረስ ይችል እንደሆነ ከሚለው የተለየ ጥያቄ፦ ያ ፍሰት እዚያ ሲሳብ፣ ሌላ ማንኛውም ነገር ከዝቅተኛ ግፊቱ በታች ይወርዳል ወይስ የፍጥነት ገደቡን ያልፋል? መፈተኑን መምረጥ ምንም ተጨማሪ ስሌት አያስወጣም።';
 $ec_lang['lpn_ff_design_off']='አትፈትሽ';
-$ec_lang['lpn_ff_design_nodes']='ሌሎቹ መገናኛዎች ሁሉ';
 $ec_lang['lpn_ff_design_all']='ሌሎቹ መገናኛዎችና ቧንቧዎች ሁሉ';
 $ec_lang['lpn_ff_minpressure']='በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት';
 $ec_lang['lpn_ff_minpressure_tip']='ሌላ መገናኛ የእሳት ፍሰቱን እየሳበ ሳለ ከዚህ በታች የሚወርድ መገናኛ እንደ ንድፍ ችግር ይነገራል።';

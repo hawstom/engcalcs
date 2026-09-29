@@ -1441,7 +1441,6 @@ $ec_lang['lpn_ff_residual_tip']='La pressione che il nodo deve ancora mantenere 
 $ec_lang['lpn_ff_design']='Verifica di progetto (effetto sul sistema)';
 $ec_lang['lpn_ff_design_tip']='Una domanda separata da se il nodo può erogare la portata: con quella portata prelevata lì, qualcos\'altro scende sotto la sua pressione minima o supera il suo limite di velocità? Scegliere di verificarlo non costa alcun calcolo aggiuntivo.';
 $ec_lang['lpn_ff_design_off']='Non verificare';
-$ec_lang['lpn_ff_design_nodes']='Tutti gli altri nodi';
 $ec_lang['lpn_ff_design_all']='Tutti gli altri nodi e tutte le tubazioni';
 $ec_lang['lpn_ff_minpressure']='Pressione minima consentita altrove';
 $ec_lang['lpn_ff_minpressure_tip']='Un nodo che scende sotto questo valore mentre un altro sta prelevando la propria portata antincendio è segnalato come un problema di progetto.';

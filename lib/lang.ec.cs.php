@@ -1441,7 +1441,6 @@ $ec_lang['lpn_ff_residual_tip']='Tlak, který musí uzel stále držet při odb�
 $ec_lang['lpn_ff_design']='Návrhová kontrola (vliv na síť)';
 $ec_lang['lpn_ff_design_tip']='Samostatná otázka od toho, zda uzel dokáže dodat průtok: klesne při odběru tohoto průtoku tam něco jiného pod svůj minimální tlak, nebo přesáhne limit rychlosti? Volba tuto kontrolu provést nestojí žádný další výpočet navíc.';
 $ec_lang['lpn_ff_design_off']='Nekontrolovat';
-$ec_lang['lpn_ff_design_nodes']='Všechny ostatní uzly';
 $ec_lang['lpn_ff_design_all']='Všechny ostatní uzly a všechna potrubí';
 $ec_lang['lpn_ff_minpressure']='Nejnižší povolený tlak jinde';
 $ec_lang['lpn_ff_minpressure_tip']='Uzel, který klesne pod tuto hodnotu, zatímco jiný odebírá svůj požární průtok, je nahlášen jako návrhový problém.';

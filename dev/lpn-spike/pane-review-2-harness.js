@@ -34,7 +34,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn paneSelBox(s, paneTableRowsInOrder(s), paneCols(s)); },\n" +
 	"\t\tmode: paneCellMode, focusable: paneCellFocusable,\n" +
 	"\t\tscrollTopFor: paneScrollTopFor, clampXY: paneClampXY,\n" +
-	"\t\tselectedRefs: selectedRefs,\n" +
+	"\t\tselectedRefs: selectedRefs, clearSel: clearSelection,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -356,6 +356,8 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 		'Select in map on the ID column still selects the row’s own asset', JSON.stringify(refs));
 
 	// The From column: the node that end lands on.
+	// Zoom & select ADDS to the selection (Tom, 2026-09-28), so each case starts from none.
+	L.clearSel();
 	menu = rightClick('from');
 	fire(gotoItem(menu), 'click', {});
 	refs = L.selectedRefs();
@@ -363,6 +365,8 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 		'Select in map on From selects the node at that end', JSON.stringify(refs));
 
 	// The To column: the other one.
+	// Zoom & select ADDS to the selection (Tom, 2026-09-28), so each case starts from none.
+	L.clearSel();
 	menu = rightClick('to');
 	fire(gotoItem(menu), 'click', {});
 	refs = L.selectedRefs();
@@ -370,6 +374,8 @@ console.log('\n--- item 6(c): right-click on From or To shows THAT asset ---');
 		'Select in map on To selects the node at the other end', JSON.stringify(refs));
 
 	// A support column whose value is a NUMBER, not an asset, falls back to the row.
+	// Zoom & select ADDS to the selection (Tom, 2026-09-28), so each case starts from none.
+	L.clearSel();
 	menu = rightClick('length');
 	if (menu) {
 		fire(gotoItem(menu), 'click', {});
