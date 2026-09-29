@@ -304,7 +304,14 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 	// panel goes through openPanelAtAnchor(); which rect it is handed is that panel's own business.
 	report(/openPanelAtAnchor\(panel,/.test(extract('showBackdropTargetPanel')),
 		'the backdrop-position panel');
-	report(/fitPanelToViewport\(popup\)/.test(extract('toggleNotesPopup')), 'the Notes box');
+	// **THE NOTES BOX JOINED SETTINGS' PATTERN ON 2026-09-28**, not the property popup's: it is a
+	// standing, draggable, resizeable box that remembers its own corner (Tom, "Draggable non-hog
+	// box for Help, Notes"), not a centred popover placed fresh with fitPanelToViewport() on every
+	// open. Same two assertions as openSettingsBox() above, for the same reason.
+	report(!/openPanelAtAnchor/.test(extract('openNotesBox')),
+		'the Notes box is a standing box, not an anchored pull-down');
+	report(/clampPanel\(/.test(extract('openNotesBox')),
+		'...and it is clamped into the viewport, so a remembered position always comes back');
 	report(/fitPanelToViewport\(popup\)/.test(extract('openPopupAt')), 'and the property popup');
 	// The clamp must be handed the CAPPED height, or it re-derives a top from a height the panel no
 	// longer has -- which is the original bug wearing a different hat.
