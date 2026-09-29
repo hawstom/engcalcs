@@ -544,11 +544,11 @@
         "lpn_goto_on_map": "Go to on map",
         "lpn_pane_select_on_map": "Select on map",
         "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click one to add it to the map selection or take it out.",
+        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
         "lpn_field_lat_abbr": "Lat",
         "lpn_field_lon_abbr": "Lon",
         "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them."
+        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
     },
     "keys": {
         "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
@@ -562,11 +562,11 @@
         "lpn_goto_on_map": "Go to on map",
         "lpn_pane_select_on_map": "Select on map",
         "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click one to add it to the map selection or take it out.",
+        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
         "lpn_field_lat_abbr": "Lat",
         "lpn_field_lon_abbr": "Lon",
         "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them."
+        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
     },
     "key_context": {
         "lpn_pane_paste_text_no_position": {

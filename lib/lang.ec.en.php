@@ -1615,7 +1615,7 @@ $ec_lang['lpn_find_op_lt']='below';
 $ec_lang['lpn_find_op_empty']='empty';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
-$ec_lang['lpn_find_shift_hint']='Shift+click one to add it to the map selection or take it out.';
+$ec_lang['lpn_find_shift_hint']='Shift+click to add/remove toggle.';
 $ec_lang['lpn_find_none']='Nothing matched.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -2126,7 +2126,7 @@ $ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nob
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='That file was not opened, and nothing here changed. Somebody else still has it open.';
 // The other end of the back channel, shown to the holder.
-$ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
+$ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
 $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
@@ -2720,7 +2720,7 @@ $ec_lang['lpn_mapgeo_dial_turn']='Rotate the map';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
 $ec_lang['lpn_mapgeo_dial_size']='Map size';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
-$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
@@ -3926,7 +3926,7 @@ $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can
 $ec_lang['lpn_ff_design_off']='Do not check';
 $ec_lang['lpn_ff_design_all']='All other junctions and all pipes';
 $ec_lang['lpn_ff_design_selected']='The selected junctions and their pipes';
-$ec_lang['lpn_ff_design_no_selection']='The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.';
+$ec_lang['lpn_ff_design_no_selection']='The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
