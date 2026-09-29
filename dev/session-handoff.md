@@ -8,10 +8,9 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/table-width`,
-  `feat/fill-handle`, `feat/label-placer` (the seam; merges with the chosen placer), and
-  `feat/label-gang-search` (bench only now; delete once a placer lands). Builder branches
-  `feat/label-placer-a`, `-b`, `-c`, `-d` never merge on their own.
+- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/label-placer`
+  (the seam; merges with the chosen placer) and `feat/label-gang-search` (bench only; delete once a
+  placer lands). Builder branches `feat/label-placer-a`..`-d` never merge on their own.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -96,94 +95,69 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-28 (evening)
+## STATE — 2026-09-29 (small hours)
 
-### Production = master 9c71d54f (Tom pulled 2026-09-28 morning)
+### Master = 0190cad2, pushed. Production = 9c71d54f (Tom pulled 2026-09-28 morning)
 
-Master is ahead, pushed through 3f7e7bae, with 329bf07a (R-369) and this handoff merged after it:
-Ctrl+Enter (Task 690), his 49 English rulings harvested, label rules round 2 + bench round 2,
-Wave 0 of the next sprint, roadmap closures 610/645/648/679, R-369. **R-348: remind him to test
-symbology on dev once he pulls.**
+a912bcfe was pushed first for his table-editing video. On top of it: `fix/time-series-switch` (Time
+Series blank after a project switch and not redrawn on arrival; a Task 680 defect from 09-16, not
+a regression), `chore/rulings-0928` and `chore/sprint-0928-delta` (313 lpn_ keys in 26 languages;
+the sprint stays OPEN in friction_check until his two English rulings below).
 
-### Label placement rebuild (Task 539) -- the live thread
+Merged 2026-09-29 on his "Done. Close, merge, and delete branch" for all four: `feat/fill-handle`
+(8131), `feat/table-width` (8124: KLmax 0.8 with ceil, word cap 7, Vertices "(Lat/Lon|Lat/Lon|…)",
+"No ▾" clipping accepted), `feat/selection-set` (8135: Tables Select/Unselect on map, go-to keeps the
+selection, Shift+click in Find, row bars, fire-flow links and sorting, Find always names the kind,
+Task 742 design check None/All/Selected, "Zoom in to see labels" notes gone), `fix/tables-legend`
+(8134: paste round-trip incl. Text and Customers creating rows, legend top-left default, tank
+diameter in length units, scenario switch keeps Properties, Credits follows the brand, Import
+libraries brings patterns/controls/rules, draggable non-modal Notes box). He wants master for a
+**table-editing video**. **Remind him to try drag-to-fill on a phone after he pulls** (his ask).
+Deleted key: `lpn_ff_design_nodes`. New storage: the Notes box position (localStorage, window
+furniture; in the inventory) -- he was told.
 
-- Rules: `dev/label-placement-rules.md`. **Round 2 Part A (§1-§5) is his markup of 2026-09-28**, word
-  for word; Part B records what he deleted (S3, W2, no-churn R12) and why they stay deleted.
-  Page from round 1: https://claude.ai/artifact/HBdFNppA44NuwHjeKsi43N
-- Bench round 2 (on master): churn replaces "unforced" (a move that shows more is not churn), plus
-  reported R5/R7/R9/R11 scores. Judges' secret tests in `dev/lpn-spike/label-bench/judges/`; builders
-  must never be told about them. **The bench's `score.js` carries his numeric crossing weights and
-  was on the builders' reading list**, so "order only" leaked in both rounds. Move the weights into
-  `dev/lpn-spike/label-bench/judges/` before any round 3.
-- Round 2 pair, built from Part A only: **C (8132, `?placer=c`)** 79% labels / 49% values, 0 breaks,
-  no leader-on-leader; **D (8133, `?placer=d`)** 77% / 54%, 0 breaks, crossing cost below master's.
-  Master 45% / 25%. Both pass his two screenshot tests; **both FAIL R-075 again** (long IDs move 67% C,
-  66% D; round 1 61%/52%; master 13%). Without a stillness rule nothing asks them to hold, so R-075
-  is now a question for him: is it a rule he wants in Part A, or stays secret?
-- Perry found and we fixed, before he looks: both placer files never registered in
-  `EngCalcs.lpnPlacers`, so `?placer=` silently showed master's labels (the bench cannot see this;
-  the seam harness now fails such a file); and a hard wheel flick froze the map ~27 s (every notch
-  ran a layout; seam a5131fc4 defers to the settle; worst freeze now 0.3-0.6 s).
-- **Next: his side-by-side of C and D** (8132/8133; round 1 still on 8129/8130), then the choice, then
-  the winner is wired in (undo its `EC_UNREFERENCED_MODULES` line) and merged with the seam.
+### Label placement (Task 539)
 
-### Awaiting his browser pass or ruling
+Round 4 on 8132 (C, `?placer=c`) and 8133 (D, `?placer=d`), both merged with seam a74b3558 (view
+stops above the footer; `scene.furniture`). Bench: both 0 breaks, R13 (setting off) 0 turned; close
+zoom level-with-room C 6/74, D 6/43; along C 531, D 642; values C 50%, D 54%; cost C 922, D 419.
+Perry r4 (before the seam fix): only fault was pipe 185 level at close zoom -- the seam's footer, now
+fixed. **Next: a short Perry real-Chrome pass on the merged C/D when the machine is quiet, then his
+side-by-side.** His rulings this round (rules Part A/B): R14 "values outrank alignment; alignment
+required wherever the same rows fit aligned"; blank time "about a second"; rough-then-tidy (his hint
+(b)) measured by D, not shipped: the seam draws only what place() returns. Interviews with named
+strategies: `dev/label-placer-interview-{a,b,c,d}.md`; paper notes `dev/paper-notes-label-placement.md`
+(on the rulings branch). Mary: showing all labels is an outlier, not a known impossibility; citation
+trace (Kakoulis-Tollis 2006, Been et al.) before any novelty claim. Task 741: the infinite map.
 
-- **8124 `feat/table-width`** f57dedf5: R-366 (measured ~11% print shortfall, headroom only on
-  columns at risk, numeric ones included; wrap kept as the fallback so nothing overlaps) and R-367
-  (print read EPANET's stored word, FIFO, instead of the label, in every language: a bug, fixed).
-  Perry READY.
-- **8131 `feat/fill-handle`** 76716393 (+433b86f4): drag-to-fill in the tables. Perry READY with real
-  mouse and touch; up/left drags and filtered tables were proven only in the stub harness.
-- **2 English strings** (Ctrl+Enter): `lpn_pane_ctrlenter_filled` "Filled {n} cells. {skipped} were
-  not changed." and the new Ctrl+Enter row in `lpn_notes_7_def`.
-- **6 `$ec_lang_syn` proposals from Wave 0** (`dev/english-friction/2026-09-28-delta.json`, each entry's
-  `resolution` holds the exact line). AI may not write them without his written yes. **The sprint is
-  blocked on them** (`friction_check.php --sprint=2026-09-28-delta` fails while they are
-  refer-to-human); on his yes, write them, mark the entries `intent`, regenerate payloads, launch.
-- **R-190**: answered back (the button was retired by R-219).
-- **R-369's design**: he agreed. There is no "push scenario to Base" action; say so if he asks.
+### Awaiting him
 
-### EPANET++ is live (Option A), 2026-09-28
+- 2 English rulings closing the sprint: `lpn_mapgeo_dial_help` (proposed "The middle of each bar
+  keeps the fit from step 1, so 1 and 0 mean no change.") and `lpn_lock_requested` ("File, Close
+  project" -> "File, Close"). Then friction_check passes and the sprint closes.
+- ~30 new English keys from the merges (dev/new-english-keys.md) for the next sprint.
+- Task 737 first piece: the per-language collision check (41 today: junction/node in 6 languages,
+  minor/junction loss, max allowable head vs pressure rating).
+- "Zoom in to see labels" is gone from the examples; nothing else of R-174 changed.
+- EPANET++: pages now revalidate (repo 2ff1c58, pushed); he must pull it on the server.
+- "Press Calculate to run the simulation" names a button hidden while Recalculate automatically is
+  on; wording is his.
+- The browser-pass `time` spec has 4 failures on master too (not in check_all); look separately.
+- Retired ports 8124/8131/8134/8135 need his Apache reload (commands at the foot).
 
-epanet-plus-plus.org serves the landing site, epanetpp.org 301s to it; both are clones in their
-docroots (`~/addon_html/...`), ignored by the home-folder repo like the other two sites. Search
-Console property added. `advisors.html` is on the server but noindex, out of sitemap and nav, until
-three more advisors are filled (Tom's card is his own words and his "Tom-surveying" photo).
+- `dev/tom-review-queue.md` still lists R-366/R-367/R-075 and the round-2 placer items as open;
+  all were answered in conversation 2026-09-28/29. Clear them against this file.
 
-### Translation sprint (sprint id `2026-09-28-delta`)
+### Traps met 2026-09-28/29
 
-311 ruled `lpn_` keys wait; Wave 0 done (9 findings: 2 English fixes and 1 glossary term applied,
-6 synonym notes to him). Authorized by his standing "Proceed with a translation sprint whenever
-you deem it prudent"; 26 Sonnet agents, 20 at once then 6.
-
-### Traps met 2026-09-28
-
-- **The auto-mode permission classifier refused a green merge to master ("Merge Without Review"),
-  killing another agent's stray processes, and once a plain `git status`.** It cannot see our
-  merge-on-green rule. Quote Tom's words when retrying; never route the refused action through an
-  agent. He asked whether updates caused it; the honest answer is "probably a stricter classifier,
-  not our repo".
-- **A fresh worktree lacks `dev/browser-pass/node_modules`**, so browser harnesses fail as
-  "playwright-core is not installed". Link it: `ln -s <main>/dev/browser-pass/node_modules
-  dev/browser-pass/node_modules` in each new worktree before its suite.
-- **Closing a roadmap task changes `dev/features.md`**: run `php dev/scripts/generate_features.php`
-  with the closure, or master's suite fails "features list fresh".
-- **Keep `~/.claude/hooks/chime.busy` until NOTHING is outstanding** -- no agent, no background run,
-  no scheduled wakeup. Removing it at a report while notifications could still arrive made every
-  later turn chime (his "chimes noise I can't account for").
-- **A subagent will write "P.E.", "Founder" and reasons he never gave** into copy about him. Read
-  every sentence about Tom before it ships.
-
-- **A placer can score perfectly on the bench and do nothing on the page.** The bench require()s the
-  file; the page looks in `EngCalcs.lpnPlacers`. Always have a real-Chrome pass before a placer
-  goes to him.
-- **A resumed agent that "waits" hands back instead.** Tell it to block with
-  `timeout 580 bash -c 'until grep -qE "All blocking checks pass|BLOCKING FAILURES" <log>; do sleep 20; done'`.
-- **Perry wrote its journal into the main checkout once** despite a scratchpad brief; check
-  `git status` in the main checkout after every pre-review.
-- **Killing a stale queued check_all is refused by the classifier** ("Interfere With Workloads");
-  let it run out rather than edit under it.
+- **A broad `pkill -f check_all.sh` kills every session's run** (an agent did it; master's run died
+  with 144). Brief agents: kill only by PID, and only their own.
+- **Network drops (EAI_AGAIN) kill agents mid-work**; resume with SendMessage, "git status first".
+- **The four gallery FAIL lines in example-open-guard-harness are its own mutation tests**; the
+  verdict is the exit code. Read `FAILED:` lines, not raw FAIL lines.
+- **Agents writing journals into the main checkout dirty a running suite.** Brief them to the
+  scratchpad while a suite runs there.
+- **The master pre-commit refuses `--amend` too**: regenerate payloads on a chore branch and merge.
 
 ## Commands to hand Tom with any panel change
 
