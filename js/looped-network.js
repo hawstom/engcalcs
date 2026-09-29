@@ -29944,7 +29944,26 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.')) { return; }
 		wipeAllStorage();
-		window.location.reload();
+		// **AND THE CONSENT RECORD ITSELF, PLUS WHAT IT GATES.** A brand-new visitor has never
+		// answered the banner, so ec_consent has to go, not just be set to refused -- and
+		// ec_consent's own JS mirror only ever WRITES an answer (Consent.lib.php), never erases
+		// one, while ec_blang and ec_seen are HttpOnly by design (config.inc.php) and JS cannot
+		// reach them at all. consent.php's `ec_wipe` is the one door for this (ecConsentForget(),
+		// which reuses ecForgetAnalyticsStorage() rather than a second cookie list) -- and that
+		// request's own redirect back to this page IS the reload the confirm promised, so there
+		// is no separate window.location.reload() to race it.
+		var form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/engcalcs/consent.php';
+		form.style.display = 'none';
+		[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
+			var field = document.createElement('input');
+			field.name = pair[0];
+			field.value = pair[1];
+			form.appendChild(field);
+		});
+		document.body.appendChild(form);
+		form.submit();
 	}
 	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
 	// projects are created in the same millisecond in two tabs.
