@@ -86,4 +86,32 @@ must beat, and what may be given up to beat it. Today the repair pass is bounded
 chose, and it is about two fifths of the time for about two percent more values shown. Whether
 that trade is worth the blank is Tom's call, not mine.
 
+## Round 4
+
+Tom's ruling: values outrank alignment, but a pipe label must lie along its pipe wherever the same
+rows fit that way. Three things kept my labels level when they need not have been, and one broke
+R13.
+
+- **R13, a settings change.** Last view's place was offered back even when the alignment setting
+  had just been switched off, so turned labels stayed turned. Now last view's place is offered
+  only when the alignment setting, the reading window and the label's own `along` are unchanged.
+  With the setting switched off at the same view, no label stays turned (0 of 220; was 108).
+- **Level kept by habit.** A level place kept from the last view earned the bonus for staying put,
+  which cancelled what level costs. A kept level place now pays the level price like any other.
+- **Level priced too cheaply.** Level now costs 8, still under the worth of one row (10 or more),
+  so a label never trades a value for alignment, but the gap is wide enough that an along place
+  wins whenever the same rows fit.
+- **Too strict at the corners.** Along a very short pipe the turned text grazes the end symbols by a
+  pixel or so. I allowed 1.0 px of such leading; the rules allow 1.5, and I now allow 1.4.
+
+At 4x and closer, 6 of 43 level pipe labels still had room to lie along (was 27 of 90). Over all
+views, 642 of 949 lie along, and 38 of the rest had room (was 93). To keep the blank after a zoom
+short I lowered the repair pass's work cap from 25 000 to 18 000 label tests, about an eighth off
+the layout time for under one percent of values.
+
+Strategy names: **Along by default** now reads **Along unless it costs a value**: a pipe label
+lies along its pipe wherever its rows fit that way, and is level only when turning it would cost a
+value or there is no room. New: **Clean slate on a setting change**: when the user changes how
+labels are drawn, nothing is carried over from the view before.
+
 Copyright 2009 Thomas Gail Haws. Licensed under GNU GPL v3.0 or later.

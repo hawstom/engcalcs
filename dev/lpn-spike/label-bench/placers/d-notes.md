@@ -37,7 +37,7 @@ row at a time, down to the ID alone):
 - for a pipe label, beside the pipe (R7), at the middle of its on-screen stretch or up to three
   tenths of it either way: turned along it where the user's setting asks (R14), in the reading
   window the scene gives, three pixels off the pipe or half a row off; level and clear of it only
-  as the fallback, which costs a little under one row;
+  as the fallback, which costs 8, under the worth of one row;
 - further out on a straight leader in 8 directions at three distances, or, where the leader would
   be steep, on a leader ending in the one standard short hook (R6); the text is always justified
   to the side the leader arrives from (R5);
@@ -60,7 +60,9 @@ before it cannot win; an along place is tested only when the search reaches it.
    This is R2: a neighbour takes a longer leader so that another label keeps its properties.
 5. Polish: each label re-seats itself if that cuts crossings.
 
-**Between views:** last view's place is offered back to every label with a bonus, so a label moves
+**Between views:** last view's place is offered back to every label with a bonus (not after a
+change to the alignment setting or the reading window, R13; a kept level place still pays the
+level price), so a label moves
 only when that buys something. On a zoom-in or a pan, last view's labels are seated first and get
 a bonus for keeping their rows, so zooming in gives back (R11) instead of reshuffling.
 
