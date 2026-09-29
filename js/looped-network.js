@@ -34886,7 +34886,7 @@ var EngCalcs = EngCalcs || {};
 	async function askForLockedFile(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
-		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
+		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', '');
 		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
 		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
 		if (initials === null) {
@@ -35119,6 +35119,8 @@ var EngCalcs = EngCalcs || {};
 	// prompting again every time -- which is the second thing he called undesirable. **Ask once per
 	// browser, keep the answer, and reuse it when this browser is the one HOLDING a file**, so the
 	// colleague who finds it locked is told who has it rather than "somebody". Task 698.
+	// **THAT REUSE IS NOT BUILT** (checked 2026-09-29): nothing writes `identity.name`, so a holder
+	// sends an empty name and Ask's initials reach only the broker's lock record, never this device.
 	async function postLock(action, docId, opts) {
 		var idn = loadIdentity();
 		// **"We never asked" is not "the server is down."** Returning the same null for both let the

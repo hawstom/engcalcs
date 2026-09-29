@@ -226,7 +226,7 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 | `TITLE_LOG` | page title event | Same |
 | `SIGNAL_LOG` | page, language, event, short slug (a link's host+path, a unit token, a diagnostic code, a share outcome, a one-tap grievance press) | Same. The outbound row names a page we linked to, never anything the visitor typed |
 | `CONTACT_SEND_LOG` + `formmail.php` | **name, email, message** | **Yes** |
-| `lpn-locks/*.json` | project id, **holder name/initials**, timestamps | **Yes, if initials identify a colleague** |
+| `lpn-locks/*.json` | project id, holder token, **the initials an asker typed** (and a holder name only from pages older than Task 667(b)), timestamps | **Yes, if initials identify a colleague** |
 
 The usage logs carrying **no IP and no session id** is a deliberate design already recorded in
 `lib/config.inc.php`, and it is the single strongest fact in this whole file: it is what keeps the
