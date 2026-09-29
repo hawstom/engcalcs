@@ -3317,3 +3317,37 @@ friction unrelated to R-356's column-width rule. Diameter/Length/Roughness value
 Pipes table read suspiciously uniform (99, 199, 130...) -- a column-order slip in my own
 TSV harvest against Net3's real values, not a defect in the product; irrelevant to the widths
 being measured (which depend on headings and selector text, not magnitude of numbers).
+
+# Pre-review round 3 — feat/label-placer-c (50a37bdc) and feat/label-placer-d (6d9b865a)
+
+OBSERVED, real headless Chrome via dev/lpn-spike/browser-drive.js (CDP, no puppeteer), against
+the running preview servers on :8132 (?placer=c) and :8133 (?placer=d). Confirmed `?placer=`
+really drove layout both times (`EngCalcs.lpnPlacerLast.step` advanced on both). Files: only
+`js/lpn-placer-c.js`/`js/lpn-placer-d.js` differ between the two worktrees (checked with `diff
+-rq`), so every other finding below is shared seam behaviour, not one builder's alone.
+
+**R14, align pipe labels to pipe:** on Net3-Novato-CA-World, zoomed in, toggled "Draw link labels
+along the link line" off with the checkbox (`debug-align.js`). C: step advanced (3->4) but 0 of
+84 link-label rotate angles changed; a screenshot taken with the setting on and one taken with it
+off are byte-identical (md5 9805b0db...). **C still ignores the setting**, exactly Tom's round-2
+complaint, unfixed. D: 10 of 37 previously-angled labels reverted to level; 27 stayed rotated
+regardless of the setting, and with the setting ON only 41 of 85 landed within 8 degrees of their
+own pipe's angle (e.g. link 103's pipe runs at 117 degrees, its label sat at 0). D honours the
+setting for less than half its link labels.
+
+**"Zoom in to see labels" lingers (item 4):** at the exact same view where 150+ real labels are
+drawn, the banner is still on screen, full-size, floating over open ground east of downtown Novato
+-- on BOTH branches (shots/{c,d}/04-after-zoomin-burst.png). The build agent's claim that this was
+fixed does not hold on the live page.
+
+**N1, label/label overlap (screen-space bbox, `text[data-nodelbl]`/`text[data-linklbl]` only,
+hit-paths excluded):** C 23 overlapping pairs after a 15-notch zoom-in, 28 after a zoom-out/in
+round trip; D 16 and 30. Label/symbol overlap: C 3, D 8.
+
+**Pan and the 27s stall:** ordinary pan never blanked labels on either branch (152->147 on C,
+155->150 on D). The round-2 stall did not reproduce; every layout step timed 3-140 ms in this pass.
+
+No console errors on either branch in any run.
+
+Files: `/tmp/claude-1000/.../scratchpad/placer-r3-check.js`, `debug-align.js`, `debug-labels.js`;
+screenshots in `.../scratchpad/shots/{c,d}/`.
