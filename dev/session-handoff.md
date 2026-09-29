@@ -121,9 +121,14 @@ furniture; in the inventory) -- he was told.
 Round 4 on 8132 (C, `?placer=c`) and 8133 (D, `?placer=d`), both merged with seam a74b3558 (view
 stops above the footer; `scene.furniture`). Bench: both 0 breaks, R13 (setting off) 0 turned; close
 zoom level-with-room C 6/74, D 6/43; along C 531, D 642; values C 50%, D 54%; cost C 922, D 419.
-Perry r4 (before the seam fix): only fault was pipe 185 level at close zoom -- the seam's footer, now
-fixed. **Next: a short Perry real-Chrome pass on the merged C/D when the machine is quiet, then his
-side-by-side.** His rulings this round (rules Part A/B): R14 "values outrank alignment; alignment
+Perry r4b (after the seam fix, 09-29): C and D clean on everything measured (alignment with room,
+off->level, 0 letter overlaps, nothing under furniture, blank 0.13-0.5 s, 0 page errors) EXCEPT one
+open disagreement: pipe 185 (129.7 deg) labelled level at Novato hard zoom in both. Perry calls it
+an alignment defect; the seam agent measured the label ~95 px beside ~76 px of visible pipe, which
+R14's "values outrank alignment" allows. **First job next session: measure 185 in Perry's exact
+view (his probe, .../scratchpad/labels/probe-r4.js; his window is taller than the seam agent's):
+aligned label length vs visible pipe length and free room. Level-with-no-room is correct; fix the
+probe. Level-with-room is a defect; find whose.** Then his side-by-side (Perry: show C first). His rulings this round (rules Part A/B): R14 "values outrank alignment; alignment
 required wherever the same rows fit aligned"; blank time "about a second"; rough-then-tidy (his hint
 (b)) measured by D, not shipped: the seam draws only what place() returns. Interviews with named
 strategies: `dev/label-placer-interview-{a,b,c,d}.md`; paper notes `dev/paper-notes-label-placement.md`
