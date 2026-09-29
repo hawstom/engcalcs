@@ -36636,15 +36636,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
 	}
-	function closeNotesBox() {
+	function closeNotesPopup() {
 		hidePanel(notesBoxEl());
 		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
 	}
 	function toggleNotesPopup() {
-		if (notesBoxIsOpen()) { closeNotesBox(); return; }
+		if (notesBoxIsOpen()) { closeNotesPopup(); return; }
 		openNotesBox();
 	}
-	function closeNotesPopup() { closeNotesBox(); }
 	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
 	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
@@ -36668,14 +36667,14 @@ var EngCalcs = EngCalcs || {};
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
 		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
 		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeNotesBox); }
+		if (x) { x.addEventListener('click', closeNotesPopup); }
 		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
 		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
 		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
 		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
 		// away, and a table cell or the map must keep taking Escape for its own undo.
 		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeNotesBox(); }
+			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
 		});
 		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}

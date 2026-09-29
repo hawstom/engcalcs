@@ -108,7 +108,7 @@ console.log('\n-- the Notes box is a non-hog reference box, not a pull-down (Tom
 	}
 	report(/id="lpn_notes_title"/.test(page), 'it has a title bar to drag by');
 	report(/LPN_NOTESBOX_KEY *= *'lpn_notesbox'/.test(src), 'its layout is remembered under lpn_notesbox');
-	report(/box\.addEventListener\('keydown', function \(e\) \{\s*if \(e\.key === 'Escape'\) \{ e\.preventDefault\(\); closeNotesBox\(\); \}/.test(src),
+	report(/box\.addEventListener\('keydown', function \(e\) \{\s*if \(e\.key === 'Escape'\) \{ e\.preventDefault\(\); closeNotesPopup\(\); \}/.test(src),
 		'Escape closes it only when bound to the box itself, i.e. only when focus is inside it');
 }
 
