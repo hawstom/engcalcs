@@ -46,6 +46,7 @@ function obstaclesOf(scene, layout) {
 			segs.push({ p: p, q: q, link: l.id, bb: bb([p, q]) });
 		}
 	});
+	(scene.furniture || []).forEach(function (f) { const b = C.rectToOBox(f); boxes.push({ box: b, bb: boxBB(b) }); });
 	scene.texts.forEach(function (t) {
 		boxes.push({ box: t.box, bb: boxBB(t.box) });
 		if (t.leader) { leaders.push({ pts: t.leader, bb: bb(t.leader) }); }

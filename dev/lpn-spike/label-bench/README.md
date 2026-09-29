@@ -64,6 +64,11 @@ view reaches a scale the last layout was not made for (a zoom, a newly opened pr
 every node and link label, and shows them again when `place()` has answered, so no label is seen
 in an unconfirmed position. A pan at the same scale hides nothing. A slow `place()` is therefore a
 longer blank after each zoom, which is what R10 asks you to keep short.
+On the page, `scene.viewport` is the map a reader can see: the canvas less the strips its mode
+hint (top) and status footer (bottom) cover, so its `y` is not 0, and a label whose owner sits
+under a strip is not asked for. What else the page draws over the map (legends, the zoom buttons,
+the status chips) arrives as `scene.furniture`, boxes to keep clear of as of a Text object; the
+bench's own scenes have none.
 
 ## What is scored
 

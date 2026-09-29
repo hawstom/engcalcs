@@ -53255,6 +53255,31 @@ var EngCalcs = EngCalcs || {};
 		if (sep) { out[sep] = Math.max(0, (out[sepPair] || 0) - (out.xx || 0)); }
 		return out;
 	}
+	// **THE MAP A READER CAN SEE, AND WHAT THE PAGE DRAWS OVER IT**, in view px, for the scene. The
+	// top and bottom strips are what zoomExtent() already reserves for the mode hint and the status
+	// footer (overlayReserve()): a placer keeps its labels inside the viewport, so nothing is drawn
+	// under the footer, and a pipe whose middle is under it is not asked for (round 4's pre-review:
+	// pipe 185 on Novato squeezed level against the bottom edge, half under the status bar). What
+	// else sits over the map -- the chips of both strips, the tile credit, the zoom buttons and the
+	// two legends -- goes to the placer as `furniture`, boxes it keeps clear of.
+	function placerVisibleMap() {
+		var W = svg.clientWidth, H = svg.clientHeight, r = svg.getBoundingClientRect();
+		var ox = r.left + (svg.clientLeft || 0), oy = r.top + (svg.clientTop || 0);
+		var top = Math.min(H, overlayReserve('lpn_mode_hint')), bot = Math.min(H - top, overlayReserve('lpn_map_footer'));
+		var vp = { x: 0, y: top, w: W, h: Math.max(0, H - top - bot) }, furniture = [];
+		var rects = [], wrap = svg.parentNode && svg.parentNode.getBoundingClientRect ? svg.parentNode.getBoundingClientRect() : null;
+		if (wrap) { overlayOccupants(wrap).forEach(function (o) { rects.push(o.rect); }); }
+		[document.getElementById('lpn_labels_legend'), colorLegendBox].forEach(function (e) {
+			if (e && e.getBoundingClientRect && !(e.style && e.style.display === 'none')) { rects.push(e.getBoundingClientRect()); }
+		});
+		rects.forEach(function (q) {
+			if (!q || !(q.width > 0) || !(q.height > 0)) { return; }
+			var b = { x: q.left - ox, y: q.top - oy, w: q.width, h: q.height };
+			if (b.x >= vp.x + vp.w || b.x + b.w <= vp.x || b.y >= vp.y + vp.h || b.y + b.h <= vp.y) { return; }
+			furniture.push(b);
+		});
+		return { viewport: vp, furniture: furniture };
+	}
 	// One placement, from view pixels at the view it was made for into WORLD units, which is what
 	// the labels are drawn in: a pan or a zoom then carries it with the map until the next layout.
 	function placerToWorld(req, pl, scene) {
@@ -53378,10 +53403,11 @@ var EngCalcs = EngCalcs || {};
 		beginLinkGeomHold();
 		try {
 			obs = staticObstacles();
-			var widths = placerMeasureAll();
+			var widths = placerMeasureAll(), seen = placerVisibleMap();
 			scene = EngCalcs.lpnLabelScene.buildScene(placerHost(), {
 				id: rt.project + '@' + rt.step, set: rt.project, step: rt.step, source: rt.project,
 				canvas: { w: svg.clientWidth, h: svg.clientHeight }, obs: obs,
+				viewport: seen.viewport, furniture: seen.furniture,
 				measure: function (str) { return widths[str] !== undefined ? widths[str] : 0; }
 			}).scene;
 			t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();

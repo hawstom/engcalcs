@@ -14,6 +14,8 @@
 //      while a pan is held, and a layout follows its release (rule T1).
 //   1b. R15: with the placer slowed, no frame shows a data label at a scale no layout was made for,
 //      nor a newly opened project's labels before their first layout; a small pan never hides them.
+//   1c. Novato zoomed as round 4's pre-review did it: the scene's viewport ends above the status
+//      footer, and pipe 185, whose middle is then under the footer, is not asked for.
 //   2. The same page WITHOUT the parameter draws every label, leader and grab shape exactly as the
 //      tree before the seam did: attribute for attribute, against `git merge-base HEAD master`
 //      exported to a temp directory (LABEL_SEAM_BASE=<ref> overrides). Once this branch is merged
@@ -555,6 +557,58 @@ async function sectionPending(Session, browser, env) {
 	}
 }
 
+// ---- 1c. the scene's viewport is the map a reader can see: pipe 185 on Novato --------------------
+// Round 4's pre-review (2026-09-28), real Chrome: Novato opened, 10 wheel notches in at the canvas
+// centre, then 20 more. Pipe 185 then lies across the bottom edge with its middle under the status
+// footer, and both placers drew its label squeezed level against the edge, half under the footer --
+// because the scene's viewport was the whole <svg>, footer strip included. The viewport must stop
+// where the footer and the mode hint begin (the strips zoomExtent() reserves), no label may be asked
+// for an owner under them, and what else the page draws over the map must reach the placer.
+async function sectionVisibleMap(Session, browser, env) {
+	console.log('\n--- 1c. the scene\'s viewport is the visible map (Novato, pipe 185 under the footer) ---');
+	const a = await Session.open(browser, 'visible');
+	try {
+		const page = a.page;
+		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+		await page.goto(env.pageUrl('Looped-Network.php?ec_nolog=1&placer=trivial'), { waitUntil: 'load' });
+		await a.settle(400);
+		await a.answerTrainingPanel().catch(() => {});
+		await a.openExampleCard(await a.lang('lpn_ex_net3_world_title'));
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.settle(1500);
+		const c = await page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
+		await page.mouse.move(c.x + c.w / 2, c.y + c.h / 2);
+		for (let k = 0; k < 10; k++) { await page.mouse.wheel(0, -120); await page.waitForTimeout(35); }
+		await a.settle(2500);
+		for (let k = 0; k < 20; k++) { await page.mouse.wheel(0, -120); await page.waitForTimeout(35); }
+		await a.settle(2500);
+		const got = await page.evaluate(() => {
+			const L = EngCalcs.lpnPlacerLast, cv = document.getElementById('lpn_canvas'), r = cv.getBoundingClientRect();
+			const oy = r.top + (cv.clientTop || 0);
+			let footTop = Infinity;
+			const f = document.getElementById('lpn_map_footer');
+			if (f) { Array.from(f.children).forEach((k) => { const q = k.getBoundingClientRect(); if (q.height > 0 && q.width > 0) { footTop = Math.min(footTop, q.top - oy); } }); }
+			const t185 = document.querySelector('#lpn_canvas text.lpn-lbl[data-linklbl="185"]:not([data-repeat])');
+			const P = L.scene.links.find((l) => l.id === '185');
+			return { vp: L.scene.viewport, footTop: footTop, canvasH: cv.clientHeight, furniture: (L.scene.furniture || []).length,
+				asked185: L.scene.labels.some((q) => q.id === 'l:185'), shown185: !!(t185 && t185.textContent && getComputedStyle(t185).visibility !== 'hidden'),
+				mid185: P ? [(P.points[0][0] + P.points[P.points.length - 1][0]) / 2, (P.points[0][1] + P.points[P.points.length - 1][1]) / 2] : null,
+				outside: L.scene.labels.filter((q) => q.anchor.y > L.scene.viewport.y + L.scene.viewport.h || q.anchor.y < L.scene.viewport.y).map((q) => q.id) };
+		});
+		ok('the view puts pipe 185\'s middle under the status footer (the pre-review\'s case)', got.mid185 && got.mid185[1] > got.footTop,
+			'middle ' + JSON.stringify(got.mid185 && got.mid185.map(Math.round)) + ', footer from y ' + Math.round(got.footTop));
+		ok('the scene\'s viewport stops above the status footer', got.vp.y + got.vp.h <= got.footTop + 0.5 && got.vp.h < got.canvasH,
+			JSON.stringify(got.vp) + ' vs footer top ' + Math.round(got.footTop) + ', canvas ' + got.canvasH);
+		ok('pipe 185\'s label is not asked for, nor drawn, while its middle is under the footer', !got.asked185 && !got.shown185,
+			'asked ' + got.asked185 + ', drawn ' + got.shown185);
+		ok('no label is asked for an owner outside the viewport', !got.outside.length, got.outside.slice(0, 5).join(' '));
+		ok('what the page draws over the map reaches the placer as furniture', got.furniture > 0, got.furniture + ' box(es)');
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 1).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
 // ---- 2. no parameter: the page as the base tree drew it -----------------------------------------
 async function sectionUnchanged(Session, browser, env) {
 	console.log('\n--- 2. no parameter: every label exactly as the base tree drew it ---');
@@ -642,6 +696,7 @@ async function main() {
 		await devRefusals(env);
 		await sectionPlacer(Session, browser, env);
 		await sectionPending(Session, browser, env);
+		await sectionVisibleMap(Session, browser, env);
 		await sectionUnchanged(Session, browser, env);
 		env.stopServer();
 		delete process.env.APP_ENV;

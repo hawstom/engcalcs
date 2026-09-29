@@ -18,7 +18,12 @@
  * @property {string} id                    e.g. 'novato-zoom@4x'
  * @property {string} set                   the scene set (one project, one or more views)
  * @property {number} step                  index of this view within its set
- * @property {Rect}   viewport              the visible canvas; the model runs off it on every side
+ * @property {Rect}   viewport              the visible map; the model runs off it on every side. On
+ *          the page it is the canvas less the strips the page's mode hint and status footer cover,
+ *          so its top-left need not be (0, 0).
+ * @property {Rect[]} [furniture]           boxes the page draws OVER the map inside the viewport
+ *          (legends, the zoom buttons, status chips): a label under one cannot be read, so keep
+ *          clear of them as of a Text object. Absent in the bench's scenes.
  * @property {{s:number, tx:number, ty:number}} view   view px = model * s + t, for a placer that
  *          caches in model space across zooms (H-b: hard thinking may be cached across zooms).
  *          Everything else is already in view px.
