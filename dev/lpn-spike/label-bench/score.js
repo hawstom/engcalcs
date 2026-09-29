@@ -238,7 +238,7 @@ function scoreView(scene, layout, opts) {
 		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH,
 		r5: { checked: r5Checked, mismatch: r5Mismatch }, r7: { checked: r7Checked, onOwnPipe: r7OnOwnPipe },
 		r9: { should: r9Should, has: r9Has },
-		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed } };
+		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed, zoom: scene.zoom || null } };
 }
 
 // ---- R14: along the pipe -------------------------------------------------------------------------

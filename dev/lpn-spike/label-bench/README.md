@@ -103,7 +103,9 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
   sit, within 5 degrees, and reading inside `scene.settings.readableAngleDeg`); and of the rest, how
   many had room to: the same rows as one line, turned to the pipe and half a row clear of it, fitting
   at or near the middle of the pipe's on-screen stretch on either side, over no symbol, label, Text
-  or other pipe, on screen (`alignedRoom()` in `score.js`).
+  or other pipe, on screen (`alignedRoom()` in `score.js`). The same figure is given again for the
+  close views alone (4x and closer, where there is plenty of room): of the pipe labels still level
+  there, how many had room to lie along their pipe with the same rows. It should be near zero.
 - **R13 on a settings change, reported**: the first view of each set, placed with "Draw link labels
   along the link line" on, then again at the same view with it off and `prev` set to the first
   layout (as the page does when the user unticks it): how many shown pipe labels are still turned.

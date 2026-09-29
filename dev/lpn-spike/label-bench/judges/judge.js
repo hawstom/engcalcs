@@ -35,7 +35,7 @@
 
 const path = require('path');
 const C = require('../contract.js');
-const { runBench, loadSets, machine, settingsToggle } = require('../run.js');
+const { runBench, loadSets, machine, settingsToggle, CLOSE_ZOOM } = require('../run.js');
 const { roomWithinReach } = require('./room.js');
 const TOM_WEIGHTS = require('./weights.js');
 
@@ -53,6 +53,10 @@ const R075_REACH_ROWS = 3;
 // R14: at most this share of the shown pipe labels asked to lie along their pipe may be drawn
 // otherwise while an aligned spot beside their pipe was free. Master's own placer misses none.
 const R14_MAX_MISSED = 0.05;
+// R14 at close zoom (Tom, 2026-09-28, below): of the pipe labels still level in views zoomed
+// CLOSE_ZOOM x or closer, at most this share may have had room to lie along their pipe with the
+// same rows. "It should be near zero."
+const R14_CLOSE_MAX = 0.05;
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -120,11 +124,12 @@ function r14(placer) {
 	console.log('--- R14: pipe labels along their pipe where there is room, every public scene ---');
 	const sets = loadSets(path.join(BENCH, 'scenes'));
 	const res = runBench(placer, sets);
-	let asked = 0, along = 0, missed = 0, cost = 0, rankCost = 0;
+	let asked = 0, along = 0, missed = 0, cost = 0, rankCost = 0, cLevel = 0, cRoom = 0;
 	res.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const r = st.score.r14;
 			asked += r.asked; along += r.along; missed += r.missedWithRoom;
+			if (r.zoom >= CLOSE_ZOOM) { cLevel += r.asked - r.along; cRoom += r.missedWithRoom; }
 			rankCost += st.score.cost;
 			Object.keys(st.score.counts).forEach(function (k) { cost += st.score.counts[k] * TOM_WEIGHTS[k]; });
 			if (r.asked) {
@@ -135,6 +140,12 @@ function r14(placer) {
 	});
 	report(asked === 0 || missed <= R14_MAX_MISSED * asked, 'R14: at most ' + (100 * R14_MAX_MISSED) + '% of the pipe labels asked to lie along their pipe are drawn otherwise where there was room',
 		missed + '/' + asked + (asked ? ' (' + (100 * missed / asked).toFixed(1) + '%)' : '') + '; along ' + along + '/' + asked);
+	// Tom, 2026-09-28: "The problem was that at any close zoom whatsoever, pipe labels stayed
+	// horizontal. [...] If they are still horizontal when there's no good reason to ignore the user
+	// setting, that's bad."
+	report(cLevel === 0 || cRoom <= R14_CLOSE_MAX * cLevel, 'R14 at close zoom (' + CLOSE_ZOOM + 'x and closer): of the pipe labels still level, at most '
+		+ (100 * R14_CLOSE_MAX) + '% had room to lie along their pipe with the same rows',
+		cRoom + '/' + cLevel + (cLevel ? ' (' + (100 * cRoom / cLevel).toFixed(1) + '%)' : ''));
 	const tog = settingsToggle(placer, sets);
 	if (!(tog.skipped && !tog.checked)) {
 		report(tog.stillTurned === 0, 'R13: with "Draw link labels along the link line" switched off at the same view, no pipe label stays turned',

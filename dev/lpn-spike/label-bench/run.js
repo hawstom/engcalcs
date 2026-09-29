@@ -34,6 +34,12 @@ const CROSSING_ORDER = ['leader on leader', 'label on leader', 'label on pipe', 
 // canvas (1400x900), so this is one number for every scene -- filled in at load time rather than by
 // re-running extract.js's headless browser pass, which regenerating the committed scenes only for a
 // derived, constant field would not be worth.
+// R14 AT CLOSE ZOOM (Tom, 2026-09-28: "The problem was that at any close zoom whatsoever, pipe
+// labels stayed horizontal [...] If they are still horizontal when there's no good reason to ignore
+// the user setting, that's bad."): the views zoomed this far in or further (novato-zoom@4x and 8x,
+// novato-seq@4x), where there is plenty of room.
+const CLOSE_ZOOM = 4;
+
 function withRepeatSpacing(scene) {
 	scene.text.repeatSpacingPx = 0.75 * Math.min(scene.viewport.w, scene.viewport.h);
 	return scene;
@@ -142,7 +148,7 @@ function printTable(results, log) {
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
-		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, zoomRegained: 0, zoomLost: 0 };
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
@@ -152,6 +158,7 @@ function printTable(results, log) {
 			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
 			T.r9s += s.r9.should; T.r9h += s.r9.has;
 			T.r14a += s.r14.asked; T.r14y += s.r14.along; T.r14m += s.r14.missedWithRoom;
+			if (s.r14.zoom >= CLOSE_ZOOM) { T.r14ca += s.r14.asked; T.r14cy += s.r14.along; T.r14cm += s.r14.missedWithRoom; }
 			const stab = st.stability;
 			if (stab) { T.moved += stab.moved; T.churn += stab.churn; T.compared += stab.compared; }
 			if (st.zoomIn) { T.zoomRegained += st.zoomIn.regained; T.zoomLost += st.zoomIn.lost; }
@@ -178,7 +185,9 @@ function printTable(results, log) {
 		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
 		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps;'
 		+ ' R14 along the pipe: ' + T.r14y + '/' + T.r14a + ' shown pipe labels the setting asks to lie along their pipe do,'
-		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to');
+		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to; R14 at close zoom (' + CLOSE_ZOOM + 'x and closer): of '
+		+ (T.r14ca - T.r14cy) + ' pipe labels still level, ' + T.r14cm + ' had room to lie along their pipe with the same rows'
+		+ ' (' + pct(T.r14cm, T.r14ca - T.r14cy) + '; should be near zero)');
 	return T;
 }
 
@@ -225,4 +234,4 @@ function main() {
 }
 
 if (require.main === module) { main(); }
-module.exports = { runBench, printTable, loadSets, machine, settingsToggle };
+module.exports = { runBench, printTable, loadSets, machine, settingsToggle, CLOSE_ZOOM };

@@ -54,6 +54,8 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
 - **R9. A pipe longer than the repeat spacing carries its label more than once,** evenly along it.
   The spacing is `scene.text.repeatSpacingPx`, which the bench sets. (Master does this today.)
 - **R14. When there is space available, honor the setting about aligning labels to pipes.**
+  Values outrank alignment: an aligned label showing one value fewer does not beat a level label
+  showing one more. But alignment is required wherever the same rows fit aligned.
 
 #### Time and change
 
@@ -211,6 +213,17 @@ they were given. Every bench scene is saved with the setting on. The scene now c
 (`scene.settings`, and `along` on each pipe label it applies to), Part A §5 names it, and the
 bench reports R14; the judges assert it (at most 5% of the pipe labels asked, drawn otherwise
 where an aligned spot beside the pipe was free; master misses none).
+
+**His ruling on R14, 2026-09-28**, answering builder C's question "Should an aligned label
+showing one value fewer beat a level label showing one more?": *"No. The problem was that at any
+close zoom whatsoever, pipe labels stayed horizontal. There's nothing wrong with their being
+horizontal, and there's nothing especially urgent about making them aligned. But Use available
+space. If they are still horizontal when there's no good reason to ignore the user setting, that's
+bad."* Part A's R14 carries it as one clarifying line. The bench reports, and the judges assert,
+his actual complaint: at close zoom (4x and closer), of the pipe labels still level, the share that
+had room to lie along their pipe with the same rows (at most 5%; round 3 had C 21%, D 30%). With it,
+R13 on a settings change: the setting switched off at the same view leaves no pipe label turned
+(round 3 kept 106/240 and 108/250, which his pre-reviewer saw on the page).
 
 **R-075 now measures what his original complaint named**: longer IDs must not hide a label or
 cut its values where free space exists within reach. A move is no longer a failure; the moves are
