@@ -42,7 +42,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var NAME = 'D (candidates, labels first, ejection repair)';
 
 	// ---- tuning --------------------------------------------------------------------------------
-	var TOL = 1.0;          // box overlap tolerated as leading (the bench tolerates 1.5)
+	var TOL = 1.4;          // box overlap tolerated as leading (the bench tolerates 1.5)
 	var GAP = 1.5;          // clearance between a node symbol and text touching it
 	var PIPE_GAP = 3;       // clearance between a pipe and a label beside it
 	var CELL = 48;          // spatial grid cell, px
@@ -57,7 +57,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
 	var C_ALT_LAYOUT = 0.8;         // the label's other shape (line for a node, stack for a pipe)
-	var C_NOT_ALONG = 6;            // R14: a pipe label the setting turns, drawn level (under a row)
+	var C_NOT_ALONG = 9.5;          // R14: a pipe label the setting turns, drawn level (just under a row)
 	var B_KEEP = 6;                 // keeping last view's rows on a zoom-in (R11)
 	var B_STICK = 6;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
@@ -955,6 +955,21 @@ EngCalcs.lpnPlacerD = (function () {
 		var settings = scene.settings || {}, alignOn = settings.alignPipeLabels !== false;
 		var win = settings.readableAngleDeg && isFinite(settings.readableAngleDeg.min) && isFinite(settings.readableAngleDeg.max)
 			? settings.readableAngleDeg : { min: -90, max: 90 };
+		var prevSet = prev && prev.scene ? prev.scene.settings || {} : null;
+		var sameSettings = !prevSet || (prevSet.alignPipeLabels !== false) === alignOn &&
+			JSON.stringify(prevSet.readableAngleDeg || null) === JSON.stringify(settings.readableAngleDeg || null);
+		// Is the pipe level (so level text is along it) at its segment nearest (x, y)?
+		function levelPipeAt(pts, x, y) {
+			var best = Infinity, lev = false;
+			for (var i = 1; i < pts.length; i++) {
+				var a = pts[i - 1], b = pts[i], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
+				if (!L2) { continue; }
+				var t = Math.max(0, Math.min(1, ((x - a[0]) * vx + (y - a[1]) * vy) / L2));
+				var dd = Math.hypot(a[0] + t * vx - x, a[1] + t * vy - y);
+				if (dd < best) { best = dd; lev = Math.abs(vy) <= Math.abs(vx) * Math.tan(4 * Math.PI / 180); }
+			}
+			return lev;
+		}
 		function wantsAlong(req) { return req.kind === 'link' && alignOn && !!req.along; }
 		// The readable angle of text along direction (ux, uy), in degrees.
 		function readAngle(ux, uy) {
@@ -1184,6 +1199,8 @@ EngCalcs.lpnPlacerD = (function () {
 		function genSticky(li, req, lv, list) {
 			var pl = prevPl[req.id], pr = prevReq[req.id];
 			if (!pl || !pl.shown || !pr) { return; }
+			// R13: a change of the alignment setting, or of what the label asks, starts it afresh.
+			if (!sameSettings || !!pr.along !== !!req.along) { return; }
 			var ox = pl.x - pr.anchor.x, oy = pl.y - pr.anchor.y;
 			var layout = pl.layout || pr.layout;
 			var pd = dims(pr, pl.rows, layout, text);
@@ -1212,6 +1229,12 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			var c = newCand(li, lv, layout, pl.align || 'left', x, y, d.w, d.h, pl.angle || 0, leader, 0);
 			c.base += B_STICK;
+			// A level place kept from last view is still level: it pays what level pays (R14).
+			if (req.kind === 'link') {
+				var lk2 = linksById[req.owner];
+				c.along = !!c.angle || (!!lk2 && levelPipeAt(lk2.points, x + d.w / 2, y + d.h / 2));
+				if (wantsAlong(req) && !c.along) { c.base -= C_NOT_ALONG; }
+			}
 			if (pl.repeats && pl.repeats.length) {
 				c.reps = pl.repeats.map(function (r) {
 					return { x: x + (r.x - pl.x), y: y + (r.y - pl.y), angle: r.angle === undefined ? pl.angle : r.angle };
