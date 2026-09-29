@@ -57,14 +57,14 @@ EngCalcs.lpnPlacerD = (function () {
 	var C_LEADER_LINKSYM = 5;       // a leader through a pump or valve (not N3; ugly)
 	var C_LEADER_BASE = 0.4, C_LEADER_PER_ROW = 0.45;   // nearness (R1: first to give way)
 	var C_ALT_LAYOUT = 0.8;         // the label's other shape (line for a node, stack for a pipe)
-	var C_NOT_ALONG = 9.5;          // R14: a pipe label the setting turns, drawn level (just under a row)
+	var C_NOT_ALONG = 8;            // R14: a pipe label the setting turns, drawn level (under a row)
 	var B_KEEP = 6;                 // keeping last view's rows on a zoom-in (R11)
 	var B_STICK = 6;                // staying where it was last view (no churn for nothing)
 	var HARD_HAND = 1000;           // a hand-placed label cannot move: hard hits become costs
 
 	var DIRS = 8;
 	var DISTS = [1, 2.2, 3.8];          // leader lengths beyond the symbol, in row heights
-	var MAX_DYN = 25000;                    // repair work cap per place(); deterministic, not wall-clock
+	var MAX_DYN = 18000;                    // repair work cap per place(); deterministic, not wall-clock
 	var TRIES = 2;                          // blocked places a short-changed label tries per level
 	var PASSES = 1;
 	var DIRSET = [];
