@@ -84,6 +84,41 @@ function runBench(placerPath, sets, opts) {
 	return out;
 }
 
+// **R13 ON A SETTINGS CHANGE: THE ALIGNMENT SETTING SWITCHED OFF AT THE SAME VIEW.** The scene
+// sets are all views of an unchanging project, so nothing above ever changes a setting under a
+// placer. The page does: a user unticks "Draw link labels along the link line" and the very next
+// place() gets the same view with `alignPipeLabels: false`, `along: false` on every pipe label, and
+// `prev` = the layout it just made with the setting on. R13 says the layout reflects the settings,
+// so no pipe label may stay turned. For the first view of every set that asks for any pipe label
+// along its pipe: place it with the setting on, then again with it off and `prev` set, and count
+// the pipe labels still turned (angle not a multiple of 180). A placer that cannot place a scene
+// it has not seen (master's replay) is reported as such. Reported, never failing.
+function settingsToggle(placerPath, sets) {
+	const make = loadPlacer(placerPath), out = { checked: 0, stillTurned: 0, ids: [], skipped: false };
+	sets.forEach(function (set) {
+		const on = set.steps[0];
+		if (!on.labels.some(function (r) { return r.along; })) { return; }
+		const off = JSON.parse(JSON.stringify(on));
+		off.id = on.id + '#align-off';
+		off.settings = Object.assign({}, off.settings, { alignPipeLabels: false });
+		off.labels.forEach(function (r) { if (r.kind === 'link') { r.along = false; } });
+		const placer = make();
+		let a, b;
+		try {
+			a = placer.place(on, { prev: null });
+			b = placer.place(off, { prev: { scene: on, layout: a } });
+		} catch (e) { out.skipped = true; return; }
+		const L = (b && b.labels) || {};
+		Object.keys(L).forEach(function (id) {
+			const p = L[id];
+			if (id.charAt(0) !== 'l' || !p || !p.shown) { return; }
+			out.checked++;
+			if (Math.abs(((+p.angle || 0) % 180)) > 0.5) { out.stillTurned++; out.ids.push(off.id + ' ' + id); }
+		});
+	});
+	return out;
+}
+
 function pct(a, b) { return b ? (100 * a / b).toFixed(0) + '%' : '-'; }
 function quant(arr, q) {
 	if (!arr.length) { return null; }
@@ -159,7 +194,12 @@ function main() {
 		idleStep: opt('--idle-step') !== undefined ? +opt('--idle-step') : undefined });
 	console.log('placer: ' + (res[0] && res[0].name) + ' (' + placer + ')');
 	const T = printTable(res);
+	const tog = settingsToggle(placer, sets);
+	console.log('REPORTED, never failing -- R13 alignment setting switched off at the same view: '
+		+ (tog.skipped && !tog.checked ? 'not measurable (this placer cannot place a scene it has not seen)'
+			: tog.stillTurned + '/' + tog.checked + ' shown pipe labels still turned (should be 0)'));
 	if (a.indexOf('--verbose') >= 0) {
+		tog.ids.forEach(function (m) { console.log('  R13 still turned after the setting went off: ' + m); });
 		res.forEach(function (set) {
 			set.steps.forEach(function (st) {
 				const b = st.score.breaks;
@@ -185,4 +225,4 @@ function main() {
 }
 
 if (require.main === module) { main(); }
-module.exports = { runBench, printTable, loadSets, machine };
+module.exports = { runBench, printTable, loadSets, machine, settingsToggle };

@@ -25,7 +25,9 @@ node dev/lpn-spike/label-bench/judges/judge.js --placer dev/lpn-spike/label-benc
   about aligning labels to pipes"*). Over every public scene, of the shown pipe labels the setting
   asks to lie along their pipe, at most 5% may be drawn otherwise where an aligned spot beside the
   pipe was free (`score.js` `alignedRoom()`, which the public bench also reports). A named
-  assertion. Master misses none.
+  assertion. Master misses none. With it, **R13 on a settings change**: the setting switched off
+  at the same view (with `prev` the layout made with it on) leaves no pipe label turned. Both
+  round-3 placers kept 106/240 and 108/250 turned, which is what Tom's pre-reviewer saw on the page.
 - **Tom's crossing weights** (`weights.js`, his Q05 numbers). The public bench counts each crossing
   by its rank in his order; the judge reports the cost weighted with his numbers. They lived in
   `score.js` through round 2, where every builder could read them.

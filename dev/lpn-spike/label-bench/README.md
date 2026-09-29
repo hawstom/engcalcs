@@ -104,6 +104,10 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
   many had room to: the same rows as one line, turned to the pipe and half a row clear of it, fitting
   at or near the middle of the pipe's on-screen stretch on either side, over no symbol, label, Text
   or other pipe, on screen (`alignedRoom()` in `score.js`).
+- **R13 on a settings change, reported**: the first view of each set, placed with "Draw link labels
+  along the link line" on, then again at the same view with it off and `prev` set to the first
+  layout (as the page does when the user unticks it): how many shown pipe labels are still turned.
+  It should be none.
 - **R11, reported**: across the zoom-in steps of a set (`view.s` increasing), rows regained (shown
   now that were not, or more of them) versus rows lost, summed over labels present in both views.
 - **Time per layout**, median and max, with the machine it ran on.

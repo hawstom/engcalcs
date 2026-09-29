@@ -21,6 +21,9 @@
 //      about aligning labels to pipes"). Over every public scene: of the shown pipe labels the
 //      setting asks to lie along their pipe, those drawn otherwise although an aligned spot beside
 //      their pipe was free (score.js alignedRoom()) may be at most R14_MAX_MISSED of them.
+//      Also R13 on a settings change (run.js settingsToggle()): with the setting switched off at
+//      the same view, and `prev` the layout made with it on, no pipe label may stay turned. Tom's
+//      pre-reviewer found both round-3 placers keeping them on the real page (2026-09-28).
 //   4. TOM'S CROSSING WEIGHTS (weights.js), the cost the bench reports by rank, weighted with his
 //      numbers. Reported.
 //
@@ -32,7 +35,7 @@
 
 const path = require('path');
 const C = require('../contract.js');
-const { runBench, loadSets, machine } = require('../run.js');
+const { runBench, loadSets, machine, settingsToggle } = require('../run.js');
 const { roomWithinReach } = require('./room.js');
 const TOM_WEIGHTS = require('./weights.js');
 
@@ -132,6 +135,11 @@ function r14(placer) {
 	});
 	report(asked === 0 || missed <= R14_MAX_MISSED * asked, 'R14: at most ' + (100 * R14_MAX_MISSED) + '% of the pipe labels asked to lie along their pipe are drawn otherwise where there was room',
 		missed + '/' + asked + (asked ? ' (' + (100 * missed / asked).toFixed(1) + '%)' : '') + '; along ' + along + '/' + asked);
+	const tog = settingsToggle(placer, sets);
+	if (!(tog.skipped && !tog.checked)) {
+		report(tog.stillTurned === 0, 'R13: with "Draw link labels along the link line" switched off at the same view, no pipe label stays turned',
+			tog.stillTurned + '/' + tog.checked + (tog.ids.length ? ': ' + tog.ids.slice(0, 5).join(', ') : ''));
+	} else { console.log('  ..   R13 settings toggle: not measurable for this placer'); }
 	console.log('--- Tom\'s crossing weights (weights.js), every public scene: weighted cost ' + cost.toFixed(1)
 		+ ' (the bench\'s ranked cost ' + rankCost.toFixed(0) + ') ---');
 	return { asked: asked, along: along, missed: missed, cost: cost };
