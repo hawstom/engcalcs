@@ -45,8 +45,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
+- Task 739 — Say where each setting is saved: the project or this browser.
 - Task 741 — The infinite map: generated networks for the label bench.
-- Task 742 — Fire-flow design check: None, All, or Selected junctions.
 
 ## 50 — Someday (44)
 
