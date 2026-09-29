@@ -110,8 +110,9 @@ function clearReport() { document.getElementById('lpn_dialog_body').innerHTML = 
 // the sections below assert is what the wizard DOES and not what libImportRun() would do if it
 // were asked directly. The stub carries `_listeners` rather than an event system, which is the
 // seam every harness here drives a control through.
-const KIND_LABEL = { curves: 'lpn_library_curves', pipetypes: 'lpn_library_pipetypes',
-	fittings: 'lpn_library_fittings' };
+const KIND_LABEL = { patterns: 'lpn_library_patterns', curves: 'lpn_library_curves',
+	pipetypes: 'lpn_library_pipetypes', fittings: 'lpn_library_fittings',
+	controls: 'lpn_library_controls', rules: 'lpn_library_rules' };
 function tag(e) { return String(e.tagName).toLowerCase(); }
 function chooserRows() {
 	const body = document.getElementById('lpn_dialog_body');
@@ -212,6 +213,28 @@ head('1. the three libraries copy across, and a definition is cloned rather than
 	wizard(JSON.stringify(fixture()), 'standards.lwn', ['curves']);
 	check((L.getDoc().curves || []).length === 2,
 		`both curves landed: ${JSON.stringify((L.getDoc().curves || []).map(c => c.id))}`);
+
+	// Tom, 2026-09-28: *"Import libraries imported only Curves. Not Patterns, Controls, etc."* --
+	// so every kind the Libraries box holds gets its own landing check here, the same as the three
+	// above.
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['patterns']);
+	check((L.getDoc().patterns || []).length === 2,
+		`both patterns landed: ${JSON.stringify((L.getDoc().patterns || []).map(p => p.id))}`);
+	check(JSON.stringify(L.getDoc().patterns.filter(p => p.id === 'Pat-AM')[0].multipliers)
+			=== JSON.stringify(src.patterns[0].multipliers),
+		'a pattern\'s multipliers cross exactly as the file wrote them');
+
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['controls']);
+	check((L.getDoc().controls || []).length === 2,
+		`both controls landed: ${JSON.stringify((L.getDoc().controls || []).map(c => c.raw))}`);
+
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['rules']);
+	check((L.getDoc().rules || []).join('\n').indexOf('RULE R1') >= 0
+			&& L.getDoc().rules.join('\n').indexOf('RULE R2') >= 0,
+		`both rules landed: ${JSON.stringify(L.getDoc().rules)}`);
 }());
 
 // ---- 2. A NAME ALREADY TAKEN IS SKIPPED AND REPORTED -------------------------------------------
@@ -248,6 +271,47 @@ head('2. a name already taken here is skipped and reported, and nothing of ours 
 	check(L.getDoc().pipeTypes.length === 1 && L.pipeTypeById('T1').props.diameter === 4,
 		'the first T1 lands and the second is the clash, not the winner');
 	check(said('lpn_library_import_conflict'), 'and the duplicate inside the file is reported too');
+}());
+
+// A pattern collides on its id exactly like a curve does.
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 },
+		patterns: [{ id: 'Pat-AM', multipliers: [9, 9, 9] }] });
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['patterns']);
+	const d = L.getDoc();
+	check(d.patterns.length === 2, `one pattern landed and one was skipped: ${JSON.stringify(d.patterns.map(p => p.id))}`);
+	check(JSON.stringify(d.patterns.filter(p => p.id === 'Pat-AM')[0].multipliers) === JSON.stringify([9, 9, 9]),
+		'the pattern already here is untouched');
+	check(said('lpn_library_import_conflict'), 'and the clash is reported');
+}());
+
+// A RULE collides on its name (`RULE R1`), the same way a curve collides on its id -- names, not
+// the network elements the rule mentions, since this project has none of those either.
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 },
+		rules: ['RULE R1', 'IF SYSTEM DEMAND ABOVE 0', 'THEN PUMP X STATUS IS OPEN'] });
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['rules']);
+	const d = L.getDoc();
+	check(d.rules.join('\n').indexOf('THEN PUMP X STATUS IS OPEN') >= 0,
+		'the R1 already here is untouched');
+	check(d.rules.join('\n').indexOf('RULE R2') >= 0, 'and R2, whose name was free, came in');
+	check(said('lpn_library_import_conflict'), `the R1 clash is reported: ${JSON.stringify(reportLines())}`);
+	check(saidOne('lpn_library_import_conflict').indexOf('R1') >= 0, 'and it is reported by name');
+}());
+
+// A CONTROL has no name at all, so its identity for this wizard is its own sentence -- an exact
+// duplicate is the clash, and two different sentences are simply both taken.
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 },
+		controls: [{ link: 'PMP-1', raw: 'LINK PMP-1 OPEN IF NODE TNK-1 BELOW 10',
+			action: { status: 'open' }, condition: { kind: 'node', node: 'TNK-1', cmp: 'below', value: 10 }, text: {} }] });
+	clearReport();
+	wizard(JSON.stringify(fixture()), 'standards.lwn', ['controls']);
+	const d = L.getDoc();
+	check(d.controls.length === 2, `the duplicate sentence was skipped, the other one landed: ${JSON.stringify(d.controls.map(c => c.raw))}`);
+	check(said('lpn_library_import_conflict'), 'and the clash is reported');
 }());
 
 // ---- 3. AN EMPTY IMPORT WRITES NOTHING ---------------------------------------------------------
@@ -441,8 +505,8 @@ head('9. the chooser: one wizard, a checkbox per library the file holds, with it
 	const rows = chooserRows();
 	// THE FILE DECIDES WHAT IS ON OFFER, NOT THE SECTION THE BUTTON WAS PRESSED IN. Tom's own
 	// wizard: one entry point, and step 2 is what this file turned out to hold.
-	check(rows.length === 3, `every library the file holds is offered: ${JSON.stringify(rows.map(r => r.text))}`);
-	check(rows.map(r => r.kind).join(',') === 'curves,pipetypes,fittings',
+	check(rows.length === 6, `every library the file holds is offered: ${JSON.stringify(rows.map(r => r.text))}`);
+	check(rows.map(r => r.kind).join(',') === 'patterns,curves,pipetypes,fittings,controls,rules',
 		`in the Libraries box's own section order: ${rows.map(r => r.kind).join(',')}`);
 	// **THE COUNT IS THE POINT OF STEP 2**: it is the only thing on this screen that says what the
 	// file actually holds, so somebody who chose the wrong file finds out before anything lands.
@@ -504,7 +568,11 @@ head('10. several libraries out of one file are one act: one undo snapshot, one 
 	wizard(JSON.stringify(fixture()), 'standards.lwn');
 	const d = L.getDoc();
 	check((d.curves || []).length === 2 && (d.pipeTypes || []).length === 2
-		&& (d.fittingSets || []).length === 1, 'all three libraries land in one pass');
+		&& (d.fittingSets || []).length === 1 && (d.patterns || []).length === 2
+		&& (d.controls || []).length === 2
+		&& (d.rules || []).join('\n').indexOf('RULE R1') >= 0
+		&& (d.rules || []).join('\n').indexOf('RULE R2') >= 0,
+		`all six libraries land in one pass: ${JSON.stringify(Object.keys(d))}`);
 	// **THE DANGLING REFERENCE IS THE WHOLE REASON THIS IS ONE ACT.** Taking the pipe types alone
 	// left DIP-8 pointing at a fittings list this project did not have; taking both in one pass
 	// resolves it, and the report must not warn about a reference that now resolves.
@@ -517,7 +585,8 @@ head('10. several libraries out of one file are one act: one undo snapshot, one 
 	const titles = walk(document.getElementById('lpn_dialog_body'))
 		.filter(e => tag(e) === 'p').map(e => String(e.textContent || ''));
 	check(pat('lpn_library_import_heading').test(titles[0]), `one heading, naming the file: ${titles[0]}`);
-	[pc.lpn_library_curves, pc.lpn_library_pipetypes, pc.lpn_library_fittings].forEach(function (name) {
+	[pc.lpn_library_patterns, pc.lpn_library_curves, pc.lpn_library_pipetypes, pc.lpn_library_fittings,
+		pc.lpn_library_controls, pc.lpn_library_rules].forEach(function (name) {
 		check(titles.indexOf(name) > 0, `the receipt has a block headed ${name}`);
 	});
 	// ONE UNDO SNAPSHOT FOR THE WHOLE WIZARD: one button was pressed, so one Undo puts the project
@@ -604,6 +673,9 @@ head('11. one undo puts the document AND the Libraries box back');
 	cycle('pipetypes', 'DIP-8');
 	cycle('curves', 'Booster-B');
 	cycle('fittings', 'Hydrant-lateral');
+	cycle('patterns', 'Pat-AM');
+	cycle('controls', 'TNK-1');
+	cycle('rules', 'R2');
 	// AN IMPORT THAT WROTE NOTHING TAKES NO SNAPSHOT, so Ctrl+Z after it is not swallowed by an
 	// undo step that would put the document back exactly where it already is.
 	const empty = L.undoDepth();

@@ -23,7 +23,16 @@
 		"x": 0,
 		"y": 0
 	},
-	"patterns": [],
+	"patterns": [
+		{
+			"id": "Pat-AM",
+			"multipliers": [0.6, 0.7, 1.1, 1.5, 1.3, 1.0]
+		},
+		{
+			"id": "Pat-PM",
+			"multipliers": [1.0, 1.2, 1.4, 1.1, 0.8, 0.6]
+		}
+	],
 	"defaultPattern": null,
 	"pipeTypes": [
 		{
@@ -127,8 +136,31 @@
 	],
 	"profiles": [],
 	"times": null,
-	"controls": [],
-	"rules": [],
+	"controls": [
+		{
+			"link": "PMP-1",
+			"raw": "LINK PMP-1 OPEN IF NODE TNK-1 BELOW 10",
+			"action": { "status": "open" },
+			"condition": { "kind": "node", "node": "TNK-1", "cmp": "below", "value": 10 },
+			"text": {}
+		},
+		{
+			"link": "PMP-1",
+			"raw": "LINK PMP-1 CLOSED IF NODE TNK-1 ABOVE 20",
+			"action": { "status": "closed" },
+			"condition": { "kind": "node", "node": "TNK-1", "cmp": "above", "value": 20 },
+			"text": {}
+		}
+	],
+	"rules": [
+		"RULE R1",
+		"IF TANK TNK-1 LEVEL ABOVE 20",
+		"THEN PUMP PMP-1 STATUS IS CLOSED",
+		"",
+		"RULE R2",
+		"IF SYSTEM CLOCKTIME = 6 AM",
+		"THEN PUMP PMP-1 STATUS IS OPEN"
+	],
 	"inpSections": {},
 	"view": {
 		"x": 0,

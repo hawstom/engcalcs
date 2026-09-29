@@ -44313,18 +44313,53 @@ var EngCalcs = EngCalcs || {};
 	// own name, so the chooser and the receipt call it what the box behind them calls it. `units`
 	// names the unit selections these numbers depend on; a fittings list names none, because a minor
 	// loss coefficient is dimensionless.
+	// A control names nothing (there is no id a second one could collide with), so its identity for
+	// this wizard is the sentence itself -- the same `raw` text `libControlText()` shows. Two
+	// controls with the same words are the duplicate this wizard exists to catch; two with
+	// different words are simply both taken, whatever elements they name.
+	function libImportControlKey(rec) {
+		return String((rec && (rec.raw || libControlText(rec))) || '').trim();
+	}
+	function libImportControlUsable(rec) {
+		return !!rec && typeof rec === 'object' && !!libImportControlKey(rec);
+	}
+	// A RULE, unlike a control, IS named -- `RULE <name>` is the first line of every chunk
+	// lpnRuleSplit() cuts `[RULES]` into -- so it collides on that name the same way a curve
+	// collides on its id. The synthetic `{id, lines}` record below is never written to `doc.rules`
+	// itself; libImportRulesWrite()'s `push` reads only `.lines` back out of it.
+	function libImportRuleChunks(lines) {
+		return (EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines || []) : [])
+			.filter(function (c) { return c.name; })
+			.map(function (c) { return { id: c.name, lines: c.lines.slice() }; });
+	}
+	function libImportRulesSource(saved) {
+		return libImportRuleChunks(Array.isArray(saved.rules) ? saved.rules : []);
+	}
+	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
+	function libImportRulesWrite() {
+		return { push: function (clone) { doc.rules = libRules().concat(clone.lines || []); } };
+	}
 	var LIB_IMPORTABLE = {
+		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
+		// (js/lpn-patterns.js's own rule) -- there is nothing here for libImportUnitDiffs() to say.
+		patterns: { from: 'patterns', label: 'lpn_library_patterns',
+			read: libPatternsRead, write: libPatterns, units: [] },
 		curves: { from: 'curves', label: 'lpn_library_curves',
 			read: libCurvesRead, write: libCurves, units: ['lpn_u_flow', 'lpn_u_elevhead'] },
 		pipetypes: { from: 'pipeTypes', label: 'lpn_library_pipetypes',
 			read: libPipeTypesRead, write: libPipeTypes, units: ['lpn_u_diameter'] },
 		fittings: { from: 'fittingSets', label: 'lpn_library_fittings',
-			read: libFittingSetsRead, write: libFittingSets, units: [] }
+			read: libFittingSetsRead, write: libFittingSets, units: [] },
+		controls: { from: 'controls', label: 'lpn_library_controls',
+			read: libControlsRead, write: libControls, units: [],
+			keyOf: libImportControlKey, usable: libImportControlUsable },
+		rules: { label: 'lpn_library_rules', units: [],
+			source: libImportRulesSource, read: libImportRulesExisting, write: libImportRulesWrite }
 	};
 	// The order the chooser and the receipt list them in: the Libraries box's OWN section order, so
 	// the dialog reads down in the same order as the index behind it. Not the object's key order,
 	// which is nobody's decision.
-	var LIB_IMPORT_ORDER = ['curves', 'pipetypes', 'fittings'];
+	var LIB_IMPORT_ORDER = ['patterns', 'curves', 'pipetypes', 'fittings', 'controls', 'rules'];
 	// A record with no id is not a definition: nothing could ever have referred to it, so it is
 	// neither offered, counted, copied nor reported. The one place that judgement is made, because
 	// the count in the chooser has to be the number of things the import will actually consider.
@@ -44332,6 +44367,15 @@ var EngCalcs = EngCalcs || {};
 		return !!rec && typeof rec === 'object' && rec.id !== undefined && rec.id !== null
 			&& String(rec.id) !== '';
 	}
+	// **THE SEAM BETWEEN THE ORDINARY id-KEYED LIBRARIES AND THE TWO THAT ARE NOT.** A spec states
+	// `source`/`keyOf`/`usable` only when the default (a named field, keyed on `.id`) does not fit
+	// it; every other kind falls straight through to what it always did.
+	function libImportSourceOf(spec, saved) {
+		if (spec.source) { return spec.source(saved); }
+		return Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
+	}
+	function libImportKeyOf(spec, rec) { return spec.keyOf ? spec.keyOf(rec) : rec.id; }
+	function libImportIsUsable(spec, rec) { return (spec.usable || libImportUsable)(rec); }
 	function libImportPick() {
 		var input = document.getElementById('lpn_library_file');
 		if (!input) { return; }
@@ -44363,8 +44407,10 @@ var EngCalcs = EngCalcs || {};
 	function libImportOffer(saved) {
 		return LIB_IMPORT_ORDER.map(function (kind) {
 			var spec = LIB_IMPORTABLE[kind],
-				source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
-			return { kind: kind, count: source.filter(libImportUsable).length };
+				source = libImportSourceOf(spec, saved);
+			return { kind: kind, count: source.filter(function (rec) {
+				return libImportIsUsable(spec, rec);
+			}).length };
 		}).filter(function (o) { return o.count > 0; });
 	}
 	/**
@@ -44560,14 +44606,14 @@ var EngCalcs = EngCalcs || {};
 		(kinds || []).forEach(function (kind) {
 			var spec = LIB_IMPORTABLE[kind];
 			if (!spec) { return; }
-			var source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
+			var source = libImportSourceOf(spec, saved),
 				taken = {}, clones = [], added = [], clashed = [];
 			spec.read().forEach(function (rec) {
-				if (libImportUsable(rec)) { taken[String(rec.id)] = true; }
+				if (libImportIsUsable(spec, rec)) { taken[String(libImportKeyOf(spec, rec))] = true; }
 			});
 			source.forEach(function (rec) {
-				if (!libImportUsable(rec)) { return; }
-				var id = String(rec.id), clone;
+				if (!libImportIsUsable(spec, rec)) { return; }
+				var id = String(libImportKeyOf(spec, rec)), clone;
 				if (taken[id]) { clashed.push(id); return; }
 				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
 				taken[id] = true;
