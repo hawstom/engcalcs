@@ -21,31 +21,9 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (2 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
-
-### from sprint 2026-09-28-delta
-
-- **`lpn_lock_requested`**
-  > {name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.
-  *The finding:* The prose names 'File, Close project', but the menu row (lpn_file_close) says 'Close'. Translators used the real label.
-  1. File, Close (the real menu row)
-  2. a 'Close project' control that does not exist
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* Proposed English: '...save your work and use File, Close to hand it over.' Waits for Tom's ruling.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_dial_help`**
-  > Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.
-  *The finding:* 'The middle of each bar is the fit step 1 left' does not parse; five translators guessed at it independently.
-  1. the middle of each bar is where step 1 (Place approximately) left the size and rotation, so 1 and 0 mean no change
-  2. a garbled fragment with some other meaning
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* Proposed English: 'The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change.' Waits for Tom's ruling; the five translations follow the first reading.
-  @@ NEEDS RULING
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
 ## lpn_  (16, all ruled)
 
