@@ -809,7 +809,7 @@ EngCalcs.lpnPlacerC = (function () {
 				var sh = layout === L.usual ? 0 : SHAPE;
 				// Along the pipe only as one line (a turned stack reads badly), and only when the
 				// user's setting asks for it (R14); a level label is then the dearer fallback.
-				[0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
+				[0, 0.5, -0.5, 1, -1, 1.5, -1.5, 2, -2, 3, -3, 4, -4, 6, -6].forEach(function (k) {
 					if (layout !== 'line' || !L.along) { return; }
 					[1, -1].forEach(function (side) {
 						(Math.abs(k) <= 3 ? [0, 1] : [0]).forEach(function (far) {
