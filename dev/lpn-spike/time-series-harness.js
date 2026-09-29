@@ -126,10 +126,19 @@ const finite = (s) => s.points.filter((p) => p.y !== undefined).map((p) => p.y);
 	// **NO RUN MEANS NO CHART, SAID IN WORDS.** Before the engine has answered there are no frames,
 	// and the panel must say so rather than draw an empty axis pair -- which reads as a chart that
 	// failed. Asserted against pageConfig, never against English (harness_wording_check.php).
+	// **AND "PRESS CALCULATE" ONLY WHERE THERE IS A CALCULATE BUTTON** (Tom, 2026-09-29): with
+	// Recalculate automatically off, which is when the button shows. On, the owed run is started
+	// and the panel says it is running.
+	d.settings.autoRun = false;
 	L.openPane('timeseries');
 	check(byId.lpn_ts_note._text === PC.lpn_ts_no_frames,
-		`with no run yet the panel says so and draws nothing: "${byId.lpn_ts_note._text}"`);
+		`Recalculate off, no run yet: the panel names Calculate and draws nothing: "${byId.lpn_ts_note._text}"`);
 	check(chartEls('lpn-ts-line').length === 0, 'and there is no line, and no axis frame, to misread');
+	d.settings.autoRun = true;
+	L.renderTimeSeries();
+	check(byId.lpn_ts_note._text === PC.lpn_time_running,
+		`Recalculate on, no run yet: the panel says the run is under way: "${byId.lpn_ts_note._text}"`);
+	check(chartEls('lpn-ts-line').length === 0, 'and still draws no line');
 
 	await warmEpanet();
 	// THE CALCULATE BUTTON'S OWN DOOR. requestRun -> host.solveNow() -> runSolve() -> assembleModel()

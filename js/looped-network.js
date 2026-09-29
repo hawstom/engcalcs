@@ -27229,7 +27229,13 @@ var EngCalcs = EngCalcs || {};
 		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
 		// The Time series tab draws from the run, not the table specs, and a switch that re-solves
 		// nothing never reached it: it went on showing the project just left (2026-09-29).
-		else if (paneIsOpen() && t && t.id === 'timeseries' && t.refresh) { t.refresh(); }
+		//
+		// **ARRIVING IS SHOWING, NOT REFRESHING** (Tom, 2026-09-29: "Time Series graphs are still
+		// blank on open. They only appear when you switch to them from another bottom pane tab.").
+		// show() is what chooses the assets to graph; refresh() only redraws the ones chosen. A tab
+		// left on Time series was shown over the EMPTY startup document, chose nothing, and every
+		// run that landed afterwards redrew that nothing -- on a reload, the gallery and File > Open.
+		else if (paneIsOpen() && t && t.id === 'timeseries' && t.show) { t.show(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -28633,6 +28639,20 @@ var EngCalcs = EngCalcs || {};
 	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
 	// thing about the same moment.
 	function tsHours(t) { return (t || 0) / 3600; }
+	function tsWaitingText(pc) {
+		var why;
+		if (EngCalcs.lpnTimeIsExtended && !EngCalcs.lpnTimeIsExtended(doc.times)) {
+			return pc.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
+		}
+		why = EngCalcs.lpnTimeWaiting ? EngCalcs.lpnTimeWaiting() : 'manual';
+		if (why === 'running') { return pc.lpn_time_running || 'Working out the extended period simulation.'; }
+		if (why === 'failed') { return pc.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.'; }
+		if (why === 'engine') {
+			return String(pc.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.')
+				.replace('{time}', EngCalcs.lpnTimeElapsedText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0));
+		}
+		return pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.';
+	}
 	function renderTimeSeries() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
 			note = document.getElementById('lpn_ts_note'),
@@ -28648,12 +28668,12 @@ var EngCalcs = EngCalcs || {};
 		// are three different things to do about it: set a duration, press Calculate, or choose an
 		// asset. An extended-period run is EPANET's alone, so a page whose engine is unreachable
 		// lands on the middle message and js/lpn-time.js's own status note says why.
+		// **AND THE WAITING SENTENCE IS TRUE IN BOTH STATES OF THE SWITCH** (Tom, 2026-09-29).
+		// "Press Calculate" names a button Recalculate automatically hides, so it is said only with
+		// the switch off; with it on, lpnTimeWaiting() starts any run that is owed and nothing would
+		// start, and the tab says a run is under way, or why there will not be one.
 		if (!frames.length) {
-			if (note) {
-				note.textContent = (EngCalcs.lpnTimeIsExtended && !EngCalcs.lpnTimeIsExtended(doc.times))
-					? (pc.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.')
-					: (pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.');
-			}
+			if (note) { note.textContent = tsWaitingText(pc); }
 			return;
 		}
 		series = tsSeries(frames);
@@ -43594,6 +43614,9 @@ var EngCalcs = EngCalcs || {};
 			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
 			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
 			if (settings.autoRun) { scheduleSolve(); }
+			// The Time series tab's waiting sentence names Calculate only with the switch off, so it
+			// is said again now rather than at the next solve, which off may never bring.
+			else { refreshPaneIfOpen(); }
 			clearSlowAdvice();
 			saveToStorage();
 		});
