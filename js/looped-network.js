@@ -10139,8 +10139,8 @@ var EngCalcs = EngCalcs || {};
 	 * wants a field of its own name makes a custom property. Nothing here is born holding either:
 	 * an absent description and an absent tag are what every other element is born with.
 	 */
-	function addCustomer(x, y, attach) {
-		var id = mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
+	function addCustomer(x, y, attach, wantId) {
+		var id = wantId || mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
 		// **`x`/`y` IS WHERE THE METER GOES, AND THE STATION IS DERIVED FROM IT WHEN THE CALLER
 		// DOES NOT STATE ONE.** That is the placement gesture's ordinary case: the second press
 		// names the PIPE, and where along the pipe the service lands is the nearest point on it to
@@ -22214,7 +22214,16 @@ var EngCalcs = EngCalcs || {};
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			paneColId(), paneColTextCoord(1), paneColTextCoord(2), paneColActive(),
+			paneColId(), paneColTextCoord(1), paneColTextCoord(2),
+			// **WHAT THE POSITION CELLS CANNOT SAY WHEN THEY ARE PLAIN** (Tom, 2026-09-28): an anchored
+			// Text's X/Y read "Attached" rather than a number, so a copy of that row carries nothing
+			// naming WHAT it is attached to -- the one thing a paste needs to create it attached again.
+			// Read-only here (attaching and detaching are map gestures, not a typed rename), but its own
+			// value is a node or link ID exactly as From/To name one on a Pipe, so panePlanCreates()
+			// reads it the same way.
+			{ key: 'anchor', label: 'lpn_field_text_anchor', str: true, em: 5,
+				get: function (lb) { return lb.anchorNode || lb.anchorLink || ''; } },
+			paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
 			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
@@ -23465,19 +23474,6 @@ var EngCalcs = EngCalcs || {};
 					if (e.preventDefault) { e.preventDefault(); }
 					panePasteAt(spec, cells, { append: true });
 				});
-			// **TEXT AND CUSTOMER OFFER NO PASTE-CREATES-ROWS ACTION** (paneCanCreate(): a Text is
-			// placed on the map and a Customer is served from a pipe, neither by typing an ID), so an
-			// empty one of these tables had NOTHING for a pasted block to land on and a paste onto it
-			// did nothing at all -- no refusal, no notice (Tom, 2026-09-28: "pasting Text table just
-			// does nothing"). The rule was already right; only the silence was a defect. The note now
-			// states the rule up front, exactly as a plain cell states the rule that made it plain,
-			// instead of a keystroke landing on nothing and looking broken.
-			} else if (!filterNote && spec.group === 'label') {
-				note.textContent += ' ' + (pc.lpn_pane_paste_not_created_text ||
-					'A Text object is placed on the map and is not created by pasting rows here.');
-			} else if (!filterNote && spec.group === 'customer') {
-				note.textContent += ' ' + (pc.lpn_pane_paste_not_created_customer ||
-					'A Customer is served from a pipe and is not created by pasting rows here.');
 			}
 			host.appendChild(note);
 			return;
@@ -24523,7 +24519,13 @@ var EngCalcs = EngCalcs || {};
 	 * Text and Customer rows are not created this way (a Text is placed and a customer is served
 	 * from a pipe, neither by typing an ID), so those two tables offer no such action.
 	 */
-	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link'; }
+	// **EVERY TABLE CREATES ROWS BY PASTE, NOT JUST NODES AND LINKS** (Tom, 2026-09-28: *"Nothing
+	// about text is harder to put in a table than a junction is. Same with Customer... Refusing to
+	// paste Customers makes no more sense than refusing to paste Pipes."*). A Text names its anchor
+	// (a node or a link) by ID in its own `anchor` column, exactly as a Pipe names its two nodes; a
+	// Customer names its serving pipe or node exactly the same way. Each refuses a row only when
+	// what it needs is not there yet, never because the TABLE cannot make the kind of thing at all.
+	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'; }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
 	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
 	// whose every filled cell is the heading of the column it lands on, with or without its unit,
@@ -24598,6 +24600,86 @@ var EngCalcs = EngCalcs || {};
 				}
 				plan.from = f; plan.to = to;
 			}
+			// **A TEXT NAMES ITS ANCHOR THE WAY A PIPE NAMES ITS NODES** (Tom, 2026-09-28: *"Nothing
+			// about text is harder to put in a table than a junction is."*). The Attached to cell
+			// names an existing node or link, exactly as From/To do; a blank one means the row is a
+			// free-floating Text and X/Y (a node's own requirement) state where. An anchored row's
+			// offset is not stated anywhere a copy can read (the position cells go plain there), so it
+			// is born at zero offset -- attached, at the anchor's own point, same as spec §2 leaves a
+			// blank cell at the default a drawn element is born with.
+			if (!err && spec.group === 'label') {
+				var anchorTxt = txt('anchor'), anchorNodeEl, anchorLinkEl;
+				if (anchorTxt) {
+					anchorNodeEl = nodeById(anchorTxt);
+					anchorLinkEl = !anchorNodeEl && linkById(anchorTxt);
+					if (!anchorNodeEl && !anchorLinkEl) {
+						err = panePasteSay('lpn_pane_paste_no_anchor',
+							'Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.', row, { id: anchorTxt });
+					} else {
+						plan.anchorNode = anchorNodeEl ? anchorTxt : null;
+						plan.anchorLink = anchorLinkEl ? anchorTxt : null;
+					}
+				} else {
+					a = txt('axis1'); b = txt('axis2');
+					if (a === '' || b === '') {
+						err = panePasteSay('lpn_pane_paste_text_no_position', 'Row {row}: a new Text needs both {first} and {second}.', row,
+							{ first: axisNames().first, second: axisNames().second });
+					} else if (!isFinite(+a) || !coordValueOk(coordSlotIsY(1), +a)) { err = bad('axis1'); }
+					else if (!isFinite(+b) || !coordValueOk(coordSlotIsY(2), +b)) { err = bad('axis2'); }
+					else {
+						plan.yv = coordSlotIsY(1) ? +a : +b;
+						plan.xv = coordSlotIsY(1) ? +b : +a;
+					}
+				}
+			}
+			// **A CUSTOMER NAMES ITS SERVING PIPE OR NODE THE WAY A PIPE NAMES ITS NODES** (Tom,
+			// 2026-09-28: *"Customers can refuse to paste only if the pipe they need is not present.
+			// Refusing to paste Customers makes no more sense than refusing to paste Pipes."*). The
+			// Connected asset cell (a pipe) or the read-only Added to node cell (a node, when the
+			// source copy shows a connection lumped exactly at one) each name what it needs; a row
+			// naming neither is refused rather than guessed at, the same way a blank From/To is.
+			// Position is required as it is for a node, and Station (if stated) fixes exactly where
+			// along the named pipe, ahead of a manual snap from X/Y; Offset, like every other cell,
+			// is applied afterward through its own setter.
+			if (!err && spec.group === 'customer') {
+				a = txt('axis1'); b = txt('axis2');
+				if (a === '' || b === '') {
+					err = panePasteSay('lpn_pane_paste_customer_no_position', 'Row {row}: a new Customer needs both {first} and {second}.', row,
+						{ first: axisNames().first, second: axisNames().second });
+				} else if (!isFinite(+a) || !coordValueOk(coordSlotIsY(1), +a)) { err = bad('axis1'); }
+				else if (!isFinite(+b) || !coordValueOk(coordSlotIsY(2), +b)) { err = bad('axis2'); }
+				else {
+					plan.yv = coordSlotIsY(1) ? +a : +b;
+					plan.xv = coordSlotIsY(1) ? +b : +a;
+				}
+				if (!err) {
+					var linkTxt = txt('link'), nodeTxt = txt('atNode'), stTxt = txt('station'), pipeEl, nodeEl, atPick;
+					if (linkTxt) {
+						pipeEl = linkById(linkTxt);
+						if (!pipeEl) {
+							err = panePasteSay('lpn_pane_paste_no_pipe', 'Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.', row, { id: linkTxt });
+						} else {
+							plan.customerLink = pipeEl.id;
+							if (stTxt !== '') {
+								if (!isFinite(+stTxt)) { err = bad('station'); }
+								else { plan.customerT = Math.max(0, Math.min(100, +stTxt)) / 100; }
+							}
+						}
+					} else if (nodeTxt) {
+						nodeEl = nodeById(nodeTxt);
+						if (!nodeEl) {
+							err = panePasteSay('lpn_pane_paste_no_customer_node', 'Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.', row, { id: nodeTxt });
+						} else {
+							atPick = customerAttachAtNode(nodeEl, { x: inwardX(plan.xv), y: inwardY(plan.yv) });
+							if (!atPick) {
+								err = panePasteSay('lpn_pane_paste_customer_node_no_pipe', 'Row {row}: node {id} has no pipe for a Customer to attach to.', row, { id: nodeTxt });
+							} else { plan.customerLink = atPick.link.id; plan.customerT = atPick.t; }
+						}
+					} else {
+						err = panePasteSay('lpn_pane_paste_no_customer_ref', 'Row {row}: a new Customer needs a connected pipe or node.', row);
+					}
+				}
+			}
 			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
 			// result or identity cell is left to the solve and counted, and anything else must read
 			// as its column reads a typed value.
@@ -24605,7 +24687,8 @@ var EngCalcs = EngCalcs || {};
 				Object.keys(cells).forEach(function (key) {
 					var c = cells[key].c, t = cells[key].t, p;
 					if (err || key === 'id' || key === 'axis1' || key === 'axis2' ||
-						key === 'from' || key === 'to' || key === 'verts' || t === '') { return; }
+						key === 'from' || key === 'to' || key === 'verts' ||
+						key === 'anchor' || key === 'link' || key === 'atNode' || key === 'station' || t === '') { return; }
 					if (c.result || !c.set) { plan.ignored++; return; }
 					p = paneParseCellText(c, t);
 					if (!p.ok) { err = bad(key); return; }
@@ -24629,7 +24712,7 @@ var EngCalcs = EngCalcs || {};
 				el[LPN_GEO_XSRC] = plan.xv;   // the typed characters, exactly as setNodeCoordAxis() keeps them
 				el[LPN_GEO_YSRC] = plan.yv;
 			}
-		} else {
+		} else if (spec.group === 'link') {
 			el = addLink(spec.type, plan.from, plan.to, plan.verts || [], plan.id);
 			(plan.verts || []).forEach(function (p, i) {
 				if (typeof p[LPN_GEO_XSRC] === 'number') {
@@ -24637,6 +24720,20 @@ var EngCalcs = EngCalcs || {};
 					el.verts[i][LPN_GEO_YSRC] = p[LPN_GEO_YSRC];
 				}
 			});
+		} else if (spec.group === 'label') {
+			// **BORN AT ZERO OFFSET WHEN ANCHORED** -- see panePlanCreates()'s own comment: the source
+			// copy's position cells go plain the moment a Text is anchored, so there is no pasted
+			// offset to honour. addText() computes an offset from the (x, y) it is handed and the
+			// anchor point it resolves internally; forcing both back to exactly the anchor's own point
+			// afterward is simpler and no less correct than trying to hand it the right x/y up front
+			// for a link anchor, whose point it would otherwise have to duplicate finding.
+			el = addText(plan.anchorNode || plan.anchorLink ? 0 : inwardX(plan.xv),
+				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
+				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
+			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+		} else {
+			el = addCustomer(inwardX(plan.xv), inwardY(plan.yv),
+				plan.customerLink ? { link: plan.customerLink, t: plan.customerT } : null, plan.id);
 		}
 		plan.writes.forEach(function (w) {
 			// Asked at write time, per element, as a typed cell asks it: a pipe type written by an
@@ -27967,8 +28064,8 @@ var EngCalcs = EngCalcs || {};
 	// `attach` is the LINK form of the same argument (Task 502): {link: id, t: fraction}, and the
 	// offset is taken from the point that fraction names. A Text has ONE anchor -- a node wins if
 	// both are somehow supplied, because a node is the more specific thing to have tapped.
-	function addText(x, y, anchorNode, attach) {
-		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null, lb, onLink = null;
+	function addText(x, y, anchorNode, attach, wantId) {
+		var id = wantId || mintId('X'), an = anchorNode ? nodeById(anchorNode) : null, lb, onLink = null;
 		if (!an && attach && linkById(attach.link)) {
 			onLink = attach;
 			an = textAnchorPoint({ anchorLink: attach.link, anchorT: attach.t });

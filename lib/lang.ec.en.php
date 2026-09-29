@@ -906,11 +906,16 @@ $ec_lang['lpn_pane_paste_no_node']='Row {row}: node {id} does not exist yet. Pas
 $ec_lang['lpn_pane_paste_same_ends']='Row {row}: From and To are the same node.';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
-// Text and Customer offer no paste-creates-rows action (paneCanCreate()): a Text is placed on the
-// map and a Customer is served from a pipe, neither by typing an ID. Said on the empty table's own
-// note, so a paste onto it explains itself instead of doing nothing.
-$ec_lang['lpn_pane_paste_not_created_text']='A Text object is placed on the map and is not created by pasting rows here.';
-$ec_lang['lpn_pane_paste_not_created_customer']='A Customer is served from a pipe and is not created by pasting rows here.';
+// A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
+// the project's two coordinate names).
+$ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {first} and {second}.';
+// {id} is what the Text table's own Attached to cell named.
+$ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Row {row}: a new Customer needs a connected pipe or node.';
+$ec_lang['lpn_pane_paste_no_pipe']='Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Row {row}: node {id} has no pipe for a Customer to attach to.';
 $ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
@@ -948,6 +953,9 @@ $ec_lang['lpn_field_text_bold']='Bold text';
 // It's a technical term. We can only give a definition, which is not our job."). $ec_lang_syn holds
 // phrases that could STAND ON THE CONTROL in place of the label; a technical term has no such
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
+// The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
+// attaching and detaching are map gestures, never a typed rename.
+$ec_lang['lpn_field_text_anchor']='Attached to';
 $ec_lang['lpn_field_text_align']='Horizontal alignment';
 $ec_lang['lpn_field_text_align_left']='Left';
 $ec_lang['lpn_field_text_align_center']='Centre';
