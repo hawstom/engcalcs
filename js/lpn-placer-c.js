@@ -506,7 +506,7 @@ EngCalcs.lpnPlacerC = (function () {
 			function mix(v) { h = (h * 31 + (typeof v === 'number' ? Math.round(v * 100) : hashStr(String(v)))) | 0; }
 			function hashStr(t) { var k = 0; for (var j = 0; j < t.length; j++) { k = (k * 33 + t.charCodeAt(j)) | 0; } return k; }
 			mix(scene.view.s); mix(scene.view.tx); mix(scene.view.ty); mix(scene.viewport.w); mix(scene.viewport.h);
-			mix(scene.text.sizePx); mix(JSON.stringify(scene.dropOrder || {}));
+			mix(scene.text.sizePx); mix(JSON.stringify(scene.dropOrder || {})); mix(JSON.stringify(scene.settings || null));
 			for (i = 0; i < scene.nodes.length; i++) { mix(scene.nodes[i].x); mix(scene.nodes[i].y); mix(scene.nodes[i].symbol.w); }
 			for (i = 0; i < scene.links.length; i++) {
 				var l = scene.links[i];
@@ -517,7 +517,7 @@ EngCalcs.lpnPlacerC = (function () {
 			for (i = 0; i < (scene.texts || []).length; i++) { mix(scene.texts[i].box.cx); mix(scene.texts[i].box.cy); mix(scene.texts[i].text); }
 			for (i = 0; i < scene.labels.length; i++) {
 				var r = scene.labels[i];
-				mix(r.id); mix(r.layout); mix(r.hand ? r.hand.x + ',' + r.hand.y : '-');
+				mix(r.id); mix(r.layout); mix(r.hand ? r.hand.x + ',' + r.hand.y : '-'); mix(r.along ? 'A' : '-');
 				for (var j = 0; j < r.rows.length; j++) { mix(r.rows[j].text); mix(r.rows[j].w); }
 			}
 			mix(prev ? (prev.layout === (last && last.layout) ? 'last' : 'other') : 'none');
@@ -644,14 +644,17 @@ EngCalcs.lpnPlacerC = (function () {
 			// that could not show or grow last view cannot now either, unless the edge of the
 			// view was what stopped it.
 			var pan = !!prev && Math.abs(prev.scene.view.s - scene.view.s) <= 1e-9 * Math.abs(scene.view.s)
-				&& prev.scene.text.sizePx === text.sizePx && !prev.again;
+				&& prev.scene.text.sizePx === text.sizePx && !prev.again
+				&& JSON.stringify(prev.scene.settings || null) === JSON.stringify(scene.settings || null);
 			var st = { pan: pan, scene: scene, text: text, vp: vpbb, hg: hg, sg: sg, dg: dg, hr: hr, dr: dr, labels: [], byId: {},
 				buf: [], seen: [], seen2: [], probe: newCand(), work: 0 };
 			scene.labels.forEach(function (req) {
 				var L = mkLabel(st, req, nodes, links, incident, customers);
 				if (!L) { return; }
 				var pp = prevL[req.id], pr = prevReq[req.id];
-				if (pp && pp.shown && pr && pp.rows && pp.rows.length && !pr.hand) {
+				// R13: last view's spot counts only if the label is asked the same way; a label the
+				// user has just switched to (or from) lying along its pipe is placed afresh.
+				if (pp && pp.shown && pr && pp.rows && pp.rows.length && !pr.hand && !pr.along === !req.along) {
 					L.prevPl = pp; L.prevReq = pr;
 					L.prevRs = rowsetMatching(L, pp.rows, pr);
 				}
@@ -912,7 +915,7 @@ EngCalcs.lpnPlacerC = (function () {
 			var x, y, angle = pp.angle || 0, o = L.owner;
 			c.base = PREV_BONUS; c.spec = null;
 			if (angle) {
-				if (o.t !== 'link') { return false; }
+				if (o.t !== 'link' || !L.along) { return false; }
 				var a = normAngle(Math.atan2(o.P.dy, o.P.dx) * 180 / Math.PI);
 				if (angDiff(a, angle) > 3 && angDiff(a + 180, angle) > 3) { return false; }
 				var ccx = pp.x + dp.w / 2 - px, ccy = pp.y + dp.h / 2 - py;
