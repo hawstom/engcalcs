@@ -1,7 +1,17 @@
 # Roadmap
 
 Open tasks for the EngCalcs hydraulic calculator suite. **Format: `Priority|ID| Description`.** One
-flat list, highest priority first, lowest ID first inside a band. `# Reference` at the foot holds the
+flat list, highest priority first, lowest ID first inside a band. `- 75|739| **Say where each setting is saved: the project or this browser.**
+  Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
+- 50|740| **One sentence for the node-size cap, not three fragments.**
+  Sprint 2026-09-28-delta: five languages (it, he, ur, my, am) could not assemble
+  lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
+  {n} and {p} placeholders, split into inputs at render time.
+- 75|741| **The infinite map: generated networks for the label bench.**
+  Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
+  networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
+  utility-scale networks. Notes: dev/paper-notes-label-placement.md.
+# Reference` at the foot holds the
 standing prose that is not a task.
 
 | Priority | Means |

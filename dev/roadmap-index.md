@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**105 open tasks.** Next (100): 2 · Soon (75): 22 · Someday (50): 43 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
+**107 open tasks.** Next (100): 2 · Soon (75): 23 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
 
 ## 100 — Next (2)
 
@@ -21,7 +21,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 
-## 75 — Soon (22)
+## 75 — Soon (23)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -45,8 +45,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
+- Task 741 — The infinite map: generated networks for the label bench.
 
-## 50 — Someday (43)
+## 50 — Someday (44)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -91,6 +92,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
+- Task 740 — One sentence for the node-size cap, not three fragments.
 
 ## 25 — Maybe (15)
 
@@ -136,5 +138,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-94 of 105 titles are within 4–12 words. `!` marks the rest;
+96 of 107 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

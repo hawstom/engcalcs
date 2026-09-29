@@ -3235,3 +3235,85 @@ byte-for-byte layout stability between two identical views.
   branches.
 - No repo file edited on either worktree; `git status --porcelain` empty on both,
   re-checked after this pass.
+# Perry's pre-review: feat/table-width fc384d79 (R-356 items 4, 5, 8)
+
+2026-09-28, OBSERVED unless noted. Real Chromium (playwright-core), fresh browser profile
+(no localStorage), against the worktree served on 8124. Reproduced Tom's steps: new lat/lon
+project, harvested real row values from the built-in "EPANET Net3" example's own Junctions/
+Reservoirs/Tanks/Pipes/Pumps tables (copy semantics via paneCellText's own rules, curve and
+mixing-model references blanked since those are separate library objects out of this rule's
+scope), pasted into the new project via a real ClipboardEvent('paste') dispatched on the app's
+own paste target (Ctrl+Shift+V append semantics), let autoRun solve, then measured the live
+DOM. Screenshots and script at
+/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/6be60d75-130b-4289-88ca-8357100391c4/scratchpad/
+(table-width-check.js, after-paste-*.png, print-preview.png, print-pipes.png,
+screen-net3-pipes.png).
+
+## Verdict: CONFIRMED for items 4 and 5; a genuine new defect found under item 8's own rule;
+## the "N⌄" pull-down clipping the builder flagged is real and reproduces on the STOCK Net3
+## example, not just my paste.
+
+1. **Item 4 (headings wrap, not one line) -- CONFIRMED.** After pasting real Net3 rows into a
+   new lat/lon project and letting it solve, every heading Tom named wraps to multiple lines,
+   measured directly: Head (ft H2O) 3 lines, Pressure (psi) 3 lines, Flow (gpm) 3 lines, Head
+   loss (ft H2O) 4 lines, Head loss gradient (% rise/run) 7 lines, Fittings list 3 lines. None
+   sit on one line. **Could not check** "Source share (%)" / "Average source share (%)" --
+   those columns only appear with a Trace configured, which this network does not have; a
+   person needs to open a project with a Source trace and read those two headings.
+
+2. **Item 5 ("Lat and lon do not wrap on print") -- CONFIRMED, now wraps.** Clicked the real
+   Print table button (window.print stubbed so the harness doesn't hang), switched to
+   `@media print`, and read the actual printable sheet: "Latitude" prints as "Lati-" / "tude"
+   on two lines and "Longitude" as "Longi-" / "tude" on two lines
+   (print-preview.png). This is a real print-media render, not a screen approximation of one,
+   but Chromium's print-preview pixel metrics can still differ slightly from Tom's own printer
+   driver/PDF settings -- a real print or "Save as PDF" from his own browser is the only way to
+   fully close this out.
+
+3. **Item 8, the Vertices column -- NOT clean. A new, ugly consequence of the "ignore units"
+   rule, worth Tom's eyes before he calls this done.** On a lat/lon project the Vertices
+   heading is "Vertices (Latitude/Longitude|...)". Excluding the parenthetical from the FLOOR
+   calculation (per his own rule) correctly narrows the column to fit "Vertices" alone -- but
+   the leftover unit text still has to render somewhere, and it wraps into **9 lines**
+   ("Vert-", "ices", "(Lati", "tude", "/", "Lon", "gitu", "del", "...)"), measured on both
+   Pipes and Pumps (after-paste-pipes.png, after-paste-pumps.png). On the plain-XY Net3 example
+   the same column reads "Vert-ices (X/Y|...)" in a normal single line
+   (screen-net3-pipes.png) -- so this is geo-project-specific and will not show up on most of
+   Tom's own testing unless he opens a lat/lon project with pipes, pumps or valves. Technically
+   the rule is being followed; the visible result is a header row nine lines tall, which is a
+   plausible new complaint rather than the fix he asked for. Worth a screenshot in front of him
+   before calling item 8 closed.
+
+4. **The "N⌄" pull-down clipping the build agent flagged -- REAL, and reproduces on the STOCK
+   Net3 example with no paste involved (screen-net3-pipes.png).** "Pipe type" and "Fittings
+   list" both show only "No" plus the dropdown arrow, cutting off "No pipe type selected" /
+   "No fittings list selected" entirely -- measured column width equals the select's own
+   rendered width (2.53-2.59em), nowhere near enough for either label. This is the same shape
+   Tom flagged as R-110 (*"Sometimes the column widths are unreasonable... width = 2 em (due
+   to selector?)"*), reopened rather than closed by this branch. His R-356 rule explicitly
+   excludes "No..." selectors from the floor "not counting 'No....' selectors", so a column
+   this narrow (Fittings list, Pipe type, Pump head curve, Speed pattern, Pump efficiency
+   curve, Price pattern) is arguably rule-compliant but reads exactly like the defect he named
+   before. He should see this rendered, not just be told it obeys the letter of his own rule.
+
+5. **ID column centered -- CONFIRMED.** `getComputedStyle(td).textAlign === 'center'` on the
+   first row of every one of the 5 tables checked (junctions, reservoirs, tanks, pipes, pumps),
+   and visually confirmed in every screenshot.
+
+6. **No clipped plain-value cells, no page errors** across the whole sequence (paste x5,
+   solve, screenshot, print). Harness's own clip-detector (`scrollWidth > clientWidth`) found
+   nothing on any plain cell in any of the 5 tables.
+
+7. **Could not check:** the builder's storage claim ("widths are never stored in projects,
+   only dragged widths in localStorage `lpn_panecols`") -- not exercised here (fresh profile,
+   never dragged a column). A person dragging a column and reloading, then opening a
+   DIFFERENT project on the same browser, is the one thing that would catch a leak there.
+
+## Method note
+Net3's own Pump head curve / Pump efficiency curve and Tank Mixing model / Mixing fraction
+were blanked before pasting -- those reference library objects (curves) or need exact stored
+codes the friendly on-screen text doesn't paste back as, which is a `paneCellText()`/R-367
+friction unrelated to R-356's column-width rule. Diameter/Length/Roughness values in the pasted
+Pipes table read suspiciously uniform (99, 199, 130...) -- a column-order slip in my own
+TSV harvest against Net3's real values, not a defect in the product; irrelevant to the widths
+being measured (which depend on headings and selector text, not magnitude of numbers).
