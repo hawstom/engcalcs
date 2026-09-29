@@ -37,7 +37,9 @@
 	 * host: { state(), getDoc(), settings(), labelSettings(), nodeEls(), linkEls(), nodeAt(n),
 	 *         nodeRadius(n), linkPointList(l), linkLabelMid(l), pumpSymbolSize(type),
 	 *         labelSeparator(), labelFlipLeftOfVertical()? }
-	 * opts: { id, set, step, source, canvas: {w, h}, measure(str) -> px, obs, zoom? }
+	 * opts: { id, set, step, source, canvas: {w, h}, measure(str) -> px, obs, zoom?, viewport?, furniture? }
+	 *   `viewport` (view px) is the part of the canvas a reader can see, when the page covers some of
+	 *   it; `furniture` the boxes the page draws over the map inside it (legends, the zoom buttons).
 	 *   `obs` is an obstacle set shaped like the page's staticObstacles(): the Text objects are
 	 *   read off its boxes and segments that carry `textOwner`.
 	 *
@@ -52,14 +54,19 @@
 		var rowH = textPx * 1.2;
 		var st = host.state(), s = st.s, tx = st.tx, ty = st.ty;
 		var V = function (p) { return { x: r2(p.x * s + tx), y: r2(p.y * s + ty) }; };
-		var inView = function (p) { return p.x >= 0 && p.y >= 0 && p.x <= CANVAS.w && p.y <= CANVAS.h; };
+		// **THE VIEWPORT IS THE MAP A READER CAN SEE, NOT THE CANVAS ELEMENT** when the caller says so:
+		// the page lays a status footer and a mode-hint line over the canvas's bottom and top edges,
+		// and a label drawn there, or asked for an owner under one, cannot be read (2026-09-28, pipe
+		// 185 on Novato). Without `opts.viewport` it is the whole canvas, as every bench scene is.
+		var VP = opts.viewport || { x: 0, y: 0, w: CANVAS.w, h: CANVAS.h };
+		var inView = function (p) { return p.x >= VP.x && p.y >= VP.y && p.x <= VP.x + VP.w && p.y <= VP.y + VP.h; };
 		var nodeEls = host.nodeEls(), linkEls = host.linkEls(), obs = opts.obs;
 		var sep = host.labelSeparator();
 		var alignOn = !!settings.alignPipeLabels;
 		var flipDeg = typeof host.labelFlipLeftOfVertical === 'function' ? host.labelFlipLeftOfVertical() : 20;
 		var scene = {
 			id: opts.id, set: opts.set, step: opts.step, source: opts.source,
-			viewport: { x: 0, y: 0, w: CANVAS.w, h: CANVAS.h },
+			viewport: { x: r2(VP.x), y: r2(VP.y), w: r2(VP.w), h: r2(VP.h) },
 			view: { s: s, tx: tx, ty: ty, note: 'view px = model * s + t (model = the app draw frame, y down)' },
 			text: { sizePx: textPx, rowHeightPx: r2(rowH), separator: sep,
 				separatorW: r2(textW(sep)), hookMaxPx: r2(rowH) },
@@ -74,6 +81,9 @@
 			nodes: [], links: [], texts: [], customers: [], labels: []
 		};
 		if (opts.zoom) { scene.zoom = opts.zoom; }
+		if (opts.furniture) {
+			scene.furniture = opts.furniture.map(function (b) { return { x: r2(b.x), y: r2(b.y), w: r2(b.w), h: r2(b.h) }; });
+		}
 
 		doc.nodes.forEach(function (n) {
 			var p = V(host.nodeAt(n)), r = host.nodeRadius(n) * s;
