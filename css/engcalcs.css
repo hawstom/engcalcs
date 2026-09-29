@@ -3973,6 +3973,11 @@ html:has(#lpn_canvas) { overflow: hidden; }
    44rem against Settings' 34. Everything else -- the height, the minimums, the resize -- is
    inherited deliberately. */
 .lpn-libbox { width: min(44rem, 94vw); }
+/* ---- THE NOTES BOX (Tom, 2026-09-28) ------------------------------------------------------------
+   It borrows .lpn-setbox's whole shell, same as the Library and Fire flow boxes above and below.
+   Only the width is its own, kept at the 44rem the old centred popover opened with -- a column of
+   defined terms reads better at Library's width than at Settings' narrower one. */
+.lpn-notesbox { width: min(44rem, 94vw); }
 /* ---- THE FIRE FLOW BOX (ROADMAP Task 530) -----------------------------------------------------
    It borrows .lpn-setbox's whole shell -- moveable by its chrome, resizeable by `resize: both` and
    by the touch grabber, capped to the viewport, body scrolling inside itself. Only the width is its

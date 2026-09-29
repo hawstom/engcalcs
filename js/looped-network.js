@@ -34917,8 +34917,11 @@ var EngCalcs = EngCalcs || {};
 	// read and work WHILE you work the map -- clicking a pipe to look at it must not throw either
 	// away, and that is exactly what membership here would do. Both get the property popup's
 	// chrome instead: a drag surface and an X. Settings LEFT this list with Task 441, when it
-	// stopped being a pull-down.
-	var VIEW_POPOVERS = ['lpn_notes_popup', 'lpn_about_popup'];
+	// stopped being a pull-down. **NOTES LEFT TOO** (Tom, 2026-09-28: *"Draggable non-hog box for
+	// Help, Notes. I need it open for my spreadsheet editing video."*) -- it is wired through
+	// wireBoxMemory() like the report boxes below, and a click on the map or a table while it is
+	// open must not dismiss it, which is exactly what membership here would do.
+	var VIEW_POPOVERS = ['lpn_about_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it (Task 372). Exempting the whole
@@ -36587,39 +36590,63 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 
-	// The Notes, revealed. Centred rather than hung off the menu button, because this is a column of
-	// prose to be read, not a control panel to be operated next to the thing it controls -- and it
-	// is the only popover here that can be taller than the map it covers, so it takes its own
-	// scrollbar via .lpn-popover-body.
-	function toggleNotesPopup() {
-		var popup = document.getElementById('lpn_notes_popup');
-		if (!popup) { return; }
-		if (popup.style.display === 'block') { closeNotesPopup(); return; }
+	// **THE NOTES BOX** (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open
+	// for my spreadsheet editing video."*). Until now this was a centred popover in VIEW_POPOVERS --
+	// a click anywhere away from it, or a bare Escape, closed it, which is exactly what "non-hog"
+	// rules out. It is now the same shell and the same memory as Settings, Find and the four report
+	// boxes: draggable by its title bar, resizable, remembered per browser as window furniture
+	// (`lpn_notesbox`), and dismissed only by its own × or an Escape pressed while focus is inside
+	// it -- see wireNotesBox().
+	function notesBoxEl() { return document.getElementById('lpn_notes_popup'); }
+	function notesBoxIsOpen() {
+		var b = notesBoxEl();
+		return !!b && b.style.display === 'flex';
+	}
+	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
+	var notesboxLayout = newBoxLayout();
+	function saveNotesboxLayout() {
+		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
+	}
+	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
+	// corner Settings opens at). Centring is what the old popover did, and centring a box tall
+	// enough to hold every term in this list lands squarely on top of the Tables pane docked under
+	// the map, which is the one thing this box must not do on a first open.
+	function openNotesBox() {
+		var box = notesBoxEl(), r, at, home, floor;
+		if (!box) { return; }
 		closeMenu();
 		closeViewPopovers();
-		popup.style.display = 'block';
-		raisePanel(popup);   // centred, not dragged, so it is raised where it becomes visible
-		// **CAPPED TO THE ROOM BELOW WHERE IT LANDS, NOT TO THE WHOLE VIEWPORT** (Tom, 2026-09-11:
-		// *"Notes is too large for my laptop and my phone. It scrolls, but its bottom is off the
-		// map."*). fitPanelToViewport() caps to `innerHeight - 2 * POPUP_EDGE`, which is right only
-		// for a box free to sit anywhere; this one is then floored at chromeFloor(), so a box taller
-		// than the room UNDER the chrome fits the viewport, gets pushed down past the menu bar, and
-		// hangs off the bottom by exactly the height of the chrome -- with the end of the prose
-		// below the fold rather than below a scrollbar, which is why scrolling did not reach it.
-		//
-		// The note above capPanelToRoomBelow() describes this defect in general terms and the Find
-		// box was fixed for it; the Notes popup was simply never brought along. Choose the top from
-		// the natural height, then cap to what is genuinely left below that top.
-		var natural = fitPanelToViewport(popup);
-		var top = Math.max(chromeFloor(), (window.innerHeight - natural) / 2);
-		capPanelToRoomBelow(popup, top);
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
-		popup.style.top = top + 'px';
+		hideOpenTips();
+		box.style.display = 'flex';
+		placePanelForScreen(box, function () {
+			applyBoxSize(box, notesboxLayout);
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			r = box.getBoundingClientRect();
+			if (notesboxLayout.left === null || notesboxLayout.top === null) {
+				home = setboxHomeCorner(r.width, r.height);
+				at = clampPanel(home.left, home.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor);
+			} else {
+				at = restoreBounds(notesboxLayout.left, notesboxLayout.top, r.width, r.height,
+					window.innerWidth, window.innerHeight);
+			}
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
+		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
 	}
-	function closeNotesPopup() { hidePanel(document.getElementById('lpn_notes_popup')); }
-	// The About box. Same shape as the Notes popup on purpose -- centred, capped to the room below
-	// the chrome, one close button -- because this page should have one kind of box and not two.
+	function closeNotesBox() {
+		hidePanel(notesBoxEl());
+		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
+	}
+	function toggleNotesPopup() {
+		if (notesBoxIsOpen()) { closeNotesBox(); return; }
+		openNotesBox();
+	}
+	function closeNotesPopup() { closeNotesBox(); }
+	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
+	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
 		var popup = document.getElementById('lpn_about_popup');
 		if (!popup) { return; }
@@ -36639,8 +36666,18 @@ var EngCalcs = EngCalcs || {};
 	function wireNotesPopup() {
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
-		var x = document.getElementById('lpn_notes_close');
-		if (x) { x.addEventListener('click', closeNotesPopup); }
+		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeNotesBox); }
+		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
+		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
+		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
+		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
+		// away, and a table cell or the map must keep taking Escape for its own undo.
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeNotesBox(); }
+		});
+		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -43507,6 +43544,10 @@ var EngCalcs = EngCalcs || {};
 	//   panel, which have done this since Tasks 434 and 441. All five are standing boxes and all
 	//   five remember their geometry, which is the same sentence Tom's question is about.
 	//
+	//   **THE NOTES BOX JOINED THEM ON 2026-09-28**, the same day it stopped being a modal-feeling
+	//   popover: Tom wants it left open across a whole recording session, which is exactly the
+	//   "standing reference" case this section already draws the line on.
+	//
 	//   **THE LIBRARY BOX JOINED THEM ON HIS WORD AND IT BROUGHT ITS GEOMETRY WITH IT** (Tom,
 	//   2026-09-04: *"The bottom pane has long remembered its openness. If it should get both, add
 	//   its height or whatever size setting you can save."*). It had been left out here for a
@@ -43525,7 +43566,7 @@ var EngCalcs = EngCalcs || {};
 	//   DELIBERATELY LEFT ALONE, and each for a reason, not by omission:
 	//
 	//   * **The property popup.** It is an answer to a selection, and a selection is not restored.
-	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the notes popover,
+	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the About box,
 	//     the backdrop target panel and the two menu popovers.** Modals, transient choosers and
 	//     pull-downs. A modal that survives a reload is a question the reader has already answered.
 	//
@@ -43552,6 +43593,9 @@ var EngCalcs = EngCalcs || {};
 		if (energyboxLayout.open) { openEnergyBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
+		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
+		// reason: Find is the smallest and ends up on top.
+		if (notesboxLayout.open) { openNotesBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------

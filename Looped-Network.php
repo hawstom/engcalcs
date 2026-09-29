@@ -1752,9 +1752,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php   endif; ?>
 	</div>
 </div>
-<div id="lpn_notes_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:44rem">
+<?php // **A NON-HOGGING BOX, LIKE SETTINGS, FIND AND THE FOUR REPORT BOXES** (Tom, 2026-09-28: *"I
+      // need it open for my spreadsheet editing video."*). It used to be a centred, modal-feeling
+      // popover that a click anywhere away from it would close (VIEW_POPOVERS in
+      // js/looped-network.js) -- fine for a column of prose read once, wrong for a box Tom wants
+      // to leave open while he works the Tables pane on camera. It now borrows the Settings box's
+      // whole shell (`.lpn-setbox` for the drag band, the resize grabber and the viewport caps),
+      // is wired through wireBoxMemory() like the report boxes, and is no longer in VIEW_POPOVERS:
+      // nothing closes it but its own × or an Escape pressed while focus is inside it. ?>
+<div id="lpn_notes_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_notes_title">
+	<div id="lpn_notes_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_notes']?></div>
 	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
+	<div class="lpn-popover-body lpn-setbox-body">
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
