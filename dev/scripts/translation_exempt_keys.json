@@ -193,6 +193,20 @@
             ],
             "reason": "Manual -- the colour-band mode where the reader sets the breaks. Four independent sprint-459 agents landed on the identical word; it is the ordinary term in each of these languages for this sense, not an untranslated string."
         },
+        "lpn_convas_label_col": {
+            "category": "cognate",
+            "languages": [
+                "de"
+            ],
+            "reason": "Suffix -- the German word is Suffix."
+        },
+        "lpn_cp_key": {
+            "category": "loanword",
+            "languages": [
+                "bn"
+            ],
+            "reason": "Key -- the English loanword Bengali software uses for a property key."
+        },
         "lpn_cp_label": {
             "category": "cognate",
             "languages": [
@@ -314,12 +328,37 @@
             ],
             "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13. Added sw, Task 251 wave 3, 2026-08-13: Latin script, so this is NOT the script-contamination defect that made hi and de fail here, and Swahili has no false-friend collision (a car is gari, not auto). The sw agent declared the choice explicitly as asked, reasoning that Otomatiki does not fit a narrow toggle and that Auto is the field register -- consistent with this project's finding that Tanzanian engineering practice is English-medium. Flag for native review; a native reader could still prefer Otomatiki."
         },
+        "lpn_field_desc": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Description -- the French word is Description."
+        },
         "lpn_field_diameter": {
             "category": "cognate",
             "languages": [
                 "id"
             ],
             "reason": "Diameter -- the same word in Indonesian (KBBI). Scoped to id; other languages inflect or spell it differently."
+        },
+        "lpn_field_easting_abbr": {
+            "category": "abbreviation",
+            "languages": [
+                "am",
+                "ar",
+                "bn",
+                "cs",
+                "es",
+                "fr",
+                "hi",
+                "it",
+                "my",
+                "pt",
+                "ro",
+                "ur"
+            ],
+            "reason": "E -- survey-grid abbreviation kept as E where the language keeps it (Est/Este/E) or has no native short form."
         },
         "lpn_field_id": {
             "category": "symbol",
@@ -335,6 +374,32 @@
             "category": "cognate",
             "languages": "*",
             "reason": "'Longitude' is spelled identically in several Latin-script languages and is the exact scientific term; no synonym exists."
+        },
+        "lpn_field_northing_abbr": {
+            "category": "abbreviation",
+            "languages": [
+                "am",
+                "ar",
+                "bn",
+                "cs",
+                "es",
+                "fr",
+                "hi",
+                "it",
+                "my",
+                "pt",
+                "ro",
+                "ur"
+            ],
+            "reason": "N -- survey-grid abbreviation kept as N where the language keeps it (Nord/Norte/N) or has no native short form."
+        },
+        "lpn_field_tag": {
+            "category": "loanword",
+            "languages": [
+                "de",
+                "id"
+            ],
+            "reason": "Tag -- the EPANET field name, the ordinary loanword in German and Indonesian."
         },
         "lpn_field_text_align_center": {
             "category": "cognate",
@@ -359,6 +424,39 @@
                 "fr"
             ],
             "reason": "Coefficient -- the correct French word is the English word. Tom, 2026-09-08, on the fr agent disambiguating it to 'Coefficient k' to clear the identical-to-English gate: 'That is the tail wagging the dog. The right answer is to add a standard comment flag to the French.' A gate that makes a translator write worse French than French has is a gate mis-set, not a translation problem."
+        },
+        "lpn_full_col_id": {
+            "category": "symbol",
+            "languages": [
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "tr",
+                "uk",
+                "ur",
+                "zh"
+            ],
+            "reason": "ID -- identifier column heading, used as a symbol."
+        },
+        "lpn_full_col_type": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Type -- the French word is Type."
         },
         "lpn_geomap": {
             "category": "symbol",
@@ -387,6 +485,11 @@
             "languages": "*",
             "reason": "Y -- same as lpn_library_curve_x. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
         },
+        "lpn_library_import_count": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "{name} ({count}) -- two placeholders and punctuation, nothing to translate (sprint 2026-09-28-delta, 25 of 26 translators)."
+        },
         "lpn_menu_edit": {
             "category": "cognate",
             "languages": [
@@ -403,6 +506,13 @@
             "category": "acronym",
             "languages": "*",
             "reason": "LIFO plug flow -- same as lpn_mixing_fifo."
+        },
+        "lpn_msglog_name": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Messages -- the French word is Messages."
         },
         "lpn_new_text": {
             "category": "cognate",
@@ -434,6 +544,44 @@
             "category": "cognate",
             "languages": "*",
             "reason": "'Point 3' -- see lpn_pump_point1."
+        },
+        "lpn_quality_unit_ug": {
+            "category": "symbol",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "de",
+                "es",
+                "fa",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "ur",
+                "zh"
+            ],
+            "reason": "µg/L -- SI unit symbol; uk writes мкг/л, so this is per language."
+        },
+        "lpn_reports_status": {
+            "category": "loanword",
+            "languages": [
+                "de",
+                "id"
+            ],
+            "reason": "Status -- the ordinary word in German and Indonesian."
         },
         "lpn_result_concentration": {
             "category": "cognate",
@@ -504,6 +652,13 @@
             ],
             "reason": "Concentration -- EPANET's CONCEN source type. Same French collision as lpn_result_concentration, same forced substitution."
         },
+        "lpn_survey_sev_error": {
+            "category": "cognate",
+            "languages": [
+                "es"
+            ],
+            "reason": "error -- the Spanish word is error."
+        },
         "lpn_time_pause": {
             "category": "cognate",
             "languages": "*",
@@ -551,6 +706,15 @@
                 "it"
             ],
             "reason": "File -- the File menu label. Scoped to Italian, whose Task 251 agent chose it deliberately and where it is the standard menu label. Add a language only on the same evidence."
+        },
+        "lpn_units_usft": {
+            "category": "abbreviation",
+            "languages": [
+                "am",
+                "bn",
+                "cs"
+            ],
+            "reason": "US survey ft -- a legally defined unit name kept in English where no local term exists (friction, sprint 2026-09-28-delta)."
         },
         "lpn_valve_type_tcv": {
             "category": "loanword",

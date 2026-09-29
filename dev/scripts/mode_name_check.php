@@ -40,15 +40,82 @@ function ec_mode_values(string $path): array {
     return $out;
 }
 
+/* WHICH ENGLISH STRINGS NAME A MODE. Only `lpn_` keys: the two modes exist in the looped-network
+ * editor and nowhere else, so 'local' in Hazen-Williams or Irrigation Pressure prose is not a mode.
+ * And the suite's loss term "Minor (local) loss" (CLAUDE.md, Labels) is cut out before the test,
+ * because its 'local' is the loss, not the grid: sprint 2026-09-28-delta translated the anchors in
+ * every language for the first time and that one phrase turned into 70 false findings. */
+function ec_mode_names_mode(string $key, string $value, array $mode): bool {
+    if (strpos($key, 'lpn_') !== 0) { return false; }
+    $value = preg_replace('/\bminor \(local\)/i', '', $value);
+    return $mode['regex'] ? (bool)preg_match($mode['regex'], $value) : (strpos($value, $mode['needle']) !== false);
+}
+
+/* DOES A TRANSLATED STRING USE THE ANCHOR'S NAME. Same ROOT, not same characters: a case ending,
+ * a gender, a plural, a class concord or a negation is not a second name (bg `географски привързана`
+ * names a project `географски привързан`; sw `za ndani` becomes `ya ndani`). So every word of the
+ * anchor longer than three characters must appear with at most its last one (5-6 characters), two
+ * (7-9) or three (10+) characters trimmed (cs `georeferencovaný` / `Bez georeferencování`); words of three characters or fewer are concords and particles and
+ * are skipped, unless the anchor has nothing else (`xy`). A different word for the same idea still
+ * fails, which is the defect: am `ጂኦሪፈረንስ` (transliterated) against the anchor's `ጂዮ-ማጣቀሻ`. */
+function ec_mode_stems(string $anchor): array {
+    $words = preg_split('/\s+/u', trim($anchor), -1, PREG_SPLIT_NO_EMPTY);
+    $stems = array();
+    foreach ($words as $w) {
+        $n = mb_strlen($w, 'UTF-8');
+        if ($n <= 3) { continue; }
+        $cut = $n >= 10 ? 3 : ($n >= 7 ? 2 : ($n >= 5 ? 1 : 0));
+        $stems[] = mb_substr($w, 0, $n - $cut, 'UTF-8');
+    }
+    return $stems ? $stems : $words;
+}
+function ec_mode_uses_anchor(string $value, string $anchor): bool {
+    /* CASE-INSENSITIVE, because a capital letter at the start of a sentence is not a second
+     * name. Turkish's `Coğrafi referanslı` opens a sentence capitalised and closes one in lower case. */
+    foreach (ec_mode_stems($anchor) as $stem) {
+        if (mb_stripos($value, $stem, 0, 'UTF-8') === false) { return false; }
+    }
+    return true;
+}
+
+if (in_array('--selftest', $argv, true)) {
+    $geo = array('needle' => 'georeferenced', 'regex' => null);
+    $xy  = array('needle' => 'local', 'regex' => '/\blocal\b/i');
+    $cases = array(
+        // [what, got, want]
+        array('minor (local) loss is not the mode', ec_mode_names_mode('lpn_field_km', 'Minor (local) loss coefficient, k', $xy), false),
+        array('non-lpn key is not the mode',        ec_mode_names_mode('ip_notes_2_def', 'the actual local pressure', $xy), false),
+        array('local schematic names the mode',     ec_mode_names_mode('lpn_new_coordsys_local', 'Local, schematic, or custom', $xy), true),
+        array('mode word beside a minor loss',      ec_mode_names_mode('lpn_x', 'Minor (local) loss in a local project', $xy), true),
+        array('not georeferenced names the mode',   ec_mode_names_mode('lpn_crs_none', 'Not georeferenced', $geo), true),
+        array('locally is not local',               ec_mode_names_mode('lpn_x', 'stored locally', $xy), false),
+        array('bg gender ending',                   ec_mode_uses_anchor('Този проект вече е географски привързан', 'географски привързана'), true),
+        array('cs noun of the same root',           ec_mode_uses_anchor('Bez georeferencování', 'georeferencovaný'), true),
+        array('sw concord',                         ec_mode_uses_anchor('Marejeleo (ya ndani)', 'za ndani'), true),
+        array('tr sentence case',                   ec_mode_uses_anchor('Coğrafi referanslı değil', 'coğrafi referanslı'), true),
+        array('am two roots',                       ec_mode_uses_anchor('ጂኦሪፈረንስ ያልተደረገ', 'ጂዮ-ማጣቀሻ ያለው'), false),
+        array('hi transliteration vs native',       ec_mode_uses_anchor('जियोरेफ़रेंस नहीं किया गया', 'भू-संदर्भित'), false),
+        array('xy abbreviation vs a word',          ec_mode_uses_anchor('Lokalno, shematsko', 'xy'), false),
+        array('a whole different word',             ec_mode_uses_anchor('Без географической привязки', 'привязан к местности'), false),
+    );
+    $bad = 0;
+    foreach ($cases as $c) {
+        if ($c[1] !== $c[2]) { $bad++; echo "FAIL  {$c[0]}\n"; }
+    }
+    echo $bad ? "mode_name_check selftest: $bad of " . count($cases) . " failed\n"
+              : 'mode_name_check selftest: ' . count($cases) . " cases pass\n";
+    exit($bad ? 1 : 0);
+}
+
 $en = ec_mode_values($root . '/lib/lang.ec.en.php');
 if (!isset($en['lpn_geomap'], $en['lpn_xymap'])) {
     fwrite(STDERR, "lpn_geomap / lpn_xymap missing from the English file.\n");
     exit(1);
 }
 
-/* THE KEY LIST IS DERIVED, NEVER TYPED. Any English string containing the mode's English name is a
- * string that names the mode. The local noun is matched on a word boundary so it cannot hit a stray
- * longer word. The two anchor keys are excluded: they ARE the rendering. */
+/* THE KEY LIST IS DERIVED, NEVER TYPED. Any `lpn_` English string containing the mode's English
+ * name is a string that names the mode. The local noun is matched on a word boundary so it cannot
+ * hit a stray longer word. The two anchor keys are excluded: they ARE the rendering. */
 $modes = array(
     'geo' => array('anchor' => 'lpn_geomap', 'needle' => $en['lpn_geomap'], 'regex' => null),
     // On a word boundary, case-insensitive, so the short noun ('local') cannot hit 'locally' or
@@ -60,8 +127,7 @@ foreach ($modes as $id => &$m) {
     $m['keys'] = array();
     foreach ($en as $k => $v) {
         if ($k === $modes['geo']['anchor'] || $k === $modes['xy']['anchor']) { continue; }
-        $hit = $m['regex'] ? preg_match($m['regex'], $v) : (strpos($v, $m['needle']) !== false);
-        if ($hit) { $m['keys'][] = $k; }
+        if (ec_mode_names_mode($k, $v, $m)) { $m['keys'][] = $k; }
     }
 }
 unset($m);
@@ -80,11 +146,7 @@ foreach ($langs as $lang => $path) {
         if ($own === null || $own === '') { continue; }   // not translated yet is not a disagreement
         foreach ($m['keys'] as $k) {
             if (!isset($vals[$k]) || $vals[$k] === '') { continue; }   // absent falls back to English
-            /* CASE-INSENSITIVE, because a capital letter at the start of a sentence is not a second
-             * name. Turkish's `enlem/boylam` opens `Enlem/boylama dönüştür…` in sentence case and
-             * takes a dative suffix; the suffix is a substring match already, the capital was not,
-             * and reporting that as one mode with two names sent a reader to rewrite good Turkish. */
-            if (mb_stripos($vals[$k], $own, 0, 'UTF-8') !== false) { continue; }
+            if (ec_mode_uses_anchor($vals[$k], $own)) { continue; }
             /* A language that keeps the English name gets the English spelling everywhere, which the
              * test above already accepts. This only fires when the anchor and the string disagree. */
             $findings[] = array($lang, $k, $own, $vals[$k]);
@@ -104,7 +166,7 @@ foreach ($findings as $f) {
     echo "      but this string says:         " . mb_substr($f[3], 0, 100) . "\n";
 }
 echo "\nWhatever a language calls a project mode in lpn_geomap / lpn_xymap, every string that names\n";
-echo "the mode must use that same rendering. Either is fine -- 10 of 26 translate it, 16 keep it --\n";
-echo "but a reader must meet ONE name. Fix the string, or fix the anchor if the anchor is the wrong\n";
+echo "the mode must use that same root word (endings may differ). Translated or kept in English, a\n";
+echo "reader must meet ONE name. Fix the string, or fix the anchor if the anchor is the wrong\n";
 echo "one. This list is derived from the English, so a new mode-naming string joins it by itself.\n";
 exit($strict ? 1 : 0);

@@ -3772,8 +3772,8 @@
                 "reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.",
                 "assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent."
             ],
-            "context": "A project is in one of two modes. A lat/lon project has geographic coordinates and can draw a street map behind it; an XY project is drawn on a plain local grid with no place on the Earth. The names appear in lpn_geomap, lpn_xymap and in the prose of lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map and the four New project rows.",
-            "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the names are coined and nothing marked them as coined, so some agents would translate them and others keep them. A per-label synonym would have to be repeated across nine strings; one concept pointer is the right shape.",
+            "context": "A project is in one of two modes, named in lpn_geomap ('georeferenced') and lpn_xymap ('local'). A georeferenced project has geographic coordinates and can draw a street map behind it; a local project is drawn on a plain grid with no place on the Earth. Older prose called them 'lat/lon' and 'XY'; those are the retired names, not the anchors. The names appear in lpn_geomap, lpn_xymap and in the prose of lpn_georef_*, lpn_crs_none, lpn_new_coordsys_local(_tip) and the New project rows.",
+            "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the names are coined and nothing marked them as coined, so some agents would translate them and others keep them. A per-label synonym would have to be repeated across nine strings; one concept pointer is the right shape. [2026-09-28, sprint 2026-09-28-delta] The anchors were translated for the first time in all 26 languages. Five agents (it, ru, zh, fa, hr) wrote 'lat/lon' or 'xy' because this entry still named the modes that way; corrected here and in the lang files (mode_name_check.php now derives only from lpn_ keys and matches by root).",
             "translations": [],
             "source": "sprint 438-wave0, 2026-08-19"
         },
@@ -4014,6 +4014,45 @@
             "translation_notes": "[2026-09-28, Wave 0 of the 2026-09-28-delta sprint] Created from a Wave 0 finding on lpn_settings_sec_symbology. No renderings recorded yet; the sprint's write-back fills them.",
             "translations": {},
             "source": "wave0"
+        },
+        "customer": {
+            "term": "customer",
+            "symbol": "",
+            "avoid": [
+                "any word for a METER or counting device; the interface says Customer, never Meter (Tom's ruling).",
+                "a word that also means the app's own USER (the person at the keyboard), where the file already uses it for that."
+            ],
+            "context": "A water customer served by a pipe: a symbol placed where the customer is, joined to the pipe or node that serves it. Its demand is added to the junction at the near end of that pipe. One customer may stand for several SERVICES (individual connections); keep the two words distinct.",
+            "translation_notes": "[2026-09-28, sprint 2026-09-28-delta] First translated in all 26 languages. Renderings below are what the files ship. Utility 'subscriber' words were chosen in ar, bg, fa, ro, ru, uk (مشترك, Абонат, مشترک, Abonat, Абонент, Абонент); hr Korisnik and zh 用户 also mean 'user' generally but are the utilities' own words for a water customer, and neither file uses them for the app's user.",
+            "translations": {
+                "am": "ደንበኛ",
+                "ar": "مشترك",
+                "bg": "Абонат",
+                "bn": "গ্রাহক",
+                "cs": "Odběratel",
+                "de": "Kunde",
+                "es": "Cliente",
+                "fa": "مشترک",
+                "fr": "Client",
+                "he": "לקוח",
+                "hi": "ग्राहक",
+                "hr": "Korisnik",
+                "id": "Pelanggan",
+                "it": "Cliente",
+                "km": "អតិថិជន",
+                "my": "ဖောက်သည်",
+                "ps": "مشتری",
+                "pt": "Cliente",
+                "ro": "Abonat",
+                "ru": "Абонент",
+                "sr": "Потрошач",
+                "sw": "Mteja",
+                "tr": "Müşteri",
+                "uk": "Абонент",
+                "ur": "گاہک",
+                "zh": "用户"
+            },
+            "source": "sprint 2026-09-28-delta"
         }
     }
 }

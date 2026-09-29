@@ -121,6 +121,186 @@
       ],
       "disposition": "english",
       "resolution": "Typo fixed: \"coefficent\" to \"coefficient\"."
+    },
+    {
+      "key": "lpn_mapgeo_dial_help",
+      "source": "translator",
+      "lang": "es,ro,fr,fa,he",
+      "complaint": "'The middle of each bar is the fit step 1 left' does not parse; five translators guessed at it independently.",
+      "readings": [
+        "the middle of each bar is where step 1 (Place approximately) left the size and rotation, so 1 and 0 mean no change",
+        "a garbled fragment with some other meaning"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Proposed English: 'The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change.' Waits for Tom's ruling; the five translations follow the first reading."
+    },
+    {
+      "key": "lpn_lock_requested",
+      "source": "translator",
+      "lang": "es,id,ps",
+      "complaint": "The prose names 'File, Close project', but the menu row (lpn_file_close) says 'Close'. Translators used the real label.",
+      "readings": [
+        "File, Close (the real menu row)",
+        "a 'Close project' control that does not exist"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Proposed English: '...save your work and use File, Close to hand it over.' Waits for Tom's ruling."
+    },
+    {
+      "key": "lpn_settings_symbol_cap_mid",
+      "source": "translator",
+      "lang": "it,he,ur,my,am",
+      "complaint": "Three fragments around two number inputs force English word order; SOV and RTL languages cannot assemble a natural sentence.",
+      "readings": [
+        "translate each fragment in English order",
+        "one sentence with {n} and {p} placeholders"
+      ],
+      "disposition": "english",
+      "resolution": "Not a wording defect: a construction defect. Roadmap task to replace the three keys with one string holding {n} and {p}. Hebrew was given a non-blank order ('...של הצינורות')."
+    },
+    {
+      "key": "lpn_geomap",
+      "source": "translator",
+      "lang": "ru",
+      "complaint": "The ru file already writes 'xy' untranslated for the local mode in older sentences while the georeferenced mode is a phrase; the translator matched that asymmetry.",
+      "readings": [
+        "xy / широта/долгота (matches the file)",
+        "an invented symmetric pair"
+      ],
+      "disposition": "intent",
+      "resolution": "Matches mode_name_check's consistency rule; kept."
+    },
+    {
+      "key": "lpn_units_usft",
+      "source": "translator",
+      "lang": "am,bn,cs",
+      "complaint": "The correct word in this language is the English one ('US survey ft'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_convas_label_col",
+      "source": "translator",
+      "lang": "de",
+      "complaint": "The correct word in this language is the English one ('Suffix'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_reports_status",
+      "source": "translator",
+      "lang": "de,id",
+      "complaint": "The correct word in this language is the English one ('Status'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_field_tag",
+      "source": "translator",
+      "lang": "id",
+      "complaint": "The correct word in this language is the English one ('Tag'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_survey_sev_error",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "The correct word in this language is the English one ('error'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_msglog_name",
+      "source": "translator",
+      "lang": "fr",
+      "complaint": "The correct word in this language is the English one ('Messages'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_field_desc",
+      "source": "translator",
+      "lang": "fr",
+      "complaint": "The correct word in this language is the English one ('Description'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_full_col_type",
+      "source": "translator",
+      "lang": "fr",
+      "complaint": "The correct word in this language is the English one ('Type'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_xymap",
+      "source": "translator",
+      "lang": "fr",
+      "complaint": "The correct word in this language is the English one ('local'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_library_import_count",
+      "source": "translator",
+      "lang": "*",
+      "complaint": "The correct word in this language is the English one ('{name} ({count})'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
+    },
+    {
+      "key": "lpn_field_northing_abbr",
+      "source": "translator",
+      "lang": "hi,ur",
+      "complaint": "The correct word in this language is the English one ('N'), which trips identical-to-English.",
+      "readings": [
+        "keep it",
+        "invent a worse word"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Correct as written; exempted per language in translation_exempt_keys.json at sprint close."
     }
   ]
 }
