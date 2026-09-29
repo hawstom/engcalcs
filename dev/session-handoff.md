@@ -8,9 +8,9 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/label-placer`
-  (the seam; merges with the chosen placer) and `feat/label-gang-search` (bench only; delete once a
-  placer lands). Builder branches `feat/label-placer-a`..`-d` never merge on their own.
+- **Protected branches alive** (need Tom's all-clear; `feature_freeze` is OFF): `feat/table-tab-keys`
+  (8136), `feat/frequency-plot` (8137), `feat/label-placer` (the seam; merges with the chosen placer)
+  and `feat/label-gang-search` (bench only; delete once a placer lands). Builder branches `feat/label-placer-a`..`-d` never merge on their own.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -95,67 +95,70 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-29 (small hours)
+## STATE — 2026-09-29 (morning)
 
-### Master = 0190cad2, pushed. Production = 9c71d54f (Tom pulled 2026-09-28 morning)
+### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28 morning)
 
-a912bcfe was pushed first for his table-editing video. On top of it: `fix/time-series-switch` (Time
-Series blank after a project switch and not redrawn on arrival; a Task 680 defect from 09-16, not
-a regression), `chore/rulings-0928` and `chore/sprint-0928-delta` (313 lpn_ keys in 26 languages;
-the sprint stays OPEN in friction_check until his two English rulings below).
+On master since his last pull, all defect/chore tracks merged on green: the four 09-29 all-clear
+branches (fill-handle, table-width, selection-set incl. fire-flow column sorting 5fe5c2a7 and Task
+742, tables-legend), Time Series fixes, `fix/start-fresh-consent` (Start fresh now also erases
+`ec_consent`, `ec_blang`, `ec_seen` through `consent.php`'s `ec_wipe`, so the banner returns --
+**a change to what the wipe erases; Tom was told**), `fix/lock-disclosure` (Ask prompt, privacy page
+rows, inventory: Ask's initials are kept in the server lock record, never in the browser -- his
+"Go ahead and make those disclosure fixes", 09-29), and sprint `2026-09-29-delta` (16 keys + the
+Ask prompt in 26 languages). Roadmap: Tasks 739-742 unspliced from the header; 742 closed.
+**Remind him to try drag-to-fill on a phone after he pulls** (his ask).
 
-Merged 2026-09-29 on his "Done. Close, merge, and delete branch" for all four: `feat/fill-handle`
-(8131), `feat/table-width` (8124: KLmax 0.8 with ceil, word cap 7, Vertices "(Lat/Lon|Lat/Lon|…)",
-"No ▾" clipping accepted), `feat/selection-set` (8135: Tables Select/Unselect on map, go-to keeps the
-selection, Shift+click in Find, row bars, fire-flow links and sorting, Find always names the kind,
-Task 742 design check None/All/Selected, "Zoom in to see labels" notes gone), `fix/tables-legend`
-(8134: paste round-trip incl. Text and Customers creating rows, legend top-left default, tank
-diameter in length units, scenario switch keeps Properties, Credits follows the brand, Import
-libraries brings patterns/controls/rules, draggable non-modal Notes box). He wants master for a
-**table-editing video**. **Remind him to try drag-to-fill on a phone after he pulls** (his ask).
-Deleted key: `lpn_ff_design_nodes`. New storage: the Notes box position (localStorage, window
-furniture; in the inventory) -- he was told.
+### Awaiting his browser pass (protected; merge on his all-clear only)
 
-### Label placement (Task 539)
+- `feat/table-tab-keys`, port 8136 (Task 690): Ctrl+Shift+PageDown/PageUp between tables, no wrap,
+  same column else ID, row clamped, a half-typed cell saved first, works from EMPTY tables (Perry's
+  blocker, fixed 065d7e81). Adds one English row to `lpn_notes_7_def`, which fails `lang markup
+  matches English` in 26 languages until translated after his ruling; that and payload freshness
+  are its only failures.
+- `feat/frequency-plot`, port 8137 (Task 600 slice 1): bottom-pane Frequency tab, EPANET's curve
+  (Fgraph.pas: point i at 100*i/n), Junctions/Pipes, follows the run frame, snapshot kept with
+  Recalculate off. Perry: no blockers. 9 new `lpn_freq_*` keys need his English ruling. No Water
+  menu row because Task 640's Graphs submenu does not exist. Unverified: reaching the bottom pane
+  on a phone (the toolbar hides it at phone width; pre-existing).
+- Both ports need his Apache reload (commands at the foot).
+- Label placement: pipe 185 is SETTLED -- no room aligned (needs 94.8 px, 57 px free), so level is
+  correct under R14 in C and D; Perry's probe was wrong. Fixed probe committed on feat/label-placer
+  (5508e0a1, `dev/lpn-spike/label-bench/probe-r14.js`). Next: his side-by-side of C (8132) and D
+  (8133), C first.
 
-Round 4 on 8132 (C, `?placer=c`) and 8133 (D, `?placer=d`), both merged with seam a74b3558 (view
-stops above the footer; `scene.furniture`). Bench: both 0 breaks, R13 (setting off) 0 turned; close
-zoom level-with-room C 6/74, D 6/43; along C 531, D 642; values C 50%, D 54%; cost C 922, D 419.
-Perry r4b (after the seam fix, 09-29): C and D clean on everything measured (alignment with room,
-off->level, 0 letter overlaps, nothing under furniture, blank 0.13-0.5 s, 0 page errors) EXCEPT one
-open disagreement: pipe 185 (129.7 deg) labelled level at Novato hard zoom in both. Perry calls it
-an alignment defect; the seam agent measured the label ~95 px beside ~76 px of visible pipe, which
-R14's "values outrank alignment" allows. **First job next session: measure 185 in Perry's exact
-view (his probe, .../scratchpad/labels/probe-r4.js; his window is taller than the seam agent's):
-aligned label length vs visible pipe length and free room. Level-with-no-room is correct; fix the
-probe. Level-with-room is a defect; find whose.** Then his side-by-side (Perry: show C first). His rulings this round (rules Part A/B): R14 "values outrank alignment; alignment
-required wherever the same rows fit aligned"; blank time "about a second"; rough-then-tidy (his hint
-(b)) measured by D, not shipped: the seam draws only what place() returns. Interviews with named
-strategies: `dev/label-placer-interview-{a,b,c,d}.md`; paper notes `dev/paper-notes-label-placement.md`
-(on the rulings branch). Mary: showing all labels is an outlier, not a known impossibility; citation
-trace (Kakoulis-Tollis 2006, Been et al.) before any novelty claim. Task 741: the infinite map.
+### Awaiting his words
 
-### Awaiting him
+- Three English rulings hold sprint 2026-09-29-delta open in friction_check (not in check_all):
+  `lpn_goto_on_map` "Go to on map" (proposed "Show on map"; ro/pt/id calqued it ungrammatically),
+  `lpn_ff_design_no_selection` "...or set All" (no option is called All; proposed "...or choose
+  All other junctions and all pipes."), `lpn_find_shift_hint` (proposed "Shift+click to add or
+  remove one."). After his ruling, retranslate those keys in 26 and baseline them.
+- Review queue: R-338 and R-351 are `[?]` -- does round 4 (C/D) answer them.
+- Lock ID from a copied file (Explorer copy keeps the docId, so two files share one lock): offered
+  as Task at 50, not added.
 
-- 2 English rulings closing the sprint: `lpn_mapgeo_dial_help` (proposed "The middle of each bar
-  keeps the fit from step 1, so 1 and 0 mean no change.") and `lpn_lock_requested` ("File, Close
-  project" -> "File, Close"). Then friction_check passes and the sprint closes.
-- ~30 new English keys from the merges (dev/new-english-keys.md) for the next sprint.
-- Task 737 first piece: the per-language collision check (41 today: junction/node in 6 languages,
-  minor/junction loss, max allowable head vs pressure rating).
-- "Zoom in to see labels" is gone from the examples; nothing else of R-174 changed.
-- EPANET++: pages now revalidate (repo 2ff1c58, pushed); he must pull it on the server.
-- "Press Calculate to run the simulation" names a button hidden while Recalculate automatically is
-  on; wording is his.
-- The browser-pass `time` spec has 4 failures on master too (not in check_all); look separately.
-- Retired ports 8124/8131/8134/8135 need his Apache reload (commands at the foot).
+### FIRST JOB NEXT SESSION: the stale translations (drift audit, 09-29)
 
-- `dev/tom-review-queue.md` still lists R-366/R-367/R-075 and the round-2 placer items as open;
-  all were answered in conversation 2026-09-28/29. Clear them against this file.
+`detect_english_drift.php` flags 184 keys against a 09-06 baseline. Audited
+(`dev/drift-audit-2026-09-29/`): **8 keys are stale in all 26 languages and are real** --
+`consent_body` (the consent banner; the translations never say "cookie" nor "records nothing you
+type"), `about_body_html` (still says Bitbucket), `install_firefox_body`, `lpn_main_title`,
+`lpn_units_length`, `lpn_result_head_tip`, `bpn_demand_tip`, `mtc_d50_mra`. 117 lpn_ keys are stale
+in SOME languages (per-key lists in `combined_full.json`); 52 are fresh; 7 are false positives
+(apostrophe or reverted edits: re-baseline each with `--update=<key> --reason=...`). Then
+`--update --except=$(cat dev/drift-audit-2026-09-29/holdback.txt)` baselines the 52, and a resync
+sprint for the 8 (consent first), then the 117 by language, closes it.
 
-- Unverified: a second File > Open in one browser session showed the picker but never opened the
-  file (seen by the fix/time-series-open agent in headless Chrome). Reproduce before believing it.
-- Time Series fixed twice on 09-29 (switch: ff488a8d; open + waiting message: 2c1814df).
+### Traps met 2026-09-29
+
+- **Worktrees had no `dev/browser-pass/node_modules`**, so 10 browser harnesses failed "playwright-core
+  is not installed" and read like defects. Symlink the main checkout's into each new worktree.
+- **Perry ran `git stash pop`** despite the rule and pulled another session's stash into a worktree;
+  a translator edited the main checkout by mistake and reverted it. Put "never stash, never touch the
+  main checkout" in EVERY brief, reviewers included.
+- **`/engcalcs/` absolute paths work on every host**; only RELATIVE ones break under `/app/`. Do
+  not "fix" an absolute `/engcalcs/` path for librewaternet.org.
 
 ### Traps met 2026-09-28/29
 
