@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 16 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 25 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (16, all ruled)
+## lpn_  (25, 9 to read @@ NEEDS RULING)
 
 - **`lpn_ff_design_no_selection`**
   > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
@@ -45,6 +45,33 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_find_shift_hint`**
   > Shift+click to add/remove toggle.
   _Ruled OK 2026-09-29._
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  @@ NEEDS RULING
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  @@ NEEDS RULING
+- **`lpn_freq_menu`**
+  > Frequency
+  @@ NEEDS RULING
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  @@ NEEDS RULING
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  @@ NEEDS RULING
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  @@ NEEDS RULING
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  @@ NEEDS RULING
+- **`lpn_freq_tip`**
+  > Graph how one value is spread over all junctions or all pipes, at the time the map is showing.
+  @@ NEEDS RULING
+- **`lpn_freq_title`**
+  > Distribution of values
+  @@ NEEDS RULING
 - **`lpn_goto_on_map`**
   > Go to on map
   _Ruled OK 2026-09-29._
@@ -80,7 +107,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 6 unmerged branch(es).
+**0 still to read**, of 3 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -90,6 +117,10 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/roadmap-0929 (`79e3b027`) — adds no English strings
+
+### feat/frequency-plot (`618180ba`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -103,7 +134,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`a74b3558`) — adds no English strings
+### feat/label-placer (`5508e0a1`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -112,3 +143,7 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/table-tab-keys (`b37ec130`) — adds no English strings
+
+### fix/start-fresh-consent (`5c61717f`) — adds no English strings

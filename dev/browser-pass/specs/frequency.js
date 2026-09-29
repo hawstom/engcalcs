@@ -23,7 +23,7 @@ exports.run = async function ({ browser, report }) {
 				text: chart ? chart.textContent : ''
 			};
 		});
-		await a.openExampleCard('EPANET Net1 plus rule-based controls');
+		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.toolbarClick('Bottom panel');
 		await a.settle(500);
 		await a.page.click('#lpn_pane_tab_frequency');
