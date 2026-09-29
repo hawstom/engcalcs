@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 16 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,66 +21,95 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (9 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
 
-## lpn_  (16, all ruled)
+### from sprint 2026-09-29-delta
 
 - **`lpn_ff_design_no_selection`**
   > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
-  _Ruled OK 2026-09-29._
-- **`lpn_ff_design_selected`**
-  > The selected junctions and their pipes
-  _Ruled OK 2026-09-29._
-- **`lpn_field_lat_abbr`**
-  > Lat
-  _Ruled 2026-09-28: Tom, 2026-09-28: "Vertices column heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'"_
-- **`lpn_field_lon_abbr`**
-  > Lon
-  _Ruled 2026-09-28: Tom, 2026-09-28: "Vertices column heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'"_
-- **`lpn_field_text_anchor`**
-  > Attached to
-  _Ruled OK 2026-09-29._
+  *The finding:* 'set All' names no option; the real option label is 'All other junctions and all pipes' (lpn_ff_design_all).
+  1. quoted short 'All' (chosen)
+  2. spell out the full option label
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "or set All" names no control: the option reads "All other junctions and all pipes" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare "All" and the full option label. Proposed English, for Tom: "The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctio...
+  @@ NEEDS RULING
+- **`lpn_ff_design_no_selection`**
+  > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
+  *The finding:* 'All' does not quote the real option label 'All other junctions and all pipes'.
+  1. generic 'set to all' (chosen)
+  2. quote the full option label
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "or set All" names no control: the option reads "All other junctions and all pipes" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare "All" and the full option label. Proposed English, for Tom: "The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctio...
+  @@ NEEDS RULING
+- **`lpn_ff_design_no_selection`**
+  > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
+  *The finding:* 'set All' is shorthand for the option labelled 'All other junctions and all pipes'.
+  1. short 'All'
+  2. spell out the full option label
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "or set All" names no control: the option reads "All other junctions and all pipes" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare "All" and the full option label. Proposed English, for Tom: "The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctio...
+  @@ NEEDS RULING
+- **`lpn_ff_design_no_selection`**
+  > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
+  *The finding:* "set All" is shorthand for the long option label; Chinese has no one-word form that identifies it.
+  1. quote the full option label (chosen)
+  2. coin a short 全部 that may not match the dropdown
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "or set All" names no control: the option reads "All other junctions and all pipes" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare "All" and the full option label. Proposed English, for Tom: "The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctio...
+  @@ NEEDS RULING
+- **`lpn_ff_design_no_selection`**
+  > The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.
+  *The finding:* No control is labelled just All; the real option is All other junctions and all pipes.
+  1. spell out the full option label (chosen, as pt)
+  2. short word for All
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "or set All" names no control: the option reads "All other junctions and all pipes" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare "All" and the full option label. Proposed English, for Tom: "The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctio...
+  @@ NEEDS RULING
 - **`lpn_find_shift_hint`**
   > Shift+click to add/remove toggle.
-  _Ruled OK 2026-09-29._
+  *The finding:* "Shift+click to add/remove toggle." has odd grammar: a noun phrase dangling after the infinitive.
+  1. Shift+click toggles whether a click adds or removes
+  2. Shift+click adds, and some other gesture removes
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "Shift+click to add/remove toggle." leaves "toggle" dangling after the infinitive (it). Most languages rendered "Shift+click to add or remove", which is what the gesture does. Proposed English, for Tom: "Shift+click to add or remove one."
+  @@ NEEDS RULING
 - **`lpn_goto_on_map`**
   > Go to on map
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_customer_no_position`**
-  > Row {row}: a new Customer needs both {first} and {second}.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_customer_node_no_pipe`**
-  > Row {row}: node {id} has no pipe for a Customer to attach to.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_no_anchor`**
-  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_no_customer_node`**
-  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_no_customer_ref`**
-  > Row {row}: a new Customer needs a connected pipe or node.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_no_pipe`**
-  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_paste_text_no_position`**
-  > Row {row}: a new Text needs both {first} and {second}.
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_select_on_map`**
-  > Select on map
-  _Ruled OK 2026-09-29._
-- **`lpn_pane_unselect_on_map`**
-  > Unselect on map
-  _Ruled OK 2026-09-29._
+  *The finding:* 'Go to on map' has no object; Arabic wants one.
+  1. bare verbal noun parallel to Select/Unselect on map (chosen)
+  2. add an implied pronoun object, whose gender may not fit every row
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "Go to on map" has no object for "to". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote "Show on map", while ro ("Mergi la pe hartă"), pt ("Ir para no mapa") and id ("Menuju di peta") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip "Zoom & sele...
+  @@ NEEDS RULING
+- **`lpn_goto_on_map`**
+  > Go to on map
+  *The finding:* "Go to on map" has no object (go to what?).
+  1. go to it on the map (chosen)
+  2. a literal Go, on map, with no object
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "Go to on map" has no object for "to". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote "Show on map", while ro ("Mergi la pe hartă"), pt ("Ir para no mapa") and id ("Menuju di peta") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip "Zoom & sele...
+  @@ NEEDS RULING
+- **`lpn_goto_on_map`**
+  > Go to on map
+  *The finding:* 'Go to on map' has no object, and sits beside lpn_pane_goto_tip ('Zoom & select') for what may be the same button.
+  1. show this row's element on the map (chosen)
+  2. a duplicate of 'Zoom & select'
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* "Go to on map" has no object for "to". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote "Show on map", while ro ("Mergi la pe hartă"), pt ("Ir para no mapa") and id ("Menuju di peta") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip "Zoom & sele...
+  @@ NEEDS RULING
+
+None on master. Every English key here is present in at least one other language.
 
 ---
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 6 unmerged branch(es).
+**9 still to read**, of 12 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -90,6 +119,38 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/roadmap-0929 (`0d83b01d`) — adds no English strings
+
+### feat/frequency-plot (`c74382c6`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  @@ NEEDS RULING
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  @@ NEEDS RULING
+- **`lpn_freq_menu`**
+  > Frequency
+  @@ NEEDS RULING
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  @@ NEEDS RULING
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  @@ NEEDS RULING
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  @@ NEEDS RULING
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  @@ NEEDS RULING
+- **`lpn_freq_tip`**
+  > Graph how one value is spread over all junctions or all pipes, at the time the map is showing.
+  @@ NEEDS RULING
+- **`lpn_freq_title`**
+  > Distribution of values
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -103,7 +164,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`a74b3558`) — adds no English strings
+### feat/label-placer (`5508e0a1`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -112,3 +173,9 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/table-tab-keys (`065d7e81`) — adds no English strings
+
+### fix/lock-disclosure (`8effc7cb`) — adds no English strings
+
+### fix/start-fresh-consent (`ef5a4c78`) — adds no English strings

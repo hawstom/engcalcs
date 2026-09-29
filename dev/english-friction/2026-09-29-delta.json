@@ -1,0 +1,199 @@
+{
+  "sprint": "2026-09-29-delta",
+  "description": "16 missing lpn_ keys (the 2026-09-29 merges: paste messages, select/unselect on map, Shift hint, Lat/Lon abbreviations, fire-flow Selected design check) plus one REPLACE-IN-PLACE resync, lpn_lock_ask_prompt, whose English was corrected 2026-09-29 (the initials are kept on the server, not in the browser). x 26 languages. Wave 0 reviewed nothing: all 17 keys carry Tom's ruling on their exact English (dev/english-key-rulings.json), and wave0_keyset.php excludes ruled keys.",
+  "entries": [
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "bn",
+      "complaint": "Bengali has no customary short form for Latitude/Longitude (unlike Lat/Lon or N/E); invented period-truncated forms.",
+      "readings": [
+        "invented truncations অক্ষা./দ্রাঘি. (chosen)",
+        "spell out অক্ষাংশ/দ্রাঘিমাংশ despite narrow column",
+        "keep Latin tokens as northing/easting keep N/E"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "ar",
+      "complaint": "No established Arabic GIS abbreviation for Lat/Lon; N/E siblings stay Latin in this file.",
+      "readings": [
+        "single Arabic letters ع/ط from the root words (chosen)",
+        "keep Lat/Lon in Latin script as es did"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_goto_on_map",
+      "source": "translator",
+      "lang": "ar",
+      "complaint": "'Go to on map' has no object; Arabic wants one.",
+      "readings": [
+        "bare verbal noun parallel to Select/Unselect on map (chosen)",
+        "add an implied pronoun object, whose gender may not fit every row"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+    },
+    {
+      "key": "lpn_find_shift_hint",
+      "source": "translator",
+      "lang": "it",
+      "complaint": "\"Shift+click to add/remove toggle.\" has odd grammar: a noun phrase dangling after the infinitive.",
+      "readings": [
+        "Shift+click toggles whether a click adds or removes",
+        "Shift+click adds, and some other gesture removes"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"Shift+click to add/remove toggle.\" leaves \"toggle\" dangling after the infinitive (it). Most languages rendered \"Shift+click to add or remove\", which is what the gesture does. Proposed English, for Tom: \"Shift+click to add or remove one.\""
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "fa",
+      "complaint": "No single-letter Persian form; ع is already Easting nearby.",
+      "readings": [
+        "short words عرض/طول (chosen)",
+        "invented single letter"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_ff_design_no_selection",
+      "source": "translator",
+      "lang": "hi",
+      "complaint": "'set All' names no option; the real option label is 'All other junctions and all pipes' (lpn_ff_design_all).",
+      "readings": [
+        "quoted short 'All' (chosen)",
+        "spell out the full option label"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "am",
+      "complaint": "Amharic latitude and longitude both begin with the same syllable, so native abbreviations would read identically.",
+      "readings": [
+        "keep Lat/Lon literally (chosen)",
+        "invent an ambiguous native abbreviation"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_goto_on_map",
+      "source": "translator",
+      "lang": "ps",
+      "complaint": "\"Go to on map\" has no object (go to what?).",
+      "readings": [
+        "go to it on the map (chosen)",
+        "a literal Go, on map, with no object"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "he",
+      "complaint": "No established single-letter Hebrew abbreviation for latitude/longitude.",
+      "readings": [
+        "drop 'קו' giving רוחב/אורך (chosen)",
+        "single letters ר/א, no precedent"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_ff_design_no_selection",
+      "source": "translator",
+      "lang": "he",
+      "complaint": "'All' does not quote the real option label 'All other junctions and all pipes'.",
+      "readings": [
+        "generic 'set to all' (chosen)",
+        "quote the full option label"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "cs",
+      "complaint": "No standard Czech short form for latitude/longitude in a narrow column; es kept Lat/Lon.",
+      "readings": [
+        "single initials Š/D, parallel to the file N/E style (chosen)",
+        "keep Lat/Lon unlocalized"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_field_lat_abbr",
+      "source": "translator",
+      "lang": "sr",
+      "complaint": "Latitude and longitude both begin with Географска, so one letter cannot tell them apart.",
+      "readings": [
+        "two-letter Гш/Гд (chosen)",
+        "φ/λ geodesy symbols"
+      ],
+      "disposition": "dismissed",
+      "resolution": "A narrow column heading with no cross-language convention to match. Each agent chose a form it could defend inside its own file (Latin Lat/Lon where the file keeps N/E in Latin; native initials or short words where the file localizes N/E; two letters where one letter could not tell the two apart). Consistency inside one language is the rule; uniformity across languages is not required. No English change."
+    },
+    {
+      "key": "lpn_goto_on_map",
+      "source": "translator",
+      "lang": "ru",
+      "complaint": "'Go to on map' has no object, and sits beside lpn_pane_goto_tip ('Zoom & select') for what may be the same button.",
+      "readings": [
+        "show this row's element on the map (chosen)",
+        "a duplicate of 'Zoom & select'"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+    },
+    {
+      "key": "lpn_ff_design_no_selection",
+      "source": "translator",
+      "lang": "ru",
+      "complaint": "'set All' is shorthand for the option labelled 'All other junctions and all pipes'.",
+      "readings": [
+        "short 'All'",
+        "spell out the full option label"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+    },
+    {
+      "key": "lpn_ff_design_no_selection",
+      "source": "translator",
+      "lang": "zh",
+      "complaint": "\"set All\" is shorthand for the long option label; Chinese has no one-word form that identifies it.",
+      "readings": [
+        "quote the full option label (chosen)",
+        "coin a short 全部 that may not match the dropdown"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+    },
+    {
+      "key": "lpn_ff_design_no_selection",
+      "source": "translator",
+      "lang": "sw",
+      "complaint": "No control is labelled just All; the real option is All other junctions and all pipes.",
+      "readings": [
+        "spell out the full option label (chosen, as pt)",
+        "short word for All"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+    }
+  ]
+}

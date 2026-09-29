@@ -642,3 +642,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|645| CLOSED 2026-09-28 with feat/water-tower on Tom's "We are gold. Publish it everywhere.": the larger towers (about, 192, 512) redrawn as one piece of work with 648 and 679.
 - 0|648| CLOSED 2026-09-28 with feat/water-tower (see 645): the About rendering, option 3.
 - 0|679| CLOSED 2026-09-28 with feat/water-tower (see 645): narrower strokes and more detail at About's size.
+- 0|742| CLOSED 2026-09-29 with feat/selection-set (merged on Tom's "Done. Close, merge, and delete branch"): the fire-flow design check offers None, All, or Selected junctions.

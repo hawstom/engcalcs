@@ -76,9 +76,9 @@ USA.</p>
 		<td>Necessary to answer you</td>
 	</tr>
 	<tr>
-		<td><strong>Project lock records.</strong> The name or initials you type for shared-file
-			locking, with the project identifier and a timestamp, shown to anyone else who opens
-			that file</td>
+		<td><strong>Project lock records.</strong> The initials you type when you ask a colleague
+			for a shared file, kept with that file&rsquo;s lock record and its identifier and
+			timestamps, and shown to whoever has the file open</td>
 		<td>So colleagues do not overwrite each other&rsquo;s work</td>
 		<td>Necessary to provide the feature you asked for</td>
 	</tr>
@@ -119,7 +119,7 @@ did agree, because they are a different kind of number.</p>
 	<tr><td><code>ec_blang</code></td><td>One digit: we have already recorded which language your browser asks for</td><td>1 year</td><td><strong>Yes</strong></td></tr>
 	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until you close your browser</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
-	<tr><td>Initials and page layout (browser storage)</td><td>Your initials for shared-file locking, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
+	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Queue of unsent counts (browser storage)</td><td>Lets a count recorded offline reach us later</td><td>Until it is sent</td><td><strong>Yes</strong></td></tr>
 </table>
 

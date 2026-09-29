@@ -63,12 +63,12 @@ languages, is not a plausible candidate for "we do not target the EU."
 |---|---|---|---|---|
 | `<PageName>` (e.g. `Manning-Pipe-Flow`) | `EngCalcs.createCookie`, `js/Cookies.lib.js` | **1 year** (was 36,000 days until Task 286) | Remembers the numbers the visitor typed and the units they chose, per calculator page | **Exempt** — user-input storage, written only after they typed |
 | `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | **Exempt** — a preference the visitor set deliberately |
-| `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
+| `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given. **Withdrawal does not delete it** — a refusal is itself an answer that has to be honoured — but Looped-Network.php's Start fresh does, through `ecConsentForget()` (`lib/config.inc.php`), reached via `consent.php`'s `ec_wipe`: its confirm promises a brand-new visitor's page, and a brand-new visitor has never answered at all |
 | `ec_nolog` | `lib/config.inc.php` | 10 years | **Author/tester tool. NOT in the UI and NOT in `privacy.php`** (Tom, 2026-08-12: *"Why disclose it if it's not in the UI?"*). Stops a browser being counted at all, and is NOT redundant with `ec_consent`: refusing consent still writes an undeduplicated 'visit' row, while this writes nothing anywhere — verified 2026-08-12 against all five log writers. **It goes into `privacy.php` the day it gets a UI control**, because then the site would be offering it. Per HOST, since no domain is set: `hawsedc.com`, `www.hawsedc.com` and `librewaternet.org` each need their own `?ec_nolog=1`. **Verified by opening `log-human-view.php` by hand** — a GET answers one line, counted or not counted, for that browser (2026-09-08) | **Exempt** — it only honours a choice |
 | `ec_geosearch` | `js/lpn-search.js` (JS only) | 1 year, readable by JS | **A second, purpose-specific consent record** (Task 437): the visitor said yes to place-name search on the Looped-Network map, which sends what they typed to `nominatim.openstreetmap.org`. Same `<state>.<unix-ts>.<policy-version>` shape as `ec_consent`, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_GEOSEARCH_VERSION` (`lib/Consent.lib.php`), which is **separate from `EC_CONSENT_VERSION` on purpose**: changing what we send, or who we send it to, must re-ask exactly the people who said yes to the old ask and must NOT re-ask everybody about analytics | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no query and no result. Removed by Settings > Erase everything (`EngCalcs.lpnSearchForget()`, called from `wipeAllStorage()`) |
 | `ec_terrain` | `js/lpn-terrain.js` (JS only) | 1 year, readable by JS | **A third, purpose-specific consent record** (Task 497): the visitor said yes to reading ground elevations for the Looped-Network map, which sends the latitude and longitude of each node that needs one to `api.mapbox.com`. Same `<state>.<unix-ts>.<policy-version>` shape, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_TERRAIN_VERSION` (`lib/config.inc.php`, beside `EC_MAPBOX_TOKEN`, because the token is what decides whether the feature exists at all). Separate from `ec_geosearch` because a search says *what the visitor typed* and this says *where their nodes are* — which is the model itself | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no coordinate and no result. Removed by Settings > Erase everything (`EngCalcs.lpnTerrainForget()`, called from `wipeAllStorage()`) |
-| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal |
-| `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal |
+| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal (`ecForgetAnalyticsStorage()`) and on Looped-Network.php's Start fresh (same function, via `ecConsentForget()`) |
+| `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal (`ecForgetAnalyticsStorage()`) and on Looped-Network.php's Start fresh (same function, via `ecConsentForget()`) |
 | ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
 
 `PHPSESSID` used to be the hard case: it carried `$_SESSION['CLANGUAGE']` (service) *and* the log
@@ -126,6 +126,14 @@ your unit choices" — literally true. A `lpn_` key added here that is not in th
 it false. The same function also expires the suite unit cookie and, since Task 437, the
 `ec_geosearch` consent record. `bpn_sketch_toggles` belongs to Branched-Network.php, which has no
 such button and is not reached by this one.
+
+**And, since the fix for "Start fresh isn't giving me the cookies banner" (Tom, 2026-09-29),
+`wipeEverything()` also submits a hidden form to `consent.php`'s `ec_wipe`, which erases
+`ec_consent`, `ec_blang` and `ec_seen` server-side** — `wipeAllStorage()` cannot reach any of the
+three itself: `ec_consent`'s own JS mirror only ever WRITES an answer, and `ec_blang`/`ec_seen` are
+HttpOnly. Without that round trip the confirm's "the page reloads exactly as a brand-new visitor
+would see it" was false — the banner stayed answered. The redirect back from `consent.php` is also
+the reload the confirm promises, so there is no separate one racing it.
 
 ### IndexedDB
 
@@ -226,7 +234,7 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 | `TITLE_LOG` | page title event | Same |
 | `SIGNAL_LOG` | page, language, event, short slug (a link's host+path, a unit token, a diagnostic code, a share outcome, a one-tap grievance press) | Same. The outbound row names a page we linked to, never anything the visitor typed |
 | `CONTACT_SEND_LOG` + `formmail.php` | **name, email, message** | **Yes** |
-| `lpn-locks/*.json` | project id, **holder name/initials**, timestamps | **Yes, if initials identify a colleague** |
+| `lpn-locks/*.json` | project id, holder token, **the initials an asker typed** (and a holder name only from pages older than Task 667(b)), timestamps | **Yes, if initials identify a colleague** |
 
 The usage logs carrying **no IP and no session id** is a deliberate design already recorded in
 `lib/config.inc.php`, and it is the single strongest fact in this whole file: it is what keeps the

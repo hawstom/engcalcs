@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Fila {row}: Desde y Hasta son el mismo nud
 $ec_lang['lpn_pane_paste_bad_cell']='Fila {row}: {text} no es un {col} válido.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Fila {row}: un Texto nuevo necesita tanto {first} como {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Fila {row}: {id} no es un nudo ni una tubería de esta red todavía. Pegue eso primero, y luego este Texto.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Fila {row}: un Cliente nuevo necesita tanto {first} como {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Fila {row}: un Cliente nuevo necesita una tubería o un nudo conectado.';
+$ec_lang['lpn_pane_paste_no_pipe']='Fila {row}: la tubería {id} todavía no existe. Pegue primero sus tuberías, y luego sus clientes.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Fila {row}: el nudo {id} todavía no existe. Pegue primero sus nudos, y luego sus clientes.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Fila {row}: el nudo {id} no tiene ninguna tubería a la que un Cliente pueda conectarse.';
 
 
 $ec_lang['lpn_pane_filled']='Se rellenaron hacia abajo {n} celdas. {skipped} no se modificaron.';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='Texto en negrita';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Vinculado a';
 $ec_lang['lpn_field_text_align']='Alineación horizontal';
 $ec_lang['lpn_field_text_align_left']='Izquierda';
 $ec_lang['lpn_field_text_align_center']='Centro';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='Nada en esta tabla coincide con el filtro.';
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Acercar y seleccionar';
-
-
-
+$ec_lang['lpn_goto_on_map']='Ir al mapa';
+$ec_lang['lpn_pane_select_on_map']='Seleccionar en el mapa';
+$ec_lang['lpn_pane_unselect_on_map']='Anular selección en el mapa';
 $ec_lang['lpn_pane_print']='Imprimir tabla';
 $ec_lang['lpn_pane_print_tip']='Imprime la tabla que está viendo, con el nombre del proyecto, el nombre de la tabla y las unidades en los encabezados. Las filas se imprimen en el orden en que las ordenó.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='menor que';
 $ec_lang['lpn_find_op_empty']='vacío';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} encontrados. Haga clic en uno para ir a él.';
-
+$ec_lang['lpn_find_shift_hint']='Mayús+clic para alternar agregar/quitar.';
 $ec_lang['lpn_find_none']='No hubo coincidencias.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"Preguntar" le indica a quien tenga este 
 $ec_lang['lpn_lock_ask']='Preguntar';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='¿A quién decimos que está preguntando? Sus iniciales son ideales. Se envían a quien tenga el archivo abierto, y se guardan solo en este navegador.';
+$ec_lang['lpn_lock_ask_prompt']='¿A quién decimos que está preguntando? Sus iniciales son ideales. Se guardan junto con el bloqueo de este archivo en nuestro servidor, para quien lo tenga abierto, y se eliminan dentro de 30 días.';
 $ec_lang['lpn_lock_ask_sent']='Le pedimos a quien tenga este archivo abierto que lo cierre. Lo verá dentro de un minuto, si su página sigue abierta. Nada más ha cambiado, y el archivo sigue siendo suyo hasta que lo cierre.';
 $ec_lang['lpn_lock_ask_failed']='Su mensaje no se pudo entregar. O nadie tiene este archivo abierto ahora, o no se pudo contactar al servidor.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3715,8 @@ $ec_lang['lpn_ff_design']='Verificación de diseño (efecto en el sistema)';
 $ec_lang['lpn_ff_design_tip']='Una pregunta aparte de si el nudo puede entregar el caudal: con ese caudal extraído allí, ¿algo más cae por debajo de su presión mínima o supera su límite de velocidad? Elegir verificarlo no cuesta cálculo adicional.';
 $ec_lang['lpn_ff_design_off']='No verificar';
 $ec_lang['lpn_ff_design_all']='Todos los demás nudos y todas las tuberías';
-
-
+$ec_lang['lpn_ff_design_selected']='Los nudos seleccionados y sus tuberías';
+$ec_lang['lpn_ff_design_no_selection']='La verificación de diseño está configurada para los nudos seleccionados, y no hay ninguno seleccionado. Seleccione algunos en el mapa, o elija Todos.';
 $ec_lang['lpn_ff_minpressure']='Presión mínima permitida en el resto';
 $ec_lang['lpn_ff_minpressure_tip']='Un nudo que cae por debajo de esto mientras otro extrae su caudal contra incendios se reporta como un problema de diseño.';
 $ec_lang['lpn_ff_maxvelocity']='Velocidad máxima permitida';

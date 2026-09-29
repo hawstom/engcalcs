@@ -2,7 +2,7 @@
     "meta": {
         "language": "sw",
         "expected_key_count": 2157,
-        "delta_key_count": 16,
+        "delta_key_count": 2,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -540,237 +540,17 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
-        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
-        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
-        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
-        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
-        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
-        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
-        "lpn_field_text_anchor": "Attached to",
-        "lpn_goto_on_map": "Go to on map",
-        "lpn_pane_select_on_map": "Select on map",
-        "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
         "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon",
-        "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
+        "lpn_field_lon_abbr": "Lon"
     },
     "keys": {
-        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
-        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
-        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
-        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
-        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
-        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
-        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
-        "lpn_field_text_anchor": "Attached to",
-        "lpn_goto_on_map": "Go to on map",
-        "lpn_pane_select_on_map": "Select on map",
-        "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
         "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon",
-        "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
+        "lpn_field_lon_abbr": "Lon"
     },
     "key_context": {
-        "lpn_pane_paste_text_no_position": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_anchor": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_customer_no_position": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_customer_ref": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_customer_node": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_customer_node_no_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Safu mlalo {row}: {text} si {col} sahihi.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_field_text_anchor": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_text_bold",
-                    "value": "Maandishi mazito",
-                    "english": "Bold text"
-                },
-                "next_translated": {
-                    "key": "lpn_field_text_align",
-                    "value": "Mpangilio mlalo",
-                    "english": "Horizontal alignment"
-                }
-            }
-        },
-        "lpn_goto_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Kuza na chagua",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Chapisha jedwali",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_pane_select_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Kuza na chagua",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Chapisha jedwali",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_pane_unselect_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Kuza na chagua",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Chapisha jedwali",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_find_shift_hint": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_count",
-                    "value": "{n} zimepatikana. Bofya moja ili kuiendea.",
-                    "english": "{n} found. Click one to go to it."
-                },
-                "next_translated": {
-                    "key": "lpn_find_none",
-                    "value": "Hakuna kilicholingana.",
-                    "english": "Nothing matched."
-                }
-            }
-        },
         "lpn_field_lat_abbr": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "Lat",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_field_easting_abbr",
@@ -785,8 +565,8 @@
             }
         },
         "lpn_field_lon_abbr": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "Lon",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_field_easting_abbr",
@@ -797,38 +577,6 @@
                     "key": "lpn_field_coord_tip",
                     "value": "Andika mahali pa kuratibu ili kuweka kifundo hiki sawasawa. Katika senario, mahali hapa hutumika kwenye senario hiyo pekee, kama vile kuiburuta hufanya; katika Msingi huweka kifundo kila mahali.",
                     "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
-                }
-            }
-        },
-        "lpn_ff_design_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_all",
-                    "value": "Miunganiko mingine yote na mabomba yote",
-                    "english": "All other junctions and all pipes"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_minpressure",
-                    "value": "Shinikizo la chini kabisa linaloruhusiwa mahali pengine",
-                    "english": "Lowest pressure allowed elsewhere"
-                }
-            }
-        },
-        "lpn_ff_design_no_selection": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_all",
-                    "value": "Miunganiko mingine yote na mabomba yote",
-                    "english": "All other junctions and all pipes"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_minpressure",
-                    "value": "Shinikizo la chini kabisa linaloruhusiwa mahali pengine",
-                    "english": "Lowest pressure allowed elsewhere"
                 }
             }
         }

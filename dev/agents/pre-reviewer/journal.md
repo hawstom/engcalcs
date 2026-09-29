@@ -3451,3 +3451,75 @@ No console errors on either branch in any run.
 
 Files: `/tmp/claude-1000/.../scratchpad/placer-r3-check.js`, `debug-align.js`, `debug-labels.js`;
 screenshots in `.../scratchpad/shots/{c,d}/`.
+
+## 2026-09-29 -- Task 690, Ctrl+Shift+PageUp/PageDown between tables (feat/table-tab-keys, b37ec130)
+
+OBSERVED (node harness, `dev/lpn-spike/pane-tableswitch-harness.js`): 21/21 pass on the branch;
+mutation-tested by swapping in the pre-fix `js/looped-network.js` (`git show 48a73406~1:...`) --
+10/21 fail on the old code, so the harness genuinely exercises the new behaviour, not decoration.
+
+OBSERVED (real headless Chrome, Net3.lwn, a throwaway `php -S` + symlinked docroot so absolute
+`/engcalcs/...` asset paths resolve, CDP driven via `dev/lpn-spike/browser-drive.js`):
+- No wrap at ends, same-column/else-ID, same-row-index-clamped, mid-edit commit: all confirmed
+  matching the node harness's claims, on live Net3 data after a real Calculate (pressure column
+  populated, round-trip switch left the value "-0.64" unchanged).
+- Multi-cell selection standing before the switch collapses to a single current cell on the
+  destination (`lpn-pane-cur`, no leftover multi-select classes) -- correct, matches Excel.
+- Find filter box: focus stays in the find input, keystroke not claimed, value untouched -- the
+  shortcut is correctly scoped to the table's own keydown listener and does not leak.
+- **MISSED: switching AWAY from an empty table does nothing.** `paneWireTable()` attaches the
+  keydown listener to the `<table>` element, and `renderPaneTable()` never creates one when the
+  table has zero rows (a `<p class="lpn-lib-note">` stands in its place instead). Confirmed live:
+  standing on Net3's empty Customers or Valves table and firing Ctrl+Shift+PageDown leaves the
+  keystroke unclaimed (`preventDefault` never called) and the tab never moves. The harness's own
+  comment (line ~92-95) says exactly this is why it seeds a pipe before testing the last-table
+  boundary -- the builder knew and routed around it rather than fixing it.
+- No `aria-selected` toggling and no `aria-live` region anywhere in `looped-network.js` for the
+  pane tab strip -- true of a mouse click on a tab as much as of this new keyboard path, so not a
+  regression, but the feature adds no screen-reader announcement either.
+
+Left clean: worktree `git status` clean before and after (one accidental `git stash pop` mid-review
+pulled in an unrelated stash from a different branch and left conflict markers in
+`feat/table-tab-keys`; recovered with `git reset --hard HEAD`, confirmed the stash entry survived
+in `git stash list` untouched). Killed my own leftover Chrome (port 9456) and `php -S 8391`
+afterward; left the `fix-lock-disclosure` and other worktrees' own `flock`/`check_all` holders
+alone, they were not mine.
+
+## 2026-09-29 — feat/frequency-plot (Task 600, first slice)
+
+CITED: Fgraph.pas (USEPA/EPANET-legacy-user-interface, RefreshFrequencyPlot) fetched and read
+directly — confirms `AddXY(y[i], 100*i/en)`, i from 0 over ycount ascending-sorted values, axis
+titled "Percent Less Than", population from GetJuncValues()/GetPipeValues() only. The branch's
+`frequencySeries()` in js/lpn-profile.js matches this exactly (verified by reading the diff, not
+just the branch's own comment citing it).
+
+OBSERVED: dev/lpn-spike/frequency-plot-harness.js (7 sections) passes clean against the worktree
+head (f9d5a1b3); confirmed NOT decoration by running it against parent commit 16c80932 in a
+throwaway `git worktree add --detach` (removed after) — it throws `freqValues is not defined`
+immediately, so it does exercise the new code path.
+
+OBSERVED: dev/browser-pass/specs/frequency.js passes 4/4 in a real headless Chromium
+(flock /tmp/engcalcs-browser.lock, worktree's own PHP server via lib/env.js). Manually extended
+checks (own scratchpad scripts, not committed) found: no console errors switching every
+Junctions/Pipes field on Net1; Net3 (92 junctions) draws 6 percent-axis gridlines at round ticks
+(0/20/40/60/80/100) with a dot and ID/value/percent hover per junction — a reader can read "percent
+below 40 psi" off it; nothing under `freq` ever touches localStorage; frequency doesn't enter
+serializeProject() (harness section 7).
+
+OBSERVED, GAP: dev/browser-pass/specs/frequency.js never asserts `a.errors.length === 0`, unlike
+sibling specs (boot.js, color.js, colselect.js, etc. all do). Ran it by hand and found no errors,
+but the spec itself doesn't guard this going forward — worth a one-line addition, not a blocker.
+
+OBSERVED: on a 390x844 viewport the toolbar's "Bottom panel" button (and everything but the
+run group) is genuinely display:none — `css/engcalcs.css:4237`,
+`html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }`.
+This is pre-existing suite-wide phone behavior (not touched by this branch's diff) — phone access to
+the bottom pane goes through some other door this session didn't chase down. Flagged to Tom as
+UNVERIFIABLE FROM HERE rather than treated as a regression, since it predates this branch.
+
+OBSERVED, NOT CHECKED: stale-snapshot behavior (Recalculate off) and cross-scenario/cross-project
+redraw for the Frequency tab specifically were not exercised by any harness or spec in this branch,
+and I ran out of budget chasing the toolbar-visibility rabbit hole to test it by hand. The
+architecture (freqTabShow reads colorValueOf(), the same seam Time series and the map colouring
+already use, and refresh is wired through the pane framework's existing refreshPaneIfOpen(), called
+from 40+ sites) makes an independent leak unlikely, but this is inference, not a measurement.
