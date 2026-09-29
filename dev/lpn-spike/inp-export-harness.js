@@ -421,9 +421,13 @@ console.log('\n4. The file is written in the project\'s own units');
 
 	// A MIXED PROJECT -- the seven selectors are independent, so metres of head beside gallons per
 	// minute is a state a user can reach, and it is the only state that can tell one converter from
-	// another. **A TANK'S DIAMETER IS IN THE ELEVATION UNIT AND A PIPE'S IS NOT** (the vessel is
-	// measured on the same staff as its water level), so here the tank's five numbers all move by the
-	// metre-to-foot factor and the pipe's diameter does not move at all.
+	// another. **A TANK'S FOUR LEVELS ARE IN THE ELEVATION UNIT; ITS DIAMETER IS IN THE LENGTH UNIT,
+	// NOT THE ELEVATION UNIT** (CLAUDE.md, corrected here after a pre-review pass caught the
+	// opposite -- a "Tank diameter (ft H2O)" heading on a horizontal distance). This project's own
+	// Length selector (ft) MATCHES the GPM file's own length unit and its Elevation/Head selector
+	// (mh2o) does NOT, which is exactly the state that tells the two families apart: the tank bottom
+	// must still move by the metre-to-foot factor and the diameter beside it must NOT move at all,
+	// tracking Length rather than Elevation/Head.
 	const mixed = JSON.parse(JSON.stringify(doc));
 	mixed.units = { lpn_u_length: 'ft', lpn_u_elevhead: 'mh2o', lpn_u_pressure: 'psi', lpn_u_diameter: 'in', lpn_u_flow: 'gpm' };
 	mixed.nodes.push({ id: 'T1', type: 'tank', x: 20, y: 0, elev: 30, _level: 3, minLevel: 0, maxLevel: 10, tankDiameter: 15 });
@@ -432,11 +436,28 @@ console.log('\n4. The file is written in the project\'s own units');
 	const mixT = tokensBySection(mixOut.inp).TANKS[0];
 	ok('a mixed project reports the elevation conversion',
 		mixOut.differences.some((d) => d.code === 'unit-converted' && /elevation/.test(d.detail)));
-	ok('the tank bottom converts', mixT[1] === String(30 * ft), mixT[1]);
-	ok('the tank diameter converts WITH IT, being in the elevation unit',
-		mixT[5] === String(15 * ft), mixT[5]);
-	ok('the pipe diameter does not, being in the pipe diameter unit',
+	ok('the tank bottom converts by the elevation factor', mixT[1] === String(30 * ft), mixT[1]);
+	ok('the tank diameter does NOT convert with it, being in the length unit (which already matched)',
+		mixT[5] === '15', mixT[5]);
+	ok('the pipe diameter does not either, being in the pipe diameter unit',
 		tokensBySection(mixOut.inp).PIPES[0][4] === '200', tokensBySection(mixOut.inp).PIPES[0][4]);
+
+	// AND THE OTHER HALF OF THE SAME PROOF: swap which selector matches the file. Now Length (m)
+	// disagrees with the GPM file's feet and Elevation/Head (fth2o) agrees, so the diameter must
+	// convert and the tank bottom must not -- the mirror image of the case above, and the only way
+	// to be sure the diameter is keyed to Length and not just "whichever one differs this time".
+	const mixed2 = JSON.parse(JSON.stringify(doc));
+	mixed2.units = { lpn_u_length: 'm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_diameter: 'in', lpn_u_flow: 'gpm' };
+	mixed2.nodes.push({ id: 'T1', type: 'tank', x: 20, y: 0, elev: 30, _level: 3, minLevel: 0, maxLevel: 10, tankDiameter: 15 });
+	const mix2Out = EngCalcs.lpnExportInp(mixed2);
+	const m2ft = EngCalcs.unitFactors.ft / EngCalcs.unitFactors.m;
+	const mix2T = tokensBySection(mix2Out.inp).TANKS[0];
+	ok('a mixed project reports the length conversion',
+		mix2Out.differences.some((d) => d.code === 'unit-converted' && /length/.test(d.detail)));
+	ok('this time the tank bottom does NOT convert, Elevation/Head having matched the file',
+		mix2T[1] === '30', mix2T[1]);
+	ok('and the diameter DOES, tracking Length rather than Elevation/Head',
+		mix2T[5] === String(15 * m2ft), mix2T[5]);
 
 	// A VALVE'S SETTING IS A DIFFERENT QUANTITY PER TYPE, and the two that convert differently are
 	// the pair to separate: under m3ps->LPS an FCV's setting is a FLOW and moves by 1000, while a

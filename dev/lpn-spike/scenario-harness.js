@@ -81,7 +81,9 @@ const L = loadLoopedNetwork(
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
 	"\t\trenameNode: renameNode,\n" +
+	"\t\topenPopup: openPopup, openLinkPopup: openLinkPopup,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
+	"\t\tpopupIsOpen: function () { var p = document.getElementById('lpn_popup'); return !!p && p.style.display !== 'none'; },\n" +
 	"\t\tscenarioMenu: openScenarioMenu, menuRows: function () { return document.getElementById('lpn_menu_list'); },\n" +
 	"\t\tbuildMenuBar: buildMenuBar, closeMenu: closeMenu, wireTabs: wireTabs,\n" +
 	"\t\tmenuOpen: function () { var p = document.getElementById('lpn_menu_popup');\n" +
@@ -1017,6 +1019,56 @@ console.log('\n--- Water > Scenarios opens the list, and its own click does not 
 				JSON.stringify(names.slice(0, 3)));
 		}
 	}
+}
+
+// ---------------------------------------------------------------------------
+// 12. R-369: SWITCHING SCENARIOS CLOSES PROPERTIES -- Tom, 2026-09-28, reported against R-369's
+// own branch: "Switching scenarios closes Properties." applyScenarioChange() used to call
+// closePopup() unconditionally; a scenario switch never removes the element a popup is open on
+// (it only changes which override effective() resolves), so the fix keeps the SAME popup open on
+// the SAME element and re-renders it against the newly active scenario.
+// ---------------------------------------------------------------------------
+console.log('\n--- R-369: switching scenarios leaves Properties open, on the same element, retargeted ---');
+{
+	// A FRESH FIXTURE, not the file's shared j1/j2/l1 -- by this point in the file several earlier
+	// sections have called L.applySaved() with fixture documents of their own (the migration and
+	// SAME-ID sections above), which replaces `doc` and `scenarios` wholesale. Building this
+	// section's own nodes is what every one of THOSE sections does for the same reason.
+	const rn1 = L.addNode('junction', 100, 0);
+	const rn2 = L.addNode('junction', 200, 0);
+	const rr = L.addNode('reservoir', 0, 0);
+	const rpipe = L.addLink('pipe', rr.id, rn1.id);
+	L.addLink('pipe', rn1.id, rn2.id);
+	L.switchScenario('base');
+	L.setProp(rn1, 'demand', 100);
+	L.openPopup(rn1.id, 10, 10);
+	ok('the popup is open before the switch', L.popupIsOpen());
+	const before = fieldsText();
+	ok('...showing Base\'s demand (100)', /100/.test(before), before);
+
+	const scn = L.createScenario('R-369 check');
+	L.setProp(rn1, 'demand', 777);
+	ok('the scenario really did get its own override', L.effective(rn1, 'demand') === 777);
+
+	L.switchScenario('base');
+	ok('THE POPUP IS STILL OPEN after switching TO Base', L.popupIsOpen());
+	const afterBase = fieldsText();
+	ok('...and shows BASE\'s value (100), not the scenario\'s', /100/.test(afterBase) && !/777/.test(afterBase),
+		afterBase);
+
+	L.switchScenario(scn.id);
+	ok('THE POPUP IS STILL OPEN after switching INTO the scenario', L.popupIsOpen());
+	const afterScn = fieldsText();
+	ok('...and now shows the SCENARIO\'s value (777)', /777/.test(afterScn), afterScn);
+
+	// The mirror image: a link's popup survives the same round trip.
+	L.switchScenario('base');
+	L.openLinkPopup(rpipe.id, 10, 10);
+	ok('a link popup is open', L.popupIsOpen());
+	L.switchScenario(scn.id);
+	ok('...and STILL visible after a scenario switch (the link popup is not special-cased shut either)',
+		L.popupIsOpen());
+	L.switchScenario('base');
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

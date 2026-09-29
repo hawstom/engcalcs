@@ -595,8 +595,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // future gear-panel setting to choose among corners/edges (see the scope doc). ?>
 		<?php // top/bottom/left/right deliberately absent -- applyLegendPosition() in
 		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
-		      // 2026-07-30; default 'top-right' reproduces this div's original hardcoded position). ?>
-		<div id="lpn_labels_legend" style="display:none;position:absolute;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		      // 2026-07-30; default now top-left, Tom 2026-09-28). ?>
+		<?php // **z-index:3, BELOW EVERY OTHER TOP-LEFT OCCUPANT** (Tom, 2026-09-28, moving the
+		      // default corner here: "I assume and hope that it has lower z-index than the
+		      // messenger history"). #lpn_map_overlay_tl -- the mode hint, the one-shot notice and
+		      // the message-log panel it opens -- carries z-index:6; #lpn_map_notice inside it is
+		      // 5; #lpn_zoom_control is 4. A legend parked in the same corner had NO z-index at all
+		      // (auto, painting as 0), so it already lost to all three by the accident of DOM order
+		      // -- this makes that an explicit, load-bearing number rather than a coincidence the
+		      // next reordering could undo. legendInsetFor() keeps the boxes from overlapping in
+		      // the ordinary case; this is what decides it on the rare frame where they still do
+		      // (a very long message list, a very long legend). ?>
+		<div id="lpn_labels_legend" style="display:none;position:absolute;z-index:3;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
 		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
 		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
 		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
@@ -1724,9 +1734,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
-        // this one can finally honour: librewaternet.org/credits.html is the About-EPANET page
-        // that survived not-epanet.org, and naming what this is built on belongs here. ?>
-		<p><a href="<?=EC_LWN_SITE_URL?>credits.html" target="_blank" rel="noopener"><?=$ec_lang['lpn_about_credits']?></a></p>
+        // this one can finally honour: credits.html is the About-EPANET page that survived
+        // not-epanet.org, and naming what this is built on belongs here.
+        //
+        // **THE BRAND'S OWN SITE, THE SAME DOOR THE NAME LINK ABOVE USES, NOT THE LITERAL
+        // LibreWaterNet CONSTANT** (pre-review, task 697 follow-up). EC_LWN_SITE_URL is
+        // LibreWaterNet's own address unconditionally; on epanet-plus-plus.org this box's OWN
+        // name links to that brand's site two lines up while Credits still pointed a visitor at
+        // librewaternet.org/credits.html -- a different site than the one they were just reading
+        // about. EPANET++ carries its own credits.html at its own root, so ecAppSiteUrl() (which
+        // already resolves per host through ecAppBrandCurrent()) is the one function both links
+        // must share. ?>
+		<p><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>credits.html" target="_blank" rel="noopener"><?=$ec_lang['lpn_about_credits']?></a></p>
 <?php   $ec_build = ecDeployIdentity();
         if ($ec_build['date'] !== '' || $ec_build['sha'] !== '') : ?>
 		<p class="lpn-about-build"><?=htmlspecialchars(trim($ec_build['date'] . ' · ' . $ec_build['sha']))?></p>

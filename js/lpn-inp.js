@@ -2574,9 +2574,13 @@
 					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)) + descOf(nd));
 				}
 			} else if (nd.type === 'tank') {
-				// ID Elev InitLvl MinLvl MaxLvl Diam MinVol. Every one in the ELEVATION unit, the
-				// vessel diameter included -- which is NOT the unit a pipe diameter two sections down
-				// is in. MinVol 0 is EPANET's own "no separate minimum volume".
+				// ID Elev InitLvl MinLvl MaxLvl Diam MinVol. The first four are in the ELEVATION
+				// unit. **THE DIAMETER IS NOT** (CLAUDE.md: "Tank diameter is in the LENGTH unit") --
+				// it is a horizontal distance across the vessel, so it converts with `cLen`, the same
+				// converter a pipe's own length uses, and NOT with `cHead` the way it used to: a
+				// project whose Length and Elevation/Head selectors differ (a state the mixed-units
+				// test below exists to reach) now moves the diameter by the right factor instead of
+				// the wrong one. MinVol 0 is EPANET's own "no separate minimum volume".
 				// **AND THE VOLUME CURVE'S NAME IN COLUMN EIGHT WHERE THE FILE PUT IT** (Task 586).
 				// Written only where the tank states one, so a cylindrical tank's row is unchanged.
 				var tankRow = [nd.id,
@@ -2584,7 +2588,7 @@
 					n(cHead, nd, '_level', eff(nd, 'level') || 0),
 					n(cHead, nd, 'minLevel', nd.minLevel || 0),
 					n(cHead, nd, 'maxLevel', nd.maxLevel || 0),
-					n(cHead, nd, 'tankDiameter', nd.tankDiameter || 0),
+					n(cLen, nd, 'tankDiameter', nd.tankDiameter || 0),
 					'0'];
 				if (nd.volCurve) {
 					tankRow.push(String(nd.volCurve));

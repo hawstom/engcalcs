@@ -4621,9 +4621,23 @@ var EngCalcs = EngCalcs || {};
 	// dashed, which elements are greyed out, which carry a halo, and what an open popup shows.
 	// A full rebuild rather than a targeted refresh, because a scenario switch can change every
 	// element on the map and the cost is one buildDom on a network of a few hundred elements.
+	//
+	// **THE POPUP STAYS OPEN, ON THE SAME ELEMENT, SHOWING THE NEW SCENARIO'S VALUES** (Tom,
+	// 2026-09-28: "Switching scenarios closes Properties" -- reported against R-369). It used to
+	// call closePopup() unconditionally, which this very comment's own second sentence ("what an
+	// open popup shows") already claimed a scenario switch would handle rather than discard. A
+	// scenario never deletes the element a popup is open on -- it only changes which overrides
+	// `effective()` resolves -- so there is nothing here an undo-style closePopup() needs to guard
+	// against (contrast restoreUndoSnapshot(), which really can make the popup's subject vanish).
+	// buildDom() throws every DOM element away and rebuilds fresh ones by id; refreshSelection()
+	// re-applies the selection highlight to the new elements exactly as it does after any other
+	// buildDom() (its own comment: "a selection naming something the rebuild no longer contains...
+	// has to go", which is a no-op here since nothing was removed), and refreshPopupIfOpen() then
+	// re-renders the popup's fields by the same id, reading whichever scenario is now active.
 	function applyScenarioChange() {
-		closePopup();
 		buildDom();
+		refreshSelection();
+		refreshPopupIfOpen();
 		refreshSymbolSizes();
 		refreshValueColors();
 		refreshScenarioStatus();
@@ -5679,11 +5693,14 @@ var EngCalcs = EngCalcs || {};
 			// its next label drag pulled somewhere the user did not put it. 0 is Off; 15, 30 and 45
 			// are the increments he named. See EngCalcs.lpnGeom.snapLeaderOffset() for the magnet.
 			leaderSnapDeg: 0,
-			// One of LEGEND_POSITIONS' keys below. On a pointer the corner is the original hardcoded
-			// CSS's, top right; **ON A PHONE THE TWO LEGENDS SWAP INTO THE TOP CORNERS** -- Tom,
-			// 2026-08-25: "527 on phone, color legend upper right and label legend upper left."
-			// See the colour key's own key below for why this is a DEFAULT and not an override.
-			legendPosition: smallScreen() ? 'top-left' : 'top-right',
+			// One of LEGEND_POSITIONS' keys below. **TOP LEFT ON EVERY SCREEN** (Tom, 2026-09-28:
+			// "New project: Put Node labels legend at top left"), which also matches what a phone
+			// already opened to -- Tom, 2026-08-25: "527 on phone, color legend upper right and
+			// label legend upper left." See the colour key's own key below for why this is a
+			// DEFAULT and not an override, and legendInsetFor()/overlayOccupants() for why this
+			// corner already dodges the message-log column and the zoom chip that also live here
+			// rather than colliding with them.
+			legendPosition: 'top-left',
 			// ---- colour by value (Task 384) ----
 			// FLAT KEYS, not one nested `colors` object: applySaved() merges with a TOP-LEVEL
 			// Object.assign and hand-lists the three nested objects it merges a level deeper, so a
@@ -5769,14 +5786,17 @@ var EngCalcs = EngCalcs || {};
 		fill('diameter', niceDefault('lpn_u_diameter', 'in', 4, 0.1));
 		fill('roughness', 100);
 		fill('k', 2);
-		// A TANK'S FOUR NUMBERS ARE ALL VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, the vessel
-		// diameter included -- EPANET's own convention, and the one that catches people out, since
-		// a PIPE diameter two rows up is in inches or millimetres. The numbers describe an ordinary
-		// municipal storage tank, roughly 15 m across and 9 m tall, about two-thirds full.
+		// A TANK'S THREE LEVELS ARE VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, EPANET's own
+		// convention. **THE VESSEL DIAMETER IS NOT ONE OF THEM** (CLAUDE.md: "Tank diameter is in
+		// the LENGTH unit, pipe diameter in millimetres") -- it is a horizontal distance across the
+		// tank, not a head, and printing it with a head suffix ("ft H2O") is the defect a pre-review
+		// pass caught. Nor is it the PIPE diameter unit two rows up (inches/millimetres). The
+		// numbers describe an ordinary municipal storage tank, roughly 15 m across and 9 m tall,
+		// about two-thirds full.
 		fill('tankLevel', niceDefault('lpn_u_elevhead', 'fth2o', 20, 6));
 		fill('tankMinLevel', 0);
 		fill('tankMaxLevel', niceDefault('lpn_u_elevhead', 'fth2o', 30, 9));
-		fill('tankDiameter', niceDefault('lpn_u_elevhead', 'fth2o', 50, 15));
+		fill('tankDiameter', niceDefault('lpn_u_length', 'ft', 50, 15));
 	}
 
 	// User-supplied backdrop image. Deliberately NOT part of `doc`/the undo-snapshotted document:
@@ -21690,6 +21710,14 @@ var EngCalcs = EngCalcs || {};
 			set: function (n, v) { setProp(n, 'initQuality', v); } };
 	}
 	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
+	// **THE TANK DIAMETER'S OWN FAMILY** (CLAUDE.md: "Tank diameter is in the LENGTH unit, pipe
+	// diameter in millimetres"). It used to share paneUnitElevHead() with the four tank inputs
+	// beside it -- a plausible reading (all five are drawn against the same vertical staff) that a
+	// pre-review pass caught printing "Tank diameter (ft H2O)", and "(ft WS)" in German, on a
+	// number that is a horizontal distance across the vessel, not a head. A diameter is still the
+	// wrong family too (millimetres/inches, the PIPE convention -- a 15 m tank would read 15000),
+	// so this is its own function rather than a reuse of either neighbour.
+	function paneUnitLength() { return 'lpn_u_length'; }
 	// **A REACTION COEFFICIENT AS A COLUMN** (Task 566), for the pipe pair and for the tank's own.
 	// It is the popup row's twin and is deliberately built from the same three parts: the same
 	// gate, the same `effective()` read, and the same setProp() write. Two editors of one property
@@ -22350,10 +22378,12 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
 						set: function (n, v) { n.maxLevel = v; updateNode(n.id, true); } },
-					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
-					// distance across the ground, and inches would put a 15 m tank on screen as
-					// 15000. The popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
+					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
+					// a pre-review pass caught this heading printing "Tank diameter (ft H2O)", "(ft
+					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
+					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
+					// popup says the same thing in its tip.
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength,
 						get: function (n) { return n.tankDiameter; },
 						set: function (n, v) { n.tankDiameter = v; updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
@@ -31065,10 +31095,12 @@ var EngCalcs = EngCalcs || {};
 				return withInpNotes(carryInpTokens(n, rz, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
 			}
 			if (n.type === 'tank') {
-				// A tank's four levels and its diameter are ALL in the Elevation/Head unit -- all
-				// vertical distances on the same staff, the diameter included, which is the one that
-				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
-				// EPANET states every one, so every one is written.
+				// EVERY LENGTH HERE PASSES THROUGH UNCHANGED (Task 390's pass-through rule): the
+				// units strip is set to the FILE's own system before this runs, so the digit the
+				// file states is the digit the document stores, whichever family (Elevation/Head for
+				// the four vertical distances, LENGTH for the diameter -- CLAUDE.md) later reads it
+				// in. Nothing here is blank-means-follow the way a reservoir's head is: EPANET states
+				// every one, so every one is written.
 				var tk = carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
@@ -39367,12 +39399,19 @@ var EngCalcs = EngCalcs || {};
 	// the question names them to the user -- and because this list IS the conversion's scope.
 	function unitServes(name) {
 		var pc = EngCalcs.pageConfig || {};
-		if (name === 'lpn_u_length') { return [pc.lpn_field_length || 'Length']; }
+		// **TANK DIAMETER MOVED HERE FROM Elevation/Head** (CLAUDE.md: "Tank diameter is in the
+		// LENGTH unit"). It is a horizontal distance across the vessel, not a vertical one, and this
+		// list is read by the user as "what is about to be rescaled" -- so it has to name the unit
+		// that actually now owns the number, or a Length change would rescale a field this dialog
+		// never mentioned.
+		if (name === 'lpn_u_length') {
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
+		}
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water depth', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_field_tank_level || 'Water depth',
 				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
@@ -39435,6 +39474,10 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_length') {
 			doc.links.forEach(function (l) { conv(l, '_length'); });
 			convOverrides('length');
+			// **THE TANK'S VESSEL DIAMETER, MOVED HERE FROM Elevation/Head** (CLAUDE.md). It is a
+			// horizontal distance and this is the horizontal-distance family; a Length change must
+			// rescale it and an Elevation/Head change must leave it alone, both now true below.
+			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -39449,9 +39492,11 @@ var EngCalcs = EngCalcs || {};
 				syncRoughnessLabelDecimals();
 			}
 		} else if (name === 'lpn_u_elevhead') {
+			// tankDiameter is NOT one of these any more (CLAUDE.md: it is a LENGTH, handled in the
+			// lpn_u_length branch above) -- these four are all vertical distances on the same staff.
 			doc.nodes.forEach(function (nd) {
 				conv(nd, 'elev'); conv(nd, '_level'); conv(nd, 'minLevel');
-				conv(nd, 'maxLevel'); conv(nd, 'tankDiameter'); conv(nd, '_head');
+				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
@@ -48716,10 +48761,11 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.maxLevel; },
 				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_maxlevel_tip);
-			// The Elevation/Head unit, NOT the pipe-diameter unit, and the tip says so. A tank
-			// diameter is a distance across the ground, of the same order as the elevations beside
-			// it; reading it in inches or millimetres would put a 15 m tank on screen as 15000.
-			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_elevhead',
+			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
+			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
+			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
+			// screen as 15000. The tip says so.
+			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
 				function () { return n.tankDiameter; },
 				function (v) { n.tankDiameter = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
@@ -51486,9 +51532,10 @@ var EngCalcs = EngCalcs || {};
 			if (n.type === 'tank') {
 				// A tank passes BOTH its resolved surface head (what the steady-state solve reads,
 				// see EngCalcs.lpnIsFixedHead) AND its vessel geometry, which the native solver
-				// ignores and js/lpn-epanet.js writes into [TANKS]. All five are lengths in the
-				// Elevation/Head unit, the vessel diameter included -- it is a vertical distance's
-				// unit because it is measured on the same staff, not a pipe diameter.
+				// ignores and js/lpn-epanet.js writes into [TANKS]. The four vertical distances are
+				// in the Elevation/Head unit, measured on the same staff as the ground; the vessel
+				// DIAMETER is a horizontal one and is in the LENGTH unit instead (CLAUDE.md) -- not
+				// a pipe diameter either, which would read a 15 m tank as 15000.
 				return {
 					id: n.id, type: n.type,
 					elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
@@ -51496,7 +51543,7 @@ var EngCalcs = EngCalcs || {};
 					level: toSI(effective(n, 'level') || 0, 'lpn_u_elevhead'),
 					minLevel: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
 					maxLevel: toSI(n.maxLevel || 0, 'lpn_u_elevhead'),
-					diameter: toSI(n.tankDiameter || 0, 'lpn_u_elevhead')
+					diameter: toSI(n.tankDiameter || 0, 'lpn_u_length')
 				};
 			}
 			return n.type === 'reservoir'
